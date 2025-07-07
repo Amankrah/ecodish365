@@ -28,7 +28,7 @@ sudo chown $USER:$USER /var/www/ecodish365
 cd /var/www/ecodish365
 
 # Clone the repository
-git clone https://github.com/yourusername/ecodish365.git .
+git clone https://github.com/Amankrah/ecodish365 .
 
 # The deployment script will create a basic production environment
 # No manual environment configuration needed for this public project

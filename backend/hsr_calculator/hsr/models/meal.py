@@ -69,15 +69,15 @@ class Meal:
         from ..utils.meal_categorizer import MealCategorizer
         
         try:
-        # Ensure all foods have categories assigned
-        foods_without_categories = [food for food in self.foods if food.category is None]
-        if foods_without_categories:
-            self.category_warnings.append(
-                f"{len(foods_without_categories)} foods missing category assignments"
-            )
-            # Auto-assign categories for foods that are missing them
-            self._assign_missing_food_categories(foods_without_categories)
-        
+            # Ensure all foods have categories assigned
+            foods_without_categories = [food for food in self.foods if food.category is None]
+            if foods_without_categories:
+                self.category_warnings.append(
+                    f"{len(foods_without_categories)} foods missing category assignments"
+                )
+                # Auto-assign categories for foods that are missing them
+                self._assign_missing_food_categories(foods_without_categories)
+            
             # Determine meal category with scientific logic
             categorization_result = MealCategorizer.determine_scientific_category(self.foods)
             self.category = categorization_result.recommended_category
@@ -93,14 +93,14 @@ class Meal:
             
             # Extract nutritional context
             self.nutritional_context = categorization_result.scientific_factors
-        
-        # Add any warnings from the analysis
+            
+            # Add any warnings from the analysis
             if hasattr(categorization_result, 'warnings'):
                 self.category_warnings.extend(categorization_result.warnings)
             
             # Add note if present
-        if 'note' in self.category_analysis:
-            self.category_warnings.append(self.category_analysis['note'])
+            if 'note' in self.category_analysis:
+                self.category_warnings.append(self.category_analysis['note'])
             
             # Log categorization for debugging
             logger.info(
@@ -142,15 +142,15 @@ class Meal:
             # Add warnings if categories don't match
             if categorization_result.recommended_category != self.category:
                 validation['warnings'].append(f"Calculated category {categorization_result.recommended_category.value} differs from assigned {self.category.value}")
-        
-        self.category_confidence = validation['confidence']
-        self.category_warnings.extend(validation['warnings'])
+            
+            self.category_confidence = validation['confidence']
+            self.category_warnings.extend(validation['warnings'])
             
             # Enhanced analysis with nutritional context
-        self.category_analysis = {
-            "reason": "user_provided",
-            "validation": validation,
-            "calculated_category": validation['calculated_category'],
+            self.category_analysis = {
+                "reason": "user_provided",
+                "validation": validation,
+                "calculated_category": validation['calculated_category'],
                 "assigned_category": validation['assigned_category'],
                 "nutritional_context": validation.get('category_breakdown', {}),
                 "analysis": validation.get('analysis', {})
@@ -182,13 +182,13 @@ class Meal:
         
         for food in foods_without_categories:
             try:
-            if hasattr(food, 'food_id') and hasattr(food, 'food_name'):
+                if hasattr(food, 'food_id') and hasattr(food, 'food_name'):
                     # Try to determine from food group
-                food_group_id = getattr(food, 'food_group_id', None)
-                if food_group_id:
+                    food_group_id = getattr(food, 'food_group_id', None)
+                    if food_group_id:
                         food.category = FoodGroupMapper.get_category(
-                        food_group_id, food.food_name
-                    )
+                            food_group_id, food.food_name
+                        )
                         food.category_source = 'food_group_mapping'
                         food.category_confidence = 0.8
                     else:
