@@ -1,0 +1,2 @@
+class InvalidScoreError(ValueError):
+    pass

@@ -1,0 +1,25 @@
+hsr_calculator/
+├── __init__.py
+├── main.py
+├── hsr/
+│   ├── __init__.py
+│   ├── config.py
+│   ├── utils/
+│   │   ├── __init__.py
+│   │   └── data_loader.py
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── food.py
+│   │   ├── meal.py
+│   │   └── category.py
+│   ├── calculators/
+│   │   ├── __init__.py
+│   │   ├── hsr_calculator.py
+│   │   └── fvnl_calculator.py
+│   ├── providers/
+│   │   ├── __init__.py
+│   │   └── threshold_provider.py
+│   └── constants/
+│       ├── __init__.py
+│       ├── food_groups.py
+│       └── nutrients.py

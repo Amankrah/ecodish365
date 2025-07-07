@@ -1,0 +1,20 @@
+net_health_impact_calculator/
+├── __init__.py
+├── main.py
+├── config.py
+├── data/
+│   └── impact_factors.csv
+├── src/
+│   ├── __init__.py
+│   ├── heni_wrapper.py
+│   ├── lca_wrapper.py
+│   ├── net_health_impact.py
+│   ├── minutes_converter.py
+│   └── utils.py
+├── tests/
+│   ├── __init__.py
+│   ├── test_heni_wrapper.py
+│   ├── test_lca_wrapper.py
+│   ├── test_net_health_impact.py
+│   └── test_minutes_converter.py
+└── requirements.txt

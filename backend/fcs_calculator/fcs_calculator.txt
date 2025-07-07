@@ -1,0 +1,21 @@
+fcs_calculator/
+├── __init__.py
+├── main.py
+├── fcs/
+│   ├── __init__.py
+│   ├── config.py
+│   ├── utils/
+│   │   ├── __init__.py
+│   │   └── data_loader.py
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── food_item.py
+│   │   ├── enums.py
+│   │   └── exceptions.py
+│   ├── analyzers/
+│   │   ├── __init__.py
+│   │   ├── food_analyzer.py
+│   │   └── cnf_integrator.py
+│   └── constants/
+│       ├── __init__.py
+│       └── reference_targets.py

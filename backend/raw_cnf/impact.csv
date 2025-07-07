@@ -1,0 +1,19 @@
+Impact category,Reference unit,€2015,2015 (€ → $) to 2024,Source
+Fine particulate matter formation,2015 €/kg PM2.5-eq,45,65.934,WER
+Fossil resource scarcity,2015 €/CT Ue-eq,0.39,0.571,WER EP
+Freshwater ecotoxicity,2015 €/PO4-eq,0.036,0.053,Manual EP
+Freshwater eutrophication,2015 €/kgCO2-eq,1.86,2.725,Manual EP
+Global warming,"2015 €/kg 1,4 DB-eq",0.057,0.084,Manual EP
+Human carcinogenic toxicity,"2015 €/kg 1,4 DB-eq",0.089,0.131,Manual EP
+Human non-carcinogenic toxicity,2015 €/kg bq Co-60 eq,0.089,0.131,Manual EP
+Ionizing radiation,2015 €/m2.a,0.001,0.001,Manual EP
+Land use,"2015 €/kg 1,4 DB-eq",0.126,0.185,Manual EP
+Marine ecotoxicity,2015 €/kg NO3-eq,0.007,0.011,Manual EP
+Marine eutrophication,2015 €/kg Cu-eq,3.11,4.557,Manual EP
+Mineral resource scarcity,2015 €/kg NOx-eq,0.2,0.293,WER
+"Ozone formation, Human health",2015 €/kg NOx eq,0.066,0.097,WER
+"Ozone formation, Terrestrial ecosystems",2015 €/kg CFC -11 eq,0.009,0.014,WER
+Stratospheric ozone depletion,2015 €/kg SO2-eq,123,180.22,Manual EP
+Terrestrial acidification,"2015 €/kg 1,4 DB-eq",7.48,10.96,Manual EP
+Terrestrial ecotoxicity,2015 €/m3,8.69,12.733,Manual EP
+Water consumption,2015 €/m3,0.045,0.066,WER

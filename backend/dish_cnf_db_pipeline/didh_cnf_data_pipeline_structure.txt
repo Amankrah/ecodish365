@@ -1,0 +1,8 @@
+dish_cnf_db_pipeline/
+    __init__.py
+    data_loader.py
+    cnf_pipeline.py
+    data_processor.py
+    translator.py
+    user_input.py
+    main.py

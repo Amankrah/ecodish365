@@ -1,0 +1,23 @@
+heni_calculator/
+├── __init__.py
+├── main.py
+├── heni/
+│   ├── __init__.py
+│   ├── config.py
+│   ├── utils/
+│   │   ├── __init__.py
+│   │   └── file_utils.py
+│   ├── database/
+│   │   ├── __init__.py
+│   │   └── cnf_database.py
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── ingredient.py
+│   │   └── nutrient_info.py
+│   ├── categorization/
+│   │   ├── __init__.py
+│   │   ├── llm_categorizer.py
+│   │   └── rule_based_categorizer.py
+│   └── calculator/
+│       ├── __init__.py
+│       └── heni_calculator.py

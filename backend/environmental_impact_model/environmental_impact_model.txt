@@ -1,0 +1,31 @@
+environmental_impact_model/
+│
+├── data/
+│   ├── FOOD_GROUP.csv
+│   ├── FOOD_NAME.csv
+│   ├── NUTRIENT_AMOUNT.csv
+│   ├── NUTRIENT_NAME.csv
+│   ├── CONVERSION_FACTOR.csv
+│   ├── MEASURE_NAME.csv
+│   └── impact_factors.csv  # Table 2 data
+│
+├── src/
+│   ├── __init__.py
+│   ├── data_loader.py
+│   ├── food.py
+│   ├── meal.py
+│   ├── life_cycle_assessment.py
+│   ├── monetization.py
+│   ├── reference_meals.py
+│   └── utils.py
+│
+├── tests/
+│   ├── __init__.py
+│   ├── test_data_loader.py
+│   ├── test_food.py
+│   ├── test_meal.py
+│   ├── test_life_cycle_assessment.py
+│   └── test_monetization.py
+│
+├── main.py
+└── requirements.txt
