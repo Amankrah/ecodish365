@@ -192,7 +192,7 @@ npm cache clean --force 2>/dev/null || true
 if [ ! -f "$FRONTEND_DIR/.env.production" ]; then
     print_status "Creating frontend production environment file..."
     cat > $FRONTEND_DIR/.env.production << EOF
-NEXT_PUBLIC_API_URL=https://ecodish365.com/api
+NEXT_PUBLIC_API_URL=https://ecodish365.com
 NODE_ENV=production
 NEXT_PUBLIC_ENVIRONMENT=production
 NEXT_PUBLIC_DOMAIN=ecodish365.com

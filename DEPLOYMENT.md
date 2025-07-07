@@ -262,3 +262,10 @@ ls -la /var/backups/ecodish365/
 # Check SSL certificate expiry
 sudo certbot certificates
 ```
+
+
+sudo certbot --nginx -d ecodish365.com -d www.ecodish365.com --non-interactive
+
+sudo ss -tlnp | grep nginx
+
+sudo cat /etc/nginx/sites-available/ecodish365.com
