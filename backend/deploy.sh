@@ -231,8 +231,125 @@ print_status "Frontend build and deployment completed ✓"
 # 11. Nginx configuration
 print_status "Configuring Nginx..."
 
-# Create upstream definitions
+# Create initial HTTP-only configuration for Let's Encrypt
 sudo tee /etc/nginx/sites-available/ecodish365.com > /dev/null << EOF
+# Upstream definitions
+upstream django_backend {
+    server 127.0.0.1:8000;
+}
+
+upstream frontend_backend {
+    server 127.0.0.1:3000;
+}
+
+# HTTP server - initial configuration for Let's Encrypt
+server {
+    listen 80;
+    server_name ecodish365.com www.ecodish365.com 13.49.5.171;
+
+    # Allow Let's Encrypt challenges
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
+
+    # Common proxy settings
+    proxy_set_header Host \$host;
+    proxy_set_header X-Real-IP \$remote_addr;
+    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto \$scheme;
+    proxy_redirect off;
+    proxy_read_timeout 300;
+    proxy_connect_timeout 300;
+    proxy_send_timeout 300;
+    
+    # Next.js static files
+    location /_next/static/ {
+        alias /var/www/html/ecodish365/.next/static/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+    
+    # Django static files
+    location /static/ {
+        alias $DJANGO_PROJECT_DIR/staticfiles/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+    
+    # Django media files
+    location /media/ {
+        alias $DJANGO_PROJECT_DIR/media/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+    
+    # Django Admin
+    location /admin/ {
+        proxy_pass http://django_backend;
+    }
+    
+    # Django API routes
+    location /api/ {
+        proxy_pass http://django_backend;
+    }
+    
+    # Health check
+    location /health/ {
+        proxy_pass http://django_backend;
+    }
+    
+    # Frontend - all other routes go to Next.js
+    location / {
+        proxy_pass http://frontend_backend;
+        
+        # WebSocket support for Next.js
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_cache_bypass \$http_upgrade;
+    }
+    
+    # Error pages
+    error_page 502 503 504 /50x.html;
+    location = /50x.html {
+        root /var/www/html;
+        internal;
+    }
+}
+EOF
+
+# Enable the site and test configuration
+sudo ln -sf /etc/nginx/sites-available/ecodish365.com /etc/nginx/sites-enabled/
+sudo rm -f /etc/nginx/sites-enabled/default
+
+# Test nginx configuration
+if ! sudo nginx -t; then
+    print_error "Nginx configuration test failed"
+    exit 1
+fi
+
+print_status "Basic Nginx configuration completed ✓"
+
+# Start nginx to serve HTTP for Let's Encrypt
+sudo systemctl reload nginx
+
+# 12. SSL Certificate with Let's Encrypt
+print_status "Setting up SSL certificate with Let's Encrypt..."
+
+# Get SSL certificate
+sudo certbot --nginx -d ecodish365.com -d www.ecodish365.com --non-interactive --agree-tos --email dishdevinfo@gmail.com
+
+# Verify SSL certificate was installed
+if [ -f "/etc/letsencrypt/live/ecodish365.com/fullchain.pem" ]; then
+    print_status "SSL certificate installed successfully ✓"
+    
+    # Now update to full HTTPS configuration
+    print_status "Updating to full HTTPS configuration..."
+    
+    sudo tee /etc/nginx/sites-available/ecodish365.com > /dev/null << EOF
 # Upstream definitions
 upstream django_backend {
     server 127.0.0.1:8000;
@@ -263,7 +380,7 @@ server {
     listen 443 ssl http2;
     server_name ecodish365.com www.ecodish365.com;
 
-    # SSL configuration - will be managed by certbot
+    # SSL configuration - managed by certbot
     ssl_certificate /etc/letsencrypt/live/ecodish365.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/ecodish365.com/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
@@ -345,19 +462,17 @@ server {
 }
 EOF
 
-# Enable the site and test configuration
-sudo ln -sf /etc/nginx/sites-available/ecodish365.com /etc/nginx/sites-enabled/
-sudo rm -f /etc/nginx/sites-enabled/default
-
-# Test nginx configuration
-if ! sudo nginx -t; then
-    print_error "Nginx configuration test failed"
-    exit 1
+    # Test the updated configuration
+    sudo nginx -t && sudo systemctl reload nginx
+    print_status "HTTPS configuration activated ✓"
+    
+else
+    print_error "SSL certificate installation failed"
+    print_warning "Continuing with HTTP-only configuration"
 fi
 
-print_status "Nginx configuration completed ✓"
-
 # Create a simple error page
+print_status "Creating error page..."
 sudo mkdir -p /var/www/html
 sudo tee /var/www/html/50x.html > /dev/null << 'EOF'
 <!DOCTYPE html>
@@ -378,10 +493,7 @@ sudo tee /var/www/html/50x.html > /dev/null << 'EOF'
 </html>
 EOF
 
-# Start nginx
-sudo systemctl reload nginx
-
-# 12. Supervisor configuration for services
+# 13. Supervisor configuration for services
 print_status "Configuring Supervisor for service management..."
 
 # Django/Gunicorn configuration
@@ -409,22 +521,6 @@ redirect_stderr=true
 stdout_logfile=/var/log/ecodish365-frontend.log
 environment=NODE_ENV="production",PORT="3000"
 EOF
-
-# 13. SSL Certificate with Let's Encrypt
-print_status "Setting up SSL certificate with Let's Encrypt..."
-
-# Get SSL certificate
-sudo certbot --nginx -d ecodish365.com -d www.ecodish365.com --non-interactive --agree-tos --email dishdevinfo@gmail.com
-
-# Verify SSL certificate was installed
-if [ -f "/etc/letsencrypt/live/ecodish365.com/fullchain.pem" ]; then
-    print_status "SSL certificate installed successfully ✓"
-    sudo nginx -t && sudo systemctl reload nginx
-    print_status "HTTPS configuration activated ✓"
-else
-    print_error "SSL certificate installation failed"
-    print_warning "Continuing with HTTP-only configuration"
-fi
 
 # 14. Start services
 print_status "Starting services..."
