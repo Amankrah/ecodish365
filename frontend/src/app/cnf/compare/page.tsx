@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { 
   ScaleIcon,
@@ -28,7 +28,7 @@ const NUTRIENT_CATEGORIES = {
   'Fatty Acids': ['FATTY ACIDS, SATURATED, TOTAL', 'FATTY ACIDS, MONOUNSATURATED, TOTAL', 'FATTY ACIDS, POLYUNSATURATED, TOTAL', 'FATTY ACIDS, TRANS, TOTAL', 'CHOLESTEROL'],
 };
 
-export default function CNFComparePage() {
+function CNFComparePageContent() {
   const searchParams = useSearchParams();
   const [comparisonData, setComparisonData] = useState<ComparisonData>({ foods: [], comparison: null });
   const [searchQuery, setSearchQuery] = useState('');
@@ -906,5 +906,24 @@ export default function CNFComparePage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function CNFComparePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
+            <div className="inline-flex items-center">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
+              <span className="ml-2 text-gray-600">Loading comparison page...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    }>
+      <CNFComparePageContent />
+    </Suspense>
   );
 } 
