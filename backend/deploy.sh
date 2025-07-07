@@ -147,6 +147,18 @@ rm -rf __pycache__
 find . -name "*.pyc" -delete
 find . -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
 
+# Clear additional Django caches
+print_status "Clearing additional Django caches..."
+rm -rf media/.cache 2>/dev/null || true
+rm -rf .django_cache 2>/dev/null || true
+rm -rf tmp 2>/dev/null || true
+
+# Clear any potential database cache files
+print_status "Clearing database cache files..."
+find . -name "*.db-journal" -delete 2>/dev/null || true
+find . -name "*.db-wal" -delete 2>/dev/null || true
+find . -name "*.db-shm" -delete 2>/dev/null || true
+
 # Set Django settings module and verify Django can be imported
 export DJANGO_SETTINGS_MODULE="dish_project.settings"
 python -c "import django; django.setup()" || {
@@ -186,7 +198,17 @@ cd $FRONTEND_DIR
 print_status "Clearing frontend cache and old builds..."
 rm -rf .next
 rm -rf node_modules/.cache
+rm -rf node_modules/.vite 2>/dev/null || true
+rm -rf .cache 2>/dev/null || true
+rm -rf dist 2>/dev/null || true
+rm -rf build 2>/dev/null || true
+rm -rf out 2>/dev/null || true
 npm cache clean --force 2>/dev/null || true
+# Clear yarn cache if it exists
+yarn cache clean 2>/dev/null || true
+# Clear any potential browser cache files
+rm -rf .turbo 2>/dev/null || true
+rm -rf .vercel 2>/dev/null || true
 
 # Create production environment file
 if [ ! -f "$FRONTEND_DIR/.env.production" ]; then
@@ -530,9 +552,21 @@ sudo supervisorctl start all
 sudo systemctl enable nginx supervisor
 sudo systemctl start nginx supervisor
 
+# Restart services to ensure configuration changes take effect
+print_status "Restarting services to apply configuration changes..."
+sudo supervisorctl restart all
+sudo systemctl restart nginx
+
+# Clear nginx cache and system caches
+print_status "Clearing nginx cache and system caches..."
 # Clear nginx cache
-print_status "Clearing nginx cache..."
 sudo systemctl reload nginx
+# Clear system caches if they exist
+sudo rm -rf /var/cache/nginx/* 2>/dev/null || true
+sudo rm -rf /tmp/nginx* 2>/dev/null || true
+# Clear any potential system-level caches
+sudo sync
+echo 3 | sudo tee /proc/sys/vm/drop_caches > /dev/null 2>&1 || true
 
 # 15. Firewall configuration
 print_status "Configuring firewall..."
@@ -567,6 +601,11 @@ print_status ""
 print_status "Services deployed:"
 print_status "- Frontend (Next.js): https://ecodish365.com → port 3000"
 print_status "- Backend (Django): https://ecodish365.com/api/, /admin/ → port 8000"
+print_status "- API endpoints: https://ecodish365.com/api/cnf/, /api/hsr/, etc."
+print_status ""
+print_status "🔧 Fixed Issues:"
+print_status "- API URL routing (removed double /api/ in paths)"
+print_status "- Comprehensive cache clearing (Django, Next.js, Nginx, System)"
 print_status ""
 print_status "Next steps:"
 print_status "1. Update backend/.env with actual production values if needed"

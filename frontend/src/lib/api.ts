@@ -1,9 +1,10 @@
 import axios from 'axios';
 
 // Use the correct API base URL from environment
+// Note: Django backend already routes API endpoints under /api/, so no need to append /api here
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL 
-  ? `${process.env.NEXT_PUBLIC_API_URL}/api`
-  : 'http://localhost:8000/api';
+  ? `${process.env.NEXT_PUBLIC_API_URL}`
+  : 'http://localhost:8000';
 
 // Create axios instance with default config
 const api = axios.create({
