@@ -10,7 +10,7 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
-import { FCSApiService, CNFApiService, type FCSFoodProfile, type SearchResult } from '@/lib/api';
+import { FCSApiService, CNFApiService, type FCSFoodProfile, type SearchResult, type FilterOptions } from '@/lib/api';
 
 interface SearchState {
   query: string;
@@ -29,6 +29,22 @@ export default function FCSFoodProfile() {
   const [selectedFood, setSelectedFood] = useState<{ id: number; name: string } | null>(null);
   const [profile, setProfile] = useState<FCSFoodProfile | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [filters, setFilters] = useState<FilterOptions | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedMethod, setSelectedMethod] = useState<string>('');
+
+  // Load filters on component mount
+  useEffect(() => {
+    const loadFilters = async () => {
+      try {
+        const filterOptions = await CNFApiService.getFoodFilters();
+        setFilters(filterOptions);
+      } catch (error) {
+        console.error('Failed to load filters:', error);
+      }
+    };
+    loadFilters();
+  }, []);
 
   // Helper to get the actual profile data from the response
   const getProfileData = (profileResponse: FCSFoodProfile | { success: boolean; data: FCSFoodProfile; message: string } | null): FCSFoodProfile | null => {
@@ -56,10 +72,18 @@ export default function FCSFoodProfile() {
         try {
           searchResult = await CNFApiService.searchFoodsEnhanced({
             query: search.query,
-            limit: 10
+            limit: 50,
+            category: selectedCategory || undefined,
+            method: selectedMethod || undefined
           });
-        } catch {
-          searchResult = await CNFApiService.searchFoods(search.query, 10);
+        } catch (enhancedError) {
+          console.log('Enhanced search failed, falling back to regular search:', enhancedError);
+          try {
+            searchResult = await CNFApiService.searchFoods(search.query, 50);
+          } catch (regularError) {
+            console.error('Both search methods failed:', { enhancedError, regularError });
+            throw regularError;
+          }
         }
         setSearch(prev => ({ 
           ...prev, 
@@ -74,7 +98,7 @@ export default function FCSFoodProfile() {
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [search.query]);
+  }, [search.query, selectedCategory, selectedMethod]);
 
   const selectFood = async (food: SearchResult['results'][0]) => {
     setSelectedFood({ id: food.FoodID, name: food.FoodDescription });
@@ -148,6 +172,63 @@ export default function FCSFoodProfile() {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Search Food</h2>
+              
+              {/* Search Filters */}
+              {filters && !selectedFood && (
+                <div className="mb-6 space-y-4 border-b pb-4">
+                  <h3 className="text-sm font-medium text-gray-700">Search Filters</h3>
+                  
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Food Category
+                    </label>
+                    <select
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      aria-label="Food category filter"
+                    >
+                      <option value="">All categories</option>
+                      {filters.categories.map((category) => (
+                        <option key={category} value={category}>
+                          {category.charAt(0).toUpperCase() + category.slice(1)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Cooking Method
+                    </label>
+                    <select
+                      value={selectedMethod}
+                      onChange={(e) => setSelectedMethod(e.target.value)}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      aria-label="Cooking method filter"
+                    >
+                      <option value="">All methods</option>
+                      {filters.methods.map((method) => (
+                        <option key={method} value={method}>
+                          {method.charAt(0).toUpperCase() + method.slice(1)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  {(selectedCategory || selectedMethod) && (
+                    <button
+                      onClick={() => {
+                        setSelectedCategory('');
+                        setSelectedMethod('');
+                      }}
+                      className="text-xs text-blue-600 hover:text-blue-800"
+                    >
+                      Clear filters
+                    </button>
+                  )}
+                </div>
+              )}
               
               <div className="relative">
                 <div className="relative">
