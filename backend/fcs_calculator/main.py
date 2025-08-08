@@ -1,7 +1,7 @@
 import time
 import logging
 from fcs.models.food_item import FoodItem
-from fcs.analyzers.cnf_integrator import CNFIntegrator
+from fcs.utils.cnf_data_integrator import create_cnf_integrator
 from fcs.analyzers.food_analyzer import FoodAnalyzer
 
 # Configure logging
@@ -15,11 +15,19 @@ def main():
         # Create an example FoodItem
         food_item = FoodItem("Example Food")
         
-        # Example food IDs (wild salmon, brown rice, broccoli)
-        food_ids = [2003, 3580, 2892]  
+        # Example food IDs ([Fish, salmon, atlantic, wild, raw], [Rice, spanish rice mix, unprepared])
+        food_ids = [3049, 3725]  
         
-        # Extract nutrients from CNF based on food IDs and populate the FoodItem
-        CNFIntegrator.extract_nutrients_from_cnf(food_ids, food_item)
+        # Extract nutrients from CNF using enhanced integrator
+        cnf_integrator = create_cnf_integrator()
+        cnf_integrator.extract_nutrients_enhanced(food_ids, food_item)
+        
+        # Debug: Show what nutrients were extracted
+        print(f"\nDEBUG: Food item '{food_item.name}' after nutrient extraction:")
+        for domain, attributes in food_item.attributes.items():
+            non_zero_attrs = {k: v for k, v in attributes.items() if v != 0}
+            if non_zero_attrs:
+                print(f"  {domain}: {non_zero_attrs}")
         
         # Analyze the food item to get the FCS and NOVA category
         analyzer = FoodAnalyzer()

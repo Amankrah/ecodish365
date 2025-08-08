@@ -2,66 +2,138 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { 
   Bars3Icon, 
   XMarkIcon,
-  HomeIcon,
   ChartBarIcon,
-  BeakerIcon,
-  DocumentChartBarIcon,
-  Cog6ToothIcon,
-  StarIcon
+  StarIcon,
+  SparklesIcon,
+  ChevronDownIcon
 } from '@heroicons/react/24/outline';
 import { clsx } from 'clsx';
 
 const navigation = [
-  { name: 'Home', href: '/', icon: HomeIcon },
-  { name: 'CNF Explorer', href: '/cnf', icon: ChartBarIcon },
-  { name: 'HSR Calculator', href: '/hsr', icon: StarIcon },
-  { name: 'Calculators', href: '/calculators', icon: BeakerIcon },
-  { name: 'Analytics', href: '/analytics', icon: DocumentChartBarIcon },
-  { name: 'Settings', href: '/settings', icon: Cog6ToothIcon },
+  { 
+    name: 'CNF Explorer', 
+    href: '/cnf', 
+    icon: ChartBarIcon,
+    dropdown: [
+      { name: 'Food Search', href: '/cnf' },
+      { name: 'Food Groups', href: '/cnf/groups' },
+      { name: 'Nutrients', href: '/cnf/nutrients' },
+      { name: 'Compare Foods', href: '/cnf/compare' },
+    ]
+  },
+  { 
+    name: 'HSR Calculator', 
+    href: '/hsr', 
+    icon: StarIcon,
+    dropdown: [
+      { name: 'Calculate HSR', href: '/hsr/calculate' },
+      { name: 'Compare Foods', href: '/hsr/compare' },
+      { name: 'Food Profile', href: '/hsr/food-profile' },
+      { name: 'Meal Insights', href: '/hsr/meal-insights' },
+    ]
+  },
+  { 
+    name: 'FCS Calculator', 
+    href: '/fcs', 
+    icon: SparklesIcon,
+    dropdown: [
+      { name: 'Calculate FCS', href: '/fcs/calculate' },
+      { name: 'Compare Foods', href: '/fcs/compare' },
+      { name: 'Food Profile', href: '/fcs/food-profile' },
+    ]
+  },
 ];
 
 export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const pathname = usePathname();
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200">
+    <nav className="bg-white/95 backdrop-blur-sm shadow-lg border-b border-gray-200/50 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+        <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-                <BeakerIcon className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-gradient">EcoDish365</span>
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/ecodish_logo.svg"
+                alt="EcoDish365"
+                width={180}
+                height={180}
+                className="w-180 h-180 hover:scale-105 transition-transform duration-200"
+              />
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-1">
             {navigation.map((item) => {
               const isActive = pathname === item.href || 
                 (item.href !== '/' && pathname.startsWith(item.href));
+              const isDropdownOpen = activeDropdown === item.name;
               
               return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={clsx(
-                    'flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200',
-                    isActive
-                      ? 'bg-primary-50 text-primary-600 border border-primary-200'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                <div key={item.name} className="relative group">
+                  <button
+                    onClick={() => setActiveDropdown(isDropdownOpen ? null : item.name)}
+                    onMouseEnter={() => setActiveDropdown(item.name)}
+                    className={clsx(
+                      'flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 relative group',
+                      isActive
+                        ? 'bg-gradient-to-r from-blue-50 to-green-50 text-blue-700 shadow-sm border border-blue-100'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50/80'
+                    )}
+                  >
+                    <item.icon className={clsx(
+                      'w-4 h-4 transition-colors duration-200',
+                      isActive ? 'text-blue-600' : 'text-gray-500 group-hover:text-gray-700'
+                    )} />
+                    <span className="relative">
+                      {item.name}
+                      {isActive && (
+                        <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-green-500 rounded-full" />
+                      )}
+                    </span>
+                    <ChevronDownIcon className={clsx(
+                      'w-4 h-4 transition-transform duration-200',
+                      isDropdownOpen ? 'rotate-180' : '',
+                      isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'
+                    )} />
+                  </button>
+                  
+                  {/* Dropdown Menu */}
+                  {isDropdownOpen && (
+                    <div 
+                      className="absolute top-full left-0 mt-2 w-56 bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/50 py-2 z-50"
+                      onMouseLeave={() => setActiveDropdown(null)}
+                    >
+                      {item.dropdown?.map((dropdownItem) => {
+                        const isDropdownActive = pathname === dropdownItem.href;
+                        return (
+                          <Link
+                            key={dropdownItem.href}
+                            href={dropdownItem.href}
+                            className={clsx(
+                              'block px-4 py-2 text-sm transition-all duration-200 mx-2 rounded-lg',
+                              isDropdownActive
+                                ? 'bg-gradient-to-r from-blue-50 to-green-50 text-blue-700 font-medium'
+                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50/80'
+                            )}
+                            onClick={() => setActiveDropdown(null)}
+                          >
+                            {dropdownItem.name}
+                          </Link>
+                        );
+                      })}
+                    </div>
                   )}
-                >
-                  <item.icon className="w-4 h-4" />
-                  <span>{item.name}</span>
-                </Link>
+                </div>
               );
             })}
           </div>
@@ -70,7 +142,7 @@ export default function Navigation() {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+              className="p-2 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100/80 transition-all duration-200"
             >
               {mobileMenuOpen ? (
                 <XMarkIcon className="w-6 h-6" />
@@ -85,26 +157,49 @@ export default function Navigation() {
       {/* Mobile Navigation */}
       {mobileMenuOpen && (
         <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 bg-white border-t border-gray-200">
+          <div className="px-4 pt-2 pb-4 space-y-2 bg-white/95 backdrop-blur-sm border-t border-gray-200/50">
             {navigation.map((item) => {
               const isActive = pathname === item.href || 
                 (item.href !== '/' && pathname.startsWith(item.href));
               
               return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={clsx(
-                    'flex items-center space-x-3 px-3 py-2 rounded-lg text-base font-medium transition-colors duration-200',
+                <div key={item.name} className="space-y-1">
+                  {/* Main Category */}
+                  <div className={clsx(
+                    'flex items-center space-x-3 px-4 py-3 rounded-xl text-base font-medium',
                     isActive
-                      ? 'bg-primary-50 text-primary-600 border border-primary-200'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                  )}
-                >
-                  <item.icon className="w-5 h-5" />
-                  <span>{item.name}</span>
-                </Link>
+                      ? 'bg-gradient-to-r from-blue-50 to-green-50 text-blue-700 shadow-sm border border-blue-100'
+                      : 'text-gray-700'
+                  )}>
+                    <item.icon className={clsx(
+                      'w-5 h-5',
+                      isActive ? 'text-blue-600' : 'text-gray-500'
+                    )} />
+                    <span>{item.name}</span>
+                  </div>
+                  
+                  {/* Dropdown Items */}
+                  <div className="ml-4 space-y-1">
+                    {item.dropdown?.map((dropdownItem) => {
+                      const isDropdownActive = pathname === dropdownItem.href;
+                      return (
+                        <Link
+                          key={dropdownItem.href}
+                          href={dropdownItem.href}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className={clsx(
+                            'block px-4 py-2 text-sm rounded-lg transition-all duration-200',
+                            isDropdownActive
+                              ? 'bg-gradient-to-r from-blue-50 to-green-50 text-blue-700 font-medium border border-blue-100'
+                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50/80'
+                          )}
+                        >
+                          {dropdownItem.name}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
               );
             })}
           </div>

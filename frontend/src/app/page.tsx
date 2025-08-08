@@ -9,9 +9,9 @@ import {
   UserGroupIcon,
   ArrowRightIcon,
   ScaleIcon,
-  CubeIcon,
   DocumentChartBarIcon,
-  HeartIcon
+  HeartIcon,
+  SparklesIcon
 } from '@heroicons/react/24/outline';
 
 const features = [
@@ -21,7 +21,6 @@ const features = [
     icon: ChartBarIcon,
     href: '/cnf',
     status: 'Available',
-    highlight: true,
   },
   {
     name: 'Health Star Rating (HSR)',
@@ -31,11 +30,11 @@ const features = [
     status: 'Available',
   },
   {
-    name: 'Food Classification System (FCS)',
-    description: 'Advanced food classification based on processing levels and nutritional profiles.',
-    icon: CubeIcon,
-    href: '/calculators/fcs',
-    status: 'Coming Soon',
+    name: 'Food Compass Score (FCS)',
+    description: 'Comprehensive nutritional analysis using the scientifically validated FCS 2.0 algorithm with 54 attributes across 9 domains.',
+    icon: SparklesIcon,
+    href: '/fcs',
+    status: 'Available',
   },
   {
     name: 'Healthy Eating Index (HENI)',
@@ -52,10 +51,10 @@ const features = [
     status: 'Coming Soon',
   },
   {
-    name: 'Policy Analytics',
-    description: 'Advanced analytics and reporting tools for policy makers and public health officials.',
+    name: 'HEFI Score',
+    description: 'Healthy Eating Food Index scoring system for comprehensive dietary quality assessment.',
     icon: DocumentChartBarIcon,
-    href: '/analytics',
+    href: '/calculators/hefi',
     status: 'Coming Soon',
   },
 ];
@@ -154,25 +153,11 @@ export default function HomePage() {
             {features.map((feature) => (
               <div
                 key={feature.name}
-                className={`card relative ${
-                  feature.highlight ? 'ring-2 ring-primary-200 bg-gradient-to-br from-primary-5 to-white' : ''
-                }`}
+                className="card relative"
               >
-                {feature.highlight && (
-                  <div className="absolute -top-3 left-6">
-                    <span className="bg-primary-600 text-white px-3 py-1 text-xs font-medium rounded-full">
-                      Featured
-                    </span>
-                  </div>
-                )}
-                
                 <div className="flex items-center justify-between mb-4">
-                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                    feature.highlight ? 'bg-primary-600' : 'bg-gray-100'
-                  }`}>
-                    <feature.icon className={`w-6 h-6 ${
-                      feature.highlight ? 'text-white' : 'text-gray-600'
-                    }`} />
+                  <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-gray-100">
+                    <feature.icon className="w-6 h-6 text-gray-600" />
                   </div>
                   <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                     feature.status === 'Available' 
@@ -259,10 +244,11 @@ export default function HomePage() {
               Launch CNF Explorer
             </Link>
             <Link
-              href="/analytics"
+              href="/fcs"
               className="inline-flex items-center justify-center px-8 py-3 border border-white text-base font-medium rounded-lg text-white hover:bg-white hover:bg-opacity-10 transition-colors duration-200"
             >
-              View Analytics
+              <SparklesIcon className="mr-2 w-5 h-5" />
+              Try FCS Calculator
             </Link>
           </div>
         </div>

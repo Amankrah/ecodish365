@@ -1,7 +1,7 @@
 # api/urls.py
 
 from django.urls import path
-from .views import cnf_views, environmental_views, food_views, translation_views, hsr_views_consolidated
+from .views import cnf_views, environmental_views, food_views, translation_views, hsr_views_consolidated, fcs_views
 from .views.cnf_views import (
     # Food Management
     add_food_to_cnf, add_foods_batch, manage_cnf_food,
@@ -31,9 +31,9 @@ urlpatterns = [
     # Food search
     path('food/search/', food_views.search_food_api, name='search_food_api'),
 
-    # Calculator endpoints (to be implemented)
-    # path('hsr-calculator/', food_views.calculate_hsr, name='calculate_hsr'),
-    # path('fcs-calculator/', food_views.calculate_fcs, name='calculate_fcs'), 
+    # Calculator endpoints
+    # path('hsr-calculator/', food_views.calculate_hsr, name='calculate_hsr'),  # Implemented in HSR section
+    path('fcs-calculator/', fcs_views.fcs_calculate, name='calculate_fcs'), 
     # path('heni-calculator/', food_views.calculate_heni, name='calculate_heni'),
     # path('net-health-impact/', food_views.calculate_net_health_impact, name='calculate_net_health_impact'),
 
@@ -94,5 +94,14 @@ urlpatterns = [
     
     # Enhanced HSR Endpoints - Scientific Improvements and Advanced Analysis
 
+    # =============================================================================
+    # FCS (Food Compass Score 2.0) Endpoints - Comprehensive Nutritional Analysis
+    # =============================================================================
+    
+    # Core FCS Endpoints using validated FCS 2.0 algorithm with 9-domain structure
+    path('fcs/calculate/', fcs_views.fcs_calculate, name='fcs_calculate'),
+    path('fcs/batch/', fcs_views.fcs_calculate_batch, name='fcs_calculate_batch'),
+    path('fcs/food/<int:food_id>/', fcs_views.get_food_fcs_profile, name='get_food_fcs_profile'),
+    path('fcs/compare/', fcs_views.compare_foods_fcs, name='compare_foods_fcs'),
 
 ]
