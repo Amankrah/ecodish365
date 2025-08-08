@@ -153,7 +153,7 @@ export interface ApiResponse<T> {
 export class CNFApiService {
   // Search & Exploration
   static async searchFoods(query: string, limit = 50, offset = 0): Promise<SearchResult> {
-    const response = await api.get(`/api/cnf/search/`, {
+    const response = await api.get(`/cnf/search/`, {
       params: { q: query, limit, offset }
     });
     return response.data.data;
@@ -169,7 +169,7 @@ export class CNFApiService {
     if (minValue !== undefined) params.min_value = minValue;
     if (maxValue !== undefined) params.max_value = maxValue;
 
-    const response = await api.get(`/api/cnf/search/by-nutrient/`, { params });
+    const response = await api.get(`/cnf/search/by-nutrient/`, { params });
     return response.data.data;
   }
 
@@ -179,14 +179,14 @@ export class CNFApiService {
     count: number;
     limit: number;
   }> {
-    const response = await api.get(`/api/cnf/groups/${foodGroupId}/foods/`, {
+    const response = await api.get(`/cnf/groups/${foodGroupId}/foods/`, {
       params: { limit }
     });
     return response.data.data;
   }
 
   static async compareFoods(foodIds: number[], nutrientIds?: number[]): Promise<FoodComparison> {
-    const response = await api.post(`/api/cnf/compare/`, {
+    const response = await api.post(`/cnf/compare/`, {
       food_ids: foodIds,
       nutrient_ids: nutrientIds
     });
@@ -195,58 +195,58 @@ export class CNFApiService {
 
   // Food Management
   static async getFoodDetails(foodId: number): Promise<Food> {
-    const response = await api.get(`/api/cnf/foods/${foodId}/`);
+    const response = await api.get(`/cnf/foods/${foodId}/`);
     return response.data.data;
   }
 
   static async addFood(foodData: Partial<Food>): Promise<{ food_id: number; food_description: string }> {
-    const response = await api.post(`/api/cnf/foods/`, foodData);
+    const response = await api.post(`/cnf/foods/`, foodData);
     return response.data.data;
   }
 
   static async updateFood(foodId: number, foodData: Partial<Food>): Promise<Food> {
-    const response = await api.put(`/api/cnf/foods/${foodId}/`, foodData);
+    const response = await api.put(`/cnf/foods/${foodId}/`, foodData);
     return response.data.data;
   }
 
   static async deleteFood(foodId: number): Promise<void> {
-    await api.delete(`/api/cnf/foods/${foodId}/`);
+    await api.delete(`/cnf/foods/${foodId}/`);
   }
 
   // Reference Data
   static async getFoodGroups(): Promise<FoodGroup[]> {
-    const response = await api.get(`/api/cnf/food-groups/`);
+    const response = await api.get(`/cnf/food-groups/`);
     return response.data.data;
   }
 
   static async getNutrients(): Promise<Nutrient[]> {
-    const response = await api.get(`/api/cnf/nutrients/`);
+    const response = await api.get(`/cnf/nutrients/`);
     return response.data.data;
   }
 
   static async getFoodSources(): Promise<FoodSource[]> {
-    const response = await api.get(`/api/cnf/food-sources/`);
+    const response = await api.get(`/cnf/food-sources/`);
     return response.data.data;
   }
 
   static async getNutrientSources(): Promise<NutrientSource[]> {
-    const response = await api.get(`/api/cnf/nutrient-sources/`);
+    const response = await api.get(`/cnf/nutrient-sources/`);
     return response.data.data;
   }
 
   static async getMeasures(): Promise<Measure[]> {
-    const response = await api.get(`/api/cnf/measures/`);
+    const response = await api.get(`/cnf/measures/`);
     return response.data.data;
   }
 
   // Analytics & Quality
   static async getDatabaseStatistics(): Promise<DatabaseStats> {
-    const response = await api.get(`/api/cnf/statistics/`);
+    const response = await api.get(`/cnf/statistics/`);
     return response.data.data;
   }
 
   static async checkDataIntegrity(): Promise<IntegrityCheck> {
-    const response = await api.get(`/api/cnf/integrity-check/`);
+    const response = await api.get(`/cnf/integrity-check/`);
     return response.data.data;
   }
 
@@ -269,7 +269,7 @@ export class CNFApiService {
       export_date: string;
     };
   }> {
-    const response = await api.post(`/api/cnf/export/`, {
+    const response = await api.post(`/cnf/export/`, {
       food_ids: foodIds,
       ...options
     });
@@ -597,12 +597,12 @@ export interface HSRMealInsights {
 // HSR API Service Class
 export class HSRApiService {
   static async calculateHSR(request: HSRCalculationRequest): Promise<HSRResult> {
-    const response = await api.post('/api/hsr/calculate/', request);
+    const response = await api.post('/hsr/calculate/', request);
     return response.data;
   }
 
   static async compareFoods(request: HSRComparisonRequest): Promise<HSRComparison> {
-    const response = await api.post('/api/hsr/compare/', request);
+    const response = await api.post('/hsr/compare/', request);
     return response.data;
   }
 
@@ -611,7 +611,7 @@ export class HSRApiService {
     servingSize = 100,
     includeAlternatives = false
   ): Promise<HSRFoodProfile> {
-    const response = await api.get(`/api/hsr/food/${foodId}/`, {
+    const response = await api.get(`/hsr/food/${foodId}/`, {
       params: {
         serving_size: servingSize,
         include_alternatives: includeAlternatives
@@ -621,7 +621,7 @@ export class HSRApiService {
   }
 
   static async getMealInsights(request: HSRMealInsightsRequest): Promise<HSRMealInsights> {
-    const response = await api.post('/api/hsr/meal-insights/', request);
+    const response = await api.post('/hsr/meal-insights/', request);
     return response.data;
   }
 }
@@ -712,7 +712,7 @@ export interface FCSComparison {
 // FCS API Service Class
 export class FCSApiService {
   static async calculateFCS(request: FCSCalculationRequest): Promise<{ data: FCSResult }> {
-    const response = await api.post('/api/fcs/calculate/', request);
+    const response = await api.post('/fcs/calculate/', request);
     // Backend returns { success: true, data: FCSResult, message: string }
     console.log('Raw backend response:', response.data);
     const result = { data: response.data.data };
@@ -721,17 +721,17 @@ export class FCSApiService {
   }
 
   static async calculateFCSBatch(request: FCSBatchRequest): Promise<{ data: FCSBatchResult }> {
-    const response = await api.post('/api/fcs/batch/', request);
+    const response = await api.post('/fcs/batch/', request);
     return { data: response.data.data };
   }
 
   static async getFoodFCSProfile(foodId: number): Promise<{ data: FCSFoodProfile }> {
-    const response = await api.get(`/api/fcs/food/${foodId}/`);
+    const response = await api.get(`/fcs/food/${foodId}/`);
     return { data: response.data.data };
   }
 
   static async compareFoodsFCS(request: FCSComparisonRequest): Promise<{ data: FCSComparison }> {
-    const response = await api.post('/api/fcs/compare/', request);
+    const response = await api.post('/fcs/compare/', request);
     return { data: response.data.data };
   }
 }
