@@ -12,6 +12,13 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Add API views path
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'api', 'views'))
 
+# HSR Calculator imports
+from hsr.utils.data_loader import load_cnf_data
+from hsr.models.food import Food
+from hsr.models.meal import Meal
+from hsr.models.category import Category
+from hsr.calculators.hsr_calculator import HSRCalculator, HSRConfig
+from hsr.calculators.fvnl_calculator import calculate_fvnl_content
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
