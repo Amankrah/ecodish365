@@ -10,14 +10,84 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "EcoDish365 - Environmental Nutrition & Health Tools",
-  description: "A comprehensive platform for environmental nutrition and health tools, helping researchers, individuals, and policy makers make informed decisions.",
-  keywords: ["nutrition", "environment", "health", "Canadian Nutrient File", "CNF", "food analysis"],
-  authors: [{ name: "EcoDish365 Team" }],
+  title: {
+    default: "EcoDish365 - Professional Nutrition Analysis & Food Research Platform",
+    template: "%s | EcoDish365 - Nutrition Research Platform"
+  },
+  description: "Professional nutrition analysis platform with 5000+ foods, Canadian Nutrient File database, Health Star Rating calculator, Food Compass Score, and environmental impact assessment tools for researchers and health professionals.",
+  keywords: [
+    "nutrition analysis", "Canadian Nutrient File", "CNF database", "food research", 
+    "Health Star Rating", "HSR calculator", "Food Compass Score", "FCS calculator",
+    "nutritional assessment", "food comparison", "dietary analysis", "nutrition research",
+    "environmental nutrition", "food sustainability", "nutrition database",
+    "food science", "dietitian tools", "nutrition professionals", "health analysis",
+    "food nutrients", "calorie calculator", "macro nutrients", "micro nutrients"
+  ],
+  authors: [{ name: "EcoDish365 Research Team", url: "https://ecodish365.com" }],
+  creator: "EcoDish365",
+  publisher: "EcoDish365",
+  category: "Health & Nutrition Technology",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: "https://ecodish365.com",
+  },
   openGraph: {
-    title: "EcoDish365 - Environmental Nutrition & Health Tools",
-    description: "A comprehensive platform for environmental nutrition and health tools",
     type: "website",
+    locale: "en_US",
+    url: "https://ecodish365.com",
+    siteName: "EcoDish365",
+    title: "EcoDish365 - Professional Nutrition Analysis & Food Research Platform",
+    description: "Advanced nutrition analysis tools with 5000+ foods from Canadian Nutrient File. Calculate Health Star Ratings, Food Compass Scores, and assess environmental impact for research and professional use.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "EcoDish365 - Professional Nutrition Analysis Platform",
+        type: "image/png",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "EcoDish365 - Professional Nutrition Analysis Platform",
+    description: "Advanced nutrition research tools with CNF database, HSR calculator, FCS scoring, and environmental impact assessment for professionals.",
+    images: ["/twitter-image.png"],
+    creator: "@ecodish365",
+    site: "@ecodish365",
+  },
+  verification: {
+    google: "your-google-verification-code",
+    yandex: "your-yandex-verification-code",
+    yahoo: "your-yahoo-verification-code",
+    other: {
+      "msvalidate.01": "your-bing-verification-code",
+    },
+  },
+  manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+  },
+  other: {
+    "theme-color": "#0ea5e9",
+    "msapplication-TileColor": "#0ea5e9",
   },
 };
 
@@ -26,8 +96,65 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "EcoDish365",
+    "alternateName": "EcoDish365 Nutrition Research Platform",
+    "url": "https://ecodish365.com",
+    "description": "Professional nutrition analysis platform with comprehensive food database and research tools",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://ecodish365.com/cnf/search?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "EcoDish365",
+      "url": "https://ecodish365.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://ecodish365.com/logo.png",
+        "width": 300,
+        "height": 100
+      },
+      "sameAs": [
+        "https://twitter.com/ecodish365",
+        "https://linkedin.com/company/ecodish365"
+      ]
+    },
+    "mainEntity": {
+      "@type": "SoftwareApplication",
+      "name": "EcoDish365 Platform",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "Web Browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Canadian Nutrient File Database Access",
+        "Health Star Rating Calculator",
+        "Food Compass Score Calculator",
+        "Nutritional Analysis Tools",
+        "Food Comparison Features",
+        "Environmental Impact Assessment"
+      ]
+    }
+  };
+
   return (
     <html lang="en" className={inter.variable}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+      </head>
       <body className={`${inter.className} min-h-screen bg-gray-50`}>
         <div className="min-h-screen flex flex-col">
           <Navigation />

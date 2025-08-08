@@ -16,22 +16,22 @@ import {
 
 const features = [
   {
-    name: 'CNF Database Explorer',
-    description: 'Comprehensive exploration of the Canadian Nutrient File with advanced search, comparison, and analytics capabilities.',
+    name: 'Canadian Nutrient File (CNF) Database',
+    description: 'Access Canada\'s official nutrition database with 5000+ foods and 150+ nutrients. Advanced search, filtering, comparison, and statistical analysis tools for professional nutrition research.',
     icon: ChartBarIcon,
     href: '/cnf',
     status: 'Available',
   },
   {
-    name: 'Health Star Rating (HSR)',
-    description: 'Calculate and analyze Health Star Ratings for foods using the Australian front-of-pack labeling system.',
+    name: 'Health Star Rating Calculator',
+    description: 'Calculate official Health Star Ratings using Australia\'s validated front-of-pack labeling algorithm. Compare nutritional quality across foods with detailed scoring breakdowns.',
     icon: HeartIcon,
     href: '/hsr',
     status: 'Available',
   },
   {
-    name: 'Food Compass Score (FCS)',
-    description: 'Comprehensive nutritional analysis using the scientifically validated FCS 2.0 algorithm with 54 attributes across 9 domains.',
+    name: 'Food Compass Score Calculator',
+    description: 'Professional food quality assessment using the scientifically validated FCS 2.0 algorithm. Analyze 54 nutritional attributes across 9 domains for comprehensive food evaluation.',
     icon: SparklesIcon,
     href: '/fcs',
     status: 'Available',
@@ -93,13 +93,14 @@ export default function HomePage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl sm:text-6xl font-bold tracking-tight">
-              <span className="text-gray-900">Environmental</span>{' '}
-              <span className="text-gradient">Nutrition</span>{' '}
-              <span className="text-gray-900">& Health Tools</span>
+              <span className="text-gray-900">Professional</span>{' '}
+              <span className="text-gradient">Nutrition Analysis</span>{' '}
+              <span className="text-gray-900">& Food Research Platform</span>
             </h1>
             <p className="mt-6 text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              A comprehensive platform empowering researchers, individuals, and policy makers 
-              with advanced nutritional analysis, environmental impact assessment, and health evaluation tools.
+              Advanced nutrition analysis platform with Canadian Nutrient File database, Health Star Rating calculator, 
+              Food Compass Score assessment, and environmental impact tools. Trusted by researchers, dietitians, 
+              and health professionals worldwide for evidence-based nutrition research and food quality analysis.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
               <Link
@@ -141,11 +142,12 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Comprehensive Research Tools
+              Professional Nutrition Analysis Tools
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Access a suite of advanced tools designed for nutritional research, 
-              health assessment, and environmental impact analysis.
+              Access Canada's most comprehensive nutrition database with 5000+ foods, calculate Health Star Ratings, 
+              Food Compass Scores, and assess environmental impact. Professional-grade tools for accurate 
+              nutritional research and evidence-based dietary analysis.
             </p>
           </div>
 

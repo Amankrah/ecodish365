@@ -8,44 +8,63 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // EcoDish365 Brand Colors - Professional Nutrition Platform
         primary: {
-          50: '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
-          500: '#22c55e',
-          600: '#16a34a',
-          700: '#15803d',
-          800: '#166534',
-          900: '#14532d',
-          950: '#052e16',
+          50: '#ecfdf5',   // Very light green for backgrounds
+          100: '#d1fae5',  // Light green for highlights
+          200: '#a7f3d0',  // Soft green for accents
+          300: '#6ee7b7',  // Medium green for interactive elements
+          400: '#34d399',  // Bright green for primary actions
+          500: '#10b981',  // Main brand green - nutrition & health
+          600: '#059669',  // Dark green for hover states
+          700: '#047857',  // Deeper green for emphasis
+          800: '#065f46',  // Dark green for text
+          900: '#064e3b',  // Very dark green
+          950: '#022c22',  // Almost black green
         },
         secondary: {
-          50: '#fdf4ff',
-          100: '#fae8ff',
-          200: '#f5d0fe',
-          300: '#f0abfc',
-          400: '#e879f9',
-          500: '#d946ef',
-          600: '#c026d3',
-          700: '#a21caf',
-          800: '#86198f',
-          900: '#701a75',
-          950: '#4a044e',
+          50: '#f0f9ff',   // Very light blue for backgrounds
+          100: '#e0f2fe',  // Light blue for highlights
+          200: '#bae6fd',  // Soft blue for accents
+          300: '#7dd3fc',  // Medium blue for interactive elements
+          400: '#38bdf8',  // Bright blue for secondary actions
+          500: '#0ea5e9',  // Main brand blue - technology & analysis
+          600: '#0284c7',  // Dark blue for hover states
+          700: '#0369a1',  // Deeper blue for emphasis
+          800: '#075985',  // Dark blue for text
+          900: '#0c4a6e',  // Very dark blue
+          950: '#082f49',  // Almost black blue
         },
         accent: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
-          950: '#172554',
+          50: '#fef7ee',   // Very light orange for backgrounds
+          100: '#fdedd3',  // Light orange for highlights
+          200: '#fed7aa',  // Soft orange for accents
+          300: '#fdba74',  // Medium orange for interactive elements
+          400: '#fb923c',  // Bright orange for accent actions
+          500: '#f97316',  // Main accent orange - energy & vitality
+          600: '#ea580c',  // Dark orange for hover states
+          700: '#c2410c',  // Deeper orange for emphasis
+          800: '#9a3412',  // Dark orange for text
+          900: '#7c2d12',  // Very dark orange
+          950: '#431407',  // Almost black orange
+        },
+        // Semantic colors for nutrition data
+        nutrition: {
+          protein: '#ef4444',    // Red for protein
+          carbs: '#f59e0b',      // Amber for carbohydrates
+          fat: '#8b5cf6',        // Purple for fats
+          fiber: '#22c55e',      // Green for fiber
+          vitamin: '#3b82f6',    // Blue for vitamins
+          mineral: '#6b7280',    // Gray for minerals
+          energy: '#f97316',     // Orange for calories/energy
+        },
+        // Rating colors for HSR and FCS scores
+        rating: {
+          excellent: '#22c55e',  // Green for excellent scores (4.5-5 stars)
+          good: '#84cc16',       // Light green for good scores (3.5-4 stars)
+          average: '#eab308',    // Yellow for average scores (2.5-3 stars)
+          poor: '#f97316',       // Orange for poor scores (1.5-2 stars)
+          very_poor: '#ef4444',  // Red for very poor scores (0.5-1 stars)
         }
       },
       fontFamily: {

@@ -38,12 +38,13 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_PROTOCOL: process.env.NEXT_PUBLIC_PROTOCOL,
   },
   
-  // Security headers
+  // Security headers and SEO optimization
   async headers() {
     return [
       {
         source: '/(.*)',
         headers: [
+          // Security headers
           {
             key: 'X-Frame-Options',
             value: 'DENY',
@@ -56,9 +57,48 @@ const nextConfig: NextConfig = {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
           },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=31536000; includeSubDomains',
+          },
+          // Performance headers
+          {
+            key: 'Cache-Control',
+            value: 's-maxage=86400, stale-while-revalidate',
+          },
+        ],
+      },
+      // Static assets caching
+      {
+        source: '/(.*)\\.(ico|png|jpg|jpeg|gif|webp|svg|woff|woff2|ttf|eot)$',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      // CSS and JS caching
+      {
+        source: '/(.*)\\.(css|js)$',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
         ],
       },
     ];
+  },
+  
+  // Enable experimental features for better performance
+  experimental: {
+    optimizeCss: true,
+    webVitalsAttribution: ['CLS', 'LCP'],
   },
 }
 
