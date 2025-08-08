@@ -51,7 +51,16 @@ export default function FCSFoodProfile() {
     const timeoutId = setTimeout(async () => {
       setSearch(prev => ({ ...prev, isLoading: true }));
       try {
-        const searchResult = await CNFApiService.searchFoods(search.query, 10);
+        // Try enhanced search first, fallback to regular search
+        let searchResult;
+        try {
+          searchResult = await CNFApiService.searchFoodsEnhanced({
+            query: search.query,
+            limit: 10
+          });
+        } catch {
+          searchResult = await CNFApiService.searchFoods(search.query, 10);
+        }
         setSearch(prev => ({ 
           ...prev, 
           results: searchResult.results, 

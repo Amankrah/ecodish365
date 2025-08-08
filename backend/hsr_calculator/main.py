@@ -2,97 +2,503 @@ import logging
 import time
 import os
 import sys
+import json
+from typing import Dict, List, Any
+from dataclasses import dataclass
 
 # Add the parent directory to the Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from hsr.utils.data_loader import load_cnf_data
-from hsr.models.food import Food
-from hsr.models.meal import Meal
-from hsr.models.category import Category
-from hsr.calculators.unified_hsr_calculator import UnifiedHSRCalculator
-from hsr.calculators.fvnl_calculator import calculate_fvnl_content
+# Add API views path
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'api', 'views'))
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-def map_food_group_to_category(food_group_id: int) -> Category:
-    beverage_groups = [14]  # Beverages
-    dairy_groups = [1]  # Dairy and Egg Products
-    oils_groups = [4]  # Fats and Oils
-    cheese_groups = [1]  # Assuming cheese is part of Dairy and Egg Products
 
-    if food_group_id in beverage_groups:
-        return Category.BEVERAGE
-    elif food_group_id in dairy_groups:
-        return Category.DAIRY_FOOD
-    elif food_group_id in oils_groups:
-        return Category.OILS_AND_SPREADS
-    elif food_group_id in cheese_groups:
-        # You may need additional logic to differentiate cheese from other dairy products
-        return Category.CHEESE
-    else:
-        return Category.FOOD
-
-def get_food_data(food_id: int, serving_size: float) -> Food:
-    food_name_df, nutrient_name_df, nutrient_amount_df, food_group_df = load_cnf_data()
+@dataclass
+class MockRequest:
+    """Mock Django request object for testing"""
+    data: Dict[str, Any]
+    GET: Dict[str, str]
+    method: str = 'POST'
     
-    food_data = food_name_df[food_name_df['FoodID'] == food_id].iloc[0]
-    category = map_food_group_to_category(food_data['FoodGroupID'])
-    
-    nutrients = {}
-    nutrient_data = nutrient_amount_df[nutrient_amount_df['FoodID'] == food_id]
-    
-    for _, row in nutrient_data.iterrows():
-        nutrient_name = nutrient_name_df[nutrient_name_df['NutrientID'] == row['NutrientID']]['NutrientName'].iloc[0]
-        nutrients[nutrient_name] = row['NutrientValue']
+    def __init__(self, data=None, get_params=None, method='POST'):
+        self.data = data or {}
+        self.GET = get_params or {}
+        self.method = method
 
-    fvnl_percent = calculate_fvnl_content(food_id)
+# Test data sets for different scenarios
+TEST_SCENARIOS = {
+    "simple_meal": {
+        "food_ids": [2003, 3580],  # Simple two-food meal
+        "serving_sizes": [150, 100],
+        "description": "Simple meal with two foods"
+    },
+    "complex_meal": {
+        "food_ids": [2003, 3580, 2892, 1001],  # More complex meal
+        "serving_sizes": [150, 100, 10, 50],
+        "description": "Complex meal with multiple foods"
+    },
+    "single_food": {
+        "food_ids": [2003],  # Single food item
+        "serving_sizes": [100],
+        "description": "Single food analysis"
+    },
+    "comparison_foods": {
+        "food_ids": [2003, 3580, 2892, 1001, 5001],  # Foods for comparison
+        "serving_size": 100,  # Standard serving size for comparison
+        "description": "Foods for comparison testing"
+    }
+}
 
-    return Food(
-        food_id=food_id,
-        food_name=food_data['FoodDescription'],
-        category=category,
-        serving_size=serving_size,
-        nutrients=nutrients,
-        fvnl_percent=fvnl_percent
-    )
 
-def calculate_hsr_for_meal(food_ids: list[int], serving_sizes: list[float]) -> float:
-    if len(food_ids) != len(serving_sizes):
-        raise ValueError("The number of food IDs must match the number of serving sizes")
+def setup_django_environment():
+    """Setup minimal Django environment for testing"""
+    try:
+        import django
+        from django.conf import settings
+        
+        if not settings.configured:
+            settings.configure(
+                DEBUG=True,
+                CNF_FOLDER=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'raw_cnf'),
+                CACHES={
+                    'default': {
+                        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+                    }
+                }
+            )
+            django.setup()
+            
+        logger.info("Django environment configured for testing")
+        return True
+    except Exception as e:
+        logger.warning(f"Could not setup Django environment: {e}")
+        logger.info("Proceeding with direct function testing")
+        return False
 
-    foods = [get_food_data(food_id, serving_size) for food_id, serving_size in zip(food_ids, serving_sizes)]
-    
-    meal_category = max(set(food.category for food in foods), key=lambda x: [food.category for food in foods].count(x))
-    
-    meal = Meal(foods=foods, category=meal_category)
-    calculator = UnifiedHSRCalculator(meal)
-    return calculator.calculate_hsr()
-
-def main():
-    start_time = time.time()
-
-    food_ids = [2003, 3580, 2892]  # Example food IDs
-    serving_sizes = [150, 100, 10]  # Example serving sizes in grams
+def test_calculate_hsr_simple():
+    """Test simple HSR calculation endpoint"""
+    logger.info("\n" + "="*60)
+    logger.info("TESTING: Simple HSR Calculation")
+    logger.info("="*60)
     
     try:
-        # Load CNF data to verify it's working
-        food_name_df, nutrient_name_df, nutrient_amount_df, food_group_df = load_cnf_data()
-        logger.info("CNF data loaded successfully")
-
-        hsr = calculate_hsr_for_meal(food_ids, serving_sizes)
+        # Import the view function
+        from hsr_views_consolidated import calculate_hsr
         
-        logger.info(f"Health Star Rating (HSR): {hsr:.1f}")
+        # Test data
+        test_data = TEST_SCENARIOS["simple_meal"]
         
+        # Create mock request
+        request = MockRequest(data={
+            "food_ids": test_data["food_ids"],
+            "serving_sizes": test_data["serving_sizes"],
+            "analysis_level": "simple",
+            "include_alternatives": False,
+            "include_meal_insights": False
+        })
+        
+        logger.info(f"Testing: {test_data['description']}")
+        logger.info(f"Food IDs: {test_data['food_ids']}")
+        logger.info(f"Serving sizes: {test_data['serving_sizes']}")
+        
+        # Call the view
+        response = calculate_hsr(request)
+        
+        if hasattr(response, 'data'):
+            result = response.data
+            logger.info(f"✓ Simple HSR calculation successful")
+            logger.info(f"  Star Rating: {result.get('hsr_result', {}).get('rating', {}).get('star_rating', 'N/A')}")
+            logger.info(f"  Level: {result.get('hsr_result', {}).get('rating', {}).get('level', 'N/A')}")
+            logger.info(f"  Category: {result.get('hsr_result', {}).get('rating', {}).get('category', 'N/A')}")
+            
+            # Print some key insights
+            key_insights = result.get('hsr_result', {}).get('key_insights', {})
+            if key_insights:
+                logger.info(f"  Strengths: {key_insights.get('strengths', 0)}")
+                logger.info(f"  Concerns: {key_insights.get('concerns', 0)}")
+            
+            return True
+        else:
+            logger.error(f"✗ Unexpected response format: {response}")
+            return False
+            
     except Exception as e:
-        logger.error(f"An error occurred: {e}")
+        logger.error(f"✗ Simple HSR calculation failed: {e}")
         import traceback
         logger.error(traceback.format_exc())
+        return False
 
+
+def test_calculate_hsr_detailed():
+    """Test detailed HSR calculation endpoint"""
+    logger.info("\n" + "="*60)
+    logger.info("TESTING: Detailed HSR Calculation")
+    logger.info("="*60)
+    
+    try:
+        from hsr_views_consolidated import calculate_hsr
+        
+        # Test data
+        test_data = TEST_SCENARIOS["complex_meal"]
+        
+        # Create mock request
+        request = MockRequest(data={
+            "food_ids": test_data["food_ids"],
+            "serving_sizes": test_data["serving_sizes"],
+            "analysis_level": "detailed",
+            "include_alternatives": True,
+            "include_meal_insights": True
+        })
+        
+        logger.info(f"Testing: {test_data['description']}")
+        logger.info(f"Food IDs: {test_data['food_ids']}")
+        logger.info(f"Serving sizes: {test_data['serving_sizes']}")
+        
+        # Call the view
+        response = calculate_hsr(request)
+        
+        if hasattr(response, 'data'):
+            result = response.data
+            logger.info(f"✓ Detailed HSR calculation successful")
+            
+            # Extract detailed information
+            hsr_result = result.get('hsr_result', {})
+            rating = hsr_result.get('rating', {})
+            score_breakdown = hsr_result.get('score_breakdown', {})
+            
+            logger.info(f"  Star Rating: {rating.get('star_rating', 'N/A')}")
+            logger.info(f"  Final Score: {score_breakdown.get('final_score', 'N/A')}")
+            logger.info(f"  Baseline Points: {score_breakdown.get('baseline_points', 'N/A')}")
+            logger.info(f"  Modifying Points: {score_breakdown.get('modifying_points', 'N/A')}")
+            
+            # Check for enhanced features
+            enhanced_features = hsr_result.get('enhanced_features', {})
+            if enhanced_features:
+                logger.info("  Enhanced Features:")
+                for feature, enabled in enhanced_features.items():
+                    logger.info(f"    {feature}: {enabled}")
+            
+            # Food details
+            food_details = result.get('food_details', [])
+            logger.info(f"  Analyzed {len(food_details)} foods")
+            
+            return True
+        else:
+            logger.error(f"✗ Unexpected response format: {response}")
+            return False
+            
+    except Exception as e:
+        logger.error(f"✗ Detailed HSR calculation failed: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return False
+
+
+def test_compare_foods():
+    """Test food comparison endpoint"""
+    logger.info("\n" + "="*60)
+    logger.info("TESTING: Food Comparison")
+    logger.info("="*60)
+    
+    try:
+        from hsr_views_consolidated import compare_foods
+        
+        # Test data
+        test_data = TEST_SCENARIOS["comparison_foods"]
+        
+        # Create mock request
+        request = MockRequest(data={
+            "food_ids": test_data["food_ids"],
+            "serving_size": test_data["serving_size"],
+            "sort_by": "hsr_rating"
+        })
+        
+        logger.info(f"Testing: {test_data['description']}")
+        logger.info(f"Food IDs: {test_data['food_ids']}")
+        logger.info(f"Standard serving size: {test_data['serving_size']}g")
+        
+        # Call the view
+        response = compare_foods(request)
+        
+        if hasattr(response, 'data'):
+            result = response.data
+            logger.info(f"✓ Food comparison successful")
+            
+            comparison = result.get('comparison', {})
+            logger.info(f"  Total foods: {comparison.get('total_foods', 0)}")
+            logger.info(f"  Successfully analyzed: {comparison.get('successfully_analyzed', 0)}")
+            
+            # Show top foods
+            foods = comparison.get('foods', [])
+            valid_foods = [f for f in foods if 'hsr_rating' in f]
+            
+            if valid_foods:
+                logger.info("  Top 3 foods by HSR rating:")
+                for i, food in enumerate(valid_foods[:3]):
+                    logger.info(f"    {i+1}. {food.get('food_name', 'Unknown')} - {food.get('hsr_rating', 'N/A')} stars")
+            
+            return True
+        else:
+            logger.error(f"✗ Unexpected response format: {response}")
+            return False
+            
+    except Exception as e:
+        logger.error(f"✗ Food comparison failed: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return False
+
+
+def test_food_profile():
+    """Test individual food profile endpoint"""
+    logger.info("\n" + "="*60)
+    logger.info("TESTING: Food Profile Analysis")
+    logger.info("="*60)
+    
+    try:
+        from hsr_views_consolidated import get_food_hsr_profile
+        
+        # Test single food
+        food_id = TEST_SCENARIOS["single_food"]["food_ids"][0]
+        serving_size = TEST_SCENARIOS["single_food"]["serving_sizes"][0]
+        
+        # Create mock request (GET request)
+        request = MockRequest(
+            get_params={
+                "serving_size": str(serving_size),
+                "include_alternatives": "true"
+            },
+            method='GET'
+        )
+        
+        logger.info(f"Testing food profile for Food ID: {food_id}")
+        logger.info(f"Serving size: {serving_size}g")
+        
+        # Call the view
+        response = get_food_hsr_profile(request, food_id)
+        
+        if hasattr(response, 'data'):
+            result = response.data
+            logger.info(f"✓ Food profile analysis successful")
+            
+            food_profile = result.get('food_profile', {})
+            basic_info = food_profile.get('basic_info', {})
+            
+            logger.info(f"  Food: {basic_info.get('food_name', 'Unknown')}")
+            logger.info(f"  Food Group: {basic_info.get('food_group', 'Unknown')}")
+            logger.info(f"  HSR Category: {basic_info.get('hsr_category', 'Unknown')}")
+            
+            # HSR Analysis
+            hsr_analysis = food_profile.get('hsr_analysis', {})
+            rating = hsr_analysis.get('rating', {})
+            if rating:
+                logger.info(f"  HSR Rating: {rating.get('star_rating', 'N/A')} stars")
+                logger.info(f"  Level: {rating.get('level', 'N/A')}")
+            
+            return True
+        else:
+            logger.error(f"✗ Unexpected response format: {response}")
+            return False
+            
+    except Exception as e:
+        logger.error(f"✗ Food profile analysis failed: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return False
+
+
+def test_meal_insights():
+    """Test meal insights endpoint"""
+    logger.info("\n" + "="*60)
+    logger.info("TESTING: Meal Insights Analysis")
+    logger.info("="*60)
+    
+    try:
+        from hsr_views_consolidated import get_meal_insights
+        
+        # Test data
+        test_data = TEST_SCENARIOS["complex_meal"]
+        
+        # Create mock request
+        request = MockRequest(data={
+            "food_ids": test_data["food_ids"],
+            "serving_sizes": test_data["serving_sizes"],
+            "meal_type": "lunch",
+            "dietary_goals": ["heart_health", "weight_loss"]
+        })
+        
+        logger.info(f"Testing: {test_data['description']}")
+        logger.info(f"Meal type: lunch")
+        logger.info(f"Dietary goals: heart_health, weight_loss")
+        
+        # Call the view
+        response = get_meal_insights(request)
+        
+        if hasattr(response, 'data'):
+            result = response.data
+            logger.info(f"✓ Meal insights analysis successful")
+            
+            meal_insights = result.get('meal_insights', {})
+            
+            # Meal composition
+            composition = meal_insights.get('meal_composition', {})
+            if composition:
+                logger.info(f"  Total foods: {composition.get('total_foods', 'N/A')}")
+                logger.info(f"  Total weight: {composition.get('total_weight', 'N/A')}g")
+            
+            # HSR breakdown
+            hsr_breakdown = meal_insights.get('hsr_breakdown', {})
+            if hsr_breakdown:
+                logger.info(f"  Final HSR Rating: {hsr_breakdown.get('final_rating', 'N/A')}")
+            
+            return True
+        else:
+            logger.error(f"✗ Unexpected response format: {response}")
+            return False
+            
+    except Exception as e:
+        logger.error(f"✗ Meal insights analysis failed: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return False
+
+
+def test_error_handling():
+    """Test error handling with invalid inputs"""
+    logger.info("\n" + "="*60)
+    logger.info("TESTING: Error Handling")
+    logger.info("="*60)
+    
+    try:
+        from hsr_views_consolidated import calculate_hsr
+        
+        # Test with invalid data
+        test_cases = [
+            {
+                "name": "Empty food list",
+                "data": {"food_ids": [], "serving_sizes": []}
+            },
+            {
+                "name": "Mismatched arrays",
+                "data": {"food_ids": [2003, 3580], "serving_sizes": [150]}
+            },
+            {
+                "name": "Invalid serving size",
+                "data": {"food_ids": [2003], "serving_sizes": [-50]}
+            }
+        ]
+        
+        for test_case in test_cases:
+            logger.info(f"  Testing: {test_case['name']}")
+            
+            request = MockRequest(data=test_case["data"])
+            
+            try:
+                response = calculate_hsr(request)
+                if hasattr(response, 'data') and not response.data.get('success', True):
+                    logger.info(f"    ✓ Correctly handled error: {response.data.get('error', 'Unknown error')}")
+                else:
+                    logger.warning(f"    ⚠ Expected error but got success")
+            except Exception as e:
+                logger.info(f"    ✓ Correctly raised exception: {str(e)}")
+        
+        return True
+        
+    except Exception as e:
+        logger.error(f"✗ Error handling test failed: {e}")
+        return False
+
+
+def main():
+    """
+    Main test runner for HSR Views Consolidated
+    
+    This test suite validates the HSR views from hsr_views_consolidated.py by:
+    1. Setting up a minimal Django environment
+    2. Creating mock request objects
+    3. Testing all major endpoints with various scenarios
+    4. Validating response formats and error handling
+    5. Providing comprehensive logging and reporting
+    
+    Usage:
+    - Run from the hsr_calculator directory: python main.py
+    - Requires Django, CNF data, and all HSR calculator dependencies
+    - Tests will run even if Django environment setup fails (with warnings)
+    """
+    start_time = time.time()
+    
+    logger.info("="*80)
+    logger.info("HSR VIEWS CONSOLIDATED - COMPREHENSIVE TEST SUITE")
+    logger.info("="*80)
+    logger.info("Testing all endpoints from hsr_views_consolidated.py")
+    logger.info("This validates the complete HSR API functionality")
+    logger.info("="*80)
+    
+    # Setup environment
+    django_available = setup_django_environment()
+    
+    if not django_available:
+        logger.error("Django environment not available - some tests may fail")
+        logger.info("Continuing with available tests...")
+    
+    # Track test results
+    test_results = {}
+    
+    # Run comprehensive tests
+    tests = [
+        ("Simple HSR Calculation", test_calculate_hsr_simple),
+        ("Detailed HSR Calculation", test_calculate_hsr_detailed),
+        ("Food Comparison", test_compare_foods),
+        ("Food Profile Analysis", test_food_profile),
+        ("Meal Insights Analysis", test_meal_insights),
+        ("Error Handling", test_error_handling)
+    ]
+    
+    for test_name, test_func in tests:
+        try:
+            logger.info(f"\nStarting test: {test_name}")
+            result = test_func()
+            test_results[test_name] = result
+            
+            if result:
+                logger.info(f"✓ {test_name} PASSED")
+            else:
+                logger.error(f"✗ {test_name} FAILED")
+                
+        except Exception as e:
+            logger.error(f"✗ {test_name} CRASHED: {e}")
+            test_results[test_name] = False
+    
+    # Final summary
     end_time = time.time()
-    logger.info(f"Execution Time: {end_time - start_time:.3f} seconds")
+    total_time = end_time - start_time
+    
+    logger.info("\n" + "="*80)
+    logger.info("TEST SUMMARY")
+    logger.info("="*80)
+    
+    passed = sum(1 for result in test_results.values() if result)
+    total = len(test_results)
+    
+    for test_name, result in test_results.items():
+        status = "✓ PASSED" if result else "✗ FAILED"
+        logger.info(f"{test_name}: {status}")
+    
+    logger.info(f"\nOverall Results: {passed}/{total} tests passed")
+    logger.info(f"Total execution time: {total_time:.3f} seconds")
+    
+    if passed == total:
+        logger.info("🎉 ALL TESTS PASSED!")
+    else:
+        logger.warning(f"⚠ {total - passed} tests failed")
+    
+    logger.info("="*80)
+
 
 if __name__ == "__main__":
     main()

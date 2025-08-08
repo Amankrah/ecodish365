@@ -20,10 +20,10 @@ const navigation = [
     href: '/cnf', 
     icon: ChartBarIcon,
     dropdown: [
-      { name: 'Food Search', href: '/cnf' },
-      { name: 'Food Groups', href: '/cnf/groups' },
-      { name: 'Nutrients', href: '/cnf/nutrients' },
+      { name: 'Food Search', href: '/cnf/search' },
       { name: 'Compare Foods', href: '/cnf/compare' },
+      { name: 'Food Groups', href: '/cnf/groups' },
+      { name: 'Analytics', href: '/cnf/analytics' },
     ]
   },
   { 
@@ -66,7 +66,7 @@ export default function Navigation() {
                 alt="EcoDish365"
                 width={180}
                 height={180}
-                className="w-180 h-180 hover:scale-105 transition-transform duration-200"
+                className="h-40 w-auto hover:scale-105 transition-transform duration-200"
               />
             </Link>
           </div>
@@ -80,8 +80,7 @@ export default function Navigation() {
               
               return (
                 <div key={item.name} className="relative group">
-                  <button
-                    onClick={() => setActiveDropdown(isDropdownOpen ? null : item.name)}
+                  <div
                     onMouseEnter={() => setActiveDropdown(item.name)}
                     className={clsx(
                       'flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 relative group',
@@ -94,18 +93,27 @@ export default function Navigation() {
                       'w-4 h-4 transition-colors duration-200',
                       isActive ? 'text-blue-600' : 'text-gray-500 group-hover:text-gray-700'
                     )} />
-                    <span className="relative">
-                      {item.name}
-                      {isActive && (
-                        <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-green-500 rounded-full" />
-                      )}
-                    </span>
-                    <ChevronDownIcon className={clsx(
-                      'w-4 h-4 transition-transform duration-200',
-                      isDropdownOpen ? 'rotate-180' : '',
-                      isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'
-                    )} />
-                  </button>
+                    <Link href={item.href} className="flex-1">
+                      <span className="relative">
+                        {item.name}
+                        {isActive && (
+                          <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-green-500 rounded-full" />
+                        )}
+                      </span>
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => setActiveDropdown(isDropdownOpen ? null : item.name)}
+                      className="p-1"
+                      aria-label={`Toggle ${item.name} dropdown`}
+                    >
+                      <ChevronDownIcon className={clsx(
+                        'w-4 h-4 transition-transform duration-200',
+                        isDropdownOpen ? 'rotate-180' : '',
+                        isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'
+                      )} />
+                    </button>
+                  </div>
                   
                   {/* Dropdown Menu */}
                   {isDropdownOpen && (

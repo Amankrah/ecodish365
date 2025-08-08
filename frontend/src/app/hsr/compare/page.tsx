@@ -12,7 +12,8 @@ import {
   CheckCircleIcon,
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
-import { HSRApiService, CNFApiService, type HSRComparison, type SearchResult } from '@/lib/api';
+import { HSRApiService, CNFApiService, type HSRComparison, type SearchResult, type FilterOptions } from '@/lib/api';
+import StarRating from '@/components/StarRating';
 
 interface ComparisonFood {
   id: string;
@@ -43,6 +44,22 @@ export default function HSRCompare() {
   const [activeSearch, setActiveSearch] = useState<string>('');
   const [result, setResult] = useState<HSRComparison | null>(null);
   const [isComparing, setIsComparing] = useState(false);
+  const [filters, setFilters] = useState<FilterOptions | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedMethod, setSelectedMethod] = useState<string>('');
+
+  // Load filters on component mount
+  useEffect(() => {
+    const loadFilters = async () => {
+      try {
+        const filterOptions = await CNFApiService.getFoodFilters();
+        setFilters(filterOptions);
+      } catch (error) {
+        console.error('Failed to load filters:', error);
+      }
+    };
+    loadFilters();
+  }, []);
 
   // Debounced search
   useEffect(() => {
@@ -54,10 +71,28 @@ export default function HSRCompare() {
     const timeoutId = setTimeout(async () => {
       setSearch(prev => ({ ...prev, isLoading: true }));
       try {
-        const searchResult = await CNFApiService.searchFoods(search.query, 10);
+        // Try enhanced search first, fallback to regular search
+        let searchResult;
+        try {
+          searchResult = await CNFApiService.searchFoodsEnhanced({
+            query: search.query,
+            limit: 50,
+            category: selectedCategory || undefined,
+            method: selectedMethod || undefined
+          });
+        } catch (enhancedError) {
+          console.log('Enhanced search failed, falling back to regular search:', enhancedError);
+          try {
+            searchResult = await CNFApiService.searchFoods(search.query, 50);
+          } catch (regularError) {
+            console.error('Both search methods failed:', { enhancedError, regularError });
+            throw regularError;
+          }
+        }
+        
         setSearch(prev => ({ 
           ...prev, 
-          results: searchResult.results, 
+          results: searchResult.results || [], 
           isLoading: false, 
           showResults: true 
         }));
@@ -68,7 +103,7 @@ export default function HSRCompare() {
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [search.query]);
+  }, [search.query, selectedCategory, selectedMethod]);
 
   const addFood = () => {
     const newId = (foods.length + 1).toString();
@@ -199,6 +234,63 @@ export default function HSRCompare() {
                   </select>
                 </div>
               </div>
+
+              {/* Search Filters */}
+              {filters && (
+                <div className="mb-6 space-y-4 border-t pt-4">
+                  <h3 className="text-sm font-medium text-gray-700">Search Filters</h3>
+                  
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Food Category
+                    </label>
+                    <select
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      aria-label="Food category filter"
+                    >
+                      <option value="">All categories</option>
+                      {filters.categories.map((category) => (
+                        <option key={category} value={category}>
+                          {category.charAt(0).toUpperCase() + category.slice(1)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Cooking Method
+                    </label>
+                    <select
+                      value={selectedMethod}
+                      onChange={(e) => setSelectedMethod(e.target.value)}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      aria-label="Cooking method filter"
+                    >
+                      <option value="">All methods</option>
+                      {filters.methods.map((method) => (
+                        <option key={method} value={method}>
+                          {method.charAt(0).toUpperCase() + method.slice(1)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  {(selectedCategory || selectedMethod) && (
+                    <button
+                      onClick={() => {
+                        setSelectedCategory('');
+                        setSelectedMethod('');
+                      }}
+                      className="text-xs text-blue-600 hover:text-blue-800"
+                    >
+                      Clear filters
+                    </button>
+                  )}
+                </div>
+              )}
 
               {/* Food Inputs */}
               <div className="space-y-4">
@@ -455,21 +547,11 @@ export default function HSRCompare() {
                               </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="flex items-center">
-                                <span className={`text-lg font-bold mr-2 ${getStarRatingColor(food.hsr_rating)}`}>
-                                  {food.hsr_rating.toFixed(1)}
-                                </span>
-                                <div className="flex">
-                                  {[...Array(5)].map((_, i) => (
-                                    <StarIcon
-                                      key={i}
-                                      className={`w-4 h-4 ${
-                                        i < food.hsr_rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
-                                      }`}
-                                    />
-                                  ))}
-                                </div>
-                              </div>
+                              <StarRating 
+                                rating={food.hsr_rating} 
+                                size="sm" 
+                                showRating={true}
+                              />
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRatingBadgeColor(food.hsr_level)}`}>
@@ -527,21 +609,11 @@ export default function HSRCompare() {
                               {food.food_name}
                             </h4>
                           </div>
-                          <div className="flex items-center">
-                            <span className={`text-lg font-bold mr-2 ${getStarRatingColor(food.hsr_rating)}`}>
-                              {food.hsr_rating.toFixed(1)}
-                            </span>
-                            <div className="flex">
-                              {[...Array(5)].map((_, i) => (
-                                <StarIcon
-                                  key={i}
-                                  className={`w-4 h-4 ${
-                                    i < food.hsr_rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
-                                  }`}
-                                />
-                              ))}
-                            </div>
-                          </div>
+                          <StarRating 
+                            rating={food.hsr_rating} 
+                            size="sm" 
+                            showRating={true}
+                          />
                         </div>
                         
                         {/* Food Details */}

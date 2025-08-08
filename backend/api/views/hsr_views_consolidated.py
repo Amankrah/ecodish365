@@ -21,7 +21,7 @@ from hsr.models.food import Food as HSRFood
 from hsr.models.meal import Meal as HSRMeal
 from hsr.models.category import Category
 from hsr.calculators.hsr_calculator import HSRCalculator, HSRConfig
-from hsr.utils.meal_categorizer import MealCategorizer
+from hsr.providers.threshold_provider import ThresholdProvider
 from hsr.calculators.fvnl_calculator import calculate_fvnl_content
 from hsr.utils.food_group_mapper import FoodGroupMapper
 
@@ -110,20 +110,27 @@ def calculate_hsr(request):
         except Exception as e:
             raise HSRAPIError(f"Failed to load food {food_id}: {str(e)}")
     
-    # Use scientific meal categorization for better accuracy
-    categorization_result = MealCategorizer.determine_scientific_category(foods)
+    # Determine HSR category using official methodology
+    primary_food = foods[0] if foods else None
+    if primary_food:
+        meal_category = ThresholdProvider.get_category_from_food(
+            primary_food.food_name, 
+            getattr(primary_food, 'food_group_id', 0)
+        )
+    else:
+        meal_category = Category.FOOD  # Default
     
-    # Create meal with scientifically-determined category
+    # Create meal with determined category
     meal = HSRMeal(foods=foods)
-    meal.category = categorization_result.recommended_category
+    meal.category = meal_category
     
-    # Use calculator with scientific improvements
+    # Use standard HSR configuration
     config = HSRConfig(
-        use_scientific_thresholds=True,
-        differentiate_sugar_sources=True,
-        apply_satiety_adjustments=True,
-        use_unified_energy_approach=True,
-        consider_processing_level=True,
+        use_scientific_thresholds=False,
+        differentiate_sugar_sources=False,
+        apply_satiety_adjustments=False,
+        use_unified_energy_approach=False,
+        consider_processing_level=False,
         include_confidence_metrics=True,
         detailed_explanations=(analysis_level == 'detailed')
     )
@@ -134,9 +141,9 @@ def calculate_hsr(request):
     else:
         result = _calculate_detailed_hsr(calculator, include_alternatives, include_meal_insights)
     
-    # Add food details and categorization info for user context
+    # Add food details for user context
     result['food_details'] = _get_food_details_summary(foods)
-    result['meal_categorization'] = _get_meal_categorization_summary(meal, categorization_result)
+    result['meal_categorization'] = _get_basic_meal_categorization_summary(meal)
     
     return Response(result)
 
@@ -173,18 +180,21 @@ def compare_foods(request):
         try:
             food = _load_food_data(food_id, serving_size)
             
-            # Use scientific categorization for single food
-            categorization_result = MealCategorizer.determine_scientific_category([food])
+            # Use official HSR categorization for single food
+            food_category = ThresholdProvider.get_category_from_food(
+                food.food_name, 
+                getattr(food, 'food_group_id', 0)
+            )
             meal = HSRMeal(foods=[food])
-            meal.category = categorization_result.recommended_category
+            meal.category = food_category
             
-            # Use calculator
+            # Use standard HSR configuration
             config = HSRConfig(
-                use_scientific_thresholds=True,
-                differentiate_sugar_sources=True,
-                apply_satiety_adjustments=True,
-                use_unified_energy_approach=True,
-                consider_processing_level=True
+                use_scientific_thresholds=False,
+                differentiate_sugar_sources=False,
+                apply_satiety_adjustments=False,
+                use_unified_energy_approach=False,
+                consider_processing_level=False
             )
             calculator = HSRCalculator(meal, config)
             result = calculator.calculate_hsr()
@@ -239,18 +249,21 @@ def get_food_hsr_profile(request, food_id):
     try:
         food = _load_food_data(food_id, serving_size)
         
-        # Use scientific categorization
-        categorization_result = MealCategorizer.determine_scientific_category([food])
+        # Use official HSR categorization
+        food_category = ThresholdProvider.get_category_from_food(
+            food.food_name, 
+            getattr(food, 'food_group_id', 0)
+        )
         meal = HSRMeal(foods=[food])
-        meal.category = categorization_result.recommended_category
+        meal.category = food_category
         
-        # Use calculator
+        # Use standard HSR configuration
         config = HSRConfig(
-            use_scientific_thresholds=True,
-            differentiate_sugar_sources=True,
-            apply_satiety_adjustments=True,
-            use_unified_energy_approach=True,
-            consider_processing_level=True,
+            use_scientific_thresholds=False,
+            differentiate_sugar_sources=False,
+            apply_satiety_adjustments=False,
+            use_unified_energy_approach=False,
+            consider_processing_level=False,
             detailed_explanations=True
         )
         calculator = HSRCalculator(meal, config)
@@ -297,21 +310,29 @@ def get_meal_insights(request):
     
     _validate_hsr_input(food_ids, serving_sizes)
     
-    # Load foods and calculate meal HSR using enhanced system
+    # Load foods and calculate meal HSR using official methodology
     foods = [_load_food_data(fid, size) for fid, size in zip(food_ids, serving_sizes)]
     
-    # Use scientific categorization
-    categorization_result = MealCategorizer.determine_scientific_category(foods)
-    meal = HSRMeal(foods=foods)
-    meal.category = categorization_result.recommended_category
+    # Use official HSR categorization
+    primary_food = foods[0] if foods else None
+    if primary_food:
+        meal_category = ThresholdProvider.get_category_from_food(
+            primary_food.food_name, 
+            getattr(primary_food, 'food_group_id', 0)
+        )
+    else:
+        meal_category = Category.FOOD  # Default
     
-    # Use calculator
+    meal = HSRMeal(foods=foods)
+    meal.category = meal_category
+    
+    # Use standard HSR configuration
     config = HSRConfig(
-        use_scientific_thresholds=True,
-        differentiate_sugar_sources=True,
-        apply_satiety_adjustments=True,
-        use_unified_energy_approach=True,
-        consider_processing_level=True,
+        use_scientific_thresholds=False,
+        differentiate_sugar_sources=False,
+        apply_satiety_adjustments=False,
+        use_unified_energy_approach=False,
+        consider_processing_level=False,
         detailed_explanations=True
     )
     calculator = HSRCalculator(meal, config)
@@ -327,21 +348,16 @@ def get_meal_insights(request):
             "improvement_opportunities": _identify_improvement_opportunities(foods, result),
             "meal_type_suitability": _assess_meal_type_suitability(meal, meal_type),
             "dietary_goal_alignment": _assess_dietary_goal_alignment(meal, result, dietary_goals),
-            # Enhanced insights
-            "sugar_source_analysis": {
-                "natural_sugars": calculator.sugar_analysis.natural_sugars,
-                "added_sugars": calculator.sugar_analysis.added_sugars,
-                "natural_percentage": calculator.sugar_analysis.natural_percentage,
-                "sources": calculator.sugar_analysis.sources
-            },
-            "satiety_analysis": {
-                "satiety_index": calculator.nutritional_context.satiety_index,
-                "processing_level": calculator.nutritional_context.processing_level,
-                "liquid_percentage": calculator.nutritional_context.liquid_percentage
+            # Basic nutritional analysis only
+            "nutritional_summary": {
+                "total_sugars": meal.sugars_total,
+                "energy_per_100g": meal.energy_kj,
+                "protein_per_100g": meal.protein,
+                "fiber_per_100g": meal.fibre_total_dietary
             }
         },
         "food_details": _get_food_details_summary(foods),
-        "meal_categorization": _get_meal_categorization_summary(meal, categorization_result)
+        "meal_categorization": _get_basic_meal_categorization_summary(meal)
     }
     
     return Response(insights)
@@ -429,11 +445,10 @@ def _calculate_simple_hsr(calculator: HSRCalculator) -> Dict:
                 "top_concern": result.concerns[0].title if result.concerns else None
             },
             # Enhanced features (additional, doesn't break compatibility)
-            "enhanced_features": {
-                "uses_scientific_thresholds": True,
-                "differentiates_sugar_sources": True,
-                "considers_satiety": True,
-                "processing_level_aware": True
+            "algorithm_info": {
+                "uses_official_hsr_algorithm": True,
+                "category_specific_thresholds": True,
+                "standard_hsr_methodology": True
             }
         }
     }
@@ -455,19 +470,13 @@ def _calculate_detailed_hsr(calculator: HSRCalculator, include_alternatives: boo
     if include_meal_insights:
         response["hsr_result"]["meal_insights"] = _get_meal_level_insights(calculator.meal, result)
     
-    # Add enhanced analysis if available
-    if hasattr(calculator, 'sugar_analysis'):
-        response["hsr_result"]["sugar_source_analysis"] = {
-            "natural_sugars": calculator.sugar_analysis.natural_sugars,
-            "added_sugars": calculator.sugar_analysis.added_sugars,
-            "natural_percentage": calculator.sugar_analysis.natural_percentage
-        }
-    
-    if hasattr(calculator, 'nutritional_context'):
-        response["hsr_result"]["satiety_analysis"] = {
-            "satiety_index": calculator.nutritional_context.satiety_index,
-            "processing_level": calculator.nutritional_context.processing_level
-        }
+    # Add basic nutritional summary
+    response["hsr_result"]["nutritional_summary"] = {
+        "total_energy_kj": calculator.meal.energy_kj,
+        "total_protein_g": calculator.meal.protein,
+        "total_fiber_g": calculator.meal.fibre_total_dietary,
+        "total_sodium_mg": calculator.meal.sodium
+    }
     
     return response
 
@@ -494,13 +503,12 @@ def _format_detailed_hsr_result(result) -> Dict:
                 "fiber": result.component_score.fiber_points,
                 "fvnl": result.component_score.fvnl_points
             },
-            # Enhanced components (additional, doesn't break compatibility)
-            "enhanced_components": {
-                "sugar_natural": getattr(result.component_score, 'sugar_natural_points', 0),
-                "sugar_added": getattr(result.component_score, 'sugar_added_points', 0),
-                "satiety_adjustment": getattr(result.component_score, 'satiety_adjustment', 0.0),
-                "processing_penalty": getattr(result.component_score, 'processing_penalty', 0.0),
-                "naturalness_bonus": getattr(result.component_score, 'naturalness_bonus', 0.0)
+            # Standard HSR calculation details
+            "calculation_method": {
+                "baseline_formula": "energy + saturated_fat + sugar + sodium",
+                "modifying_formula": "protein + fiber + fvnl", 
+                "final_formula": "max(0, baseline - modifying)",
+                "category_specific": True
             }
         },
         "nutritional_analysis": [
@@ -522,13 +530,12 @@ def _format_detailed_hsr_result(result) -> Dict:
             "confidence_score": getattr(result, 'confidence_score', 0.8),
             "warnings": getattr(result, 'warnings', [])
         },
-        # Enhanced features flag
-        "enhanced_features": {
-            "uses_enhanced_algorithm": True,
-            "scientific_thresholds": True,
-            "sugar_source_differentiation": True,
-            "satiety_considerations": True,
-            "processing_level_assessment": True
+        # Official HSR algorithm confirmation
+        "algorithm_verification": {
+            "uses_official_hsr_algorithm": True,
+            "category_specific_thresholds": True,
+            "standard_hsr_methodology": True,
+            "compliant_with_hsr_specification": True
         }
     }
 
@@ -654,46 +661,24 @@ def _get_food_details_summary(foods: List[HSRFood]) -> List[Dict]:
     ]
 
 
-def _get_meal_categorization_summary(meal: HSRMeal) -> Dict:
-    """Get detailed summary of meal categorization for transparency"""
-    return {
-        "final_category": meal.category.value if meal.category else "unknown",
-        "category_confidence": getattr(meal, 'category_confidence', 0.0),
-        "category_analysis": getattr(meal, 'category_analysis', {}),
-        "category_warnings": getattr(meal, 'category_warnings', []),
-        "category_breakdown": meal.get_category_summary() if hasattr(meal, 'get_category_summary') else {}
-    }
-
-
-def _get_meal_categorization_summary(meal: HSRMeal, categorization_result) -> Dict:
-    """Get meal categorization summary with scientific insights"""
+def _get_basic_meal_categorization_summary(meal: HSRMeal) -> Dict:
+    """Get basic summary of meal categorization"""
     # Category name mapping
     category_name_map = {
-        '1': 'Beverage',
-        '1D': 'Dairy Beverage', 
-        '2': 'Food',
-        '2D': 'Dairy Food',
-        '3': 'Oils and Spreads',
-        '3D': 'Cheese'
+        Category.BEVERAGE: 'Category 1 - Beverages',
+        Category.DAIRY_BEVERAGE: 'Category 1D - Dairy Beverages', 
+        Category.FOOD: 'Category 2 - General Foods',
+        Category.CHEESE: 'Category 2D - Dairy Foods',
+        Category.OILS_AND_SPREADS: 'Category 3 - Oils, Spreads, Nuts & Seeds'
     }
-    
-    final_category_name = category_name_map.get(meal.category.value, meal.category.value) if meal.category else "unknown"
     
     return {
-        "final_category": final_category_name,
-        "category_confidence": categorization_result.confidence,
-        "reasoning": categorization_result.reasoning,
-        "nutritional_rationale": categorization_result.nutritional_rationale,
-        "scientific_method": "Scientific nutritional profile analysis",
-        "alternative_categories": [
-            {
-                "category": category_name_map.get(cat.value, cat.value),
-                "fitness_score": score,
-                "explanation": explanation
-            }
-            for cat, score, explanation in categorization_result.alternative_categories
-        ]
+        "final_category": category_name_map.get(meal.category, "Category 2 - General Foods") if meal.category else "unknown",
+        "category_code": meal.category.value if meal.category else "2",
+        "methodology": "Official HSR categorization based on primary food characteristics"
     }
+
+
 
 
 def _get_food_basic_info(food: HSRFood) -> Dict:

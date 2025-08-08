@@ -28,8 +28,9 @@ urlpatterns = [
     # Environmental Impact Calculator
     path('environmental-impact/', environmental_views.environmental_impact, name='environmental_impact'),
 
-    # Food search
-    path('food/search/', food_views.search_food_api, name='search_food_api'),
+    # Enhanced food search
+    path('search-food/', food_views.search_food_api, name='search_food_api'),
+    path('food-filters/', food_views.get_food_filters_api, name='get_food_filters_api'),
 
     # Calculator endpoints
     # path('hsr-calculator/', food_views.calculate_hsr, name='calculate_hsr'),  # Implemented in HSR section

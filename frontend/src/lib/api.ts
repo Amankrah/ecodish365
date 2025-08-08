@@ -1,10 +1,10 @@
 import axios from 'axios';
 
 // Use the correct API base URL from environment
-// Note: Django backend already routes API endpoints under /api/, so no need to append /api here
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL 
-  ? `${process.env.NEXT_PUBLIC_API_URL}`
-  : 'http://localhost:8000';
+// In development, call backend directly; in production, use environment URL
+const API_BASE_URL = process.env.NODE_ENV === 'development' 
+  ? 'http://localhost:8000/api'
+  : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api`;
 
 // Create axios instance with default config
 const api = axios.create({
@@ -68,6 +68,14 @@ export interface SearchResult {
   limit: number;
   offset: number;
   has_more: boolean;
+  filters?: {
+    available_categories: string[];
+    available_methods: string[];
+    applied_filters?: {
+      category?: string;
+      method?: string;
+    };
+  };
 }
 
 export interface FoodGroup {
@@ -149,14 +157,57 @@ export interface ApiResponse<T> {
   details?: string | string[];
 }
 
+// Enhanced Search Interface
+export interface EnhancedSearchOptions {
+  query: string;
+  category?: string;
+  method?: string;
+  limit?: number;
+  offset?: number;
+}
+
+// Filter Options
+export interface FilterOptions {
+  categories: string[];
+  methods: string[];
+}
+
 // API Service Class
 export class CNFApiService {
-  // Search & Exploration
+  // Enhanced Search & Exploration
   static async searchFoods(query: string, limit = 50, offset = 0): Promise<SearchResult> {
     const response = await api.get(`/cnf/search/`, {
       params: { q: query, limit, offset }
     });
     return response.data.data;
+  }
+
+  static async searchFoodsEnhanced(options: EnhancedSearchOptions): Promise<SearchResult> {
+    const params: Record<string, string | number> = {
+      query: options.query,
+      limit: options.limit || 50,
+      offset: options.offset || 0
+    };
+    
+    if (options.category) {
+      params.category = options.category;
+    }
+    
+    if (options.method) {
+      params.method = options.method;
+    }
+    
+    const response = await api.get(`/search-food/`, {
+      params
+    });
+    
+    // The enhanced search returns data directly, not wrapped in a data property
+    return response.data;
+  }
+
+  static async getFoodFilters(): Promise<FilterOptions> {
+    const response = await api.get(`/food-filters/`);
+    return response.data;
   }
 
   static async searchFoodsByNutrient(

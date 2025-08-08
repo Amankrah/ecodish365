@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
   MagnifyingGlassIcon,
-  StarIcon,
   ChartBarIcon,
   ExclamationTriangleIcon,
   CheckCircleIcon,
@@ -12,7 +11,8 @@ import {
   HeartIcon,
   CubeIcon
 } from '@heroicons/react/24/outline';
-import { HSRApiService, CNFApiService, type HSRFoodProfile, type SearchResult } from '@/lib/api';
+import { HSRApiService, CNFApiService, type HSRFoodProfile, type SearchResult, type FilterOptions } from '@/lib/api';
+import StarRating from '@/components/StarRating';
 
 interface SearchState {
   query: string;
@@ -33,6 +33,22 @@ export default function HSRFoodProfile() {
   });
   const [result, setResult] = useState<HSRFoodProfile | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [filters, setFilters] = useState<FilterOptions | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedMethod, setSelectedMethod] = useState<string>('');
+
+  // Load filters on component mount
+  useEffect(() => {
+    const loadFilters = async () => {
+      try {
+        const filterOptions = await CNFApiService.getFoodFilters();
+        setFilters(filterOptions);
+      } catch (error) {
+        console.error('Failed to load filters:', error);
+      }
+    };
+    loadFilters();
+  }, []);
 
   // Debounced search
   useEffect(() => {
@@ -44,10 +60,28 @@ export default function HSRFoodProfile() {
     const timeoutId = setTimeout(async () => {
       setSearch(prev => ({ ...prev, isLoading: true }));
       try {
-        const searchResult = await CNFApiService.searchFoods(search.query, 15);
+        // Try enhanced search first, fallback to regular search
+        let searchResult;
+        try {
+          searchResult = await CNFApiService.searchFoodsEnhanced({
+            query: search.query,
+            limit: 50,
+            category: selectedCategory || undefined,
+            method: selectedMethod || undefined
+          });
+        } catch (enhancedError) {
+          console.log('Enhanced search failed, falling back to regular search:', enhancedError);
+          try {
+            searchResult = await CNFApiService.searchFoods(search.query, 50);
+          } catch (regularError) {
+            console.error('Both search methods failed:', { enhancedError, regularError });
+            throw regularError;
+          }
+        }
+        
         setSearch(prev => ({ 
           ...prev, 
-          results: searchResult.results, 
+          results: searchResult.results || [], 
           isLoading: false, 
           showResults: true 
         }));
@@ -58,7 +92,7 @@ export default function HSRFoodProfile() {
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [search.query]);
+  }, [search.query, selectedCategory, selectedMethod]);
 
   const selectFood = (selectedItem: SearchResult['results'][0]) => {
     setSelectedFood({
@@ -172,6 +206,63 @@ export default function HSRFoodProfile() {
                 )}
               </div>
 
+              {/* Search Filters */}
+              {filters && !selectedFood && (
+                <div className="mb-6 space-y-4 border-t pt-4">
+                  <h3 className="text-sm font-medium text-gray-700">Search Filters</h3>
+                  
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Food Category
+                    </label>
+                    <select
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      aria-label="Food category filter"
+                    >
+                      <option value="">All categories</option>
+                      {filters.categories.map((category) => (
+                        <option key={category} value={category}>
+                          {category.charAt(0).toUpperCase() + category.slice(1)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Cooking Method
+                    </label>
+                    <select
+                      value={selectedMethod}
+                      onChange={(e) => setSelectedMethod(e.target.value)}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      aria-label="Cooking method filter"
+                    >
+                      <option value="">All methods</option>
+                      {filters.methods.map((method) => (
+                        <option key={method} value={method}>
+                          {method.charAt(0).toUpperCase() + method.slice(1)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  {(selectedCategory || selectedMethod) && (
+                    <button
+                      onClick={() => {
+                        setSelectedCategory('');
+                        setSelectedMethod('');
+                      }}
+                      className="text-xs text-blue-600 hover:text-blue-800"
+                    >
+                      Clear filters
+                    </button>
+                  )}
+                </div>
+              )}
+
               {/* Analysis Options */}
               {selectedFood && (
                 <div className="space-y-4 mb-6">
@@ -249,16 +340,7 @@ export default function HSRFoodProfile() {
                         <span>Serving: {result.food_profile.basic_info.serving_size}g</span>
                       </div>
                     </div>
-                    <div className="flex items-center">
-                      <span className="text-sm text-gray-500 mr-2">Confidence:</span>
-                      <span className={`text-sm font-medium ${
-                        (result.food_profile.hsr_analysis.validation?.confidence_score || 0.8) >= 0.9 ? 'text-green-600' :
-                        (result.food_profile.hsr_analysis.validation?.confidence_score || 0.8) >= 0.7 ? 'text-yellow-600' :
-                        'text-red-600'
-                      }`}>
-                        {((result.food_profile.hsr_analysis.validation?.confidence_score || 0.8) * 100).toFixed(0)}%
-                      </span>
-                    </div>
+
                   </div>
 
                   {/* Star Rating */}
@@ -267,16 +349,10 @@ export default function HSRFoodProfile() {
                       <span className={`text-6xl font-bold mr-4 ${getStarRatingColor(result.food_profile.hsr_analysis.rating.star_rating)}`}>
                         {result.food_profile.hsr_analysis.rating.star_rating}
                       </span>
-                      <div className="flex">
-                        {[...Array(5)].map((_, i) => (
-                          <StarIcon
-                            key={i}
-                            className={`w-8 h-8 ${
-                              i < result.food_profile.hsr_analysis.rating.star_rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
-                            }`}
-                          />
-                        ))}
-                      </div>
+                      <StarRating 
+                        rating={result.food_profile.hsr_analysis.rating.star_rating} 
+                        size="xl" 
+                      />
                     </div>
                     <div className="text-xl font-semibold text-gray-900 mb-2">
                       {result.food_profile.hsr_analysis.rating.level.charAt(0).toUpperCase() + 

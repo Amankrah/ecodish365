@@ -12,19 +12,23 @@ import {
   InformationCircleIcon,
   SparklesIcon
 } from '@heroicons/react/24/outline';
-import { CNFApiService, SearchResult, FoodGroup, Food } from '@/lib/api';
+import { CNFApiService, SearchResult, FoodGroup, Food, EnhancedSearchOptions, FilterOptions } from '@/lib/api';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { debounce } from 'lodash';
 
 interface SearchFilters {
   foodGroup: string;
+  category: string;
+  method: string;
   minRelevance: number;
   limit: number;
 }
 
 const INITIAL_FILTERS: SearchFilters = {
   foodGroup: '',
+  category: '',
+  method: '',
   minRelevance: 0,
   limit: 50,
 };
@@ -35,14 +39,16 @@ export default function CNFSearchPage() {
   const [results, setResults] = useState<SearchResult | null>(null);
   const [selectedFood, setSelectedFood] = useState<Food | null>(null);
   const [foodGroups, setFoodGroups] = useState<FoodGroup[]>([]);
+  const [filterOptions, setFilterOptions] = useState<FilterOptions | null>(null);
   const [selectedFoods, setSelectedFoods] = useState<number[]>([]);
   const [loading, setLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [offset, setOffset] = useState(0);
 
-  // Load food groups on mount
+  // Load food groups and filter options on mount
   useEffect(() => {
     loadFoodGroups();
+    loadFilterOptions();
   }, []);
 
   // Debounced search function
@@ -72,10 +78,41 @@ export default function CNFSearchPage() {
     }
   };
 
+  const loadFilterOptions = async () => {
+    try {
+      const options = await CNFApiService.getFoodFilters();
+      setFilterOptions(options);
+    } catch (error) {
+      console.error('Failed to load filter options:', error);
+    }
+  };
+
   const performSearch = async (searchQuery: string, searchFilters: SearchFilters, searchOffset: number) => {
     try {
       setLoading(true);
-      const searchResults = await CNFApiService.searchFoods(searchQuery, searchFilters.limit, searchOffset);
+      
+      // Use enhanced search if category/method filters are specified
+      let searchResults: SearchResult;
+      
+      if (searchFilters.category || searchFilters.method) {
+        const options: EnhancedSearchOptions = {
+          query: searchQuery,
+          limit: searchFilters.limit,
+          offset: searchOffset
+        };
+        
+        if (searchFilters.category) {
+          options.category = searchFilters.category;
+        }
+        
+        if (searchFilters.method) {
+          options.method = searchFilters.method;
+        }
+        
+        searchResults = await CNFApiService.searchFoodsEnhanced(options);
+      } else {
+        searchResults = await CNFApiService.searchFoods(searchQuery, searchFilters.limit, searchOffset);
+      }
       
       // Apply client-side filtering for food groups and relevance
       let filteredResults = searchResults.results;
@@ -153,9 +190,14 @@ export default function CNFSearchPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Advanced Food Search
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 mb-2">
             Search through the Canadian Nutrient File database with advanced filtering options
           </p>
+          <div className="text-sm text-gray-500">
+            <strong>Search Tips:</strong> Use filters like <code className="bg-gray-100 px-1 rounded">category:cheese</code>, 
+            <code className="bg-gray-100 px-1 rounded">method:cooked</code>, or 
+            <code className="bg-gray-100 px-1 rounded">type:chicken</code> in your search
+          </div>
         </div>
 
         {/* Search Interface */}
@@ -167,7 +209,7 @@ export default function CNFSearchPage() {
             </div>
             <input
               type="text"
-              placeholder="Search for foods (e.g., apple, chicken breast, whole wheat bread...)"
+              placeholder="Search for foods (try: 'chicken breast', 'category:cheese', 'method:raw fish', 'type:soup tomato')..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
@@ -224,7 +266,45 @@ export default function CNFSearchPage() {
           {/* Advanced Filters */}
           {showFilters && (
             <div className="mt-4 pt-4 border-t border-gray-200">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Food Category
+                  </label>
+                  <select
+                    value={filters.category}
+                    onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
+                    className="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    aria-label="Food Category"
+                  >
+                    <option value="">All Categories</option>
+                    {filterOptions?.categories.map((category) => (
+                      <option key={category} value={category}>
+                        {category.charAt(0).toUpperCase() + category.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Preparation Method
+                  </label>
+                  <select
+                    value={filters.method}
+                    onChange={(e) => setFilters(prev => ({ ...prev, method: e.target.value }))}
+                    className="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    aria-label="Preparation Method"
+                  >
+                    <option value="">All Methods</option>
+                    {filterOptions?.methods.map((method) => (
+                      <option key={method} value={method}>
+                        {method.charAt(0).toUpperCase() + method.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Food Group
@@ -276,6 +356,49 @@ export default function CNFSearchPage() {
                   </select>
                 </div>
               </div>
+              
+              {/* Active Filters Display */}
+              {(filters.category || filters.method || filters.foodGroup) && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="text-sm text-gray-500">Active filters:</span>
+                  {filters.category && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      Category: {filters.category}
+                      <button
+                        type="button"
+                        onClick={() => setFilters(prev => ({ ...prev, category: '' }))}
+                        className="ml-1 text-blue-600 hover:text-blue-800"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  )}
+                  {filters.method && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      Method: {filters.method}
+                      <button
+                        type="button"
+                        onClick={() => setFilters(prev => ({ ...prev, method: '' }))}
+                        className="ml-1 text-green-600 hover:text-green-800"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  )}
+                  {filters.foodGroup && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                      Group: {foodGroups.find(g => g.FoodGroupID.toString() === filters.foodGroup)?.FoodGroupName}
+                      <button
+                        type="button"
+                        onClick={() => setFilters(prev => ({ ...prev, foodGroup: '' }))}
+                        className="ml-1 text-purple-600 hover:text-purple-800"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>

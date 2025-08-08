@@ -9,11 +9,11 @@ import {
   ChartBarIcon,
   LightBulbIcon,
   ArrowRightIcon,
-  StarIcon,
   CheckCircleIcon,
   ExclamationTriangleIcon,
   InformationCircleIcon,
 } from '@heroicons/react/24/outline';
+import StarRating from '@/components/StarRating';
 
 const hsrFeatures = [
   {
@@ -75,10 +75,11 @@ const hsrBenefits = [
 
 const hsrLevels = [
   { level: 'Excellent', stars: 5, range: '4.5-5.0', color: 'bg-green-500', description: 'Ideal for daily consumption' },
+  { level: 'Very Good', stars: 4.5, range: '4.0-4.5', color: 'bg-green-400', description: 'Very good choice for regular eating' },
   { level: 'Good', stars: 4, range: '3.5-4.0', color: 'bg-green-400', description: 'Great choice for regular eating' },
   { level: 'Average', stars: 3, range: '2.5-3.0', color: 'bg-yellow-400', description: 'Good as part of balanced diet' },
   { level: 'Below Average', stars: 2, range: '1.5-2.0', color: 'bg-orange-400', description: 'Consume in moderation' },
-  { level: 'Poor', stars: 1, range: '0.5-1.0', color: 'bg-red-400', description: 'Limit consumption' },
+  { level: 'Poor', stars: 0.5, range: '0.5-1.0', color: 'bg-red-400', description: 'Limit consumption' },
 ];
 
 export default function HSRDashboard() {
@@ -137,14 +138,7 @@ export default function HSRDashboard() {
                   <span className="text-white font-bold text-lg">{level.stars}</span>
                 </div>
                 <div className="flex justify-center mb-2">
-                  {[...Array(5)].map((_, i) => (
-                    <StarIcon
-                      key={i}
-                      className={`w-4 h-4 ${
-                        i < level.stars ? 'text-yellow-400 fill-current' : 'text-gray-300'
-                      }`}
-                    />
-                  ))}
+                  <StarRating rating={level.stars} size="sm" />
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-1">{level.level}</h3>
                 <p className="text-sm text-gray-500 mb-2">{level.range} stars</p>
@@ -303,16 +297,7 @@ export default function HSRDashboard() {
                   <span className="text-lg font-semibold text-gray-900">HSR Rating</span>
                   <div className="flex items-center">
                     <span className="text-lg font-bold text-blue-600 mr-2">3.5</span>
-                    <div className="flex">
-                      {[...Array(5)].map((_, i) => (
-                        <StarIcon
-                          key={i}
-                          className={`w-5 h-5 ${
-                            i < 3.5 ? 'text-yellow-400 fill-current' : 'text-gray-300'
-                          }`}
-                        />
-                      ))}
-                    </div>
+                                          <StarRating rating={3.5} size="md" />
                   </div>
                 </div>
               </div>
