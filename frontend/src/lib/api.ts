@@ -4,7 +4,7 @@ import axios from 'axios';
 // In development, call backend directly; in production, use environment URL
 const API_BASE_URL = process.env.NODE_ENV === 'development' 
   ? 'http://localhost:8000/api'
-  : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api`;
+  : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}`;
 
 // Create axios instance with default config
 const api = axios.create({
