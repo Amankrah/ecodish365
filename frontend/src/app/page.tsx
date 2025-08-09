@@ -54,8 +54,8 @@ const features = [
     name: 'HEFI Score',
     description: 'Healthy Eating Food Index scoring system for comprehensive dietary quality assessment.',
     icon: DocumentChartBarIcon,
-    href: '/calculators/hefi',
-    status: 'Coming Soon',
+    href: '/hefi',
+    status: 'Available',
   },
 ];
 
@@ -145,7 +145,7 @@ export default function HomePage() {
               Professional Nutrition Analysis Tools
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Access Canada's most comprehensive nutrition database with 5000+ foods, calculate Health Star Ratings, 
+              Access Canada&apos;s most comprehensive nutrition database with 5000+ foods, calculate Health Star Ratings, 
               Food Compass Scores, and assess environmental impact. Professional-grade tools for accurate 
               nutritional research and evidence-based dietary analysis.
             </p>

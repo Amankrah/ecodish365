@@ -1,7 +1,7 @@
 # api/urls.py
 
 from django.urls import path
-from .views import cnf_views, environmental_views, food_views, translation_views, hsr_views_consolidated, fcs_views
+from .views import cnf_views, environmental_views, food_views, translation_views, hsr_views_consolidated, fcs_views, hefi_views
 from .views.cnf_views import (
     # Food Management
     add_food_to_cnf, add_foods_batch, manage_cnf_food,
@@ -104,5 +104,14 @@ urlpatterns = [
     path('fcs/batch/', fcs_views.fcs_calculate_batch, name='fcs_calculate_batch'),
     path('fcs/food/<int:food_id>/', fcs_views.get_food_fcs_profile, name='get_food_fcs_profile'),
     path('fcs/compare/', fcs_views.compare_foods_fcs, name='compare_foods_fcs'),
+
+    # =============================================================================
+    # HEFI (Healthy Eating Food Index 2019) Endpoints - Canada's Food Guide Assessment
+    # =============================================================================
+    
+    # Core HEFI Endpoints using validated HEFI-2019 algorithm with 10-component structure
+    path('hefi/calculate/', hefi_views.hefi_calculate, name='hefi_calculate'),
+    path('hefi/food/<int:food_id>/', hefi_views.get_food_hefi_profile, name='get_food_hefi_profile'),
+    path('hefi/compare/', hefi_views.compare_foods_hefi, name='compare_foods_hefi'),
 
 ]

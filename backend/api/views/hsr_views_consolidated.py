@@ -30,8 +30,14 @@ from dish_cnf_db_pipeline.cnf_pipeline import CNFDataPipeline
 
 logger = logging.getLogger(__name__)
 
-# Initialize CNF pipeline
-cnf_pipeline = CNFDataPipeline(settings.CNF_FOLDER)
+# Global CNF pipeline instance
+_cnf_pipeline = None
+
+def get_cnf_pipeline():
+    global _cnf_pipeline
+    if _cnf_pipeline is None:
+        _cnf_pipeline = CNFDataPipeline(settings.CNF_FOLDER)
+    return _cnf_pipeline
 
 
 class HSRAPIError(Exception):
@@ -392,7 +398,7 @@ def _load_food_data(food_id: int, serving_size: float) -> HSRFood:
         return cached_food
     
     # Load from CNF pipeline
-    food_details = cnf_pipeline.get_food_details(food_id)
+    food_details = get_cnf_pipeline().get_food_details(food_id)
     if not food_details:
         raise ValueError(f"Food with ID {food_id} not found in database")
     

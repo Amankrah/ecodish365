@@ -2,9 +2,19 @@ import axios from 'axios';
 
 // Use the correct API base URL from environment
 // In development, call backend directly; in production, use environment URL
-const API_BASE_URL = process.env.NODE_ENV === 'development' 
-  ? 'http://localhost:8000/api'
-  : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}`;
+// Resolve base URL and ensure it includes the /api prefix in production
+const resolveApiBaseUrl = (): string => {
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:8000/api';
+  }
+  const raw = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').trim();
+  // If the env already includes '/api', keep it; otherwise, append it
+  const hasApiSuffix = /\/api\/?$/.test(raw);
+  const normalized = raw.replace(/\/$/, '');
+  return hasApiSuffix ? normalized : `${normalized}/api`;
+};
+
+const API_BASE_URL = resolveApiBaseUrl();
 
 // Create axios instance with default config
 const api = axios.create({
@@ -14,11 +24,21 @@ const api = axios.create({
   },
 });
 
-// Add request interceptor for error handling
+// Add response interceptor for error handling
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error('API Error:', error.response?.data || error.message);
+    const status = error.response?.status;
+    const data = error.response?.data;
+    const message = error.message;
+    const url = error.config?.url;
+
+    // Downgrade expected client errors (e.g., 400 from short queries) to warnings
+    if (status && status < 500) {
+      console.warn('API Warning:', { status, url, data, message });
+    } else {
+      console.error('API Error:', { status, url, data, message });
+    }
     return Promise.reject(error);
   }
 );
@@ -758,6 +778,180 @@ export interface FCSComparison {
     average_fcs: number;
   };
   foods_count: number;
+}
+
+// HEFI Types
+export interface HEFICalculationRequest {
+  food_ids: number[];
+}
+
+export interface HEFIComparisonRequest {
+  foods: Array<{
+    food_ids: number[];
+    food_name?: string;
+  }>;
+}
+
+export interface HEFIComponentScore {
+  c1_vf: number;
+  c2_wholegr: number;
+  c3_grratio: number;
+  c4_profoods: number;
+  c5_plantpro: number;
+  c6_beverages: number;
+  c7_fattyacid: number;
+  c8_sfat: number;
+  c9_freesugars: number;
+  c10_sodium: number;
+}
+
+export interface HEFIRatios {
+  RATIO_VF: number;
+  RATIO_WGTOT: number;
+  RATIO_WGGR: number;
+  RATIO_PRO: number;
+  RATIO_PLANT: number;
+  RATIO_BEV: number;
+  RATIO_UNSFAT: number;
+  SFA_PERC: number;
+  SUG_PERC: number;
+  SODDEN: number;
+}
+
+export interface HEFIInterpretation {
+  category: 'Below Average' | 'Below Average to Average' | 'Above Average' | 'Excellent';
+  description: string;
+  score: number;
+  population_benchmarks?: {
+    mean: number;
+    percentile_1: number;
+    percentile_99: number;
+  };
+  notes?: string[];
+  ui_color?: 'red' | 'yellow' | 'green' | 'emerald';
+}
+
+export interface HEFIInputs {
+  total_foods_ra: number;
+  energy_kcal: number;
+  vf_ra: number;
+  whole_grains_ra: number;
+  total_grains_ra: number;
+  protein_foods_ra: number;
+  plant_protein_foods_ra: number;
+  total_beverages_g: number;
+  recommended_beverages_g: number;
+  sfa_g: number;
+  mufa_g: number;
+  pufa_g: number;
+  free_sugars_g: number;
+  sodium_mg: number;
+}
+
+export interface HEFIResult {
+  success: boolean;
+  data: {
+    food_ids: number[];
+    food_name?: string;
+    total_score: number;
+    max_total_score: number;
+    percentage: number;
+    ratios: HEFIRatios;
+    components: {
+      [key: string]: {
+        score: number;
+        max_points: number;
+        name: string;
+      };
+    };
+    inputs: HEFIInputs;
+    hefi_interpretation?: HEFIInterpretation;
+  };
+}
+
+export interface HEFIFoodProfile {
+  success: boolean;
+  data: {
+    food_ids: number[];
+    food_name: string;
+    total_score: number;
+    max_total_score: number;
+    percentage: number;
+    ratios: HEFIRatios;
+    components: {
+      [key: string]: {
+        score: number;
+        max_points: number;
+        name: string;
+      };
+    };
+    inputs: HEFIInputs;
+    measure_info: {
+      conversion_factor: number;
+      measure_description?: string;
+      measure_id?: number;
+    };
+    hefi_interpretation: HEFIInterpretation;
+  };
+}
+
+export interface HEFIComparison {
+  success: boolean;
+  data: {
+    foods: Array<{
+      food_ids: number[];
+      food_name: string;
+      total_score: number;
+      max_total_score: number;
+      percentage: number;
+      ratios?: HEFIRatios;
+      components: {
+        [key: string]: {
+          score: number;
+          max_points: number;
+          name: string;
+        };
+      };
+      inputs?: HEFIInputs;
+      hefi_interpretation?: HEFIInterpretation;
+      error?: string;
+    }>;
+    comparison_insights: {
+      highest_score?: number;
+      lowest_score?: number;
+      average_score?: number;
+      score_range?: number;
+      best_performing?: string;
+      component_analysis?: {
+        [key: string]: {
+          variation: number;
+          max_score: number;
+          min_score: number;
+          component_name: string;
+        };
+      };
+      message?: string;
+    };
+    total_compared: number;
+  };
+}
+
+// HEFI API Service Class
+export class HEFIApiService {
+  static async calculateHEFI(request: HEFICalculationRequest): Promise<HEFIResult> {
+    const response = await api.post('/hefi/calculate/', request);
+    return response.data;
+  }
+
+  static async getFoodHEFIProfile(foodId: number): Promise<HEFIFoodProfile> {
+    const response = await api.get(`/hefi/food/${foodId}/`);
+    return response.data;
+  }
+
+  static async compareFoodsHEFI(request: HEFIComparisonRequest): Promise<HEFIComparison> {
+    const response = await api.post('/hefi/compare/', request);
+    return response.data;
+  }
 }
 
 // FCS API Service Class

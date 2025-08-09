@@ -14,9 +14,21 @@ from dish_cnf_db_pipeline.user_input import (
 
 logger = logging.getLogger(__name__)
 
-# Initialize pipeline and validator once
-cnf_pipeline = CNFDataPipeline(settings.CNF_FOLDER)
-food_input_validator = FoodInputValidator(cnf_pipeline)
+# Global pipeline and validator instances
+_cnf_pipeline = None
+_food_input_validator = None
+
+def get_cnf_pipeline():
+    global _cnf_pipeline
+    if _cnf_pipeline is None:
+        _cnf_pipeline = CNFDataPipeline(settings.CNF_FOLDER)
+    return _cnf_pipeline
+
+def get_food_input_validator():
+    global _food_input_validator
+    if _food_input_validator is None:
+        _food_input_validator = FoodInputValidator(get_cnf_pipeline())
+    return _food_input_validator
 
 def handle_exceptions(view_func):
     """Decorator for consistent error handling across views."""
@@ -55,8 +67,8 @@ def handle_exceptions(view_func):
 def add_food_to_cnf(request):
     """Add a single food item to the CNF database."""
     food_data = request.data
-    validated_food_data = food_input_validator.process_new_food_input(food_data)
-    food_id = cnf_pipeline.add_food(validated_food_data)
+    validated_food_data = get_food_input_validator().process_new_food_input(food_data)
+    food_id = get_cnf_pipeline().add_food(validated_food_data)
     
     return Response({
         "success": True,
@@ -89,7 +101,7 @@ def add_foods_batch(request):
     validated_foods = []
     for i, food_data in enumerate(foods_data):
         try:
-            validated_food = food_input_validator.process_new_food_input(food_data)
+            validated_food = get_food_input_validator().process_new_food_input(food_data)
             validated_foods.append(validated_food)
         except ValidationError as e:
             return Response({
@@ -99,7 +111,7 @@ def add_foods_batch(request):
             }, status=status.HTTP_400_BAD_REQUEST)
     
     # Add all foods in batch
-    food_ids = cnf_pipeline.add_foods_batch(validated_foods)
+    food_ids = get_cnf_pipeline().add_foods_batch(validated_foods)
     
     return Response({
         "success": True,
@@ -123,7 +135,7 @@ def manage_cnf_food(request, food_id):
         }, status=status.HTTP_400_BAD_REQUEST)
 
     if request.method == 'GET':
-        food_details = cnf_pipeline.get_food_details(food_id)
+        food_details = get_cnf_pipeline().get_food_details(food_id)
         if food_details is None:
             return Response({
                 "error": "Food not found",
@@ -137,8 +149,8 @@ def manage_cnf_food(request, food_id):
 
     elif request.method == 'PUT':
         updated_food_data = request.data
-        validated_food_data = food_input_validator.process_new_food_input(updated_food_data)
-        updated_food = cnf_pipeline.update_food(food_id, validated_food_data)
+        validated_food_data = get_food_input_validator().process_new_food_input(updated_food_data)
+        updated_food = get_cnf_pipeline().update_food(food_id, validated_food_data)
         
         return Response({
             "success": True,
@@ -147,7 +159,7 @@ def manage_cnf_food(request, food_id):
         })
 
     elif request.method == 'DELETE':
-        success = cnf_pipeline.delete_food(food_id)
+        success = get_cnf_pipeline().delete_food(food_id)
         if success:
             return Response({
                 "success": True,
@@ -177,7 +189,7 @@ def search_cnf_foods(request):
             "details": "Please provide a search query using the 'q' parameter"
         }, status=status.HTTP_400_BAD_REQUEST)
     
-    results = cnf_pipeline.search_foods(query, limit, offset)
+    results = get_cnf_pipeline().search_foods(query, limit, offset)
     
     return Response({
         "success": True,
@@ -209,7 +221,7 @@ def search_foods_by_nutrient(request):
             "details": "nutrient_id must be an integer, min_value and max_value must be numbers"
         }, status=status.HTTP_400_BAD_REQUEST)
     
-    foods = cnf_pipeline.search_foods_by_nutrient(nutrient_id, min_value, max_value, limit)
+    foods = get_cnf_pipeline().search_foods_by_nutrient(nutrient_id, min_value, max_value, limit)
     
     return Response({
         "success": True,
@@ -237,7 +249,7 @@ def get_foods_by_group(request, food_group_id):
         }, status=status.HTTP_400_BAD_REQUEST)
     
     limit = min(int(request.GET.get('limit', 100)), 500)
-    foods = cnf_pipeline.get_foods_by_group(food_group_id, limit)
+    foods = get_cnf_pipeline().get_foods_by_group(food_group_id, limit)
     
     return Response({
         "success": True,
@@ -277,7 +289,7 @@ def compare_foods(request):
             "details": "All IDs must be valid integers"
         }, status=status.HTTP_400_BAD_REQUEST)
     
-    comparison_data = cnf_pipeline.compare_foods(food_ids, nutrient_ids)
+    comparison_data = get_cnf_pipeline().compare_foods(food_ids, nutrient_ids)
     
     return Response({
         "success": True,
@@ -292,7 +304,7 @@ def compare_foods(request):
 @handle_exceptions
 def get_food_groups_view(request):
     """Get all available food groups."""
-    food_groups = get_food_groups(cnf_pipeline.data_loader.food_group_df)
+    food_groups = get_food_groups(get_cnf_pipeline().data_loader.food_group_df)
     return Response({
         "success": True,
         "data": food_groups,
@@ -303,7 +315,7 @@ def get_food_groups_view(request):
 @handle_exceptions
 def get_food_sources_view(request):
     """Get all available food sources."""
-    food_sources = get_food_sources(cnf_pipeline.data_loader.food_source_df)
+    food_sources = get_food_sources(get_cnf_pipeline().data_loader.food_source_df)
     return Response({
         "success": True,
         "data": food_sources,
@@ -314,7 +326,7 @@ def get_food_sources_view(request):
 @handle_exceptions
 def get_nutrient_sources_view(request):
     """Get all available nutrient sources."""
-    nutrient_sources = get_nutrient_sources(cnf_pipeline.data_loader.nutrient_source_df)
+    nutrient_sources = get_nutrient_sources(get_cnf_pipeline().data_loader.nutrient_source_df)
     return Response({
         "success": True,
         "data": nutrient_sources,
@@ -325,7 +337,7 @@ def get_nutrient_sources_view(request):
 @handle_exceptions
 def get_nutrients_view(request):
     """Get all available nutrients."""
-    nutrients = get_nutrient_info(cnf_pipeline.data_loader.nutrient_name_df)
+    nutrients = get_nutrient_info(get_cnf_pipeline().data_loader.nutrient_name_df)
     return Response({
         "success": True,
         "data": nutrients,
@@ -336,7 +348,7 @@ def get_nutrients_view(request):
 @handle_exceptions
 def get_measures_view(request):
     """Get all available measures."""
-    measures = get_conversion_factors(cnf_pipeline.data_loader.measure_name_df)
+    measures = get_conversion_factors(get_cnf_pipeline().data_loader.measure_name_df)
     return Response({
         "success": True,
         "data": measures,
@@ -358,7 +370,7 @@ def add_food_source(request):
             "details": "Food source description is required"
         }, status=status.HTTP_400_BAD_REQUEST)
     
-    new_source = cnf_pipeline.add_food_source(description)
+    new_source = get_cnf_pipeline().add_food_source(description)
     return Response({
         "success": True,
         "message": "Food source added successfully",
@@ -376,7 +388,7 @@ def add_nutrient_source(request):
             "details": "Nutrient source description is required"
         }, status=status.HTTP_400_BAD_REQUEST)
     
-    new_source = cnf_pipeline.add_nutrient_source(description)
+    new_source = get_cnf_pipeline().add_nutrient_source(description)
     return Response({
         "success": True,
         "message": "Nutrient source added successfully",
@@ -394,7 +406,7 @@ def add_new_measure(request):
             "details": "Measure description is required"
         }, status=status.HTTP_400_BAD_REQUEST)
     
-    new_measure = cnf_pipeline.add_measure(description)
+    new_measure = get_cnf_pipeline().add_measure(description)
     return Response({
         "success": True,
         "message": "Measure added successfully",
@@ -409,7 +421,7 @@ def add_new_measure(request):
 @handle_exceptions
 def check_data_integrity(request):
     """Perform comprehensive data integrity check."""
-    integrity_results = cnf_pipeline.check_data_integrity()
+    integrity_results = get_cnf_pipeline().check_data_integrity()
     
     if integrity_results['overall_status'] == 'passed':
         return Response({
@@ -428,7 +440,7 @@ def check_data_integrity(request):
 @handle_exceptions
 def get_database_statistics(request):
     """Get comprehensive database statistics."""
-    stats = cnf_pipeline.get_database_statistics()
+    stats = get_cnf_pipeline().get_database_statistics()
     return Response({
         "success": True,
         "data": stats
@@ -476,7 +488,7 @@ def export_foods_data(request):
     # Collect food data
     exported_foods = []
     for food_id in food_ids:
-        food_details = cnf_pipeline.get_food_details(food_id)
+        food_details = get_cnf_pipeline().get_food_details(food_id)
         if food_details:
             # Optionally exclude large datasets
             if not include_nutrients:
@@ -495,7 +507,7 @@ def export_foods_data(request):
                 "format": export_format,
                 "include_nutrients": include_nutrients,
                 "include_conversions": include_conversions,
-                "export_date": cnf_pipeline.get_database_statistics()['timestamp']
+                "export_date": get_cnf_pipeline().get_database_statistics()['timestamp']
             }
         }
     })

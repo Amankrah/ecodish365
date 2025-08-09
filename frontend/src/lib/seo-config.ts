@@ -114,6 +114,11 @@ export const seoConfig = {
       title: 'Food Compass Score Calculator - Professional FCS Analysis',
       description: 'Calculate Food Compass Scores using the scientifically validated algorithm with 54 nutritional attributes across 9 domains.',
     },
+    hefi: {
+      title: 'Healthy Eating Food Index (HEFI) Calculator - HEFI-2019 Scoring',
+      description:
+        "Assess diet quality using Canada's Healthy Eating Food Index (HEFI-2019). Evaluate nutritional quality across 10 components with professional insights.",
+    },
   },
 
   // Schema.org structured data templates

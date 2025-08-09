@@ -45,6 +45,7 @@ RAW_CNF_DIR = BASE_DIR / 'raw_cnf'
 sys.path.extend([
     str(BASE_DIR / 'environmental_impact_model'),
     str(BASE_DIR / 'fcs_calculator'),
+    str(BASE_DIR / 'hefi_calculator'),
     str(BASE_DIR / 'heni_calculator'),
     str(BASE_DIR / 'hsr_calculator'),
     str(BASE_DIR / 'net_health_impact_calculator'),
@@ -138,6 +139,7 @@ INSTALLED_APPS = [
     'api.apps.ApiConfig',
     'environmental_impact_model',
     'fcs_calculator',
+    'hefi_calculator',
     'heni_calculator',
     'hsr_calculator',
     'net_health_impact_calculator',

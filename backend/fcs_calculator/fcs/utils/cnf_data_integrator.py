@@ -17,6 +17,16 @@ from cnf_data_pipeline import CNFDataPipeline
 
 from fcs.models.food_item import FoodItem
 
+# Global pipeline instance to avoid expensive reinitialization
+_cnf_pipeline_instance = None
+
+def get_shared_cnf_pipeline(cnf_data_dir: str) -> CNFDataPipeline:
+    """Get shared CNF pipeline instance to avoid expensive reinitialization"""
+    global _cnf_pipeline_instance
+    if _cnf_pipeline_instance is None:
+        _cnf_pipeline_instance = CNFDataPipeline(cnf_data_dir)
+    return _cnf_pipeline_instance
+
 logger = logging.getLogger(__name__)
 
 class EnhancedCNFDataIntegrator:
@@ -27,7 +37,7 @@ class EnhancedCNFDataIntegrator:
     
     def __init__(self, cnf_data_dir: str):
         """Initialize with existing CNF data pipeline"""
-        self.cnf_pipeline = CNFDataPipeline(cnf_data_dir)
+        self.cnf_pipeline = get_shared_cnf_pipeline(cnf_data_dir)
         self.nutrient_mapping = self._create_nutrient_mapping()
     
     def _create_nutrient_mapping(self) -> Dict[str, str]:
@@ -176,7 +186,7 @@ class EnhancedCNFDataIntegrator:
                     food_item.set_attribute(domain_name, fcs_attribute, normalized_value)
                     mapped_count += 1
             
-            print(f"DEBUG CNF: Mapped {mapped_count} out of {total_nutrients} nutrients")
+            logger.debug(f"CNF: Mapped {mapped_count} out of {total_nutrients} nutrients")
             
             # Calculate nutrient ratios using extracted values
             self._calculate_nutrient_ratios(food_item)
@@ -253,7 +263,7 @@ class EnhancedCNFDataIntegrator:
                 group_name = row.get('FoodGroupName', '').upper() if 'FoodGroupName' in row else ''
                 food_group_id = row.get('FoodGroupID', 0)
                 
-                print(f"DEBUG: Categorizing food: '{food_desc}' in group: '{group_name}' (ID: {food_group_id})")
+                logger.debug(f" Categorizing food: '{food_desc}' in group: '{group_name}' (ID: {food_group_id})")
                 
                 # Use CNF food group structure for better categorization
                 if food_group_id == 9:  # Fruits and Fruit Juices
@@ -334,7 +344,7 @@ class EnhancedCNFDataIntegrator:
                     if 'CANNED' in food_desc:
                         food_item.set_attribute('processing', 'canning', 100)
                     
-                    print(f"DEBUG: Detected NOVA 4 (ultra-processed) food: '{food_desc}'")
+                    logger.debug(f" Detected NOVA 4 (ultra-processed) food: '{food_desc}'")
                 
                 # Check for processed foods
                 elif any(term in food_desc for term in processed_terms):
@@ -361,7 +371,7 @@ class EnhancedCNFDataIntegrator:
                     if any(term in food_desc for term in ['FERMENTED', 'AGED']):
                         food_item.set_attribute('processing', 'fermentation', 100)
                     
-                    print(f"DEBUG: Detected NOVA 3 (processed) food: '{food_desc}'")
+                    logger.debug(f" Detected NOVA 3 (processed) food: '{food_desc}'")
                 
                 # Check for culinary ingredients
                 elif any(term in food_desc for term in culinary_terms):
@@ -371,13 +381,13 @@ class EnhancedCNFDataIntegrator:
                     if any(oil_term in food_desc for oil_term in ['OIL', 'BUTTER', 'MARGARINE', 'SHORTENING']):
                         food_item.set_attribute('food_ingredients', 'plant_oils', 100)
                     
-                    print(f"DEBUG: Detected NOVA 2 (culinary ingredient): '{food_desc}'")
+                    logger.debug(f" Detected NOVA 2 (culinary ingredient): '{food_desc}'")
                 
                 else:
                     # Minimally processed
                     detected_processing_levels.append(1)
                     food_item.set_attribute('processing', 'minimal_processing', 100)
-                    print(f"DEBUG: Detected NOVA 1 (minimally processed): '{food_desc}'")
+                    logger.debug(f" Detected NOVA 1 (minimally processed): '{food_desc}'")
                 
                 # Detect whole grains vs refined grains
                 if food_group_id == 20:  # Cereals, Grains and Pasta
@@ -386,13 +396,13 @@ class EnhancedCNFDataIntegrator:
                     else:
                         food_item.set_attribute('food_ingredients', 'refined_grains', 100)
                 
-                print(f"DEBUG: Food '{food_desc}' categorized as NOVA level {current_processing_level}")
+                logger.debug(f" Food '{food_desc}' categorized as NOVA level {current_processing_level}")
             
             # For combined foods, use energy-weighted processing level
             if detected_processing_levels:
                 final_processing_level = self._calculate_energy_weighted_processing(food_ids, detected_processing_levels)
-                print(f"DEBUG: Combined food processing levels: {detected_processing_levels}")
-                print(f"DEBUG: Energy-weighted final processing level: {final_processing_level}")
+                logger.debug(f" Combined food processing levels: {detected_processing_levels}")
+                logger.debug(f" Energy-weighted final processing level: {final_processing_level}")
                 
                 # Store detailed processing information for mixed dishes
                 processing_details = self._get_processing_details(food_ids, detected_processing_levels, food_with_groups)
@@ -403,15 +413,15 @@ class EnhancedCNFDataIntegrator:
                 
                 # Set a flag to indicate this is a combined food with mixed processing levels
                 if len(set(detected_processing_levels)) > 1:
-                    print(f"DEBUG: Mixed processing levels detected in combined food - using energy weighting")
+                    logger.debug(f" Mixed processing levels detected in combined food - using energy weighting")
             else:
                 # Default to minimally processed if no processing levels detected
-                print(f"DEBUG: No processing levels detected, defaulting to NOVA 1 (minimally processed)")
+                logger.debug(f" No processing levels detected, defaulting to NOVA 1 (minimally processed)")
                 self._set_final_nova_processing_level(food_item, 1)
                     
         except Exception as e:
             logger.warning(f"Could not fully categorize food ingredients: {e}")
-            print(f"DEBUG: Error in food categorization: {e}")
+            logger.debug(f" Error in food categorization: {e}")
     
     def _get_processing_details(self, food_ids: List[int], processing_levels: List[int], food_with_groups) -> Dict:
         """
@@ -528,7 +538,7 @@ class EnhancedCNFDataIntegrator:
             
             if any(term in food_desc for term in artificial_color_terms):
                 food_item.set_attribute('additives', 'artificial_colors', 100)
-                print(f"DEBUG: Detected artificial colors in '{food_desc}'")
+                logger.debug(f" Detected artificial colors in '{food_desc}'")
             
             # Infer artificial colors from food types
             if processing_level == 4:  # Ultra-processed
@@ -538,7 +548,7 @@ class EnhancedCNFDataIntegrator:
                 ]
                 if any(term in food_desc for term in color_likely_foods):
                     food_item.set_attribute('additives', 'artificial_colors', 100)
-                    print(f"DEBUG: Inferred artificial colors in colored processed food: '{food_desc}'")
+                    logger.debug(f" Inferred artificial colors in colored processed food: '{food_desc}'")
             
             # Hydrogenated Oils - Trans fats
             hydrogenated_terms = [
@@ -548,7 +558,7 @@ class EnhancedCNFDataIntegrator:
             
             if any(term in food_desc for term in hydrogenated_terms):
                 food_item.set_attribute('additives', 'hydrogenated_oils', 100)
-                print(f"DEBUG: Detected hydrogenated oils in '{food_desc}'")
+                logger.debug(f" Detected hydrogenated oils in '{food_desc}'")
             
             # High Fructose Corn Syrup
             hfcs_terms = [
@@ -558,7 +568,7 @@ class EnhancedCNFDataIntegrator:
             
             if any(term in food_desc for term in hfcs_terms):
                 food_item.set_attribute('additives', 'high_fructose_corn_syrup', 100)
-                print(f"DEBUG: Detected HFCS in '{food_desc}'")
+                logger.debug(f" Detected HFCS in '{food_desc}'")
             
             # Monosodium Glutamate
             msg_terms = [
@@ -568,7 +578,7 @@ class EnhancedCNFDataIntegrator:
             
             if any(term in food_desc for term in msg_terms):
                 food_item.set_attribute('additives', 'monosodium_glutamate', 100)
-                print(f"DEBUG: Detected MSG in '{food_desc}'")
+                logger.debug(f" Detected MSG in '{food_desc}'")
             
             # Nitrites/Nitrates - Cured meats
             nitrite_terms = [
@@ -578,7 +588,7 @@ class EnhancedCNFDataIntegrator:
             
             if any(term in food_desc for term in nitrite_terms):
                 food_item.set_attribute('additives', 'nitrites', 100)
-                print(f"DEBUG: Detected nitrites from description: '{food_desc}'")
+                logger.debug(f" Detected nitrites from description: '{food_desc}'")
             
             # Additional ultra-processed indicators
             if processing_level == 4:
@@ -592,11 +602,11 @@ class EnhancedCNFDataIntegrator:
                 # For gluten-free bread (like rice bran bread), emulsifiers are very common
                 if 'GLUTEN FREE' in food_desc or 'GLUTEN-FREE' in food_desc:
                     food_item.set_attribute('additives', 'preservatives', 100)  # Likely has emulsifiers
-                    print(f"DEBUG: Inferred emulsifiers in gluten-free product: '{food_desc}'")
+                    logger.debug(f" Inferred emulsifiers in gluten-free product: '{food_desc}'")
                 
                 if any(term in food_desc for term in emulsifier_terms):
                     food_item.set_attribute('additives', 'preservatives', 100)
-                    print(f"DEBUG: Detected emulsifiers/stabilizers in '{food_desc}'")
+                    logger.debug(f" Detected emulsifiers/stabilizers in '{food_desc}'")
             
         except Exception as e:
             logger.warning(f"Error detecting additives for '{food_desc}': {e}")
@@ -640,9 +650,9 @@ class EnhancedCNFDataIntegrator:
         # Set the NOVA processing score directly in Domain 6
         food_item.set_attribute('processing', 'nova_processing', nova_score)
         
-        print(f"DEBUG: Set processing level {processing_level} with interpolated score {nova_score:.2f}")
+        logger.debug(f" Set processing level {processing_level} with interpolated score {nova_score:.2f}")
         if processing_level != int(processing_level):
-            print(f"DEBUG: Mixed dish detected - using energy-weighted processing penalty instead of single NOVA category")
+            logger.debug(f" Mixed dish detected - using energy-weighted processing penalty instead of single NOVA category")
     
     def _calculate_energy_weighted_processing(self, food_ids: List[int], processing_levels: List[int]) -> float:
         """
@@ -663,10 +673,10 @@ class EnhancedCNFDataIntegrator:
                 if not energy_rows.empty:
                     energy_value = energy_rows['NutrientValue'].iloc[0]
                     food_energies.append(energy_value)
-                    print(f"DEBUG: Food ID {food_id} has {energy_value} kcal")
+                    logger.debug(f" Food ID {food_id} has {energy_value} kcal")
                 else:
                     food_energies.append(100)  # Default fallback
-                    print(f"DEBUG: Food ID {food_id} - no energy data, using 100 kcal default")
+                    logger.debug(f" Food ID {food_id} - no energy data, using 100 kcal default")
             
             # Calculate energy weights
             total_energy = sum(food_energies)
@@ -678,8 +688,8 @@ class EnhancedCNFDataIntegrator:
             weighted_sum = sum(processing_levels[i] * food_energies[i] for i in range(len(processing_levels)))
             energy_weighted_level = weighted_sum / total_energy
             
-            print(f"DEBUG: Energy weights: {[round(e/total_energy, 2) for e in food_energies]}")
-            print(f"DEBUG: Weighted processing calculation: {weighted_sum}/{total_energy} = {energy_weighted_level}")
+            logger.debug(f" Energy weights: {[round(e/total_energy, 2) for e in food_energies]}")
+            logger.debug(f" Weighted processing calculation: {weighted_sum}/{total_energy} = {energy_weighted_level}")
             
             # Keep fractional level for mixed dishes - don't round to integer
             final_level = max(1.0, min(4.0, energy_weighted_level))
