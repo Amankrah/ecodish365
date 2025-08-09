@@ -782,13 +782,18 @@ export interface FCSComparison {
 
 // HEFI Types
 export interface HEFICalculationRequest {
-  food_ids: number[];
+  foods: Array<{
+    food_id: number;
+    amount_g: number;
+  }>;
 }
 
 export interface HEFIComparisonRequest {
   foods: Array<{
-    food_ids: number[];
+    food_ids?: number[];
     food_name?: string;
+    amount_g?: number;
+    food_items?: Array<{ food_id: number; amount_g: number }>
   }>;
 }
 
@@ -943,8 +948,10 @@ export class HEFIApiService {
     return response.data;
   }
 
-  static async getFoodHEFIProfile(foodId: number): Promise<HEFIFoodProfile> {
-    const response = await api.get(`/hefi/food/${foodId}/`);
+  static async getFoodHEFIProfile(foodId: number, amount_g = 100): Promise<HEFIFoodProfile> {
+    const response = await api.get(`/hefi/food/${foodId}/`, {
+      params: { amount_g }
+    });
     return response.data;
   }
 

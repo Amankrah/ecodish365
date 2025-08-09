@@ -20,8 +20,14 @@ def main():
     init_time = time.time() - init_start
     print(f"Pipeline initialization: {init_time:.3f} seconds")
 
-    # Example food IDs
-    food_ids = [3049, 3725,3580]
+    # Example food data with amounts (food_id, amount_in_grams)
+    food_data = [
+        (3049, 100.0),  # Salmon, 100g
+        (3725, 75.0),   # Rice bran bread, 75g (1 RA)
+        (3580, 100.0)   # Venison, 100g
+    ]
+    
+    food_ids = [food_id for food_id, _ in food_data]
     
     # Time food data lookup
     lookup_start = time.time()
@@ -30,61 +36,33 @@ def main():
     print(f"Food data lookup: {lookup_time:.3f} seconds")
     
     print("\n=== FOODS BEING ANALYZED ===")
-    for _, row in foods_df.iterrows():
-        print(f"ID {row['FoodID']}: {row['FoodDescription']} (Group: {row['FoodGroupID']})")
-    
-    # Time conversion factor calculation
-    conversion_start = time.time()
-    print("\n=== CONVERSION FACTORS ===")
-    for food_id in food_ids:
-        factor = integrator._get_best_conversion_factor(food_id)
-        
-        # Get ALL available measures for this food to show options
-        if not integrator.conversion_factors_df.empty and not integrator.measure_names_df.empty:
-            food_factors = integrator.conversion_factors_df[
-                integrator.conversion_factors_df['FoodID'] == food_id
-            ].merge(
-                integrator.measure_names_df[['MeasureID', 'MeasureDescription']], 
-                on='MeasureID', 
-                how='left'
-            )
+    for i, (food_id, amount) in enumerate(food_data):
+        food_row = foods_df[foods_df['FoodID'] == food_id]
+        if not food_row.empty:
+            desc = food_row['FoodDescription'].iloc[0]
+            group = int(food_row['FoodGroupID'].iloc[0])
             
-            # Find the measure that matches our selected factor
-            selected_measure_desc = "Unknown measure"
-            all_measures = []
+            # Show RA classification with improved details
+            ra_category = integrator._classify_food_to_ra_category(desc, group)
+            ra_amount = integrator._get_ra_amount(ra_category)
+            calculated_ra = amount / ra_amount
             
-            for _, row in food_factors.iterrows():
-                measure_id = row.get('MeasureID', 'N/A')
-                conversion_value = float(row['ConversionFactorValue'])
-                measure_desc = integrator.get_measure_description(food_id, conversion_value)
-                
-                all_measures.append(f"{conversion_value} ({measure_desc})")
-                
-                # Check if this is the selected measure
-                if abs(conversion_value - factor) < 0.001:
-                    selected_measure_desc = measure_desc
+            # Get conversion factor and measure info
+            conversion_factor = integrator._get_best_conversion_factor(food_id)
+            measure_desc = integrator.get_measure_description(food_id, conversion_factor)
             
-            print(f"ID {food_id}: Selected Factor = {factor} ({selected_measure_desc})")
-            print(f"  All available measures: {', '.join(all_measures)}")
-        else:
-            print(f"ID {food_id}: Factor = {factor} (default - no conversion data)")
-    conversion_time = time.time() - conversion_start
-    print(f"Conversion factor calculation: {conversion_time:.3f} seconds")
-
-    # Debug: Check whole grain detection
-    cereals = foods_df[foods_df['FoodGroupID'].isin(integrator.GROUP_CEREALS_GRAINS_PASTA)]
-    if not cereals.empty:
-        print("\n=== GRAIN FOODS DETECTED ===")
-        whole_keywords = ['WHOLE', 'BROWN', 'BRAN', 'WHEAT GERM', 'OATS']
-        for _, row in cereals.iterrows():
-            desc_upper = row['FoodDescription'].upper()
-            is_whole = any(keyword in desc_upper for keyword in whole_keywords)
-            print(f"ID {row['FoodID']}: {row['FoodDescription']} -> Whole grain: {is_whole}")
-            print(f"  Keywords found: {[kw for kw in whole_keywords if kw in desc_upper]}")
+            print(f"ID {food_id}: {desc} (Group: {group})")
+            print(f"  Amount: {amount}g, RA Category: {ra_category}, RA Amount: {ra_amount}g")
+            print(f"  Calculated RAs: {calculated_ra:.3f}, Conversion Factor: {conversion_factor}")
+            print(f"  Best Measure: {measure_desc}")
+            
+            # Show classification confidence
+            confidence = 'HIGH' if ra_category != 'default' else 'LOW (using default)'
+            print(f"  Classification Confidence: {confidence}")
     
     # Time data aggregation (the main computation)
     agg_start = time.time()
-    agg = integrator.aggregate_inputs(food_ids)
+    agg = integrator.aggregate_inputs(food_data)
     agg_time = time.time() - agg_start
     print(f"\nData aggregation: {agg_time:.3f} seconds")
     
@@ -109,7 +87,6 @@ def main():
     print(f"\n=== PERFORMANCE SUMMARY ===")
     print(f"Pipeline initialization: {init_time:.3f}s")
     print(f"Food data lookup: {lookup_time:.3f}s")
-    print(f"Conversion factors: {conversion_time:.3f}s")
     print(f"Data aggregation: {agg_time:.3f}s")
     print(f"HEFI computation: {hefi_time:.3f}s")
     print(f"TOTAL TIME: {total_time:.3f} seconds")
@@ -123,26 +100,67 @@ def test_subsequent_calculations():
     cnf_dir = os.path.join(base_dir, 'raw_cnf')
     integrator = HEFICNFIntegrator(cnf_dir)  # Should use cached pipeline
     
-    # Test different food combinations
+    # Test different food combinations with amounts
     test_cases = [
-        ([3049], "Single food: Salmon"),
-        ([3725], "Single food: Rice bran bread"),  
-        ([3049, 3725], "Two foods: Salmon + Bread"),
-        ([3049, 3725, 3580], "Three foods: Salmon + Bread + Venison")
+        ([(3049, 100.0)], "Single food: Salmon 100g"),
+        ([(3725, 75.0)], "Single food: Rice bran bread 75g"),  
+        ([(3049, 100.0), (3725, 75.0)], "Two foods: Salmon + Bread"),
+        ([(3049, 100.0), (3725, 75.0), (3580, 100.0)], "Three foods: Salmon + Bread + Venison")
     ]
     
-    for food_ids, description in test_cases:
+    for food_data, description in test_cases:
         start_time = time.time()
         
-        agg = integrator.aggregate_inputs(food_ids)
+        agg = integrator.aggregate_inputs(food_data)
         inputs = HEFIInputs(**agg)
         result = compute_hefi(inputs)
         
         calc_time = time.time() - start_time
         print(f"{description}: {calc_time:.3f}s (Score: {result.total_score:.1f}/80)")
+        
+        # Show key inputs for the combination
+        print(f"  Total Foods RA: {agg['total_foods_ra']:.2f}, VF RA: {agg['vf_ra']:.2f}")
+        print(f"  Energy: {agg['energy_kcal']:.0f} kcal, Sodium: {agg['sodium_mg']:.0f} mg")
+
+
+def test_ra_categories():
+    """Test the new RA classification system with various food types"""
+    print("\n=== TESTING RA CLASSIFICATION SYSTEM ===")
+    
+    base_dir = os.path.dirname(os.path.dirname(__file__))
+    cnf_dir = os.path.join(base_dir, 'raw_cnf')
+    integrator = HEFICNFIntegrator(cnf_dir)
+    
+    # Test foods from different categories
+    test_foods = [
+        (3049, "Fish/Protein"),      # Salmon
+        (3725, "Bread/Grains"),      # Rice bran bread  
+        (3580, "Meat/Protein"),      # Venison
+        # Add more test foods if available
+    ]
+    
+    print("Food ID | Group | Description | RA Category | RA Amount | Confidence")
+    print("-" * 80)
+    
+    for food_id, expected_category in test_foods:
+        try:
+            food_rows = integrator._get_food_rows([food_id])
+            if not food_rows.empty:
+                food_row = food_rows.iloc[0]
+                desc = food_row['FoodDescription']
+                group_id = int(food_row['FoodGroupID'])
+                
+                ra_category = integrator._classify_food_to_ra_category(desc, group_id)
+                ra_amount = integrator._get_ra_amount(ra_category)
+                confidence = 'HIGH' if ra_category != 'default' else 'LOW'
+                
+                print(f"{food_id:7} | {group_id:5} | {desc[:25]:25} | {ra_category:15} | {ra_amount:9.1f} | {confidence}")
+        except Exception as e:
+            print(f"{food_id:7} | ERROR: {str(e)}")
 
 if __name__ == '__main__':
     main()
     test_subsequent_calculations()
+    test_ra_categories()
 
 

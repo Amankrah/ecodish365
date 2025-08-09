@@ -10,7 +10,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { HEFIApiService, CNFApiService, type HEFIComparison, type FilterOptions, type SearchResult as CNFSearchResult, type HEFIInterpretation } from '../../../lib/api';
 
-type SelectedFood = { FoodID: number; FoodDescription: string; FoodCode?: string };
+type SelectedFood = { FoodID: number; FoodDescription: string; FoodCode?: string; amount_g: number };
 
 const HEFIComparisonDisplay = ({ result }: { result: HEFIComparison }) => {
   const { data } = result;
@@ -49,7 +49,7 @@ const HEFIComparisonDisplay = ({ result }: { result: HEFIComparison }) => {
           <div className="flex items-center justify-center bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <TrophyIcon className="w-6 h-6 text-yellow-600 mr-3" />
             <div>
-              <div className="font-semibold text-yellow-900">Best Performing Food</div>
+              <div className="font-semibold text-yellow-900">Best Performing Meal</div>
               <div className="text-yellow-700">{comparison_insights.best_performing}</div>
             </div>
           </div>
@@ -159,6 +159,8 @@ const HEFIComparisonDisplay = ({ result }: { result: HEFIComparison }) => {
 
 export default function HEFIComparePage() {
   const [selectedFoods, setSelectedFoods] = useState<SelectedFood[]>([]);
+  const [meals, setMeals] = useState<Array<{ name: string; items: SelectedFood[] }>>([]);
+  const [mealName, setMealName] = useState<string>('Meal 1');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<CNFSearchResult['results']>([]);
   const [searchIsLoading, setSearchIsLoading] = useState(false);
@@ -220,35 +222,61 @@ export default function HEFIComparePage() {
     return () => clearTimeout(timeoutId);
   }, [searchQuery, selectedCategory, selectedMethod]);
 
-  const addFood = (food: SelectedFood) => {
+  const addFood = (food: CNFSearchResult['results'][0]) => {
+    const newFood: SelectedFood = {
+      FoodID: food.FoodID,
+      FoodDescription: food.FoodDescription,
+      FoodCode: food.FoodCode,
+      amount_g: 100 // Default amount
+    };
     setSelectedFoods((prev) => {
       if (prev.some((f) => f.FoodID === food.FoodID)) return prev;
-      return [...prev, food];
+      return [...prev, newFood];
     });
     setSearchQuery('');
     setSearchResults([]);
     setShowResults(false);
   };
 
+  const updateFoodAmount = (foodId: number, amount: number) => {
+    setSelectedFoods(prev => prev.map(f => 
+      f.FoodID === foodId ? { ...f, amount_g: Math.max(0.1, amount) } : f
+    ));
+  };
+
   const removeFood = (foodId: number) => {
     setSelectedFoods((prev) => prev.filter((f) => f.FoodID !== foodId));
   };
 
-  const compareHEFI = async () => {
-    const validFoods = selectedFoods;
-    if (validFoods.length < 2) {
-      setError('Please select at least 2 foods to compare.');
+  const addMealFromSelection = () => {
+    if (selectedFoods.length === 0) {
+      setError('Add some foods to build a meal first.');
       return;
     }
+    const name = mealName?.trim() || `Meal ${meals.length + 1}`;
+    setMeals(prev => [...prev, { name, items: selectedFoods }]);
+    setSelectedFoods([]);
+    setMealName(`Meal ${meals.length + 2}`);
+  };
 
+  const removeMeal = (index: number) => {
+    setMeals(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const compareHEFI = async () => {
+    if (meals.length < 2) {
+      setError('Please create at least 2 meals to compare.');
+      return;
+    }
     try {
       setIsLoading(true);
       setError('');
-      
       const compareRequest = {
-        foods: validFoods.map(f => ({ food_ids: [f.FoodID], food_name: f.FoodDescription }))
+        foods: meals.map(m => ({
+          food_name: m.name,
+          food_items: m.items.map(it => ({ food_id: it.FoodID, amount_g: it.amount_g }))
+        }))
       };
-      
       const response = await HEFIApiService.compareFoodsHEFI(compareRequest);
       setResult(response);
     } catch (err: unknown) {
@@ -262,6 +290,8 @@ export default function HEFIComparePage() {
 
   const resetComparison = () => {
     setSelectedFoods([]);
+    setMeals([]);
+    setMealName('Meal 1');
     setResult(null);
     setError('');
     setSearchQuery('');
@@ -276,7 +306,19 @@ export default function HEFIComparePage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">HEFI Comparison</h1>
-          <p className="text-lg text-gray-600">Create groups of foods and compare their HEFI scores side-by-side.</p>
+          <p className="text-lg text-gray-600">Create meal groups or day-level combinations and compare their HEFI-2019 alignment. Single-food comparisons are educational only.</p>
+          <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div className="flex">
+              <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600 mr-2 flex-shrink-0" />
+              <div className="text-sm text-yellow-800">
+                <p className="font-semibold">Important: HEFI-2019 measures dietary patterns</p>
+                <ul className="list-disc list-inside mt-1 space-y-1">
+                  <li>For valid interpretation, combine foods to represent a complete daily intake (24-hour recall).</li>
+                  <li>Single-food results should not be considered a HEFI-2019 assessment.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -327,16 +369,16 @@ export default function HEFIComparePage() {
               </div>
             )}
 
-            {/* Add Foods */}
+            {/* Build a Meal */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Search Foods</label>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Search Foods to add to current meal</label>
                 <div className="relative">
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search foods to compare..."
+                    placeholder="Search foods to add to meal..."
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                   />
                   {showResults && (
@@ -365,7 +407,7 @@ export default function HEFIComparePage() {
               {/* Selected Foods */}
               <div className="mt-4">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm font-medium text-gray-700">Selected Foods ({selectedFoods.length})</h3>
+                  <h3 className="text-sm font-medium text-gray-700">Current Meal Foods ({selectedFoods.length})</h3>
                   {selectedFoods.length > 0 && (
                     <button
                       onClick={() => setSelectedFoods([])}
@@ -383,27 +425,91 @@ export default function HEFIComparePage() {
                 ) : (
                   <div className="space-y-2">
                     {selectedFoods.map((food) => (
-                      <div key={food.FoodID} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900 truncate max-w-[200px]">{food.FoodDescription}</div>
-                          <div className="text-xs text-gray-500">ID: {food.FoodID}</div>
+                      <div key={food.FoodID} className="p-2 bg-gray-50 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <div className="text-sm font-medium text-gray-900 truncate max-w-[200px]">{food.FoodDescription}</div>
+                            <div className="text-xs text-gray-500">ID: {food.FoodID}</div>
+                          </div>
+                          <button
+                            onClick={() => removeFood(food.FoodID)}
+                            className="text-red-500 hover:text-red-700 p-1"
+                            aria-label={`Remove ${food.FoodDescription}`}
+                          >
+                            <XMarkIcon className="w-4 h-4" />
+                          </button>
                         </div>
-                        <button
-                          onClick={() => removeFood(food.FoodID)}
-                          className="text-red-500 hover:text-red-700 p-1"
-                          aria-label={`Remove ${food.FoodDescription}`}
-                        >
-                          <XMarkIcon className="w-4 h-4" />
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <label htmlFor={`amount-g-${food.FoodID}`} className="text-xs font-medium text-gray-600">Amount:</label>
+                          <input
+                            id={`amount-g-${food.FoodID}`}
+                            type="number"
+                            min="0.1"
+                            step="0.1"
+                            value={food.amount_g}
+                            onChange={(e) => updateFoodAmount(food.FoodID, parseFloat(e.target.value) || 0.1)}
+                            className="w-20 px-2 py-1 border border-gray-300 rounded text-xs focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                            aria-label={`Amount in grams for ${food.FoodDescription}`}
+                          />
+                          <span className="text-xs text-gray-500">g</span>
+                        </div>
                       </div>
                     ))}
                   </div>
                 )}
               </div>
+
+              {/* Save Meal */}
+              <div className="mt-4 space-y-2">
+                <div className="flex items-center gap-2">
+                  <label htmlFor="meal-name" className="text-xs font-medium text-gray-600">Meal name:</label>
+                  <input
+                    id="meal-name"
+                    type="text"
+                    value={mealName}
+                    onChange={(e) => setMealName(e.target.value)}
+                    className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    placeholder="e.g., Breakfast, Lunch, Salmon Bowl"
+                  />
+                </div>
+                <button
+                  onClick={addMealFromSelection}
+                  disabled={selectedFoods.length === 0}
+                  className="w-full inline-flex items-center justify-center px-4 py-2 rounded-md text-white bg-purple-600 hover:bg-purple-700 disabled:opacity-50"
+                >
+                  Add Meal from Selected Foods
+                </button>
+              </div>
             </div>
 
+            {/* Saved Meals */}
+            {meals.length > 0 && (
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <h3 className="text-sm font-medium text-gray-700 mb-3">Meals to compare ({meals.length})</h3>
+                <div className="space-y-2">
+                  {meals.map((m, idx) => (
+                    <div key={idx} className="p-2 bg-gray-50 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">{m.name}</div>
+                          <div className="text-xs text-gray-500">{m.items.length} foods, {Math.round(m.items.reduce((s, it) => s + it.amount_g, 0))}g total</div>
+                        </div>
+                        <button
+                          onClick={() => removeMeal(idx)}
+                          className="text-red-500 hover:text-red-700 text-xs"
+                          aria-label={`Remove ${m.name}`}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Compare Button */}
-            {selectedFoods.length >= 2 && (
+            {meals.length >= 2 && (
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <button
                   onClick={compareHEFI}
@@ -411,7 +517,7 @@ export default function HEFIComparePage() {
                   className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   <ChartBarIcon className="mr-2 w-5 h-5" />
-                  {isLoading ? 'Comparing...' : 'Compare HEFI Scores'}
+                  {isLoading ? 'Comparing...' : 'Compare Meal HEFI Scores'}
                 </button>
               </div>
             )}
@@ -447,7 +553,7 @@ export default function HEFIComparePage() {
                 <InformationCircleIcon className="w-16 h-16 mx-auto text-gray-300 mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No Results Yet</h3>
                 <p className="text-gray-600 max-w-xl mx-auto">
-                  Use the sidebar to add at least two foods, then click &quot;Compare HEFI Scores&quot; to see the results here.
+                  Build at least two meals in the sidebar, then click &quot;Compare Meal HEFI Scores&quot; to see results here.
                 </p>
               </div>
             )}

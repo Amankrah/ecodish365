@@ -8,7 +8,7 @@ import {
   ExclamationTriangleIcon,
   ChartBarIcon
 } from '@heroicons/react/24/outline';
-import { HEFIApiService, CNFApiService, type HEFIFoodProfile, type FilterOptions, type SearchResult as CNFSearchResult, type HEFIInterpretation } from '../../../lib/api';
+import { HEFIApiService, CNFApiService, type HEFIFoodProfile, type HEFIResult, type FilterOptions, type SearchResult as CNFSearchResult, type HEFIInterpretation } from '../../../lib/api';
 
 const HEFIProfileDisplay = ({ profile }: { profile: HEFIFoodProfile }) => {
   const { data } = profile;
@@ -182,7 +182,7 @@ const HEFIProfileDisplay = ({ profile }: { profile: HEFIFoodProfile }) => {
   );
 };
 
-type SelectedFood = { FoodID: number; FoodDescription: string; FoodCode?: string };
+type SelectedFood = { FoodID: number; FoodDescription: string; FoodCode?: string; amount_g: number };
 
 export default function HEFIFoodProfilePage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -195,6 +195,7 @@ export default function HEFIFoodProfilePage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedMethod, setSelectedMethod] = useState<string>('');
   const [searchIsLoading, setSearchIsLoading] = useState(false);
+  const [combinedResult, setCombinedResult] = useState<HEFIResult | null>(null);
 
   // Load filters on mount
   useEffect(() => {
@@ -242,11 +243,18 @@ export default function HEFIFoodProfilePage() {
     return () => clearTimeout(timeoutId);
   }, [searchQuery, selectedCategory, selectedMethod]);
 
-  const addFood = async (food: SelectedFood) => {
+  const addFood = async (food: CNFSearchResult['results'][0]) => {
+    const newFood: SelectedFood = {
+      FoodID: food.FoodID,
+      FoodDescription: food.FoodDescription,
+      FoodCode: food.FoodCode,
+      amount_g: 100 // Default amount
+    };
+
     // Add to selected list if not already present
     setSelectedFoods((prev) => {
       if (prev.some((f) => f.FoodID === food.FoodID)) return prev;
-      return [...prev, food];
+      return [...prev, newFood];
     });
 
     // Clear search UI
@@ -254,10 +262,29 @@ export default function HEFIFoodProfilePage() {
     setSearchResults([]);
 
     // Fetch and store profile
+    await fetchProfile(newFood);
+  };
+
+  const updateFoodAmount = async (foodId: number, amount: number) => {
+    const validAmount = Math.max(0.1, amount);
+    
+    // Update the food amount
+    setSelectedFoods(prev => prev.map(f => 
+      f.FoodID === foodId ? { ...f, amount_g: validAmount } : f
+    ));
+
+    // Refetch profile with new amount
+    const food = selectedFoods.find(f => f.FoodID === foodId);
+    if (food) {
+      await fetchProfile({ ...food, amount_g: validAmount });
+    }
+  };
+
+  const fetchProfile = async (food: SelectedFood) => {
     try {
       setIsLoading(true);
       setError('');
-      const response = await HEFIApiService.getFoodHEFIProfile(food.FoodID);
+      const response = await HEFIApiService.getFoodHEFIProfile(food.FoodID, food.amount_g);
       setProfiles((prev) => ({ ...prev, [food.FoodID]: response }));
     } catch (err: unknown) {
       const e = err as { response?: { data?: { message?: string } } };
@@ -283,6 +310,26 @@ export default function HEFIFoodProfilePage() {
     setError('');
     setSearchQuery('');
     setSearchResults([]);
+    setCombinedResult(null);
+  };
+
+  const buildCombinedMealProfile = async () => {
+    if (selectedFoods.length === 0) {
+      setError('Add at least one food to build a meal profile.');
+      return;
+    }
+    try {
+      setIsLoading(true);
+      setError('');
+      const foods = selectedFoods.map(f => ({ food_id: f.FoodID, amount_g: f.amount_g }));
+      const response = await HEFIApiService.calculateHEFI({ foods });
+      setCombinedResult(response);
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { message?: string; error?: string } } };
+      setError(e?.response?.data?.error || e?.response?.data?.message || 'Failed to build combined meal profile');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -291,7 +338,19 @@ export default function HEFIFoodProfilePage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">HEFI Food Profile</h1>
-          <p className="text-lg text-gray-600">Get a detailed HEFI profile for any food with component, ratio, and input breakdowns.</p>
+          <p className="text-lg text-gray-600">Educational HEFI-2019 profile estimate for a food or meal component. For valid HEFI use, evaluate complete daily intakes (24-hour recalls).</p>
+          <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div className="flex">
+              <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600 mr-2 flex-shrink-0" />
+              <div className="text-sm text-yellow-800">
+                <p className="font-semibold">Important: HEFI-2019 is intended for full-day dietary patterns</p>
+                <ul className="list-disc list-inside mt-1 space-y-1">
+                  <li>Use HEFI-2019 with complete meals or 24-hour dietary recalls.</li>
+                  <li>Single-food profiles are approximate and should be interpreted cautiously.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -392,18 +451,34 @@ export default function HEFIFoodProfilePage() {
                 ) : (
                   <div className="space-y-2">
                     {selectedFoods.map((food) => (
-                      <div key={food.FoodID} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900 truncate max-w-[200px]">{food.FoodDescription}</div>
-                          <div className="text-xs text-gray-500">ID: {food.FoodID}</div>
+                      <div key={food.FoodID} className="p-2 bg-gray-50 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <div className="text-sm font-medium text-gray-900 truncate max-w-[200px]">{food.FoodDescription}</div>
+                            <div className="text-xs text-gray-500">ID: {food.FoodID}</div>
+                          </div>
+                          <button
+                            onClick={() => removeFood(food.FoodID)}
+                            className="text-red-500 hover:text-red-700 p-1"
+                            aria-label={`Remove ${food.FoodDescription}`}
+                          >
+                            Remove
+                          </button>
                         </div>
-                        <button
-                          onClick={() => removeFood(food.FoodID)}
-                          className="text-red-500 hover:text-red-700 p-1"
-                          aria-label={`Remove ${food.FoodDescription}`}
-                        >
-                          Remove
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <label htmlFor={`amount-g-${food.FoodID}`} className="text-xs font-medium text-gray-600">Amount:</label>
+                          <input
+                            id={`amount-g-${food.FoodID}`}
+                            type="number"
+                            min="0.1"
+                            step="0.1"
+                            value={food.amount_g}
+                            onChange={(e) => updateFoodAmount(food.FoodID, parseFloat(e.target.value) || 0.1)}
+                            className="w-20 px-2 py-1 border border-gray-300 rounded text-xs focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                            aria-label={`Amount in grams for ${food.FoodDescription}`}
+                          />
+                          <span className="text-xs text-gray-500">g</span>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -428,6 +503,85 @@ export default function HEFIFoodProfilePage() {
               <div className="bg-white rounded-lg shadow-sm p-4 text-center text-sm text-gray-600">Loading profiles...</div>
             )}
 
+            {/* Combined Meal Profile */}
+            {selectedFoods.length > 0 && (
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-bold text-gray-900">Combined Meal HEFI (from selected foods)</h2>
+                  <button
+                    onClick={buildCombinedMealProfile}
+                    className="text-sm px-3 py-2 rounded-md text-white bg-purple-600 hover:bg-purple-700"
+                  >
+                    {isLoading ? 'Calculating...' : 'Calculate Meal HEFI'}
+                  </button>
+                </div>
+                {combinedResult ? (
+                  <div className="space-y-6">
+                    {/* Overall */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-2xl font-bold text-gray-900">{combinedResult.data.total_score.toFixed(1)} / {combinedResult.data.max_total_score}</div>
+                        <div className="text-sm text-gray-600">{combinedResult.data.food_name || 'Combined meal'}</div>
+                      </div>
+                      {combinedResult.data.hefi_interpretation && (
+                        <div className="px-4 py-2 rounded-lg border">
+                          <div className="text-sm font-semibold">{combinedResult.data.hefi_interpretation.category}</div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Components */}
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Component Scores</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {Object.entries(combinedResult.data.components).map(([key, component]) => {
+                          const percentage = (component.score / component.max_points) * 100;
+                          return (
+                            <div key={key} className="bg-gray-50 rounded-lg p-4">
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="font-medium text-gray-900">{component.name}</div>
+                                <div className="text-sm text-gray-600">{component.score.toFixed(1)} / {component.max_points}</div>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div className="bg-purple-600 h-2 rounded-full" style={{ width: `${Math.min(percentage, 100)}%` }} />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Ratios */}
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Key Ratios</h3>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {Object.entries(combinedResult.data.ratios).map(([key, value]) => (
+                          <div key={key} className="text-center p-3 bg-gray-50 rounded-lg">
+                            <div className="text-xl font-bold text-purple-600">{typeof value === 'number' ? value.toFixed(2) : value}</div>
+                            <div className="text-xs text-gray-600">{key.replace(/_/g, ' ').toLowerCase()}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Inputs */}
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Nutritional Inputs</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {Object.entries(combinedResult.data.inputs).map(([key, value]) => (
+                          <div key={key} className="bg-gray-50 rounded-lg p-3">
+                            <div className="text-sm font-semibold text-gray-900">{typeof value === 'number' ? (key.includes('_g') || key.includes('_mg') || key.includes('_kcal') ? value.toFixed(1) : value.toFixed(1)) : value}</div>
+                            <div className="text-xs text-gray-600">{key.replace(/_/g, ' ').toLowerCase()}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-sm text-gray-600">No meal calculation yet. Select foods on the left and click Calculate.</div>
+                )}
+              </div>
+            )}
             {selectedFoods.length > 0 ? (
               <div className="space-y-6">
                 {selectedFoods.map((food) => (

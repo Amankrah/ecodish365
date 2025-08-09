@@ -122,24 +122,104 @@ def _format_hefi_response(result, food_ids=None, food_name=None, integrator=None
 
 @api_view(['POST'])
 def hefi_calculate(request):
+    """
+    Calculate HEFI score for foods with specified quantities.
+    Expected input: {
+        "foods": [
+            {"food_id": 3049, "amount_g": 100.0},
+            {"food_id": 3725, "amount_g": 75.0}
+        ]
+    }
+    """
     try:
-        food_ids = request.data.get('food_ids', [])
-        if not food_ids:
-            return Response({"error": "No food IDs provided"}, status=status.HTTP_400_BAD_REQUEST)
+        foods_data = request.data.get('foods')
+        
+        if not foods_data:
+            return Response({"error": "'foods' array with food_id and amount_g is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not isinstance(foods_data, list) or len(foods_data) == 0:
+            return Response({"error": "Foods array cannot be empty"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        food_data = []
+        food_ids = []
+        total_amount = 0
+        
+        for food_item in foods_data:
+            food_id = food_item.get('food_id')
+            amount_g = food_item.get('amount_g')
+            
+            if not food_id:
+                return Response({"error": "Each food item must have a food_id"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            if amount_g is None:
+                return Response({"error": "Each food item must have an amount_g"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            if amount_g <= 0:
+                return Response({"error": "Amount must be greater than 0"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            food_data.append((food_id, float(amount_g)))
+            food_ids.append(food_id)
+            total_amount += amount_g
 
         integrator = get_hefi_integrator()
-        agg = integrator.aggregate_inputs(food_ids)
+        agg = integrator.aggregate_inputs(food_data)
         inputs = HEFIInputs(**agg)
         result = compute_hefi(inputs)
 
-        # Get food name if single food
-        food_name = None
+        # Get food name
         if len(food_ids) == 1:
-            food_name = _get_food_name(food_ids[0], integrator)
-        elif len(food_ids) > 1:
-            food_name = f"Meal with {len(food_ids)} foods"
+            amount = food_data[0][1]
+            base_name = _get_food_name(food_ids[0], integrator)
+            food_name = f"{base_name} ({amount}g)"
+        else:
+            food_name = f"Meal with {len(food_ids)} foods ({total_amount}g total)"
 
         data = _format_hefi_response(result, food_ids, food_name, integrator)
+        
+        # Add detailed food breakdown
+        food_breakdown = []
+        for (food_id, amount_g) in food_data:
+            food_info = {
+                'food_id': food_id,
+                'amount_g': amount_g,
+                'name': _get_food_name(food_id, integrator)
+            }
+            
+            # Get RA classification for this food
+            try:
+                food_rows = integrator._get_food_rows([food_id])
+                if not food_rows.empty:
+                    food_row = food_rows.iloc[0]
+                    food_description = food_row['FoodDescription']
+                    food_group_id = int(food_row['FoodGroupID'])
+                    
+                    ra_category = integrator._classify_food_to_ra_category(food_description, food_group_id)
+                    ra_amount_g = integrator._get_ra_amount(ra_category)
+                    calculated_ra = amount_g / ra_amount_g
+                    
+                    # Get conversion factor and measure description
+                    conversion_factor = integrator._get_best_conversion_factor(food_id)
+                    measure_description = integrator.get_measure_description(food_id, conversion_factor)
+                    
+                    # Remove debug logging
+                    # if measure_description == "Unknown measure":
+                    #     print(f"DEBUG: No measure description found for Food ID {food_id}, conversion factor {conversion_factor}")
+                    
+                    food_info.update({
+                        'group_id': food_group_id,
+                        'ra_category': ra_category,
+                        'ra_amount_g': ra_amount_g,
+                        'calculated_ra': round(calculated_ra, 3),
+                        'conversion_factor': conversion_factor,
+                        'measure_description': measure_description
+                    })
+            except Exception as e:
+                food_info['ra_error'] = f"Could not calculate RA: {str(e)}"
+            
+            food_breakdown.append(food_info)
+        
+        data['food_breakdown'] = food_breakdown
+
         return Response({'success': True, 'data': data})
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -158,36 +238,91 @@ def get_food_hefi_profile(request, food_id):
         integrator = get_hefi_integrator()
         
         try:
-            agg = integrator.aggregate_inputs([food_id])
+            # Use amount_g from query parameters, require it to be specified
+            amount_g = request.GET.get('amount_g')
+            if amount_g is None:
+                return Response({"error": "amount_g query parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            amount_g = float(amount_g)
+            if amount_g <= 0:
+                return Response({"error": "Amount must be greater than 0"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            food_data = [(food_id, amount_g)]
+            agg = integrator.aggregate_inputs(food_data)
             inputs = HEFIInputs(**agg)
             result = compute_hefi(inputs)
         except Exception as e:
             return Response({"error": f"Food not found or processing error: {str(e)}"}, status=status.HTTP_404_NOT_FOUND)
         
-        food_name = _get_food_name(food_id, integrator)
+        base_name = _get_food_name(food_id, integrator)
+        food_name = f"{base_name} ({amount_g}g)"
         data = _format_hefi_response(result, [food_id], food_name, integrator)
         
-        # Add conversion factor information
-        conversion_factor = integrator._get_best_conversion_factor(food_id)
-        measure_info = {"conversion_factor": conversion_factor}
+        # Add RA classification details
+        try:
+            food_rows = integrator._get_food_rows([food_id])
+            if not food_rows.empty:
+                food_row = food_rows.iloc[0]
+                food_description = food_row['FoodDescription']
+                food_group_id = int(food_row['FoodGroupID'])
+                
+                ra_category = integrator._classify_food_to_ra_category(food_description, food_group_id)
+                ra_amount_g = integrator._get_ra_amount(ra_category)
+                calculated_ra = amount_g / ra_amount_g
+                
+                data['ra_details'] = {
+                    'amount_g': amount_g,
+                    'ra_category': ra_category,
+                    'ra_amount_g': ra_amount_g,
+                    'calculated_ra': round(calculated_ra, 3),
+                    'group_id': food_group_id,
+                    'description': food_description,
+                    'classification_confidence': 'high' if ra_category != 'default' else 'low'
+                }
+        except Exception as e:
+            data['ra_details'] = {'error': f"Could not calculate RA details: {str(e)}"}
         
-        # Try to get measure description from MEASURE_NAME.csv
-        if not integrator.conversion_factors_df.empty and not integrator.measure_names_df.empty:
-            food_factors = integrator.conversion_factors_df[
-                integrator.conversion_factors_df['FoodID'] == food_id
-            ].merge(
-                integrator.measure_names_df[['MeasureID', 'MeasureDescription']], 
-                on='MeasureID', 
-                how='left'
-            )
+        # Add conversion factor information
+        try:
+            conversion_factor = integrator._get_best_conversion_factor(food_id)
+            measure_description = integrator.get_measure_description(food_id, conversion_factor)
             
-            for _, row in food_factors.iterrows():
-                if abs(float(row['ConversionFactorValue']) - conversion_factor) < 0.001:
-                    measure_desc = row.get('MeasureDescription', 'Unknown measure')
+            measure_info = {
+                "conversion_factor": conversion_factor,
+                "measure_description": measure_description
+            }
+            
+            # Add all available measures for this food
+            if not integrator.conversion_factors_df.empty and not integrator.measure_names_df.empty:
+                food_factors = integrator.conversion_factors_df[
+                    integrator.conversion_factors_df['FoodID'] == food_id
+                ].copy()
+                
+                # Ensure MeasureID columns are the same type for proper merging
+                food_factors['MeasureID'] = food_factors['MeasureID'].astype(int)
+                measure_names_subset = integrator.measure_names_df[['MeasureID', 'MeasureDescription']].copy()
+                measure_names_subset['MeasureID'] = measure_names_subset['MeasureID'].astype(int)
+                
+                merged_factors = food_factors.merge(
+                    measure_names_subset, 
+                    on='MeasureID', 
+                    how='left'
+                )
+                
+                available_measures = []
+                for _, row in merged_factors.iterrows():
+                    measure_desc = row.get('MeasureDescription', '')
                     if pd.notna(measure_desc) and str(measure_desc).strip():
-                        measure_info["measure_description"] = str(measure_desc)
-                        measure_info["measure_id"] = row.get('MeasureID', None)
-                        break
+                        available_measures.append({
+                            'measure_id': int(row.get('MeasureID', 0)),
+                            'description': str(measure_desc).strip(),
+                            'conversion_factor': float(row['ConversionFactorValue'])
+                        })
+                
+                measure_info['available_measures'] = available_measures
+                measure_info['total_measures_found'] = len(available_measures)
+        except Exception as e:
+            measure_info = {'error': f'Could not get measure info: {str(e)}'}
         
         data['measure_info'] = measure_info
         
@@ -204,14 +339,13 @@ def get_food_hefi_profile(request, food_id):
 @api_view(['POST'])
 def compare_foods_hefi(request):
     """
-    Compare HEFI scores between multiple foods
-    Expected input: {
-        "foods": [
-            {"food_ids": [3049], "food_name": "Salmon"},
-            {"food_ids": [3725], "food_name": "Rice Bran Bread"},
-            {"food_ids": [3049, 3725], "food_name": "Salmon & Bread Meal"}
-        ]
-    }
+    Compare HEFI scores between multiple meals (or foods)
+    Supports two input formats per item:
+      1) Meal format (recommended):
+         {"food_name": "Meal A", "food_items": [{"food_id": 3049, "amount_g": 120.0}, {"food_id": 3725, "amount_g": 80.0}]}
+      2) Legacy format (backward compatible):
+         {"food_ids": [3049, 3725], "food_name": "Meal A", "amount_g": 100.0}  # same grams applied to each food
+         or {"food_ids": [3049]}  # defaults to 100g
     """
     try:
         foods_data = request.data.get('foods', [])
@@ -228,20 +362,46 @@ def compare_foods_hefi(request):
         # Calculate HEFI for each food/meal
         for food_data in foods_data:
             try:
-                food_ids = food_data.get('food_ids', [])
                 food_name = food_data.get('food_name')
-                
-                if not food_ids:
-                    continue
-                
+
+                food_input_data = []
+                food_ids = []
+
+                # Preferred: meal format with explicit amounts per item
+                food_items = food_data.get('food_items')
+                if isinstance(food_items, list) and len(food_items) > 0:
+                    for item in food_items:
+                        item_food_id = item.get('food_id')
+                        item_amount_g = item.get('amount_g')
+                        if item_food_id is None:
+                            raise ValueError("Each food item must include 'food_id'")
+                        if item_amount_g is None or float(item_amount_g) <= 0:
+                            raise ValueError("Each food item must include a positive 'amount_g'")
+                        food_input_data.append((int(item_food_id), float(item_amount_g)))
+                        food_ids.append(int(item_food_id))
+                else:
+                    # Backward compatible: food_ids plus optional single amount applied to all
+                    food_ids = food_data.get('food_ids', [])
+                    if not food_ids:
+                        raise ValueError("'food_ids' or 'food_items' is required")
+                    if 'amount_g' in food_data and food_data['amount_g']:
+                        amount_g = float(food_data.get('amount_g', 100.0))
+                        if amount_g <= 0:
+                            raise ValueError("amount_g must be greater than 0")
+                        food_input_data = [(int(fid), amount_g) for fid in food_ids]
+                    else:
+                        # default 100g per item
+                        food_input_data = [(int(fid), 100.0) for fid in food_ids]
+
                 # If no name provided, generate one
                 if not food_name:
                     if len(food_ids) == 1:
                         food_name = _get_food_name(food_ids[0], integrator)
                     else:
-                        food_name = f"Meal with {len(food_ids)} foods"
+                        total_g = sum(amount for _, amount in food_input_data)
+                        food_name = f"Meal with {len(food_ids)} foods ({int(total_g)}g)"
                 
-                agg = integrator.aggregate_inputs(food_ids)
+                agg = integrator.aggregate_inputs(food_input_data)
                 inputs = HEFIInputs(**agg)
                 result = compute_hefi(inputs)
                 
@@ -251,7 +411,7 @@ def compare_foods_hefi(request):
             except Exception as e:
                 # Add error entry for this food but continue with others
                 results.append({
-                    'food_ids': food_data.get('food_ids', []),
+                    'food_ids': food_data.get('food_ids') or [fi.get('food_id') for fi in food_data.get('food_items', [])],
                     'food_name': food_data.get('food_name', 'Unknown'),
                     'error': f"Error processing: {str(e)}",
                     'total_score': 0,

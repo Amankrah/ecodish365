@@ -14,6 +14,7 @@ interface SelectedFood {
   FoodID: number;
   FoodDescription: string;
   FoodCode?: string;
+  amount_g: number;
 }
 
 // Minimal shape returned by CNF search used in this UI
@@ -210,7 +211,8 @@ export default function HEFICalculatePage() {
     const newFood: SelectedFood = {
       FoodID: food.FoodID,
       FoodDescription: food.FoodDescription,
-      FoodCode: food.FoodCode
+      FoodCode: food.FoodCode,
+      amount_g: 100 // Default amount
     };
     
     if (!selectedFoods.some(f => f.FoodID === food.FoodID)) {
@@ -224,9 +226,22 @@ export default function HEFICalculatePage() {
     setSelectedFoods(selectedFoods.filter(f => f.FoodID !== foodId));
   };
 
+  const updateFoodAmount = (foodId: number, amount: number) => {
+    setSelectedFoods(selectedFoods.map(f => 
+      f.FoodID === foodId ? { ...f, amount_g: Math.max(0.1, amount) } : f
+    ));
+  };
+
   const calculateHEFI = async () => {
     if (selectedFoods.length === 0) {
       setError('Please select at least one food item.');
+      return;
+    }
+
+    // Check for valid amounts
+    const invalidAmounts = selectedFoods.filter(f => f.amount_g <= 0);
+    if (invalidAmounts.length > 0) {
+      setError('All food amounts must be greater than 0.');
       return;
     }
 
@@ -234,8 +249,8 @@ export default function HEFICalculatePage() {
       setIsLoading(true);
       setError('');
       
-      const foodIds = selectedFoods.map(f => f.FoodID);
-      const response = await HEFIApiService.calculateHEFI({ food_ids: foodIds });
+      const foods = selectedFoods.map(f => ({ food_id: f.FoodID, amount_g: f.amount_g }));
+      const response = await HEFIApiService.calculateHEFI({ foods });
       
       setResult(response);
     } catch (err: unknown) {
@@ -262,8 +277,21 @@ export default function HEFICalculatePage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">HEFI Calculator</h1>
           <p className="text-lg text-gray-600">
-            Calculate Healthy Eating Food Index scores for selected foods using Canada’s validated HEFI-2019 algorithm.
+            Build a meal or day from foods to estimate HEFI-2019 alignment. For scientifically valid use, HEFI-2019 is intended for complete
+            daily dietary patterns (24-hour recalls), not single foods.
           </p>
+          <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div className="flex">
+              <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600 mr-2 flex-shrink-0" />
+              <div className="text-sm text-yellow-800">
+                <p className="font-semibold">Important: HEFI-2019 is a pattern-level index</p>
+                <ul className="list-disc list-inside mt-1 space-y-1">
+                  <li>Use HEFI with complete meals or 24-hour recalls.</li>
+                  <li>Single-food scores are educational estimates and should be interpreted cautiously.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -375,20 +403,36 @@ export default function HEFICalculatePage() {
                 ) : (
                   <div className="space-y-2">
                     {selectedFoods.map((food) => (
-                      <div key={food.FoodID} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
-                          <div className="font-medium text-gray-900">{food.FoodDescription}</div>
-                          <div className="text-sm text-gray-500">ID: {food.FoodID}</div>
+                      <div key={food.FoodID} className="p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <div className="font-medium text-gray-900">{food.FoodDescription}</div>
+                            <div className="text-sm text-gray-500">ID: {food.FoodID}</div>
+                          </div>
+                          <button
+                            onClick={() => removeFood(food.FoodID)}
+                            className="text-red-500 hover:text-red-700 p-1"
+                            title={`Remove ${food.FoodDescription}`}
+                            aria-label={`Remove ${food.FoodDescription}`}
+                          >
+                            <XMarkIcon className="w-5 h-5" />
+                            <span className="sr-only">Remove {food.FoodDescription}</span>
+                          </button>
                         </div>
-                        <button
-                          onClick={() => removeFood(food.FoodID)}
-                          className="text-red-500 hover:text-red-700 p-1"
-                          title={`Remove ${food.FoodDescription}`}
-                          aria-label={`Remove ${food.FoodDescription}`}
-                        >
-                          <XMarkIcon className="w-5 h-5" />
-                          <span className="sr-only">Remove {food.FoodDescription}</span>
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <label htmlFor={`amount-g-${food.FoodID}`} className="text-sm font-medium text-gray-600">Amount:</label>
+                          <input
+                            id={`amount-g-${food.FoodID}`}
+                            type="number"
+                            min="0.1"
+                            step="0.1"
+                            value={food.amount_g}
+                            onChange={(e) => updateFoodAmount(food.FoodID, parseFloat(e.target.value) || 0.1)}
+                            className="w-24 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                            aria-label={`Amount in grams for ${food.FoodDescription}`}
+                          />
+                          <span className="text-sm text-gray-500">grams</span>
+                        </div>
                       </div>
                     ))}
                   </div>
