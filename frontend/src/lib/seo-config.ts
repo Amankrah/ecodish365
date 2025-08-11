@@ -27,6 +27,10 @@ export const seoConfig = {
     'CNF database',
     'Health Star Rating calculator',
     'Food Compass Score',
+    'Healthy Eating Food Index',
+    'HEFI 2019',
+    'HEalth Nutritional Index',
+    'HENI health impact',
     'nutritional assessment',
     'food research platform',
     'professional nutrition tools',
@@ -50,6 +54,10 @@ export const seoConfig = {
     'FCS scoring system',
     'environmental nutrition',
     'sustainable food analysis',
+    'DALY-based nutrition',
+    'health impact of foods',
+    'micro-DALY',
+    'GBD risk factors',
   ],
 
   // Target audience segments
@@ -119,6 +127,11 @@ export const seoConfig = {
       description:
         "Assess diet quality using Canada's Healthy Eating Food Index (HEFI-2019). Evaluate nutritional quality across 10 components with professional insights.",
     },
+    heni: {
+      title: 'HENI Calculator - Health Impact in micro-DALYs (μDALYs)',
+      description:
+        'Evaluate food health impacts using the HEalth Nutritional Index (HENI). Evidence-based methodology maps dietary risk factors to micro-DALYs using GBD research.',
+    },
   },
 
   // Schema.org structured data templates
@@ -138,6 +151,9 @@ export const seoConfig = {
         'Food Compass Scores',
         'Canadian Nutrient File',
         'Dietary Assessment',
+        'HEFI-2019',
+        'HENI',
+        'DALY methodology',
       ],
     },
     website: {
