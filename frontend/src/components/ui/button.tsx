@@ -1,4 +1,5 @@
 import React from 'react';
+import type { ButtonHTMLAttributes } from 'react';
 
 const buttonVariants = {
   default: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
@@ -16,7 +17,15 @@ const buttonSizes = {
   icon: 'p-2'
 };
 
-export const Button = ({ 
+type ButtonVariant = keyof typeof buttonVariants;
+type ButtonSize = keyof typeof buttonSizes;
+
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+}
+
+export const Button: React.FC<ButtonProps> = ({ 
   variant = 'default', 
   size = 'default', 
   className = '', 

@@ -1,22 +1,18 @@
 import React from 'react';
 
-export const Alert = ({ className = '', children, ...props }) => {
+type DivProps = React.HTMLAttributes<HTMLDivElement>;
+
+export const Alert = ({ className = '', children, ...props }: DivProps) => {
   return (
-    <div
-      className={`p-4 rounded-lg border ${className}`}
-      {...props}
-    >
+    <div className={`p-4 rounded-lg border ${className}`} {...props}>
       {children}
     </div>
   );
 };
 
-export const AlertDescription = ({ className = '', children, ...props }) => {
+export const AlertDescription = ({ className = '', children, ...props }: DivProps) => {
   return (
-    <div
-      className={`text-sm ${className}`}
-      {...props}
-    >
+    <div className={`text-sm ${className}`} {...props}>
       {children}
     </div>
   );

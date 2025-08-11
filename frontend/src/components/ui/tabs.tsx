@@ -1,15 +1,28 @@
 import React, { createContext, useContext, useState } from 'react';
+import type { HTMLAttributes, ReactNode } from 'react';
 
-const TabsContext = createContext({});
+interface TabsContextValue {
+  value: string;
+  onValueChange: (value: string) => void;
+}
 
-export const Tabs = ({ defaultValue, value, onValueChange, className = '', children, ...props }) => {
-  const [internalValue, setInternalValue] = useState(defaultValue);
+const TabsContext = createContext<TabsContextValue | undefined>(undefined);
+
+interface TabsProps extends HTMLAttributes<HTMLDivElement> {
+  defaultValue?: string;
+  value?: string;
+  onValueChange?: (value: string) => void;
+  children?: ReactNode;
+}
+
+export const Tabs: React.FC<TabsProps> = ({ defaultValue = '', value, onValueChange, className = '', children, ...props }) => {
+  const [internalValue, setInternalValue] = useState<string>(defaultValue);
   
   const currentValue = value !== undefined ? value : internalValue;
   const handleValueChange = onValueChange || setInternalValue;
 
   return (
-    <TabsContext.Provider value={{ value: currentValue, onValueChange: handleValueChange }}>
+    <TabsContext.Provider value={{ value: currentValue as string, onValueChange: handleValueChange as (v: string) => void }}>
       <div className={className} {...props}>
         {children}
       </div>
@@ -17,7 +30,9 @@ export const Tabs = ({ defaultValue, value, onValueChange, className = '', child
   );
 };
 
-export const TabsList = ({ className = '', children, ...props }) => {
+type TabsListProps = HTMLAttributes<HTMLDivElement>;
+
+export const TabsList: React.FC<TabsListProps> = ({ className = '', children, ...props }) => {
   return (
     <div
       className={`inline-flex h-10 items-center justify-center rounded-md bg-gray-100 p-1 ${className}`}
@@ -28,8 +43,15 @@ export const TabsList = ({ className = '', children, ...props }) => {
   );
 };
 
-export const TabsTrigger = ({ value, disabled = false, className = '', children, ...props }) => {
-  const { value: currentValue, onValueChange } = useContext(TabsContext);
+interface TabsTriggerProps extends HTMLAttributes<HTMLButtonElement> {
+  value: string;
+  disabled?: boolean;
+}
+
+export const TabsTrigger: React.FC<TabsTriggerProps> = ({ value, disabled = false, className = '', children, ...props }) => {
+  const ctx = useContext(TabsContext);
+  if (!ctx) return null;
+  const { value: currentValue, onValueChange } = ctx;
   const isActive = currentValue === value;
 
   return (
@@ -49,8 +71,14 @@ export const TabsTrigger = ({ value, disabled = false, className = '', children,
   );
 };
 
-export const TabsContent = ({ value, className = '', children, ...props }) => {
-  const { value: currentValue } = useContext(TabsContext);
+interface TabsContentProps extends HTMLAttributes<HTMLDivElement> {
+  value: string;
+}
+
+export const TabsContent: React.FC<TabsContentProps> = ({ value, className = '', children, ...props }) => {
+  const ctx = useContext(TabsContext);
+  if (!ctx) return null;
+  const { value: currentValue } = ctx;
   
   if (currentValue !== value) {
     return null;
