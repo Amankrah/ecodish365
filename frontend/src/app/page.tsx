@@ -25,7 +25,7 @@ const features = [
   {
     name: 'Health Star Rating Calculator',
     description: 'Calculate official Health Star Ratings using Australia\'s validated front-of-pack labeling algorithm. Compare nutritional quality across foods with detailed scoring breakdowns.',
-    icon: HeartIcon,
+    icon: DocumentChartBarIcon,
     href: '/hsr',
     status: 'Available',
   },
@@ -37,11 +37,11 @@ const features = [
     status: 'Available',
   },
   {
-    name: 'Healthy Eating Index (HENI)',
-    description: 'Assess diet quality using various healthy eating indices and nutritional guidelines.',
-    icon: ScaleIcon,
-    href: '/calculators/heni',
-    status: 'Coming Soon',
+    name: 'Health and Nutritional Impact (HENI)',
+    description: 'Calculate comprehensive health impacts using DALY-based epidemiological evidence. Research-grade tool for individuals, researchers, and policy makers.',
+    icon: HeartIcon,
+    href: '/heni',
+    status: 'Available',
   },
   {
     name: 'Environmental Impact',
@@ -51,9 +51,9 @@ const features = [
     status: 'Coming Soon',
   },
   {
-    name: 'HEFI Score',
-    description: 'Healthy Eating Food Index scoring system for comprehensive dietary quality assessment.',
-    icon: DocumentChartBarIcon,
+    name: 'Healthy Eating Food Index (HEFI)',
+    description: 'Canadian validated dietary quality assessment tool measuring adherence to evidence-based healthy eating patterns with 10-component scoring system.',
+    icon: ScaleIcon,
     href: '/hefi',
     status: 'Available',
   },

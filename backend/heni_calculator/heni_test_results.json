@@ -1,0 +1,88 @@
+{
+  "heni_scores": {
+    "total_heni_score": 292.13,
+    "heni_per_100_kcal": 55.8,
+    "heni_per_100_grams": 83.47,
+    "heni_per_serving": 292.13
+  },
+  "health_impact": {
+    "health_impact_minutes": 153.5,
+    "description": "Highly Beneficial: This food provides significant health benefits, adding approximately 153.5 minutes to healthy life expectancy. Primary benefit comes from vegetables."
+  },
+  "component_breakdown": {
+    "food_group_contributions": {
+      "sodium": -0.58,
+      "vegetables": 480.0,
+      "sugar_sweetened_beverages": -210.0
+    },
+    "nutrient_contributions": {
+      "fiber": 14.53,
+      "calcium": 0.33,
+      "polyunsaturated_fatty_acids": 7.84
+    }
+  },
+  "disease_burden_analysis": {
+    "disease_breakdown": {
+      "cardiovascular_diseases": 97.3,
+      "colorectal_cancer": 0.89,
+      "other_cancers": 19.2,
+      "metabolic_disorders": -10.5,
+      "all_cause_mortality": 0.0
+    }
+  },
+  "risk_factor_analysis": {
+    "risk_factors": {
+      "fiber": 7.65,
+      "calcium": 0.065,
+      "sodium": 0.073,
+      "polyunsaturated_fatty_acids": 1.307,
+      "vegetables": 150.0,
+      "sugar_sweetened_beverages": 100.0
+    },
+    "warnings": []
+  },
+  "meal_composition": {
+    "total_energy_kcal": 523.5,
+    "total_weight_grams": 350.0,
+    "ingredient_count": 3,
+    "ingredient_details": [
+      {
+        "food_id": 2003,
+        "amount_g": 150.0,
+        "energy_kcal": 169.5,
+        "risk_factors": {
+          "fiber": 7.35,
+          "calcium": 0.051000000000000004,
+          "sodium": 0.012,
+          "polyunsaturated_fatty_acids": 0.6285,
+          "vegetables": 150.0
+        },
+        "description": "Beans, lima, raw"
+      },
+      {
+        "food_id": 3580,
+        "amount_g": 100.0,
+        "energy_kcal": 158.0,
+        "risk_factors": {
+          "calcium": 0.007000000000000001,
+          "sodium": 0.054000000000000006,
+          "polyunsaturated_fatty_acids": 0.62
+        },
+        "description": "Game meat, deer (venison), roasted"
+      },
+      {
+        "food_id": 2892,
+        "amount_g": 100.0,
+        "energy_kcal": 196.0,
+        "risk_factors": {
+          "fiber": 0.3,
+          "calcium": 0.007000000000000001,
+          "sodium": 0.007000000000000001,
+          "polyunsaturated_fatty_acids": 0.059,
+          "sugar_sweetened_beverages": 100.0
+        },
+        "description": "Lemonade, white, frozen concentrate"
+      }
+    ]
+  }
+}

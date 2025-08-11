@@ -8,9 +8,9 @@ from rest_framework import status
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../hefi_calculator'))
 
-from hefi.cnf_integrator import HEFICNFIntegrator
-from hefi.models import HEFIInputs
-from hefi.algorithm import compute_hefi
+from hefi_calculator.hefi.cnf_integrator import HEFICNFIntegrator
+from hefi_calculator.hefi.models import HEFIInputs
+from hefi_calculator.hefi.algorithm import compute_hefi
 
 # Global integrator instance to avoid initialization overhead
 _hefi_integrator = None

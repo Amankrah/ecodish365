@@ -60,3 +60,13 @@ class FcsCalculatorSitemap(Sitemap):
 
     def location(self, item):
         return reverse(item)
+
+class HEFICalculatorSitemap(Sitemap):
+    priority = 0.7
+    changefreq = 'weekly'
+
+    def items(self):
+        return ['hefi-calculate']
+
+    def location(self, item):
+        return reverse(item)

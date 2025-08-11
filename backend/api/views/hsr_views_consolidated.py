@@ -17,13 +17,13 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../hsr_calculator'))
 
-from hsr.models.food import Food as HSRFood
-from hsr.models.meal import Meal as HSRMeal
-from hsr.models.category import Category
-from hsr.calculators.hsr_calculator import HSRCalculator, HSRConfig
-from hsr.providers.threshold_provider import ThresholdProvider
-from hsr.calculators.fvnl_calculator import calculate_fvnl_content
-from hsr.utils.food_group_mapper import FoodGroupMapper
+from hsr_calculator.hsr.models.food import Food as HSRFood
+from hsr_calculator.hsr.models.meal import Meal as HSRMeal
+from hsr_calculator.hsr.models.category import Category
+from hsr_calculator.hsr.calculators.hsr_calculator import HSRCalculator, HSRConfig
+from hsr_calculator.hsr.providers.threshold_provider import ThresholdProvider
+from hsr_calculator.hsr.calculators.fvnl_calculator import calculate_fvnl_content
+from hsr_calculator.hsr.utils.food_group_mapper import FoodGroupMapper
 
 # CNF integration
 from dish_cnf_db_pipeline.cnf_pipeline import CNFDataPipeline

@@ -1,42 +1,85 @@
-from typing import List, Tuple, Dict
-from ..database.cnf_database import CNFDatabase
+from typing import List, Tuple, Dict, Optional
+from ..database.cnf_integrator import HENICNFIntegrator
 from ..models.ingredient import Ingredient
 from ..categorization.llm_categorizer import LLMFoodCategorizer
-from ..config import DRF_TABLE
+from ..core.daly_calculator import DALYCalculator, HENIResult
+from ..config.heni_factors import HENI_FACTORS
 
 import logging
 
 logger = logging.getLogger(__name__)
 
 class HENICalculator:
-    def __init__(self, cnf_db: CNFDatabase, llm_api_key: str):
-        self.cnf_db = cnf_db
-        self.drf_table = DRF_TABLE
-        self.categorizer = LLMFoodCategorizer(cnf_db, llm_api_key)
+    def __init__(self, cnf_integrator: HENICNFIntegrator, llm_api_key: str = "", age_group: str = "adult_male"):
+        self.cnf_integrator = cnf_integrator
+        self.heni_factors = HENI_FACTORS
+        self.categorizer = LLMFoodCategorizer(cnf_integrator, llm_api_key) if llm_api_key else None
+        self.daly_calculator = DALYCalculator(age_group=age_group)
 
-    def calculate_heni(self, ingredients: List[Ingredient]) -> Tuple[float, float, float, Dict[int, Dict[str, float]]]:
-        total_heni = 0
-        total_kcal = 0
-        ingredient_categories = {}
-
+    def calculate_heni(self, ingredients: List[Ingredient]) -> HENIResult:
+        """Calculate comprehensive HENI score using proper DALY methodology"""
+        total_energy_kcal = 0.0
+        total_weight_grams = 0.0
+        aggregated_risk_factors = {}
+        ingredient_details = []
+        
         for ingredient in ingredients:
-            logger.info(f"Processing ingredient: {ingredient.food_id}, amount: {ingredient.amount}, unit: {ingredient.unit}")
-            ingredient_kcal = ingredient.kcal * (float(ingredient.amount) / 100)
-            logger.info(f"Ingredient kcal: {ingredient_kcal}")
-            total_kcal += ingredient_kcal
-
-            categories = self.categorizer.categorize_food(ingredient.food_id)
-            ingredient_categories[ingredient.food_id] = categories
+            logger.info(f"Processing ingredient: {ingredient.food_id}, amount: {ingredient.amount}g")
             
-            for category, score in categories.items():
-                if category in self.drf_table:
-                    drf = self.drf_table[category]
-                    logger.info(f"Category: {category}, DRF: {drf}, Score: {score}")
-                    heni_contribution = float(drf) * float(score) * (ingredient_kcal / 100)
-                    logger.info(f"HENI contribution: {heni_contribution}")
-                    total_heni += heni_contribution
-
-        logger.info(f"Total HENI: {total_heni}, Total kcal: {total_kcal}")
-        heni_per_100kcal = (total_heni / total_kcal) * 100 if total_kcal != 0 else 0
-        logger.info(f"HENI per 100kcal: {heni_per_100kcal}")
-        return round(heni_per_100kcal, 2), round(total_kcal, 2), round(total_heni, 2), ingredient_categories
+            # Calculate energy and weight contributions
+            ingredient_kcal = ingredient.kcal * (float(ingredient.amount) / 100)
+            total_energy_kcal += ingredient_kcal
+            total_weight_grams += float(ingredient.amount)
+            
+            # Get risk factor amounts for this ingredient
+            risk_factors = self._extract_risk_factors_from_ingredient(ingredient)
+            
+            # Scale risk factors by ingredient amount
+            scaled_risk_factors = {}
+            for factor, amount_per_100g in risk_factors.items():
+                scaled_amount = (amount_per_100g * float(ingredient.amount)) / 100
+                scaled_risk_factors[factor] = scaled_amount
+                
+                # Aggregate across all ingredients
+                if factor in aggregated_risk_factors:
+                    aggregated_risk_factors[factor] += scaled_amount
+                else:
+                    aggregated_risk_factors[factor] = scaled_amount
+            
+            # Store ingredient details for reporting
+            ingredient_details.append({
+                'food_id': ingredient.food_id,
+                'amount_g': ingredient.amount,
+                'energy_kcal': ingredient_kcal,
+                'risk_factors': scaled_risk_factors,
+                'description': self.cnf_integrator.get_food_description(ingredient.food_id)
+            })
+            
+            logger.info(f"Ingredient kcal: {ingredient_kcal}, risk factors: {len(scaled_risk_factors)}")
+        
+        # Calculate HENI score using DALY methodology
+        heni_result = self.daly_calculator.calculate_heni_score(
+            risk_factor_amounts=aggregated_risk_factors,
+            total_energy_kcal=total_energy_kcal,
+            total_weight_grams=total_weight_grams,
+            serving_size_grams=total_weight_grams
+        )
+        
+        # Add ingredient details to result
+        heni_result.ingredient_details = ingredient_details
+        heni_result.total_energy_kcal = total_energy_kcal
+        heni_result.total_weight_grams = total_weight_grams
+        
+        logger.info(f"Total HENI: {heni_result.total_heni_score:.2f} μDALY, Health impact: {heni_result.health_impact_minutes:.1f} minutes")
+        
+        return heni_result
+    
+    def _extract_risk_factors_from_ingredient(self, ingredient) -> Dict[str, float]:
+        """Extract HENI risk factors from ingredient using CNF data and categorization"""
+        from .heni_calculator_methods import extract_risk_factors_from_ingredient
+        return extract_risk_factors_from_ingredient(self, ingredient)
+    
+    def calculate_meal_heni(self, ingredients: List) -> Dict:
+        """Calculate HENI for a complete meal with detailed breakdown"""
+        from .heni_calculator_methods import calculate_meal_heni
+        return calculate_meal_heni(self, ingredients)

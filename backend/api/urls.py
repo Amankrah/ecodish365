@@ -1,7 +1,7 @@
 # api/urls.py
 
 from django.urls import path
-from .views import cnf_views, environmental_views, food_views, translation_views, hsr_views_consolidated, fcs_views, hefi_views
+from .views import cnf_views, environmental_views, food_views, translation_views, hsr_views_consolidated, fcs_views, hefi_views, heni_views
 from .views.cnf_views import (
     # Food Management
     add_food_to_cnf, add_foods_batch, manage_cnf_food,
@@ -113,5 +113,14 @@ urlpatterns = [
     path('hefi/calculate/', hefi_views.hefi_calculate, name='hefi_calculate'),
     path('hefi/food/<int:food_id>/', hefi_views.get_food_hefi_profile, name='get_food_hefi_profile'),
     path('hefi/compare/', hefi_views.compare_foods_hefi, name='compare_foods_hefi'),
+
+    # =============================================================================
+    # HENI (Health Nutritional Impact) Endpoints - DALY-based Health Impact Analysis
+    # =============================================================================
+    
+    # Core HENI Endpoints using evidence-based DALY methodology with 14 risk factors
+    path('heni/calculate/', heni_views.heni_calculate, name='heni_calculate'),
+    path('heni/food/<int:food_id>/profile/', heni_views.get_food_heni_profile, name='get_food_heni_profile'),
+    path('heni/analyze-pattern/', heni_views.analyze_dietary_pattern, name='analyze_dietary_pattern'),
 
 ]

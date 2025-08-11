@@ -1,0 +1,11 @@
+{
+  "timestamp": "2025-08-10 20:58:25",
+  "base_url": "http://localhost:8000",
+  "tests": {
+    "heni_calculate": true,
+    "food_profile": true,
+    "dietary_pattern": true,
+    "error_handling": true,
+    "performance": true
+  }
+}

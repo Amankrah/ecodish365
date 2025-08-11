@@ -11,6 +11,7 @@ import {
   StarIcon,
   SparklesIcon,
   ScaleIcon,
+  HeartIcon,
   ChevronDownIcon
 } from '@heroicons/react/24/outline';
 import { clsx } from 'clsx';
@@ -56,6 +57,15 @@ const navigation = [
       { name: 'Calculate HEFI', href: '/hefi/calculate' },
       { name: 'Compare Foods', href: '/hefi/compare' },
       { name: 'Food Profile', href: '/hefi/food-profile' },
+    ]
+  },
+  { 
+    name: 'HENI Calculator', 
+    href: '/heni', 
+    icon: HeartIcon,
+    dropdown: [
+      { name: 'Individual Calculator', href: '/heni/calculate' },
+      { name: 'Policy Dashboard', href: '/heni/policy-dashboard' },
     ]
   },
 ];
