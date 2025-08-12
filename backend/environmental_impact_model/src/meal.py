@@ -104,6 +104,14 @@ class Meal:
         """
         return sum(food.get_total_quantity() for food in self.foods)
 
+    def get_total_weight_without_waste(self) -> float:
+        """
+        Calculate the total weight of the meal excluding waste (raw input quantities).
+
+        :return: Total input weight of the meal in grams
+        """
+        return sum(food.quantity for food in self.foods)
+
     def get_food_breakdown(self) -> List[Dict[str, Any]]:
         """
         Get a breakdown of foods in the meal.

@@ -452,10 +452,10 @@ const EnvironmentalFoodComparison = () => {
                           <span className="font-semibold text-green-900">Best Performer</span>
                         </div>
                         <div className="font-bold text-green-900">
-                          {comparisonResults.data.comparison_analysis.best_performing.food_name}
+                          {comparisonResults?.data?.comparison_analysis?.best_performing?.food_name || 'N/A'}
                         </div>
                         <div className="text-sm text-green-700 mt-1">
-                          {comparisonResults.data.comparison_analysis.best_performing.reason}
+                          {comparisonResults?.data?.comparison_analysis?.best_performing?.reason || ''}
                         </div>
                       </div>
 
@@ -465,10 +465,10 @@ const EnvironmentalFoodComparison = () => {
                           <span className="font-semibold text-red-900">Needs Improvement</span>
                         </div>
                         <div className="font-bold text-red-900">
-                          {comparisonResults.data.comparison_analysis.worst_performing.food_name}
+                          {comparisonResults?.data?.comparison_analysis?.worst_performing?.food_name || 'N/A'}
                         </div>
                         <div className="text-sm text-red-700 mt-1">
-                          {comparisonResults.data.comparison_analysis.worst_performing.reason}
+                          {comparisonResults?.data?.comparison_analysis?.worst_performing?.reason || ''}
                         </div>
                       </div>
                     </div>
@@ -484,7 +484,7 @@ const EnvironmentalFoodComparison = () => {
                         <div>
                           <h5 className="font-medium text-blue-900 mb-2">Key Findings:</h5>
                           <ul className="space-y-1 text-sm text-blue-800">
-                            {comparisonResults.data.user_explanation.key_findings.slice(0, 3).map((finding, index) => (
+                      {comparisonResults?.data?.user_explanation?.key_findings?.slice(0, 3).map((finding, index) => (
                               <li key={index} className="flex items-start gap-2">
                                 <Badge variant="outline" className="text-xs mt-0.5">{index + 1}</Badge>
                                 {finding}
@@ -495,7 +495,7 @@ const EnvironmentalFoodComparison = () => {
                         <div>
                           <h5 className="font-medium text-blue-900 mb-2">Recommendations:</h5>
                           <ul className="space-y-1 text-sm text-blue-800">
-                            {comparisonResults.data.user_explanation.recommendations.slice(0, 3).map((rec, index) => (
+                      {comparisonResults?.data?.user_explanation?.recommendations?.slice(0, 3).map((rec, index) => (
                               <li key={index} className="flex items-start gap-2">
                                 <Leaf className="h-3 w-3 text-green-600 mt-0.5" />
                                 {rec}
@@ -515,7 +515,7 @@ const EnvironmentalFoodComparison = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-6">
-                      {comparisonResults.data.comparison_analysis.foods.map((food, index) => {
+                      {comparisonResults?.data?.comparison_analysis?.foods?.map((food, index) => {
                         const sustainabilityLevel = food.sustainability_score >= 80 ? 'Excellent' :
                                                   food.sustainability_score >= 60 ? 'Good' :
                                                   food.sustainability_score >= 40 ? 'Fair' :
@@ -535,7 +535,7 @@ const EnvironmentalFoodComparison = () => {
                                 </Badge>
                                 <div>
                                   <h4 className="font-semibold text-gray-900">{food.food_name}</h4>
-                                  <div className="text-sm text-gray-600">{food.amount_g}g serving</div>
+                                  <div className="text-sm text-gray-600">Functional unit: per 100 kcal</div>
                                 </div>
                               </div>
                               <div className="text-right">
@@ -629,7 +629,7 @@ const EnvironmentalFoodComparison = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {comparisonResults.data.comparison_analysis.comparison_insights.map((insight, index) => (
+                      {comparisonResults?.data?.comparison_analysis?.comparison_insights?.map((insight, index) => (
                         <div key={index} className="flex items-start gap-3 p-3 bg-indigo-50 rounded-lg">
                           <Info className="h-5 w-5 text-indigo-600 mt-0.5" />
                           <p className="text-sm text-indigo-800">{insight}</p>

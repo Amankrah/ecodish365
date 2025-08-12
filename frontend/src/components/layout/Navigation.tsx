@@ -76,7 +76,6 @@ const navigation = [
     dropdown: [
       { name: 'Calculate Impact', href: '/environmental/calculate' },
       { name: 'Compare Foods', href: '/environmental/compare' },
-      { name: 'Food Profile', href: '/environmental/food-profile' },
     ]
   },
   

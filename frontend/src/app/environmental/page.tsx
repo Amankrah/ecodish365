@@ -49,7 +49,7 @@ export default function EnvironmentalMainPage() {
       icon: Search,
       title: 'Food Profile',
       description: 'Get detailed environmental profiles for individual foods',
-      href: '/environmental/food-profile',
+      href: '#',
       color: 'from-purple-500 to-indigo-500',
       benefits: ['Comprehensive Profiling', 'Comparative Context', 'Similar Foods Analysis'],
     },

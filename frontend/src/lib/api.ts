@@ -1519,28 +1519,152 @@ export class EnvironmentalImpactApiService {
   }
 
   static async compareFoodsEnvironmentalImpact(request: FoodComparisonRequest): Promise<FoodComparisonResult> {
-    const response = await api.post('/environmental-impact/compare-foods/', request);
-    return {
-      success: Boolean(response.data?.success ?? true),
-      data: response.data?.data ?? response.data
-    } as FoodComparisonResult;
+    // Backend expects 'quantity' (g) not 'amount'; normalize payload
+    const payload = {
+      foods: (request.foods || []).map((f) => ({
+        food_id: f.food_id,
+        quantity: f.amount,
+      })),
+      user_type: request.user_type || 'individual',
+    };
+
+    const response = await api.post('/environmental-impact/compare-foods/', payload);
+
+    // Normalize backend shape to the component's expected structure (typed, no 'any')
+    type BackendFoodInfo = {
+      name?: string;
+      food_name?: string;
+      FoodDescription?: string;
+      FoodDescriptionF?: string;
+      food_id?: number;
+      foodId?: number;
+      FoodID?: number;
+      quantity?: number;
+    };
+    type BackendComparisonItem = {
+      food_info?: BackendFoodInfo;
+      all_impacts?: Record<string, unknown>;
+      sustainability_score?: number;
+      amount?: number;
+      error?: unknown;
+    };
+
+    const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null;
+
+    const raw: unknown = response.data;
+    const bodyObj = (isRecord(raw) && (raw.data ?? raw)) as Record<string, unknown>;
+
+    const fcRaw = bodyObj['food_comparisons'];
+    const items: BackendComparisonItem[] = Array.isArray(fcRaw)
+      ? (fcRaw as unknown[]).filter((x): x is BackendComparisonItem => isRecord(x))
+      : [];
+
+    const ciRaw = bodyObj['comparison_insights'];
+    let insights: string[] = [];
+    if (Array.isArray(ciRaw)) {
+      insights = (ciRaw as unknown[]).map((v) => String(v));
+    } else if (isRecord(ciRaw) && Array.isArray((ciRaw as Record<string, unknown>)['key_takeaways'])) {
+      insights = ((ciRaw as Record<string, unknown>)['key_takeaways'] as unknown[]).map((v) => String(v));
+    }
+
+    const explanations = (isRecord(bodyObj['explanations']) ? (bodyObj['explanations'] as Record<string, unknown>) : {}) as Record<string, unknown>;
+
+    // Map foods
+    const foods = items
+      .filter((it) => !it.error)
+      .map((it) => {
+        const info: BackendFoodInfo = it.food_info || {};
+        const allImpRaw = isRecord(it.all_impacts) ? (it.all_impacts as Record<string, unknown>) : {};
+        const allImp: Record<string, number> = Object.fromEntries(
+          Object.entries(allImpRaw).map(([k, v]) => [k, typeof v === 'number' ? v : 0])
+        ) as Record<string, number>;
+        const amountG = typeof info.quantity === 'number' ? info.quantity : (typeof it.amount === 'number' ? it.amount : 0);
+        // Prefer new structured per-100g LCA metrics when provided
+        const lcaPer100g = isRecord((it as Record<string, unknown>)['lca_per_100g'])
+          ? ((it as Record<string, unknown>)['lca_per_100g'] as Record<string, unknown>)
+          : undefined;
+        const midpointsPer100g = isRecord(lcaPer100g?.['midpoint_impacts'])
+          ? (lcaPer100g?.['midpoint_impacts'] as Record<string, unknown>)
+          : undefined;
+        const allImpFinal: Record<string, number> = midpointsPer100g
+          ? Object.fromEntries(Object.entries(midpointsPer100g).map(([k, v]) => [k, typeof v === 'number' ? v : 0]))
+          : allImp;
+
+        // Derive simple key impacts (top 3 by value)
+        const key_impacts = Object.entries(allImpFinal)
+          .sort((a, b) => (b[1] ?? 0) - (a[1] ?? 0))
+          .slice(0, 3)
+          .map(([k]) => k);
+        const name = info.name || info.food_name || info.FoodDescription || info.FoodDescriptionF || String(info.food_id || info.foodId || 'Food');
+
+        // Prefer new monetization field when available
+        const monetRaw = (it as Record<string, unknown>)['monetization'];
+        const costPer100gNew = isRecord(monetRaw) && typeof (monetRaw as Record<string, unknown>)['cost_per_100g'] === 'number'
+          ? ((monetRaw as Record<string, unknown>)['cost_per_100g'] as number)
+          : undefined;
+        const legacyCostPer100g = typeof (it as Record<string, unknown>)['environmental_cost_per_100g'] === 'number'
+          ? ((it as Record<string, unknown>)['environmental_cost_per_100g'] as number)
+          : 0;
+        const costPer100g = typeof costPer100gNew === 'number' ? costPer100gNew : legacyCostPer100g;
+
+        return {
+          food_id: info.food_id ?? info.foodId ?? info.FoodID ?? 0,
+          food_name: name,
+          amount_g: amountG,
+          lca_results: allImpFinal,
+          environmental_cost: costPer100g,
+          sustainability_score: typeof it.sustainability_score === 'number' ? it.sustainability_score : 0,
+          key_impacts,
+        };
+      });
+
+    // Compute best/worst performers by sustainability score
+    const bestFood = foods.length > 0 ? foods.reduce((a, b) => (b.sustainability_score > a.sustainability_score ? b : a)) : undefined;
+    const worstFood = foods.length > 0 ? foods.reduce((a, b) => (b.sustainability_score < a.sustainability_score ? b : a)) : undefined;
+
+    // Build user explanation from backend description and generate actionable recommendations
+    const recs: string[] = [];
+    if (bestFood && worstFood) {
+      recs.push(`Swap ${worstFood.food_name} with ${bestFood.food_name} to reduce overall impact.`);
+      if (Array.isArray(worstFood.key_impacts) && worstFood.key_impacts.length > 0) {
+        recs.push(`Focus on lowering '${worstFood.key_impacts[0]}' for ${worstFood.food_name}.`);
+      }
+    }
+    if (recs.length === 0 && insights.length > 0) {
+      recs.push(...insights.slice(0, 2));
+    }
+
+    const user_explanation: UserExplanation = {
+      summary: String((explanations['description'] as string) || 'Comparison completed'),
+      key_findings: insights.slice(0, 3),
+      interpretation: String((explanations['comparison_explanation'] as string) || ''),
+      recommendations: recs,
+      context: String((explanations['title'] as string) || 'Food Environmental Impact Comparison'),
+    };
+
+    const normalized: FoodComparisonResult = {
+      success: true,
+      data: {
+        comparison_analysis: {
+          foods,
+          best_performing: bestFood
+            ? { food_id: bestFood.food_id, food_name: bestFood.food_name, reason: 'Highest sustainability score' }
+            : { food_id: 0, food_name: foods[0]?.food_name || 'N/A', reason: 'Insufficient data' },
+          worst_performing: worstFood
+            ? { food_id: worstFood.food_id, food_name: worstFood.food_name, reason: 'Lowest sustainability score' }
+            : { food_id: 0, food_name: foods[foods.length - 1]?.food_name || 'N/A', reason: 'Insufficient data' },
+          comparison_insights: insights,
+        },
+        user_explanation,
+      },
+    };
+
+    return normalized;
   }
 
-  static async getFoodEnvironmentalProfile(
-    foodId: number, 
-    amount_g = 100, 
-    userType: 'individual' | 'researcher' | 'policy' = 'individual'
-  ): Promise<FoodEnvironmentalProfile> {
-    const response = await api.get(`/environmental-impact/food/${foodId}/profile/`, {
-      params: { 
-        amount_g,
-        user_type: userType
-      }
-    });
-    return {
-      success: Boolean(response.data?.success ?? true),
-      data: response.data?.data ?? response.data
-    } as FoodEnvironmentalProfile;
+  static async getFoodEnvironmentalProfile(): Promise<FoodEnvironmentalProfile> {
+    // Endpoint removed per request; keep method but throw to signal deprecation
+    throw new Error('Food environmental profile endpoint is disabled.');
   }
 
   // Normalize and coerce API response to exactly what the components expect

@@ -236,6 +236,23 @@ class Monetization:
         except Exception as e:
             self.logger.error(f"Error calculating cost per gram protein: {str(e)}")
             return 0.0
+
+    def calculate_cost_per_100g(self, total_weight_grams: float) -> float:
+        """
+        Calculate environmental cost per 100 grams of analyzed food/meal.
+
+        :param total_weight_grams: Total analyzed weight in grams (including waste where applicable)
+        :return: Environmental cost per 100 grams in CAD
+        """
+        try:
+            total_cost = self.get_total_monetized_impact()
+            units_of_100g = (total_weight_grams / 100.0) if float(total_weight_grams or 0) > 0 else 0.0
+            if units_of_100g > 0:
+                return total_cost / units_of_100g
+            return 0.0
+        except Exception as e:
+            self.logger.error(f"Error calculating cost per 100g: {str(e)}")
+            return 0.0
     
     def get_cost_breakdown_by_category(self) -> Dict[str, Dict[str, float]]:
         """
