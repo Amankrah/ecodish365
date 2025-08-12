@@ -119,10 +119,14 @@ class Food:
             actual_quantity = self.get_total_quantity()
             quantity_factor = actual_quantity / 100.0  # Convert to per 100g basis
             
-            # Scale impacts by quantity
+            # Scale impacts by quantity; skip metadata and non-numeric factors
             impacts = {}
             for impact_category, factor_per_100g in impact_factors.items():
-                impacts[impact_category] = factor_per_100g * quantity_factor
+                if isinstance(impact_category, str) and impact_category.startswith('_'):
+                    continue
+                if not isinstance(factor_per_100g, (int, float)):
+                    continue
+                impacts[impact_category] = float(factor_per_100g) * quantity_factor
             
             # Apply nutritional density adjustments
             nutritional_adjustments = self._calculate_nutritional_adjustments()

@@ -1,5 +1,6 @@
 from typing import Dict, List
 import logging
+import os
 from datetime import datetime
 from src.data_loader import DataLoader
 from .cnf_integrator import get_cnf_integrator
@@ -47,8 +48,8 @@ class Monetization:
             'Fossil resource scarcity': 0.85,  # CAD per kg oil-eq
             'Mineral resource scarcity': 2.1,  # CAD per kg Cu-eq
             
-            # CORRECTED: Based on actual Canadian municipal water rates (Toronto: $3.28-4.69/m³)
-            'Water consumption': 3.5,  # CAD per m³ (Canadian average municipal pricing)
+            # UPDATED: Use an approximate Canada-wide median for potable water ($1–$4.7/m³ range)
+            'Water consumption': 2.0,  # CAD per m³ (median; can override via WATER_COST_PER_M3)
             
             # CORRECTED: Based on Statistics Canada agricultural rental data
             'Land use': 0.03,  # CAD per m²*year crop-eq (Canadian farmland rental rates ~2.55% of land value)
@@ -61,11 +62,21 @@ class Monetization:
             'Land use': 0.8,  # Lower due to abundant land resources (minimal conversion rates)
             'Fossil resource scarcity': 1.1,  # Adjusted for oil sands intensity (2.2x extraction emissions)
         }
+
+        # Allow environment-based override for water pricing to reflect local tariffs
+        try:
+            env_water = os.getenv('WATER_COST_PER_M3')
+            if env_water is not None and str(env_water).strip() != '':
+                val = float(str(env_water).strip())
+                if val > 0:
+                    self.monetary_values['Water consumption'] = val
+        except Exception:
+            pass
         
         # Data quality and uncertainty notes
         self.value_uncertainties = {
             'Global warming': 'Official ECCC value - high confidence',
-            'Water consumption': 'Based on municipal rates - high confidence for urban areas',
+            'Water consumption': 'Based on municipal rates; varies by municipality (override with WATER_COST_PER_M3)',
             'Land use': 'Based on agricultural rental rates - medium confidence for ecosystem services',
             'Fine particulate matter formation': 'Extrapolated from international studies - medium confidence',
             'Toxicity categories': 'High uncertainty - limited Canadian-specific data',

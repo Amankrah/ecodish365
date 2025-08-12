@@ -155,10 +155,15 @@ class LifeCycleAssessment:
             # Scale by food quantity (food.quantity is in grams)
             quantity_factor = food.quantity / 100.0  # Convert to per 100g basis
             
-            # Calculate impacts
+            # Calculate impacts (only numeric factors; skip metadata)
             food_impacts = {}
             for impact_category, factor in impact_factors.items():
-                food_impacts[impact_category] = factor * quantity_factor
+                # Skip metadata keys (e.g., _data_source) and non-numeric values
+                if isinstance(impact_category, str) and impact_category.startswith('_'):
+                    continue
+                if not isinstance(factor, (int, float)):
+                    continue
+                food_impacts[impact_category] = float(factor) * quantity_factor
             
             return food_impacts
             

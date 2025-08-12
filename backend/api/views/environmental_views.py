@@ -557,11 +557,16 @@ def _analyze_meal_comprehensive(meal: EnvMeal, data_loader: EnvDataLoader) -> Di
                 ref_cost = ref_monetization.get_total_monetized_impact()
                 ref_carbon = ref_impacts.get('Global warming', 0)
                 
+                # Avoid infinities in JSON by guarding zero denominators
+                safe_cost_ratio = (main_cost / ref_cost) if (isinstance(ref_cost, (int, float)) and ref_cost > 0) else 1.0
+                safe_carbon_ratio = (main_carbon / ref_carbon) if (isinstance(ref_carbon, (int, float)) and ref_carbon > 0) else 1.0
+
                 reference_comparisons[meal_type] = {
-                    'cost_ratio': main_cost / ref_cost if ref_cost > 0 else float('inf'),
-                    'carbon_ratio': main_carbon / ref_carbon if ref_carbon > 0 else float('inf'),
+                    'cost_ratio': safe_cost_ratio,
+                    'carbon_ratio': safe_carbon_ratio,
                     'reference_cost': ref_cost,
-                    'reference_carbon': ref_carbon
+                    'reference_carbon': ref_carbon,
+                    'notes': 'Ratios default to 1.0 when reference denominator is zero or invalid.'
                 }
                 
             except Exception as e:
@@ -745,7 +750,7 @@ def compare_foods_environmental(request):
                 sustainability_score = food.get_sustainability_score()
                 
                 # Calculate key metrics per 100g for fair comparison
-                quantity_100g = food_data['quantity'] / 100.0
+                quantity_100g = food_data['quantity'] / 100.0 if float(food_data['quantity'] or 0) > 0 else None
                 
                 food_comparisons.append({
                     "food_info": {
@@ -755,12 +760,12 @@ def compare_foods_environmental(request):
                         "food_id": food_data['food_id']
                     },
                     "environmental_impact_per_100g": {
-                        "carbon_footprint": environmental_impact.get('Global warming', 0) / quantity_100g,
-                        "water_consumption": environmental_impact.get('Water consumption', 0) / quantity_100g,
-                        "land_use": environmental_impact.get('Land use', 0) / quantity_100g
+                        "carbon_footprint": (environmental_impact.get('Global warming', 0) / quantity_100g) if quantity_100g else 0.0,
+                        "water_consumption": (environmental_impact.get('Water consumption', 0) / quantity_100g) if quantity_100g else 0.0,
+                        "land_use": (environmental_impact.get('Land use', 0) / quantity_100g) if quantity_100g else 0.0
                     },
                     "sustainability_score": sustainability_score.get('overall', 50),
-                    "all_impacts": {k: v / quantity_100g for k, v in environmental_impact.items()}
+                    "all_impacts": {k: (v / quantity_100g) if quantity_100g else 0.0 for k, v in environmental_impact.items()}
                 })
                 
             except Exception as e:
@@ -866,7 +871,7 @@ def food_environmental_profile(request, food_id):
                         "rating": _get_land_rating(environmental_impact.get('Land use', 0) / (quantity/100))
                     }
                 },
-                "all_impact_categories": {k: v / (quantity/100) for k, v in environmental_impact.items()},
+                "all_impact_categories": {k: (v / (quantity/100)) if (quantity and quantity != 0) else 0.0 for k, v in environmental_impact.items()},
                 "overall_rating": _get_overall_environmental_rating(environmental_impact, quantity)
             },
             "sustainability_assessment": {
@@ -1002,9 +1007,10 @@ def _get_land_rating(land_per_100g: float) -> Dict[str, str]:
 def _get_overall_environmental_rating(environmental_impact: Dict, quantity: float) -> Dict[str, str]:
     """Get overall environmental rating."""
     # Normalize impacts per 100g
-    carbon = environmental_impact.get('Global warming', 0) / (quantity/100)
-    water = environmental_impact.get('Water consumption', 0) / (quantity/100)
-    land = environmental_impact.get('Land use', 0) / (quantity/100)
+    denom = (quantity/100) if quantity else None
+    carbon = (environmental_impact.get('Global warming', 0) / denom) if denom else 0.0
+    water = (environmental_impact.get('Water consumption', 0) / denom) if denom else 0.0
+    land = (environmental_impact.get('Land use', 0) / denom) if denom else 0.0
     
     # Simple scoring based on thresholds
     score = 0
