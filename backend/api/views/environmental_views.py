@@ -845,7 +845,7 @@ def compare_foods_environmental(request):
 
 @api_view(['GET'])
 @seo_metadata(
-    title="Food Environmental Profile | DISH Research", 
+    title="Food Environmental Profile | EcoDish365", 
     description="Get detailed environmental profile for a specific food item.",
     keywords="food profile, environmental impact, sustainability profile"
 )
