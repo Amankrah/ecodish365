@@ -6,27 +6,41 @@
 import React from 'react';
 import type { Metadata } from 'next';
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
 export const metadata: Metadata = {
-  title: 'Environmental Impact Analysis Suite',
+  metadataBase: new URL(siteUrl),
+  applicationName: 'EcoDish365',
+  title: {
+    default: 'Environmental Impact Analysis Suite',
+    template: '%s | Environmental Impact • EcoDish365',
+  },
   description:
-    'Analyze meal environmental impacts using ReCiPe 2016 with 18 impact categories, Canadian-specific factors, and CAD economic valuation.',
+    'Analyze meal environmental impacts using ReCiPe 2016 with 18 impact categories, Canadian-specific factors, sustainability scoring and CAD economic valuation.',
   keywords: [
     'environmental impact',
+    'environmental impacts of food',
+    'life cycle assessment',
     'LCA',
     'ReCiPe 2016',
-    'sustainability',
     'carbon footprint',
-    'life cycle assessment',
-    'food sustainability',
+    'water consumption',
+    'land use',
+    'sustainability score',
+    'food comparison',
+    'meal analysis',
     'environmental cost',
+    'social cost of carbon',
+    'Canada',
     'Canadian factors',
   ],
   openGraph: {
     title: 'Environmental Impact Analysis Suite - EcoDish365',
     description:
-      'Comprehensive LCA with 18 impact categories, Canadian regional factors, and economic valuation in CAD.',
+      'Comprehensive LCA with 18 impact categories, Canadian regional factors, sustainability scoring, and CAD economic valuation.',
     type: 'website',
-    url: 'https://ecodish365.com/environmental',
+    url: '/environmental',
+    siteName: 'EcoDish365',
     images: [
       {
         url: '/og-environmental.png',
@@ -40,11 +54,31 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Environmental Impact Analysis Suite',
     description:
-      'Comprehensive meal LCA with Canadian factors and CAD economic valuation.',
+      'Comprehensive meal LCA with Canadian factors, sustainability scoring and CAD economic valuation.',
     images: ['/twitter-environmental.png'],
   },
   alternates: {
-    canonical: 'https://ecodish365.com/environmental',
+    canonical: `${siteUrl.replace(/\/$/, '')}/environmental`,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    nocache: false,
+    googleBot: {
+      index: true,
+      follow: true,
+      noimageindex: false,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  themeColor: '#0ea5e9',
+  referrer: 'origin-when-cross-origin',
+  formatDetection: {
+    telephone: false,
+    email: false,
+    address: false,
   },
 };
 
@@ -55,17 +89,17 @@ interface EnvironmentalLayoutProps {
 export default function EnvironmentalLayout({ children }: EnvironmentalLayoutProps) {
   const structuredData = {
     '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
+    '@type': 'WebPage',
     name: 'Environmental Impact Analysis Suite',
     description:
       'Suite of tools for meal Life Cycle Assessment (ReCiPe 2016), Canadian regional factors, and economic valuation in CAD.',
-    url: 'https://ecodish365.com/environmental',
+    url: `${siteUrl.replace(/\/$/, '')}/environmental`,
     applicationCategory: 'ScienceApplication',
     operatingSystem: 'Web Browser',
     creator: {
       '@type': 'Organization',
       name: 'EcoDish365',
-      url: 'https://ecodish365.com',
+      url: siteUrl,
     },
     featureList: [
       '18 impact categories (ReCiPe 2016)',
@@ -75,6 +109,29 @@ export default function EnvironmentalLayout({ children }: EnvironmentalLayoutPro
       'Reference meal comparisons',
       'Sustainability scoring with nutritional context',
     ],
+    breadcrumb: {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Environmental Impact',
+          item: `${siteUrl.replace(/\/$/, '')}/environmental`,
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: 'Calculator',
+          item: `${siteUrl.replace(/\/$/, '')}/environmental/calculate`,
+        },
+        {
+          '@type': 'ListItem',
+          position: 3,
+          name: 'Compare Foods',
+          item: `${siteUrl.replace(/\/$/, '')}/environmental/compare`,
+        },
+      ],
+    },
     offers: {
       '@type': 'Offer',
       price: '0',

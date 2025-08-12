@@ -3,13 +3,15 @@
 import React from 'react';
 
 interface EcoDishLogoProps {
-  className?: string; // apply width/height like w-16 h-16 from parent
+  className?: string; // Apply width/height like w-16 h-16 from parent
+  variant?: 'icon' | 'brand'; // 'brand' renders icon + wordmark; 'icon' shows just the glyph
+  labelClassName?: string; // Additional classes for the wordmark text
 }
 
 // A sleek, 3D-styled EcoDish365 logo with layered gradients and subtle depth
-// Built with accessible SVG and Tailwind utility classes
-export default function EcoDishLogo({ className = '' }: EcoDishLogoProps) {
-  return (
+// Accessible SVG; supports an icon-only or brand wordmark variant
+export default function EcoDishLogo({ className = '', variant = 'icon', labelClassName = '' }: EcoDishLogoProps) {
+  const Icon = ({ embedText }: { embedText: boolean }) => (
     <div
       className={`relative inline-flex items-center justify-center select-none ${className}`}
       aria-hidden="true"
@@ -65,25 +67,46 @@ export default function EcoDishLogo({ className = '' }: EcoDishLogoProps) {
         {/* Leaf vein */}
         <path d="M26 61c10-3 20-9 29-18" stroke="#15803d" strokeWidth="1.2" fill="none" opacity="0.7" />
 
-        {/* Brand text */}
-        <text
-          x="50"
-          y="90"
-          textAnchor="middle"
-          fontFamily="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial"
-          fontWeight="700"
-          fontSize="12"
-          fill="#0f172a"
-          opacity="0.9"
-        >
-          EcoDish365
-        </text>
+        {/* Embedded brand text (only for icon variant) */}
+        {embedText && (
+          <text
+            x="50"
+            y="90"
+            textAnchor="middle"
+            fontFamily="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial"
+            fontWeight="700"
+            fontSize="12"
+            fill="#0f172a"
+            opacity="0.9"
+          >
+            EcoDish365
+          </text>
+        )}
       </svg>
 
       {/* Gloss highlight */}
       <div className="pointer-events-none absolute -top-1 left-1/2 -translate-x-1/2 w-3/4 h-1/3 rounded-[999px] bg-[linear-gradient(180deg,_rgba(255,255,255,0.65)_0%,_rgba(255,255,255,0.05)_85%)] blur-[1px]" />
     </div>
   );
+
+  if (variant === 'brand') {
+    return (
+      <div className={`inline-flex items-center gap-3 ${className}`}>
+        <Icon embedText={false} />
+        <div className="leading-none">
+          <span
+            className={`text-lg sm:text-xl font-extrabold tracking-tight bg-gradient-to-r from-blue-700 via-emerald-600 to-blue-600 bg-clip-text text-transparent drop-shadow-[0_1px_1px_rgba(0,0,0,0.15)] ${labelClassName}`}
+          >
+            EcoDish365
+          </span>
+          <div className="mt-0.5 h-[3px] w-full max-w-[110px] bg-gradient-to-r from-blue-500 via-green-500 to-emerald-500 rounded-full opacity-70" />
+        </div>
+      </div>
+    );
+  }
+
+  // Default: icon variant (with embedded small text for legacy parity)
+  return <Icon embedText={true} />;
 }
 
 

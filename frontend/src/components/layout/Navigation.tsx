@@ -93,7 +93,7 @@ export default function Navigation() {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center" aria-label="EcoDish365 Home">
-              <EcoDishLogo className="w-16 h-16 hover:scale-105 transition-transform duration-200" />
+              <EcoDishLogo variant="brand" className="w-10 h-10 hover:scale-105 transition-transform duration-200" />
             </Link>
           </div>
 

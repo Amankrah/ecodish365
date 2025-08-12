@@ -13,7 +13,6 @@ import {
   Globe,
   Calculator,
   BarChart3,
-  Search,
   Droplets,
   TreePine,
   Factory,
@@ -44,14 +43,6 @@ export default function EnvironmentalMainPage() {
       href: '/environmental/compare',
       color: 'from-blue-500 to-cyan-500',
       benefits: ['Side-by-Side Analysis', 'User-Tailored Insights', 'Best/Worst Identification'],
-    },
-    {
-      icon: Search,
-      title: 'Food Profile',
-      description: 'Get detailed environmental profiles for individual foods',
-      href: '#',
-      color: 'from-purple-500 to-indigo-500',
-      benefits: ['Comprehensive Profiling', 'Comparative Context', 'Similar Foods Analysis'],
     },
   ];
 
@@ -150,11 +141,11 @@ export default function EnvironmentalMainPage() {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Comprehensive Environmental Analysis Tools</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Three powerful tools to analyze, compare, and profile the environmental impacts of your food choices
+              Two powerful tools to analyze and compare the environmental impacts of your food choices
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 gap-8">
             {features.map((feature, index) => {
               const IconComponent = feature.icon;
               return (
@@ -348,7 +339,7 @@ export default function EnvironmentalMainPage() {
               </Button>
             </Link>
             <Link href="/environmental/compare">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-gray-900 font-semibold py-3 px-8 rounded-lg transition-all duration-200">
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200">
                 <BarChart3 className="mr-2 h-5 w-5" />
                 Compare Foods
               </Button>
