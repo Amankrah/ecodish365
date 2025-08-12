@@ -60,6 +60,16 @@ export const EnvironmentalResultsCard: React.FC<EnvironmentalResultsCardProps> =
     return `${value.toExponential(2)} ${unit}`;
   };
 
+  // Format endpoint impacts (DALY, sp.year, USD) with e-notation for very small values
+  const formatEndpointValue = (value: number, unit: string): string => {
+    if (!Number.isFinite(value) || value === 0) return `0 ${unit}`;
+    const absVal = Math.abs(value);
+    if (absVal < 1e-6) return `${value.toExponential(2)} ${unit}`;
+    if (absVal < 1e-3) return `${value.toExponential(2)} ${unit}`;
+    if (absVal < 1) return `${value.toFixed(6)} ${unit}`;
+    return `${value.toFixed(3)} ${unit}`;
+  };
+
   if (compact) {
     return (
       <div className="space-y-4">
@@ -313,7 +323,7 @@ export const EnvironmentalResultsCard: React.FC<EnvironmentalResultsCardProps> =
                 <span className="font-medium text-red-900">Human Health</span>
               </div>
               <div className="text-lg font-bold text-red-900">
-                {(analysis?.endpoint_impacts?.['Human Health'] ?? 0).toFixed(3)} DALY
+                {formatEndpointValue(analysis?.endpoint_impacts?.['Human Health'] ?? 0, 'DALY')}
               </div>
               <div className="text-sm text-red-700 mt-1">
                 Disability Adjusted Life Years
@@ -325,7 +335,7 @@ export const EnvironmentalResultsCard: React.FC<EnvironmentalResultsCardProps> =
                 <span className="font-medium text-green-900">Ecosystem Quality</span>
               </div>
               <div className="text-lg font-bold text-green-900">
-                {(analysis?.endpoint_impacts?.['Ecosystems'] ?? 0).toFixed(3)} sp.year
+                {formatEndpointValue(analysis?.endpoint_impacts?.['Ecosystems'] ?? 0, 'sp.year')}
               </div>
               <div className="text-sm text-green-700 mt-1">
                 Species Extinction Years
@@ -337,7 +347,7 @@ export const EnvironmentalResultsCard: React.FC<EnvironmentalResultsCardProps> =
                 <span className="font-medium text-blue-900">Resource Scarcity</span>
               </div>
               <div className="text-lg font-bold text-blue-900">
-                {(analysis?.endpoint_impacts?.['Resources'] ?? 0).toFixed(3)} USD
+                {formatEndpointValue(analysis?.endpoint_impacts?.['Resources'] ?? 0, 'USD')}
               </div>
               <div className="text-sm text-blue-700 mt-1">
                 Resource Depletion Cost

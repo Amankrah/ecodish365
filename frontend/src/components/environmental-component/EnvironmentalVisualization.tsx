@@ -106,6 +106,16 @@ export const EnvironmentalVisualization: React.FC<EnvironmentalVisualizationProp
     return `${value.toExponential(2)} ${unit}`;
   };
 
+  // Format endpoint impacts with scientific notation for very small values
+  const formatEndpointValue = (value: number, unit: string): string => {
+    if (!Number.isFinite(value) || value === 0) return `0 ${unit}`;
+    const absVal = Math.abs(value);
+    if (absVal < 1e-6) return `${value.toExponential(2)} ${unit}`;
+    if (absVal < 1e-3) return `${value.toExponential(2)} ${unit}`;
+    if (absVal < 1) return `${value.toFixed(6)} ${unit}`;
+    return `${value.toFixed(3)} ${unit}`;
+  };
+
   // Get impact level indicator
   const getImpactLevel = (value: number, maxVal: number) => {
     const percentage = (value / maxVal) * 100;
@@ -176,7 +186,7 @@ export const EnvironmentalVisualization: React.FC<EnvironmentalVisualizationProp
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-red-900">Human Health Impact</span>
               <span className="text-sm font-bold text-red-900">
-                {(endpoints?.['Human Health'] ?? 0).toFixed(6)} DALY
+                {formatEndpointValue(endpoints?.['Human Health'] ?? 0, 'DALY')}
               </span>
             </div>
             <Progress 
@@ -192,7 +202,7 @@ export const EnvironmentalVisualization: React.FC<EnvironmentalVisualizationProp
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-green-900">Ecosystem Quality Impact</span>
               <span className="text-sm font-bold text-green-900">
-                {(endpoints?.['Ecosystems'] ?? 0).toFixed(6)} sp.year
+                {formatEndpointValue(endpoints?.['Ecosystems'] ?? 0, 'sp.year')}
               </span>
             </div>
             <Progress 
@@ -208,7 +218,7 @@ export const EnvironmentalVisualization: React.FC<EnvironmentalVisualizationProp
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-blue-900">Resource Scarcity Impact</span>
               <span className="text-sm font-bold text-blue-900">
-                ${(endpoints?.['Resources'] ?? 0).toFixed(3)}
+                {formatEndpointValue(endpoints?.['Resources'] ?? 0, 'USD')}
               </span>
             </div>
             <Progress 
