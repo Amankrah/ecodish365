@@ -47,8 +47,8 @@ const features = [
     name: 'Environmental Impact',
     description: 'Analyze the environmental footprint of foods including carbon, water, and land use.',
     icon: GlobeAltIcon,
-    href: '/calculators/environmental',
-    status: 'Coming Soon',
+    href: '/environmental',
+    status: 'Available',
   },
   {
     name: 'Healthy Eating Food Index (HEFI)',

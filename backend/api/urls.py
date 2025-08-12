@@ -25,8 +25,14 @@ from .views.cnf_views import (
 )
 
 urlpatterns = [
-    # Environmental Impact Calculator
+    # =============================================================================
+    # Environmental Impact Assessment Endpoints - Comprehensive LCA Analysis
+    # =============================================================================
+    
+    # Core Environmental Impact Analysis
     path('environmental-impact/', environmental_views.environmental_impact, name='environmental_impact'),
+    path('environmental-impact/compare-foods/', environmental_views.compare_foods_environmental, name='compare_foods_environmental'),
+    path('environmental-impact/food/<int:food_id>/profile/', environmental_views.food_environmental_profile, name='food_environmental_profile'),
 
     # Enhanced food search
     path('search-food/', food_views.search_food_api, name='search_food_api'),

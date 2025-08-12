@@ -1,0 +1,11 @@
+{
+  "timestamp": "2025-08-12 09:37:42",
+  "base_url": "http://localhost:8000",
+  "tests": {
+    "environmental_impact": true,
+    "food_profile": true,
+    "compare_foods": true,
+    "error_handling": true,
+    "performance": true
+  }
+}

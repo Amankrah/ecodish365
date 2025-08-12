@@ -1235,4 +1235,441 @@ export class HENIApiService {
   }
 }
 
+// Environmental Impact Types
+export interface EnvironmentalImpactRequest {
+  foods: Array<{
+    food_id: number;
+    quantity: number;
+  }>;
+  user_type?: 'individual' | 'researcher' | 'policy';
+}
+
+export interface FoodComparisonRequest {
+  foods: Array<{
+    food_id: number;
+    amount: number;
+    unit?: string;
+  }>;
+  user_type?: 'individual' | 'researcher' | 'policy';
+}
+
+export interface EnvironmentalProfileRequest {
+  food_id: number;
+  amount_g?: number;
+  user_type?: 'individual' | 'researcher' | 'policy';
+}
+
+export interface LCAResults {
+  'Global warming': number;
+  'Fine particulate matter formation': number;
+  'Terrestrial acidification': number;
+  'Freshwater eutrophication': number;
+  'Marine eutrophication': number;
+  'Stratospheric ozone depletion': number;
+  'Fossil resource scarcity': number;
+  'Mineral resource scarcity': number;
+  'Water consumption': number;
+  'Land use': number;
+  'Terrestrial ecotoxicity': number;
+  'Freshwater ecotoxicity': number;
+  'Marine ecotoxicity': number;
+  'Human carcinogenic toxicity': number;
+  'Human non-carcinogenic toxicity': number;
+  'Ionizing radiation': number;
+  'Ozone formation, Human health': number;
+  'Ozone formation, Terrestrial ecosystems': number;
+}
+
+export interface EndpointImpacts {
+  'Human Health': number;
+  'Ecosystems': number;
+  'Resources': number;
+}
+
+export interface EnvironmentalMonetization {
+  monetized_impacts: Record<string, number>;
+  total_cost: number;
+  cost_per_calorie: number;
+  cost_per_protein: number;
+  cost_breakdown_by_category: Record<string, {
+    total_cost: number;
+    individual_impacts: Record<string, number>;
+    percentage_of_total: number;
+  }>;
+  top_cost_drivers: Array<{
+    rank: number;
+    impact_category: string;
+    cost: number;
+    percentage_of_total: number;
+  }>;
+}
+
+export interface SustainabilityScore {
+  overall_sustainability_score: number;
+  sustainability_rating: string;
+  environmental_score: number;
+  nutritional_score: number;
+  processing_score: number;
+  category_scores: Record<string, number>;
+  recommendations: string[];
+}
+
+export interface MealComposition {
+  total_energy_kcal: number;
+  total_weight_grams: number;
+  food_count: number;
+  macronutrient_distribution: {
+    protein_percent: number;
+    carbohydrate_percent: number;
+    fat_percent: number;
+  };
+  food_breakdown: Array<{
+    name: string;
+    quantity: number;
+    group: string;
+    calories: number;
+    weight_percentage: number;
+  }>;
+}
+
+export interface UserExplanation {
+  summary: string;
+  key_findings: string[];
+  interpretation: string;
+  recommendations: string[];
+  context: string;
+  technical_notes?: string[];
+}
+
+export interface EnvironmentalImpactResult {
+  success: boolean;
+  data: {
+    meal_analysis: {
+      lca_results: LCAResults;
+      endpoint_impacts: EndpointImpacts;
+      single_score: number;
+      monetization: EnvironmentalMonetization;
+      sustainability_score: SustainabilityScore;
+      meal_composition: MealComposition;
+    };
+    user_explanation: UserExplanation;
+    comparison_to_references: {
+      sustainable_meal: {
+        cost_ratio: number;
+        carbon_ratio: number;
+        sustainability_comparison: string;
+      };
+      average_meal: {
+        cost_ratio: number;
+        carbon_ratio: number;
+        sustainability_comparison: string;
+      };
+    };
+  };
+  metadata?: {
+    analysis_timestamp: string;
+    methodology: string;
+    reference_version: string;
+  };
+}
+
+export interface FoodComparisonResult {
+  success: boolean;
+  data: {
+    comparison_analysis: {
+      foods: Array<{
+        food_id: number;
+        food_name: string;
+        amount_g: number;
+        lca_results: Partial<LCAResults>;
+        environmental_cost: number;
+        sustainability_score: number;
+        key_impacts: string[];
+      }>;
+      best_performing: {
+        food_id: number;
+        food_name: string;
+        reason: string;
+      };
+      worst_performing: {
+        food_id: number;
+        food_name: string;
+        reason: string;
+      };
+      comparison_insights: string[];
+    };
+    user_explanation: UserExplanation;
+  };
+}
+
+export interface FoodEnvironmentalProfile {
+  success: boolean;
+  data: {
+    food_details: {
+      food_id: number;
+      food_name: string;
+      food_group: string;
+      amount_analyzed_g: number;
+    };
+    environmental_analysis: {
+      lca_results: LCAResults;
+      endpoint_impacts: EndpointImpacts;
+      single_score: number;
+      monetization: EnvironmentalMonetization;
+      sustainability_score: SustainabilityScore;
+    };
+    comparative_context: {
+      food_group_percentile: number;
+      similar_foods: Array<{
+        name: string;
+        environmental_cost: number;
+        carbon_footprint: number;
+      }>;
+      reference_comparisons: Record<string, {
+        ratio: number;
+        interpretation: string;
+      }>;
+    };
+    user_explanation: UserExplanation;
+  };
+}
+
+// Environmental Impact API Service Class
+export class EnvironmentalImpactApiService {
+  static async analyzeMealEnvironmentalImpact(request: EnvironmentalImpactRequest): Promise<EnvironmentalImpactResult> {
+    const response = await api.post('/environmental-impact/', request);
+    
+    console.log('DEBUG - Full response:', response.data);
+    console.log('DEBUG - response.data.data keys:', Object.keys(response.data?.data || {}));
+    
+    // Extract the actual backend data structure with safe fallbacks
+    const outerData = response.data?.data || {};
+    const backendData = outerData.data || {};  // The actual environmental data is nested one level deeper
+    const envImpacts = backendData.environmental_impacts || {};
+    const monetData = backendData.monetization || {};
+    const overallAssessment = backendData.overall_assessment || {};
+    const sustainability = backendData.sustainability || {};
+    const refComparisons = backendData.reference_comparisons || {};
+    const mealInfo = outerData.meal_info || {};
+    
+    console.log('DEBUG - envImpacts:', envImpacts);
+    console.log('DEBUG - envImpacts.all_impacts:', envImpacts.all_impacts);
+    console.log('DEBUG - monetData:', monetData);
+    console.log('DEBUG - monetData.results:', monetData.results);
+    
+    // Simple transformation to match component expectations using actual calculated values
+    return {
+      success: true,
+      data: {
+        meal_analysis: {
+          lca_results: envImpacts.all_impacts || {},
+          endpoint_impacts: envImpacts.endpoint_impacts || {},
+          single_score: typeof envImpacts.summary_score?.value === 'number' ? envImpacts.summary_score.value : (outerData?.data?.environmental_impacts?.summary_score?.value ?? 0),
+          monetization: {
+            monetized_impacts: monetData.results?.monetized_impacts || {},
+            total_cost: monetData.results?.total_environmental_cost?.value || 0,
+            cost_per_calorie: monetData.results?.cost_per_calorie?.value || 0,
+            cost_per_protein: monetData.results?.cost_per_protein?.value || 0,
+            cost_breakdown_by_category: monetData.results?.cost_breakdown || {},
+            top_cost_drivers: monetData.results?.top_cost_drivers || []
+          },
+          sustainability_score: {
+            // Prefer backend-provided sustainability block; fall back conservatively if missing
+            overall_sustainability_score: sustainability.overall_sustainability_score ?? 50,
+            sustainability_rating: sustainability.sustainability_rating ?? (overallAssessment.rating || 'Unknown'),
+            environmental_score: sustainability.environmental_score ?? 0,
+            nutritional_score: sustainability.nutritional_score ?? 0,
+            processing_score: sustainability.processing_score ?? 0,
+            category_scores: sustainability.category_scores || {},
+            recommendations: Array.isArray(sustainability.recommendations) && sustainability.recommendations.length > 0
+              ? sustainability.recommendations
+              : (overallAssessment.recommendation ? [overallAssessment.recommendation] : [])
+          },
+          meal_composition: {
+            total_energy_kcal: mealInfo.total_calories || 0,
+            total_weight_grams: mealInfo.total_weight || 0,
+            food_count: Array.isArray(mealInfo.composition) ? mealInfo.composition.length : 0,
+            macronutrient_distribution: mealInfo.macronutrient_distribution || { protein_percent: 0, carbohydrate_percent: 0, fat_percent: 0 },
+            food_breakdown: mealInfo.composition || []
+          }
+        },
+        user_explanation: {
+          summary: envImpacts.explanation?.simple_explanation || '',
+          key_findings: [monetData.interpretation?.message || 'Environmental impact analysis completed'],
+          interpretation: envImpacts.explanation?.detailed_explanation || '',
+          recommendations: overallAssessment.recommendation ? [overallAssessment.recommendation] : [],
+          context: envImpacts.explanation?.what_it_means || '',
+          technical_notes: []
+        },
+        comparison_to_references: {
+          sustainable_meal: {
+            cost_ratio: refComparisons.results?.sustainable?.environmental_cost_ratio?.value || 1.0,
+            carbon_ratio: refComparisons.results?.sustainable?.carbon_footprint_ratio?.value || 1.0,
+            sustainability_comparison: refComparisons.interpretation?.sustainable || 'No comparison available'
+          },
+          average_meal: {
+            cost_ratio: refComparisons.results?.unsustainable?.environmental_cost_ratio?.value || 1.0,
+            carbon_ratio: refComparisons.results?.unsustainable?.carbon_footprint_ratio?.value || 1.0,
+            sustainability_comparison: refComparisons.interpretation?.unsustainable || 'No comparison available'
+          }
+        }
+      },
+      metadata: outerData.metadata || {}
+    };
+  }
+
+  static async compareFoodsEnvironmentalImpact(request: FoodComparisonRequest): Promise<FoodComparisonResult> {
+    const response = await api.post('/environmental-impact/compare-foods/', request);
+    return {
+      success: Boolean(response.data?.success ?? true),
+      data: response.data?.data ?? response.data
+    } as FoodComparisonResult;
+  }
+
+  static async getFoodEnvironmentalProfile(
+    foodId: number, 
+    amount_g = 100, 
+    userType: 'individual' | 'researcher' | 'policy' = 'individual'
+  ): Promise<FoodEnvironmentalProfile> {
+    const response = await api.get(`/environmental-impact/food/${foodId}/profile/`, {
+      params: { 
+        amount_g,
+        user_type: userType
+      }
+    });
+    return {
+      success: Boolean(response.data?.success ?? true),
+      data: response.data?.data ?? response.data
+    } as FoodEnvironmentalProfile;
+  }
+
+  // Normalize and coerce API response to exactly what the components expect
+  private static normalizeEnvironmentalImpactResponse(raw: unknown): EnvironmentalImpactResult {
+    const safeNumber = (v: unknown, fallback = 0): number => {
+      const n = typeof v === 'string' ? Number(v) : v;
+      return typeof n === 'number' && Number.isFinite(n) ? n : fallback;
+    };
+
+    const coerceRecordNumbers = (obj: Record<string, unknown> | undefined): Record<string, number> => {
+      const source = obj || {};
+      return Object.fromEntries(
+        Object.entries(source).map(([k, v]) => [k, safeNumber(v, 0)])
+      );
+    };
+
+    const root = (raw as Record<string, unknown>) || {};
+    const dataObj: Record<string, unknown> = (root?.data as Record<string, unknown>) ?? root;
+    const maObj: Record<string, unknown> = (dataObj?.meal_analysis as Record<string, unknown>) ?? {};
+
+    const lca_results = coerceRecordNumbers((maObj as Record<string, unknown>)["lca_results"] as Record<string, unknown> | undefined) as unknown as LCAResults;
+    const endpoint_impacts = coerceRecordNumbers((maObj as Record<string, unknown>)["endpoint_impacts"] as Record<string, unknown> | undefined) as unknown as EndpointImpacts;
+
+    const monetizationRaw = (maObj?.monetization as Record<string, unknown>) ?? {};
+    const monetization: EnvironmentalMonetization = {
+      monetized_impacts: coerceRecordNumbers(monetizationRaw?.monetized_impacts as Record<string, unknown> | undefined),
+      total_cost: safeNumber(monetizationRaw?.total_cost, 0),
+      cost_per_calorie: safeNumber(monetizationRaw?.cost_per_calorie, 0),
+      cost_per_protein: safeNumber(monetizationRaw?.cost_per_protein, 0),
+      cost_breakdown_by_category: Object.fromEntries(
+        Object.entries((monetizationRaw?.cost_breakdown_by_category || {}) as Record<string, unknown>).map(([cat, info]) => [
+          cat,
+          {
+            total_cost: safeNumber((info as Record<string, unknown>)?.total_cost, 0),
+            individual_impacts: coerceRecordNumbers(((info as Record<string, unknown>)?.individual_impacts as Record<string, unknown> | undefined)),
+            percentage_of_total: safeNumber((info as Record<string, unknown>)?.percentage_of_total, 0),
+          },
+        ])
+      ),
+      top_cost_drivers: Array.isArray(monetizationRaw?.top_cost_drivers)
+        ? (monetizationRaw.top_cost_drivers as unknown[]).map((d: unknown) => ({
+        rank: safeNumber((d as Record<string, unknown>)?.rank, 0),
+        impact_category: String((d as Record<string, unknown>)?.impact_category ?? ''),
+        cost: safeNumber((d as Record<string, unknown>)?.cost, 0),
+        percentage_of_total: safeNumber((d as Record<string, unknown>)?.percentage_of_total, 0),
+        }))
+        : [],
+    };
+
+    const sustainabilityRaw = (((maObj as Record<string, unknown>)["sustainability_score"] as Record<string, unknown>) || {}) as Record<string, unknown>;
+    const sustainability_score: SustainabilityScore = {
+      overall_sustainability_score: safeNumber(sustainabilityRaw?.overall_sustainability_score, 0),
+      sustainability_rating: String(sustainabilityRaw?.sustainability_rating ?? 'Unknown'),
+      environmental_score: safeNumber(sustainabilityRaw?.environmental_score, 0),
+      nutritional_score: safeNumber(sustainabilityRaw?.nutritional_score, 0),
+      processing_score: safeNumber(sustainabilityRaw?.processing_score, 0),
+      category_scores: coerceRecordNumbers(sustainabilityRaw?.category_scores as Record<string, unknown> | undefined) as Record<string, number>,
+      recommendations: Array.isArray(sustainabilityRaw?.recommendations)
+        ? (sustainabilityRaw.recommendations as unknown[]).map((r) => String(r))
+        : [],
+    };
+
+    const compRaw = (((maObj as Record<string, unknown>)["meal_composition"] as Record<string, unknown>) || {}) as Record<string, unknown>;
+    const meal_composition: MealComposition = {
+      total_energy_kcal: safeNumber(compRaw?.total_energy_kcal, 0),
+      total_weight_grams: safeNumber(compRaw?.total_weight_grams, 0),
+      food_count: safeNumber(compRaw?.food_count, 0),
+      macronutrient_distribution: {
+        protein_percent: safeNumber((compRaw?.macronutrient_distribution as Record<string, unknown>)?.protein_percent, 0),
+        carbohydrate_percent: safeNumber((compRaw?.macronutrient_distribution as Record<string, unknown>)?.carbohydrate_percent, 0),
+        fat_percent: safeNumber((compRaw?.macronutrient_distribution as Record<string, unknown>)?.fat_percent, 0),
+      },
+    } as MealComposition;
+    // Include optional food_breakdown if present
+    if (Array.isArray(compRaw?.food_breakdown)) {
+      (meal_composition as unknown as { food_breakdown: MealComposition['food_breakdown'] }).food_breakdown = compRaw.food_breakdown as MealComposition['food_breakdown'];
+    }
+
+    const userExpRaw = (dataObj?.user_explanation as Record<string, unknown>) ?? {};
+    const user_explanation: UserExplanation = {
+      summary: String(userExpRaw?.summary ?? ''),
+      key_findings: Array.isArray(userExpRaw?.key_findings)
+        ? (userExpRaw.key_findings as unknown[]).map((k) => String(k))
+        : [],
+      interpretation: String(userExpRaw?.interpretation ?? ''),
+      recommendations: Array.isArray(userExpRaw?.recommendations)
+        ? (userExpRaw.recommendations as unknown[]).map((r) => String(r))
+        : [],
+      context: String(userExpRaw?.context ?? ''),
+      technical_notes: Array.isArray(userExpRaw?.technical_notes)
+        ? (userExpRaw.technical_notes as unknown[]).map((t) => String(t))
+        : undefined,
+    };
+
+    const compRefsRaw = (dataObj?.comparison_to_references as {
+      sustainable_meal?: { cost_ratio?: unknown; carbon_ratio?: unknown; sustainability_comparison?: unknown };
+      average_meal?: { cost_ratio?: unknown; carbon_ratio?: unknown; sustainability_comparison?: unknown };
+    }) ?? {};
+    const comparison_to_references = {
+      sustainable_meal: {
+        cost_ratio: safeNumber(compRefsRaw?.sustainable_meal?.cost_ratio, 0),
+        carbon_ratio: safeNumber(compRefsRaw?.sustainable_meal?.carbon_ratio, 0),
+        sustainability_comparison: String(compRefsRaw?.sustainable_meal?.sustainability_comparison ?? ''),
+      },
+      average_meal: {
+        cost_ratio: safeNumber(compRefsRaw?.average_meal?.cost_ratio, 0),
+        carbon_ratio: safeNumber(compRefsRaw?.average_meal?.carbon_ratio, 0),
+        sustainability_comparison: String(compRefsRaw?.average_meal?.sustainability_comparison ?? ''),
+      },
+    } as EnvironmentalImpactResult['data']['comparison_to_references'];
+
+    const normalized: EnvironmentalImpactResult = {
+      success: Boolean((root?.success as boolean | undefined) ?? true),
+      data: {
+        meal_analysis: {
+          lca_results,
+          endpoint_impacts,
+          single_score: safeNumber(maObj?.single_score, 0),
+          monetization,
+          sustainability_score,
+          meal_composition,
+        },
+        user_explanation,
+        comparison_to_references,
+      },
+      metadata: root?.metadata as EnvironmentalImpactResult['metadata'],
+    };
+    return normalized;
+  }
+}
+
 export default CNFApiService; 

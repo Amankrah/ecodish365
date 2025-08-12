@@ -42,6 +42,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly' as const,
       priority: 0.9,
     },
+    {
+      url: `${baseUrl}/environmental`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly' as const,
+      priority: 0.9,
+    },
   ];
 
   // CNF tool pages
@@ -166,5 +172,27 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  return [...mainPages, ...cnfPages, ...hsrPages, ...fcsPages, ...hefiPages, ...heniPages];
+  // Environmental tool pages
+  const environmentalPages = [
+    {
+      url: `${baseUrl}/environmental/calculate`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/environmental/compare`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/environmental/food-profile`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly' as const,
+      priority: 0.7,
+    },
+  ];
+
+  return [...mainPages, ...cnfPages, ...hsrPages, ...fcsPages, ...hefiPages, ...heniPages, ...environmentalPages];
 }

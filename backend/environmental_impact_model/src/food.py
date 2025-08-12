@@ -1,13 +1,20 @@
 import logging
 from typing import Dict
 from .data_loader import DataLoader
+from .cnf_integrator import get_cnf_integrator
 
 class Food:
+    """
+    Enhanced Food class that integrates with the CNF singleton for improved data access
+    and environmental impact calculations using current LCA best practices.
+    """
+    
     def __init__(self, food_id: int, quantity: float, data_loader: 'DataLoader'):
         self.logger = logging.getLogger(__name__)
         self.food_id = food_id
         self.quantity = quantity
         self.data_loader = data_loader
+        self.cnf_integrator = get_cnf_integrator()
         
         try:
             self.data = self.data_loader.get_food_data(food_id)
@@ -16,8 +23,11 @@ class Food:
             raise
 
         self.food_name = self.data['food_info']['FoodDescription']
-        self.food_group = self.data['food_group']['FoodGroupName']
+        self.food_group = self.data['food_group'].get('FoodGroupName', 'Unknown')
         self.nutrients = self._process_nutrients()
+        # Build a normalized nutrient map for robust lookups (case/alias tolerant)
+        self._nutrients_normalized = self._build_normalized_nutrients(self.nutrients)
+        self._nutrient_alias = self._build_nutrient_aliases()
         self.conversion_factors = self._get_conversion_factors()
 
     def _process_nutrients(self) -> Dict[str, float]:
@@ -26,6 +36,44 @@ class Food:
             for nutrient in self.data['nutrients']
         }
 
+    def _normalize_name(self, name: str) -> str:
+        # Upper-case, strip, remove punctuation except spaces and letters, collapse spaces
+        import re
+        upper = (name or '').upper()
+        cleaned = re.sub(r"[^A-Z0-9\s]", " ", upper)
+        collapsed = re.sub(r"\s+", " ", cleaned).strip()
+        return collapsed
+
+    def _build_normalized_nutrients(self, nutrients: Dict[str, float]) -> Dict[str, float]:
+        normalized: Dict[str, float] = {}
+        for key, value in nutrients.items():
+            normalized[self._normalize_name(key)] = value
+        return normalized
+
+    def _build_nutrient_aliases(self) -> Dict[str, str]:
+        # Map common query names to CNF canonical nutrient names (normalized)
+        canonical_fat = self._normalize_name('FAT (TOTAL LIPIDS)')
+        canonical_carb = self._normalize_name('CARBOHYDRATE, TOTAL (BY DIFFERENCE)')
+        canonical_energy = self._normalize_name('ENERGY (KILOCALORIES)')
+        aliases = {
+            # Protein is already canonical 'PROTEIN'
+            self._normalize_name('FAT'): canonical_fat,
+            self._normalize_name('TOTAL FAT'): canonical_fat,
+            self._normalize_name('FAT TOTAL'): canonical_fat,
+            self._normalize_name('LIPID'): canonical_fat,
+            self._normalize_name('TOTAL LIPID'): canonical_fat,
+
+            self._normalize_name('CARBOHYDRATE'): canonical_carb,
+            self._normalize_name('CARBOHYDRATES'): canonical_carb,
+            self._normalize_name('TOTAL CARBOHYDRATE'): canonical_carb,
+            self._normalize_name('CARBOHYDRATE TOTAL'): canonical_carb,
+
+            self._normalize_name('ENERGY'): canonical_energy,
+            self._normalize_name('KILOCALORIES'): canonical_energy,
+            self._normalize_name('KCAL'): canonical_energy,
+        }
+        return aliases
+
     def _get_conversion_factors(self) -> Dict[int, float]:
         conversion_factors = {}
         for _, row in self.data_loader.conversion_factor[self.data_loader.conversion_factor['FoodID'] == self.food_id].iterrows():
@@ -33,8 +81,23 @@ class Food:
         return conversion_factors
 
     def get_nutrient_amount(self, nutrient_name: str) -> float:
-        base_amount = self.nutrients.get(nutrient_name, 0)
-        return (base_amount * self.quantity) / 100  # Assuming nutrient values are per 100g
+        # Robust, alias-tolerant lookup
+        normalized = self._normalize_name(nutrient_name)
+        # Direct normalized hit
+        base_amount = self._nutrients_normalized.get(normalized)
+        if base_amount is None:
+            # Alias mapping
+            target = self._nutrient_alias.get(normalized)
+            if target:
+                base_amount = self._nutrients_normalized.get(target, 0.0)
+            else:
+                # Final attempt: exact original case key
+                base_amount = self.nutrients.get(nutrient_name, 0.0)
+        # Scale to actual quantity (CNF values are per 100g)
+        try:
+            return (float(base_amount or 0.0) * float(self.quantity)) / 100.0
+        except Exception:
+            return 0.0
 
     def get_total_quantity(self) -> float:
         """Calculate total quantity including waste."""
@@ -43,84 +106,132 @@ class Food:
 
     def get_environmental_impact(self) -> Dict[str, float]:
         """
-        Calculate environmental impact based on food data.
-        This is a placeholder method and should be implemented based on actual impact data.
+        Calculate environmental impact using the CNF integrator's improved impact factors.
+        Based on current LCA science and Canadian-specific data.
         
         :return: Dictionary with impact categories as keys and impact values as values
         """
-        # This is a simplified placeholder. In a real scenario, you'd use actual impact data.
-        impact_categories = [
-            'Fine particulate matter formation',
-            'Fossil resource scarcity',
-            'Freshwater ecotoxicity',
-            'Freshwater eutrophication',
-            'Global warming',
-            'Human carcinogenic toxicity',
-            'Human non-carcinogenic toxicity',
-            'Ionizing radiation',
-            'Land use',
-            'Marine ecotoxicity',
-            'Marine eutrophication',
-            'Mineral resource scarcity',
-            'Ozone formation, Human health',
-            'Ozone formation, Terrestrial ecosystems',
-            'Stratospheric ozone depletion',
-            'Terrestrial acidification',
-            'Terrestrial ecotoxicity',
-            'Water consumption'
-        ]
-
-        # Placeholder impact calculation
-        # In a real implementation, these values would come from LCA databases or calculations
-        # Define impact factors for each food group
-        food_group_factors = {
-            'Dairy and Egg Products': 1.5,
-            'Spices and Herbs': 0.5,
-            'Babyfoods': 1.0,
-            'Fats and Oils': 1.2,
-            'Poultry Products': 1.8,
-            'Soups, Sauces and Gravies': 1.0,
-            'Sausages and Luncheon meats': 2.0,
-            'Breakfast cereals': 0.8,
-            'Fruits and fruit juices': 0.6,
-            'Pork Products': 2.2,
-            'Vegetables and Vegetable Products': 0.5,
-            'Nuts and Seeds': 0.7,
-            'Beef Products': 2.5,
-            'Beverages': 0.8,
-            'Finfish and Shellfish Products': 1.3,
-            'Legumes and Legume Products': 0.6,
-            'Lamb, Veal and Game': 2.3,
-            'Baked Products': 1.1,
-            'Sweets': 1.2,
-            'Cereals, Grains and Pasta': 0.9,
-            'Fast Foods': 1.8,
-            'Mixed Dishes': 1.5,
-            'Snacks': 1.3
-        }
-
-        # Get the impact factor for the food's group
-        group_factor = food_group_factors.get(self.food_group, 1.0)
-
-        # Base impact per 100g (this could be refined with more accurate data)
-        base_impact = 0.1
-
-        impacts = {}
-        for category in impact_categories:
-            # Calculate impact based on food group factor and quantity
-            impact = base_impact * group_factor * (self.get_total_quantity() / 100)
+        try:
+            # Get impact factors from the CNF integrator
+            impact_factors = self.cnf_integrator.get_environmental_impact_factors(self.food_id)
             
-            # Adjust impact based on specific categories
-            if category == 'Global warming' and self.food_group in ['Beef Products', 'Lamb, Veal and Game']:
-                impact *= 1.5  # Higher global warming impact for ruminant meats
-            elif category == 'Water consumption' and self.food_group in ['Fruits and fruit juices', 'Vegetables and Vegetable Products']:
-                impact *= 1.2  # Higher water consumption for produce
-            elif category == 'Land use' and self.food_group in ['Beef Products', 'Dairy and Egg Products']:
-                impact *= 1.3  # Higher land use for cattle-based products
+            # Calculate actual quantity including food waste
+            actual_quantity = self.get_total_quantity()
+            quantity_factor = actual_quantity / 100.0  # Convert to per 100g basis
             
-            impacts[category] = impact
+            # Scale impacts by quantity
+            impacts = {}
+            for impact_category, factor_per_100g in impact_factors.items():
+                impacts[impact_category] = factor_per_100g * quantity_factor
+            
+            # Apply nutritional density adjustments
+            nutritional_adjustments = self._calculate_nutritional_adjustments()
+            for impact_category in impacts:
+                impacts[impact_category] *= nutritional_adjustments.get(impact_category, 1.0)
+            
+            return impacts
+            
+        except Exception as e:
+            self.logger.error(f"Error calculating environmental impact for food ID {self.food_id}: {e}")
+            # Return minimal fallback impacts
+            return {
+                'Global warming': 0.5 * (self.quantity / 100),
+                'Land use': 0.3 * (self.quantity / 100),
+                'Water consumption': 0.1 * (self.quantity / 100)
+            }
+    
+    def _calculate_nutritional_adjustments(self) -> Dict[str, float]:
+        """
+        Calculate adjustment factors based on nutritional density.
+        Foods with higher nutritional value get lower environmental burden per nutritional unit.
+        """
+        adjustments = {}
         
-        return impacts
+        # Get key nutrients
+        protein = self.get_nutrient_amount('PROTEIN')
+        fiber = self.get_nutrient_amount('FIBRE')
+        vitamins = (
+            self.get_nutrient_amount('VITAMIN A') +
+            self.get_nutrient_amount('VITAMIN C') +
+            self.get_nutrient_amount('FOLATE')
+        )
+        
+        # Calculate nutritional density score (higher is better)
+        nutritional_score = (protein * 0.4 + fiber * 0.3 + vitamins * 0.3) / 100
+        
+        # Adjustment factor (1.0 = no adjustment, <1.0 = lower burden per nutrition)
+        base_adjustment = max(0.7, min(1.3, 1.0 - (nutritional_score * 0.1)))
+        
+        # Apply to all impact categories with some variation
+        impact_categories = [
+            'Global warming', 'Stratospheric ozone depletion', 'Ionizing radiation',
+            'Ozone formation, Human health', 'Fine particulate matter formation',
+            'Ozone formation, Terrestrial ecosystems', 'Terrestrial acidification',
+            'Freshwater eutrophication', 'Marine eutrophication', 'Terrestrial ecotoxicity',
+            'Freshwater ecotoxicity', 'Marine ecotoxicity', 'Human carcinogenic toxicity',
+            'Human non-carcinogenic toxicity', 'Land use', 'Mineral resource scarcity',
+            'Fossil resource scarcity', 'Water consumption'
+        ]
+        
+        for category in impact_categories:
+            if category in ['Land use', 'Water consumption']:
+                # Land and water use less affected by nutritional density
+                adjustments[category] = base_adjustment * 1.2
+            elif category in ['Global warming', 'Fossil resource scarcity']:
+                # Carbon and energy impacts more affected by processing
+                adjustments[category] = base_adjustment * 0.9
+            else:
+                adjustments[category] = base_adjustment
+        
+        return adjustments
+    
+    def get_sustainability_score(self) -> Dict[str, float]:
+        """
+        Calculate a comprehensive sustainability score considering multiple factors.
+        """
+        impacts = self.get_environmental_impact()
+        
+        # Normalize impacts to 0-100 scale (lower environmental impact = higher score)
+        # These are typical maximum values per 100g food
+        max_values = {
+            'Global warming': 100,  # kg CO2 eq
+            'Land use': 200,  # m2a crop eq
+            'Water consumption': 20,  # m3
+            'Terrestrial acidification': 0.5,  # kg SO2 eq
+            'Freshwater eutrophication': 0.02,  # kg P eq
+            'Marine eutrophication': 0.2,  # kg N eq
+        }
+        
+        sustainability_scores = {}
+        for impact_category, impact_value in impacts.items():
+            if impact_category in max_values:
+                # Convert to 0-100 scale (100 = best, 0 = worst)
+                normalized = min(100, (impact_value / max_values[impact_category]) * 100)
+                sustainability_scores[impact_category] = max(0, 100 - normalized)
+        
+        # Overall sustainability score (weighted average)
+        weights = {
+            'Global warming': 0.3,
+            'Land use': 0.2,
+            'Water consumption': 0.2,
+            'Terrestrial acidification': 0.1,
+            'Freshwater eutrophication': 0.1,
+            'Marine eutrophication': 0.1
+        }
+        
+        overall_score = 0
+        total_weight = 0
+        for category, weight in weights.items():
+            if category in sustainability_scores:
+                overall_score += sustainability_scores[category] * weight
+                total_weight += weight
+        
+        if total_weight > 0:
+            sustainability_scores['overall'] = overall_score / total_weight
+        else:
+            sustainability_scores['overall'] = 50  # Neutral score if no data
+        
+        return sustainability_scores
     
     def __str__(self) -> str:
         return f"Food(id={self.food_id}, name='{self.food_name}', quantity={self.quantity}g)"

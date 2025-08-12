@@ -1,0 +1,881 @@
+'use client';
+/**
+ * Environmental Impact Calculator - Main Interface Component
+ * Comprehensive environmental LCA calculator for sustainable food choices
+ */
+
+import React, { useState, useEffect } from 'react';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '../ui/card';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { Alert, AlertDescription } from '../ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import {
+  Leaf,
+  Calculator,
+  TrendingUp,
+  AlertTriangle,
+  Info,
+  Plus,
+  Trash2,
+  Download,
+  Share2,
+  ChevronDown,
+  Globe,
+  Users,
+} from 'lucide-react';
+import { EnvironmentalResultsCard } from './EnvironmentalResultsCard';
+import { EnvironmentalVisualization } from './EnvironmentalVisualization';
+import { LCABreakdown } from './LCABreakdown';
+import { SustainabilityChart } from './SustainabilityChart';
+import { MonetizationBreakdown } from './MonetizationBreakdown';
+import { 
+  EnvironmentalImpactApiService, 
+  CNFApiService, 
+  type EnvironmentalImpactResult,
+  type FilterOptions 
+} from '../../lib/api';
+
+interface SelectedFood {
+  FoodID: number;
+  FoodDescription: string;
+  FoodCode?: string;
+  amount: number;
+  unit: string;
+}
+
+interface SearchResult {
+  FoodID: number;
+  FoodDescription: string;
+  FoodCode?: string;
+}
+
+type UserType = 'individual' | 'researcher' | 'policy';
+
+const EnvironmentalCalculator = () => {
+  const [selectedFoods, setSelectedFoods] = useState<SelectedFood[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [environmentalResults, setEnvironmentalResults] = useState<EnvironmentalImpactResult | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [searchIsLoading, setSearchIsLoading] = useState(false);
+  const [error, setError] = useState<string>('');
+  const [selectedTab, setSelectedTab] = useState('calculator');
+  const [filters, setFilters] = useState<FilterOptions | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedMethod, setSelectedMethod] = useState<string>('');
+  const [showExportDropdown, setShowExportDropdown] = useState(false);
+  const [userType, setUserType] = useState<UserType>('individual');
+
+  useEffect(() => {
+    const loadFilters = async () => {
+      try {
+        const data = await CNFApiService.getFoodFilters();
+        setFilters(data);
+      } catch (e) {
+        console.warn('Failed to load CNF filters', e);
+      }
+    };
+    loadFilters();
+  }, []);
+
+  // Close export dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showExportDropdown && !(event.target as Element).closest('.relative')) {
+        setShowExportDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showExportDropdown]);
+
+  // Debounced search with filters
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    if (searchQuery.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
+
+    const timeoutId = setTimeout(async () => {
+      setSearchIsLoading(true);
+      try {
+        try {
+          const enhanced = await CNFApiService.searchFoodsEnhanced({
+            query: searchQuery,
+            limit: 50,
+            category: selectedCategory || undefined,
+            method: selectedMethod || undefined,
+          });
+          setSearchResults(enhanced.results || []);
+        } catch {
+          const basic = await CNFApiService.searchFoods(searchQuery, 50);
+          setSearchResults(basic.results || []);
+        }
+      } catch (err) {
+        console.error('Search error:', err);
+        setSearchResults([]);
+      } finally {
+        setSearchIsLoading(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, selectedCategory, selectedMethod]);
+
+  const addFood = (food: SearchResult) => {
+    const newFood: SelectedFood = {
+      FoodID: food.FoodID,
+      FoodDescription: food.FoodDescription,
+      FoodCode: food.FoodCode,
+      amount: 100,
+      unit: 'g'
+    };
+    
+    if (!selectedFoods.some(f => f.FoodID === food.FoodID)) {
+      setSelectedFoods([...selectedFoods, newFood]);
+    }
+    setSearchQuery('');
+    setSearchResults([]);
+  };
+
+  const removeFood = (foodId: number) => {
+    setSelectedFoods(selectedFoods.filter(f => f.FoodID !== foodId));
+  };
+
+  const updateFoodAmount = (foodId: number, amount: number) => {
+    setSelectedFoods(selectedFoods.map(f => 
+      f.FoodID === foodId ? { ...f, amount: Math.max(0.1, amount) } : f
+    ));
+  };
+
+  // Calculate Environmental Impact
+  const calculateEnvironmentalImpact = async () => {
+    if (selectedFoods.length === 0) {
+      setError('Please add at least one food item to calculate environmental impact');
+      return;
+    }
+
+    // Check for valid amounts
+    const invalidAmounts = selectedFoods.filter(f => f.amount <= 0);
+    if (invalidAmounts.length > 0) {
+      setError('All food amounts must be greater than 0.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError('');
+      
+      const foods = selectedFoods.map(f => ({ 
+        food_id: f.FoodID, 
+        quantity: f.amount
+      }));
+      
+      const response = await EnvironmentalImpactApiService.analyzeMealEnvironmentalImpact({ 
+        foods,
+        user_type: userType 
+      });
+      setEnvironmentalResults(response);
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { message?: string; error?: string } } };
+      setError(e?.response?.data?.error || e?.response?.data?.message || 'Failed to calculate environmental impact');
+      console.warn('Environmental calculation error:', e?.response?.data || err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Clear all foods
+  const resetCalculation = () => {
+    setSelectedFoods([]);
+    setEnvironmentalResults(null);
+    setError('');
+    setSearchQuery('');
+    setSearchResults([]);
+  };
+
+  // Export results as JSON
+  const exportResultsJSON = () => {
+    if (!environmentalResults) return;
+    
+    const exportData = {
+      timestamp: new Date().toISOString(),
+      meal_composition: selectedFoods,
+      environmental_analysis: environmentalResults,
+      user_type: userType
+    };
+    
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+      type: 'application/json'
+    });
+    
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `environmental-impact-analysis-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Export results as PDF report
+  const exportResultsPDF = async () => {
+    if (!environmentalResults) return;
+    
+    const analysis = environmentalResults.data;
+    const timestamp = new Date().toLocaleString();
+    
+    const reportContent = `
+ENVIRONMENTAL IMPACT ANALYSIS REPORT
+Generated on: ${timestamp}
+User Type: ${userType.charAt(0).toUpperCase() + userType.slice(1)}
+
+===========================================
+MEAL COMPOSITION
+===========================================
+${selectedFoods.map(food => 
+  `• ${food.FoodDescription}: ${food.amount}g`
+).join('\n')}
+
+Total Weight: ${analysis?.meal_analysis?.meal_composition?.total_weight_grams || 0}g
+Total Energy: ${analysis?.meal_analysis?.meal_composition?.total_energy_kcal || 0} kcal
+
+===========================================
+ENVIRONMENTAL IMPACTS (LCA RESULTS)
+===========================================
+Carbon Footprint: ${analysis?.meal_analysis?.lca_results['Global warming']?.toFixed(3) || '0.000'} kg CO2-eq
+Water Consumption: ${analysis?.meal_analysis?.lca_results['Water consumption']?.toFixed(3) || '0.000'} m³
+Land Use: ${analysis?.meal_analysis?.lca_results['Land use']?.toFixed(3) || '0.000'} m²a crop-eq
+Acidification: ${analysis?.meal_analysis?.lca_results['Terrestrial acidification']?.toFixed(3) || '0.000'} kg SO2-eq
+Eutrophication: ${analysis?.meal_analysis?.lca_results['Freshwater eutrophication']?.toFixed(3) || '0.000'} kg P-eq
+
+Single Score: ${analysis?.meal_analysis?.single_score?.toFixed(3) || '0.000'} points
+
+===========================================
+ECONOMIC IMPACT (MONETIZATION)
+===========================================
+Total Environmental Cost: CAD $${analysis?.meal_analysis?.monetization?.total_cost?.toFixed(3) || '0.000'}
+Cost per Calorie: CAD $${analysis?.meal_analysis?.monetization?.cost_per_calorie?.toFixed(5) || '0.00000'}
+Cost per Protein: CAD $${analysis?.meal_analysis?.monetization?.cost_per_protein?.toFixed(5) || '0.00000'}
+
+Top Cost Drivers:
+${analysis?.meal_analysis?.monetization?.top_cost_drivers?.slice(0, 3).map(driver => 
+  `${driver.rank}. ${driver.impact_category}: CAD $${driver.cost.toFixed(3)} (${driver.percentage_of_total.toFixed(1)}%)`
+).join('\n') || 'N/A'}
+
+===========================================
+SUSTAINABILITY ASSESSMENT
+===========================================
+Overall Sustainability Score: ${analysis?.meal_analysis?.sustainability_score?.overall_sustainability_score?.toFixed(1) || '0.0'}/100
+Rating: ${analysis?.meal_analysis?.sustainability_score?.sustainability_rating || 'Unknown'}
+Environmental Score: ${analysis?.meal_analysis?.sustainability_score?.environmental_score?.toFixed(1) || '0.0'}/100
+Nutritional Score: ${analysis?.meal_analysis?.sustainability_score?.nutritional_score?.toFixed(1) || '0.0'}/100
+
+===========================================
+USER EXPLANATION
+===========================================
+${analysis?.user_explanation?.summary || 'No summary available'}
+
+Key Findings:
+${analysis?.user_explanation?.key_findings?.map((finding, i) => `${i + 1}. ${finding}`).join('\n') || 'N/A'}
+
+Recommendations:
+${analysis?.user_explanation?.recommendations?.map((rec, i) => `${i + 1}. ${rec}`).join('\n') || 'N/A'}
+
+===========================================
+SCIENTIFIC METHODOLOGY
+===========================================
+This environmental impact analysis uses ReCiPe 2016 LCA methodology with 18 midpoint 
+impact categories and Canadian regional correction factors. Monetization uses current 
+Canadian economic factors including $185 CAD per tonne CO2-eq (Environment Canada SCC 2024).
+
+Analysis considers:
+• 18 Midpoint Impact Categories (Climate, Resource Depletion, Ecosystem Quality, Human Health)
+• 3 Endpoint Categories (Human Health, Ecosystem Quality, Resource Scarcity)
+• Canadian Regional Adjustment Factors
+• Current Environmental Economic Valuations (2024)
+• Comprehensive Sustainability Scoring
+
+Report generated by EcoDish365 Environmental Impact Calculator
+    `.trim();
+    
+    const blob = new Blob([reportContent], {
+      type: 'text/plain;charset=utf-8'
+    });
+    
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `environmental-impact-report-${new Date().toISOString().split('T')[0]}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const getUserTypeIcon = (type: UserType) => {
+    switch (type) {
+      case 'individual': return <Users className="h-4 w-4" />;
+      case 'researcher': return <Info className="h-4 w-4" />;
+      case 'policy': return <Globe className="h-4 w-4" />;
+    }
+  };
+
+  const getUserTypeDescription = (type: UserType) => {
+    switch (type) {
+      case 'individual': return 'Consumer-friendly explanations with practical tips for everyday choices';
+      case 'researcher': return 'Scientific methodology details and data suitable for academic research';
+      case 'policy': return 'Policy-relevant analysis for decision-makers and regulatory frameworks';
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-emerald-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center mb-4">
+            <Leaf className="h-8 w-8 text-green-500 mr-3" />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+              Environmental Impact Calculator
+            </h1>
+          </div>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Analyze your food&apos;s environmental impact using comprehensive Life Cycle Assessment (LCA) 
+            methodology with Canadian-specific factors and economic valuation
+          </p>
+          
+          {/* User Type Selector */}
+          <div className="mt-4 flex justify-center">
+            <div className="bg-white rounded-lg border p-1 shadow-sm">
+              {(['individual', 'researcher', 'policy'] as UserType[]).map((type) => (
+                <button
+                  key={type}
+                  onClick={() => setUserType(type)}
+                  title={getUserTypeDescription(type)}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+                    userType === type
+                      ? 'bg-green-100 text-green-700 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                >
+                  {getUserTypeIcon(type)}
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <Tabs value={selectedTab} onValueChange={setSelectedTab} defaultValue={selectedTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsTrigger value="calculator" className="flex items-center gap-2">
+              <Calculator className="h-4 w-4" />
+              Calculator
+            </TabsTrigger>
+            <TabsTrigger value="analysis" className="flex items-center gap-2" disabled={!environmentalResults}>
+              <TrendingUp className="h-4 w-4" />
+              Analysis
+            </TabsTrigger>
+            <TabsTrigger value="insights" className="flex items-center gap-2" disabled={!environmentalResults}>
+              <Info className="h-4 w-4" />
+              Insights
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Calculator Tab */}
+          <TabsContent value="calculator" className="space-y-6">
+            <div className="grid lg:grid-cols-2 gap-6">
+              {/* Food Input Section */}
+              <Card className="shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Plus className="h-5 w-5" />
+                    Build Your Meal
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-900 mb-1">Add Foods</h2>
+                    <p className="text-sm text-gray-600">
+                      Search and select foods to analyze their environmental impact using LCA methodology.
+                    </p>
+                  </div>
+
+                  {/* Search Filters */}
+                  {filters && (
+                    <div className="space-y-4 border-b pb-4">
+                      <h3 className="text-sm font-medium text-gray-700">Search Filters</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Food Category</label>
+                          <select
+                            value={selectedCategory}
+                            onChange={(e) => setSelectedCategory(e.target.value)}
+                            aria-label="Food category"
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          >
+                            <option value="">All categories</option>
+                            {filters.categories.map((c) => (
+                              <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Cooking Method</label>
+                          <select
+                            value={selectedMethod}
+                            onChange={(e) => setSelectedMethod(e.target.value)}
+                            aria-label="Cooking method"
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          >
+                            <option value="">All methods</option>
+                            {filters.methods.map((m) => (
+                              <option key={m} value={m}>{m.charAt(0).toUpperCase() + m.slice(1)}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                      {(selectedCategory || selectedMethod) && (
+                        <button
+                          onClick={() => { setSelectedCategory(''); setSelectedMethod(''); }}
+                          className="text-xs text-green-600 hover:text-green-800"
+                        >
+                          Clear filters
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Food Search */}
+                  <div className="space-y-3">
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search for foods (e.g., beef, lentils, rice)..."
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      />
+                    </div>
+                    {searchIsLoading && searchQuery && (
+                      <div className="text-sm text-gray-500">Searching...</div>
+                    )}
+
+                    {searchResults.length > 0 && (
+                      <div className="bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto">
+                        {searchResults.map((food) => (
+                          <button
+                            key={food.FoodID}
+                            onClick={() => addFood(food)}
+                            className="w-full text-left px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                          >
+                            <div className="font-medium text-gray-900">{food.FoodDescription}</div>
+                            <div className="text-sm text-gray-500">ID: {food.FoodID}</div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Selected Foods */}
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-sm font-medium text-gray-700">Selected Foods ({selectedFoods.length})</h3>
+                      {selectedFoods.length > 0 && (
+                        <button
+                          onClick={resetCalculation}
+                          className="text-xs text-gray-500 hover:text-gray-700"
+                        >
+                          Clear all
+                        </button>
+                      )}
+                    </div>
+
+                    {selectedFoods.length === 0 ? (
+                      <div className="text-center py-6 text-gray-500">
+                        <Leaf className="w-10 h-10 mx-auto mb-2 opacity-50" />
+                        <p>No foods selected yet.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {selectedFoods.map((food) => (
+                          <div key={food.FoodID} className="p-3 bg-gray-50 rounded-lg">
+                            <div className="flex items-center justify-between mb-2">
+                              <div>
+                                <div className="font-medium text-gray-900">{food.FoodDescription}</div>
+                                <div className="text-sm text-gray-500">ID: {food.FoodID}</div>
+                              </div>
+                              <button
+                                onClick={() => removeFood(food.FoodID)}
+                                className="text-red-500 hover:text-red-700 p-1"
+                                aria-label={`Remove ${food.FoodDescription}`}
+                                title={`Remove ${food.FoodDescription}`}
+                              >
+                                <Trash2 className="w-5 h-5" />
+                              </button>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <label className="text-sm font-medium text-gray-600">Amount:</label>
+                              <input
+                                type="number"
+                                min="0.1"
+                                step="0.1"
+                                value={food.amount}
+                                onChange={(e) => updateFoodAmount(food.FoodID, parseFloat(e.target.value) || 0.1)}
+                                aria-label="Amount in grams"
+                                placeholder="Amount (g)"
+                                title="Amount in grams"
+                                className="w-24 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                              />
+                              <span className="text-sm text-gray-500">grams</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Calculate Button */}
+                  <button
+                    onClick={calculateEnvironmentalImpact}
+                    disabled={loading || selectedFoods.length === 0}
+                    className="w-full mt-2 inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+                  >
+                    <Leaf className="mr-2 w-5 h-5" />
+                    {loading ? 'Analyzing...' : 'Analyze Environmental Impact'}
+                  </button>
+
+                  {/* Error */}
+                  {error && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                      <div className="flex items-center">
+                        <AlertTriangle className="w-5 h-5 text-red-500 mr-2" />
+                        <div className="text-sm text-red-700">{error}</div>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Quick Results Preview */}
+              <Card className="shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Globe className="h-5 w-5" />
+                    Environmental Impact Preview
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {error && (
+                    <Alert className="mb-4 border-red-200 bg-red-50">
+                      <AlertTriangle className="h-4 w-4 text-red-500" />
+                      <AlertDescription className="text-red-700">{error}</AlertDescription>
+                    </Alert>
+                  )}
+
+                  {environmentalResults ? (
+                    <EnvironmentalResultsCard results={environmentalResults} compact />
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <Leaf className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                      <p>Add ingredients and calculate to see environmental impact</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Analysis Tab */}
+          <TabsContent value="analysis" className="space-y-6">
+            {environmentalResults && (
+              <>
+                {/* Comprehensive Results */}
+                <div className="grid lg:grid-cols-5 gap-6 mb-6">
+                  <Card className="lg:col-span-3 shadow-lg">
+                    <CardHeader className="flex flex-row items-center justify-between">
+                      <CardTitle>Detailed Environmental Analysis</CardTitle>
+                      <div className="flex gap-2">
+                        <div className="relative">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => setShowExportDropdown(!showExportDropdown)}
+                            className="flex items-center gap-2"
+                          >
+                            <Download className="h-4 w-4" />
+                            Export
+                            <ChevronDown className="h-3 w-3" />
+                          </Button>
+                          
+                          {showExportDropdown && (
+                            <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 min-w-[140px]">
+                              <button
+                                onClick={() => {
+                                  exportResultsJSON();
+                                  setShowExportDropdown(false);
+                                }}
+                                className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 flex items-center gap-2"
+                              >
+                                <Download className="h-4 w-4" />
+                                JSON Data
+                              </button>
+                              <button
+                                onClick={() => {
+                                  exportResultsPDF();
+                                  setShowExportDropdown(false);
+                                }}
+                                className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 flex items-center gap-2"
+                              >
+                                <Download className="h-4 w-4" />
+                                Report
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                        <Button variant="outline" size="sm">
+                          <Share2 className="h-4 w-4 mr-2" />
+                          Share
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <EnvironmentalResultsCard results={environmentalResults} detailed />
+                    </CardContent>
+                  </Card>
+
+                  <Card className="lg:col-span-2 shadow-lg">
+                    <CardHeader>
+                      <CardTitle>Environmental Visualization</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <EnvironmentalVisualization results={environmentalResults} />
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Impact Breakdown and Sustainability */}
+                <div className="grid lg:grid-cols-2 gap-6 mb-6">
+                  <Card className="shadow-lg">
+                    <CardHeader>
+                      <CardTitle>LCA Impact Breakdown</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <LCABreakdown results={environmentalResults} />
+                    </CardContent>
+                  </Card>
+
+                  <Card className="shadow-lg">
+                    <CardHeader>
+                      <CardTitle>Sustainability Assessment</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <SustainabilityChart results={environmentalResults} />
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Economic Analysis */}
+                <Card className="shadow-lg">
+                  <CardHeader>
+                    <CardTitle>Economic Impact Analysis</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <MonetizationBreakdown results={environmentalResults} />
+                  </CardContent>
+                </Card>
+              </>
+            )}
+          </TabsContent>
+
+          {/* Insights Tab */}
+          <TabsContent value="insights" className="space-y-6">
+            {environmentalResults && (
+              <div className="grid gap-6">
+                {/* User-Tailored Explanation */}
+                <Card className="shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      {getUserTypeIcon(userType)}
+                      {userType.charAt(0).toUpperCase() + userType.slice(1)} Insights
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {/* Summary */}
+                      <div className="bg-blue-50 p-4 rounded-lg">
+                        <h4 className="font-semibold text-blue-900 mb-2">Summary</h4>
+                        <p className="text-blue-800">{environmentalResults.data?.user_explanation?.summary || 'No summary available'}</p>
+                      </div>
+
+                      {/* Key Findings */}
+                      <div>
+                        <h4 className="font-semibold text-gray-900 mb-3">Key Findings</h4>
+                        <div className="grid gap-2">
+                          {(environmentalResults.data?.user_explanation?.key_findings || []).map((finding, index) => (
+                            <div key={index} className="flex items-start gap-2">
+                              <Badge variant="outline" className="text-xs mt-0.5">
+                                {index + 1}
+                              </Badge>
+                              <p className="text-sm text-gray-700">{finding}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Recommendations */}
+                      <div>
+                        <h4 className="font-semibold text-green-700 mb-3">Recommendations</h4>
+                        <div className="space-y-2">
+                          {(environmentalResults.data?.user_explanation?.recommendations || []).map((rec, index) => (
+                            <div key={index} className="flex items-start gap-2 p-3 bg-green-50 rounded-lg">
+                              <Leaf className="h-4 w-4 text-green-600 mt-0.5" />
+                              <p className="text-sm text-green-800">{rec}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Context */}
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <h4 className="font-semibold text-gray-900 mb-2">Context</h4>
+                        <p className="text-gray-700 text-sm">{environmentalResults.data?.user_explanation?.context || 'No context available'}</p>
+                      </div>
+
+                      {/* Technical Notes for Researchers/Policy */}
+                      {(userType === 'researcher' || userType === 'policy') && environmentalResults.data?.user_explanation?.technical_notes && (
+                        <div className="bg-indigo-50 p-4 rounded-lg">
+                          <h4 className="font-semibold text-indigo-900 mb-2">Technical Notes</h4>
+                          <div className="space-y-1">
+                            {(environmentalResults.data?.user_explanation?.technical_notes || []).map((note, index) => (
+                              <p key={index} className="text-sm text-indigo-800">• {note}</p>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Reference Comparisons */}
+                <Card className="shadow-lg">
+                  <CardHeader>
+                    <CardTitle>Reference Meal Comparisons</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-3">
+                        <h4 className="font-semibold text-green-700">vs Sustainable Meal</h4>
+                        <div className="bg-green-50 p-4 rounded-lg space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-sm">Cost Ratio:</span>
+                            <Badge variant={environmentalResults.data?.comparison_to_references?.sustainable_meal?.cost_ratio <= 1 ? 'default' : 'destructive'}>
+                              {environmentalResults.data?.comparison_to_references?.sustainable_meal?.cost_ratio?.toFixed(2) || '0.00'}x
+                            </Badge>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-sm">Carbon Ratio:</span>
+                            <Badge variant={environmentalResults.data?.comparison_to_references?.sustainable_meal?.carbon_ratio <= 1 ? 'default' : 'destructive'}>
+                              {environmentalResults.data?.comparison_to_references?.sustainable_meal?.carbon_ratio?.toFixed(2) || '0.00'}x
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-green-700">
+                            {environmentalResults.data?.comparison_to_references?.sustainable_meal?.sustainability_comparison || 'No comparison available'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <h4 className="font-semibold text-orange-700">vs Average Meal</h4>
+                        <div className="bg-orange-50 p-4 rounded-lg space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-sm">Cost Ratio:</span>
+                            <Badge variant={environmentalResults.data?.comparison_to_references?.average_meal?.cost_ratio <= 1 ? 'default' : 'destructive'}>
+                              {environmentalResults.data?.comparison_to_references?.average_meal?.cost_ratio?.toFixed(2) || '0.00'}x
+                            </Badge>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-sm">Carbon Ratio:</span>
+                            <Badge variant={environmentalResults.data?.comparison_to_references?.average_meal?.carbon_ratio <= 1 ? 'default' : 'destructive'}>
+                              {environmentalResults.data?.comparison_to_references?.average_meal?.carbon_ratio?.toFixed(2) || '0.00'}x
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-orange-700">
+                            {environmentalResults.data?.comparison_to_references?.average_meal?.sustainability_comparison || 'No comparison available'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Scientific Context */}
+                <Card className="shadow-lg">
+                  <CardHeader>
+                    <CardTitle>Scientific Methodology</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="prose prose-sm max-w-none">
+                      <p className="text-gray-600 mb-4">
+                        This environmental impact analysis uses the <strong>ReCiPe 2016 LCA methodology</strong> with 
+                        18 midpoint impact categories and Canadian regional correction factors. Economic valuation 
+                        includes current Canadian factors with <strong>$185 CAD per tonne CO2-eq</strong> social cost of carbon.
+                      </p>
+
+                      <div className="grid md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <h5 className="font-semibold mb-2">18 Impact Categories:</h5>
+                          <ul className="space-y-1 text-gray-600">
+                            <li>• Climate Change (Global Warming)</li>
+                            <li>• Ozone Depletion</li>
+                            <li>• Fine Particulate Matter Formation</li>
+                            <li>• Terrestrial/Freshwater/Marine Acidification</li>
+                            <li>• Terrestrial/Freshwater/Marine Ecotoxicity</li>
+                            <li>• Human Carcinogenic/Non-carcinogenic Toxicity</li>
+                            <li>• Land Use, Water Consumption</li>
+                            <li>• Fossil/Mineral Resource Scarcity</li>
+                          </ul>
+                        </div>
+
+                        <div>
+                          <h5 className="font-semibold mb-2">3 Endpoint Categories:</h5>
+                          <ul className="space-y-1 text-gray-600">
+                            <li>• <strong>Human Health</strong> (DALY)</li>
+                            <li>• <strong>Ecosystem Quality</strong> (species.year)</li>
+                            <li>• <strong>Resource Scarcity</strong> (USD)</li>
+                          </ul>
+                          
+                          <h5 className="font-semibold mb-2 mt-4">Regional Adjustments:</h5>
+                          <ul className="space-y-1 text-gray-600">
+                            <li>• Canadian Climate Factors (+15%)</li>
+                            <li>• Water Abundance Adjustment (-30%)</li>
+                            <li>• Land Use Factors (-20%)</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  );
+};
+
+export default EnvironmentalCalculator;

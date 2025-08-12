@@ -3,67 +3,68 @@ import logging
 import os
 from django.conf import settings
 import chardet
-from typing import Dict, Any
+from typing import Dict, Any, Optional
+from .cnf_integrator import get_cnf_integrator
 
 class DataLoader:
+    """
+    Updated DataLoader that uses the central singleton CNF integrator.
+    Maintains backward compatibility while leveraging centralized data access.
+    """
+    
     def __init__(self):
-        self.data_dir = settings.ENVIRONMENTAL_IMPACT_DATA_DIR
         self.logger = logging.getLogger(__name__)
-        self._load_all_data()
-
-    def _load_all_data(self) -> None:
-        required_files = [
-            'FOOD_GROUP.csv', 
-            'FOOD_NAME.csv', 
-            'NUTRIENT_AMOUNT.csv',
-            'NUTRIENT_NAME.csv', 
-            'CONVERSION_FACTOR.csv',
-            'MEASURE_NAME.csv'
-        ]
-        for file in required_files:
-            attr_name = file.split('.')[0].lower()
-            setattr(self, attr_name, self._load_csv(file))
-
-        self._create_nutrient_mappings()
-
-    def _load_csv(self, filename: str) -> pd.DataFrame:
-        filepath = os.path.join(self.data_dir, filename)
-        if not os.path.exists(filepath):
-            self.logger.error(f"File not found: {filepath}")
-            raise FileNotFoundError(f"File not found: {filepath}")
+        self.cnf_integrator = get_cnf_integrator()
         
-        if os.path.getsize(filepath) == 0:
-            self.logger.warning(f"File is empty: {filepath}")
-            raise pd.errors.EmptyDataError(f"File is empty: {filepath}")
+        # Initialize the CNF integrator if not already done
+        if not self.cnf_integrator.is_initialized():
+            data_dir = getattr(settings, 'ENVIRONMENTAL_IMPACT_DATA_DIR', 'raw_cnf')
+            self.cnf_integrator.initialize(data_dir)
+        
+        # Create backward compatibility attributes
+        self._create_backward_compatibility_attributes()
 
+    def _create_backward_compatibility_attributes(self):
+        """Create attributes for backward compatibility with existing code"""
         try:
-            with open(filepath, 'rb') as file:
-                raw_data = file.read(10000)
-                result = chardet.detect(raw_data)
-                encoding = result['encoding']
+            # Map CNF integrator dataframes to old attribute names
+            self.food_group = self.cnf_integrator.get_dataframe('food_group')
+            self.food_name = self.cnf_integrator.get_dataframe('food_name')
+            self.nutrient_amount = self.cnf_integrator.get_dataframe('nutrient_amount')
+            self.nutrient_name = self.cnf_integrator.get_dataframe('nutrient_name')
+            self.conversion_factor = self.cnf_integrator.get_dataframe('conversion_factor')
+            self.measure_name = self.cnf_integrator.get_dataframe('measure_name')
             
-            return pd.read_csv(filepath, encoding=encoding)
-        except pd.errors.ParserError:
-            self.logger.error(f"Parser error in file: {filepath}")
-            raise
-
-    def _create_nutrient_mappings(self):
-        self.nutrient_id_to_name = dict(zip(self.nutrient_name['NutrientID'], self.nutrient_name['NutrientName']))
-        self.nutrient_name_to_id = dict(zip(self.nutrient_name['NutrientName'], self.nutrient_name['NutrientID']))
+            # Create nutrient mappings for backward compatibility
+            if not self.nutrient_name.empty:
+                self.nutrient_id_to_name = dict(zip(self.nutrient_name['NutrientID'], self.nutrient_name['NutrientName']))
+                self.nutrient_name_to_id = dict(zip(self.nutrient_name['NutrientName'], self.nutrient_name['NutrientID']))
+            else:
+                self.nutrient_id_to_name = {}
+                self.nutrient_name_to_id = {}
+                
+        except Exception as e:
+            self.logger.error(f"Error creating backward compatibility attributes: {e}")
+            # Create empty DataFrames as fallback
+            self.food_group = pd.DataFrame()
+            self.food_name = pd.DataFrame()
+            self.nutrient_amount = pd.DataFrame()
+            self.nutrient_name = pd.DataFrame()
+            self.conversion_factor = pd.DataFrame()
+            self.measure_name = pd.DataFrame()
+            self.nutrient_id_to_name = {}
+            self.nutrient_name_to_id = {}
 
     def get_food_data(self, food_id: int) -> Dict[str, Any]:
+        """Get comprehensive food data using the CNF integrator"""
         try:
-            food_info = self.food_name[self.food_name['FoodID'] == food_id].iloc[0].to_dict()
-            nutrients = self.nutrient_amount[self.nutrient_amount['FoodID'] == food_id].to_dict('records')
-            food_group = self.food_group[self.food_group['FoodGroupID'] == food_info['FoodGroupID']].iloc[0].to_dict()
-            
-            return {
-                'food_info': food_info,
-                'nutrients': nutrients,
-                'food_group': food_group
-            }
-        except IndexError:
-            self.logger.error(f"Food ID {food_id} not found")
+            # Use the CNF integrator for more robust data retrieval
+            food_data = self.cnf_integrator.get_food_data(food_id)
+            if food_data is None:
+                raise ValueError(f"Food ID {food_id} not found")
+            return food_data
+        except Exception as e:
+            self.logger.error(f"Error getting food data for ID {food_id}: {e}")
             raise ValueError(f"Food ID {food_id} not found")
         
     def get_food_group(self, food_id: int) -> str:
@@ -74,36 +75,20 @@ class DataLoader:
             return "Unknown"
 
     def get_nutrient_amount(self, food_id: int, nutrient_name: str) -> float:
-        nutrient_id = self.get_nutrient_id(nutrient_name)
-        if nutrient_id is None:
-            return 0.0
-        
-        nutrient_data = self.nutrient_amount[
-            (self.nutrient_amount['FoodID'] == food_id) & 
-            (self.nutrient_amount['NutrientID'] == nutrient_id)
-        ]
-        
-        if nutrient_data.empty:
-            return 0.0
-        
-        return nutrient_data.iloc[0]['NutrientValue']
+        """Get nutrient amount using the CNF integrator"""
+        return self.cnf_integrator.get_nutrient_amount(food_id, nutrient_name)
 
     def get_conversion_factor(self, food_id: int, measure_id: int) -> float:
-        conversion_data = self.conversion_factor[
-            (self.conversion_factor['FoodID'] == food_id) & 
-            (self.conversion_factor['MeasureID'] == measure_id)
-        ]
-        
-        if conversion_data.empty:
-            return 1.0
-        
-        return conversion_data.iloc[0]['ConversionFactorValue']
+        """Get conversion factor using the CNF integrator"""
+        return self.cnf_integrator.get_conversion_factor(food_id, measure_id)
 
-    def get_nutrient_id(self, nutrient_name: str) -> int:
-        return self.nutrient_name_to_id.get(nutrient_name.upper())
+    def get_nutrient_id(self, nutrient_name: str) -> Optional[int]:
+        """Get nutrient ID using the CNF integrator"""
+        return self.cnf_integrator.get_nutrient_id(nutrient_name)
 
     def get_nutrient_name(self, nutrient_id: int) -> str:
-        return self.nutrient_id_to_name.get(nutrient_id, "Unknown")
+        """Get nutrient name using the CNF integrator"""
+        return self.cnf_integrator.get_nutrient_name(nutrient_id)
     
     def get_cpi(self, year: int) -> float:
         base_cpi = 100.0

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import EcoDishLogo from './EcoDishLogo';
 import { usePathname } from 'next/navigation';
 import { 
   Bars3Icon, 
@@ -12,7 +12,8 @@ import {
   SparklesIcon,
   ScaleIcon,
   HeartIcon,
-  ChevronDownIcon
+  ChevronDownIcon,
+  GlobeAltIcon
 } from '@heroicons/react/24/outline';
 import { clsx } from 'clsx';
 
@@ -29,7 +30,7 @@ const navigation = [
     ]
   },
   { 
-    name: 'HSR Calculator', 
+    name: 'HSR', 
     href: '/hsr', 
     icon: StarIcon,
     dropdown: [
@@ -40,7 +41,7 @@ const navigation = [
     ]
   },
   { 
-    name: 'FCS Calculator', 
+    name: 'FCS', 
     href: '/fcs', 
     icon: SparklesIcon,
     dropdown: [
@@ -50,7 +51,7 @@ const navigation = [
     ]
   },
   { 
-    name: 'HEFI Calculator', 
+    name: 'HEFI', 
     href: '/hefi', 
     icon: ScaleIcon,
     dropdown: [
@@ -60,7 +61,7 @@ const navigation = [
     ]
   },
   { 
-    name: 'HENI Calculator', 
+    name: 'HENI', 
     href: '/heni', 
     icon: HeartIcon,
     dropdown: [
@@ -68,6 +69,17 @@ const navigation = [
       { name: 'Policy Dashboard', href: '/heni/policy-dashboard' },
     ]
   },
+  { 
+    name: 'Environmental Impact', 
+    href: '/environmental', 
+    icon: GlobeAltIcon,
+    dropdown: [
+      { name: 'Calculate Impact', href: '/environmental/calculate' },
+      { name: 'Compare Foods', href: '/environmental/compare' },
+      { name: 'Food Profile', href: '/environmental/food-profile' },
+    ]
+  },
+  
 ];
 
 export default function Navigation() {
@@ -81,14 +93,8 @@ export default function Navigation() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center">
-              <Image
-                src="/ecodish_logo.svg"
-                alt="EcoDish365"
-                width={180}
-                height={180}
-                className="h-40 w-auto hover:scale-105 transition-transform duration-200"
-              />
+            <Link href="/" className="flex items-center" aria-label="EcoDish365 Home">
+              <EcoDishLogo className="w-16 h-16 hover:scale-105 transition-transform duration-200" />
             </Link>
           </div>
 
