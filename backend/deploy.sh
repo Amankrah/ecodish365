@@ -168,7 +168,25 @@ python -c "import django; django.setup()" || {
 
 # Run Django commands
 python manage.py collectstatic --noinput --clear
-python manage.py migrate
+
+# Remove development SQLite database if accidentally present in repo
+if [ -f "$DJANGO_PROJECT_DIR/db.sqlite3" ]; then
+    print_warning "Removing committed development database db.sqlite3 from server checkout"
+    rm -f "$DJANGO_PROJECT_DIR/db.sqlite3"
+fi
+
+# Ensure no development migrations are applied. If migrations directories exist without files, make fresh ones.
+print_status "Resetting Django migrations (server should not run dev migrations)"
+find "$DJANGO_PROJECT_DIR" -type d -path "*/migrations" -exec bash -c '
+  for d in "$@"; do
+    find "$d" -type f ! -name "__init__.py" -delete 2>/dev/null || true
+    touch "$d/__init__.py"
+  done
+' bash {} +
+
+# Make initial migrations on server and migrate
+python manage.py makemigrations --noinput
+python manage.py migrate --noinput
 
 # Seed meal categories (safe to run multiple times - no duplicates created)
 print_status "Setting up meal categories..."
