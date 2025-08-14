@@ -2,7 +2,8 @@ import os
 import sys
 import logging
 from django.conf import settings
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -40,6 +41,7 @@ def get_heni_integrator():
     return _heni_integrator
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 @seo_metadata(
     title="Health and Nutritional Impact (HENI) Calculator | DISH Research",
     description="Calculate the Health and Nutritional Impact (HENI) score for your meals. Analyze the health benefits of your food choices.",
@@ -109,6 +111,7 @@ def heni_calculate(request):
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 @seo_metadata(
     title="HENI Food Profile Analysis | DISH Research",
     description="Get detailed HENI profile for a specific food item with comprehensive health impact analysis",
@@ -185,6 +188,7 @@ def get_food_heni_profile(request, food_id):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 @seo_metadata(
     title="HENI Diet Pattern Analysis | DISH Research", 
     description="Analyze complete dietary patterns for population health impact assessment",

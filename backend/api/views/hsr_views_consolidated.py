@@ -6,7 +6,8 @@ Combines enhanced analysis with clean, user-friendly endpoints for better decisi
 import logging
 from typing import List, Dict, Optional, Union
 from functools import lru_cache
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from django.core.cache import cache
@@ -81,6 +82,7 @@ def hsr_error_handler(view_func):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 @hsr_error_handler
 def calculate_hsr(request):
     """
@@ -155,6 +157,7 @@ def calculate_hsr(request):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 @hsr_error_handler
 def compare_foods(request):
     """
@@ -236,6 +239,7 @@ def compare_foods(request):
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 @hsr_error_handler
 def get_food_hsr_profile(request, food_id):
     """
@@ -296,6 +300,7 @@ def get_food_hsr_profile(request, food_id):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 @hsr_error_handler
 def get_meal_insights(request):
     """

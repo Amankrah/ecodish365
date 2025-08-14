@@ -1,7 +1,8 @@
 import os
 import pandas as pd
 from django.conf import settings
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -121,6 +122,7 @@ def _format_hefi_response(result, food_ids=None, food_name=None, integrator=None
     return data
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def hefi_calculate(request):
     """
     Calculate HEFI score for foods with specified quantities.
@@ -226,6 +228,7 @@ def hefi_calculate(request):
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_food_hefi_profile(request, food_id):
     """
     Get detailed HEFI profile for a specific food ID
@@ -337,6 +340,7 @@ def get_food_hefi_profile(request, food_id):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def compare_foods_hefi(request):
     """
     Compare HEFI scores between multiple meals (or foods)

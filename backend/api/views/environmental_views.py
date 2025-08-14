@@ -1,6 +1,7 @@
 import logging
 from typing import Dict, Any, List
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from environmental_impact_model.src.data_loader import DataLoader as EnvDataLoader
@@ -349,6 +350,7 @@ def _get_overall_assessment(meal_data: Dict[str, Any], user_type: str) -> Dict[s
         }
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 @seo_metadata(
     title="Environmental Impact Calculator | EcoDish365",
     description="Calculate the comprehensive environmental impact of your meals with our advanced LCA tool. Get clear explanations and compare to reference meals.",
@@ -706,6 +708,7 @@ def _estimate_processing_score(meal: EnvMeal) -> float:
     return score
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 @seo_metadata(
     title="Compare Environmental Impact of Foods | DISH Research",
     description="Compare the environmental impact of multiple foods side-by-side with detailed analysis.",
@@ -844,6 +847,7 @@ def compare_foods_environmental(request):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 @seo_metadata(
     title="Food Environmental Profile | EcoDish365", 
     description="Get detailed environmental profile for a specific food item.",

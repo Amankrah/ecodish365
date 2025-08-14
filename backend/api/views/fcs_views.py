@@ -1,5 +1,6 @@
 import logging
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from fcs_calculator.fcs.models.food_item import FoodItem
@@ -13,6 +14,7 @@ class InvalidScoreError(ValueError):
     pass
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 @seo_metadata(
     title="Food Compass Score Calculator | DISH Research",
     description="Calculate the Food Compass Score (FCS) for your food items. Analyze nutritional content and get detailed FCS results.",
@@ -70,6 +72,7 @@ def fcs_calculate(request):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 @seo_metadata(
     title="Batch Food Compass Score Calculator | DISH Research",
     description="Calculate Food Compass Scores (FCS) for multiple food items in a single request. Efficient batch processing for nutritional analysis.",
@@ -138,6 +141,7 @@ def fcs_calculate_batch(request):
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 @seo_metadata(
     title="Food Compass Score Profile | DISH Research", 
     description="Get detailed Food Compass Score profile for a specific food item including domain breakdown and nutritional insights.",
@@ -216,6 +220,7 @@ def get_food_fcs_profile(request, food_id):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 @seo_metadata(
     title="Compare Food Compass Scores | DISH Research",
     description="Compare Food Compass Scores between multiple foods with detailed analysis and recommendations.",

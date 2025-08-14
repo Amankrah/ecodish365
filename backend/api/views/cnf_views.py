@@ -1,5 +1,6 @@
 import logging
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
@@ -63,6 +64,7 @@ def handle_exceptions(view_func):
 # =============================================================================
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 @handle_exceptions
 def add_food_to_cnf(request):
     """Add a single food item to the CNF database."""
@@ -80,6 +82,7 @@ def add_food_to_cnf(request):
     }, status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 @handle_exceptions
 def add_foods_batch(request):
     """Add multiple foods in a batch operation."""
@@ -123,6 +126,7 @@ def add_foods_batch(request):
     }, status=status.HTTP_201_CREATED)
 
 @api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([AllowAny])
 @handle_exceptions
 def manage_cnf_food(request, food_id):
     """Get, update, or delete a specific food item."""
@@ -176,6 +180,7 @@ def manage_cnf_food(request, food_id):
 # =============================================================================
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 @handle_exceptions
 def search_cnf_foods(request):
     """Advanced food search with pagination and relevance scoring."""
@@ -197,6 +202,7 @@ def search_cnf_foods(request):
     })
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 @handle_exceptions
 def search_foods_by_nutrient(request):
     """Search foods by nutrient content."""
@@ -237,6 +243,7 @@ def search_foods_by_nutrient(request):
     })
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 @handle_exceptions
 def get_foods_by_group(request, food_group_id):
     """Get all foods in a specific food group."""
@@ -262,6 +269,7 @@ def get_foods_by_group(request, food_group_id):
     })
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 @handle_exceptions
 def compare_foods(request):
     """Compare nutritional content of multiple foods."""
@@ -301,6 +309,7 @@ def compare_foods(request):
 # =============================================================================
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 @handle_exceptions
 def get_food_groups_view(request):
     """Get all available food groups."""
@@ -312,6 +321,7 @@ def get_food_groups_view(request):
     })
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 @handle_exceptions
 def get_food_sources_view(request):
     """Get all available food sources."""
@@ -323,6 +333,7 @@ def get_food_sources_view(request):
     })
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 @handle_exceptions
 def get_nutrient_sources_view(request):
     """Get all available nutrient sources."""
@@ -334,6 +345,7 @@ def get_nutrient_sources_view(request):
     })
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 @handle_exceptions
 def get_nutrients_view(request):
     """Get all available nutrients."""
@@ -345,6 +357,7 @@ def get_nutrients_view(request):
     })
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 @handle_exceptions
 def get_measures_view(request):
     """Get all available measures."""
@@ -360,6 +373,7 @@ def get_measures_view(request):
 # =============================================================================
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 @handle_exceptions
 def add_food_source(request):
     """Add a new food source."""
@@ -378,6 +392,7 @@ def add_food_source(request):
     }, status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 @handle_exceptions
 def add_nutrient_source(request):
     """Add a new nutrient source."""
@@ -396,6 +411,7 @@ def add_nutrient_source(request):
     }, status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 @handle_exceptions
 def add_new_measure(request):
     """Add a new measure."""
@@ -418,6 +434,7 @@ def add_new_measure(request):
 # =============================================================================
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 @handle_exceptions
 def check_data_integrity(request):
     """Perform comprehensive data integrity check."""
@@ -437,6 +454,7 @@ def check_data_integrity(request):
         }, status=status.HTTP_200_OK)  # Still 200 as it's not an error in the request
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 @handle_exceptions
 def get_database_statistics(request):
     """Get comprehensive database statistics."""
@@ -451,6 +469,7 @@ def get_database_statistics(request):
 # =============================================================================
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 @handle_exceptions
 def export_foods_data(request):
     """Export food data in various formats."""
@@ -517,6 +536,7 @@ def export_foods_data(request):
 # =============================================================================
 
 @api_view(['GET', 'PUT'])
+@permission_classes([AllowAny])
 @handle_exceptions
 def get_cnf_food(request, food_id):
     """
