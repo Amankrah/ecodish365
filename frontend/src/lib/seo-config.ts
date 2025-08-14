@@ -102,6 +102,16 @@ export const seoConfig = {
       keywords: ['food database', 'nutrition database', 'Canadian Nutrient File'],
       description: 'Access to comprehensive food and nutrition databases',
     },
+    environmental: {
+      title: 'Environmental Impact Analysis',
+      keywords: ['environmental impact', 'life cycle assessment', 'carbon footprint', 'sustainability'],
+      description: 'Analyze carbon, water, land use and more with evidence-based LCA methods',
+    },
+    meals: {
+      title: 'Meal Creation & Analysis',
+      keywords: ['meal creator', 'recipe nutrition', 'meal environmental impact', 'healthy meals'],
+      description: 'Create, analyze, and share meals with nutrition and environmental insights',
+    },
   },
 
   // Page-specific SEO templates
@@ -131,6 +141,16 @@ export const seoConfig = {
       title: 'HENI Calculator - Health Impact in micro-DALYs (μDALYs)',
       description:
         'Evaluate food health impacts using the HEalth Nutritional Index (HENI). Evidence-based methodology maps dietary risk factors to micro-DALYs using GBD research.',
+    },
+    environmental: {
+      title: 'Environmental Impact Calculator - Carbon, Water, and Land Use',
+      description:
+        'Analyze the environmental footprint of foods and meals using life cycle assessment, including carbon footprint, water use, land use, and more.',
+    },
+    meals: {
+      title: 'Meals - Create, Analyze, and Share Healthy Meals',
+      description:
+        'Build meals from CNF foods, analyze nutrition and sustainability, and share with the community.',
     },
   },
 

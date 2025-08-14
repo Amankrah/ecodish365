@@ -170,6 +170,10 @@ python -c "import django; django.setup()" || {
 python manage.py collectstatic --noinput --clear
 python manage.py migrate
 
+# Seed meal categories (safe to run multiple times - no duplicates created)
+print_status "Setting up meal categories..."
+python manage.py seed_meal_categories
+
 # Set proper permissions for SQLite database
 if [ -f "$DJANGO_PROJECT_DIR/db.sqlite3" ]; then
     sudo chown $USER:www-data $DJANGO_PROJECT_DIR/db.sqlite3

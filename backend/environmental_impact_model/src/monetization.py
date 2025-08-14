@@ -20,39 +20,39 @@ class Monetization:
         self.base_year = 2021  # Updated to match ECCC SCC base year
         self.current_year = datetime.now().year
         
-        # Corrected monetary values based on official Canadian sources and verified data (CAD 2024)
+        # Corrected monetary values based in consultasion with Raphael LCA expert.
         self.monetary_values = {
-            # CORRECTED: Official Environment and Climate Change Canada (ECCC) 2024 value
-            'Global warming': 266.0,  # CAD per tonne CO2-eq (ECCC SCC 2024, 2021 dollars)
+            # CORRECTED: in consultation with Raphael LCA expert.
+            'Global warming': 221.0,  # CAD per tonne CO2-eq CORRECTED based on True Price Foundation data
             
             # Health impacts - based on international studies adjusted for Canadian context
-            'Fine particulate matter formation': 45000.0,  # CAD per tonne PM2.5-eq
-            'Human carcinogenic toxicity': 2.5,  # CAD per kg 1,4-DCB-eq
-            'Human non-carcinogenic toxicity': 1.8,  # CAD per kg 1,4-DCB-eq
-            'Ionizing radiation': 0.15,  # CAD per kBq Co-60-eq
+            'Fine particulate matter formation': 52920.0,  # CAD per tonne PM2.5-eq CORRECTED based on True Price Foundation data
+            'Human carcinogenic toxicity': 0.1029,  # CAD per kg 1,4-DCB-eq
+            'Human non-carcinogenic toxicity': 0.000808,  # CAD per kg 1,4-DCB-eq
+            'Ionizing radiation': 0.000056,  # CAD per kBq Co-60-eq
             'Ozone formation, Human health': 8500.0,  # CAD per tonne NOx-eq
             
             # Ecosystem impacts - based on European Environmental Prices Handbook adjusted for CAD
-            'Terrestrial acidification': 8500.0,  # CAD per tonne SO2-eq
-            'Freshwater eutrophication': 12500.0,  # CAD per tonne P-eq
-            'Marine eutrophication': 3200.0,  # CAD per tonne N-eq
-            'Terrestrial ecotoxicity': 0.08,  # CAD per kg 1,4-DCB-eq
-            'Freshwater ecotoxicity': 0.12,  # CAD per kg 1,4-DCB-eq
-            'Marine ecotoxicity': 0.05,  # CAD per kg 1,4-DCB-eq
+            'Terrestrial acidification': 1985.0,  # CAD per tonne SO2-eq
+            'Freshwater eutrophication': 38220.0,  # CAD per tonne P-eq
+            'Marine eutrophication': 9560.0,  # CAD per tonne N-eq
+            'Terrestrial ecotoxicity': 0.00081,  # CAD per kg 1,4-DCB-eq
+            'Freshwater ecotoxicity': 0.00081,  # CAD per kg 1,4-DCB-eq
+            'Marine ecotoxicity': 0.000081,  # CAD per kg 1,4-DCB-eq
             'Ozone formation, Terrestrial ecosystems': 2100.0,  # CAD per tonne NOx-eq
             
             # Atmospheric impacts
-            'Stratospheric ozone depletion': 125000.0,  # CAD per tonne CFC11-eq
+            'Stratospheric ozone depletion': 80850.0,  # CAD per tonne CFC11-eq
             
             # Resource depletion
-            'Fossil resource scarcity': 0.85,  # CAD per kg oil-eq
-            'Mineral resource scarcity': 2.1,  # CAD per kg Cu-eq
+            'Fossil resource scarcity': 0.2205,  # CAD per kg oil-eq
+            'Mineral resource scarcity': 0.0956,  # CAD per kg Cu-eq
             
-            # UPDATED: Use an approximate Canada-wide median for potable water ($1–$4.7/m³ range)
-            'Water consumption': 2.0,  # CAD per m³ (median; can override via WATER_COST_PER_M3)
+            # UPDATED: True Price 
+            'Water consumption': 0.0162,  # CAD per m³ 
             
-            # CORRECTED: Based on Statistics Canada agricultural rental data
-            'Land use': 0.03,  # CAD per m²*year crop-eq (Canadian farmland rental rates ~2.55% of land value)
+            # CORRECTED: Based True Price
+            'Land use': 0.00617,  # CAD per m²*year crop-eq (Canadian farmland rental rates ~2.55% of land value)
         }
         
         # Canadian regional adjustment factors (validated against scientific literature)

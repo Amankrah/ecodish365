@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/layout/Navigation";
 import { Toaster } from "react-hot-toast";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -156,34 +157,36 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.className} min-h-screen bg-gray-50`}>
-        <div className="min-h-screen flex flex-col">
-          <Navigation />
-          <main className="flex-1">
-            {children}
-          </main>
-          <footer className="bg-white border-t border-gray-200 py-8">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex flex-col md:flex-row justify-between items-center">
-                <div className="flex items-center space-x-2 mb-4 md:mb-0">
-                  <span className="text-sm text-gray-600">
-                    © 2025 EcoDish365. All rights reserved.
-                  </span>
-                </div>
-                <div className="flex items-center space-x-6">
-                  <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
-                    Privacy Policy
-                  </a>
-                  <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
-                    Terms of Service
-                  </a>
-                  <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
-                    Documentation
-                  </a>
+        <AuthProvider>
+          <div className="min-h-screen flex flex-col">
+            <Navigation />
+            <main className="flex-1">
+              {children}
+            </main>
+            <footer className="bg-white border-t border-gray-200 py-8">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex flex-col md:flex-row justify-between items-center">
+                  <div className="flex items-center space-x-2 mb-4 md:mb-0">
+                    <span className="text-sm text-gray-600">
+                      © 2025 EcoDish365. All rights reserved.
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-6">
+                    <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                      Privacy Policy
+                    </a>
+                    <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                      Terms of Service
+                    </a>
+                    <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                      Documentation
+                    </a>
+                  </div>
                 </div>
               </div>
-            </div>
-          </footer>
-        </div>
+            </footer>
+          </div>
+        </AuthProvider>
         <Toaster 
           position="top-right"
           toastOptions={{

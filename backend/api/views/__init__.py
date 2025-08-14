@@ -6,4 +6,3 @@ from .hsr_views_consolidated import *
 from .food_views import *
 from .cnf_views import *
 from .translation_views import *
-from .net_health_views import *

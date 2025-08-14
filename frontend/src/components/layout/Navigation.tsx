@@ -1,23 +1,35 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import EcoDishLogo from './EcoDishLogo';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import { 
   Bars3Icon, 
   XMarkIcon,
   ChartBarIcon,
-  StarIcon,
-  SparklesIcon,
   ScaleIcon,
-  HeartIcon,
   ChevronDownIcon,
-  GlobeAltIcon
+  GlobeAltIcon,
+  UserIcon,
+  PlusCircleIcon,
+  BookmarkIcon,
+  ArrowRightOnRectangleIcon
 } from '@heroicons/react/24/outline';
 import { clsx } from 'clsx';
 
-const navigation = [
+type DropdownChild = { name: string; href: string };
+type DropdownItem = { name: string; href: string; children?: DropdownChild[] };
+type NavItem = {
+  name: string;
+  href: string;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  requiresAuth?: boolean;
+  dropdown?: DropdownItem[];
+};
+
+const navigation: NavItem[] = [
   { 
     name: 'CNF Explorer', 
     href: '/cnf', 
@@ -30,47 +42,50 @@ const navigation = [
     ]
   },
   { 
-    name: 'HSR', 
+    name: 'Nutrition Indicators', 
     href: '/hsr', 
-    icon: StarIcon,
-    dropdown: [
-      { name: 'Calculate HSR', href: '/hsr/calculate' },
-      { name: 'Compare Foods', href: '/hsr/compare' },
-      { name: 'Food Profile', href: '/hsr/food-profile' },
-      { name: 'Meal Insights', href: '/hsr/meal-insights' },
-    ]
-  },
-  { 
-    name: 'FCS', 
-    href: '/fcs', 
-    icon: SparklesIcon,
-    dropdown: [
-      { name: 'Calculate FCS', href: '/fcs/calculate' },
-      { name: 'Compare Foods', href: '/fcs/compare' },
-      { name: 'Food Profile', href: '/fcs/food-profile' },
-    ]
-  },
-  { 
-    name: 'HEFI', 
-    href: '/hefi', 
     icon: ScaleIcon,
     dropdown: [
-      { name: 'Calculate HEFI', href: '/hefi/calculate' },
-      { name: 'Compare Foods', href: '/hefi/compare' },
-      { name: 'Food Profile', href: '/hefi/food-profile' },
+      { 
+        name: 'HSR', 
+        href: '/hsr', 
+        children: [
+          { name: 'Calculate HSR', href: '/hsr/calculate' },
+          { name: 'Compare Foods', href: '/hsr/compare' },
+          { name: 'Food Profile', href: '/hsr/food-profile' },
+          { name: 'Meal Insights', href: '/hsr/meal-insights' },
+        ]
+      },
+      { 
+        name: 'FCS', 
+        href: '/fcs', 
+        children: [
+          { name: 'Calculate FCS', href: '/fcs/calculate' },
+          { name: 'Compare Foods', href: '/fcs/compare' },
+          { name: 'Food Profile', href: '/fcs/food-profile' },
+        ]
+      },
+      { 
+        name: 'HEFI', 
+        href: '/hefi', 
+        children: [
+          { name: 'Calculate HEFI', href: '/hefi/calculate' },
+          { name: 'Compare Foods', href: '/hefi/compare' },
+          { name: 'Food Profile', href: '/hefi/food-profile' },
+        ]
+      },
+      { 
+        name: 'HENI', 
+        href: '/heni', 
+        children: [
+          { name: 'Individual Calculator', href: '/heni/calculate' },
+          { name: 'Policy Dashboard', href: '/heni/policy-dashboard' },
+        ]
+      },
     ]
   },
   { 
-    name: 'HENI', 
-    href: '/heni', 
-    icon: HeartIcon,
-    dropdown: [
-      { name: 'Individual Calculator', href: '/heni/calculate' },
-      { name: 'Policy Dashboard', href: '/heni/policy-dashboard' },
-    ]
-  },
-  { 
-    name: 'Environmental Impact', 
+    name: 'Environmental Indicators', 
     href: '/environmental', 
     icon: GlobeAltIcon,
     dropdown: [
@@ -78,15 +93,74 @@ const navigation = [
       { name: 'Compare Foods', href: '/environmental/compare' },
     ]
   },
-  
+  { 
+    name: 'Meals', 
+    href: '/meals', 
+    icon: PlusCircleIcon,
+    requiresAuth: true,
+    dropdown: [
+      { name: 'Create Meal', href: '/meals/create' },
+      { name: 'My Meals', href: '/meals/my-meals' },
+      { name: 'Saved Meals', href: '/meals/saved' },
+      { name: 'Discover Meals', href: '/meals' },
+    ]
+  },
 ];
 
 export default function Navigation() {
+  const { isAuthenticated, user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const closeTimeoutRef = useRef<number | null>(null);
   const pathname = usePathname();
 
+  const openDropdown = (name: string) => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+    setActiveDropdown(name);
+  };
+
+  const scheduleCloseDropdown = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+    }
+    closeTimeoutRef.current = window.setTimeout(() => {
+      setActiveDropdown(null);
+    }, 180);
+  };
+
+  const filteredNavigation = navigation.filter(item => 
+    !item.requiresAuth || isAuthenticated
+  );
+
+  // Compute contextual sub-navigation for current section
+  const getContextSubnav = (): DropdownChild[] => {
+    const currentPath = pathname || '/';
+    // Nutrition Indicators context (HSR/FCS/HEFI/HENI)
+    const nutrition = filteredNavigation.find((n) => n.name === 'Nutrition Indicators');
+    if (nutrition?.dropdown && Array.isArray(nutrition.dropdown)) {
+      const match = nutrition.dropdown.find((d) => currentPath.startsWith(d.href));
+      if (match?.children && match.children.length > 0) {
+        return match.children;
+      }
+    }
+
+    // Environmental Indicators context
+    const environmental = filteredNavigation.find((n) => n.name === 'Environmental Indicators');
+    if (environmental?.dropdown && currentPath.startsWith(environmental.href)) {
+      return environmental.dropdown.map((d) => ({ name: d.name, href: d.href }));
+    }
+
+    return [];
+  };
+
+  const contextSubnav = getContextSubnav();
+
   return (
+    <>
     <nav className="bg-white/95 backdrop-blur-sm shadow-lg border-b border-gray-200/50 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
@@ -99,17 +173,19 @@ export default function Navigation() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
-            {navigation.map((item) => {
-              const isActive = pathname === item.href || 
-                (item.href !== '/' && pathname.startsWith(item.href));
+            {filteredNavigation.map((item) => {
+              const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
               const isDropdownOpen = activeDropdown === item.name;
-              
+              const showDropdown = Array.isArray(item.dropdown) && (
+                item.name === 'CNF Explorer' || item.name === 'Environmental Indicators' || item.name === 'Nutrition Indicators' || item.name === 'Meals'
+              );
               return (
                 <div key={item.name} className="relative group">
                   <div
-                    onMouseEnter={() => setActiveDropdown(item.name)}
+                    onMouseEnter={() => showDropdown && openDropdown(item.name)}
+                    onMouseLeave={() => showDropdown && scheduleCloseDropdown()}
                     className={clsx(
-                      'flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 relative group',
+                      'flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 relative',
                       isActive
                         ? 'bg-gradient-to-r from-blue-50 to-green-50 text-blue-700 shadow-sm border border-blue-100'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50/80'
@@ -127,41 +203,56 @@ export default function Navigation() {
                         )}
                       </span>
                     </Link>
-                    <button
-                      type="button"
-                      onClick={() => setActiveDropdown(isDropdownOpen ? null : item.name)}
-                      className="p-1"
-                      aria-label={`Toggle ${item.name} dropdown`}
-                    >
-                      <ChevronDownIcon className={clsx(
-                        'w-4 h-4 transition-transform duration-200',
-                        isDropdownOpen ? 'rotate-180' : '',
-                        isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'
-                      )} />
-                    </button>
+                    {showDropdown && (
+                      <button
+                        type="button"
+                        onClick={() => setActiveDropdown(isDropdownOpen ? null : item.name)}
+                        aria-label={`Toggle ${item.name} menu`}
+                        className="p-1 ml-1"
+                      >
+                        <ChevronDownIcon className={clsx(
+                          'w-4 h-4 transition-transform duration-200',
+                          isDropdownOpen ? 'rotate-180' : '',
+                          isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'
+                        )} />
+                      </button>
+                    )}
                   </div>
-                  
-                  {/* Dropdown Menu */}
-                  {isDropdownOpen && (
+                  {showDropdown && isDropdownOpen && (
                     <div 
-                      className="absolute top-full left-0 mt-2 w-56 bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/50 py-2 z-50"
-                      onMouseLeave={() => setActiveDropdown(null)}
+                      className="absolute top-full left-0 mt-2 w-64 bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/50 py-2 z-50"
+                      onMouseEnter={() => openDropdown(item.name)}
+                      onMouseLeave={scheduleCloseDropdown}
                     >
-                      {item.dropdown?.map((dropdownItem) => {
-                        const isDropdownActive = pathname === dropdownItem.href;
+                      {item.dropdown?.map((d: DropdownItem) => {
+                        // For Nutrition Indicators, only show main paths (no children)
+                        if (item.name === 'Nutrition Indicators') {
+                          return (
+                            <Link
+                              key={d.href}
+                              href={d.href}
+                              className={clsx('block px-4 py-2 text-sm mx-2 rounded-lg transition-colors',
+                                pathname.startsWith(d.href)
+                                  ? 'bg-gradient-to-r from-blue-50 to-green-50 text-blue-700'
+                                  : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50/80'
+                              )}
+                            >
+                              {d.name}
+                            </Link>
+                          );
+                        }
+                        // For CNF/Environmental, show their subdirectories
                         return (
                           <Link
-                            key={dropdownItem.href}
-                            href={dropdownItem.href}
-                            className={clsx(
-                              'block px-4 py-2 text-sm transition-all duration-200 mx-2 rounded-lg',
-                              isDropdownActive
-                                ? 'bg-gradient-to-r from-blue-50 to-green-50 text-blue-700 font-medium'
-                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50/80'
+                            key={d.href}
+                            href={d.href}
+                            className={clsx('block px-4 py-2 text-sm mx-2 rounded-lg transition-colors',
+                              pathname === d.href
+                                ? 'bg-gradient-to-r from-blue-50 to-green-50 text-blue-700'
+                                : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50/80'
                             )}
-                            onClick={() => setActiveDropdown(null)}
                           >
-                            {dropdownItem.name}
+                            {d.name}
                           </Link>
                         );
                       })}
@@ -170,6 +261,87 @@ export default function Navigation() {
                 </div>
               );
             })}
+            
+            {/* User Menu / Auth Buttons */}
+            <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-gray-200">
+              {isAuthenticated ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    className="flex items-center space-x-2 p-2 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50/80 transition-all duration-200"
+                  >
+                    <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center">
+                      <span className="text-white text-sm font-semibold">
+                        {user?.first_name?.charAt(0) || user?.username?.charAt(0) || 'U'}
+                      </span>
+                    </div>
+                    <ChevronDownIcon className={clsx(
+                      'w-4 h-4 transition-transform duration-200',
+                      userMenuOpen ? 'rotate-180' : ''
+                    )} />
+                  </button>
+                  
+                  {userMenuOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-56 bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/50 py-2 z-50">
+                      <div className="px-4 py-2 border-b border-gray-200">
+                        <p className="text-sm font-medium text-gray-900">{user?.full_name}</p>
+                        <p className="text-xs text-gray-500">{user?.email}</p>
+                      </div>
+                      <Link
+                        href="/meals/create"
+                        className="flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50/80 mx-2 rounded-lg transition-all duration-200"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <PlusCircleIcon className="w-4 h-4 mr-3" />
+                        Create Meal
+                      </Link>
+                      <Link
+                        href="/meals/my-meals"
+                        className="flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50/80 mx-2 rounded-lg transition-all duration-200"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <BookmarkIcon className="w-4 h-4 mr-3" />
+                        My Meals
+                      </Link>
+                      <Link
+                        href="/profile"
+                        className="flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50/80 mx-2 rounded-lg transition-all duration-200"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <UserIcon className="w-4 h-4 mr-3" />
+                        Profile Settings
+                      </Link>
+                      <hr className="my-2 border-gray-200" />
+                      <button
+                        onClick={() => {
+                          logout();
+                          setUserMenuOpen(false);
+                        }}
+                        className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50/80 mx-2 rounded-lg transition-all duration-200"
+                      >
+                        <ArrowRightOnRectangleIcon className="w-4 h-4 mr-3" />
+                        Sign Out
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <Link
+                    href="/auth/login"
+                    className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50/80 rounded-xl transition-all duration-200"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/auth/register"
+                    className="px-3 py-2 text-sm font-medium text-white bg-gradient-primary hover:opacity-90 rounded-xl transition-all duration-200"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Mobile menu button */}
@@ -192,7 +364,7 @@ export default function Navigation() {
       {mobileMenuOpen && (
         <div className="md:hidden">
           <div className="px-4 pt-2 pb-4 space-y-2 bg-white/95 backdrop-blur-sm border-t border-gray-200/50">
-            {navigation.map((item) => {
+            {filteredNavigation.map((item) => {
               const isActive = pathname === item.href || 
                 (item.href !== '/' && pathname.startsWith(item.href));
               
@@ -212,27 +384,7 @@ export default function Navigation() {
                     <span>{item.name}</span>
                   </div>
                   
-                  {/* Dropdown Items */}
-                  <div className="ml-4 space-y-1">
-                    {item.dropdown?.map((dropdownItem) => {
-                      const isDropdownActive = pathname === dropdownItem.href;
-                      return (
-                        <Link
-                          key={dropdownItem.href}
-                          href={dropdownItem.href}
-                          onClick={() => setMobileMenuOpen(false)}
-                          className={clsx(
-                            'block px-4 py-2 text-sm rounded-lg transition-all duration-200',
-                            isDropdownActive
-                              ? 'bg-gradient-to-r from-blue-50 to-green-50 text-blue-700 font-medium border border-blue-100'
-                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50/80'
-                          )}
-                        >
-                          {dropdownItem.name}
-                        </Link>
-                      );
-                    })}
-                  </div>
+          {/* No dropdown items on mobile; use context sub-nav below */}
                 </div>
               );
             })}
@@ -240,5 +392,32 @@ export default function Navigation() {
         </div>
       )}
     </nav>
+    {/* Contextual Sub-Navigation Bar */}
+    {contextSubnav.length > 0 && (
+      <div className="bg-white/95 backdrop-blur-sm border-b border-gray-200/60">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-2 overflow-x-auto py-2">
+            {contextSubnav.map((link) => {
+              const active = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={clsx(
+                    'px-3 py-1.5 rounded-lg text-sm whitespace-nowrap transition-colors duration-200',
+                    active
+                      ? 'bg-gradient-to-r from-blue-50 to-green-50 text-blue-700 border border-blue-100'
+                      : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
+                  )}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 } 

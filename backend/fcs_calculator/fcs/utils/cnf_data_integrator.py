@@ -13,7 +13,7 @@ import logging
 backend_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 api_dir = os.path.join(backend_dir, 'api')
 sys.path.append(api_dir)
-from cnf_data_pipeline import CNFDataPipeline
+from api.cnf_data_pipeline import CNFDataPipeline
 
 from fcs.models.food_item import FoodItem
 

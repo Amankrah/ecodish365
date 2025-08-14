@@ -48,7 +48,6 @@ sys.path.extend([
     str(BASE_DIR / 'hefi_calculator'),
     str(BASE_DIR / 'heni_calculator'),
     str(BASE_DIR / 'hsr_calculator'),
-    str(BASE_DIR / 'net_health_impact_calculator'),
     str(BASE_DIR / 'dish_cnf_db_pipeline'),
 ])
 
@@ -136,15 +135,17 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
     'rest_framework',
+    'rest_framework.authtoken',
     'api.apps.ApiConfig',
     'environmental_impact_model',
     'fcs_calculator',
     'hefi_calculator',
     'heni_calculator',
     'hsr_calculator',
-    'net_health_impact_calculator',
     'dish_cnf_db_pipeline',
     'corsheaders',
+    'users',
+    'meals',
 ]
 
 # Add debug toolbar only in development (disabled for now due to conflicts)
@@ -204,6 +205,31 @@ USE_TZ = True
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Custom user model
+AUTH_USER_MODEL = 'users.CustomUser'
+
+# Django REST Framework configuration
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ],
+}
+
+# Media files configuration
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 CNF_FOLDER = str(RAW_CNF_DIR)
 

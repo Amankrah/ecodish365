@@ -14,8 +14,7 @@ import {
   Factory,
   Zap,
   AlertTriangle,
-  TrendingUp,
-  TrendingDown,
+  
 } from 'lucide-react';
 import type { EnvironmentalImpactResult, LCAResults, EndpointImpacts, SustainabilityScore } from '../../lib/api';
 
@@ -94,8 +93,7 @@ export const EnvironmentalVisualization: React.FC<EnvironmentalVisualizationProp
     }
   ];
 
-  // Find the maximum value for scaling bars
-  const maxValue = Math.max(...keyImpacts.map(impact => impact.value || 0));
+  // Removed cross-indicator scaling; display absolute values only
 
   // Format impact values using backend units; scientific notation for tiny values
   const formatImpactValue = (value: number, unit: string): string => {
@@ -116,15 +114,7 @@ export const EnvironmentalVisualization: React.FC<EnvironmentalVisualizationProp
     return `${value.toFixed(3)} ${unit}`;
   };
 
-  // Get impact level indicator
-  const getImpactLevel = (value: number, maxVal: number) => {
-    const percentage = (value / maxVal) * 100;
-    if (percentage >= 80) return { level: 'Very High', color: 'text-red-600', icon: TrendingUp };
-    if (percentage >= 60) return { level: 'High', color: 'text-orange-600', icon: TrendingUp };
-    if (percentage >= 40) return { level: 'Medium', color: 'text-yellow-600', icon: TrendingUp };
-    if (percentage >= 20) return { level: 'Low', color: 'text-blue-600', icon: TrendingDown };
-    return { level: 'Very Low', color: 'text-green-600', icon: TrendingDown };
-  };
+  // Removed relative impact level logic
 
   return (
     <div className="space-y-6">
@@ -137,40 +127,23 @@ export const EnvironmentalVisualization: React.FC<EnvironmentalVisualizationProp
         <div className="space-y-3">
           {keyImpacts.map((impact) => {
             const IconComponent = impact.icon;
-            const percentage = maxValue > 0 ? (impact.value / maxValue) * 100 : 0;
-            const impactLevel = getImpactLevel(impact.value, maxValue);
-            const LevelIcon = impactLevel.icon;
-
             return (
-              <div key={impact.key} className="space-y-2">
+              <div key={impact.key} className="space-y-1">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <IconComponent className={`h-4 w-4 ${impact.color}`} />
                     <span className="text-sm font-medium text-gray-900">
                       {impact.label}
                     </span>
-                    <LevelIcon className={`h-3 w-3 ${impactLevel.color}`} />
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" className={`text-xs ${impactLevel.color}`}>
-                      {impactLevel.level}
-                    </Badge>
                     <span className="text-sm font-bold text-gray-900">
                       {formatImpactValue(impact.value, impact.unit)}
                     </span>
                   </div>
                 </div>
-                
-                <div className="relative">
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className={`h-2 rounded-full transition-all duration-300 ${impact.bgColor.replace('bg-', 'bg-gradient-to-r from-').replace('-100', '-300 to-').replace('to-', impact.color.replace('text-', 'to-'))}`}
-                      style={{ width: `${Math.max(2, percentage)}%` }}
-                    />
-                  </div>
-                  <div className="text-xs text-gray-600 mt-1">
-                    {impact.description}
-                  </div>
+                <div className="text-xs text-gray-600">
+                  {impact.description}
                 </div>
               </div>
             );
@@ -183,48 +156,36 @@ export const EnvironmentalVisualization: React.FC<EnvironmentalVisualizationProp
         <h4 className="font-semibold text-gray-900 mb-4">Endpoint Impact Summary</h4>
         <div className="grid grid-cols-1 gap-3">
           <div className="bg-red-50 p-3 rounded-lg">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between mb-1">
               <span className="text-sm font-medium text-red-900">Human Health Impact</span>
               <span className="text-sm font-bold text-red-900">
                 {formatEndpointValue(endpoints?.['Human Health'] ?? 0, 'DALY')}
               </span>
             </div>
-            <Progress 
-              value={Math.min(100, ((endpoints?.['Human Health'] ?? 0) as number) * 1000000)} 
-              className="h-2"
-            />
             <div className="text-xs text-red-700 mt-1">
               Disability Adjusted Life Years - Health burden from environmental impacts
             </div>
           </div>
 
           <div className="bg-green-50 p-3 rounded-lg">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between mb-1">
               <span className="text-sm font-medium text-green-900">Ecosystem Quality Impact</span>
               <span className="text-sm font-bold text-green-900">
                 {formatEndpointValue(endpoints?.['Ecosystems'] ?? 0, 'sp.year')}
               </span>
             </div>
-            <Progress 
-              value={Math.min(100, ((endpoints?.['Ecosystems'] ?? 0) as number) * 1000000)} 
-              className="h-2"
-            />
             <div className="text-xs text-green-700 mt-1">
               Species extinction years - Biodiversity loss from environmental damage
             </div>
           </div>
 
           <div className="bg-blue-50 p-3 rounded-lg">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between mb-1">
               <span className="text-sm font-medium text-blue-900">Resource Scarcity Impact</span>
               <span className="text-sm font-bold text-blue-900">
                 {formatEndpointValue(endpoints?.['Resources'] ?? 0, 'USD')}
               </span>
             </div>
-            <Progress 
-              value={Math.min(100, ((endpoints?.['Resources'] ?? 0) as number) * 10)} 
-              className="h-2"
-            />
             <div className="text-xs text-blue-700 mt-1">
               Economic value of resource depletion impacts
             </div>
@@ -320,11 +281,7 @@ export const EnvironmentalVisualization: React.FC<EnvironmentalVisualizationProp
             <strong>Single Score:</strong> {(analysis?.single_score ?? 0).toFixed(4)} ReCiPe points 
             (lower is better - represents combined environmental burden)
           </p>
-          <p>
-            <strong>Top Impact:</strong> {keyImpacts.reduce((max, impact) => 
-              impact.value > max.value ? impact : max, keyImpacts[0]).label} 
-            is the primary environmental concern for this meal
-          </p>
+          {/* Removed cross-category "Top Impact" comparison */}
           <p>
             <strong>Benchmark:</strong> This meal&apos;s sustainability score of{' '}
             {(sustainability.overall_sustainability_score ?? 0).toFixed(0)}/100 indicates{' '}

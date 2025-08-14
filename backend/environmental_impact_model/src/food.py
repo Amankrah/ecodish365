@@ -101,8 +101,8 @@ class Food:
 
     def get_total_quantity(self) -> float:
         """Calculate total quantity including waste."""
-        waste_factor = 0.319  # 31.9% waste
-        return self.quantity / (1 - waste_factor)
+        #waste_factor = 0.319  # 31.9% waste
+        return self.quantity #/ (1 - waste_factor)
 
     def get_environmental_impact(self) -> Dict[str, float]:
         """

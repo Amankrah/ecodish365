@@ -1,6 +1,6 @@
 # api/urls.py
 
-from django.urls import path
+from django.urls import path, include
 from .views import cnf_views, environmental_views, food_views, translation_views, hsr_views_consolidated, fcs_views, hefi_views, heni_views
 from .views.cnf_views import (
     # Food Management
@@ -128,5 +128,15 @@ urlpatterns = [
     path('heni/calculate/', heni_views.heni_calculate, name='heni_calculate'),
     path('heni/food/<int:food_id>/profile/', heni_views.get_food_heni_profile, name='get_food_heni_profile'),
     path('heni/analyze-pattern/', heni_views.analyze_dietary_pattern, name='analyze_dietary_pattern'),
+
+    # =============================================================================
+    # User Management & Social Features
+    # =============================================================================
+    path('users/', include('users.urls')),
+    
+    # =============================================================================
+    # Meal Creation & Sharing Platform
+    # =============================================================================
+    path('meals/', include('meals.urls')),
 
 ]

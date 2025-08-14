@@ -6,7 +6,6 @@
 
 import React, { useState } from 'react';
 import { Badge } from '../ui/badge';
-import { Progress } from '../ui/progress';
 import { Button } from '../ui/button';
 import {
   Globe,
@@ -233,26 +232,56 @@ export const LCABreakdown: React.FC<LCABreakdownProps> = ({ results }) => {
     return colorMap[color as keyof typeof colorMap] || colorMap.blue;
   };
 
-  // Calculate relative impact levels
-  const numericValues = Object.values(lca as Record<string, number>).map(v => (typeof v === 'number' ? v : 0));
-  const positiveValues = numericValues.filter(v => v > 0);
-  const maxValue = positiveValues.length ? Math.max(...positiveValues) : Math.max(...numericValues, 1);
-  const minValue = positiveValues.length ? Math.min(...positiveValues) : 1;
-
-  const getRelativeLevel = (value: number) => {
-    if (value === 0) return { level: 'None', percentage: 0 };
-    const logValue = Math.log10(value);
-    const logMax = Math.log10(maxValue);
-    const logMin = Math.log10(minValue);
-    const denominator = (logMax - logMin) || 1;
-    const percentage = ((logValue - logMin) / denominator) * 100;
-    
-    if (percentage >= 80) return { level: 'Very High', percentage };
-    if (percentage >= 60) return { level: 'High', percentage };
-    if (percentage >= 40) return { level: 'Medium', percentage };
-    if (percentage >= 20) return { level: 'Low', percentage };
-    return { level: 'Very Low', percentage };
+  // Monetary factors from backend monetization.py for proper normalization
+  const monetaryFactors: Record<string, number> = {
+    'Global warming': 221.0,  // CAD per tonne CO2-eq
+    'Fine particulate matter formation': 52920.0,  // CAD per tonne PM2.5-eq
+    'Human carcinogenic toxicity': 0.1029,  // CAD per kg 1,4-DCB-eq
+    'Human non-carcinogenic toxicity': 0.000808,  // CAD per kg 1,4-DCB-eq
+    'Ionizing radiation': 0.000056,  // CAD per kBq Co-60-eq
+    'Ozone formation, Human health': 8500.0,  // CAD per tonne NOx-eq
+    'Terrestrial acidification': 1985.0,  // CAD per tonne SO2-eq
+    'Freshwater eutrophication': 38220.0,  // CAD per tonne P-eq
+    'Marine eutrophication': 9560.0,  // CAD per tonne N-eq
+    'Terrestrial ecotoxicity': 0.00081,  // CAD per kg 1,4-DCB-eq
+    'Freshwater ecotoxicity': 0.00081,  // CAD per kg 1,4-DCB-eq
+    'Marine ecotoxicity': 0.000081,  // CAD per kg 1,4-DCB-eq
+    'Ozone formation, Terrestrial ecosystems': 2100.0,  // CAD per tonne NOx-eq
+    'Stratospheric ozone depletion': 80850.0,  // CAD per tonne CFC11-eq
+    'Fossil resource scarcity': 0.2205,  // CAD per kg oil-eq
+    'Mineral resource scarcity': 0.0956,  // CAD per kg Cu-eq
+    'Water consumption': 0.0162,  // CAD per m³
+    'Land use': 0.00617,  // CAD per m²*year crop-eq
   };
+
+  // Categories priced per tonne (need kg->tonne conversion)
+  const perTonneCategories = new Set([
+    'Global warming',
+    'Fine particulate matter formation',
+    'Terrestrial acidification',
+    'Freshwater eutrophication',
+    'Marine eutrophication',
+    'Stratospheric ozone depletion',
+    'Ozone formation, Human health',
+    'Ozone formation, Terrestrial ecosystems',
+  ]);
+
+  // Calculate monetized values for all impacts
+  const monetizedValues: Record<string, number> = {};
+
+  Object.entries(lca as Record<string, number>).forEach(([key, value]) => {
+    const numericValue = typeof value === 'number' ? value : 0;
+    const monetaryFactor = monetaryFactors[key];
+    
+    if (monetaryFactor && numericValue > 0) {
+      // Apply unit conversion for per-tonne categories
+      const unitScale = perTonneCategories.has(key) ? 1.0 / 1000.0 : 1.0;
+      const monetizedValue = (numericValue * unitScale) * monetaryFactor;
+      monetizedValues[key] = monetizedValue;
+    } else {
+      monetizedValues[key] = 0;
+    }
+  });
 
   return (
     <div className="space-y-4">
@@ -268,8 +297,7 @@ export const LCABreakdown: React.FC<LCABreakdownProps> = ({ results }) => {
         const colors = getColorClasses(category.color);
         const CategoryIcon = category.icon;
         
-        // Calculate category total for relative sizing
-        const categoryTotal = category.impacts.reduce((sum, impact) => sum + impact.value, 0);
+         // Category total no longer used since comparisons are removed
         
         return (
           <div key={categoryName} className={`border rounded-lg ${colors.border}`}>
@@ -295,63 +323,38 @@ export const LCABreakdown: React.FC<LCABreakdownProps> = ({ results }) => {
             
             {isExpanded && (
               <div className="border-t p-4 space-y-4">
-                {category.impacts.map((impact) => {
-                  const relativeLevel = getRelativeLevel(impact.value);
-                  const ImpactIcon = impact.icon;
-                  
-                  return (
-                    <div key={impact.key} className="bg-white p-3 rounded-lg border border-gray-100">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <ImpactIcon className={`h-4 w-4 ${colors.accent}`} />
-                          <span className="font-medium text-gray-900">{impact.name}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge 
-                            variant="outline" 
-                            className={`text-xs ${
-                              relativeLevel.level === 'Very High' ? 'text-red-600' :
-                              relativeLevel.level === 'High' ? 'text-orange-600' :
-                              relativeLevel.level === 'Medium' ? 'text-yellow-600' :
-                              relativeLevel.level === 'Low' ? 'text-blue-600' :
-                              'text-green-600'
-                            }`}
-                          >
-                            {relativeLevel.level}
-                          </Badge>
-                          <span className="font-bold text-gray-900 text-sm">
-                            {formatImpactValue(impact.value, impact.unit)}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <div className="mb-2">
-                        <Progress value={Math.max(1, relativeLevel.percentage)} className="h-2" />
-                      </div>
-                      
-                      <div className="text-xs text-gray-600">
-                        {impact.description}
-                      </div>
-                      
-                      {impact.value === 0 && (
-                        <div className="text-xs text-green-600 mt-1 font-medium">
-                          No impact detected for this category
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                 {category.impacts.map((impact) => {
+                   const ImpactIcon = impact.icon;
+                   const monetized = monetizedValues[impact.key] || 0;
+                   return (
+                     <div key={impact.key} className="bg-white p-3 rounded-lg border border-gray-100">
+                       <div className="flex items-center justify-between mb-2">
+                         <div className="flex items-center gap-2">
+                           <ImpactIcon className={`h-4 w-4 ${colors.accent}`} />
+                           <span className="font-medium text-gray-900">{impact.name}</span>
+                         </div>
+                         <div className="flex items-center gap-3">
+                           <span className="font-bold text-gray-900 text-sm">
+                             {formatImpactValue(impact.value, impact.unit)}
+                           </span>
+                           {monetized > 0 && (
+                             <span className="text-xs text-gray-600">${monetized.toFixed(2)} CAD</span>
+                           )}
+                         </div>
+                       </div>
+                       <div className="text-xs text-gray-600">
+                         {impact.description}
+                       </div>
+                       {impact.value === 0 && (
+                         <div className="text-xs text-green-600 mt-1 font-medium">
+                           No impact detected for this category
+                         </div>
+                       )}
+                     </div>
+                   );
+                 })}
                 
-                <div className={`bg-gray-50 p-3 rounded-lg border-l-4 ${colors.border}`}>
-                  <div className="text-xs text-gray-600">
-                    <strong>Category Summary:</strong> {categoryName} represents{' '}
-                    {(() => {
-                      const total = numericValues.reduce((sum: number, v: number) => sum + v, 0);
-                      const pct = total > 0 ? (categoryTotal / total) * 100 : 0;
-                      return pct.toFixed(1);
-                    })()}% of total impact burden
-                  </div>
-                </div>
+                {/* Removed category percentage summary to avoid cross-indicator comparisons */}
               </div>
             )}
           </div>

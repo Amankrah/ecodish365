@@ -24,6 +24,15 @@ const api = axios.create({
   },
 });
 
+// Add request interceptor for authentication
+api.interceptors.request.use((config) => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+  if (token) {
+    config.headers.Authorization = `Token ${token}`;
+  }
+  return config;
+});
+
 // Add response interceptor for error handling
 api.interceptors.response.use(
   (response) => response,
@@ -1793,6 +1802,320 @@ export class EnvironmentalImpactApiService {
       metadata: root?.metadata as EnvironmentalImpactResult['metadata'],
     };
     return normalized;
+  }
+}
+
+// User Management Types
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  full_name: string;
+  date_of_birth?: string;
+  bio: string;
+  profile_picture?: string;
+  activity_level: 'sedentary' | 'light' | 'moderate' | 'very_active' | 'extra_active';
+  dietary_preferences: string[];
+  allergies: string[];
+  health_goals: string[];
+  daily_calorie_target?: number;
+  profile_public: boolean;
+  meals_public_by_default: boolean;
+  created_at: string;
+  last_active: string;
+  followers_count: number;
+  following_count: number;
+  meals_count: number;
+}
+
+export interface UserRegistration {
+  email: string;
+  username: string;
+  password: string;
+  password_confirm: string;
+  first_name: string;
+  last_name: string;
+  date_of_birth?: string;
+  bio?: string;
+  activity_level?: string;
+  dietary_preferences?: string[];
+  allergies?: string[];
+  health_goals?: string[];
+  daily_calorie_target?: number;
+}
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  token: string;
+  user: User;
+}
+
+// Meal Types
+export interface MealCategory {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  color: string;
+}
+
+export interface FoodItem {
+  food_id: number;
+  quantity: number;
+  unit: string;
+}
+
+export interface Meal {
+  id: string;
+  name: string;
+  description: string;
+  creator: string;
+  category: MealCategory;
+  meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'dessert' | 'beverage';
+  is_public: boolean;
+  is_featured: boolean;
+  food_items: FoodItem[];
+  total_calories?: number;
+  total_weight_grams?: number;
+  nutrient_profile: Record<string, number>;
+  fcs_score?: number;
+  hefi_score?: number;
+  hsr_score?: number;
+  heni_score?: number;
+  environmental_impact: Partial<LCAResults>;
+  sustainability_score?: number;
+  carbon_footprint?: number;
+  preparation_time?: number;
+  cooking_time?: number;
+  servings: number;
+  difficulty_level: 'easy' | 'medium' | 'hard';
+  instructions: string;
+  tips: string;
+  image?: string;
+  likes_count: number;
+  saves_count: number;
+  views_count: number;
+  comments_count: number;
+  average_rating?: number;
+  tags: string[];
+  created_at: string;
+  updated_at: string;
+  is_liked: boolean;
+  is_saved: boolean;
+  health_score_average?: number;
+  overall_rating?: number;
+}
+
+export interface MealCreateRequest {
+  name: string;
+  description: string;
+  category: string;
+  meal_type: string;
+  is_public?: boolean;
+  food_items: FoodItem[];
+  preparation_time?: number;
+  cooking_time?: number;
+  servings: number;
+  difficulty_level: string;
+  instructions: string;
+  tips?: string;
+  image?: File;
+  tags: string[];
+}
+
+export interface MealComment {
+  id: string;
+  user: string;
+  content: string;
+  parent_comment?: string;
+  replies: MealComment[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MealRating {
+  id: string;
+  user: string;
+  taste_rating?: number;
+  health_rating?: number;
+  ease_rating?: number;
+  sustainability_rating?: number;
+  overall_rating: number;
+  review: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// API Service Classes
+
+export class AuthApiService {
+  static async register(userData: UserRegistration): Promise<AuthResponse> {
+    const response = await api.post('/users/register/', userData);
+    if (response.data.token) {
+      localStorage.setItem('authToken', response.data.token);
+    }
+    return response.data;
+  }
+
+  static async login(credentials: LoginCredentials): Promise<AuthResponse> {
+    const response = await api.post('/users/login/', credentials);
+    if (response.data.token) {
+      localStorage.setItem('authToken', response.data.token);
+    }
+    return response.data;
+  }
+
+  static async logout(): Promise<void> {
+    localStorage.removeItem('authToken');
+  }
+
+  static async getCurrentUser(): Promise<User> {
+    const response = await api.get('/users/profiles/me/');
+    return response.data;
+  }
+
+  static async updateProfile(userData: Partial<User>): Promise<User> {
+    const response = await api.patch('/users/profiles/me/', userData);
+    return response.data;
+  }
+
+  static async followUser(username: string): Promise<{ message: string }> {
+    const response = await api.post(`/users/profiles/${username}/follow/`);
+    return response.data;
+  }
+
+  static async unfollowUser(username: string): Promise<{ message: string }> {
+    const response = await api.delete(`/users/profiles/${username}/unfollow/`);
+    return response.data;
+  }
+
+  static async searchUsers(query: string): Promise<User[]> {
+    const response = await api.get('/users/search/', { params: { q: query } });
+    return response.data;
+  }
+}
+
+export class MealApiService {
+  static async getCategories(): Promise<MealCategory[]> {
+    const response = await api.get('/meals/categories/');
+    const body = response.data;
+    if (Array.isArray(body)) return body as MealCategory[];
+    if (body && Array.isArray(body.results)) return body.results as MealCategory[];
+    if (body && body.data) {
+      if (Array.isArray(body.data)) return body.data as MealCategory[];
+      if (Array.isArray(body.data?.results)) return body.data.results as MealCategory[];
+    }
+    return [];
+  }
+
+  static async getMeals(params: {
+    page?: number;
+    meal_type?: string;
+    difficulty_level?: string;
+    tags?: string;
+    min_calories?: number;
+    max_calories?: number;
+    creator?: string;
+    search?: string;
+    ordering?: string;
+  } = {}): Promise<{ results: Meal[]; count: number; next?: string; previous?: string }> {
+    const response = await api.get('/meals/meals/', { params });
+    return response.data;
+  }
+
+  static async getMeal(id: string): Promise<Meal> {
+    const response = await api.get(`/meals/meals/${id}/`);
+    return response.data;
+  }
+
+  static async createMeal(mealData: MealCreateRequest): Promise<Meal> {
+    const formData = new FormData();
+    
+    // Add all non-file fields
+    Object.entries(mealData).forEach(([key, value]) => {
+      if (key === 'image' && value instanceof File) {
+        formData.append(key, value);
+      } else if (key === 'food_items' || key === 'tags') {
+        formData.append(key, JSON.stringify(value));
+      } else if (value !== undefined && value !== null) {
+        formData.append(key, String(value));
+      }
+    });
+
+    const response = await api.post('/meals/meals/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+  }
+
+  static async updateMeal(id: string, mealData: Partial<MealCreateRequest>): Promise<Meal> {
+    const response = await api.patch(`/meals/meals/${id}/`, mealData);
+    return response.data;
+  }
+
+  static async deleteMeal(id: string): Promise<void> {
+    await api.delete(`/meals/meals/${id}/`);
+  }
+
+  static async likeMeal(id: string): Promise<{ message: string }> {
+    const response = await api.post(`/meals/meals/${id}/like/`);
+    return response.data;
+  }
+
+  static async unlikeMeal(id: string): Promise<{ message: string }> {
+    const response = await api.delete(`/meals/meals/${id}/unlike/`);
+    return response.data;
+  }
+
+  static async saveMeal(id: string): Promise<{ message: string }> {
+    const response = await api.post(`/meals/meals/${id}/save/`);
+    return response.data;
+  }
+
+  static async unsaveMeal(id: string): Promise<{ message: string }> {
+    const response = await api.delete(`/meals/meals/${id}/unsave/`);
+    return response.data;
+  }
+
+  static async getMyMeals(): Promise<{ results: Meal[] }> {
+    const response = await api.get('/meals/meals/my_meals/');
+    return response.data;
+  }
+
+  static async getSavedMeals(): Promise<{ results: Meal[] }> {
+    const response = await api.get('/meals/meals/saved_meals/');
+    return response.data;
+  }
+
+  static async getRecommendations(params: {
+    meal_type?: string;
+    limit?: number;
+  } = {}): Promise<Meal[]> {
+    const response = await api.get('/meals/recommendations/', { params });
+    return response.data;
+  }
+
+  static async addComment(mealId: string, content: string, parentId?: string): Promise<MealComment> {
+    const response = await api.post(`/meals/comments/`, {
+      meal: mealId,
+      content,
+      parent_comment: parentId
+    });
+    return response.data;
+  }
+
+  static async rateMeal(mealId: string, rating: Omit<MealRating, 'id' | 'user' | 'created_at' | 'updated_at'>): Promise<MealRating> {
+    const response = await api.post(`/meals/ratings/`, {
+      meal: mealId,
+      ...rating
+    });
+    return response.data;
   }
 }
 

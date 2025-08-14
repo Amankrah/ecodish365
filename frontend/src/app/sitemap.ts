@@ -194,5 +194,33 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  return [...mainPages, ...cnfPages, ...hsrPages, ...fcsPages, ...hefiPages, ...heniPages, ...environmentalPages];
+  // Meal platform pages
+  const mealPages = [
+    {
+      url: `${baseUrl}/meals`,
+      lastModified: currentDate,
+      changeFrequency: 'daily' as const,
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/meals/create`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/auth/login`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/auth/register`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    },
+  ];
+
+  return [...mainPages, ...cnfPages, ...hsrPages, ...fcsPages, ...hefiPages, ...heniPages, ...environmentalPages, ...mealPages];
 }
