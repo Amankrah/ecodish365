@@ -189,8 +189,9 @@ print_status "Creating Django superuser (optional)..."
 activate_venv
 export DJANGO_SETTINGS_MODULE="dish_project.settings"
 
-python manage.py shell << EOF
-from django.contrib.auth.models import User
+python manage.py shell << 'EOF'
+from django.contrib.auth import get_user_model
+User = get_user_model()
 if not User.objects.filter(username='admin').exists():
     User.objects.create_superuser('admin', 'admin@ecodish365.com', 'change-this-password')
     print("Superuser 'admin' created")
