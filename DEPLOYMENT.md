@@ -269,3 +269,6 @@ sudo certbot --nginx -d ecodish365.com -d www.ecodish365.com --non-interactive
 sudo ss -tlnp | grep nginx
 
 sudo cat /etc/nginx/sites-available/ecodish365.com
+
+
+git fetch origin && git restore --worktree --staged backend/deploy.sh && git pull origin main --ff-only"
