@@ -1888,7 +1888,8 @@ export interface Meal {
   hefi_score?: number;
   hsr_score?: number;
   heni_score?: number;
-  environmental_impact: Partial<LCAResults>;
+  heni_total_score?: number;
+  environmental_impact: Record<string, number>;
   sustainability_score?: number;
   carbon_footprint?: number;
   preparation_time?: number;
@@ -2083,14 +2084,30 @@ export class MealApiService {
     return response.data;
   }
 
-  static async getMyMeals(): Promise<{ results: Meal[] }> {
-    const response = await api.get('/meals/meals/my_meals/');
-    return response.data;
+  static async getMyMeals(params: { ordering?: string } = {}): Promise<{ results: Meal[] }> {
+    const response = await api.get('/meals/meals/my_meals/', { params });
+    // Normalize to always return { results }
+    const body = response.data;
+    if (Array.isArray(body)) return { results: body as Meal[] };
+    if (body && Array.isArray(body.results)) return { results: body.results as Meal[] };
+    if (body && body.data) {
+      if (Array.isArray(body.data)) return { results: body.data as Meal[] };
+      if (Array.isArray(body.data?.results)) return { results: body.data.results as Meal[] };
+    }
+    return { results: [] };
   }
 
-  static async getSavedMeals(): Promise<{ results: Meal[] }> {
-    const response = await api.get('/meals/meals/saved_meals/');
-    return response.data;
+  static async getSavedMeals(params: { ordering?: string } = {}): Promise<{ results: Meal[] }> {
+    const response = await api.get('/meals/meals/saved_meals/', { params });
+    // Normalize to always return { results }
+    const body = response.data;
+    if (Array.isArray(body)) return { results: body as Meal[] };
+    if (body && Array.isArray(body.results)) return { results: body.results as Meal[] };
+    if (body && body.data) {
+      if (Array.isArray(body.data)) return { results: body.data as Meal[] };
+      if (Array.isArray(body.data?.results)) return { results: body.data.results as Meal[] };
+    }
+    return { results: [] };
   }
 
   static async getRecommendations(params: {
@@ -2115,6 +2132,11 @@ export class MealApiService {
       meal: mealId,
       ...rating
     });
+    return response.data;
+  }
+
+  static async recalculateMealMetrics(mealId: string): Promise<{ message: string; meal: Meal }> {
+    const response = await api.post(`/meals/meals/${mealId}/recalculate/`);
     return response.data;
   }
 }

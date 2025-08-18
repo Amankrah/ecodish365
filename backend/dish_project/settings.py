@@ -63,6 +63,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '0.0.0.0',
+    'testserver',  # For Django test client internal API calls
     'ecodish365.com',
     'www.ecodish365.com',
     '13.49.5.171',  # Elastic IP

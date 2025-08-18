@@ -78,7 +78,7 @@ export default function MealCreator() {
     try {
       const results = await CNFApiService.searchFoodsEnhanced({
         query,
-        limit: 10
+        limit: 50
       });
       setFoodSearchResults(results.results);
     } catch (error) {

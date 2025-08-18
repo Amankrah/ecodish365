@@ -109,6 +109,91 @@ class MealViewSet(viewsets.ModelViewSet):
         
         return super().retrieve(request, *args, **kwargs)
     
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def recalculate(self, request, pk=None):
+        """Recalculate nutrition and environmental metrics for a meal"""
+        meal = self.get_object()
+        
+        # Check if user can edit this meal
+        if meal.creator != request.user:
+            return Response(
+                {'error': 'Only meal creator can recalculate metrics'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        try:
+            # Use the calculation service to recalculate all metrics
+            from .services import MealCalculationService
+            calculation_service = MealCalculationService()
+            scores_data = calculation_service.calculate_all_scores(meal.food_items)
+            
+            # Update meal with new calculated data
+            np = scores_data.get('nutritional_profile', {})
+            if not np or not isinstance(np, dict):
+                np = {}
+            
+            # Ensure the nutrient profile is valid JSON by creating clean dict
+            safe_np = {}
+            for k, v in np.items():
+                try:
+                    # Skip None, NaN, Inf values and ensure the key is a string
+                    if (v is not None and 
+                        str(v).lower() not in ['nan', 'inf', '-inf', 'none'] and
+                        not (isinstance(v, float) and not (v == v))):  # Check for NaN
+                        clean_value = float(v)
+                        # Only include if it's a finite number
+                        if isinstance(clean_value, float) and clean_value != float('inf') and clean_value != float('-inf'):
+                            safe_np[str(k)] = clean_value
+                except (ValueError, TypeError, OverflowError):
+                    continue
+            
+            # Set to empty dict if nothing valid was found
+            safe_np = safe_np if safe_np else {}
+            
+            meal.nutrient_profile = safe_np
+            meal.total_calories = scores_data['total_calories']
+            meal.total_weight_grams = scores_data['total_weight_grams']
+            
+            # Health scores
+            health_scores = scores_data['health_scores']
+            meal.fcs_score = health_scores.get('fcs_score')
+            meal.hefi_score = health_scores.get('hefi_score')
+            meal.heni_score = health_scores.get('heni_score')
+            meal.heni_total_score = health_scores.get('heni_total_score')
+            meal.hsr_score = health_scores.get('hsr_score')
+            
+            # Environmental data
+            env_data = scores_data['environmental_data']
+            env_impacts = env_data.get('environmental_impacts', {})
+            env_impacts_with_costs = {
+                **env_impacts,
+                '_monetized_total_cad': env_data.get('environmental_cost_total_cad'),
+                '_monetized_per_100g_cad': env_data.get('environmental_cost_per_100g_cad'),
+                '_monetized_per_calorie_cad': env_data.get('environmental_cost_per_calorie_cad'),
+            }
+            meal.environmental_impact = env_impacts_with_costs
+            meal.sustainability_score = env_data.get('sustainability_score')
+            meal.carbon_footprint = env_impacts.get('Global warming') if isinstance(env_impacts, dict) else None
+            
+            meal.save(update_fields=[
+                'nutrient_profile', 'total_calories', 'total_weight_grams',
+                'fcs_score', 'hefi_score', 'heni_score', 'heni_total_score', 'hsr_score',
+                'environmental_impact', 'sustainability_score', 'carbon_footprint'
+            ])
+            
+            # Return updated meal data
+            serializer = self.get_serializer(meal)
+            return Response({
+                'message': 'Meal metrics recalculated successfully',
+                'meal': serializer.data
+            })
+            
+        except Exception as e:
+            return Response(
+                {'error': f'Failed to recalculate metrics: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
     def perform_create(self, serializer):
         """Create meal with current user as creator"""
         # Use user's default privacy setting if not specified
@@ -209,30 +294,40 @@ class MealViewSet(viewsets.ModelViewSet):
         except MealSave.DoesNotExist:
             return Response({'error': 'Not saved'}, status=status.HTTP_400_BAD_REQUEST)
     
-    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated], url_path=r'my[-_]meals')
     def my_meals(self, request):
         """Get current user's meals"""
         meals = self.queryset.filter(creator=request.user)
+        # Optional ordering (e.g., -created_at, -likes_count)
+        ordering = request.query_params.get('ordering')
+        if ordering:
+            meals = meals.order_by(ordering)
         page = self.paginate_queryset(meals)
         if page is not None:
             serializer = MealListSerializer(page, many=True, context={'request': request})
             return self.get_paginated_response(serializer.data)
         
         serializer = MealListSerializer(meals, many=True, context={'request': request})
-        return Response(serializer.data)
+        # Return a consistent paginated-like shape when pagination is not applied
+        return Response({'results': serializer.data})
     
-    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated], url_path=r'saved[-_]meals')
     def saved_meals(self, request):
         """Get user's saved meals"""
         saved = MealSave.objects.filter(user=request.user).values_list('meal', flat=True)
         meals = self.queryset.filter(id__in=saved)
+        # Optional ordering (e.g., -created_at, -likes_count, -saves_count)
+        ordering = request.query_params.get('ordering')
+        if ordering:
+            meals = meals.order_by(ordering)
         page = self.paginate_queryset(meals)
         if page is not None:
             serializer = MealListSerializer(page, many=True, context={'request': request})
             return self.get_paginated_response(serializer.data)
         
         serializer = MealListSerializer(meals, many=True, context={'request': request})
-        return Response(serializer.data)
+        # Return a consistent paginated-like shape when pagination is not applied
+        return Response({'results': serializer.data})
 
 
 class MealCommentViewSet(viewsets.ModelViewSet):

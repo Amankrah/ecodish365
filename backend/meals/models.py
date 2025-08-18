@@ -66,7 +66,8 @@ class Meal(models.Model):
     fcs_score = models.FloatField(null=True, blank=True)  # Food Choice Score
     hefi_score = models.FloatField(null=True, blank=True)  # Healthy Eating Food Index
     hsr_score = models.FloatField(null=True, blank=True)  # Health Star Rating
-    heni_score = models.FloatField(null=True, blank=True)  # Health and Nutrition Index
+    heni_score = models.FloatField(null=True, blank=True)  # Health and Nutrition Index (per 100kcal)
+    heni_total_score = models.FloatField(null=True, blank=True)  # Total HENI score (for minutes calculation)
     
     # Environmental impact scores
     environmental_impact = models.JSONField(default=dict, blank=True)

@@ -36,7 +36,7 @@ export default function MealCard({ meal, onUpdate }: MealCardProps) {
         const updatedMeal = {
           ...meal,
           is_liked: false,
-          likes_count: meal.likes_count - 1
+          likes_count: Math.max(0, (meal.likes_count || 0) - 1)
         };
         onUpdate?.(updatedMeal);
       } else {
@@ -44,7 +44,7 @@ export default function MealCard({ meal, onUpdate }: MealCardProps) {
         const updatedMeal = {
           ...meal,
           is_liked: true,
-          likes_count: meal.likes_count + 1
+          likes_count: Math.max(0, (meal.likes_count || 0) + 1)
         };
         onUpdate?.(updatedMeal);
       }
@@ -65,7 +65,7 @@ export default function MealCard({ meal, onUpdate }: MealCardProps) {
         const updatedMeal = {
           ...meal,
           is_saved: false,
-          saves_count: meal.saves_count - 1
+          saves_count: Math.max(0, (meal.saves_count || 0) - 1)
         };
         onUpdate?.(updatedMeal);
       } else {
@@ -73,7 +73,7 @@ export default function MealCard({ meal, onUpdate }: MealCardProps) {
         const updatedMeal = {
           ...meal,
           is_saved: true,
-          saves_count: meal.saves_count + 1
+          saves_count: Math.max(0, (meal.saves_count || 0) + 1)
         };
         onUpdate?.(updatedMeal);
       }
@@ -110,9 +110,9 @@ export default function MealCard({ meal, onUpdate }: MealCardProps) {
   const totalTime = (meal.preparation_time || 0) + (meal.cooking_time || 0);
 
   return (
-    <div className="card group hover:shadow-lg transition-all duration-200">
+    <div className="card group hover:shadow-lg transition-all duration-200 overflow-hidden" role="article" aria-label={`Meal card for ${meal.name}`}>
       {/* Image */}
-      <div className="relative mb-4 overflow-hidden rounded-lg bg-gray-100 h-48">
+      <div className="relative overflow-hidden bg-gray-100 h-48">
         {meal.image ? (
           <Image
             src={meal.image}
@@ -142,11 +142,11 @@ export default function MealCard({ meal, onUpdate }: MealCardProps) {
           </div>
           
           <div className="text-right">
-            {meal.sustainability_score && (
+            {typeof meal.sustainability_score === 'number' && (
               <div className="bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center space-x-1">
                 <GlobeAltIcon className="w-3 h-3 text-green-600" />
                 <span className="text-xs font-medium text-green-700">
-                  {Math.round(meal.sustainability_score)}
+                  {meal.sustainability_score.toFixed(2)}
                 </span>
               </div>
             )}
@@ -155,7 +155,7 @@ export default function MealCard({ meal, onUpdate }: MealCardProps) {
       </div>
 
       {/* Content */}
-      <div className="space-y-3">
+      <div className="p-4 space-y-3">
         <div>
           <Link href={`/meals/${meal.id}`}>
             <h3 className="text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-2">
@@ -163,21 +163,21 @@ export default function MealCard({ meal, onUpdate }: MealCardProps) {
             </h3>
           </Link>
           
-          <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
+          <div className="flex flex-wrap items-center gap-2 mt-2 text-sm text-gray-500">
             <div className="flex items-center space-x-1">
               <UserIcon className="w-4 h-4" />
-              <span>{meal.creator}</span>
+              <span className="truncate max-w-24">@{meal.creator}</span>
             </div>
             
             {totalTime > 0 && (
-              <div className="flex items-center space-x-1">
-                <ClockIcon className="w-4 h-4" />
-                <span>{formatTime(totalTime)}</span>
+              <div className="flex items-center space-x-1 bg-blue-50 text-blue-700 px-2 py-1 rounded-full">
+                <ClockIcon className="w-3 h-3" />
+                <span className="text-xs font-medium">{formatTime(totalTime)}</span>
               </div>
             )}
             
-            <div className="flex items-center space-x-1">
-              <span className="capitalize">{meal.meal_type}</span>
+            <div className="flex items-center space-x-1 bg-purple-50 text-purple-700 px-2 py-1 rounded-full">
+              <span className="text-xs font-medium capitalize">{meal.meal_type}</span>
             </div>
           </div>
         </div>
@@ -190,29 +190,29 @@ export default function MealCard({ meal, onUpdate }: MealCardProps) {
         )}
 
         {/* Nutrition & Health Scores */}
-        <div className="flex items-center space-x-4 text-sm">
-          {meal.total_calories && (
-            <div className="text-gray-600">
-              <span className="font-medium">{Math.round(meal.total_calories)}</span> cal
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          {typeof meal.total_calories === 'number' && (
+            <div className="bg-orange-50 text-orange-700 px-2 py-1 rounded-full">
+              <span className="text-xs font-medium">{Math.round(meal.total_calories)} cal</span>
             </div>
           )}
           
-          {meal.health_score_average && (
-            <div className={`flex items-center space-x-1 ${getHealthScoreColor(meal.health_score_average)}`}>
-              <StarIcon className="w-4 h-4" />
-              <span className="font-medium">{Math.round(meal.health_score_average)}</span>
+          {typeof meal.health_score_average === 'number' && (
+            <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${getHealthScoreColor(meal.health_score_average)} bg-opacity-10`}>
+              <StarIcon className="w-3 h-3" />
+              <span className="text-xs font-medium">{meal.health_score_average.toFixed(2)}</span>
             </div>
           )}
           
-          <div className="text-gray-500">
-            {meal.servings} serving{meal.servings !== 1 ? 's' : ''}
+          <div className="bg-gray-50 text-gray-600 px-2 py-1 rounded-full">
+            <span className="text-xs font-medium">{meal.servings} serving{meal.servings !== 1 ? 's' : ''}</span>
           </div>
         </div>
 
         {/* Tags */}
         {meal.tags && meal.tags.length > 0 && (
           <div className="flex flex-wrap gap-1">
-            {meal.tags.slice(0, 3).map((tag) => (
+            {meal.tags.slice(0, 2).map((tag) => (
               <span
                 key={tag}
                 className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-600"
@@ -220,9 +220,9 @@ export default function MealCard({ meal, onUpdate }: MealCardProps) {
                 {tag}
               </span>
             ))}
-            {meal.tags.length > 3 && (
+            {meal.tags.length > 2 && (
               <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-500">
-                +{meal.tags.length - 3}
+                +{meal.tags.length - 2}
               </span>
             )}
           </div>
@@ -230,16 +230,17 @@ export default function MealCard({ meal, onUpdate }: MealCardProps) {
 
         {/* Actions */}
         <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             <button
               onClick={handleLike}
               disabled={!isAuthenticated || loading}
-              className="flex items-center space-x-1 text-sm text-gray-500 hover:text-red-600 transition-colors disabled:opacity-50"
+              className="flex items-center space-x-1 text-xs text-gray-500 hover:text-red-600 transition-colors disabled:opacity-50"
+              aria-label={meal.is_liked ? 'Unlike meal' : 'Like meal'}
             >
               {meal.is_liked ? (
-                <HeartSolidIcon className="w-4 h-4 text-red-600" />
+                <HeartSolidIcon className="w-3 h-3 text-red-600" />
               ) : (
-                <HeartIcon className="w-4 h-4" />
+                <HeartIcon className="w-3 h-3" />
               )}
               <span>{meal.likes_count}</span>
             </button>
@@ -247,25 +248,26 @@ export default function MealCard({ meal, onUpdate }: MealCardProps) {
             <button
               onClick={handleSave}
               disabled={!isAuthenticated || loading}
-              className="flex items-center space-x-1 text-sm text-gray-500 hover:text-primary-600 transition-colors disabled:opacity-50"
+              className="flex items-center space-x-1 text-xs text-gray-500 hover:text-primary-600 transition-colors disabled:opacity-50"
+              aria-label={meal.is_saved ? 'Unsave meal' : 'Save meal'}
             >
               {meal.is_saved ? (
-                <BookmarkSolidIcon className="w-4 h-4 text-primary-600" />
+                <BookmarkSolidIcon className="w-3 h-3 text-primary-600" />
               ) : (
-                <BookmarkIcon className="w-4 h-4" />
+                <BookmarkIcon className="w-3 h-3" />
               )}
               <span>{meal.saves_count}</span>
             </button>
 
-            <div className="flex items-center space-x-1 text-sm text-gray-500">
-              <ChatBubbleLeftIcon className="w-4 h-4" />
+            <div className="flex items-center space-x-1 text-xs text-gray-500">
+              <ChatBubbleLeftIcon className="w-3 h-3" />
               <span>{meal.comments_count || 0}</span>
             </div>
           </div>
 
-          {meal.average_rating && (
-            <div className="flex items-center space-x-1 text-sm text-yellow-600">
-              <StarIcon className="w-4 h-4 fill-current" />
+          {typeof meal.average_rating === 'number' && (
+            <div className="flex items-center space-x-1 text-xs text-yellow-600">
+              <StarIcon className="w-3 h-3 fill-current" />
               <span>{meal.average_rating.toFixed(1)}</span>
             </div>
           )}

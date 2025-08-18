@@ -7,6 +7,8 @@ try:
     # Environmental Impact Model
     from environmental_impact_model.src.meal import Meal as EnvironmentalMeal
     from environmental_impact_model.src.food import Food as EnvironmentalFood
+    from environmental_impact_model.src.monetization import Monetization
+    from environmental_impact_model.src.data_loader import DataLoader as EnvDataLoader
     
     # FCS Calculator
     from fcs_calculator.fcs.models.food_item import FoodItem as FCSFoodItem
@@ -21,7 +23,10 @@ try:
     # HSR Calculator
     from hsr_calculator.hsr.models.food import Food as HSRFood
     from hsr_calculator.hsr.models.meal import Meal as HSRMeal
+    from hsr_calculator.hsr.models.category import Category
     from hsr_calculator.hsr.calculators.hsr_calculator import HSRCalculator, HSRConfig
+    from hsr_calculator.hsr.providers.threshold_provider import ThresholdProvider
+    from hsr_calculator.hsr.calculators.fvnl_calculator import calculate_fvnl_content
     
     # HENI Calculator  
     from heni_calculator.heni.database.cnf_integrator import create_heni_cnf_integrator
@@ -34,6 +39,8 @@ except ImportError as e:
     CALCULATORS_AVAILABLE = False
 
 from api.food_id_finder import load_food_data, search_food
+from django.conf import settings
+from dish_cnf_db_pipeline.cnf_pipeline import CNFDataPipeline
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +53,8 @@ class MealCalculationService:
         if self.food_df is None:
             logger.error("Failed to load food data")
             raise ValidationError("Food database not available")
+        # Lazy-init CNF pipeline for HSR and other model integrations
+        self._cnf_pipeline = None
     
     def validate_food_items(self, food_items: List[Dict[str, Any]]) -> bool:
         """Validate that all food items exist and have proper format"""
@@ -68,27 +77,37 @@ class MealCalculationService:
         """Calculate comprehensive nutritional profile from food items"""
         try:
             total_nutrients = {}
+            cnf_pipeline = self._get_cnf_pipeline()
             
             for item in food_items:
-                food_id = item['food_id']
+                food_id = int(item['food_id'])
                 quantity_g = self._convert_to_grams(item['quantity'], item['unit'])
                 
-                # Get food data
-                food_row = self.food_df[self.food_df['FoodID'] == food_id].iloc[0]
+                # Get comprehensive food data including nutrients
+                food_details = cnf_pipeline.get_food_details(food_id)
+                if not food_details:
+                    logger.warning(f"Food ID {food_id} not found in CNF database")
+                    continue
                 
-                # Calculate nutrient amounts (nutrients are typically per 100g)
+                # Calculate nutrient amounts (CNF data is per 100g)
                 factor = quantity_g / 100.0
                 
-                # Add up all nutrients - you'll need to map your actual nutrient columns
-                nutrient_columns = [col for col in self.food_df.columns 
-                                  if col not in ['FoodID', 'FoodDescription', 'FoodDescription_processed', 
-                                               'food_category', 'preparation_method']]
-                
-                for nutrient_col in nutrient_columns:
-                    nutrient_value = food_row.get(nutrient_col, 0) or 0
-                    if isinstance(nutrient_value, (int, float)):
-                        total_nutrients[nutrient_col] = total_nutrients.get(nutrient_col, 0) + (nutrient_value * factor)
+                # Process nutrient values
+                nutrient_values = food_details.get('NutrientValues', [])
+                for nutrient in nutrient_values:
+                    nutrient_name = nutrient.get('NutrientName', '')
+                    nutrient_value = nutrient.get('NutrientValue', 0)
+                    
+                    if nutrient_name and nutrient_value is not None:
+                        try:
+                            nutrient_value = float(nutrient_value)
+                            if nutrient_value > 0:  # Only include positive values
+                                scaled_value = nutrient_value * factor
+                                total_nutrients[nutrient_name] = total_nutrients.get(nutrient_name, 0) + scaled_value
+                        except (ValueError, TypeError):
+                            continue
             
+            logger.info(f"Calculated {len(total_nutrients)} nutrients from CNF pipeline")
             return total_nutrients
             
         except Exception as e:
@@ -99,24 +118,44 @@ class MealCalculationService:
         """Calculate total calories from food items"""
         try:
             total_calories = 0
+            cnf_pipeline = self._get_cnf_pipeline()
+            
             for item in food_items:
-                food_id = item['food_id']
+                food_id = int(item['food_id'])
                 quantity_g = self._convert_to_grams(item['quantity'], item['unit'])
                 
-                # Get food data and calculate calories
-                food_row = self.food_df[self.food_df['FoodID'] == food_id].iloc[0]
+                # Get comprehensive food data including nutrients
+                food_details = cnf_pipeline.get_food_details(food_id)
+                if not food_details:
+                    logger.warning(f"Food ID {food_id} not found for calorie calculation")
+                    continue
                 
-                # Try different possible calorie column names
-                calorie_fields = ['ENERGY (KILOCALORIES)', 'ENERGY', 'KILOCALORIES', 'KCAL']
+                # Find energy/calorie nutrient
                 calories_per_100g = 0
+                found_nutrient = None
                 
-                for field in calorie_fields:
-                    if field in food_row and food_row[field]:
-                        calories_per_100g = float(food_row[field])
-                        break
+                nutrient_values = food_details.get('NutrientValues', [])
+                calorie_names = ['ENERGY (KILOCALORIES)', 'ENERGY', 'KILOCALORIES', 'KCAL', 'Energy (kcal)', 'energy', 'kcal']
                 
-                total_calories += (calories_per_100g * quantity_g / 100.0)
+                for nutrient in nutrient_values:
+                    nutrient_name = nutrient.get('NutrientName', '')
+                    nutrient_value = nutrient.get('NutrientValue', 0)
+                    
+                    if any(calorie_name.lower() in nutrient_name.lower() for calorie_name in calorie_names):
+                        try:
+                            calories_per_100g = float(nutrient_value)
+                            if calories_per_100g > 0:
+                                found_nutrient = nutrient_name
+                                break
+                        except (ValueError, TypeError):
+                            continue
+                
+                item_calories = (calories_per_100g * quantity_g / 100.0)
+                total_calories += item_calories
+                
+                logger.debug(f"Food {food_id}: {quantity_g}g, {calories_per_100g} kcal/100g (nutrient: {found_nutrient}), total: {item_calories} kcal")
             
+            logger.info(f"Total calories calculated: {total_calories}")
             return total_calories
             
         except Exception as e:
@@ -137,77 +176,110 @@ class MealCalculationService:
             return scores
         
         try:
-            # Calculate FCS (Food Choice Score)
+            # Calculate FCS (Food Compass Score) using working FCS view logic
             try:
+                # Build combined FoodItem for the meal
                 food_item = FCSFoodItem("Meal Analysis")
-                integrator = create_fcs_integrator()
-                analyzer = FoodAnalyzer(integrator)
-                
-                # Add foods to the food item based on food_items
-                for item in food_items:
-                    food_id = item['food_id']
-                    quantity_g = self._convert_to_grams(item['quantity'], item['unit'])
-                    # This needs to be adapted based on actual FCS API
-                
-                fcs_score = analyzer.calculate_fcs(50.0)  # Base score - adapt as needed
-                scores['fcs_score'] = fcs_score
+                food_ids = [int(item['food_id']) for item in food_items]
+
+                # Use enhanced CNF integrator to populate attributes
+                cnf_integrator = create_fcs_integrator()
+                cnf_integrator.extract_nutrients_enhanced(food_ids, food_item)
+
+                # Analyze and extract FCS
+                analyzer = FoodAnalyzer()
+                fcs_result = analyzer.analyze_food_item(food_item)
+                scores['fcs_score'] = fcs_result.get('fcs')
             except Exception as e:
                 logger.error(f"FCS calculation error: {e}")
             
-            # Calculate HEFI (Healthy Eating Food Index)
+            # Calculate HEFI (Healthy Eating Food Index) using working HEFI flow
             try:
-                from django.conf import settings
                 integrator = HEFICNFIntegrator(settings.CNF_FOLDER)
-                
-                # Create HEFI inputs from food items
-                food_ids = [item['food_id'] for item in food_items]
-                quantities = [self._convert_to_grams(item['quantity'], item['unit']) for item in food_items]
-                
-                hefi_inputs = HEFIInputs(food_ids=food_ids, quantities=quantities)
-                hefi_score = compute_hefi(hefi_inputs, integrator)
-                scores['hefi_score'] = hefi_score.total_score if hefi_score else None
+                # Build (food_id, amount_g) pairs
+                food_data = [
+                    (int(item['food_id']), float(self._convert_to_grams(item['quantity'], item['unit'])))
+                    for item in food_items
+                ]
+                agg = integrator.aggregate_inputs(food_data)
+                hefi_inputs = HEFIInputs(**agg)
+                hefi_result = compute_hefi(hefi_inputs)
+                scores['hefi_score'] = hefi_result.total_score if hefi_result else None
             except Exception as e:
                 logger.error(f"HEFI calculation error: {e}")
             
-            # Calculate HENI (Health and Nutrition Index)
+            # Calculate HENI (Health and Nutrition Index) using standalone HENI endpoint
             try:
-                integrator = create_heni_cnf_integrator()
-                calculator = HENICalculator(integrator)
+                from django.test import Client
+                import json
                 
-                # Convert food items to ingredients
-                ingredients = []
+                # Prepare meal data for HENI API
+                meal_data = []
                 for item in food_items:
-                    food_id = item['food_id']
-                    quantity_g = self._convert_to_grams(item['quantity'], item['unit'])
-                    ingredient = Ingredient(food_id=food_id, quantity_grams=quantity_g)
-                    ingredients.append(ingredient)
+                    food_id = int(item['food_id'])
+                    quantity_g = float(self._convert_to_grams(item['quantity'], item['unit']))
+                    meal_data.append({
+                        'food_id': food_id,
+                        'amount': quantity_g,
+                        'unit': 'g'
+                    })
                 
-                heni_result = calculator.calculate_heni(ingredients)
-                scores['heni_score'] = heni_result.net_daly_total if heni_result else None
+                # Use Django test client to call internal HENI API
+                client = Client()
+                response = client.post(
+                    '/api/heni/calculate/',
+                    data=json.dumps({'meal': meal_data}),
+                    content_type='application/json'
+                )
+                
+                if response.status_code == 200:
+                    heni_result = response.json()
+                    if heni_result.get('success'):
+                        comprehensive_result = heni_result.get('data', {})
+                        heni_scores = comprehensive_result.get('heni_scores', {})
+                        scores['heni_score'] = heni_scores.get('total_heni_score')  # For minutes calculation
+                        scores['heni_total_score'] = heni_scores.get('heni_per_100_kcal')  # For μDALY/100kcal display
+                    else:
+                        logger.warning(f"HENI API returned error: {heni_result}")
+                else:
+                    logger.warning(f"HENI API call failed with status {response.status_code}")
             except Exception as e:
                 logger.error(f"HENI calculation error: {e}")
             
-            # Calculate HSR (Health Star Rating)
+            # Calculate HSR (Health Star Rating) using consolidated logic
             try:
-                calculator = HSRCalculator(HSRConfig())
-                
-                # Create HSR foods from food items
-                hsr_foods = []
+                # Build HSR foods using CNF pipeline-backed data (per hsr_views_consolidated)
+                hsr_foods: List[HSRFood] = []
                 for item in food_items:
-                    food_id = item['food_id']
-                    quantity_g = self._convert_to_grams(item['quantity'], item['unit'])
-                    food_row = self.food_df[self.food_df['FoodID'] == food_id].iloc[0]
-                    
-                    hsr_food = HSRFood(
-                        food_id=food_id,
-                        name=food_row['FoodDescription'],
-                        quantity_grams=quantity_g
+                    food_id = int(item['food_id'])
+                    serving_size = float(self._convert_to_grams(item['quantity'], item['unit']))
+                    hsr_foods.append(self._build_hsr_food(food_id, serving_size))
+
+                # Determine HSR category from the primary food
+                primary_food = hsr_foods[0] if hsr_foods else None
+                if primary_food:
+                    meal_category = ThresholdProvider.get_category_from_food(
+                        primary_food.food_name,
+                        getattr(primary_food, 'food_group_id', 0)
                     )
-                    hsr_foods.append(hsr_food)
-                
-                hsr_meal = HSRMeal(hsr_foods)
-                hsr_result = calculator.calculate_meal_hsr(hsr_meal)
-                scores['hsr_score'] = hsr_result.overall_hsr_rating if hsr_result else None
+                else:
+                    meal_category = Category.FOOD
+
+                # Create meal and calculator with standard config
+                meal = HSRMeal(foods=hsr_foods)
+                meal.category = meal_category
+                config = HSRConfig(
+                    use_scientific_thresholds=False,
+                    differentiate_sugar_sources=False,
+                    apply_satiety_adjustments=False,
+                    use_unified_energy_approach=False,
+                    consider_processing_level=False,
+                    include_confidence_metrics=True,
+                    detailed_explanations=False
+                )
+                calculator = HSRCalculator(meal, config)
+                result = calculator.calculate_hsr()
+                scores['hsr_score'] = result.star_rating if result else None
             except Exception as e:
                 logger.error(f"HSR calculation error: {e}")
                 
@@ -223,27 +295,22 @@ class MealCalculationService:
             return {
                 'environmental_impacts': {},
                 'sustainability_score': 50,
-                'sustainability_rating': 'Unknown'
+                'sustainability_rating': 'Unknown',
+                'environmental_cost_total_cad': 0.0,
+                'environmental_cost_per_100g_cad': 0.0,
+                'environmental_cost_per_calorie_cad': 0.0
             }
         
         try:
             # Create environmental foods
             env_foods = []
+            data_loader = EnvDataLoader()
             for item in food_items:
                 food_id = item['food_id']
                 quantity_g = self._convert_to_grams(item['quantity'], item['unit'])
                 
-                # Get food info
-                food_row = self.food_df[self.food_df['FoodID'] == food_id].iloc[0]
-                food_name = food_row['FoodDescription']
-                
                 # Create environmental food object
-                env_food = EnvironmentalFood(
-                    food_id=food_id,
-                    food_name=food_name,
-                    quantity=quantity_g,
-                    food_group=food_row.get('food_category', 'other')
-                )
+                env_food = EnvironmentalFood(food_id=food_id, quantity=quantity_g, data_loader=data_loader)
                 env_foods.append(env_food)
             
             # Create environmental meal
@@ -252,11 +319,27 @@ class MealCalculationService:
             # Calculate impacts
             environmental_impact = env_meal.calculate_environmental_impact()
             sustainability_score = env_meal.get_sustainability_score()
-            
+
+            # Monetize environmental impacts (environmental cost)
+            try:
+                data_loader = EnvDataLoader()
+                monetization = Monetization(environmental_impact, data_loader)
+                total_cost = monetization.get_total_monetized_impact()
+                cost_per_100g = monetization.calculate_cost_per_100g(env_meal.get_total_weight())
+                cost_per_calorie = monetization.calculate_cost_per_calorie(env_meal.calculate_total_calories())
+            except Exception as e:
+                logger.error(f"Monetization error: {e}")
+                total_cost = 0.0
+                cost_per_100g = 0.0
+                cost_per_calorie = 0.0
+
             return {
                 'environmental_impacts': environmental_impact,
                 'sustainability_score': sustainability_score.get('overall_sustainability_score', 50) if isinstance(sustainability_score, dict) else 50,
-                'sustainability_rating': sustainability_score.get('sustainability_rating', 'Unknown') if isinstance(sustainability_score, dict) else 'Unknown'
+                'sustainability_rating': sustainability_score.get('sustainability_rating', 'Unknown') if isinstance(sustainability_score, dict) else 'Unknown',
+                'environmental_cost_total_cad': total_cost,
+                'environmental_cost_per_100g_cad': cost_per_100g,
+                'environmental_cost_per_calorie_cad': cost_per_calorie
             }
             
         except Exception as e:
@@ -264,7 +347,10 @@ class MealCalculationService:
             return {
                 'environmental_impacts': {},
                 'sustainability_score': 50,
-                'sustainability_rating': 'Unknown'
+                'sustainability_rating': 'Unknown',
+                'environmental_cost_total_cad': 0.0,
+                'environmental_cost_per_100g_cad': 0.0,
+                'environmental_cost_per_calorie_cad': 0.0
             }
     
     def calculate_all_scores(self, food_items: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -330,6 +416,36 @@ class MealCalculationService:
         
         factor = conversion_factors.get(unit, 1)
         return quantity * factor
+
+    def _get_cnf_pipeline(self) -> CNFDataPipeline:
+        """Get or initialize the CNF data pipeline (singleton within this service)."""
+        if self._cnf_pipeline is None:
+            self._cnf_pipeline = CNFDataPipeline(settings.CNF_FOLDER)
+        return self._cnf_pipeline
+
+    def _build_hsr_food(self, food_id: int, serving_size: float) -> 'HSRFood':
+        """Construct an HSRFood using CNF data (aligns with hsr_views_consolidated logic)."""
+        food_details = self._get_cnf_pipeline().get_food_details(food_id)
+        if not food_details:
+            raise ValidationError(f"Food with ID {food_id} not found in CNF database")
+
+        # Extract nutrients
+        nutrients: Dict[str, float] = {}
+        for nutrient in food_details.get('NutrientValues', []):
+            nutrients[nutrient['NutrientName']] = nutrient['NutrientValue']
+
+        # FVNL percent and food group
+        fvnl_percent = calculate_fvnl_content(food_id)
+        food_group_id = food_details['FoodGroupID']
+
+        return HSRFood(
+            food_id=food_id,
+            food_name=food_details['FoodDescription'],
+            serving_size=serving_size,
+            nutrients=nutrients,
+            fvnl_percent=fvnl_percent,
+            food_group_id=food_group_id
+        )
     
     def _prepare_meal_data_for_calculators(self, food_items: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Prepare meal data in the format expected by your existing calculators"""

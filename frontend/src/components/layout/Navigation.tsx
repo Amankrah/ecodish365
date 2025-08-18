@@ -101,7 +101,7 @@ const navigation: NavItem[] = [
     dropdown: [
       { name: 'Create Meal', href: '/meals/create' },
       { name: 'My Meals', href: '/meals/my-meals' },
-      { name: 'Saved Meals', href: '/meals/saved' },
+      { name: 'Saved Meals', href: '/meals/saved-meals' },
       { name: 'Discover Meals', href: '/meals' },
     ]
   },
