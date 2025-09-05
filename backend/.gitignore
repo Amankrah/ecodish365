@@ -19,7 +19,16 @@ db.sqlite3
 media/
 staticfiles/
 
-.pem
+# Security files
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+.env
+.env.local
+.env.production
+.env.development
 
 # Ignore Django migration files in apps (keep package file)
 **/migrations/*
