@@ -11,7 +11,7 @@ export default function LoginForm() {
   const { login } = useAuth();
   const router = useRouter();
   const [formData, setFormData] = useState({
-    email: '',
+    username_or_email: '',
     password: '',
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -74,11 +74,11 @@ export default function LoginForm() {
             </label>
             <input
               id="email"
-              name="email"
+              name="username_or_email"
               type="email"
               autoComplete="email"
               required
-              value={formData.email}
+              value={formData.username_or_email}
               onChange={handleChange}
               className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
               placeholder="Email address"
