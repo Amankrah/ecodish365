@@ -1847,7 +1847,7 @@ export interface UserRegistration {
 }
 
 export interface LoginCredentials {
-  email: string;
+  username_or_email: string;
   password: string;
 }
 
@@ -1863,6 +1863,23 @@ export interface MealCategory {
   description: string;
   icon: string;
   color: string;
+}
+
+export interface MealMedia {
+  id: string;
+  media_type: 'image' | 'video';
+  file: string;
+  thumbnail?: string;
+  caption: string;
+  order: number;
+  is_primary: boolean;
+  file_size?: number;
+  file_size_mb?: number;
+  duration?: number;
+  width?: number;
+  height?: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface FoodItem {
@@ -1898,7 +1915,10 @@ export interface Meal {
   difficulty_level: 'easy' | 'medium' | 'hard';
   instructions: string;
   tips: string;
-  image?: string;
+  image?: string; // Legacy field for backward compatibility
+  media_files?: MealMedia[]; // New media files
+  primary_media?: MealMedia; // Primary media file
+  media_count?: number; // Total number of media files
   likes_count: number;
   saves_count: number;
   views_count: number;
@@ -1926,7 +1946,9 @@ export interface MealCreateRequest {
   difficulty_level: string;
   instructions: string;
   tips?: string;
-  image?: File;
+  image?: File; // Legacy field for backward compatibility
+  media_files?: File[]; // New media files
+  media_captions?: string[]; // Captions for media files
   tags: string[];
 }
 
@@ -2042,6 +2064,14 @@ export class MealApiService {
     Object.entries(mealData).forEach(([key, value]) => {
       if (key === 'image' && value instanceof File) {
         formData.append(key, value);
+      } else if (key === 'media_files' && Array.isArray(value)) {
+        // Add media files
+        (value as File[]).forEach(file => {
+          formData.append('media_files', file);
+        });
+      } else if (key === 'media_captions' && Array.isArray(value)) {
+        // Add media captions as JSON string
+        formData.append('media_captions', JSON.stringify(value));
       } else if (key === 'food_items' || key === 'tags') {
         formData.append(key, JSON.stringify(value));
       } else if (value !== undefined && value !== null) {
@@ -2056,8 +2086,36 @@ export class MealApiService {
   }
 
   static async updateMeal(id: string, mealData: Partial<MealCreateRequest>): Promise<Meal> {
-    const response = await api.patch(`/meals/meals/${id}/`, mealData);
-    return response.data;
+    // If media files are included, use FormData
+    if (mealData.media_files && mealData.media_files.length > 0) {
+      const formData = new FormData();
+      
+      // Add all non-file fields
+      Object.entries(mealData).forEach(([key, value]) => {
+        if (key === 'media_files' && Array.isArray(value)) {
+          // Add media files
+          (value as File[]).forEach(file => {
+            formData.append('media_files', file);
+          });
+        } else if (key === 'media_captions' && Array.isArray(value)) {
+          // Add media captions
+          formData.append('media_captions', JSON.stringify(value));
+        } else if (key === 'food_items' || key === 'tags') {
+          formData.append(key, JSON.stringify(value));
+        } else if (value !== undefined && value !== null) {
+          formData.append(key, String(value));
+        }
+      });
+
+      const response = await api.patch(`/meals/meals/${id}/`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      return response.data;
+    } else {
+      // Regular JSON update for non-media updates
+      const response = await api.patch(`/meals/meals/${id}/`, mealData);
+      return response.data;
+    }
   }
 
   static async deleteMeal(id: string): Promise<void> {
@@ -2137,6 +2195,43 @@ export class MealApiService {
 
   static async recalculateMealMetrics(mealId: string): Promise<{ message: string; meal: Meal }> {
     const response = await api.post(`/meals/meals/${mealId}/recalculate/`);
+    return response.data;
+  }
+
+  // Media management
+  static async getMealMedia(mealId: string): Promise<MealMedia[]> {
+    const response = await api.get(`/meals/media/`, { params: { meal_id: mealId } });
+    return response.data;
+  }
+
+  static async uploadMealMedia(mealId: string, mediaData: {
+    file: File;
+    caption?: string;
+    order?: number;
+  }): Promise<MealMedia> {
+    const formData = new FormData();
+    formData.append('file', mediaData.file);
+    if (mediaData.caption) formData.append('caption', mediaData.caption);
+    if (mediaData.order !== undefined) formData.append('order', mediaData.order.toString());
+    formData.append('meal', mealId);
+
+    const response = await api.post(`/meals/media/`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+  }
+
+  static async updateMealMedia(mediaId: string, updates: Partial<MealMedia>): Promise<MealMedia> {
+    const response = await api.patch(`/meals/media/${mediaId}/`, updates);
+    return response.data;
+  }
+
+  static async deleteMealMedia(mediaId: string): Promise<void> {
+    await api.delete(`/meals/media/${mediaId}/`);
+  }
+
+  static async setPrimaryMedia(mediaId: string): Promise<{ message: string }> {
+    const response = await api.post(`/meals/media/${mediaId}/set_primary/`);
     return response.data;
   }
 }

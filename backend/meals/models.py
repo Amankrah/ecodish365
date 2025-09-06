@@ -142,6 +142,22 @@ class Meal(models.Model):
         if health is not None and sustainability is not None:
             return (health + sustainability) / 2
         return health or sustainability or 50  # Default neutral score
+    
+    def get_primary_media(self):
+        """Get the primary media file for this meal"""
+        return self.media_files.filter(is_primary=True).first()
+    
+    def get_all_media(self):
+        """Get all media files ordered by order and creation date"""
+        return self.media_files.all()
+    
+    def get_images(self):
+        """Get all image files for this meal"""
+        return self.media_files.filter(media_type='image')
+    
+    def get_videos(self):
+        """Get all video files for this meal"""
+        return self.media_files.filter(media_type='video')
 
 
 class MealLike(models.Model):
@@ -251,3 +267,54 @@ class MealCollectionItem(models.Model):
     class Meta:
         db_table = 'meals_collection_item'
         ordering = ['order']
+
+
+class MealMedia(models.Model):
+    """Media files (images/videos) associated with meals"""
+    MEDIA_TYPE_CHOICES = [
+        ('image', 'Image'),
+        ('video', 'Video'),
+    ]
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    meal = models.ForeignKey(Meal, on_delete=models.CASCADE, related_name='media_files')
+    media_type = models.CharField(max_length=10, choices=MEDIA_TYPE_CHOICES)
+    file = models.FileField(upload_to='meal_media/')
+    thumbnail = models.ImageField(upload_to='meal_media/thumbnails/', null=True, blank=True)
+    caption = models.TextField(blank=True)
+    order = models.PositiveIntegerField(default=0)  # For ordering multiple media files
+    is_primary = models.BooleanField(default=False)  # Primary image/video for the meal
+    
+    # File metadata
+    file_size = models.PositiveIntegerField(null=True, blank=True)  # Size in bytes
+    duration = models.FloatField(null=True, blank=True)  # For videos, duration in seconds
+    width = models.PositiveIntegerField(null=True, blank=True)
+    height = models.PositiveIntegerField(null=True, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'meals_media'
+        ordering = ['order', 'created_at']
+        indexes = [
+            models.Index(fields=['meal', 'order']),
+            models.Index(fields=['meal', 'is_primary']),
+        ]
+    
+    def __str__(self):
+        return f"{self.meal.name} - {self.media_type} ({self.order})"
+    
+    def get_file_extension(self):
+        """Get file extension from the file name"""
+        if self.file:
+            return self.file.name.split('.')[-1].lower()
+        return None
+    
+    def is_image(self):
+        """Check if this is an image file"""
+        return self.media_type == 'image'
+    
+    def is_video(self):
+        """Check if this is a video file"""
+        return self.media_type == 'video'

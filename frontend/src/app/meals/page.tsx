@@ -51,7 +51,8 @@ export default function MealsPage() {
       if (filters.tags.length > 0) params.tags = filters.tags.join(',');
 
       const data = await MealApiService.getMeals(params);
-      setMeals(data.results || data);
+      const mealsWithMedia = Array.isArray(data.results) ? data.results : (Array.isArray(data) ? data : []);
+      setMeals(mealsWithMedia);
     } catch (error) {
       console.error('Failed to load meals:', error);
     } finally {
@@ -92,7 +93,7 @@ export default function MealsPage() {
                 Discover Meals
               </h1>
               <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                Explore healthy, sustainable meals created by our community
+                Explore healthy, sustainable meals with photos, videos, and comprehensive nutrition analysis
               </p>
             </div>
             <div className="mt-4 flex md:mt-0 md:ml-4">
@@ -221,6 +222,10 @@ export default function MealsPage() {
                     />
                     <span className="ml-2 text-sm text-gray-700">Featured meals only</span>
                   </label>
+                  
+                  <div className="text-sm text-gray-500">
+                    📸 Meals with photos and videos are highlighted with media indicators
+                  </div>
 
                   <button
                     onClick={clearFilters}

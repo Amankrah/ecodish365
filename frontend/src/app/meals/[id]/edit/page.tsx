@@ -1,12 +1,15 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { 
   MagnifyingGlassIcon, 
   PlusIcon, 
   XMarkIcon,
-  InformationCircleIcon
+  InformationCircleIcon,
+  PhotoIcon,
+  VideoCameraIcon,
+  TrashIcon
 } from '@heroicons/react/24/outline';
 import { CNFApiService, MealApiService, MealCategory, FoodItem, MealCreateRequest, Meal } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
@@ -16,6 +19,15 @@ interface SearchResult {
   FoodID: number;
   FoodDescription: string;
   relevance: number;
+}
+
+interface MediaFile {
+  id: string;
+  file: File;
+  type: 'image' | 'video';
+  preview: string;
+  caption: string;
+  isPrimary: boolean;
 }
 
 export default function EditMealPage() {
@@ -47,6 +59,11 @@ export default function EditMealPage() {
   
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
   const [categories, setCategories] = useState<MealCategory[]>([]);
+
+  // Media upload state
+  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
+  const [uploadingMedia, setUploadingMedia] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Food search state
   const [foodSearchQuery, setFoodSearchQuery] = useState('');
@@ -173,6 +190,66 @@ export default function EditMealPage() {
     });
   };
 
+  // Media handling functions
+  const handleMediaUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files) return;
+
+    Array.from(files).forEach(file => {
+      const isImage = file.type.startsWith('image/');
+      const isVideo = file.type.startsWith('video/');
+      
+      if (!isImage && !isVideo) {
+        setError('Please upload only image or video files.');
+        return;
+      }
+
+      const mediaFile: MediaFile = {
+        id: Math.random().toString(36).substr(2, 9),
+        file,
+        type: isImage ? 'image' : 'video',
+        preview: URL.createObjectURL(file),
+        caption: '',
+        isPrimary: mediaFiles.length === 0 // First file is primary by default
+      };
+
+      setMediaFiles(prev => [...prev, mediaFile]);
+    });
+
+    // Reset the input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const removeMediaFile = (id: string) => {
+    setMediaFiles(prev => {
+      const updated = prev.filter(file => file.id !== id);
+      // If we removed the primary file, make the first remaining file primary
+      if (updated.length > 0 && !updated.some(file => file.isPrimary)) {
+        updated[0].isPrimary = true;
+      }
+      return updated;
+    });
+  };
+
+  const setPrimaryMedia = (id: string) => {
+    setMediaFiles(prev => 
+      prev.map(file => ({
+        ...file,
+        isPrimary: file.id === id
+      }))
+    );
+  };
+
+  const updateMediaCaption = (id: string, caption: string) => {
+    setMediaFiles(prev =>
+      prev.map(file =>
+        file.id === id ? { ...file, caption } : file
+      )
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -190,15 +267,33 @@ export default function EditMealPage() {
         food_items: foodItems
       };
       
+      // Only include media if we have new files to upload
+      if (mediaFiles.length > 0) {
+        mealData.media_files = mediaFiles.map(mf => mf.file);
+        mealData.media_captions = mediaFiles.map(mf => mf.caption);
+      }
+      
       await MealApiService.updateMeal(mealId, mealData);
       router.push(`/meals/${mealId}`);
     } catch (err: unknown) {
       let message = 'Failed to update meal. Please try again.';
       if (isAxiosError(err)) {
+        console.error('Update meal error:', err.response?.data);
         const data = err.response?.data as unknown;
-        if (data && typeof data === 'object' && 'message' in data) {
-          const maybeMsg = (data as { message?: unknown }).message;
-          if (typeof maybeMsg === 'string') message = maybeMsg;
+        if (data && typeof data === 'object') {
+          if ('message' in data) {
+            const maybeMsg = (data as { message?: unknown }).message;
+            if (typeof maybeMsg === 'string') message = maybeMsg;
+          } else if ('error' in data) {
+            const maybeError = (data as { error?: unknown }).error;
+            if (typeof maybeError === 'string') message = maybeError;
+          } else if ('detail' in data) {
+            const maybeDetail = (data as { detail?: unknown }).detail;
+            if (typeof maybeDetail === 'string') message = maybeDetail;
+          } else {
+            // Try to extract any validation errors
+            message = `Update failed: ${JSON.stringify(data)}`;
+          }
         }
       }
       setError(message);
@@ -483,6 +578,104 @@ export default function EditMealPage() {
               </div>
             </div>
           )}
+
+          {/* Media Upload */}
+          <div className="card">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">Photos & Videos</h2>
+                <p className="text-sm text-gray-600 mt-1">📸 Upload images and videos to showcase your meal</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
+              >
+                <PhotoIcon className="w-4 h-4 mr-2" />
+                Add Media
+              </button>
+            </div>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              accept="image/*,video/*"
+              onChange={handleMediaUpload}
+              className="hidden"
+            />
+
+            {mediaFiles.length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                <PhotoIcon className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>No media files added yet. Click "Add Media" to upload photos or videos of your meal.</p>
+              </div>
+            )}
+
+            {/* Media Files Grid */}
+            {mediaFiles.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {mediaFiles.map((mediaFile) => (
+                  <div key={mediaFile.id} className="relative border border-gray-200 rounded-lg overflow-hidden">
+                    {/* Media Preview */}
+                    <div className="relative h-48 bg-gray-100">
+                      {mediaFile.type === 'image' ? (
+                        <img
+                          src={mediaFile.preview}
+                          alt="Meal preview"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <video
+                          src={mediaFile.preview}
+                          className="w-full h-full object-cover"
+                          controls
+                        />
+                      )}
+                      
+                      {/* Primary Badge */}
+                      {mediaFile.isPrimary && (
+                        <div className="absolute top-2 left-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded-full">
+                          Primary
+                        </div>
+                      )}
+                      
+                      {/* Remove Button */}
+                      <button
+                        type="button"
+                        onClick={() => removeMediaFile(mediaFile.id)}
+                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                      >
+                        <TrashIcon className="w-4 h-4" />
+                      </button>
+                      
+                      {/* Set Primary Button */}
+                      {!mediaFile.isPrimary && (
+                        <button
+                          type="button"
+                          onClick={() => setPrimaryMedia(mediaFile.id)}
+                          className="absolute bottom-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full hover:bg-blue-600"
+                        >
+                          Set Primary
+                        </button>
+                      )}
+                    </div>
+                    
+                    {/* Caption Input */}
+                    <div className="p-3">
+                      <input
+                        type="text"
+                        value={mediaFile.caption}
+                        onChange={(e) => updateMediaCaption(mediaFile.id, e.target.value)}
+                        placeholder="Add a caption..."
+                        className="w-full text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Recipe Details */}
           <div className="card">

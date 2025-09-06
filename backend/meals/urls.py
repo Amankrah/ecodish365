@@ -2,13 +2,14 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
     MealCategoryViewSet, MealViewSet, MealCollectionViewSet, MealRecommendationView,
-    MealCommentViewSet, MealRatingViewSet
+    MealCommentViewSet, MealRatingViewSet, MealMediaViewSet
 )
 
 router = DefaultRouter()
 router.register(r'categories', MealCategoryViewSet, basename='mealcategory')
 router.register(r'meals', MealViewSet, basename='meal')
 router.register(r'collections', MealCollectionViewSet, basename='mealcollection')
+router.register(r'media', MealMediaViewSet, basename='mealmedia')
 
 app_name = 'meals'
 

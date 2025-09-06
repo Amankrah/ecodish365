@@ -14,7 +14,7 @@ function LoginContent() {
   const redirect = searchParams.get('redirect') || '/meals';
 
   const [formData, setFormData] = useState({
-    email: '',
+    username_or_email: '',
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -27,7 +27,7 @@ function LoginContent() {
     setError('');
 
     try {
-      await login({ email: formData.email, password: formData.password });
+      await login({ username_or_email: formData.username_or_email, password: formData.password });
       router.push(redirect);
     } catch (err: unknown) {
       let message = 'Login failed. Please check your credentials.';
@@ -70,19 +70,19 @@ function LoginContent() {
 
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
+              <label htmlFor="username_or_email" className="block text-sm font-medium text-gray-700">
+                Username or Email
               </label>
               <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
+                id="username_or_email"
+                name="username_or_email"
+                type="text"
+                autoComplete="username"
                 required
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                value={formData.username_or_email}
+                onChange={(e) => setFormData({ ...formData, username_or_email: e.target.value })}
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
-                placeholder="Enter your email"
+                placeholder="Enter your username or email"
               />
             </div>
 

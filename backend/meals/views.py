@@ -8,12 +8,12 @@ import django_filters
 
 from .models import (
     MealCategory, Meal, MealLike, MealSave, MealComment,
-    MealRating, MealCollection, MealCollectionItem
+    MealRating, MealCollection, MealCollectionItem, MealMedia
 )
 from .serializers import (
     MealCategorySerializer, MealListSerializer, MealDetailSerializer,
     MealCreateUpdateSerializer, MealCommentSerializer, MealRatingSerializer,
-    MealCollectionSerializer, MealLikeSerializer, MealSaveSerializer
+    MealCollectionSerializer, MealLikeSerializer, MealSaveSerializer, MealMediaSerializer
 )
 from .services import MealRecommendationService
 
@@ -74,7 +74,7 @@ class MealViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
     
     def get_queryset(self):
-        queryset = Meal.objects.all()
+        queryset = Meal.objects.select_related('creator', 'category').prefetch_related('media_files', 'likes', 'saves', 'comments', 'ratings')
         
         # Filter public meals for anonymous users
         if not self.request.user.is_authenticated:
@@ -297,7 +297,7 @@ class MealViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated], url_path=r'my[-_]meals')
     def my_meals(self, request):
         """Get current user's meals"""
-        meals = self.queryset.filter(creator=request.user)
+        meals = self.get_queryset().filter(creator=request.user)
         # Optional ordering (e.g., -created_at, -likes_count)
         ordering = request.query_params.get('ordering')
         if ordering:
@@ -315,7 +315,7 @@ class MealViewSet(viewsets.ModelViewSet):
     def saved_meals(self, request):
         """Get user's saved meals"""
         saved = MealSave.objects.filter(user=request.user).values_list('meal', flat=True)
-        meals = self.queryset.filter(id__in=saved)
+        meals = self.get_queryset().filter(id__in=saved)
         # Optional ordering (e.g., -created_at, -likes_count, -saves_count)
         ordering = request.query_params.get('ordering')
         if ordering:
@@ -440,3 +440,69 @@ class MealRecommendationView(generics.ListAPIView):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+
+class MealMediaViewSet(viewsets.ModelViewSet):
+    """ViewSet for meal media files"""
+    serializer_class = MealMediaSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        meal_id = self.kwargs.get('meal_pk') or self.request.query_params.get('meal_id')
+        if meal_id:
+            return MealMedia.objects.filter(meal_id=meal_id)
+        return MealMedia.objects.none()
+    
+    def perform_create(self, serializer):
+        meal_id = self.kwargs.get('meal_pk') or self.request.data.get('meal')
+        meal = get_object_or_404(Meal, pk=meal_id)
+        
+        # Check if user can add media to this meal
+        if meal.creator != self.request.user:
+            raise PermissionError("Only meal creator can add media")
+        
+        # If this is the first media file, make it primary
+        is_primary = not meal.media_files.exists()
+        
+        serializer.save(meal=meal, is_primary=is_primary)
+    
+    def perform_update(self, serializer):
+        # Check if user can update this media
+        if serializer.instance.meal.creator != self.request.user:
+            raise PermissionError("Only meal creator can update media")
+        serializer.save()
+    
+    def perform_destroy(self, instance):
+        # Check if user can delete this media
+        if instance.meal.creator != self.request.user:
+            raise PermissionError("Only meal creator can delete media")
+        
+        # If deleting primary media, make another media primary
+        meal = instance.meal
+        was_primary = instance.is_primary
+        instance.delete()
+        
+        if was_primary:
+            next_media = meal.media_files.first()
+            if next_media:
+                next_media.is_primary = True
+                next_media.save()
+    
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def set_primary(self, request, pk=None, meal_pk=None):
+        """Set this media file as primary"""
+        media = self.get_object()
+        
+        # Check permissions
+        if media.meal.creator != request.user:
+            return Response(
+                {'error': 'Only meal creator can set primary media'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Unset current primary and set this one as primary
+        MealMedia.objects.filter(meal=media.meal, is_primary=True).update(is_primary=False)
+        media.is_primary = True
+        media.save()
+        
+        return Response({'message': 'Primary media updated'}, status=status.HTTP_200_OK)

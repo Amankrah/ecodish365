@@ -234,13 +234,22 @@ class MealCalculationService:
                 
                 if response.status_code == 200:
                     heni_result = response.json()
-                    if heni_result.get('success'):
-                        comprehensive_result = heni_result.get('data', {})
-                        heni_scores = comprehensive_result.get('heni_scores', {})
+                    # Check for the nested data structure from HENI API
+                    if heni_result.get('data', {}).get('success'):
+                        heni_data = heni_result.get('data', {}).get('data', {})
+                        heni_scores = heni_data.get('heni_scores', {})
                         scores['heni_score'] = heni_scores.get('total_heni_score')  # For minutes calculation
                         scores['heni_total_score'] = heni_scores.get('heni_per_100_kcal')  # For μDALY/100kcal display
+                        logger.info(f"HENI calculation successful: {heni_scores.get('total_heni_score')} μDALY, {heni_scores.get('heni_per_100_kcal')} per 100kcal")
+                    elif heni_result.get('success'):
+                        # Handle direct success format
+                        comprehensive_result = heni_result.get('data', {})
+                        heni_scores = comprehensive_result.get('heni_scores', {})
+                        scores['heni_score'] = heni_scores.get('total_heni_score')
+                        scores['heni_total_score'] = heni_scores.get('heni_per_100_kcal')
+                        logger.info(f"HENI calculation successful: {heni_scores.get('total_heni_score')} μDALY")
                     else:
-                        logger.warning(f"HENI API returned error: {heni_result}")
+                        logger.warning(f"HENI API returned unsuccessful response: {heni_result}")
                 else:
                     logger.warning(f"HENI API call failed with status {response.status_code}")
             except Exception as e:
@@ -289,7 +298,7 @@ class MealCalculationService:
         return scores
     
     def calculate_environmental_impact(self, food_items: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Calculate environmental impact using existing environmental model"""
+        """Calculate environmental impact using the same comprehensive analysis as the environmental API"""
         if not CALCULATORS_AVAILABLE:
             logger.warning("Environmental calculators not available, returning default values")
             return {
@@ -298,11 +307,146 @@ class MealCalculationService:
                 'sustainability_rating': 'Unknown',
                 'environmental_cost_total_cad': 0.0,
                 'environmental_cost_per_100g_cad': 0.0,
-                'environmental_cost_per_calorie_cad': 0.0
+                'environmental_cost_per_calorie_cad': 0.0,
+                'carbon_footprint': 0.0,
+                'water_use': 0.0,
+                'land_use': 0.0
             }
         
         try:
-            # Create environmental foods
+            # Use the same environmental analysis as the standalone API
+            from django.test import RequestFactory
+            from api.views.environmental_views import environmental_impact as env_impact_view
+            import json
+            
+            # Prepare food data in the format expected by the environmental API
+            foods_data = []
+            for item in food_items:
+                foods_data.append({
+                    'food_id': int(item['food_id']),
+                    'quantity': float(self._convert_to_grams(item['quantity'], item['unit']))
+                })
+            
+            # Create a mock request to call the environmental view directly
+            factory = RequestFactory()
+            request = factory.post(
+                '/api/environmental-impact/',
+                data=json.dumps({
+                    'foods': foods_data,
+                    'user_type': 'individual'  # Use individual explanations for meal context
+                }),
+                content_type='application/json'
+            )
+            request.data = {
+                'foods': foods_data,
+                'user_type': 'individual'
+            }
+            
+            # Call the environmental view directly
+            response = env_impact_view(request)
+            
+            if response.status_code == 200:
+                env_result = response.data if hasattr(response, 'data') else response.json()
+                logger.info(f"Environmental API response keys: {list(env_result.keys())}")
+                logger.info(f"Full environmental API response structure: {env_result}")
+                
+                env_data = env_result.get('data', {})
+                logger.info(f"Environmental data keys: {list(env_data.keys()) if env_data else 'None'}")
+                
+                # The response has nested 'data' structure: {data: {data: {...}}}
+                inner_data = env_data.get('data', {}) if env_data else {}
+                logger.info(f"Inner data keys: {list(inner_data.keys()) if inner_data else 'None'}")
+                
+                # Extract the key metrics from the comprehensive analysis
+                monetization_data = inner_data.get('monetization', {})
+                monetization_results = monetization_data.get('results', {}) if monetization_data else {}
+                
+                environmental_impacts_data = inner_data.get('environmental_impacts', {})
+                key_impacts = environmental_impacts_data.get('key_impacts', {}) if environmental_impacts_data else {}
+                
+                sustainability = inner_data.get('sustainability', {})
+                
+                # Get carbon footprint with fallback
+                carbon_footprint = 0.0
+                if key_impacts.get('carbon_footprint'):
+                    carbon_footprint = key_impacts['carbon_footprint'].get('value', 0.0)
+                
+                # Get water use with fallback
+                water_use = 0.0
+                if key_impacts.get('water_consumption'):
+                    water_use = key_impacts['water_consumption'].get('value', 0.0)
+                
+                # Get land use with fallback
+                land_use = 0.0
+                if key_impacts.get('land_use'):
+                    land_use = key_impacts['land_use'].get('value', 0.0)
+                
+                # Get environmental cost
+                env_cost = 0.0
+                if monetization_results.get('total_environmental_cost'):
+                    env_cost = monetization_results['total_environmental_cost'].get('value', 0.0)
+                
+                logger.info(f"Environmental extraction - Carbon: {carbon_footprint}, Water: {water_use}, Land: {land_use}, Cost: {env_cost}")
+                logger.info(f"Monetization results keys: {list(monetization_results.keys()) if monetization_results else 'None'}")
+                logger.info(f"Key impacts keys: {list(key_impacts.keys()) if key_impacts else 'None'}")
+                
+                # Get all environmental impacts from comprehensive analysis
+                all_impacts = environmental_impacts_data.get('all_impacts', {}) if environmental_impacts_data else {}
+                
+                # Build environmental impacts with proper keys for the serializer
+                environmental_impacts = {}
+                if isinstance(all_impacts, dict):
+                    environmental_impacts.update(all_impacts)
+                
+                # Add monetized costs to environmental impacts (include even small values)
+                environmental_impacts['_monetized_total_cad'] = env_cost
+                
+                # Get cost per calorie
+                env_cost_per_calorie = 0.0
+                if monetization_results.get('cost_per_calorie'):
+                    env_cost_per_calorie = monetization_results['cost_per_calorie'].get('value', 0.0)
+                environmental_impacts['_monetized_per_calorie_cad'] = env_cost_per_calorie
+                
+                # Add specific impact values for easy access (include all values, even small ones)
+                environmental_impacts['Global warming'] = carbon_footprint
+                environmental_impacts['Water consumption'] = water_use
+                environmental_impacts['Water use'] = water_use  # Frontend compatibility
+                environmental_impacts['Land use'] = land_use
+
+                return {
+                    'environmental_impacts': environmental_impacts,
+                    'sustainability_score': sustainability.get('overall_sustainability_score', 50),
+                    'sustainability_rating': sustainability.get('sustainability_rating', 'Unknown'),
+                    'environmental_cost_total_cad': env_cost,
+                    'environmental_cost_per_100g_cad': 0.0,  # This would need total weight calculation
+                    'environmental_cost_per_calorie_cad': env_cost_per_calorie,
+                    'carbon_footprint': carbon_footprint,
+                    'water_use': water_use,
+                    'land_use': land_use,
+                    # Include additional comprehensive data for frontend
+                    'comprehensive_data': inner_data,
+                    'meal_info': env_result.get('meal_info', {})
+                }
+            else:
+                logger.warning(f"Environmental API call failed with status {response.status_code}")
+                try:
+                    error_response = response.data if hasattr(response, 'data') else response.json()
+                    logger.warning(f"Environmental API error response: {error_response}")
+                except:
+                    error_content = getattr(response, 'content', str(response))
+                    logger.warning(f"Environmental API error response (raw): {error_content}")
+                # Fallback to original calculation
+                return self._calculate_environmental_impact_fallback(food_items)
+                
+        except Exception as e:
+            logger.error(f"Error calling environmental API: {str(e)}")
+            # Fallback to original calculation
+            return self._calculate_environmental_impact_fallback(food_items)
+
+    def _calculate_environmental_impact_fallback(self, food_items: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Fallback environmental calculation if API call fails"""
+        try:
+            # Create environmental foods using the original method
             env_foods = []
             data_loader = EnvDataLoader()
             for item in food_items:
@@ -320,37 +464,46 @@ class MealCalculationService:
             environmental_impact = env_meal.calculate_environmental_impact()
             sustainability_score = env_meal.get_sustainability_score()
 
-            # Monetize environmental impacts (environmental cost)
+            # Monetize environmental impacts
             try:
-                data_loader = EnvDataLoader()
                 monetization = Monetization(environmental_impact, data_loader)
                 total_cost = monetization.get_total_monetized_impact()
-                cost_per_100g = monetization.calculate_cost_per_100g(env_meal.get_total_weight())
                 cost_per_calorie = monetization.calculate_cost_per_calorie(env_meal.calculate_total_calories())
             except Exception as e:
                 logger.error(f"Monetization error: {e}")
                 total_cost = 0.0
-                cost_per_100g = 0.0
                 cost_per_calorie = 0.0
 
+            carbon_fp = environmental_impact.get('Global warming', 0.0)
+            water_consumption = environmental_impact.get('Water consumption', 0.0)
+            land_consumption = environmental_impact.get('Land use', 0.0)
+            
+            logger.info(f"Fallback environmental calculation - Carbon: {carbon_fp}, Water: {water_consumption}, Land: {land_consumption}, Cost: {total_cost}")
+            
             return {
                 'environmental_impacts': environmental_impact,
                 'sustainability_score': sustainability_score.get('overall_sustainability_score', 50) if isinstance(sustainability_score, dict) else 50,
                 'sustainability_rating': sustainability_score.get('sustainability_rating', 'Unknown') if isinstance(sustainability_score, dict) else 'Unknown',
                 'environmental_cost_total_cad': total_cost,
-                'environmental_cost_per_100g_cad': cost_per_100g,
-                'environmental_cost_per_calorie_cad': cost_per_calorie
+                'environmental_cost_per_100g_cad': 0.0,
+                'environmental_cost_per_calorie_cad': cost_per_calorie,
+                'carbon_footprint': carbon_fp,
+                'water_use': water_consumption,
+                'land_use': land_consumption
             }
             
         except Exception as e:
-            logger.error(f"Error calculating environmental impact: {str(e)}")
+            logger.error(f"Error in fallback environmental calculation: {str(e)}")
             return {
                 'environmental_impacts': {},
                 'sustainability_score': 50,
                 'sustainability_rating': 'Unknown',
                 'environmental_cost_total_cad': 0.0,
                 'environmental_cost_per_100g_cad': 0.0,
-                'environmental_cost_per_calorie_cad': 0.0
+                'environmental_cost_per_calorie_cad': 0.0,
+                'carbon_footprint': 0.0,
+                'water_use': 0.0,
+                'land_use': 0.0
             }
     
     def calculate_all_scores(self, food_items: List[Dict[str, Any]]) -> Dict[str, Any]:

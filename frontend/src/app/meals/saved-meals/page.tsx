@@ -39,7 +39,7 @@ export default function SavedMealsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Saved Meals</h1>
-                <p className="mt-1 text-sm text-gray-600">Meals you have saved</p>
+                <p className="mt-1 text-sm text-gray-600">Meals you have saved with rich media and detailed nutrition insights</p>
               </div>
               <Link href="/meals" className="px-4 py-2 bg-gradient-primary text-white rounded-md">
                 Discover Meals
@@ -73,9 +73,9 @@ export default function SavedMealsPage() {
           ) : meals.length === 0 ? (
             <div className="text-center py-12">
               <h3 className="text-lg font-medium text-gray-900">No saved meals yet</h3>
-              <p className="mt-2 text-gray-500">Browse meals and save your favorites.</p>
+              <p className="mt-2 text-gray-500">Browse meals with photos and videos, then save your favorites for easy access.</p>
               <Link href="/meals" className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-primary hover:opacity-90">
-                Browse Meals
+                Discover Meals
               </Link>
             </div>
           ) : (

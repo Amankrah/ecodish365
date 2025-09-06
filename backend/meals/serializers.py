@@ -2,11 +2,50 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import (
     MealCategory, Meal, MealLike, MealSave, MealComment,
-    MealRating, MealCollection, MealCollectionItem
+    MealRating, MealCollection, MealCollectionItem, MealMedia
 )
 from .services import MealCalculationService
 
 User = get_user_model()
+
+
+class MealMediaSerializer(serializers.ModelSerializer):
+    """Serializer for meal media files"""
+    file_size_mb = serializers.SerializerMethodField()
+    file = serializers.SerializerMethodField()
+    thumbnail = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = MealMedia
+        fields = (
+            'id', 'media_type', 'file', 'thumbnail', 'caption', 'order',
+            'is_primary', 'file_size', 'file_size_mb', 'duration', 'width', 'height',
+            'created_at', 'updated_at'
+        )
+        read_only_fields = ('id', 'created_at', 'updated_at', 'file_size', 'width', 'height')
+    
+    def get_file_size_mb(self, obj):
+        if obj.file_size:
+            return round(obj.file_size / (1024 * 1024), 2)
+        return None
+    
+    def get_file(self, obj):
+        """Return the full URL for the media file"""
+        if obj.file:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.file.url)
+            return obj.file.url
+        return None
+    
+    def get_thumbnail(self, obj):
+        """Return the full URL for the thumbnail"""
+        if obj.thumbnail:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.thumbnail.url)
+            return obj.thumbnail.url
+        return None
 
 
 class MealCategorySerializer(serializers.ModelSerializer):
@@ -24,8 +63,11 @@ class MealListSerializer(serializers.ModelSerializer):
     saves_count = serializers.ReadOnlyField()
     comments_count = serializers.SerializerMethodField()
     average_rating = serializers.SerializerMethodField()
+    health_score_average = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
     is_saved = serializers.SerializerMethodField()
+    primary_media = serializers.SerializerMethodField()
+    media_count = serializers.SerializerMethodField()
     
     class Meta:
         model = Meal
@@ -33,8 +75,9 @@ class MealListSerializer(serializers.ModelSerializer):
             'id', 'name', 'description', 'creator', 'category', 'meal_type',
             'is_public', 'is_featured', 'total_calories', 'sustainability_score',
             'preparation_time', 'cooking_time', 'servings', 'difficulty_level',
-            'image', 'likes_count', 'saves_count', 'comments_count', 'views_count',
-            'average_rating', 'tags', 'created_at', 'is_liked', 'is_saved'
+            'image', 'primary_media', 'media_count', 'likes_count', 'saves_count', 
+            'comments_count', 'views_count', 'average_rating', 'health_score_average',
+            'tags', 'created_at', 'is_liked', 'is_saved'
         )
     
     def get_comments_count(self, obj):
@@ -60,6 +103,32 @@ class MealListSerializer(serializers.ModelSerializer):
     
     def get_creator(self, obj):
         return obj.creator.username
+    
+    def get_health_score_average(self, obj):
+        return obj.get_health_score_average()
+    
+    def get_primary_media(self, obj):
+        """Get the primary media file for this meal"""
+        # Try to get from prefetched media_files first
+        if hasattr(obj, '_prefetched_objects_cache') and 'media_files' in obj._prefetched_objects_cache:
+            for media in obj._prefetched_objects_cache['media_files']:
+                if media.is_primary:
+                    return MealMediaSerializer(media, context=self.context).data
+        else:
+            # Fallback to database query
+            primary = obj.media_files.filter(is_primary=True).first()
+            if primary:
+                return MealMediaSerializer(primary, context=self.context).data
+        return None
+    
+    def get_media_count(self, obj):
+        """Get the count of media files for this meal"""
+        # Try to get from prefetched media_files first
+        if hasattr(obj, '_prefetched_objects_cache') and 'media_files' in obj._prefetched_objects_cache:
+            return len(obj._prefetched_objects_cache['media_files'])
+        else:
+            # Fallback to database query
+            return obj.media_files.count()
 
 
 class MealDetailSerializer(serializers.ModelSerializer):
@@ -75,6 +144,9 @@ class MealDetailSerializer(serializers.ModelSerializer):
     health_score_average = serializers.SerializerMethodField()
     overall_rating = serializers.SerializerMethodField()
     food_items_with_details = serializers.SerializerMethodField()
+    primary_media = serializers.SerializerMethodField()
+    media_files = serializers.SerializerMethodField()
+    media_count = serializers.SerializerMethodField()
     
     class Meta:
         model = Meal
@@ -84,10 +156,10 @@ class MealDetailSerializer(serializers.ModelSerializer):
             'total_weight_grams', 'nutrient_profile', 'fcs_score', 'hefi_score',
             'hsr_score', 'heni_score', 'heni_total_score', 'environmental_impact', 'sustainability_score',
             'carbon_footprint', 'preparation_time', 'cooking_time', 'servings',
-            'difficulty_level', 'instructions', 'tips', 'image', 'likes_count',
-            'saves_count', 'comments_count', 'views_count', 'average_rating',
-            'tags', 'created_at', 'updated_at', 'is_liked', 'is_saved',
-            'health_score_average', 'overall_rating'
+            'difficulty_level', 'instructions', 'tips', 'image', 'primary_media', 
+            'media_files', 'media_count', 'likes_count', 'saves_count', 'comments_count', 
+            'views_count', 'average_rating', 'tags', 'created_at', 'updated_at', 
+            'is_liked', 'is_saved', 'health_score_average', 'overall_rating'
         )
     
     def get_comments_count(self, obj):
@@ -147,35 +219,90 @@ class MealDetailSerializer(serializers.ModelSerializer):
         except Exception as e:
             # Fallback to original food items if there's an error
             return obj.food_items
+    
+    def get_primary_media(self, obj):
+        """Get the primary media file for this meal"""
+        # Try to get from prefetched media_files first
+        if hasattr(obj, '_prefetched_objects_cache') and 'media_files' in obj._prefetched_objects_cache:
+            for media in obj._prefetched_objects_cache['media_files']:
+                if media.is_primary:
+                    return MealMediaSerializer(media, context=self.context).data
+        else:
+            # Fallback to database query
+            primary = obj.media_files.filter(is_primary=True).first()
+            if primary:
+                return MealMediaSerializer(primary, context=self.context).data
+        return None
+    
+    def get_media_files(self, obj):
+        """Get all media files for this meal"""
+        # Try to get from prefetched media_files first
+        if hasattr(obj, '_prefetched_objects_cache') and 'media_files' in obj._prefetched_objects_cache:
+            # Sort the prefetched media files
+            media = sorted(obj._prefetched_objects_cache['media_files'], 
+                         key=lambda x: (x.order, x.created_at))
+        else:
+            # Fallback to database query
+            media = obj.media_files.all().order_by('order', 'created_at')
+        return MealMediaSerializer(media, many=True, context=self.context).data
+    
+    def get_media_count(self, obj):
+        """Get the count of media files for this meal"""
+        # Try to get from prefetched media_files first
+        if hasattr(obj, '_prefetched_objects_cache') and 'media_files' in obj._prefetched_objects_cache:
+            return len(obj._prefetched_objects_cache['media_files'])
+        else:
+            # Fallback to database query
+            return obj.media_files.count()
 
 
 class MealCreateUpdateSerializer(serializers.ModelSerializer):
     """Serializer for creating and updating meals"""
+    media_files = serializers.ListField(
+        child=serializers.FileField(),
+        write_only=True,
+        required=False,
+        allow_empty=True
+    )
+    media_captions = serializers.CharField(
+        write_only=True,
+        required=False,
+        allow_blank=True
+    )
+    
     class Meta:
         model = Meal
         fields = (
             'id', 'name', 'description', 'category', 'meal_type', 'is_public',
             'food_items', 'preparation_time', 'cooking_time', 'servings',
-            'difficulty_level', 'instructions', 'tips', 'image', 'tags'
+            'difficulty_level', 'instructions', 'tips', 'image', 'tags',
+            'media_files', 'media_captions'
         )
         read_only_fields = ('id',)
     
     def validate_food_items(self, value):
         """Validate food items format and existence"""
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"Validating food items: {value}")
+        
         if not value or not isinstance(value, list):
             raise serializers.ValidationError("Food items must be a non-empty list")
         
         required_fields = ['food_id', 'quantity', 'unit']
         for item in value:
             if not all(field in item for field in required_fields):
+                logger.error(f"Food item missing fields: {item}, required: {required_fields}")
                 raise serializers.ValidationError(
                     f"Each food item must have: {required_fields}"
                 )
             
             if not isinstance(item['food_id'], int) or item['food_id'] <= 0:
+                logger.error(f"Invalid food_id: {item['food_id']}")
                 raise serializers.ValidationError("food_id must be a positive integer")
             
             if not isinstance(item['quantity'], (int, float)) or item['quantity'] <= 0:
+                logger.error(f"Invalid quantity: {item['quantity']}")
                 raise serializers.ValidationError("quantity must be a positive number")
         
         # Validate using the calculation service
@@ -183,26 +310,106 @@ class MealCreateUpdateSerializer(serializers.ModelSerializer):
             calculation_service = MealCalculationService()
             calculation_service.validate_food_items(value)
         except Exception as e:
+            logger.error(f"Food validation service error: {str(e)}")
             raise serializers.ValidationError(f"Food validation error: {str(e)}")
         
+        logger.info(f"Food items validation passed: {len(value)} items")
         return value
     
     def create(self, validated_data):
         """Create meal with calculated health and environmental scores"""
-        meal = super().create(validated_data)
-        self._calculate_and_save_scores(meal)
-        return meal
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"Creating meal with validated_data keys: {list(validated_data.keys())}")
+        
+        # Extract media files data before creating meal
+        media_files = validated_data.pop('media_files', [])
+        media_captions_raw = validated_data.pop('media_captions', '')
+        
+        logger.info(f"Media files count: {len(media_files) if media_files else 0}")
+        logger.info(f"Media captions raw: {media_captions_raw}")
+        
+        # Handle media_captions that might come as JSON string from FormData
+        media_captions = []
+        if media_captions_raw:
+            if isinstance(media_captions_raw, str):
+                try:
+                    import json
+                    media_captions = json.loads(media_captions_raw)
+                    logger.info(f"Parsed media captions: {media_captions}")
+                except json.JSONDecodeError:
+                    logger.warning(f"Failed to parse media captions JSON: {media_captions_raw}")
+                    media_captions = []
+            elif isinstance(media_captions_raw, list):
+                media_captions = media_captions_raw
+        
+        try:
+            meal = super().create(validated_data)
+            logger.info(f"Meal basic creation successful")
+            
+            self._calculate_and_save_scores(meal)
+            
+            # Create media files
+            if media_files:
+                logger.info(f"Creating {len(media_files)} media files")
+                self._create_media_files(meal, media_files, media_captions)
+            
+            logger.info(f"Meal creation completed successfully")
+            return meal
+        except Exception as e:
+            logger.error(f"Error during meal creation: {str(e)}")
+            raise
     
     def update(self, instance, validated_data):
         """Update meal and recalculate scores if food items changed"""
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"Updating meal {instance.id} with validated_data keys: {list(validated_data.keys())}")
+        
+        # Extract media files data before updating meal
+        media_files = validated_data.pop('media_files', None)
+        media_captions_raw = validated_data.pop('media_captions', None)
+        
+        logger.info(f"Media files count: {len(media_files) if media_files else 0}")
+        logger.info(f"Media captions raw: {media_captions_raw}")
+        
+        # Handle media_captions that might come as JSON string from FormData
+        media_captions = []
+        if media_captions_raw:
+            if isinstance(media_captions_raw, str):
+                try:
+                    import json
+                    media_captions = json.loads(media_captions_raw)
+                    logger.info(f"Parsed media captions: {media_captions}")
+                except json.JSONDecodeError:
+                    logger.warning(f"Failed to parse media captions JSON: {media_captions_raw}")
+                    media_captions = []
+            elif isinstance(media_captions_raw, list):
+                media_captions = media_captions_raw
+        
         old_food_items = instance.food_items
-        meal = super().update(instance, validated_data)
         
-        # Recalculate scores if food items changed
-        if meal.food_items != old_food_items:
-            self._calculate_and_save_scores(meal)
-        
-        return meal
+        try:
+            meal = super().update(instance, validated_data)
+            logger.info(f"Meal basic update successful")
+            
+            # Recalculate scores if food items changed
+            if meal.food_items != old_food_items:
+                logger.info(f"Food items changed, recalculating scores")
+                self._calculate_and_save_scores(meal)
+            
+            # Update media files if provided and not empty
+            if media_files is not None and len(media_files) > 0:
+                logger.info(f"Creating {len(media_files)} new media files")
+                # Clear existing media files and create new ones
+                meal.media_files.all().delete()
+                self._create_media_files(meal, media_files, media_captions)
+            
+            logger.info(f"Meal update completed successfully")
+            return meal
+        except Exception as e:
+            logger.error(f"Error during meal update: {str(e)}")
+            raise
     
     def _calculate_and_save_scores(self, meal):
         """Calculate and save all health and environmental scores"""
@@ -291,6 +498,46 @@ class MealCreateUpdateSerializer(serializers.ModelSerializer):
             import logging
             logger = logging.getLogger(__name__)
             logger.error(f"Failed to calculate meal scores for meal {meal.id}: {str(e)}")
+    
+    def _create_media_files(self, meal, media_files, media_captions):
+        """Create media files for the meal"""
+        try:
+            import os
+            from PIL import Image as PILImage
+            
+            for i, media_file in enumerate(media_files):
+                # Determine media type
+                media_type = 'image' if media_file.content_type.startswith('image/') else 'video'
+                
+                # Get caption (use empty string if not provided or index out of range)
+                caption = media_captions[i] if i < len(media_captions) else ''
+                
+                # Create MealMedia instance
+                meal_media = MealMedia(
+                    meal=meal,
+                    media_type=media_type,
+                    file=media_file,
+                    caption=caption,
+                    order=i,
+                    is_primary=(i == 0),  # First file is primary
+                    file_size=media_file.size
+                )
+                
+                # For images, try to get dimensions
+                if media_type == 'image':
+                    try:
+                        with PILImage.open(media_file) as img:
+                            meal_media.width = img.width
+                            meal_media.height = img.height
+                    except Exception:
+                        pass  # Don't fail if we can't get dimensions
+                
+                meal_media.save()
+                
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Failed to create media files for meal {meal.id}: {str(e)}")
 
 
 class MealCommentSerializer(serializers.ModelSerializer):

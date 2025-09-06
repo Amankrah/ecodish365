@@ -5,13 +5,13 @@ export const seoConfig = {
   // Site-wide settings
   siteName: 'EcoDish365',
   siteUrl: 'https://ecodish365.com',
-  siteDescription: 'Professional nutrition analysis platform with comprehensive food database and research tools',
+  siteDescription: 'The world\'s first integrated environmental nutrition platform combining nutrition science, environmental impact, and health outcomes for individuals, researchers, and policy makers',
   
   // Brand information
   brand: {
     name: 'EcoDish365',
-    tagline: 'Professional Nutrition Analysis & Food Research Platform',
-    description: 'Advanced nutrition analysis platform with Canadian Nutrient File database, Health Star Rating calculator, Food Compass Score assessment, and environmental impact tools.',
+    tagline: 'Integrated Environmental Nutrition Platform',
+    description: 'The world\'s first platform to integrate nutrition science, environmental impact, and health outcomes. Empowering individuals to make healthier food choices, researchers to make breakthrough discoveries, and policy makers to create evidence-based policies.',
     email: 'contact@ecodish365.com',
     socialMedia: {
       twitter: '@ecodish365',
@@ -22,7 +22,10 @@ export const seoConfig = {
 
   // Primary keywords for SEO targeting
   primaryKeywords: [
-    'nutrition analysis',
+    'environmental nutrition',
+    'nutrition decision system',
+    'integrated nutrition environment health',
+    'sustainable food choices',
     'Canadian Nutrient File',
     'CNF database',
     'Health Star Rating calculator',
@@ -31,13 +34,22 @@ export const seoConfig = {
     'HEFI 2019',
     'HEalth Nutritional Index',
     'HENI health impact',
-    'nutritional assessment',
-    'food research platform',
-    'professional nutrition tools',
+    'environmental food impact',
+    'nutrition research platform',
+    'food policy tools',
   ],
 
   // Secondary keywords for long-tail targeting
   secondaryKeywords: [
+    'healthy environmentally friendly food choices',
+    'integrated nutrition environmental health',
+    'food decision support system',
+    'sustainable nutrition platform',
+    'integrated food analysis',
+    'nutrition research discoveries',
+    'evidence-based food policy',
+    'environmental nutrition research',
+    'food impact assessment',
     'nutrition database search',
     'food comparison tool',
     'dietary analysis software',
@@ -52,7 +64,6 @@ export const seoConfig = {
     'Canadian food data',
     'HSR calculator online',
     'FCS scoring system',
-    'environmental nutrition',
     'sustainable food analysis',
     'DALY-based nutrition',
     'health impact of foods',
@@ -62,16 +73,20 @@ export const seoConfig = {
 
   // Target audience segments
   targetAudiences: [
+    'individuals seeking healthy food choices',
+    'families making sustainable food decisions',
     'nutrition researchers',
     'registered dietitians',
     'food scientists',
     'public health professionals',
     'policy makers',
+    'government nutrition agencies',
     'academic researchers',
     'healthcare providers',
     'nutrition students',
     'food industry professionals',
-    'health technology developers',
+    'environmental health experts',
+    'sustainability consultants',
   ],
 
   // Geographic targeting
@@ -82,20 +97,25 @@ export const seoConfig = {
 
   // Content themes for SEO
   contentThemes: {
-    nutrition: {
-      title: 'Comprehensive Nutrition Analysis',
-      keywords: ['nutrition analysis', 'nutritional assessment', 'diet quality'],
-      description: 'Professional nutrition analysis tools and comprehensive food databases',
+    integration: {
+      title: 'Integrated Nutrition Environment Health Platform',
+      keywords: ['integrated environmental nutrition', 'unified platform', 'comprehensive food analysis', 'all-in-one nutrition tools'],
+      description: 'The world\'s first platform integrating nutrition science, environmental impact, and health outcomes',
+    },
+    individuals: {
+      title: 'Healthy Environmentally Friendly Food Choices',
+      keywords: ['healthy food choices', 'sustainable eating', 'environmental food impact', 'personal nutrition'],
+      description: 'Tools for individuals and families to make informed, healthy, and environmentally friendly food choices',
     },
     research: {
-      title: 'Evidence-Based Food Research',
-      keywords: ['food research', 'nutrition research', 'evidence-based nutrition'],
-      description: 'Research-grade tools for food science and nutrition studies',
+      title: 'Environmental Nutrition Research',
+      keywords: ['nutrition research', 'environmental food research', 'evidence-based nutrition', 'food science discoveries'],
+      description: 'Research-grade tools for breakthrough discoveries at the intersection of nutrition, health, and environment',
     },
-    tools: {
-      title: 'Professional Nutrition Tools',
-      keywords: ['nutrition tools', 'food calculators', 'diet analysis software'],
-      description: 'Advanced calculators and analysis tools for nutrition professionals',
+    policy: {
+      title: 'Evidence-Based Food Policy Tools',
+      keywords: ['food policy', 'nutrition policy', 'environmental policy', 'evidence-based decisions'],
+      description: 'Data-driven tools for policy makers to create nutrition, health, and environmental policies',
     },
     database: {
       title: 'Comprehensive Food Databases',
@@ -117,8 +137,8 @@ export const seoConfig = {
   // Page-specific SEO templates
   pageTemplates: {
     homepage: {
-      title: 'EcoDish365 - Professional Nutrition Analysis & Food Research Platform',
-      description: 'Advanced nutrition analysis platform with Canadian Nutrient File database, Health Star Rating calculator, Food Compass Score assessment, and environmental impact tools.',
+      title: 'EcoDish365 - Environmental Nutrition Decision System | Harmony for Health, Nutrition & Environment',
+      description: 'The world\'s first environmental nutrition decision system harmonizing nutrition, environment, and health. Empowering individuals, researchers, and policy makers with integrated food analysis tools.',
     },
     cnf: {
       title: 'Canadian Nutrient File (CNF) Database Explorer',
@@ -148,9 +168,9 @@ export const seoConfig = {
         'Analyze the environmental footprint of foods and meals using life cycle assessment, including carbon footprint, water use, land use, and more.',
     },
     meals: {
-      title: 'Meals - Create, Analyze, and Share Healthy Meals',
+      title: 'Personal Food Journey - Healthy & Environmentally Friendly Meal Planning',
       description:
-        'Build meals from CNF foods, analyze nutrition and sustainability, and share with the community.',
+        'Create personalized meals that are both nutritious and environmentally sustainable. Discover the harmony of health, nutrition, and environmental impact in your daily food choices.',
     },
   },
 
@@ -165,7 +185,8 @@ export const seoConfig = {
       industry: 'Health Technology',
       areaServed: 'Worldwide',
       knowsAbout: [
-        'Nutrition Analysis',
+        'Environmental Nutrition',
+        'Nutrition Decision Systems',
         'Food Science',
         'Health Star Ratings',
         'Food Compass Scores',
@@ -174,6 +195,9 @@ export const seoConfig = {
         'HEFI-2019',
         'HENI',
         'DALY methodology',
+        'Sustainable Food Choices',
+        'Integrated Nutrition Platform',
+        'Food Policy Research',
       ],
     },
     website: {

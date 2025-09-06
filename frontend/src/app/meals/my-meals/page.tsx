@@ -38,7 +38,7 @@ export default function MyMealsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">My Meals</h1>
-                <p className="mt-1 text-sm text-gray-600">Meals you created</p>
+                <p className="mt-1 text-sm text-gray-600">Meals you created with photos, videos, and nutrition analysis</p>
               </div>
               <Link href="/meals/create" className="px-4 py-2 bg-gradient-primary text-white rounded-md">
                 Create Meal
@@ -73,10 +73,10 @@ export default function MyMealsPage() {
             <div className="text-center py-12">
               <h3 className="text-lg font-medium text-gray-900">You haven&apos;t created any meals yet</h3>
               <p className="mt-2 text-gray-500">
-                Start by creating your first meal.
+                Start by creating your first meal with photos, videos, and detailed nutrition analysis.
               </p>
               <Link href="/meals/create" className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-primary hover:opacity-90">
-                Create Meal
+                Create Your First Meal
               </Link>
             </div>
           ) : (

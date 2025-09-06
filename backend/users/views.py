@@ -42,11 +42,13 @@ class UserLoginView(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
     
     def post(self, request, *args, **kwargs):
-        email = request.data.get('email')
+        username_or_email = request.data.get('username_or_email')
         password = request.data.get('password')
         
-        if email and password:
-            user = authenticate(email=email, password=password)
+        if username_or_email and password:
+            # Use the custom authentication backend that handles both username and email
+            user = authenticate(username=username_or_email, password=password)
+            
             if user:
                 token, created = Token.objects.get_or_create(user=user)
                 
@@ -66,7 +68,7 @@ class UserLoginView(generics.GenericAPIView):
                 )
         
         return Response(
-            {'error': 'Email and password required'},
+            {'error': 'Username/email and password required'},
             status=status.HTTP_400_BAD_REQUEST
         )
 

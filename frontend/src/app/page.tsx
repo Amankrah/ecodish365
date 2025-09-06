@@ -68,27 +68,27 @@ const features = [
 
 const userTypes = [
   {
-    name: 'Researchers',
-    description: 'Run environmental LCA (ReCiPe 2016), monetize impacts (CAD), and analyze nutrition with CNF, HSR, FCS, HEFI, and HENI for publishable, reproducible insights.',
+    name: 'Individuals & Families',
+    description: 'Make informed, healthy food choices that benefit both your health and the planet. Discover which foods provide optimal nutrition while minimizing environmental impact through our intuitive meal planning and food comparison tools.',
+    icon: HeartIcon,
+  },
+  {
+    name: 'Researchers & Nutrition Experts',
+    description: 'Conduct groundbreaking research at the intersection of nutrition, health, and environment. Access comprehensive databases, validated scoring systems (HSR, FCS, HEFI, HENI), and LCA data to make practical nutrition discoveries that advance the field.',
     icon: BeakerIcon,
   },
   {
-    name: 'Policy Makers',
-    description: 'Use monetized environmental impacts (CAD), carbon/water/land indicators, and health metrics to inform policy, procurement, and dietary guidelines.',
+    name: 'Policy Makers & Organizations',
+    description: 'Develop evidence-based nutrition, health, and environmental policies using our comprehensive analytics. Make data-driven decisions about dietary guidelines, food procurement, and sustainability initiatives that truly benefit people and the planet.',
     icon: UserGroupIcon,
-  },
-  {
-    name: 'Health Professionals',
-    description: 'Support counseling with combined nutrition quality and environmental performance to guide healthier, more sustainable choices.',
-    icon: HeartIcon,
   },
 ];
 
 const stats = [
-  { label: 'Foods in CNF Database', value: '5,000+' },
-  { label: 'Nutrients Tracked', value: '150+' },
-  { label: 'LCA Impact Categories', value: '18' },
-  { label: 'Monetized Impact Types (CAD)', value: '16+' },
+  { label: 'Comprehensive Food Database', value: '5,000+' },
+  { label: 'Nutrition & Health Metrics', value: '150+' },
+  { label: 'Environmental Impact Categories', value: '18' },
+  { label: 'Unified Decision Factors', value: '3-in-1' },
 ];
 
 export default function HomePage() {
@@ -100,27 +100,28 @@ export default function HomePage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl sm:text-6xl font-bold tracking-tight">
-              <span className="text-gray-900">Environmental</span>{' '}
-              <span className="text-gradient">Nutrition Intelligence</span>{' '}
-              <span className="text-gray-900">Platform</span>
+              <span className="text-gradient">Environmental</span>{' '}
+              <span className="text-gray-900">Nutrition</span>{' '}
+              <span className="text-gradient">Intelligence</span>
             </h1>
             <p className="mt-6 text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Analyze food and meals through both nutritional quality and environmental performance. Run LCA across 18 categories, 
-              monetize impacts in CAD, and pair with CNF, HSR, FCS, HEFI, and HENI — for decisions that are good for people and the planet.
+              The world's first environmental nutrition decision system uniting nutrition science, environmental impact, and health outcomes. 
+              Empowering <strong>individuals</strong> to make healthier food choices, <strong>researchers</strong> to make breakthrough discoveries, 
+              and <strong>policy makers</strong> to create evidence-based nutrition and environmental policies.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/cnf"
+                href="/meals"
                 className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-primary hover:opacity-90 transition-opacity duration-200 shadow-lg hover:shadow-xl"
               >
-                Explore CNF Database
+                Start Your Food Journey
                 <ArrowRightIcon className="ml-2 w-5 h-5" />
               </Link>
               <Link
-                href="/environmental/calculate"
+                href="/cnf"
                 className="inline-flex items-center justify-center px-8 py-3 border border-gray-300 text-base font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200 shadow-sm"
               >
-                Analyze Environmental Indicators
+                Explore Research Tools
               </Link>
             </div>
           </div>
@@ -129,6 +130,9 @@ export default function HomePage() {
 
       {/* Stats Section */}
       <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-8">
+          <p className="text-lg text-gray-600 font-medium">The World's First Integrated Platform</p>
+        </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat) => (
@@ -148,11 +152,12 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Integrated Environmental + Nutrition Tools
+              Integration in Action: Unified Tools & Insights
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Explore environmental indicators (ReCiPe 2016 + monetization in CAD) alongside Canada&apos;s CNF nutrition database, HSR, FCS, HEFI, and HENI.
-              Professional-grade analytics for evidence-based, sustainable dietary assessment.
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Experience the power of unified nutrition, environmental, and health analytics. Our comprehensive toolkit brings together
+              Canada's CNF database, validated scoring systems (HSR, FCS, HEFI, HENI), and environmental LCA indicators
+              to create the world's first truly integrated environmental nutrition platform.
             </p>
           </div>
 
@@ -205,10 +210,10 @@ export default function HomePage() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Built for Environmental Nutrition</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              EcoDish365 serves researchers, policy makers, and health professionals with combined environmental and nutrition analytics
-              to support healthier people and a healthier planet.
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Three Ways to Drive Impact</h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              EcoDish365 is the world's first platform to unite nutrition science, environmental impact, and health outcomes in one comprehensive system. 
+              Discover how we're revolutionizing food decisions for individuals, advancing research, and informing policy.
             </p>
           </div>
 
@@ -232,25 +237,33 @@ export default function HomePage() {
 
       {/* CTA Section */}
       <section className="py-20 bg-gradient-primary">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">Start Exploring Environmental Nutrition</h2>
+        <div className="max-w-5xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">Join the Environmental Nutrition Revolution</h2>
           <p className="text-xl text-primary-100 mb-8 leading-relaxed">
-            Begin with the CNF database and our Environmental Indicators to evaluate both nutritional quality and environmental performance.
+            Whether you're making personal food choices, conducting research, or shaping policy — 
+            experience the world's first platform that harmonizes nutrition, environment, and health in every decision.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
+            <Link
+              href="/meals"
+              className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-primary-600 bg-white hover:bg-gray-50 transition-colors duration-200 shadow-lg"
+            >
+              <HeartIcon className="mr-2 w-5 h-5" />
+              Personal Food Choices
+            </Link>
             <Link
               href="/cnf"
-              className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-lg text-primary-600 bg-white hover:bg-gray-50 transition-colors duration-200 shadow-lg"
+              className="inline-flex items-center justify-center px-6 py-3 border border-white text-base font-medium rounded-lg text-white hover:bg-white hover:bg-opacity-10 transition-colors duration-200"
             >
-              <ChartBarIcon className="mr-2 w-5 h-5" />
-              Launch CNF Explorer
+              <BeakerIcon className="mr-2 w-5 h-5" />
+              Research & Discovery
             </Link>
             <Link
               href="/environmental/calculate"
-              className="inline-flex items-center justify-center px-8 py-3 border border-white text-base font-medium rounded-lg text-white hover:bg-white hover:bg-opacity-10 transition-colors duration-200"
+              className="inline-flex items-center justify-center px-6 py-3 border border-white text-base font-medium rounded-lg text-white hover:bg-white hover:bg-opacity-10 transition-colors duration-200"
             >
-              <GlobeAltIcon className="mr-2 w-5 h-5" />
-              Analyze Environmental Indicators
+              <UserGroupIcon className="mr-2 w-5 h-5" />
+              Policy & Impact
             </Link>
           </div>
         </div>

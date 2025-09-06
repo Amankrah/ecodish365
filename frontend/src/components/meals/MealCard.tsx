@@ -10,7 +10,10 @@ import {
   UserIcon,
   StarIcon,
   GlobeAltIcon,
-  FireIcon
+  FireIcon,
+  PlayIcon,
+  PhotoIcon,
+  VideoCameraIcon
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolidIcon, BookmarkIcon as BookmarkSolidIcon } from '@heroicons/react/24/solid';
 import { Meal, MealApiService } from '@/lib/api';
@@ -25,6 +28,7 @@ interface MealCardProps {
 export default function MealCard({ meal, onUpdate }: MealCardProps) {
   const { isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(false);
+
 
   const handleLike = async () => {
     if (!isAuthenticated || loading) return;
@@ -110,21 +114,100 @@ export default function MealCard({ meal, onUpdate }: MealCardProps) {
   const totalTime = (meal.preparation_time || 0) + (meal.cooking_time || 0);
 
   return (
-    <div className="card group hover:shadow-lg transition-all duration-200 overflow-hidden" role="article" aria-label={`Meal card for ${meal.name}`}>
-      {/* Image */}
+    <div className={`card group hover:shadow-lg transition-all duration-200 overflow-hidden ${meal.primary_media || meal.image ? 'ring-1 ring-green-100' : ''}`} role="article" aria-label={`Meal card for ${meal.name}`}>
+      {/* Media */}
       <div className="relative overflow-hidden bg-gray-100 h-48">
-        {meal.image ? (
-          <Image
-            src={meal.image}
-            alt={meal.name}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover group-hover:scale-105 transition-transform duration-200"
-            unoptimized
-          />
+        {meal.primary_media ? (
+          <div className="relative w-full h-full group">
+            {meal.primary_media.media_type === 'image' ? (
+              <Image
+                src={meal.primary_media.file}
+                alt={meal.primary_media.caption || meal.name}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                onError={(e) => {
+                  // Hide broken image gracefully
+                  e.currentTarget.style.display = 'none';
+                }}
+                unoptimized
+              />
+            ) : (
+              <video
+                src={meal.primary_media.file}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                muted
+                preload="metadata"
+                poster={meal.primary_media.thumbnail}
+                onError={(e) => {
+                  // Hide broken video gracefully
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            )}
+            
+            {/* Video Play Icon with Enhanced Styling */}
+            {meal.primary_media.media_type === 'video' && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="bg-black/60 backdrop-blur-sm rounded-full p-4 group-hover:bg-black/70 transition-colors">
+                  <PlayIcon className="w-10 h-10 text-white drop-shadow-lg" />
+                </div>
+              </div>
+            )}
+            
+            {/* Media Count Badge - Enhanced */}
+            {meal.media_count && meal.media_count > 1 && (
+              <div className="absolute top-2 right-2 bg-black/80 backdrop-blur-sm text-white text-xs px-2.5 py-1.5 rounded-full flex items-center space-x-1 shadow-lg">
+                <PhotoIcon className="w-3.5 h-3.5" />
+                <span className="font-medium">+{meal.media_count - 1}</span>
+              </div>
+            )}
+            
+            {/* Media Type Indicator */}
+            <div className="absolute bottom-2 left-2">
+              <div className="bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full flex items-center space-x-1">
+                {meal.primary_media.media_type === 'video' ? (
+                  <VideoCameraIcon className="w-3 h-3" />
+                ) : (
+                  <PhotoIcon className="w-3 h-3" />
+                )}
+                <span className="capitalize">{meal.primary_media.media_type}</span>
+              </div>
+            </div>
+            
+            {/* Caption Preview on Hover */}
+            {meal.primary_media.caption && (
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                <p className="text-white text-xs truncate">{meal.primary_media.caption}</p>
+              </div>
+            )}
+          </div>
+        ) : meal.image ? (
+          /* Legacy Image Fallback */
+          <div className="relative w-full h-full group">
+            <Image
+              src={meal.image}
+              alt={meal.name}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              onError={(e) => {
+                // Hide broken legacy image gracefully
+                e.currentTarget.style.display = 'none';
+              }}
+              unoptimized
+            />
+            <div className="absolute bottom-2 left-2">
+              <div className="bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full">
+                Legacy Image
+              </div>
+            </div>
+          </div>
         ) : (
-          <div className="flex items-center justify-center h-48 text-gray-400">
-            <FireIcon className="w-12 h-12" />
+          /* No Media Placeholder */
+          <div className="flex flex-col items-center justify-center h-48 text-gray-400 bg-gradient-to-br from-gray-50 to-gray-100">
+            <FireIcon className="w-12 h-12 mb-2" />
+            <span className="text-sm font-medium">No Photo</span>
           </div>
         )}
         
@@ -132,22 +215,29 @@ export default function MealCard({ meal, onUpdate }: MealCardProps) {
         <div className="absolute top-3 left-3 right-3 flex items-start justify-between">
           <div className="flex flex-col space-y-2">
             {meal.is_featured && (
-              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                Featured
+              <span className="inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 shadow-md">
+                ⭐ Featured
               </span>
             )}
-            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(meal.difficulty_level)}`}>
+            <span className={`inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-bold shadow-md ${getDifficultyColor(meal.difficulty_level)}`}>
               {meal.difficulty_level}
             </span>
           </div>
           
-          <div className="text-right">
-            {typeof meal.sustainability_score === 'number' && (
-              <div className="bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center space-x-1">
-                <GlobeAltIcon className="w-3 h-3 text-green-600" />
-                <span className="text-xs font-medium text-green-700">
-                  {meal.sustainability_score.toFixed(2)}
-                </span>
+          <div className="text-right flex flex-col space-y-2">
+            {/* Total Time Badge */}
+            {totalTime > 0 && (
+              <div className="bg-blue-500/90 backdrop-blur-sm rounded-full px-2.5 py-1.5 flex items-center space-x-1 text-white shadow-md">
+                <ClockIcon className="w-3 h-3" />
+                <span className="text-xs font-bold">{formatTime(totalTime)}</span>
+              </div>
+            )}
+            
+            {/* Video Badge for Video Content */}
+            {meal.primary_media && meal.primary_media.media_type === 'video' && (
+              <div className="bg-purple-500/90 backdrop-blur-sm rounded-full px-2.5 py-1.5 flex items-center space-x-1 text-white shadow-md">
+                <VideoCameraIcon className="w-3 h-3" />
+                <span className="text-xs font-bold">Video</span>
               </div>
             )}
           </div>
@@ -169,16 +259,17 @@ export default function MealCard({ meal, onUpdate }: MealCardProps) {
               <span className="truncate max-w-24">@{meal.creator}</span>
             </div>
             
-            {totalTime > 0 && (
-              <div className="flex items-center space-x-1 bg-blue-50 text-blue-700 px-2 py-1 rounded-full">
-                <ClockIcon className="w-3 h-3" />
-                <span className="text-xs font-medium">{formatTime(totalTime)}</span>
-              </div>
-            )}
-            
             <div className="flex items-center space-x-1 bg-purple-50 text-purple-700 px-2 py-1 rounded-full">
               <span className="text-xs font-medium capitalize">{meal.meal_type}</span>
             </div>
+            
+            {/* Show media count in content when there are multiple files */}
+            {meal.media_count && meal.media_count > 1 && (
+              <div className="flex items-center space-x-1 bg-indigo-50 text-indigo-700 px-2 py-1 rounded-full">
+                <PhotoIcon className="w-3 h-3" />
+                <span className="text-xs font-medium">{meal.media_count} media</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -197,10 +288,17 @@ export default function MealCard({ meal, onUpdate }: MealCardProps) {
             </div>
           )}
           
+          {typeof meal.sustainability_score === 'number' && (
+            <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${meal.sustainability_score >= 70 ? 'bg-green-50 text-green-700' : meal.sustainability_score >= 50 ? 'bg-yellow-50 text-yellow-700' : 'bg-red-50 text-red-700'}`}>
+              <GlobeAltIcon className="w-3 h-3" />
+              <span className="text-xs font-medium">{meal.sustainability_score.toFixed(0)}</span>
+            </div>
+          )}
+          
           {typeof meal.health_score_average === 'number' && (
             <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${getHealthScoreColor(meal.health_score_average)} bg-opacity-10`}>
               <StarIcon className="w-3 h-3" />
-              <span className="text-xs font-medium">{meal.health_score_average.toFixed(2)}</span>
+              <span className="text-xs font-medium">{meal.health_score_average.toFixed(1)}</span>
             </div>
           )}
           

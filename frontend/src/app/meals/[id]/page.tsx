@@ -298,17 +298,114 @@ export default function MealDetailPage() {
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="xl:col-span-2 space-y-8">
-            {/* Image */}
-            {meal.image && (
-              <div className="aspect-w-16 aspect-h-9 overflow-hidden rounded-xl relative">
+            {/* Media Gallery */}
+            {(meal.primary_media || (meal.media_files && meal.media_files.length > 0)) ? (
+              <div className="space-y-4">
+                {/* Primary Media */}
+                {meal.primary_media && (
+                  <div className="relative w-full h-96 overflow-hidden rounded-xl bg-gray-100">
+                    {meal.primary_media.media_type === 'image' ? (
+                      <Image
+                        src={meal.primary_media.file}
+                        alt={meal.primary_media.caption || meal.name}
+                        fill
+                        sizes="(max-width: 1280px) 100vw, 1280px"
+                        className="object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                        unoptimized
+                      />
+                    ) : (
+                      <video
+                        src={meal.primary_media.file}
+                        controls
+                        className="w-full h-full object-cover"
+                        poster={meal.primary_media.thumbnail}
+                        onError={(e) => {
+                          // Hide broken video gracefully
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    )}
+                    {meal.primary_media.caption && (
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                        <p className="text-white text-sm">{meal.primary_media.caption}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Additional Media Thumbnails */}
+                {meal.media_files && meal.media_files.length > 1 && (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {meal.media_files.filter(media => !media.is_primary).map((media) => (
+                      <div key={media.id} className="relative w-full h-48 overflow-hidden rounded-lg bg-gray-100 cursor-pointer hover:opacity-90 transition-opacity">
+                        {media.media_type === 'image' ? (
+                          <Image
+                            src={media.file}
+                            alt={media.caption || meal.name}
+                            fill
+                            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 200px"
+                            className="object-cover"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
+                            unoptimized
+                          />
+                        ) : (
+                          <div className="relative w-full h-full bg-gray-900 flex items-center justify-center">
+                            <video
+                              src={media.file}
+                              className="w-full h-full object-cover"
+                              muted
+                              preload="metadata"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="bg-black/50 rounded-full p-2">
+                                <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        {media.caption && (
+                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
+                            <p className="text-white text-xs truncate">{media.caption}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : meal.image ? (
+              /* Fallback to legacy image field */
+              <div className="relative w-full h-96 overflow-hidden rounded-xl bg-gray-100">
                 <Image
                   src={meal.image}
                   alt={meal.name}
                   fill
                   sizes="(max-width: 1280px) 100vw, 1280px"
                   className="object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
                   unoptimized
                 />
+              </div>
+            ) : (
+              /* No media available placeholder */
+              <div className="relative w-full h-96 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl flex flex-col items-center justify-center text-gray-400">
+                <svg className="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <p className="text-lg font-medium">No media available</p>
+                <p className="text-sm text-gray-500 mt-1">This meal doesn't have any photos or videos</p>
               </div>
             )}
 
@@ -382,66 +479,93 @@ export default function MealDetailPage() {
                   <div className="p-3 bg-green-500 rounded-xl mr-4">
                     <GlobeAltIcon className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-green-900">Environmental Impact</h3>
+                  <div>
+                    <h3 className="text-xl font-bold text-green-900">Environmental Impact</h3>
+                    <p className="text-sm text-green-700 mt-1">How this meal affects our planet</p>
+                  </div>
                 </div>
                 
                 {meal.sustainability_score && (
                   <div className="mb-6 p-4 bg-white/70 rounded-xl">
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-lg font-semibold text-green-700">Sustainability Score</span>
+                      <div>
+                        <span className="text-lg font-semibold text-green-700">Sustainability Score</span>
+                        <p className="text-xs text-green-600 mt-1">Overall environmental friendliness (0-100)</p>
+                      </div>
                       <span className="text-3xl font-bold text-green-800">{meal.sustainability_score.toFixed(1)}/100</span>
                     </div>
-                    <div className="w-full bg-green-200 rounded-full h-3 mb-2">
+                    <div className="w-full bg-green-200 rounded-full h-3 mb-3">
                       <div 
                         className="bg-gradient-to-r from-green-400 to-green-600 h-3 rounded-full transition-all duration-500" 
                         style={{ width: `${Math.min(meal.sustainability_score, 100)}%` }}
                       ></div>
                     </div>
-                    <p className="text-sm text-green-600 font-medium">
-                      {meal.sustainability_score > 80 ? 'Excellent for the planet! 🌱' : 
-                       meal.sustainability_score > 60 ? 'Good environmental choice 🌿' : 
-                       meal.sustainability_score > 40 ? 'Moderate impact ⚖️' : 'Consider eco-alternatives 🌍'}
-                    </p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-green-600 font-medium">
+                        {meal.sustainability_score > 80 ? 'Excellent for the planet! 🌱' : 
+                         meal.sustainability_score > 60 ? 'Good environmental choice 🌿' : 
+                         meal.sustainability_score > 40 ? 'Moderate impact ⚖️' : 'Consider eco-alternatives 🌍'}
+                      </p>
+                      <div className="text-xs text-green-600">
+                        {meal.sustainability_score > 80 ? 'Planet-friendly' : 
+                         meal.sustainability_score > 60 ? 'Environmentally good' : 
+                         meal.sustainability_score > 40 ? 'Room for improvement' : 'High impact'}
+                      </div>
+                    </div>
+                    <div className="mt-3 p-3 bg-green-50 rounded-lg">
+                      <p className="text-xs text-green-700">
+                        <strong>What this means:</strong> Higher scores mean less harm to the environment. 
+                        This considers carbon emissions, water usage, land use, and food processing.
+                      </p>
+                    </div>
                   </div>
                 )}
                 
-                {meal.carbon_footprint && (
+                {(meal.carbon_footprint || meal.carbon_footprint === 0) && (
                   <div className="mb-4 p-4 bg-white/70 rounded-xl">
-                    <div className="flex items-center justify-between">
-                      <span className="text-lg font-semibold text-green-700">Carbon Footprint</span>
-                      <span className="text-2xl font-bold text-green-800">{meal.carbon_footprint.toFixed(2)} kg CO₂</span>
+                    <div className="flex items-center justify-between mb-2">
+                      <div>
+                        <span className="text-lg font-semibold text-green-700">Carbon Footprint</span>
+                        <p className="text-xs text-green-600 mt-1">Greenhouse gases released to make this meal</p>
+                      </div>
+                      <span className="text-2xl font-bold text-green-800">{meal.carbon_footprint ? meal.carbon_footprint.toFixed(2) : '0.00'} kg CO₂</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-green-600">
+                      <span>🚗 Equivalent to driving {((meal.carbon_footprint || 0) * 4.1).toFixed(1)} km</span>
+                      <span className={`px-2 py-1 rounded ${(meal.carbon_footprint || 0) < 1 ? 'bg-green-200 text-green-800' : (meal.carbon_footprint || 0) < 3 ? 'bg-yellow-200 text-yellow-800' : 'bg-red-200 text-red-800'}`}>
+                        {(meal.carbon_footprint || 0) < 1 ? 'Low impact' : (meal.carbon_footprint || 0) < 3 ? 'Moderate' : 'High impact'}
+                      </span>
                     </div>
                   </div>
                 )}
 
-                {meal.environmental_impact && typeof meal.environmental_impact === 'object' && (
+                {meal.environmental_impact && typeof meal.environmental_impact === 'object' && Object.keys(meal.environmental_impact).length > 0 && (
                   <div className="space-y-3">
-                    {meal.environmental_impact['_monetized_total_cad'] && (
+                    {(meal.environmental_impact['_monetized_total_cad'] !== undefined && meal.environmental_impact['_monetized_total_cad'] !== null) && (
                       <div className="p-3 bg-white/70 rounded-xl">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-semibold text-green-700">Environmental Cost</span>
-                          <span className="text-lg font-bold text-green-800">${Number(meal.environmental_impact['_monetized_total_cad']).toFixed(2)} CAD</span>
+                        <div className="flex items-center justify-between mb-1">
+                          <div>
+                            <span className="text-sm font-semibold text-green-700">Environmental Cost</span>
+                            <p className="text-xs text-green-600">True cost of environmental damage</p>
+                          </div>
+                          <span className="text-lg font-bold text-green-800">${(meal.environmental_impact['_monetized_total_cad'] || 0).toFixed(2)} CAD</span>
                         </div>
-                      </div>
-                    )}
-                    {meal.environmental_impact['Water use'] && (
-                      <div className="p-3 bg-white/70 rounded-xl">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-semibold text-green-700">Water Use</span>
-                          <span className="text-lg font-bold text-green-800">{Number(meal.environmental_impact['Water use']).toFixed(2)} L</span>
-                        </div>
-                      </div>
-                    )}
-                    {meal.environmental_impact['Land use'] && (
-                      <div className="p-3 bg-white/70 rounded-xl">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-semibold text-green-700">Land Use</span>
-                          <span className="text-lg font-bold text-green-800">{Number(meal.environmental_impact['Land use']).toFixed(2)} m²</span>
-                        </div>
+                        <p className="text-xs text-green-600">💰 This represents the hidden environmental costs society pays</p>
                       </div>
                     )}
                   </div>
                 )}
+                
+                {/* Environmental action guide */}
+                <div className="mt-4 p-4 bg-green-50 rounded-lg">
+                  <h4 className="text-sm font-bold text-green-700 mb-2">🌱 Making a Difference</h4>
+                  <div className="text-xs text-green-600 space-y-1">
+                    <p>• <strong>Small changes matter:</strong> Every sustainable meal choice helps</p>
+                    <p>• <strong>Share recipes:</strong> Inspire others with your eco-friendly meals</p>
+                    <p>• <strong>Buy local:</strong> Choose seasonal, locally-grown ingredients when possible</p>
+                    <p>• <strong>Reduce waste:</strong> Plan portions carefully and use leftovers creatively</p>
+                  </div>
+                </div>
               </div>
             )}
             
@@ -451,13 +575,19 @@ export default function MealDetailPage() {
                 <div className="p-3 bg-blue-500 rounded-xl mr-4">
                   <SparklesIcon className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-blue-900">Health Impact</h3>
+                <div>
+                  <h3 className="text-xl font-bold text-blue-900">Health Impact</h3>
+                  <p className="text-sm text-blue-700 mt-1">How this meal supports your wellbeing</p>
+                </div>
               </div>
               
-              {meal.heni_score && (
+              {(meal.heni_score !== undefined && meal.heni_score !== null) && (
                 <div className="mb-6 p-4 bg-white/70 rounded-xl">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-lg font-semibold text-blue-700">Healthy Life Impact</span>
+                    <div>
+                      <span className="text-lg font-semibold text-blue-700">Healthy Life Impact</span>
+                      <p className="text-xs text-blue-600 mt-1">How much healthy time this meal adds to your life</p>
+                    </div>
                     <div className="text-right">
                       <div className="text-3xl font-bold text-blue-800">
                         {meal.heni_score ? (meal.heni_score * 0.5256).toFixed(2) : '0'} min
@@ -465,8 +595,21 @@ export default function MealDetailPage() {
                       <div className="text-sm text-blue-600">of healthy life</div>
                     </div>
                   </div>
-                  <div className="text-sm text-blue-600 font-medium">
-                    {meal.heni_total_score ? meal.heni_total_score.toFixed(1) : (meal.heni_score ? meal.heni_score.toFixed(1) : '0.0')} μDALY/100kcal
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-blue-600">
+                      {meal.heni_score && meal.heni_score > 0 ? '✅ This meal supports longevity' : 
+                       meal.heni_score && meal.heni_score < 0 ? '⚠️ Consider healthier alternatives' : 
+                       'Neutral health impact'}
+                    </div>
+                    <div className="text-xs text-blue-500">
+                      Score: {meal.heni_total_score ? meal.heni_total_score.toFixed(1) : (meal.heni_score ? meal.heni_score.toFixed(1) : '0.0')} µDALY/100kcal
+                    </div>
+                  </div>
+                  <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+                    <p className="text-xs text-blue-700">
+                      <strong>What this means:</strong> This measures how this meal affects your healthy lifespan. 
+                      Positive values mean it may help you live longer and healthier.
+                    </p>
                   </div>
                 </div>
               )}
@@ -475,21 +618,44 @@ export default function MealDetailPage() {
                 {meal.fcs_score && (
                   <div className="text-center p-4 bg-white/70 rounded-xl">
                     <div className="text-2xl font-bold text-blue-800">{meal.fcs_score.toFixed(1)}</div>
-                    <div className="text-sm text-blue-600 font-medium">Food Compass Score</div>
+                    <div className="text-sm text-blue-600 font-medium mb-1">Food Compass Score</div>
+                    <div className="text-xs text-blue-500">Overall food healthiness (1-100)</div>
+                    <div className={`mt-2 px-2 py-1 rounded text-xs ${
+                      meal.fcs_score >= 70 ? 'bg-green-200 text-green-800' :
+                      meal.fcs_score >= 31 ? 'bg-yellow-200 text-yellow-800' :
+                      'bg-red-200 text-red-800'
+                    }`}>
+                      {meal.fcs_score >= 70 ? 'Encourage' :
+                       meal.fcs_score >= 31 ? 'Moderate' :
+                       'Minimize'}
+                    </div>
                   </div>
                 )}
                 {meal.hefi_score && (
                   <div className="text-center p-4 bg-white/70 rounded-xl">
                     <div className="text-2xl font-bold text-blue-800">{meal.hefi_score.toFixed(1)}</div>
-                    <div className="text-sm text-blue-600 font-medium">HEFI Score</div>
+                    <div className="text-sm text-blue-600 font-medium mb-1">HEFI Score</div>
+                    <div className="text-xs text-blue-500">Canadian healthy eating index (0-80)</div>
+                    <div className={`mt-2 px-2 py-1 rounded text-xs ${
+                      meal.hefi_score >= 60 ? 'bg-green-200 text-green-800' :
+                      meal.hefi_score >= 40 ? 'bg-yellow-200 text-yellow-800' :
+                      'bg-red-200 text-red-800'
+                    }`}>
+                      {meal.hefi_score >= 60 ? 'Excellent diet' :
+                       meal.hefi_score >= 40 ? 'Good diet' :
+                       'Needs improvement'}
+                    </div>
                   </div>
                 )}
               </div>
               
               {meal.hsr_score && (
                 <div className="p-4 bg-white/70 rounded-xl">
-                  <div className="flex items-center justify-between">
-                    <span className="text-lg font-semibold text-blue-700">Health Star Rating</span>
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <span className="text-lg font-semibold text-blue-700">Health Star Rating</span>
+                      <p className="text-xs text-blue-600 mt-1">Australian government nutrition rating (0.5-5 stars)</p>
+                    </div>
                     <div className="flex items-center space-x-2">
                       {Array.from({ length: 5 }, (_, i) => {
                         const starValue = i + 1;
@@ -512,8 +678,30 @@ export default function MealDetailPage() {
                       <span className="text-lg font-bold text-blue-800 ml-2">{meal.hsr_score.toFixed(1)}</span>
                     </div>
                   </div>
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-blue-600">
+                      {meal.hsr_score >= 4 ? '🌟 Excellent nutritional choice' :
+                       meal.hsr_score >= 3 ? '👍 Good nutritional value' :
+                       meal.hsr_score >= 2 ? '⚖️ Moderate nutrition' :
+                       '⚠️ Limited nutritional benefits'}
+                    </div>
+                    <div className="text-xs text-blue-500">
+                      Higher stars = healthier choice
+                    </div>
+                  </div>
                 </div>
               )}
+              
+              {/* Health action guide */}
+              <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                <h4 className="text-sm font-bold text-blue-700 mb-2">💪 Health Tips</h4>
+                <div className="text-xs text-blue-600 space-y-1">
+                  <p>• <strong>Balance is key:</strong> Combine different food groups for optimal nutrition</p>
+                  <p>• <strong>Mindful eating:</strong> Eat slowly and pay attention to your body's signals</p>
+                  <p>• <strong>Regular meals:</strong> Consistent eating patterns support your health</p>
+                  <p>• <strong>Stay active:</strong> Good nutrition works best with regular movement</p>
+                </div>
+              </div>
             </div>
             
             {/* Nutrition Summary - Enhanced */}
@@ -522,17 +710,33 @@ export default function MealDetailPage() {
                 <div className="p-3 bg-orange-500 rounded-xl mr-4">
                   <ScaleIcon className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900">Nutrition Facts</h3>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900">Nutrition Facts</h3>
+                  <p className="text-sm text-gray-600 mt-1">Key nutrients in this meal</p>
+                </div>
               </div>
               <div className="space-y-4">
                 {meal.total_calories && meal.total_calories > 0 ? (
                   <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <span className="text-lg font-semibold text-gray-700">Calories</span>
-                    <span className="text-2xl font-bold text-gray-900">{Math.round(meal.total_calories)}</span>
+                    <div>
+                      <span className="text-lg font-semibold text-gray-700">Calories</span>
+                      <p className="text-xs text-gray-500 mt-1">Energy this meal provides</p>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-2xl font-bold text-gray-900">{Math.round(meal.total_calories)}</span>
+                      <div className="text-xs text-gray-500">
+                        {meal.total_calories < 300 ? 'Light meal' :
+                         meal.total_calories < 600 ? 'Moderate meal' :
+                         meal.total_calories < 800 ? 'Substantial meal' : 'Large meal'}
+                      </div>
+                    </div>
                   </div>
                 ) : (
                   <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <span className="text-lg font-semibold text-gray-700">Calories</span>
+                    <div>
+                      <span className="text-lg font-semibold text-gray-700">Calories</span>
+                      <p className="text-xs text-gray-500 mt-1">Energy this meal provides</p>
+                    </div>
                     <span className="text-lg text-gray-400">Not calculated</span>
                   </div>
                 )}
@@ -549,10 +753,18 @@ export default function MealDetailPage() {
                     {/* Try multiple possible protein column names */}
                     {(meal.nutrient_profile['PROTEIN'] || meal.nutrient_profile['Protein'] || meal.nutrient_profile['protein']) ? (
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <span className="text-lg font-semibold text-gray-700">Protein</span>
-                        <span className="text-2xl font-bold text-gray-900">
-                          {Math.round(meal.nutrient_profile['PROTEIN'] || meal.nutrient_profile['Protein'] || meal.nutrient_profile['protein'])}g
-                        </span>
+                        <div>
+                          <span className="text-lg font-semibold text-gray-700">Protein</span>
+                          <p className="text-xs text-gray-500 mt-1">💪 Builds and repairs muscles</p>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-2xl font-bold text-gray-900">
+                            {Math.round(meal.nutrient_profile['PROTEIN'] || meal.nutrient_profile['Protein'] || meal.nutrient_profile['protein'])}g
+                          </span>
+                          <div className="text-xs text-gray-500">
+                            {Math.round((meal.nutrient_profile['PROTEIN'] || meal.nutrient_profile['Protein'] || meal.nutrient_profile['protein']) * 4)} cal from protein
+                          </div>
+                        </div>
                       </div>
                     ) : null}
                     
@@ -562,15 +774,23 @@ export default function MealDetailPage() {
                       meal.nutrient_profile['Carbohydrate'] || 
                       meal.nutrient_profile['carbohydrate']) ? (
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <span className="text-lg font-semibold text-gray-700">Carbs</span>
-                        <span className="text-2xl font-bold text-gray-900">
-                          {Math.round(
-                            meal.nutrient_profile['CARBOHYDRATE, TOTAL (BY DIFFERENCE)'] || 
-                            meal.nutrient_profile['CARBOHYDRATE'] || 
-                            meal.nutrient_profile['Carbohydrate'] || 
-                            meal.nutrient_profile['carbohydrate']
-                          )}g
-                        </span>
+                        <div>
+                          <span className="text-lg font-semibold text-gray-700">Carbs</span>
+                          <p className="text-xs text-gray-500 mt-1">⚡ Main energy source for your body</p>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-2xl font-bold text-gray-900">
+                            {Math.round(
+                              meal.nutrient_profile['CARBOHYDRATE, TOTAL (BY DIFFERENCE)'] || 
+                              meal.nutrient_profile['CARBOHYDRATE'] || 
+                              meal.nutrient_profile['Carbohydrate'] || 
+                              meal.nutrient_profile['carbohydrate']
+                            )}g
+                          </span>
+                          <div className="text-xs text-gray-500">
+                            {Math.round((meal.nutrient_profile['CARBOHYDRATE, TOTAL (BY DIFFERENCE)'] || meal.nutrient_profile['CARBOHYDRATE'] || meal.nutrient_profile['Carbohydrate'] || meal.nutrient_profile['carbohydrate']) * 4)} cal from carbs
+                          </div>
+                        </div>
                       </div>
                     ) : null}
                     
@@ -580,15 +800,23 @@ export default function MealDetailPage() {
                       meal.nutrient_profile['Fat'] || 
                       meal.nutrient_profile['fat']) ? (
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <span className="text-lg font-semibold text-gray-700">Fat</span>
-                        <span className="text-2xl font-bold text-gray-900">
-                          {Math.round(
-                            meal.nutrient_profile['FAT (TOTAL LIPIDS)'] || 
-                            meal.nutrient_profile['FAT'] || 
-                            meal.nutrient_profile['Fat'] || 
-                            meal.nutrient_profile['fat']
-                          )}g
-                        </span>
+                        <div>
+                          <span className="text-lg font-semibold text-gray-700">Fat</span>
+                          <p className="text-xs text-gray-500 mt-1">🧄 Essential for vitamins and brain health</p>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-2xl font-bold text-gray-900">
+                            {Math.round(
+                              meal.nutrient_profile['FAT (TOTAL LIPIDS)'] || 
+                              meal.nutrient_profile['FAT'] || 
+                              meal.nutrient_profile['Fat'] || 
+                              meal.nutrient_profile['fat']
+                            )}g
+                          </span>
+                          <div className="text-xs text-gray-500">
+                            {Math.round((meal.nutrient_profile['FAT (TOTAL LIPIDS)'] || meal.nutrient_profile['FAT'] || meal.nutrient_profile['Fat'] || meal.nutrient_profile['fat']) * 9)} cal from fat
+                          </div>
+                        </div>
                       </div>
                     ) : null}
                     
@@ -598,15 +826,23 @@ export default function MealDetailPage() {
                       meal.nutrient_profile['Fiber'] || 
                       meal.nutrient_profile['fiber']) ? (
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <span className="text-lg font-semibold text-gray-700">Fiber</span>
-                        <span className="text-2xl font-bold text-gray-900">
-                          {Math.round(
-                            meal.nutrient_profile['FIBRE, TOTAL DIETARY'] || 
-                            meal.nutrient_profile['FIBER'] || 
-                            meal.nutrient_profile['Fiber'] || 
-                            meal.nutrient_profile['fiber']
-                          )}g
-                        </span>
+                        <div>
+                          <span className="text-lg font-semibold text-gray-700">Fiber</span>
+                          <p className="text-xs text-gray-500 mt-1">🌾 Supports digestion and heart health</p>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-2xl font-bold text-gray-900">
+                            {Math.round(
+                              meal.nutrient_profile['FIBRE, TOTAL DIETARY'] || 
+                              meal.nutrient_profile['FIBER'] || 
+                              meal.nutrient_profile['Fiber'] || 
+                              meal.nutrient_profile['fiber']
+                            )}g
+                          </span>
+                          <div className="text-xs text-gray-500">
+                            {Math.round((meal.nutrient_profile['FIBRE, TOTAL DIETARY'] || meal.nutrient_profile['FIBER'] || meal.nutrient_profile['Fiber'] || meal.nutrient_profile['fiber']) / 25 * 100)}% of daily needs
+                          </div>
+                        </div>
                       </div>
                     ) : null}
                     
@@ -615,14 +851,28 @@ export default function MealDetailPage() {
                       meal.nutrient_profile['Sodium'] || 
                       meal.nutrient_profile['sodium']) ? (
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <span className="text-lg font-semibold text-gray-700">Sodium</span>
-                        <span className="text-2xl font-bold text-gray-900">
-                          {Math.round(
-                            meal.nutrient_profile['SODIUM'] || 
-                            meal.nutrient_profile['Sodium'] || 
-                            meal.nutrient_profile['sodium']
-                          )}mg
-                        </span>
+                        <div>
+                          <span className="text-lg font-semibold text-gray-700">Sodium</span>
+                          <p className="text-xs text-gray-500 mt-1">🧂 Essential mineral, but limit intake</p>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-2xl font-bold text-gray-900">
+                            {Math.round(
+                              meal.nutrient_profile['SODIUM'] || 
+                              meal.nutrient_profile['Sodium'] || 
+                              meal.nutrient_profile['sodium']
+                            )}mg
+                          </span>
+                          <div className={`text-xs ${
+                            (meal.nutrient_profile['SODIUM'] || meal.nutrient_profile['Sodium'] || meal.nutrient_profile['sodium']) > 800 ?
+                            'text-red-500' : (meal.nutrient_profile['SODIUM'] || meal.nutrient_profile['Sodium'] || meal.nutrient_profile['sodium']) > 400 ?
+                            'text-yellow-600' : 'text-green-600'
+                          }`}>
+                            {(meal.nutrient_profile['SODIUM'] || meal.nutrient_profile['Sodium'] || meal.nutrient_profile['sodium']) > 800 ?
+                             'High sodium' : (meal.nutrient_profile['SODIUM'] || meal.nutrient_profile['Sodium'] || meal.nutrient_profile['sodium']) > 400 ?
+                             'Moderate sodium' : 'Low sodium'}
+                          </div>
+                        </div>
                       </div>
                     ) : null}
                     
@@ -654,6 +904,17 @@ export default function MealDetailPage() {
                     Nutrition data not available. Try recalculating metrics.
                   </div>
                 )}
+                
+                {/* Nutritional guidance */}
+                <div className="mt-6 p-4 bg-orange-50 rounded-lg">
+                  <h4 className="text-sm font-bold text-orange-700 mb-2">🍎 Nutrition Tips</h4>
+                  <div className="text-xs text-orange-600 space-y-1">
+                    <p>• <strong>Balanced meals</strong> include protein, carbs, healthy fats, and fiber</p>
+                    <p>• <strong>Portion control:</strong> Listen to your body's hunger cues</p>
+                    <p>• <strong>Variety matters:</strong> Different foods provide different nutrients</p>
+                    <p>• <strong>Stay hydrated:</strong> Drink water with your meals</p>
+                  </div>
+                </div>
               </div>
             </div>
 
