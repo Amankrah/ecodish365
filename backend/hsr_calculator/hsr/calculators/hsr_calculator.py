@@ -4,10 +4,8 @@ Addresses fundamental issues in the original HSR algorithm with evidence-based i
 """
 
 import logging
-import bisect
-from typing import List, Dict, Optional, Tuple, Union
+from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass, field
-from functools import lru_cache
 
 from ..models.meal import Meal
 from ..models.food import Food
@@ -17,7 +15,9 @@ from ..models.hsr_result import (
     HealthInsight, HSRLevel, NutrientImpact
 )
 from ..providers.threshold_provider import (
-    ThresholdProvider, NutritionalContext
+    ThresholdProvider,
+    NutritionalContext,
+    rust_hsr_backend,
 )
 
 logger = logging.getLogger(__name__)
@@ -125,53 +125,36 @@ class HSRCalculator:
 
 
     def _calculate_components(self) -> HSRComponentScore:
-        """Calculate component scores using official HSR methodology"""
-        
-        # Calculate baseline (risk) components
-        energy_points = ThresholdProvider.calculate_hsr_points(
-            self.meal.energy_kj, self.thresholds.energy
+        """Calculate component scores using official HSR methodology (Rust)."""
+        rust = rust_hsr_backend()
+        category_value = (
+            self.meal.category.value
+            if self.meal.category is not None
+            else Category.FOOD.value
         )
-        saturated_fat_points = ThresholdProvider.calculate_hsr_points(
-            self.meal.fatty_acids_saturated_total, self.thresholds.saturated_fat
+        d = rust.calculate_component_scores(
+            category_value,
+            float(self.meal.energy_kj),
+            float(self.meal.fatty_acids_saturated_total),
+            float(self.meal.sugars_total),
+            float(self.meal.sodium),
+            float(self.meal.protein),
+            float(self.meal.fibre_total_dietary),
+            float(self.meal.fvnl_percent),
         )
-        sugar_points = ThresholdProvider.calculate_hsr_points(
-            self.meal.sugars_total, self.thresholds.sugar
-        )
-        sodium_points = ThresholdProvider.calculate_hsr_points(
-            self.meal.sodium, self.thresholds.sodium
-        )
-        
-        baseline_points = energy_points + saturated_fat_points + sugar_points + sodium_points
-        
-        # Calculate modifying (beneficial) components
-        protein_points = ThresholdProvider.calculate_hsr_points(
-            self.meal.protein, self.thresholds.protein
-        )
-        fiber_points = ThresholdProvider.calculate_hsr_points(
-            self.meal.fibre_total_dietary, self.thresholds.fiber
-        )
-        fvnl_points = ThresholdProvider.calculate_hsr_points(
-            self.meal.fvnl_percent, self.thresholds.fvnl
-        )
-        
-        modifying_points = protein_points + fiber_points + fvnl_points
-        
-        # Calculate final score: baseline - modifying (minimum 0)
-        final_score = max(0, baseline_points - modifying_points)
-        
         return HSRComponentScore(
-            baseline_points=baseline_points,
-            energy_points=energy_points,
-            saturated_fat_points=saturated_fat_points,
-            sugar_points=sugar_points,
-            sodium_points=sodium_points,
-            modifying_points=modifying_points,
-            protein_points=protein_points,
-            fiber_points=fiber_points,
-            fvnl_points=fvnl_points,
-            final_score=final_score,
-            star_rating=0.0,  # Will be calculated separately
-            scientific_confidence=self._calculate_confidence()
+            baseline_points=int(d["baseline_points"]),
+            energy_points=int(d["energy_points"]),
+            saturated_fat_points=int(d["saturated_fat_points"]),
+            sugar_points=int(d["sugar_points"]),
+            sodium_points=int(d["sodium_points"]),
+            modifying_points=int(d["modifying_points"]),
+            protein_points=int(d["protein_points"]),
+            fiber_points=int(d["fiber_points"]),
+            fvnl_points=int(d["fvnl_points"]),
+            final_score=int(d["final_score"]),
+            star_rating=0.0,
+            scientific_confidence=self._calculate_confidence(),
         )
 
 

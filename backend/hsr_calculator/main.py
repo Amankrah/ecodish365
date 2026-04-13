@@ -1,41 +1,26 @@
 import logging
-import time
 import os
 import sys
-import json
-from typing import Dict, List, Any
-from dataclasses import dataclass
+import time
+from pathlib import Path
+from typing import Any, Dict
 
-# Add the parent directory to the Python path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+_BACKEND_ROOT = Path(__file__).resolve().parent.parent
 
-# Add API views path
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'api', 'views'))
-
-# HSR Calculator imports
-from hsr.utils.data_loader import load_cnf_data
-from hsr.models.food import Food
-from hsr.models.meal import Meal
-from hsr.models.category import Category
-from hsr.calculators.hsr_calculator import HSRCalculator, HSRConfig
-from hsr.calculators.fvnl_calculator import calculate_fvnl_content
-
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
-@dataclass
-class MockRequest:
-    """Mock Django request object for testing"""
-    data: Dict[str, Any]
-    GET: Dict[str, str]
-    method: str = 'POST'
-    
-    def __init__(self, data=None, get_params=None, method='POST'):
-        self.data = data or {}
-        self.GET = get_params or {}
-        self.method = method
+def _api_post(path: str, payload: Dict[str, Any]):
+    from rest_framework.test import APIRequestFactory
+
+    return APIRequestFactory().post(path, payload, format="json")
+
+
+def _api_get(path: str, query: Dict[str, Any] | None = None):
+    from rest_framework.test import APIRequestFactory
+
+    return APIRequestFactory().get(path, data=query or {})
 
 # Test data sets for different scenarios
 TEST_SCENARIOS = {
@@ -63,28 +48,20 @@ TEST_SCENARIOS = {
 
 
 def setup_django_environment():
-    """Setup minimal Django environment for testing"""
+    """Load full ``dish_project`` settings (CNF path, apps, cache) for API tests."""
     try:
         import django
         from django.conf import settings
-        
+
         if not settings.configured:
-            settings.configure(
-                DEBUG=True,
-                CNF_FOLDER=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'raw_cnf'),
-                CACHES={
-                    'default': {
-                        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-                    }
-                }
-            )
+            sys.path.insert(0, str(_BACKEND_ROOT))
+            os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dish_project.settings")
             django.setup()
-            
+
         logger.info("Django environment configured for testing")
         return True
     except Exception as e:
-        logger.warning(f"Could not setup Django environment: {e}")
-        logger.info("Proceeding with direct function testing")
+        logger.warning("Could not setup Django environment: %s", e)
         return False
 
 def test_calculate_hsr_simple():
@@ -94,20 +71,20 @@ def test_calculate_hsr_simple():
     logger.info("="*60)
     
     try:
-        # Import the view function
-        from hsr_views_consolidated import calculate_hsr
-        
-        # Test data
+        from api.views.hsr_views_consolidated import calculate_hsr
+
         test_data = TEST_SCENARIOS["simple_meal"]
-        
-        # Create mock request
-        request = MockRequest(data={
-            "food_ids": test_data["food_ids"],
-            "serving_sizes": test_data["serving_sizes"],
-            "analysis_level": "simple",
-            "include_alternatives": False,
-            "include_meal_insights": False
-        })
+
+        request = _api_post(
+            "/api/hsr/calculate/",
+            {
+                "food_ids": test_data["food_ids"],
+                "serving_sizes": test_data["serving_sizes"],
+                "analysis_level": "simple",
+                "include_alternatives": False,
+                "include_meal_insights": False,
+            },
+        )
         
         logger.info(f"Testing: {test_data['description']}")
         logger.info(f"Food IDs: {test_data['food_ids']}")
@@ -148,19 +125,20 @@ def test_calculate_hsr_detailed():
     logger.info("="*60)
     
     try:
-        from hsr_views_consolidated import calculate_hsr
-        
-        # Test data
+        from api.views.hsr_views_consolidated import calculate_hsr
+
         test_data = TEST_SCENARIOS["complex_meal"]
-        
-        # Create mock request
-        request = MockRequest(data={
-            "food_ids": test_data["food_ids"],
-            "serving_sizes": test_data["serving_sizes"],
-            "analysis_level": "detailed",
-            "include_alternatives": True,
-            "include_meal_insights": True
-        })
+
+        request = _api_post(
+            "/api/hsr/calculate/",
+            {
+                "food_ids": test_data["food_ids"],
+                "serving_sizes": test_data["serving_sizes"],
+                "analysis_level": "detailed",
+                "include_alternatives": True,
+                "include_meal_insights": True,
+            },
+        )
         
         logger.info(f"Testing: {test_data['description']}")
         logger.info(f"Food IDs: {test_data['food_ids']}")
@@ -213,17 +191,18 @@ def test_compare_foods():
     logger.info("="*60)
     
     try:
-        from hsr_views_consolidated import compare_foods
-        
-        # Test data
+        from api.views.hsr_views_consolidated import compare_foods
+
         test_data = TEST_SCENARIOS["comparison_foods"]
-        
-        # Create mock request
-        request = MockRequest(data={
-            "food_ids": test_data["food_ids"],
-            "serving_size": test_data["serving_size"],
-            "sort_by": "hsr_rating"
-        })
+
+        request = _api_post(
+            "/api/hsr/compare/",
+            {
+                "food_ids": test_data["food_ids"],
+                "serving_size": test_data["serving_size"],
+                "sort_by": "hsr_rating",
+            },
+        )
         
         logger.info(f"Testing: {test_data['description']}")
         logger.info(f"Food IDs: {test_data['food_ids']}")
@@ -268,19 +247,17 @@ def test_food_profile():
     logger.info("="*60)
     
     try:
-        from hsr_views_consolidated import get_food_hsr_profile
-        
-        # Test single food
+        from api.views.hsr_views_consolidated import get_food_hsr_profile
+
         food_id = TEST_SCENARIOS["single_food"]["food_ids"][0]
         serving_size = TEST_SCENARIOS["single_food"]["serving_sizes"][0]
-        
-        # Create mock request (GET request)
-        request = MockRequest(
-            get_params={
+
+        request = _api_get(
+            f"/api/hsr/profile/{food_id}/",
+            {
                 "serving_size": str(serving_size),
-                "include_alternatives": "true"
+                "include_alternatives": "true",
             },
-            method='GET'
         )
         
         logger.info(f"Testing food profile for Food ID: {food_id}")
@@ -326,18 +303,19 @@ def test_meal_insights():
     logger.info("="*60)
     
     try:
-        from hsr_views_consolidated import get_meal_insights
-        
-        # Test data
+        from api.views.hsr_views_consolidated import get_meal_insights
+
         test_data = TEST_SCENARIOS["complex_meal"]
-        
-        # Create mock request
-        request = MockRequest(data={
-            "food_ids": test_data["food_ids"],
-            "serving_sizes": test_data["serving_sizes"],
-            "meal_type": "lunch",
-            "dietary_goals": ["heart_health", "weight_loss"]
-        })
+
+        request = _api_post(
+            "/api/hsr/insights/",
+            {
+                "food_ids": test_data["food_ids"],
+                "serving_sizes": test_data["serving_sizes"],
+                "meal_type": "lunch",
+                "dietary_goals": ["heart_health", "weight_loss"],
+            },
+        )
         
         logger.info(f"Testing: {test_data['description']}")
         logger.info(f"Meal type: lunch")
@@ -382,9 +360,8 @@ def test_error_handling():
     logger.info("="*60)
     
     try:
-        from hsr_views_consolidated import calculate_hsr
-        
-        # Test with invalid data
+        from api.views.hsr_views_consolidated import calculate_hsr
+
         test_cases = [
             {
                 "name": "Empty food list",
@@ -403,17 +380,22 @@ def test_error_handling():
         for test_case in test_cases:
             logger.info(f"  Testing: {test_case['name']}")
             
-            request = MockRequest(data=test_case["data"])
+            request = _api_post("/api/hsr/calculate/", test_case["data"])
             
             try:
                 response = calculate_hsr(request)
-                if hasattr(response, 'data') and not response.data.get('success', True):
-                    logger.info(f"    ✓ Correctly handled error: {response.data.get('error', 'Unknown error')}")
+                if hasattr(response, "data"):
+                    if response.status_code >= 400 or response.data.get("success") is False:
+                        logger.info(
+                            "    Handled error: %s",
+                            response.data.get("error", response.data.get("message", "HTTP error")),
+                        )
+                    else:
+                        logger.warning("    Expected error but got success")
                 else:
-                    logger.warning(f"    ⚠ Expected error but got success")
+                    logger.warning("    Unexpected response (no .data)")
             except Exception as e:
-                logger.info(f"    ✓ Correctly raised exception: {str(e)}")
-        
+                logger.info("    Raised exception: %s", str(e))
         return True
         
     except Exception as e:
@@ -426,8 +408,8 @@ def main():
     Main test runner for HSR Views Consolidated
     
     This test suite validates the HSR views from hsr_views_consolidated.py by:
-    1. Setting up a minimal Django environment
-    2. Creating mock request objects
+    1. Setting up Django with ``dish_project.settings``
+    2. Building requests with DRF ``APIRequestFactory``
     3. Testing all major endpoints with various scenarios
     4. Validating response formats and error handling
     5. Providing comprehensive logging and reporting
@@ -435,7 +417,7 @@ def main():
     Usage:
     - Run from the hsr_calculator directory: python main.py
     - Requires Django, CNF data, and all HSR calculator dependencies
-    - Tests will run even if Django environment setup fails (with warnings)
+    - Requires a successful Django setup (see ``setup_django_environment``)
     """
     start_time = time.time()
     
@@ -450,8 +432,8 @@ def main():
     django_available = setup_django_environment()
     
     if not django_available:
-        logger.error("Django environment not available - some tests may fail")
-        logger.info("Continuing with available tests...")
+        logger.error("Django environment not available — aborting HSR API tests.")
+        return
     
     # Track test results
     test_results = {}

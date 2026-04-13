@@ -1,0 +1,18 @@
+[package]
+name = "rust_core"
+version = "0.1.0"
+edition = "2021"
+description = "Rust compute core for ecodish365 calculators (HSR, HEFI, etc.)"
+
+[lib]
+name = "rust_core"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+once_cell = "1.20"
+pyo3 = { version = "0.22", features = ["extension-module"] }
+regex = "1.11"
+
+[profile.release]
+lto = true
+codegen-units = 1

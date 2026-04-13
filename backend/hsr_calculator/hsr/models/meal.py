@@ -483,23 +483,17 @@ class Meal:
         alternatives = []
         
         if self.category_confidence < 0.7:
-            # Import here to avoid circular imports
             from ..utils.meal_categorizer import MealCategorizer
-            
+
             try:
-                # Get the full analysis to see other options
-                _, analysis = MealCategorizer.determine_meal_category(self.foods)
-                category_breakdown = analysis.get('nutritional_context', {}).get('category_breakdown', {})
-                
-                # Suggest categories with significant representation
-                for cat_name, percentage in category_breakdown.items():
-                    if percentage >= 25 and cat_name != self.category.value:
+                result = MealCategorizer.determine_scientific_category(self.foods)
+                for cat, fitness, reason in result.alternative_categories:
+                    if fitness >= 0.25 and cat != self.category:
                         alternatives.append({
-                            'category': cat_name,
-                            'percentage': percentage,
-                            'reason': f"Significant component ({percentage:.1f}%)"
+                            "category": cat.value,
+                            "percentage": fitness * 100.0,
+                            "reason": reason,
                         })
-                        
             except Exception as e:
                 logger.error(f"Error suggesting alternatives: {str(e)}")
         

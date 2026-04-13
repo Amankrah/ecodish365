@@ -4,6 +4,7 @@ Combines enhanced analysis with clean, user-friendly endpoints for better decisi
 """
 
 import logging
+import time
 from typing import List, Dict, Optional, Union
 from functools import lru_cache
 from rest_framework.decorators import api_view, permission_classes
@@ -30,6 +31,19 @@ from hsr_calculator.hsr.utils.food_group_mapper import FoodGroupMapper
 from dish_cnf_db_pipeline.cnf_pipeline import CNFDataPipeline
 
 logger = logging.getLogger(__name__)
+
+
+def _log_hsr_timing(view: str, food_ids: List, meta: str = "", **parts_ms: float) -> None:
+    """Log wall-clock segments in milliseconds (``time.perf_counter``)."""
+    ordered = " ".join(f"{k}={parts_ms[k]:.2f}ms" for k in sorted(parts_ms))
+    logger.info(
+        "HSR timing view=%s food_ids=%s %s%s",
+        view,
+        food_ids,
+        f"{meta} " if meta else "",
+        ordered,
+    )
+
 
 # Global CNF pipeline instance
 _cnf_pipeline = None
@@ -108,7 +122,9 @@ def calculate_hsr(request):
     
     # Validate inputs
     _validate_hsr_input(food_ids, serving_sizes)
-    
+
+    t0 = time.perf_counter()
+
     # Load and process foods
     foods = []
     for food_id, serving_size in zip(food_ids, serving_sizes):
@@ -117,21 +133,24 @@ def calculate_hsr(request):
             foods.append(food)
         except Exception as e:
             raise HSRAPIError(f"Failed to load food {food_id}: {str(e)}")
-    
+
+    t1 = time.perf_counter()
+    load_ms = (t1 - t0) * 1000.0
+
     # Determine HSR category using official methodology
     primary_food = foods[0] if foods else None
     if primary_food:
         meal_category = ThresholdProvider.get_category_from_food(
-            primary_food.food_name, 
-            getattr(primary_food, 'food_group_id', 0)
+            primary_food.food_name,
+            getattr(primary_food, "food_group_id", 0),
         )
     else:
         meal_category = Category.FOOD  # Default
-    
+
     # Create meal with determined category
     meal = HSRMeal(foods=foods)
     meal.category = meal_category
-    
+
     # Use standard HSR configuration
     config = HSRConfig(
         use_scientific_thresholds=False,
@@ -140,19 +159,39 @@ def calculate_hsr(request):
         use_unified_energy_approach=False,
         consider_processing_level=False,
         include_confidence_metrics=True,
-        detailed_explanations=(analysis_level == 'detailed')
+        detailed_explanations=(analysis_level == "detailed"),
     )
     calculator = HSRCalculator(meal, config)
-    
-    if analysis_level == 'simple':
+
+    if analysis_level == "simple":
         result = _calculate_simple_hsr(calculator)
     else:
         result = _calculate_detailed_hsr(calculator, include_alternatives, include_meal_insights)
-    
+
+    t2 = time.perf_counter()
+    core_ms = (t2 - t1) * 1000.0
+
     # Add food details for user context
-    result['food_details'] = _get_food_details_summary(foods)
-    result['meal_categorization'] = _get_basic_meal_categorization_summary(meal)
-    
+    result["food_details"] = _get_food_details_summary(foods)
+    result["meal_categorization"] = _get_basic_meal_categorization_summary(meal)
+
+    t3 = time.perf_counter()
+    assembly_ms = (t3 - t2) * 1000.0
+    total_ms = (t3 - t0) * 1000.0
+
+    _log_hsr_timing(
+        "calculate_hsr",
+        food_ids,
+        meta=(
+            f"analysis_level={analysis_level} include_alternatives={include_alternatives} "
+            f"include_meal_insights={include_meal_insights}"
+        ),
+        load_foods=load_ms,
+        meal_and_hsr=core_ms,
+        response_assembly=assembly_ms,
+        total=total_ms,
+    )
+
     return Response(result)
 
 
@@ -320,23 +359,28 @@ def get_meal_insights(request):
     dietary_goals = request.data.get('dietary_goals', [])
     
     _validate_hsr_input(food_ids, serving_sizes)
-    
+
+    t0 = time.perf_counter()
+
     # Load foods and calculate meal HSR using official methodology
     foods = [_load_food_data(fid, size) for fid, size in zip(food_ids, serving_sizes)]
-    
+
+    t1 = time.perf_counter()
+    load_ms = (t1 - t0) * 1000.0
+
     # Use official HSR categorization
     primary_food = foods[0] if foods else None
     if primary_food:
         meal_category = ThresholdProvider.get_category_from_food(
-            primary_food.food_name, 
-            getattr(primary_food, 'food_group_id', 0)
+            primary_food.food_name,
+            getattr(primary_food, "food_group_id", 0),
         )
     else:
         meal_category = Category.FOOD  # Default
-    
+
     meal = HSRMeal(foods=foods)
     meal.category = meal_category
-    
+
     # Use standard HSR configuration
     config = HSRConfig(
         use_scientific_thresholds=False,
@@ -344,11 +388,14 @@ def get_meal_insights(request):
         apply_satiety_adjustments=False,
         use_unified_energy_approach=False,
         consider_processing_level=False,
-        detailed_explanations=True
+        detailed_explanations=True,
     )
     calculator = HSRCalculator(meal, config)
     result = calculator.calculate_hsr()
-    
+
+    t2 = time.perf_counter()
+    core_ms = (t2 - t1) * 1000.0
+
     # Generate comprehensive meal insights
     insights = {
         "success": True,
@@ -368,9 +415,23 @@ def get_meal_insights(request):
             }
         },
         "food_details": _get_food_details_summary(foods),
-        "meal_categorization": _get_basic_meal_categorization_summary(meal)
+        "meal_categorization": _get_basic_meal_categorization_summary(meal),
     }
-    
+
+    t3 = time.perf_counter()
+    assembly_ms = (t3 - t2) * 1000.0
+    total_ms = (t3 - t0) * 1000.0
+
+    _log_hsr_timing(
+        "get_meal_insights",
+        food_ids,
+        meta=f"meal_type={meal_type!r} dietary_goals={dietary_goals!r}",
+        load_foods=load_ms,
+        meal_and_hsr=core_ms,
+        response_assembly=assembly_ms,
+        total=total_ms,
+    )
+
     return Response(insights)
 
 
