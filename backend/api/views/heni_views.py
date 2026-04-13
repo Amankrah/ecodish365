@@ -1,5 +1,3 @@
-import os
-import sys
 import logging
 from django.conf import settings
 from rest_framework.decorators import api_view, permission_classes
@@ -7,13 +5,13 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 
-# Add heni_calculator to path
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../heni_calculator'))
-
-from heni_calculator.heni.database.cnf_integrator import create_heni_cnf_integrator
-from heni_calculator.heni.models.ingredient import Ingredient
-from heni_calculator.heni.calculator.heni_calculator import HENICalculator
 from api.seo_utils import seo_metadata
+from heni_calculator.heni.service import (
+    calculate_meal_heni_response,
+    get_cnf_integrator,
+    resolve_llm_api_key,
+)
+from heni_calculator.heni.models.ingredient import Ingredient
 from .heni_analysis_helpers import (
     _identify_primary_health_drivers,
     _get_epidemiological_context, 
@@ -30,15 +28,6 @@ from .heni_analysis_helpers import (
 
 logger = logging.getLogger(__name__)
 
-# Global integrator instance to avoid initialization overhead
-_heni_integrator = None
-
-def get_heni_integrator():
-    global _heni_integrator
-    if _heni_integrator is None:
-        cnf_dir = settings.CNF_FOLDER
-        _heni_integrator = create_heni_cnf_integrator(cnf_dir)
-    return _heni_integrator
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -58,10 +47,9 @@ def heni_calculate(request):
         if not isinstance(meal_data, list) or len(meal_data) == 0:
             return Response({"error": "Meal array cannot be empty"}, status=status.HTTP_400_BAD_REQUEST)
         
-        # Validate input data
+        integrator = get_cnf_integrator()
         ingredients = []
-        integrator = get_heni_integrator()
-        
+
         for item in meal_data:
             food_id = item.get('food_id')
             amount = item.get('amount')
@@ -81,22 +69,21 @@ def heni_calculate(request):
                 cnf_integrator=integrator
             )
             ingredients.append(ingredient)
-        
-        # Get LLM API key from settings
-        llm_api_key = getattr(settings, 'OPENAI_API_KEY', None)
-        if not llm_api_key:
+
+        if not getattr(settings, "OPENAI_API_KEY", None):
             logger.warning("No OpenAI API key configured, HENI categorization may be limited")
-            llm_api_key = ""  # Use empty string as fallback
-        
-        # Calculate HENI using the comprehensive methodology
-        heni_calculator = HENICalculator(integrator, llm_api_key)
-        comprehensive_result = heni_calculator.calculate_meal_heni(ingredients)
+
+        comprehensive_result = calculate_meal_heni_response(
+            ingredients,
+            llm_api_key=resolve_llm_api_key(),
+            cnf_integrator=integrator,
+        )
         
         result = {
             "success": True,
             "data": comprehensive_result,
             "metadata": {
-                "calculation_method": "DALY-based HENI scoring",
+                "calculation_method": "DALY-based HENI scoring (rust_core.heni)",
                 "reference": "Global Burden of Disease epidemiological evidence",
                 "last_updated": "2024",
                 "units": "μDALY (micro-Disability Adjusted Life Years)"
@@ -135,9 +122,8 @@ def get_food_heni_profile(request, food_id):
         except ValueError:
             return Response({"error": "Amount must be a valid number"}, status=status.HTTP_400_BAD_REQUEST)
         
-        integrator = get_heni_integrator()
-        
-        # Create ingredient and calculate HENI
+        integrator = get_cnf_integrator()
+
         ingredient = Ingredient(
             food_id=food_id,
             amount=amount_g,
@@ -145,10 +131,11 @@ def get_food_heni_profile(request, food_id):
             cnf_integrator=integrator
         )
         
-        llm_api_key = getattr(settings, 'OPENAI_API_KEY', "")
-        heni_calculator = HENICalculator(integrator, llm_api_key)
-        
-        comprehensive_result = heni_calculator.calculate_meal_heni([ingredient])
+        comprehensive_result = calculate_meal_heni_response(
+            [ingredient],
+            llm_api_key=resolve_llm_api_key(),
+            cnf_integrator=integrator,
+        )
         
         # Get food details
         food_name = integrator.get_food_description(food_id)
@@ -207,9 +194,8 @@ def analyze_dietary_pattern(request):
         if not meals:
             return Response({"error": "At least one meal is required for dietary pattern analysis"}, status=status.HTTP_400_BAD_REQUEST)
         
-        integrator = get_heni_integrator()
-        llm_api_key = getattr(settings, 'OPENAI_API_KEY', "")
-        
+        integrator = get_cnf_integrator()
+
         # Analyze each meal
         meal_analyses = []
         total_daily_heni = 0
@@ -228,9 +214,11 @@ def analyze_dietary_pattern(request):
                 )
                 meal_ingredients.append(ingredient)
             
-            # Calculate meal HENI
-            heni_calculator = HENICalculator(integrator, llm_api_key)
-            meal_analysis = heni_calculator.calculate_meal_heni(meal_ingredients)
+            meal_analysis = calculate_meal_heni_response(
+                meal_ingredients,
+                llm_api_key=resolve_llm_api_key(),
+                cnf_integrator=integrator,
+            )
             
             meal_analysis['meal_name'] = meal_name
             meal_analyses.append(meal_analysis)

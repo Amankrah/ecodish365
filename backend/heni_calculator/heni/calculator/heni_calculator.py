@@ -3,7 +3,7 @@ from ..database.cnf_integrator import HENICNFIntegrator
 from ..models.ingredient import Ingredient
 from ..categorization.llm_categorizer import LLMFoodCategorizer
 from ..core.daly_calculator import DALYCalculator, HENIResult
-from ..config.heni_factors import HENI_FACTORS
+from ..config.heni_factors import HENI_RISK_FACTOR_KEYS
 
 import logging
 
@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class HENICalculator:
     def __init__(self, cnf_integrator: HENICNFIntegrator, llm_api_key: str = "", age_group: str = "adult_male"):
         self.cnf_integrator = cnf_integrator
-        self.heni_factors = HENI_FACTORS
+        self.heni_factor_keys = HENI_RISK_FACTOR_KEYS
         self.categorizer = LLMFoodCategorizer(cnf_integrator, llm_api_key) if llm_api_key else None
         self.daly_calculator = DALYCalculator(age_group=age_group)
 

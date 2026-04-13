@@ -87,7 +87,7 @@ def extract_risk_factors_from_ingredient(calculator, ingredient) -> Dict[str, fl
         try:
             llm_categories = calculator.categorizer.categorize_food(ingredient.food_id)
             for category, confidence in llm_categories.items():
-                if category in calculator.heni_factors and confidence > 0.1:  # Only high-confidence categorizations
+                if category in calculator.heni_factor_keys and confidence > 0.1:  # Only high-confidence categorizations
                     risk_factors[category] = confidence * 100.0  # Scale by confidence
         except Exception as e:
             logger.warning(f"LLM categorization failed for food {ingredient.food_id}: {e}")

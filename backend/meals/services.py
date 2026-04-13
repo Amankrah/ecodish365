@@ -10,10 +10,8 @@ try:
     from environmental_impact_model.src.monetization import Monetization
     from environmental_impact_model.src.data_loader import DataLoader as EnvDataLoader
     
-    # FCS Calculator
-    from fcs_calculator.fcs.models.food_item import FoodItem as FCSFoodItem
-    from fcs_calculator.fcs.analyzers.food_analyzer import FoodAnalyzer
-    from fcs_calculator.fcs.utils.cnf_data_integrator import create_cnf_integrator as create_fcs_integrator
+    # FCS Calculator (CNF + rust_core.fcs via shared service)
+    from fcs_calculator.fcs.service import extract_and_score
     
     # HEFI Calculator
     from hefi_calculator.hefi.cnf_integrator import HEFICNFIntegrator
@@ -28,11 +26,14 @@ try:
     from hsr_calculator.hsr.providers.threshold_provider import ThresholdProvider
     from hsr_calculator.hsr.calculators.fvnl_calculator import calculate_fvnl_content
     
-    # HENI Calculator  
-    from heni_calculator.heni.database.cnf_integrator import create_heni_cnf_integrator
-    from heni_calculator.heni.models.ingredient import Ingredient
-    from heni_calculator.heni.calculator.heni_calculator import HENICalculator
-    
+    # HENI (CNF + rust_core.heni via heni_calculator.heni.service)
+    from heni_calculator.heni.service import (
+        calculate_meal_heni_response,
+        get_cnf_integrator,
+        ingredients_from_meal_food_items,
+        resolve_llm_api_key,
+    )
+
     CALCULATORS_AVAILABLE = True
 except ImportError as e:
     logging.warning(f"Could not import calculation modules: {e}")
@@ -168,7 +169,8 @@ class MealCalculationService:
             'fcs_score': None,
             'hefi_score': None,
             'heni_score': None,
-            'hsr_score': None
+            'heni_total_score': None,
+            'hsr_score': None,
         }
         
         if not CALCULATORS_AVAILABLE:
@@ -178,17 +180,8 @@ class MealCalculationService:
         try:
             # Calculate FCS (Food Compass Score) using working FCS view logic
             try:
-                # Build combined FoodItem for the meal
-                food_item = FCSFoodItem("Meal Analysis")
                 food_ids = [int(item['food_id']) for item in food_items]
-
-                # Use enhanced CNF integrator to populate attributes
-                cnf_integrator = create_fcs_integrator()
-                cnf_integrator.extract_nutrients_enhanced(food_ids, food_item)
-
-                # Analyze and extract FCS
-                analyzer = FoodAnalyzer()
-                fcs_result = analyzer.analyze_food_item(food_item)
+                _, fcs_result = extract_and_score(food_ids, "Meal Analysis")
                 scores['fcs_score'] = fcs_result.get('fcs')
             except Exception as e:
                 logger.error(f"FCS calculation error: {e}")
@@ -208,52 +201,29 @@ class MealCalculationService:
             except Exception as e:
                 logger.error(f"HEFI calculation error: {e}")
             
-            # Calculate HENI (Health and Nutrition Index) using standalone HENI endpoint
+            # HENI: shared service + rust_core.heni (same as /api/heni/calculate/)
             try:
-                from django.test import Client
-                import json
-                
-                # Prepare meal data for HENI API
-                meal_data = []
-                for item in food_items:
-                    food_id = int(item['food_id'])
-                    quantity_g = float(self._convert_to_grams(item['quantity'], item['unit']))
-                    meal_data.append({
-                        'food_id': food_id,
-                        'amount': quantity_g,
-                        'unit': 'g'
-                    })
-                
-                # Use Django test client to call internal HENI API
-                client = Client()
-                response = client.post(
-                    '/api/heni/calculate/',
-                    data=json.dumps({'meal': meal_data}),
-                    content_type='application/json'
+                integrator = get_cnf_integrator()
+                ingredients = ingredients_from_meal_food_items(
+                    food_items,
+                    lambda it: float(self._convert_to_grams(it["quantity"], it["unit"])),
+                    integrator=integrator,
                 )
-                
-                if response.status_code == 200:
-                    heni_result = response.json()
-                    # Check for the nested data structure from HENI API
-                    if heni_result.get('data', {}).get('success'):
-                        heni_data = heni_result.get('data', {}).get('data', {})
-                        heni_scores = heni_data.get('heni_scores', {})
-                        scores['heni_score'] = heni_scores.get('total_heni_score')  # For minutes calculation
-                        scores['heni_total_score'] = heni_scores.get('heni_per_100_kcal')  # For μDALY/100kcal display
-                        logger.info(f"HENI calculation successful: {heni_scores.get('total_heni_score')} μDALY, {heni_scores.get('heni_per_100_kcal')} per 100kcal")
-                    elif heni_result.get('success'):
-                        # Handle direct success format
-                        comprehensive_result = heni_result.get('data', {})
-                        heni_scores = comprehensive_result.get('heni_scores', {})
-                        scores['heni_score'] = heni_scores.get('total_heni_score')
-                        scores['heni_total_score'] = heni_scores.get('heni_per_100_kcal')
-                        logger.info(f"HENI calculation successful: {heni_scores.get('total_heni_score')} μDALY")
-                    else:
-                        logger.warning(f"HENI API returned unsuccessful response: {heni_result}")
-                else:
-                    logger.warning(f"HENI API call failed with status {response.status_code}")
+                comprehensive = calculate_meal_heni_response(
+                    ingredients,
+                    llm_api_key=resolve_llm_api_key(),
+                    cnf_integrator=integrator,
+                )
+                heni_scores = comprehensive.get("heni_scores", {})
+                scores["heni_score"] = heni_scores.get("total_heni_score")
+                scores["heni_total_score"] = heni_scores.get("heni_per_100_kcal")
+                logger.info(
+                    "HENI meal calculation: %s μDALY, %s per 100 kcal",
+                    heni_scores.get("total_heni_score"),
+                    heni_scores.get("heni_per_100_kcal"),
+                )
             except Exception as e:
-                logger.error(f"HENI calculation error: {e}")
+                logger.error("HENI calculation error: %s", e)
             
             # Calculate HSR (Health Star Rating) using consolidated logic
             try:

@@ -2,7 +2,7 @@ import logging
 from typing import Dict, Optional
 import openai
 from ..database.cnf_integrator import HENICNFIntegrator
-from ..config.heni_factors import HENI_FACTORS
+from ..config.heni_factors import HENI_RISK_FACTOR_KEYS
 from .rule_based_categorizer import RuleBasedCategorizer
 import json
 
@@ -14,7 +14,7 @@ class LLMFoodCategorizer:
     def __init__(self, cnf_integrator: HENICNFIntegrator, api_key: str):
         self.cnf_integrator = cnf_integrator
         self.client = openai.OpenAI(api_key=api_key) if api_key else None
-        self.heni_risk_factors = list(HENI_FACTORS.keys())
+        self.heni_risk_factors = sorted(HENI_RISK_FACTOR_KEYS)
         self.categorization_cache = {}
         self.logger = logging.getLogger(__name__)
         
