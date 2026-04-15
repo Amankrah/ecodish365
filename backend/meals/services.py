@@ -40,7 +40,7 @@ except ImportError as e:
     CALCULATORS_AVAILABLE = False
 
 from api.food_id_finder import load_food_data, search_food
-from django.conf import settings
+from api.cnf_cache import get_dish_cnf_pipeline
 from dish_cnf_db_pipeline.cnf_pipeline import CNFDataPipeline
 
 logger = logging.getLogger(__name__)
@@ -54,8 +54,6 @@ class MealCalculationService:
         if self.food_df is None:
             logger.error("Failed to load food data")
             raise ValidationError("Food database not available")
-        # Lazy-init CNF pipeline for HSR and other model integrations
-        self._cnf_pipeline = None
     
     def validate_food_items(self, food_items: List[Dict[str, Any]]) -> bool:
         """Validate that all food items exist and have proper format"""
@@ -541,10 +539,14 @@ class MealCalculationService:
         return quantity * factor
 
     def _get_cnf_pipeline(self) -> CNFDataPipeline:
-        """Get or initialize the CNF data pipeline (singleton within this service)."""
-        if self._cnf_pipeline is None:
-            self._cnf_pipeline = CNFDataPipeline(settings.CNF_FOLDER)
-        return self._cnf_pipeline
+        """Return the process-wide shared CNF pipeline.
+
+        Previously this was a per-MealCalculationService cache, meaning
+        every newly-constructed service paid the 30 s cold load again if
+        the process hadn't seen one yet. Now it's one instance across the
+        whole process via `api.cnf_cache.get_dish_cnf_pipeline`.
+        """
+        return get_dish_cnf_pipeline()
 
     def _build_hsr_food(self, food_id: int, serving_size: float) -> 'HSRFood':
         """Construct an HSRFood using CNF data (aligns with hsr_views_consolidated logic)."""

@@ -45,14 +45,8 @@ def _log_hsr_timing(view: str, food_ids: List, meta: str = "", **parts_ms: float
     )
 
 
-# Global CNF pipeline instance
-_cnf_pipeline = None
-
-def get_cnf_pipeline():
-    global _cnf_pipeline
-    if _cnf_pipeline is None:
-        _cnf_pipeline = CNFDataPipeline(settings.CNF_FOLDER)
-    return _cnf_pipeline
+# Single process-wide CNF pipeline — see backend/api/cnf_cache.py.
+from api.cnf_cache import get_dish_cnf_pipeline as get_cnf_pipeline
 
 
 class HSRAPIError(Exception):

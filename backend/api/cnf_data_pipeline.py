@@ -1,7 +1,14 @@
 import os
 import pandas as pd
-from chardet import detect
 from datetime import datetime
+
+# Every CNF CSV in `raw_cnf/` is either ASCII or ISO-8859-1. ISO-8859-1 is
+# strictly a superset of ASCII, and it decodes every possible byte
+# (0x00-0xFF) without error, so it's the safe universal choice. Running
+# `chardet.detect` on every CSV at cold load (as the old code did) was ~1-2 s
+# of superstition — the encodings don't change.
+CNF_CSV_ENCODING = 'ISO-8859-1'
+
 
 class CNFDataPipeline:
     def __init__(self, data_dir):
@@ -17,15 +24,69 @@ class CNFDataPipeline:
         for file in csv_files:
             setattr(self, f"{file.lower()}_df", self._load_csv(f"{file}.csv"))
 
+        # REFUSE_NAME.csv and YIELD_NAME.csv from the Health Canada dump ship
+        # with ~1M blank trailing rows that balloon memory from ~35 MB to
+        # ~188 MB per instance. Drop them at load time so a re-ingest of the
+        # upstream CSVs can't silently regress memory.
+        self.refuse_name_df = self.refuse_name_df.dropna(subset=['RefuseID']).reset_index(drop=True)
+        self.yield_name_df = self.yield_name_df.dropna(subset=['YieldID']).reset_index(drop=True)
+
+        # Build the nutrient index once: `{food_id: {nutrient_name: value_per_100g}}`.
+        # Replaces the per-request nested `df[col==x]` filters that HEFI and
+        # HENI used to run (O(F*N) pandas ops per meal). All downstream
+        # calculators that need nutrient values by food can read this dict
+        # directly — see `nutrients_for(food_id)` below.
+        self.nutrients_by_food = self._build_nutrients_by_food_index()
+
+    def _build_nutrients_by_food_index(self):
+        """Return a `{FoodID: {NutrientName: NutrientValue}}` dict.
+
+        One pandas merge + groupby pass, done once at pipeline load. Callers
+        no longer need to filter `nutrient_amount_df` per request.
+        """
+        na = self.nutrient_amount_df
+        nn = self.nutrient_name_df
+        if na.empty or nn.empty:
+            return {}
+        merged = pd.merge(
+            na[['FoodID', 'NutrientID', 'NutrientValue']],
+            nn[['NutrientID', 'NutrientName']],
+            on='NutrientID',
+            how='left',
+        )
+        merged = merged.dropna(subset=['FoodID', 'NutrientName'])
+        index = {}
+        # `itertuples` is ~5x faster than `iterrows` for this shape.
+        for row in merged.itertuples(index=False):
+            fid = int(row.FoodID)
+            bucket = index.get(fid)
+            if bucket is None:
+                bucket = {}
+                index[fid] = bucket
+            # First-write-wins matches the old `iloc[0]` semantics in the
+            # legacy per-food filters.
+            name = row.NutrientName
+            if name not in bucket:
+                bucket[name] = float(row.NutrientValue)
+        return index
+
+    def nutrients_for(self, food_id: int):
+        """Return the pre-indexed nutrient dict for a food, or empty dict.
+
+        Replaces the per-request `nutrient_amount_df[FoodID==x]` filter
+        pattern in HEFI/HENI integrators.
+        """
+        return self.nutrients_by_food.get(int(food_id), {})
+
     def _detect_encoding(self, file_path):
-        with open(file_path, 'rb') as f:
-            result = detect(f.read())
-            return result['encoding']
+        """Legacy shim. Kept so external callers that referenced it don't break;
+        always returns the hard-coded encoding (see `CNF_CSV_ENCODING` above)."""
+        return CNF_CSV_ENCODING
 
     def _load_csv(self, file_name):
         file_path = os.path.join(self.data_dir, file_name)
-        encoding = self._detect_encoding(file_path)
-        
+        encoding = CNF_CSV_ENCODING
+
         # Define dtypes for columns that might have mixed types
         dtypes = {
             'FoodID': 'Int64',
@@ -51,8 +112,7 @@ class CNFDataPipeline:
 
     def _save_csv(self, df, file_name):
         file_path = os.path.join(self.data_dir, file_name)
-        encoding = self._detect_encoding(file_path)
-        df.to_csv(file_path, index=False, encoding=encoding)
+        df.to_csv(file_path, index=False, encoding=CNF_CSV_ENCODING)
 
     def _get_next_unique_id(self, column_name, dataframe):
         if pd.api.types.is_integer_dtype(dataframe[column_name]):

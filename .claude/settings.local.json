@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cargo check:*)",
+      "Bash(PYO3_PYTHON=\"C:\\\\\\\\Users\\\\\\\\Windows\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Programs\\\\\\\\Python\\\\\\\\Python313\\\\\\\\python.exe\" cargo check)",
+      "Bash(PYO3_PYTHON=\"C:\\\\\\\\Users\\\\\\\\Windows\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Programs\\\\\\\\Python\\\\\\\\Python313\\\\\\\\python.exe\" cargo test --lib hefi)",
+      "Bash(PYO3_PYTHON=\"C:\\\\\\\\Users\\\\\\\\Windows\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Programs\\\\\\\\Python\\\\\\\\Python313\\\\\\\\python.exe\" python -m maturin --version)",
+      "Bash(\"C:\\\\\\\\Users\\\\\\\\Windows\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Programs\\\\\\\\Python\\\\\\\\Python313\\\\\\\\python.exe\" -m maturin --version)",
+      "Bash(\"C:\\\\\\\\Users\\\\\\\\Windows\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Programs\\\\\\\\Python\\\\\\\\Python313\\\\\\\\python.exe\" -c \"import rust_core; print\\(rust_core.__version__\\); from rust_core import hsr, fcs, heni; print\\('hsr ok'\\)\")"
+    ]
+  }
+}

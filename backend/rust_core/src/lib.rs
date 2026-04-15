@@ -1,6 +1,7 @@
 use pyo3::prelude::*;
 
 mod fcs;
+mod hefi;
 mod heni;
 mod hsr;
 
@@ -37,6 +38,13 @@ fn rust_core(m: &Bound<'_, PyModule>) -> PyResult<()> {
     py.import_bound("sys")?
         .getattr("modules")?
         .set_item("rust_core.heni", &heni_mod)?;
+
+    let hefi_mod = PyModule::new_bound(py, "hefi")?;
+    hefi::register(&hefi_mod)?;
+    m.add_submodule(&hefi_mod)?;
+    py.import_bound("sys")?
+        .getattr("modules")?
+        .set_item("rust_core.hefi", &hefi_mod)?;
 
     Ok(())
 }

@@ -9,23 +9,19 @@ import pandas as pd
 from typing import List, Dict, Optional
 import logging
 
-# Add the parent directories to path to import CNFDataPipeline
+# Use the single process-wide CNF pipeline. See backend/api/cnf_cache.py.
 backend_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-api_dir = os.path.join(backend_dir, 'api')
-sys.path.append(api_dir)
+if backend_dir not in sys.path:
+    sys.path.append(backend_dir)
+from api.cnf_cache import get_api_cnf_pipeline
 from api.cnf_data_pipeline import CNFDataPipeline
 
 from fcs.models.food_item import FoodItem
 
-# Global pipeline instance to avoid expensive reinitialization
-_cnf_pipeline_instance = None
 
 def get_shared_cnf_pipeline(cnf_data_dir: str) -> CNFDataPipeline:
-    """Get shared CNF pipeline instance to avoid expensive reinitialization"""
-    global _cnf_pipeline_instance
-    if _cnf_pipeline_instance is None:
-        _cnf_pipeline_instance = CNFDataPipeline(cnf_data_dir)
-    return _cnf_pipeline_instance
+    """Backwards-compatible shim; `cnf_data_dir` is ignored (bound at first use)."""
+    return get_api_cnf_pipeline()
 
 logger = logging.getLogger(__name__)
 

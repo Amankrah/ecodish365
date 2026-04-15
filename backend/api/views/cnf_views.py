@@ -15,15 +15,10 @@ from dish_cnf_db_pipeline.user_input import (
 
 logger = logging.getLogger(__name__)
 
-# Global pipeline and validator instances
-_cnf_pipeline = None
-_food_input_validator = None
+# Single process-wide CNF pipeline — see backend/api/cnf_cache.py.
+from api.cnf_cache import get_dish_cnf_pipeline as get_cnf_pipeline
 
-def get_cnf_pipeline():
-    global _cnf_pipeline
-    if _cnf_pipeline is None:
-        _cnf_pipeline = CNFDataPipeline(settings.CNF_FOLDER)
-    return _cnf_pipeline
+_food_input_validator = None
 
 def get_food_input_validator():
     global _food_input_validator

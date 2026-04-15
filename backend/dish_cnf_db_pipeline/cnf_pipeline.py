@@ -14,8 +14,16 @@ class CNFDataPipeline:
     Provides a clean interface for food data exploration and management.
     """
     
-    def __init__(self, data_dir: str):
-        self.data_loader = CNFDataLoader(data_dir)
+    def __init__(self, data_dir: str, *, shared_source=None):
+        """Initialise the dish pipeline, optionally borrowing dataframes.
+
+        `shared_source` — when given, should be an object exposing the
+        standard `*_df` attributes (e.g. an `api.cnf_data_pipeline.CNFDataPipeline`
+        instance). The loader wraps those frames by reference rather than
+        re-reading the CSVs from disk, so only one in-memory copy of the
+        CNF data exists in the process.
+        """
+        self.data_loader = CNFDataLoader(data_dir, shared_source=shared_source)
         self.data_processor = CNFDataProcessor(self.data_loader)
         self._initialize_search_index()
 

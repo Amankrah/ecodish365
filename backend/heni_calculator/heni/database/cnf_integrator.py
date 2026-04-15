@@ -10,21 +10,17 @@ import logging
 from typing import Dict, List, Optional
 import pandas as pd
 
-# Use the same CNF pipeline wiring as the FCS and HEFI integrators
+# Use the single process-wide CNF pipeline. See backend/api/cnf_cache.py.
 backend_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-api_dir = os.path.join(backend_dir, 'api')
-sys.path.append(api_dir)
-from cnf_data_pipeline import CNFDataPipeline  # type: ignore
+if backend_dir not in sys.path:
+    sys.path.append(backend_dir)
+from api.cnf_cache import get_api_cnf_pipeline
+from api.cnf_data_pipeline import CNFDataPipeline  # type: ignore
 
-# Global pipeline instance to avoid expensive reinitialization
-_cnf_pipeline_instance = None
 
 def get_shared_cnf_pipeline(cnf_dir: str) -> CNFDataPipeline:
-    """Get shared CNF pipeline instance to avoid expensive reinitialization"""
-    global _cnf_pipeline_instance
-    if _cnf_pipeline_instance is None:
-        _cnf_pipeline_instance = CNFDataPipeline(cnf_dir)
-    return _cnf_pipeline_instance
+    """Backwards-compatible shim; `cnf_dir` is ignored (bound at first use)."""
+    return get_api_cnf_pipeline()
 
 logger = logging.getLogger(__name__)
 
