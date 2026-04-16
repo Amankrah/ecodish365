@@ -2,7 +2,6 @@ import os
 import pandas as pd
 import logging
 from typing import Dict, Any, Optional, List
-from chardet import detect
 from datetime import datetime
 import threading
 
@@ -36,90 +35,45 @@ class CNFIntegrator:
         self._nutrient_mappings = {}
         self._initialized = False
         
-    def initialize(self, data_dir: str):
-        """Initialize the integrator with data directory path"""
+    def initialize(self, data_dir: str = ''):
+        """Initialize the integrator by borrowing from the shared CNF pipeline.
+
+        The `data_dir` parameter is accepted for API compatibility but
+        ignored — the shared pipeline is bound to `settings.CNF_FOLDER`
+        at first use. No CSV I/O happens here; the frames are borrowed
+        by reference from `api.cnf_cache.get_api_cnf_pipeline()`.
+        """
         if self._initialized:
             self.logger.info("CNF Integrator already initialized")
             return
-            
+
         self.data_dir = data_dir
-        self._load_all_dataframes()
+        self._borrow_shared_pipeline()
         self._create_mappings()
         self._initialized = True
-        self.logger.info(f"CNF Integrator initialized with data directory: {data_dir}")
-    
-    def _detect_encoding(self, file_path: str) -> str:
-        """Detect file encoding using chardet"""
-        try:
-            with open(file_path, 'rb') as f:
-                result = detect(f.read(10000))
-                return result.get('encoding', 'utf-8')
-        except Exception as e:
-            self.logger.warning(f"Could not detect encoding for {file_path}, using utf-8: {e}")
-            return 'utf-8'
-    
-    def _load_csv(self, file_name: str) -> pd.DataFrame:
-        """Load CSV file with proper encoding detection and error handling"""
-        file_path = os.path.join(self.data_dir, file_name)
-        
-        if not os.path.exists(file_path):
-            self.logger.error(f"File not found: {file_path}")
-            raise FileNotFoundError(f"CNF data file not found: {file_path}")
-        
-        if os.path.getsize(file_path) == 0:
-            self.logger.warning(f"File is empty: {file_path}")
-            return pd.DataFrame()
-        
-        encoding = self._detect_encoding(file_path)
-        
-        # Define dtypes for columns that might have mixed types
-        dtypes = {
-            'FoodID': 'Int64',
-            'FoodCode': 'str',
-            'FoodGroupID': 'Int64',
-            'FoodSourceID': 'Int64',
-            'NutrientID': 'Int64',
-            'NutrientSourceID': 'Int64',
-            'MeasureID': 'Int64',
-            'RefuseID': 'Int64',
-            'YieldID': 'Int64'
-        }
-        
-        try:
-            # Read CSV with low_memory=False and specified dtypes
-            df = pd.read_csv(file_path, encoding=encoding, low_memory=False, dtype=dtypes)
-            
-            # Convert date columns to datetime
-            date_columns = [col for col in df.columns if 'Date' in col]
-            for col in date_columns:
-                df[col] = pd.to_datetime(df[col], errors='coerce')
-            
-            self.logger.info(f"Loaded {len(df)} rows from {file_name}")
-            return df
-            
-        except Exception as e:
-            self.logger.error(f"Error loading {file_name}: {str(e)}")
-            raise
-    
-    def _load_all_dataframes(self):
-        """Load all required CNF dataframes"""
-        csv_files = [
-            'FOOD_NAME', 'NUTRIENT_AMOUNT', 'CONVERSION_FACTOR', 'FOOD_GROUP',
-            'FOOD_SOURCE', 'NUTRIENT_NAME', 'NUTRIENT_SOURCE', 'MEASURE_NAME',
-            'REFUSE_AMOUNT', 'YIELD_AMOUNT', 'REFUSE_NAME', 'YIELD_NAME'
+        self.logger.info("CNF Integrator initialized (shared pipeline, no CSV I/O)")
+
+    def _borrow_shared_pipeline(self):
+        """Populate `_dataframes` from the process-wide shared CNF pipeline.
+
+        Replaces the old `_load_all_dataframes` + `_detect_encoding` +
+        `_load_csv` chain that independently loaded all 12 CSVs with its
+        own chardet calls, creating a duplicate ~35 MB copy of the data.
+        """
+        from api.cnf_cache import get_api_cnf_pipeline
+        pipeline = get_api_cnf_pipeline()
+
+        # The shared pipeline stores frames as `food_name_df`, etc.
+        # This module expects them keyed as `_dataframes['food_name']`.
+        frame_names = [
+            'food_name', 'nutrient_amount', 'conversion_factor', 'food_group',
+            'food_source', 'nutrient_name', 'nutrient_source', 'measure_name',
+            'refuse_amount', 'yield_amount', 'refuse_name', 'yield_name',
         ]
-        
-        for file in csv_files:
-            try:
-                df = self._load_csv(f"{file}.csv")
-                self._dataframes[file.lower()] = df
-                self.logger.debug(f"Loaded dataframe for {file}")
-            except FileNotFoundError:
-                self.logger.warning(f"Optional file {file}.csv not found, skipping")
-                self._dataframes[file.lower()] = pd.DataFrame()
-            except Exception as e:
-                self.logger.error(f"Failed to load {file}.csv: {e}")
-                self._dataframes[file.lower()] = pd.DataFrame()
+        for name in frame_names:
+            attr = f"{name}_df"
+            df = getattr(pipeline, attr, None)
+            self._dataframes[name] = df if df is not None else pd.DataFrame()
     
     def _create_mappings(self):
         """Create nutrient and food mappings for efficient lookups"""

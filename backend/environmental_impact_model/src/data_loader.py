@@ -2,7 +2,6 @@ import pandas as pd
 import logging
 import os
 from django.conf import settings
-import chardet
 from typing import Dict, Any, Optional
 from .cnf_integrator import get_cnf_integrator
 
