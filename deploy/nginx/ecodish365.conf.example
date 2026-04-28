@@ -98,7 +98,7 @@ server {
 
     # --- Next.js static assets --------------------------------------------
     location /_next/static/ {
-        alias /var/www/ecodish365/frontend/.next/static/;
+        alias /var/www/ecodish365/frontend/.next/standalone/.next/static/;
         expires 1y;
         add_header Cache-Control "public, immutable";
         access_log off;

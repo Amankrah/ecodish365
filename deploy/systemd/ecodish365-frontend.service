@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=www-data
 Group=www-data
-WorkingDirectory=/var/www/ecodish365/frontend
+WorkingDirectory=/var/www/ecodish365/frontend/.next/standalone
 Environment=NODE_ENV=production
 Environment=PORT=3000
 ExecStart=/usr/bin/node server.js
