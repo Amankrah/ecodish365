@@ -12,5 +12,8 @@ ExecStart=/usr/bin/node server.js
 Restart=on-failure
 RestartSec=5
 
+MemoryMax=512M
+MemoryHigh=400M
+
 [Install]
 WantedBy=multi-user.target

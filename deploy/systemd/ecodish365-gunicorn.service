@@ -27,5 +27,11 @@ RuntimeDirectory=ecodish365
 Restart=on-failure
 RestartSec=5
 
+# Memory guardrails — systemd kills the service if it exceeds these limits,
+# then Restart=on-failure brings it back cleanly.  Prevents a single runaway
+# worker from OOM-killing unrelated processes.
+MemoryMax=2G
+MemoryHigh=1500M
+
 [Install]
 WantedBy=multi-user.target
