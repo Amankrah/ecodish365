@@ -5,6 +5,11 @@
 - AWS EC2 instance (Ubuntu 20.04+) at **13.49.5.171**
 - Domain **ecodish365.com** pointed to your Elastic IP
 - RSA key pair `ecodish365.pem` (located in `backend/` directory)
+- **Minimum 2 GB RAM** on the instance (t3.small or larger). The Rust
+  toolchain compiles the `rust_core` extension during deploy, and PyO3
+  builds can OOM on 1 GB instances. If you must deploy on t3.micro, add a
+  swap file (`sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile`)
+  before running `./deploy.sh`.
 
 ## Step 1: SSH into AWS Server
 
@@ -43,8 +48,14 @@ chmod +x deploy.sh
 ```
 
 The deployment script will automatically:
-- Install system dependencies (Python, Node.js, Nginx, SQLite, etc.)
+- Install system dependencies (Python, Node.js, Nginx, SQLite, build tools)
+- Install the **Rust toolchain** (rustup, into `$HOME/.cargo`) — required to
+  compile the `rust_core` PyO3 extension that backs the HSR / HEFI / FCS /
+  HENI scoring engines
 - Setup Python virtual environment and install packages
+- **Build `rust_core` via `maturin develop --release`** and verify the
+  resulting `rust_core.{hsr,hefi,fcs,heni}` modules import cleanly. Adds
+  ~1–3 minutes to a fresh deploy depending on instance size.
 - Configure SQLite database with proper permissions
 - Build and deploy Next.js frontend
 - Setup Nginx with SSL certificates (Let's Encrypt)
@@ -91,9 +102,15 @@ sudo tail -f /var/log/ecodish365-frontend.log
 
 ```
 Internet → Nginx (443/80) → Django (8000) + Next.js (3000)
-                         ↓
-                   SQLite Database
+                         ↓               ↓
+                   SQLite Database   rust_core (PyO3 native extension,
+                                     loaded in-process by Django for
+                                     HSR / HEFI / FCS / HENI scoring)
 ```
+
+The Rust scoring layer ships as a compiled Python extension in the venv's
+`site-packages` (`rust_core.{hsr,hefi,fcs,heni}`). Django imports it like
+any other module; there's no separate Rust process to manage.
 
 ## Service Management Commands
 
@@ -162,6 +179,33 @@ sudo journalctl -u supervisor -f
 sudo nginx -t  # Test nginx configuration
 ```
 
+**rust_core build / import issues:**
+
+If Django logs show `ImportError: rust_core.hefi is not available` or similar,
+the native extension didn't build or wasn't installed into the active venv.
+```bash
+# Confirm Rust toolchain is on PATH
+source "$HOME/.cargo/env"
+rustc --version
+
+# Rebuild the extension
+cd /var/www/ecodish365/backend
+source venv/bin/activate
+cd rust_core
+maturin develop --release
+
+# Verify the module loads
+cd ..
+python -c "from rust_core import hsr, hefi, fcs, heni; print('OK')"
+
+# Restart Django so the new .so is picked up
+sudo supervisorctl restart ecodish365-django
+```
+
+If `maturin develop` is killed with `signal: 9` or hangs at "Compiling pyo3",
+the instance ran out of memory during the compile. Add swap (see Prerequisites)
+and retry.
+
 ---
 
 ## API Endpoints
@@ -207,8 +251,18 @@ git pull origin main
 # Update backend
 cd backend
 source venv/bin/activate
+pip install -r requirements.txt
 python manage.py migrate
 python manage.py collectstatic --noinput
+
+# Rebuild rust_core ONLY if backend/rust_core/ changed in this pull.
+# Cheap to skip when unchanged; required to pick up Rust changes.
+if git diff --name-only HEAD@{1} HEAD | grep -q '^backend/rust_core/'; then
+    source "$HOME/.cargo/env"
+    cd rust_core
+    maturin develop --release
+    cd ..
+fi
 
 # Update frontend
 cd ../frontend

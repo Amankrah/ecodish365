@@ -59,7 +59,7 @@ fi
 # 1. System Dependencies
 print_status "Installing system dependencies..."
 sudo apt update
-sudo apt install -y python3-pip python3-venv python3-dev nginx supervisor certbot python3-certbot-nginx sqlite3 curl
+sudo apt install -y python3-pip python3-venv python3-dev nginx supervisor certbot python3-certbot-nginx sqlite3 curl build-essential pkg-config libssl-dev
 
 # Install Node.js 18.x for frontend
 print_status "Installing Node.js for frontend..."
@@ -67,6 +67,18 @@ curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 sudo apt install -y nodejs
 node --version
 npm --version
+
+# Install Rust toolchain — needed to compile the rust_core PyO3 extension
+# (HSR, HEFI, FCS, HENI scoring runs in compiled Rust, not Python).
+# rustup installs into $HOME/.cargo so no sudo required.
+print_status "Installing Rust toolchain..."
+if ! command -v cargo > /dev/null 2>&1; then
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --profile minimal
+fi
+# Make `cargo` / `rustc` available for the rest of this script.
+source "$HOME/.cargo/env"
+rustc --version
+cargo --version
 
 # 2. Verify project structure
 print_status "Verifying project structure..."
@@ -113,6 +125,23 @@ pip install -r requirements.txt
 
 # Verify key packages are installed
 python -c "import django; print(f'Django {django.get_version()} installed')"
+
+# 5b. Build rust_core (PyO3 native extension)
+# Compiles the Rust scoring engines (rust_core.hsr, .hefi, .fcs, .heni) and
+# installs the resulting wheel into the active virtualenv. Only needed once
+# per deploy or whenever backend/rust_core/ changes; future updates that
+# don't touch Rust can skip this step.
+print_status "Building rust_core native extension..."
+pip install --quiet "maturin>=1.5,<2.0"
+source "$HOME/.cargo/env"
+cd "$BACKEND_DIR/rust_core"
+maturin develop --release
+
+cd "$BACKEND_DIR"
+python -c "from rust_core import hsr, hefi, fcs, heni; print('rust_core: hsr/hefi/fcs/heni OK')" || {
+    print_error "rust_core failed to import after build — check maturin output above"
+    exit 1
+}
 
 # 6. Environment configuration
 print_status "Setting up environment configuration..."
@@ -611,6 +640,7 @@ print_status "Services deployed:"
 print_status "- Frontend (Next.js): https://ecodish365.com → port 3000"
 print_status "- Backend (Django): https://ecodish365.com/api/, /admin/ → port 8000"
 print_status "- API endpoints: https://ecodish365.com/api/cnf/, /api/hsr/, etc."
+print_status "- rust_core: compiled native extension in venv (HSR/HEFI/FCS/HENI scoring)"
 print_status ""
 print_status "🔧 Fixed Issues:"
 print_status "- API URL routing (removed double /api/ in paths)"
