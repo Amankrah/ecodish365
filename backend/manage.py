@@ -3,6 +3,8 @@
 import os
 import sys
 
+import dish_project.env_bootstrap  # noqa: F401  — load .env before settings
+
 
 def main():
     """Run administrative tasks."""

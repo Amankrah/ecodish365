@@ -9,6 +9,8 @@ https://docs.djangoproject.com/en/5.1/howto/deployment/asgi/
 
 import os
 
+import dish_project.env_bootstrap  # noqa: F401  — load .env before settings
+
 from django.core.asgi import get_asgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'dish_project.settings')

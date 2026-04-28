@@ -1,0 +1,31 @@
+[Unit]
+Description=EcoDish365 Django (Gunicorn)
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/ecodish365/backend
+EnvironmentFile=/var/www/ecodish365/backend/.env
+
+# 3 workers × ~80 MB each ≈ 240 MB — safe for a 2 GB instance.
+# Bump to 4-5 on larger instances; max_requests recycles workers to
+# reclaim leaked memory (CNF singletons rebuild on new worker).
+ExecStart=/var/www/ecodish365/backend/venv/bin/gunicorn \
+    --bind unix:/run/ecodish365/gunicorn.sock \
+    --workers 3 \
+    --threads 2 \
+    --timeout 120 \
+    --max-requests 2000 \
+    --max-requests-jitter 200 \
+    --graceful-timeout 30 \
+    --access-logfile /var/log/ecodish365/gunicorn-access.log \
+    --error-logfile /var/log/ecodish365/gunicorn-error.log \
+    dish_project.wsgi:application
+
+RuntimeDirectory=ecodish365
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

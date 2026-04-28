@@ -1,0 +1,147 @@
+# EcoDish365 — production nginx config
+#
+# Copy to /etc/nginx/sites-available/ecodish365, adjust server_name and
+# SSL paths, symlink to sites-enabled, then: sudo nginx -t && sudo systemctl reload nginx
+#
+# TLS certificates: use certbot --nginx -d ecodish365.com -d www.ecodish365.com
+# Certbot rewrites ssl_certificate lines; keep X-Forwarded-Proto on all proxy locations.
+
+# --------------------------------------------------------------------------
+# Rate limiting (anti-abuse for API)
+# --------------------------------------------------------------------------
+limit_req_zone $binary_remote_addr zone=api_limit:10m rate=30r/s;
+limit_req_zone $binary_remote_addr zone=auth_limit:10m rate=5r/s;
+
+# --------------------------------------------------------------------------
+# Upstreams
+# --------------------------------------------------------------------------
+upstream django_backend {
+    server unix:/run/ecodish365/gunicorn.sock fail_timeout=0;
+}
+
+upstream frontend_nextjs {
+    server 127.0.0.1:3000;
+}
+
+# --------------------------------------------------------------------------
+# HTTP → HTTPS redirect
+# --------------------------------------------------------------------------
+server {
+    listen 80;
+    listen [::]:80;
+    server_name ecodish365.com www.ecodish365.com;
+
+    # Let's Encrypt challenge
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+# --------------------------------------------------------------------------
+# HTTPS server
+# --------------------------------------------------------------------------
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name ecodish365.com www.ecodish365.com;
+
+    # --- TLS (certbot manages these paths) --------------------------------
+    ssl_certificate     /etc/letsencrypt/live/ecodish365.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/ecodish365.com/privkey.pem;
+    include             /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam         /etc/letsencrypt/ssl-dhparams.pem;
+
+    # --- Security headers -------------------------------------------------
+    server_tokens off;
+    add_header X-Frame-Options           DENY always;
+    add_header X-Content-Type-Options    nosniff always;
+    add_header X-XSS-Protection          "1; mode=block" always;
+    add_header Referrer-Policy           "strict-origin-when-cross-origin" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header Permissions-Policy        "camera=(), microphone=(), geolocation=()" always;
+
+    # --- Deny hidden files (except .well-known) ---------------------------
+    location ~ /\.(?!well-known) {
+        deny all;
+        return 404;
+    }
+
+    # --- Common proxy headers (inherited by location blocks) ---------------
+    proxy_set_header Host              $host;
+    proxy_set_header X-Real-IP         $remote_addr;
+    proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_redirect   off;
+    proxy_read_timeout    120;
+    proxy_connect_timeout 30;
+    proxy_send_timeout    120;
+
+    # --- Django static files (collectstatic output) -----------------------
+    location /static/ {
+        alias /var/www/ecodish365/backend/staticfiles/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+
+    # --- Django media uploads ---------------------------------------------
+    location /media/ {
+        alias /var/www/ecodish365/backend/media/;
+        expires 30d;
+        add_header Cache-Control "public";
+        access_log off;
+    }
+
+    # --- Next.js static assets --------------------------------------------
+    location /_next/static/ {
+        alias /var/www/ecodish365/frontend/.next/static/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+
+    # --- Django Admin ------------------------------------------------------
+    location /admin/ {
+        proxy_pass http://django_backend;
+    }
+
+    # --- Django API (rate-limited) ----------------------------------------
+    location /api/ {
+        limit_req zone=api_limit burst=60 nodelay;
+        proxy_pass http://django_backend;
+    }
+
+    # --- Auth endpoints (tighter rate limit) ------------------------------
+    location /api/auth/ {
+        limit_req zone=auth_limit burst=10 nodelay;
+        proxy_pass http://django_backend;
+    }
+
+    # --- Health check (no rate limit) -------------------------------------
+    location /health/ {
+        proxy_pass http://django_backend;
+    }
+
+    # --- Frontend (Next.js) — everything else -----------------------------
+    location / {
+        proxy_pass http://frontend_nextjs;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade    $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_cache_bypass          $http_upgrade;
+    }
+
+    # --- Error pages ------------------------------------------------------
+    error_page 502 503 504 /50x.html;
+    location = /50x.html {
+        root /var/www/html;
+        internal;
+    }
+
+    # --- Request body limit (uploads) -------------------------------------
+    client_max_body_size 10M;
+}
