@@ -2,6 +2,8 @@
 
 Monorepo for the **ecodish365** stack: a **Next.js** frontend and **Django** backend with nutrition and sustainability calculators. Core numeric scoring for **HSR**, **FCS**, and **HENI** lives in **`backend/rust_core`** (PyO3 extension) and is consumed from Python.
 
+**Live site:** [ecodish365.com](https://ecodish365.com/)
+
 ## Repository layout
 
 | Path | Description |
@@ -78,6 +80,18 @@ python manage.py test fcs_calculator.tests.test_fcs_rust
 - `backend/fcs_calculator/FCS_RUST_INTEGRATION_PLAN.md` — FCS ↔ Rust
 - `backend/heni_calculator/HENI_RUST_INTEGRATION_PLAN.md` — HENI ↔ Rust
 
+## Citation
+
+This project includes a root [`CITATION.cff`](CITATION.cff) so tools and Zenodo can pick up title, authors, and license.
+
+After Zenodo archives a GitHub **release**, copy the **Markdown** for the DOI badge from Zenodo (GitHub integration page → badge on your repo row) and paste it here, for example under the title:
+
+```markdown
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.xxxxxxx.svg)](https://doi.org/10.5281/zenodo.xxxxxxx)
+```
+
+Use the **concept DOI** for the project or the **version DOI** for a specific release, depending on how you want others to cite your work.
+
 ## License
 
-Add or update a `LICENSE` file at the repo root if this project is published.
+[MIT](LICENSE)

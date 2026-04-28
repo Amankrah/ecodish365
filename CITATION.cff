@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+title: ecodish365
+message: >-
+  If you use this software, please cite it using the metadata in this file
+  and the Zenodo DOI for the version you used.
+type: software
+authors:
+  - family-names: Kwofie
+    given-names: Emmanuel Amankrah
+    email: emmanuel.kwofie@mcgill.ca
+repository-code: 'https://github.com/Amankrah/ecodish365'
+url: 'https://ecodish365.com/'
+abstract: >-
+  Monorepo for the ecodish365 stack: a Next.js frontend and Django backend
+  with nutrition and sustainability calculators (HSR, FCS, HENI), including
+  a Rust core exposed to Python via PyO3.
+license: MIT
+# After your first Zenodo release, add the version-specific DOI, e.g.:
+# identifiers:
+#   - type: doi
+#     value: 10.5281/zenodo.xxxxxxx
+# version: 1.0.0
+# date-released: '2026-04-28'
