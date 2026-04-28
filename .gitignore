@@ -42,16 +42,24 @@ db.sqlite3
 media/
 staticfiles/
 
-# Security files
+# Security / credentials
 *.pem
 *.key
 *.crt
 *.p12
 *.pfx
+*.ppk
 .env
 .env.local
 .env.production
 .env.development
+
+# Deployment (sensitive - IPs, keys, server config)
+DEPLOYMENT.md
+backend/deploy.sh
+
+# Claude AI local config
+.claude/
 
 # Ignore Django migration files in apps (keep package file)
 **/migrations/*
