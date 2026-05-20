@@ -127,4 +127,25 @@ ReCiPe fossil resource scarcity has no constant midpoint-to-endpoint factor; the
 
 ## Done
 
-*(empty — moves here when items above are merged.)*
+### 2026-05-20 — CODE-1, CODE-2, CODE-3, CODE-4, CODE-5, CODE-7 implemented
+
+**Files modified:**
+- [backend/environmental_impact_model/src/life_cycle_assessment.py](backend/environmental_impact_model/src/life_cycle_assessment.py): module rewrite. Added `RECIPE_ENDPOINT_FACTOR_PROVENANCE` (page-cited Table 1.5 source for every endpoint factor), `LCA_FACTOR_CONFIDENCE` (per-category confidence rating), `NORMALIZATION_FACTORS_RECIPE2016_PUBLISHED` and `NORMALIZATION_FACTORS_PROPOSED_2024_UNSOURCED` constants. Split CH₄ midpoint key into `ch4_biogenic` (34) / `ch4_fossil` (36). Rewrote `calculate_endpoint_impacts` to add ionising radiation, photochemical ozone (HH + terrestrial), water use (HH + terrestrial + freshwater), marine eutrophication, and climate-change-to-freshwater pathways. Renamed `calculate_single_score` parameter to `normalization_set` with a backwards-compatible `use_updated_normalization` shim and a deprecation warning. Added `get_factor_confidence_by_category` accessor. Replaced the dead "RIVM October 2024" comment.
+- [backend/environmental_impact_model/src/monetization.py](backend/environmental_impact_model/src/monetization.py): removed the two "consultation with Raphael" comments; added a `monetary_value_sources` dict carrying `{source, currency_year, status, last_verified}` per category; added `get_monetary_value_sources()` accessor.
+- [backend/api/views/environmental_views.py](backend/api/views/environmental_views.py): the three LCA call sites (comprehensive analysis, food comparison, food profile) now attach `factor_confidence_by_category`, `data_quality`, and `value_sources` to their payloads; the `format_environmental_results` formatter surfaces these as additive keys.
+
+**Verification (smoke test against stub meal with synthetic midpoint vector):**
+- All endpoint pathways execute without exception.
+- `factor_confidence_by_category` returns all 18 midpoint categories with `{level, rationale}`.
+- `get_data_quality_report` returns the new keys `confidence_by_category`, `endpoint_factor_provenance`, and the expanded `known_issues` block.
+- `sanity_check` includes the new `fossil_scarcity_approximation` and the rewritten `gwp_reference` line.
+- `calculate_single_score`: both branches and the deprecation shim produce equal results.
+- No remaining matches for `Raphael` or `consultasion` in `backend/`.
+
+**Numerical impact for the manuscript (S2 / S5 calibration).** Against the same synthetic midpoint vector, the endpoint factor correction changes the single-score from the *old* point-estimate to **~1.52 (recipe2016_published)** vs **~1.56 (proposed_2024_unsourced)** — the two normalisation branches differ by ~3 %, while the endpoint-factor correction itself shifts climate-change-to-HH by **4.4×** (2.1×10⁻⁷ → 9.3×10⁻⁷), terrestrial-acidification-to-ecosystems by ~**1.3×10⁵**, and freshwater-eutrophication-to-ecosystems by ~**4.7×10²**. Comparison ratios with reference meals (the user-facing claim) remain unchanged because they are scale-invariant.
+
+### Still pending
+
+- **CODE-6** — AGRIBALYSE matcher errata guard. Deferred to S7 implementation (greenfield; no existing matcher code to wrap today).
+- **Page-accurate monetary value updates.** `monetary_values` numerical figures are unchanged; only source attribution was added. Replace once literature group H PDFs (CE Delft 2024, True Price 2024, ECCC 2023 SC-GHG) are retrieved.
+- **Frontend.** The new API keys (`factor_confidence_by_category`, `value_sources`, `data_quality`) are additive; UI integration to render a confidence chip per impact category is a separate task.

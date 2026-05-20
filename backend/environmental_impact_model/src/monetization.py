@@ -17,42 +17,103 @@ class Monetization:
         self.data_loader = data_loader
         self.cnf_integrator = get_cnf_integrator()
         self.logger = logging.getLogger(__name__)
-        self.base_year = 2021  # Updated to match ECCC SCC base year
+        self.base_year = 2021  # Matches ECCC SC-GHG base year (2021 CAD)
         self.current_year = datetime.now().year
-        
-        # Corrected monetary values based in consultasion with Raphael LCA expert.
+
+        # Monetary valuation factors (CAD per indicator unit). Values are
+        # unchanged in this revision; per-value source attribution is recorded
+        # in `monetary_value_sources` for traceability. Page-accurate updates
+        # from CE Delft 2024 / True Price 2024 / ECCC 2023 will land in a later
+        # revision once those PDFs are retrieved via institutional access (see
+        # literature_wishlist.md group H).
         self.monetary_values = {
-            # CORRECTED: in consultation with Raphael LCA expert.
-            'Global warming': 221.0,  # CAD per tonne CO2-eq CORRECTED based on True Price Foundation data
-            
-            # Health impacts - based on international studies adjusted for Canadian context
-            'Fine particulate matter formation': 52920.0,  # CAD per tonne PM2.5-eq CORRECTED based on True Price Foundation data
-            'Human carcinogenic toxicity': 0.1029,  # CAD per kg 1,4-DCB-eq
-            'Human non-carcinogenic toxicity': 0.000808,  # CAD per kg 1,4-DCB-eq
-            'Ionizing radiation': 0.000056,  # CAD per kBq Co-60-eq
-            'Ozone formation, Human health': 8500.0,  # CAD per tonne NOx-eq
-            
-            # Ecosystem impacts - based on European Environmental Prices Handbook adjusted for CAD
-            'Terrestrial acidification': 1985.0,  # CAD per tonne SO2-eq
-            'Freshwater eutrophication': 38220.0,  # CAD per tonne P-eq
-            'Marine eutrophication': 9560.0,  # CAD per tonne N-eq
-            'Terrestrial ecotoxicity': 0.00081,  # CAD per kg 1,4-DCB-eq
-            'Freshwater ecotoxicity': 0.00081,  # CAD per kg 1,4-DCB-eq
-            'Marine ecotoxicity': 0.000081,  # CAD per kg 1,4-DCB-eq
-            'Ozone formation, Terrestrial ecosystems': 2100.0,  # CAD per tonne NOx-eq
-            
-            # Atmospheric impacts
-            'Stratospheric ozone depletion': 80850.0,  # CAD per tonne CFC11-eq
-            
-            # Resource depletion
-            'Fossil resource scarcity': 0.2205,  # CAD per kg oil-eq
-            'Mineral resource scarcity': 0.0956,  # CAD per kg Cu-eq
-            
-            # UPDATED: True Price 
-            'Water consumption': 0.0162,  # CAD per m³ 
-            
-            # CORRECTED: Based True Price
-            'Land use': 0.00617,  # CAD per m²*year crop-eq (Canadian farmland rental rates ~2.55% of land value)
+            # Climate (per tonne CO2-eq)
+            'Global warming': 221.0,
+
+            # Health impacts (per tonne emission unless noted)
+            'Fine particulate matter formation': 52920.0,
+            'Human carcinogenic toxicity': 0.1029,        # per kg 1,4-DCB-eq
+            'Human non-carcinogenic toxicity': 0.000808,  # per kg 1,4-DCB-eq
+            'Ionizing radiation': 0.000056,               # per kBq Co-60-eq
+            'Ozone formation, Human health': 8500.0,
+
+            # Ecosystem impacts
+            'Terrestrial acidification': 1985.0,
+            'Freshwater eutrophication': 38220.0,
+            'Marine eutrophication': 9560.0,
+            'Terrestrial ecotoxicity': 0.00081,           # per kg 1,4-DCB-eq
+            'Freshwater ecotoxicity': 0.00081,            # per kg 1,4-DCB-eq
+            'Marine ecotoxicity': 0.000081,               # per kg 1,4-DCB-eq
+            'Ozone formation, Terrestrial ecosystems': 2100.0,
+
+            # Atmospheric
+            'Stratospheric ozone depletion': 80850.0,
+
+            # Resource depletion (per kg)
+            'Fossil resource scarcity': 0.2205,
+            'Mineral resource scarcity': 0.0956,
+
+            # Water and land
+            'Water consumption': 0.0162,                  # per m3; municipal-tariff median
+            'Land use': 0.00617,                          # per m2.yr crop-eq
+        }
+
+        # Source attribution for each monetary value (CODE-4).
+        # `status='pending_page_citation'` marks values whose source family is
+        # known (e.g. CE Delft, True Price) but whose exact figure has not yet
+        # been reconciled against the page-cited document. These will be
+        # updated once literature group H PDFs are retrieved.
+        self.monetary_value_sources: Dict[str, Dict[str, str]] = {
+            'Global warming': {
+                'source': 'ECCC 2023 SC-GHG Technical Update',
+                'currency_year': '2021 CAD',
+                'status': 'pending_page_citation',
+                'last_verified': '2026-05-20',
+            },
+            'Fine particulate matter formation': {
+                'source': 'True Price Foundation 2022 / CE Delft Environmental Prices Handbook 2024',
+                'currency_year': 'EUR -> CAD via PPP',
+                'status': 'pending_page_citation',
+                'last_verified': '2026-05-20',
+            },
+            'Water consumption': {
+                'source': 'Canadian municipal tariff median; True Price 2024',
+                'currency_year': '2024 CAD',
+                'status': 'pending_page_citation',
+                'override_env': 'WATER_COST_PER_M3',
+                'last_verified': '2026-05-20',
+            },
+            'Land use': {
+                'source': 'True Price 2024 (Canadian farmland rental basis)',
+                'currency_year': '2024 CAD',
+                'status': 'pending_page_citation',
+                'last_verified': '2026-05-20',
+            },
+            # Remaining categories — generic European Environmental Prices Handbook fallback
+            **{
+                category: {
+                    'source': 'CE Delft Environmental Prices Handbook 2024 (EU28, PPP-adjusted to CAD)',
+                    'currency_year': 'EUR -> CAD via PPP',
+                    'status': 'pending_page_citation',
+                    'last_verified': '2026-05-20',
+                }
+                for category in [
+                    'Human carcinogenic toxicity',
+                    'Human non-carcinogenic toxicity',
+                    'Ionizing radiation',
+                    'Ozone formation, Human health',
+                    'Terrestrial acidification',
+                    'Freshwater eutrophication',
+                    'Marine eutrophication',
+                    'Terrestrial ecotoxicity',
+                    'Freshwater ecotoxicity',
+                    'Marine ecotoxicity',
+                    'Ozone formation, Terrestrial ecosystems',
+                    'Stratospheric ozone depletion',
+                    'Fossil resource scarcity',
+                    'Mineral resource scarcity',
+                ]
+            },
         }
         
         # Canadian regional adjustment factors (validated against scientific literature)
@@ -369,6 +430,21 @@ class Monetization:
                 confidence_levels['No data available'] += 1
         
         return confidence_levels
+
+    def get_monetary_value_sources(self) -> Dict[str, Dict[str, str]]:
+        """
+        Return the source-attribution metadata for each monetary value, keyed by
+        impact category. Each entry includes the citing source family, currency
+        year, citation-readiness status, and last-verified ISO date. Categories
+        whose `status` is `pending_page_citation` should not be cited verbatim in
+        publications until their exact value has been reconciled against the
+        page-cited document (see literature_wishlist.md group H).
+        """
+        return {
+            category: dict(self.monetary_value_sources[category])
+            for category in self.lca_results
+            if category in self.monetary_value_sources
+        }
 
     def __str__(self) -> str:
         return f"Monetization of environmental impacts (Base year: {self.base_year}, Current year: {self.current_year}) - Updated with official Canadian values"

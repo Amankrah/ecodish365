@@ -135,6 +135,8 @@ def format_environmental_results(meal_data: Dict[str, Any], user_type: str = "in
             "top_cost_drivers": monetization_data.get('top_cost_drivers', [])[:3],
             "cost_breakdown": monetization_data.get('cost_breakdown_by_category', {}),
             "monetized_impacts": _flat_monetized_impacts,
+            # CODE-4: per-category source attribution (additive).
+            "value_sources": monetization_data.get('value_sources', {}),
         },
         "interpretation": _get_cost_interpretation(monetization_data.get('total_cost', 0), user_type)
     }
@@ -201,7 +203,11 @@ def format_environmental_results(meal_data: Dict[str, Any], user_type: str = "in
             "explanation": "Single aggregated score combining all environmental impacts"
         },
         "all_impacts": lca_data.get('midpoint_impacts', {}),
-        "endpoint_impacts": lca_data.get('endpoint_impacts', {})
+        "endpoint_impacts": lca_data.get('endpoint_impacts', {}),
+        # CODE-5: per-category confidence rating and methodology provenance
+        # (additive — existing consumers ignore unknown keys).
+        "factor_confidence_by_category": lca_data.get('factor_confidence_by_category', {}),
+        "data_quality": lca_data.get('data_quality', {}),
     }
     
     # Surface sustainability scores (numeric) calculated server-side so the UI
@@ -513,24 +519,30 @@ def _analyze_meal_comprehensive(meal: EnvMeal, data_loader: EnvDataLoader) -> Di
         lca_results = lca.perform_lcia()
         endpoint_impacts = lca.calculate_endpoint_impacts()
         single_score = lca.calculate_single_score()
-        
+
         lca_data = {
             'midpoint_impacts': lca_results,
             'endpoint_impacts': endpoint_impacts,
-            'single_score': single_score
+            'single_score': single_score,
+            # Per-category confidence rating (CODE-5; additive).
+            'factor_confidence_by_category': lca.get_factor_confidence_by_category(),
+            # Methodology version + endpoint factor provenance (CODE-2).
+            'data_quality': lca.get_data_quality_report(),
         }
-        
+
         # Monetization
         monetization = Monetization(lca_results, data_loader)
         total_calories = meal_info['total_calories']
         total_protein = meal.get_nutrient_amount('PROTEIN')
-        
+
         monetization_data = {
             'total_cost': monetization.get_total_monetized_impact(),
             'cost_per_calorie': monetization.calculate_cost_per_calorie(total_calories),
             'cost_per_protein': monetization.calculate_cost_per_gram_protein(total_protein),
             'cost_breakdown_by_category': monetization.get_cost_breakdown_by_category(),
-            'top_cost_drivers': monetization.get_top_cost_drivers()
+            'top_cost_drivers': monetization.get_top_cost_drivers(),
+            # Per-category source attribution (CODE-4; additive).
+            'value_sources': monetization.get_monetary_value_sources(),
         }
         
         # Reference meal comparisons
@@ -793,6 +805,8 @@ def compare_foods_environmental(request):
                         "midpoint_impacts": lca_midpoints_normalized,
                         "endpoint_impacts": lca_endpoints_normalized,
                         "single_score": lca_single_score,
+                        # CODE-5: per-category confidence rating (additive).
+                        "factor_confidence_by_category": lca.get_factor_confidence_by_category(),
                     },
                     # Monetization summary (total and per 100g) plus optional breakdowns
                     "monetization": {
@@ -800,6 +814,8 @@ def compare_foods_environmental(request):
                         "cost_per_100g": cost_total,
                         "cost_breakdown_by_category": item_monetization.get_cost_breakdown_by_category(),
                         "top_cost_drivers": item_monetization.get_top_cost_drivers(),
+                        # CODE-4: per-category source attribution (additive).
+                        "value_sources": item_monetization.get_monetary_value_sources(),
                     },
                     # Legacy convenience field retained for the existing UI mapping
                     "environmental_cost_per_100g": cost_total,
@@ -923,7 +939,15 @@ def food_environmental_profile(request, food_id):
                 "total_cost": monetization.get_total_monetized_impact(),
                 "cost_per_100g": monetization.get_total_monetized_impact() / (quantity/100),
                 "cost_per_calorie": monetization.calculate_cost_per_calorie(meal.calculate_total_calories()),
-                "currency": "CAD"
+                "currency": "CAD",
+                # CODE-4: per-category source attribution (additive).
+                "value_sources": monetization.get_monetary_value_sources(),
+            },
+            # CODE-5: ReCiPe factor confidence + provenance for the listed impact
+            # categories. Additive; existing consumers ignore unknown keys.
+            "lca_quality": {
+                "factor_confidence_by_category": lca.get_factor_confidence_by_category(),
+                "data_quality": lca.get_data_quality_report(),
             },
             "nutritional_context": {
                 "calories_per_100g": meal.calculate_total_calories() / (quantity/100),

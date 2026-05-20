@@ -274,3 +274,14 @@ Pipeline AI footprint per meal < 0.1 % of the meal's LCA single-score (expected;
 | Expert labelling capacity | Pre-train labelling rubric; use third dietitian only for tie-breaks. |
 | LLM model deprecation | Pin model version; archive prompts and example I/O; ablation across two providers (OpenAI + Anthropic). |
 | Monetary factor sources weak | Replace `consultation` references with citable values; mark surviving low-confidence factors. |
+
+---
+
+## Required Canadian data dependencies (Group B surfaced)
+
+The HEFI-2019 scoring algorithm (Brassard et al., 2022a) needs **two external Canadian databases that are NOT in the base CNF 2015**:
+
+1. **Health Canada Table of Reference Amounts for Food (2016).** Required because all five food-based HEFI-2019 components (V&F, whole grains, grain-foods ratio, protein, plant-based protein) are scored in Reference Amounts (RAs), not grams or volumes. **Action:** confirm acquisition; placeholder reference Health Canada (2016).
+2. **Rana et al. 2021 free-sugars supplement to CNF 2015.** Required because the base CNF carries total sugars but not free sugars; HEFI-2019 component 9 (free sugars / energy %) cannot be computed without it. Reference: Rana H, Mallet M-C, Gonzalez A, Verreault M-F, St-Pierre S. *Free sugars consumption in Canada.* Nutrients. 2021;13(5):1471. doi:10.3390/nu13051471. **Action:** verify the supplementary dataset is publicly downloadable; if not, contact corresponding author or Health Canada.
+
+Both dependencies block any HEFI-2019 results in S4/S5. If Rana 2021 cannot be acquired in time, fall back to total sugars with a documented warning, and report HEFI-2019 component 9 as an approximation only.
