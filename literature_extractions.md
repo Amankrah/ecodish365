@@ -1602,7 +1602,827 @@ B13 serves two distinct roles in our manuscript: it documents the structure of t
 
 ## Group C. Health-burden and DALY food scoring
 
-*Pending: papers C14 through C21.*
+### C14. Stylianou, Heller, Fulgoni et al. (2016) — CONE-LCA: combining nutritional and environmental health impacts (milk case study) [★★★]
+
+**Citation.** Stylianou KS, Heller MC, Fulgoni VL III, Ernstoff AS, Keoleian GA, Jolliet O. A life cycle assessment framework combining nutritional and environmental health impacts of diet: a case study on milk. Int J Life Cycle Assess. 2016;21(5):734–746.
+
+**DOI.** 10.1007/s11367-015-0961-0 (received 30 Jan 2015, published 23 Sep 2015; print 2016)
+
+**Type.** Methodology paper introducing the **Combined Nutritional and Environmental LCA (CONE-LCA)** framework, with a proof-of-concept milk case study. This is the **conceptual ancestor of HENI** (C15, Stylianou et al. 2021): same lead author, same idea of putting environmental and nutritional effects on a common DALY scale, but here applied to a single food via dietary scenarios rather than codified into per-food μDALY/g factors. Funding: an **unrestricted grant from the Dairy Research Institute (Dairy Management Inc.)**, a material conflict to note given the milk-favourable conclusion.
+
+---
+
+#### The CONE-LCA framework (§2.1, Fig. 1, pp. 735–736) — for our §3.2/§3.3 lineage
+
+The core move is to assess **environmental and nutritional health effects in parallel and express both at the human-health endpoint in DALYs**, so they can be compared on one scale. The environmental track is a standard LCA: functional unit → inventory (emissions, resources) → midpoint categories (climate change, water, land, respiratory) → endpoint damage (human health in DALYs). The nutritional track operates on the food LCA "use stage": published epidemiology relates the food directly to disease outcomes in DALYs, or, where direct data are absent, nutrient contents (protein, calcium, vitamins, saturated fat, sodium) are linked to health effects via epidemiological data. The authors stress that putting nutrition into the *functional unit* (the older quality-corrected approach) creates "conceptual dissonance," and that their parallel-DALY approach avoids it. They are explicit that validity is "contingent on the data used, their availability, level of detail, and associated uncertainty."
+
+This is exactly the dual-track logic our platform inherits through HENI, and C14 is the citable origin of it.
+
+---
+
+#### Environmental characterization factors (§2.2.3, Table 1, pp. 738–739) — provenance for our environmental endpoint factors
+
+**Global warming, human-health endpoint:** **0.82 μDALY per kg CO2-eq** on a 100-year horizon, GSD² 4.8, attributed to "Bulle et al., manuscript in preparation" (i.e. the pre-publication IMPACT World+ factor). The authors caution this is far more uncertain than the midpoint radiative-forcing indicator and should be read as order-of-magnitude only.
+
+**Particulate matter (Table 1).** PM-related precursor emissions were not routinely reported in food LCAs, so they were correlated to the GW indicator (kg CO2-eq) across **47 food-related Ecoinvent processes**, then converted to health damage:
+
+| PM species | CO2-eq correlation factor (kg/kg CO2-eq) | GSD² | R² | CF (DALYs/kg emitted) |
+|---|---|---|---|---|
+| Primary PM2.5 (rural) | 2.4×10⁻⁴ | 1.5 | 0.92 | 3.0×10⁻⁴ |
+| SO2 | 8.3×10⁻⁴ | 2.9 | 0.65 | 6.2×10⁻⁵ |
+| NOx | 2.7×10⁻³ | 1.5 | 0.96 | 1.3×10⁻⁵ |
+| NH3 | 3.5×10⁻³ | 6.8 | −0.02 (not used) | 1.3×10⁻⁴ |
+
+PM health linkage followed Fantke et al. 2014 / Humbert et al. 2011 intake fractions with Gronlund et al. 2015 effect factors. For NH3, the CO2-eq correlation was effectively zero, so NH3 emissions were instead taken from food-specific factors (Meier and Christen 2013). Context figure: US PM2.5 causes **103,000 deaths/yr and 1,820,410 DALYs**.
+
+These are 2015-vintage factors. Our implementation almost certainly uses updated IMPACT World+ or ReCiPe values (Group A), so cite C14 for the *method* and the provenance of the 0.82 μDALY/kg CO2-eq lineage, not as the current numbers.
+
+---
+
+#### Nutritional dose-response inputs (§2.2.4, pp. 739–740) — the epidemiology-to-DALY machinery
+
+The nutritional track converts relative risks and national disease burdens into per-serving μDALY using GBD 2010 data and a theoretical-minimum-risk exposure level (TMREL) cap per outcome:
+
+| Outcome (milk) | Relative risk used | TMREL / threshold | US 2010 burden (DALYs) |
+|---|---|---|---|
+| Colorectal cancer (benefit) | RR 1.11 (95 % CI 1.03–1.20) per 226.8 g/day decrease | no further benefit above 450 g/day | 1,146,830 |
+| All stroke (benefit) | RR 0.85 (95 % CI 0.77–0.94), high vs low intake (≈541 g difference) | no benefit above 597 g | 1,569,720 |
+| Prostate cancer (harm, males) | RR 1.03 (95 % CI 1.00–1.06) per 200 g/day increase, nonlinear | risk plateaus above ~200 g/day | 592,400 |
+
+**Sugar-sweetened beverages** were assigned an **effect factor of 0.03 μDALY per SSB-calorie (95 % CI 0.02–0.04)**, derived from the US SSB burden of 770,584 DALYs, a TMREL of 0 g/day, and consumption of 236 cal/person/day. This per-calorie SSB factor is a clean, reusable number.
+
+---
+
+#### Case-study results (§3, pp. 740–742) — useful magnitudes
+
+- **Average US diet baseline:** GHGE 5.0 kg CO2-eq/person/day (95 % CI 2.5–9.2) at 2534 cal/day; PM 2.2 g PM2.5-eq/person/day (95 % CI 1.1–3.9).
+- **Adding one serving (244 g, 119 kcal) of fluid milk (scenario A):** GW 0.47 kg CO2-eq = 0.38 μDALY (GSD² 4.9); PM 0.26 g PM2.5-eq = 0.32 μDALY, dominated by NH3 from manure (80 %).
+- **Net nutritional benefit of the added serving: 1.88 μDALY** (colorectal +1.10, stroke +0.95, prostate −0.16 population-weighted).
+- **Replacing 119 kcal of SSB: 3.48 avoided μDALY** (95 % CI 2.23–5.43), which dominates scenario C.
+- **Probability that benefits exceed impacts** (Hong et al. 2010 analytical uncertainty propagation): 98.1 % (A), 99.2 % (B), 100 % (C).
+
+The headline: in this framing the use-stage nutritional effects are of **comparable or larger magnitude than the production-stage environmental effects**, which is the central argument for including nutrition in food LCA and the reason our platform reports both.
+
+---
+
+#### Author-flagged limitations (§4, pp. 743–744) — for our §7
+
+1. **Proof-of-concept, high uncertainty.** Results are order-of-magnitude and "should be interpreted with caution and only within the context of this study"; a full Monte Carlo treatment is recommended (a hook for our §3.6 uncertainty work).
+2. **GW endpoint CFs are very uncertain** (order-of-magnitude only); long-term GW health impacts beyond 100 years not assessed.
+3. **Secondary PM2.5 double-counting risk:** NOx, SO2 and NH3 are characterised with independent CFs that ignore precursor interactions and background concentrations; better spatially-differentiated secondary-PM modelling is needed.
+4. **The "average diet has no health effect" assumption** is a deliberate simplification; a worst-case substitution of fruits and vegetables could flip the sign of the result. This is the single most important caveat and maps directly onto our substitution-scenario handling.
+5. **Sparse outcome set** (2 beneficial, 1 detrimental for milk); prostate-cancer evidence is "controversial" and a worst-case RR was used to avoid overstating net benefit.
+6. **Epidemiology is correlation, not causation;** confounders (e.g. SSB burden confounded by sedentary lifestyle) may inflate effect sizes.
+7. **No sex/age segmentation.**
+8. **Dairy-industry funding** (not flagged by the authors as a limitation, but ours to note).
+
+---
+
+#### Cross-links to other entries
+
+- **C15 (HENI, Stylianou et al. 2021)** is the direct successor: it generalises this single-food CONE-LCA exercise into per-food μDALY/g nutritional factors across ~14 dietary risk factors. C14 is the framework, C15 is the operationalised factor table.
+- **Group A (ReCiPe / IMPACT World+)** supplies the modern environmental endpoint factors that supersede C14's 0.82 μDALY/kg CO2-eq and the PM CFs.
+- **Hong et al. 2010** analytical uncertainty propagation here is a lighter-weight alternative to the Monte Carlo approaches in Group F.
+
+---
+
+#### Three-sentence relevance note
+
+C14 is the founding CONE-LCA paper and the methodological root of the HENI health-burden indicator (C15) our platform implements: it establishes the principle of assessing environmental and nutritional food effects in parallel and expressing both at the human-health endpoint in DALYs, demonstrated on a milk case study where use-stage nutritional effects (net +1.88 μDALY per added serving) were of comparable or greater magnitude than production-stage environmental damage. For our methods sections it supplies the provenance of the 0.82 μDALY/kg CO2-eq global-warming endpoint factor and a usable PM characterization-factor set (primary PM2.5 3.0×10⁻⁴, SO2 6.2×10⁻⁵, NOx 1.3×10⁻⁵, NH3 1.3×10⁻⁴ DALYs/kg) plus an SSB effect factor of 0.03 μDALY/calorie, though these 2015-vintage values are likely superseded in our implementation by the Group A factors. Its limitations transfer almost wholesale to our §7 (the average-diet-no-effect assumption, secondary-PM double-counting, correlation-not-causation, and a thin single-food epidemiology base), and the dairy-industry funding is worth carrying when we describe HENI's lineage; cite as Stylianou et al. 2016, Int J Life Cycle Assess 21(5):734–746, doi:10.1007/s11367-015-0961-0.
+
+---
+
+### C15. Stylianou, Fulgoni & Jolliet (2021) — HENI: the canonical Health Nutritional Index paper [★★★]
+
+**Citation.** Stylianou KS, Fulgoni VL III, Jolliet O. Small targeted dietary changes can yield substantial gains for human health and the environment. Nat Food. 2021;2(8):616–627.
+
+**DOI.** 10.1038/s43016-021-00343-4 (received 28 Apr 2020, published 18 Aug 2021)
+
+**Type.** Primary methodology + large-scale application paper. This is **the canonical HENI reference** and the one our wishlist marks for reproducing the per-food-category figure (Fig. 4). It operationalises the C14 CONE-LCA framework into a per-food index, applies it to 5,853 US foods, pairs it with 18 IMPACT World+ environmental indicators for 167 representative foods, and derives the headline substitution result. Funding: **unrestricted grant from the National Dairy Council** plus a UMich Dow Sustainability Fellowship; COI disclosures note Fulgoni does data analyses for the food industry and Jolliet later joined a Nutella-supported board. Same dairy-funding lineage as C14, worth carrying.
+
+---
+
+#### What HENI is and the exact scoring formula (Results p. 617; Methods pp. 624–626) — core of our §3.3
+
+HENI is a **continuous single score giving the net minutes of healthy life gained (+) or lost (−)** from all-cause premature mortality and morbidity per reference amount of a food, attributable to adding a marginal amount of that food to the current US adult diet. The score for food *i* is:
+
+$$\text{HENI}_i = -0.53 \times \sum_r \text{DRF}_r \times d_{i,r}$$
+
+where DRF_r is the cumulative age- and gender-adjusted **dietary risk factor** for risk component *r* (in μDALY per g), and d_{i,r} is the amount of risk component *r* in food *i* (g per reference serving). The constant **−0.53 is minutes of healthy life per μDALY**: 1 μDALY = 10⁻⁶ × 365 × 24 × 60 ≈ 0.53 min of healthy life, and the negative sign flips the damage-oriented μDALY into a benefit-oriented "minutes gained" metric. **This −0.53 constant is the single most reusable number in the paper** and is exactly what our pipeline must hard-code to convert μDALY to HENI minutes.
+
+**Key implementation rule (Methods p. 626):** for "milk" and "flavoured milk" the calcium DRF is *excluded* from the HENI sum to avoid double-counting the colorectal-cancer benefit already captured in the milk DRF. Our implementation needs this carve-out.
+
+**Risk-component amounts** d_{i,r} are computed by the Fulgoni et al. 2018 method (ref 36), which maps WWEIA/NHANES foods to GBD risk components.
+
+---
+
+#### The dietary risk factors (DRFs) (Results pp. 617–618; Methods eq. 1–2, pp. 624–625)
+
+DRFs are derived from a **comparative risk assessment adapted for marginal (1 g) intake changes**, under a log-linear dose-response, from the **2016 GBD**. The marginal DRF reduces (via Taylor expansion) to:
+
+$$\text{DRF} = \frac{\ln(\overline{RR})}{\text{Ref}} \times \overline{BR}, \qquad \overline{BR} = \frac{BR}{\overline{RR}}, \quad \overline{RR} = \sum_x P_x \, RR_{x/\text{Ref}}$$
+
+where RR is the relative risk for a risk-outcome pair, Ref is the RR's reference exposure (g/day), BR is the outcome-specific burden rate (μDALY/person/day), and P_x is the population fraction at intake level x. Morbidity (YLDs) and mortality (YLLs) are summed to DALYs. The full cumulative DRF (eq. 2) sums over age, gender, outcome, burden type and effect-modifier strata.
+
+**Scale of the underlying model:** 15 dietary risks, 479 distinct risk-outcome RRs in GBD 2016, expanded to **6,195 age/gender/modifier/outcome/burden-specific RRs** and **6,041 probability distributions** for uncertainty. SSBs are 100% mediated through BMI; sodium through systolic blood pressure (modified by race and hypertension); fibre's cardiovascular effect is mediated through fruits/vegetables/legumes/whole grains and so split into separate DRFs to avoid double-counting.
+
+**⚠ 15 vs 16 risk-component note.** The Results say HENI "combines the 15 DRFs," but the Methods HENI definition (eq. 3) says it is "based on the 16 selected dietary risk components." The reconciliation is that **fibre is one dietary risk split into two sources** (fibre from f/v/l/w, and fibre from other sources), so there are 15 risks but 16 risk components entering the sum. We should state this explicitly so our implementation count is unambiguous.
+
+**The 15 risks** (signs from Fig. 2): beneficial = omega-3 from seafood, calcium, nuts and seeds, fibre (f/v/l/w), fibre (other), PUFAs, whole grains, legumes, fruits, vegetables, milk; detrimental = sodium, trans fatty acids (TFAs), processed meat, red meat, sugar-sweetened beverages (SSBs).
+
+**DRF magnitudes (μDALY per g risk component):** range from a benefit of **81 avoided μDALY/g for omega-3 from seafood** (95 % CI 37–113) to a loss of **14 μDALY/g for sodium** (95 % CI 11–16; the chicken-wing worked example uses 13.9). The full per-risk table is **Supplementary Table 3, now retrieved and extracted in entry C15-SI** (note the SI gives omega-3 as −81 μDALY/g, CI −37 to −110, and sodium 13.9, CI 11.5–16.1 — use those authoritative values, not the abstract-derived figures in this paragraph). The health burden for most risks is driven by ischaemic heart disease; calcium/fibre/milk benefits act through avoided colorectal cancer; red meat acts mainly through diabetes (45 % morbidity, 27 % mortality).
+
+---
+
+#### HENI results across foods (Results pp. 618–620) — including the Fig. 4 we reproduce
+
+- **5,853 foods scored** (WWEIA 2011–2016, US adults ≥25 yr). HENI per serving ranges, per the abstract, from **74 min lost to 80 min gained**; individual extremes reach **71 min lost** (corned beef with tomato sauce and onion, 95 % CI 38–91) and **82 min gained** (sardines in tomato sauce, 95 % CI 37–115).
+- **Median HENI by food category (Fig. 4, the figure we reproduce):** from **35 min lost per serving for frankfurter sandwiches** (N = 37; IQR 31–41) to **33 min gained for peanut-butter-and-jelly sandwiches** (N = 17; IQR 29–34). Almost-always-negative categories: frankfurter/breakfast sandwiches, burgers, red meat. Almost-always-positive: nuts, PB&J, legumes, seafood, fruits, snack bars, ready-to-eat cereals, non-starchy vegetables.
+- **No significant correlation** between HENI and energy density or serving size (Supplementary Fig. 3), so HENI is not reducible to "calories" or "portion."
+- **Within-category variation exceeds the uncertainty of individual estimates**, which is the core argument for food-specific (not category-level) scoring, the same principle behind our recipe-level approach.
+
+**Worked examples (Fig. 3) for validating an implementation:** chicken wings (85 g) = **3.3 min lost** (CI 2.5–3.9; sodium 0.49 g × 13.9 μDALY/g = 6.8 μDALY); beef hotdog on bun = **36 min lost** (CI 22–45, processed meat); vegetable pizza = **1.4 min lost** (CI 0.061–2.8); apple pie = **1.3 min gained** (CI −0.42 to 2.9). These are good unit-test targets for our HENI module.
+
+---
+
+#### Environmental side (Methods pp. 625–626) — the IMPACT World+ link
+
+For 167 representative foods (~27 % of daily calories, 562 kcal/person/day), cradle-to-farm/processing-gate LCAs were run in **SimaPro v8.3** on **ecoinvent v3.3 + World Food LCA Database v3.1 + ESU**, characterised with **18 environmental indicators using IMPACT World+ v1.4 default factors** (Bulle et al. 2019, the now-published version of the "manuscript in preparation" cited in C14), except for **PM2.5 and blue water use, which use improved/spatialised methods**. The 18 indicators: global warming, land occupation, fossil energy use, mineral resources use, freshwater + terrestrial acidification, freshwater + marine eutrophication, freshwater ecotoxicity, ionising radiation, ozone depletion, water use, photochemical oxidants, fine PM2.5, cancer + non-cancer human toxicity, plus aggregated human-health and ecosystem-quality endpoints.
+
+**This is the entry's most important cross-link to Group A:** HENI's environmental track uses IMPACT World+, whereas our platform may use ReCiPe (A1/A2). When we describe the environmental indicators we must be explicit about which method we adopt and reconcile category definitions accordingly.
+
+**Environmental ranges (167 foods, per serving):** GW 0.0005 to 5.7 kgCO2eq (beef stew 5.7 ≈ 14 miles driven; beef ~2.5 average, GSD² 1.4; cheese/poultry ~0.3, GSD² 1.7); land 0 to 4.0 ha-yr arable; PM2.5 health 0.0001 to 1.5 min lost; consumptive water <0.01 to 116 L. Water use ranks foods very differently from GW (weak correlation), a recurring theme.
+
+---
+
+#### Food classification zones (Results pp. 619–620) — thresholds for our classification layer
+
+| Zone | Criterion |
+|---|---|
+| Green (win-win) | HENI > 0 **and** GW below 50th percentile (< 0.32 kgCO2eq/serving) |
+| Amber | intermediate; slightly detrimental (HENI 0 to 3.2 min lost) or moderate GW (50th–75th pctl) |
+| Red | HENI > 75th pctl (> 3.2 min lost/serving) **or** GW > 75th pctl (> 0.61 kgCO2eq/serving) |
+| Dark red (worst 10 %) | HENI > 15 min lost/serving **or** GW > 3.0 kgCO2eq/serving |
+
+Green foods are mostly nuts, fruits, vegetables, legumes, whole grains, some seafood; red is driven nutritionally by processed meat and SSBs and environmentally by beef, processed meat, pork, lamb, cheese and some salmon; amber holds most poultry, dairy, eggs, cooked grains and greenhouse vegetables.
+
+---
+
+#### Headline substitution result (Results pp. 621–622) — for §6.3
+
+Substituting **10 % of daily caloric intake (190 kcal/day, roughly ~20 g processed meat + ~40 g beef)** with an isocaloric mix of nutritious foods yields **+48 min of healthy life per person per day** (95 % CI 28–62) and a **33 % reduction in dietary carbon footprint** (95 % CI 22–46 %). All other environmental impacts fall by similar magnitudes **except consumptive water use (6 %, CI −9 to 26 %) and freshwater ecotoxicity (14 %, CI −6 to 55 %)**, which are weakly correlated with GW. Combined nutrition+climate optimisation gives environmental reductions 2–5× larger than nutrition-only, but **food replacements should be chosen primarily on nutrition** because the replacement mix barely affects the environmental savings. Aggregating health-related indicators, **nutritional health effects are on average 1–2 orders of magnitude larger than environmental health damages** (PM, photochemical oxidants, GW), which is the central justification for including HENI in food sustainability assessment.
+
+---
+
+#### Uncertainty methods (Methods p. 626) — for our §3.6
+
+- **Nutritional (HENI):** Monte Carlo, **10,000 iterations in SAS 9.4**, log-normal distributions for RRs, BRs and the sodium-to-SBP conversion, normal for the other conversion factors; food-composition uncertainty assumed negligible relative to DRF uncertainty. Reported HENI uncertainty: ±1 min for |HENI| < 5 min, ±2.5 min for |HENI| ≈ 10 min, rising with HENI and highest for seafood.
+- **Environmental:** the **Hong et al. 2010 analytical Taylor-series propagation** (same method noted in C14), characterised by squared geometric standard deviation GSD². Median GSD²: ~1.7 (GW, fossil energy), 2–3 (acidification, eutrophication, water, land), 5–7 (human-health and ecosystem endpoints), ~20 (human toxicity, ecotoxicity, photochemical oxidants). These give us realistic per-category uncertainty priors.
+
+---
+
+#### Author-flagged limitations (Discussion pp. 622–624) — for our §7
+
+1. **HENI is marginal.** It estimates the effect of adding/removing a single reference serving and is "not applicable to substantial changes in diet." This is a hard scope limit our §7 must state plainly.
+2. **Benefits are capped by TMREL/maximum intake** per risk (e.g. 250 g/day fruits) beyond which no further benefit accrues.
+3. **Additivity and independence assumed** across risks unless a mediation mechanism is known; components not in the GBD are assumed health-neutral.
+4. **Risk list is not exhaustive:** no potassium-CVD, no added sugar or saturated fat in the base model (only in sensitivity studies), no vitamin D or shortfall nutrients, no ultraprocessing or cooking effects, no bioavailability. HENI "could evolve" as GBD evidence grows.
+5. **GW-to-health linkage is highly uncertain**, so the "nutrition dominates by 1–2 orders of magnitude" finding "is to be taken with care," compounded by different exposed populations and time horizons for nutritional vs environmental effects.
+6. **Lag time** between exposure and disease makes the age distribution of DRFs "only indicative."
+7. **US-specific** throughout (NHANES intakes, US burden rates), the same portability caveat as B9–B13 and central to our Canadian/French adaptation in §3.7.
+8. **"Healthy/unhealthy food" terminology is limited in the context of the overall diet.**
+9. **Dairy-industry funding** (ours to flag, as with C14).
+
+---
+
+#### Reconciliation with C14 (as promised)
+
+| Aspect | C14 (2016, milk case study) | C15 (2021, HENI) |
+|---|---|---|
+| Scope | single food (milk), 3 dietary scenarios | 5,853 foods, per-food DRFs |
+| Epidemiology base | GBD 2010 | GBD 2016 |
+| Nutritional output | per-scenario μDALY | per-food μDALY → HENI minutes (×−0.53) |
+| GW endpoint factor | 0.82 μDALY/kg CO2-eq ("Bulle et al., in prep") | IMPACT World+ v1.4 (Bulle et al. 2019, ref 38) — the same lineage, now published |
+| PM characterisation | CO2-eq correlation proxies + Fantke/Humbert/Gronlund | improved/spatialised PM2.5 (refs 61,62,81,82) |
+| SSB | 0.03 μDALY per SSB-calorie | SSB as a DRF in μDALY/g, mediated via BMI (different basis) |
+| Uncertainty | Hong et al. 2010 analytical | Hong et al. 2010 (environmental) + 10k Monte Carlo (nutritional) |
+| Funding | Dairy Research Institute (DMI) | National Dairy Council |
+
+**Net:** C14 is the framework, C15 is the operational factor engine. The 0.82 μDALY/kg CO2-eq value in C14 is the pre-publication form of the IMPACT World+ factor that C15 uses through the published Bulle et al. 2019 method, so there is no real value conflict between them, only a maturation from a proxy to a published characterisation. The PM treatment did change (proxy correlation → spatialised), so if we ever cite a PM characterisation factor we should use the C15/IMPACT World+ lineage, not the C14 Table 1 proxies.
+
+---
+
+#### Three-sentence relevance note
+
+C15 is the canonical HENI paper and the primary citation for the health-burden indicator our platform implements: HENI_i = −0.53 × Σ_r DRF_r × d_{i,r}, built on 15 dietary risks (16 risk components, with fibre split by source) drawn from GBD 2016, expressed in net minutes of healthy life per serving, with the −0.53 min/μDALY conversion and the milk-calcium double-counting carve-out being the two implementation details we must encode exactly. Beyond the method it gives us the Fig. 4 per-category distribution we reproduce, a set of unit-test foods (chicken wings 3.3 min lost, beef hotdog 36 min lost, apple pie 1.3 min gained), the green/amber/red classification thresholds, GSD² uncertainty priors by impact category, and the headline policy result that a 10 % targeted isocaloric substitution buys 48 min/day of healthy life and a 33 % carbon-footprint cut. The key reconciliation point for our methods is that HENI's environmental track uses IMPACT World+ v1.4 (the published form of C14's 0.82 μDALY/kg CO2-eq factor) whereas we may use ReCiPe from Group A, so §3 must state which we adopt; **the full DRF value table has now been retrieved — it is Suppl. Table 3, extracted in entry C15-SI — so our HENI factors can be reconciled cell-by-cell against it (and two numbers in this entry, omega-3 upper CI and sodium mean, are corrected there).** Cite as Stylianou et al. 2021, Nat Food 2(8):616–627, doi:10.1038/s43016-021-00343-4.
+
+---
+
+### C15-SI. Stylianou, Fulgoni & Jolliet (2021) — Supplementary Information: the canonical DRF factor table, HENI worked example, and full uncertainty/LCA methodology [★★★]
+
+**Citation.** Stylianou KS, Fulgoni VL III, Jolliet O. Small targeted dietary changes can yield substantial gains for human health and the environment. Supplementary Information. Nat Food. 2021;2(8):616–627. doi:10.1038/s43016-021-00343-4. (93 pp. supplement; "Prioritization of healthy and sustainable foods for small targeted dietary changes…", sections S1–S5 plus Data S1.)
+
+**Type.** Author-supplied, unedited supplement to C15. **This is the single most important PDF in Group C for our implementation**: it contains the published μDALY/g DRF factor table (Suppl. Table 3) that the C15 main-text entry flagged as "NOT in this PDF," the fully worked HENI calculation our unit tests need, and the complete environmental uncertainty methodology (GSD², pedigree, Taylor-series propagation) for our §3.6.
+
+---
+
+#### ★ The DRF factor table — Suppl. Table 3, p. 8 (lines 160–164). THE table our HENI module hard-codes.
+
+**Suppl. Table 3. 95% CI characterization of dietary risk factors (DRFs) in μDALYs/g.** Reproduce verbatim in §3.2 / Supplementary, and reconcile our `heni_calculator` factor file against it cell-by-cell.
+
+| Dietary risk component | DRF mean (μDALY/g) | Lower | Upper | Sign |
+|---|---|---|---|---|
+| Omega-3 (seafood) | −81 | −37 | −110 | beneficial |
+| Calcium | −5.1 | −4.0 | −6.2 | beneficial |
+| Nuts and seeds | −1.5 | −1.1 | −1.9 | beneficial |
+| Fiber_other | −0.99 | −0.71 | −1.3 | beneficial |
+| PUFA | −0.60 | −0.26 | −0.94 | beneficial |
+| Whole grains | −0.34 | −0.28 | −0.40 | beneficial |
+| Legumes | −0.23 | −0.10 | −0.34 | beneficial |
+| Fiber_f,v,l,w | −0.19 | −0.11 | −0.26 | beneficial |
+| Fruits | −0.18 | −0.12 | −0.22 | beneficial |
+| Vegetables | −0.083 | −0.042 | −0.11 | beneficial |
+| Milk | −0.0077 | −0.0027 | −0.012 | beneficial |
+| Sugar-sweetened beverages (SSB) | 0.066 | 0.043 | 0.089 | detrimental |
+| Red meat | 0.099 | 0.038 | 0.15 | detrimental |
+| Processed meat | 0.86 | 0.41 | 1.1 | detrimental |
+| Trans fatty acids (TFA) | 4.4 | 3.3 | 5.6 | detrimental |
+| Sodium | 13.9 | 11.5 | 16.1 | detrimental |
+
+Sign convention: a **negative DRF is health-beneficial** (consuming more reduces burden); positive is detrimental. In the HENI sum these multiply the risk-component mass d_{i,r} (g/serving), then × −0.53 min/μDALY flips the overall sign so that positive HENI = minutes gained. Fiber_other = fiber from sources other than fruit/vegetables/legumes/whole grains; Fiber_f,v,l,w = fiber from those four sources (the two are kept separate because they map to different disease sets — see double-counting rules below). Omega-3 restricted to seafood-origin EPA + DHA.
+
+**⚠ Resolves the C15 count ambiguity definitively.** The table has **16 rows = 16 risk components from 15 dietary risks** (fiber is one GBD risk split into two source-specific components). This confirms the "15 risks / 16 components" reading in the C15 entry and is the number our pipeline should use, *not* the 14-component Dutch list (C17) or the thesis-era 14 factors (C16).
+
+**⚠ Correction to two numbers carried in the C15 main-text entry.** The C15 entry, working from the abstract/main text, recorded omega-3 as "+81 avoided μDALY/g (CI 37–113)" and sodium "14 (CI 11–16)." The authoritative SI Table 3 values are: **omega-3 = −81 μDALY/g, CI −37 to −110** (the upper CI is −110, not −113), and **sodium = 13.9, CI 11.5–16.1**. Use the SI values. The DRF relative uncertainty is largest for red meat and milk (~58% around the mean) and smallest for sodium and whole grains (~17%); PUFA and legumes are also relatively uncertain (S1.3, p. 7, lines 146–148).
+
+---
+
+#### ★ Worked HENI example — Suppl. §S2.2, p. 13 (lines 190–206). Our canonical unit test.
+
+An 85 g serving of **chicken wings** decomposes to four HENI-active components: 1.85 g PUFA and 0.0281 g calcium (beneficial), 0.492 g sodium and 0.139 g TFA (detrimental); the rest (poultry) is health-neutral. Eq. S3:
+
+$$\text{HENI}_{\text{chicken wing}} = -0.53 \times \left[ 1.85 \times (-0.60) + 0.0281 \times (-5.1) + 0.492 \times 13.9 + 0.139 \times 4.4 \right] = -3.3 \text{ min/serving}$$
+
+Per-component minutes: PUFA +0.59, calcium +0.076 (gained); sodium −3.6, TFA −0.33 (lost); net **−3.3 minutes of healthy life per serving**. This is exactly the chicken-wing test value already in the C15 entry, now with the full arithmetic so we can assert each intermediate term in a unit test. Note sodium dominates (0.492 g × 13.9 = 6.84 μDALY) — a good sanity check that the sodium DRF is wired correctly.
+
+**The μDALY → minutes constant, derived explicitly (ref 65, p. 98, line 1291):** 1 μDALY = 1 yr × 365 × 24 × 60 × 10⁻⁶ = 0.53 min, hence the **−0.53 min/μDALY** HENI constant. This nails down the constant our pipeline hard-codes.
+
+---
+
+#### Dietary risk definitions and TMRELs — Suppl. Table 1, pp. 4–5 (lines 79–99)
+
+Each risk has a GBD-defined **theoretical-minimum-risk effective intake** (the threshold beyond which the marginal DRF applies) and an associated outcome set. Values our categorizer/exposure logic should respect: calcium <1.25 g/day (colorectal cancer); fiber <23.5 g/day (IHD + colorectal cancer); PUFA <11% energy (IHD); omega-3 seafood <250 mg/day (IHD); sodium >3.49 g/day dietary (15 outcomes, mediated via SBP); TFA >0.5% energy (IHD); fruits <250 g/day (10 outcomes); milk <435 g/day (colorectal cancer); nuts/seeds <20.5 g/day (T2DM, IHD); processed meat >2 g/day (T2DM, IHD, colorectal cancer); legumes <60 g/day (IHD); red meat >22.5 g/day (T2DM, colorectal cancer); SSB >2.5 g/day (38 outcomes, mediated via BMI); vegetables <360 g/day (haemorrhagic + ischaemic stroke, IHD); whole grains <125 g/day (T2DM, haemorrhagic + ischaemic stroke, IHD). The sodium effective-intake conversion: urinary→dietary at 0.85 (3 g urinary/day ÷ 0.85 = 3.49 g dietary/day). Definitions sourced from Gakidou et al. 2017 (GBD 2016).
+
+**Mediated risks (S1.2, pp. 5–7):** sodium acts through systolic blood pressure (Eq. S1; effect modifiers race and hypertension status; urinary-to-dietary factor f = 0.86, SE 1.6%; SBP reference 10 mmHg); SSB acts through BMI (Eq. S2; modifier BMI ≥25 vs <25; BMI reference 5 kg/m²; 226.8 g/day reference serving). These two-step mediations are why SSB and sodium carry far larger outcome sets than the directly-acting risks.
+
+---
+
+#### Sensitivity analyses — added sugar, SFA, TFA (S2.6–S2.8, pp. 25–31). Directly relevant to our §3.2 design choices.
+
+- **Added sugar (S2.6, p. 25, Eq. S4):** not a GBD risk, so excluded from base HENI. If included, an extrapolated DRF of **0.51 μDALY/g added sugar (95% CI 0.33–0.69)**, derived as half the SSB burden per gram of added-sugar equivalent. Effect is minor for ~85% of foods (<1 min lost/serving) but shifts desserts, candy, sweet bakery, sweetened dairy drinks and RTE cereals by 3–4 min lost. Useful precedent if a reviewer asks why we (presumably) follow GBD and omit added sugar from HENI.
+- **Saturated fat (S2.7, pp. 27–29, Eq. S5):** excluded from base HENI (mediated via total cholesterol; conversion 0.045 mmol/L per 1% energy from SFA, CI 0.038–0.051; fat energy 9.25 kcal/g). Median HENI_SFA ranges 0.008–3.9 min lost; coconut milk worst at 17 min lost, but the authors flag source-specific SFA effects (coconut, dairy may be neutral/protective) so SFA contributions "should be interpreted with caution."
+- **TFA (S2.8, pp. 29–31):** TFA *is* in base HENI but is the weakest-supported component — **~60–63% of WWEIA foods have imputed TFA** (regression model, R² = 0.69, S2.1 p. 12) and TFA burden is declining since the 2013 US partial-hydrogenation phase-out. Median HENI_TFA mostly <2 min lost; ruminant-TFA foods (red meat 0.41, cheese 0.40, milk 0.20 min lost/serving; Suppl. Table 6 p. 31). **This is a real limitation for us:** if our CNF pipeline lacks measured TFA, our HENI TFA term inherits the same imputation uncertainty, and the component may be near-obsolete for recent Canadian formulations.
+
+---
+
+#### Double-counting carve-outs — S2.9, pp. 35–36 (lines 490–505). Implementation rules our HENI module must encode.
+
+1. **Milk vs calcium:** DRF_milk is applied **only** to foods classified "milk" and "flavored milk"; for all other foods only the calcium benefit is counted (avoids double-counting the colorectal-cancer benefit). This matches the rule already in the C15 entry.
+2. **Fiber split:** two source-specific fiber DRFs. DRF_fiber(f,v,l,w) counts **only colorectal-cancer** benefit (its IHD benefit is already mediated through the fruit/vegetable/legume/whole-grain DRFs); DRF_fiber(other) counts **both colorectal cancer and IHD**. This is the mechanistic reason there are 16 components for 15 risks, and it must be implemented exactly or fiber benefits will be double-counted.
+3. **TFA** double-counting was checked via the S2.8 sensitivity study.
+
+---
+
+#### Environmental LCA + uncertainty methodology (S3, pp. 37–58) — primary source for our §3.6
+
+**Note on LCIA method:** the environmental side uses **IMPACT World+ v1.4** (Bulle et al. 2019), *not* ReCiPe — Suppl. Table 7 (pp. 46–47) lists the indicator set and units. This reinforces the C15 cross-link: if we adopt ReCiPe (Group A) we cannot reuse these endpoint factors directly. PM2.5 and water use use improved methods (US-specific PM2.5 CFs in Suppl. Table 8, p. 47: PM2.5 1.13×10⁻⁴, SO₂ 7.52×10⁻⁵, NOx 3.80×10⁻⁵, NH₃ 9.37×10⁻⁵ DALYs/kg).
+
+**The uncertainty framework we should mirror (S3.5, pp. 47–52):**
+- Uncertainty expressed as **squared geometric standard deviation GSD²** under a lognormal assumption (95% of estimates fall within median ÷ GSD² and median × GSD²). This is the same GSD²-based scheme noted in the C15 entry and is directly portable to our Monte Carlo layer.
+- **Overall GSD² (Eq. S6)** combines a *base* uncertainty with three *pedigree* components (LCI match, loss/waste, consumable-amount adjustment) in quadrature of log-GSD² terms.
+- **Pedigree GSD² ranges (Suppl. Table 9, p. 49):** LCI match 1–1.5; loss/waste 1–5; consumable-amount 1–1.5 (scored on a 1–5 data-quality scale). A concrete, citable alternative to the ecoinvent pedigree matrix our §3.6 currently falls back to.
+- **Base uncertainty (Eq. S7) by impact category (Suppl. Table 10, p. 51):** GSD²_LCI ranges from ~1.18 (terrestrial acidification, marine eutrophication) to ~2.56 (ionizing radiation); midpoint LCIA pedigree gives GSD² 1.4–10; **endpoint LCIA pedigree gives GSD² 2.5–1000** (the midpoint→endpoint conversion is the dominant uncertainty, esp. human toxicity non-cancer at GSD²_LCI 6.39). These are realistic per-category priors we can borrow when Poore & Nemecek (A4) does not cover a category.
+- **GHG GSD² (Eq. S8):** CO₂ assigned GSD²=1 (reference), other GHGs (CH₄, N₂O) GSD²=1.4 per IPCC 2013, combined by the fraction of GWP from fossil CO₂. This is a cleaner, citable basis for the GWP uncertainty in our pipeline than a flat assumption.
+- Propagation is **analytical Taylor-series** (Hong et al. 2010), Eq. S9 — an alternative to our Monte Carlo, useful as a cross-check.
+
+---
+
+#### Correlation structure across indicators — Suppl. Fig. 17, pp. 76–77. Supports our multi-indicator argument.
+
+Per-serving Pearson correlations (Fig. 17A): most environmental midpoints correlate with global warming at **r > 0.90**, **except consumptive water use (~0.50) and freshwater ecotoxicity (~0.40–0.52)**. HENI correlates only **0.26–0.31** with GW/water (and 0.08–0.44 across all environmental indicators). On a per-100-kcal basis (Fig. 17B) the HENI–environment correlations collapse further (−0.16 to 0.4, several near zero). **This is independent corroboration of the Poore & Nemecek "single-indicator proxies are weak" point we make in §1**, from the HENI side: health burden is essentially orthogonal to environmental burden, and water/ecotoxicity are orthogonal to carbon. Good supporting citation for our multi-indicator design alongside C17.
+
+**HENI ≈ total human-health damages (Suppl. Fig. 18, p. 78):** HENI vs total human-health damages (nutrition + environmental) regresses at **y = 1.04x − 1.0, R² = 0.98**, i.e. nutritional health effects dominate total human-health damages — the same "1–2 orders of magnitude" point in the C15 entry, here as a tight regression we can cite.
+
+---
+
+#### Recommendation-zone thresholds — Suppl. Table 11, pp. 63–64. Numeric cut-offs for our classification layer.
+
+Suppl. Table 11B gives the **exact per-indicator zone limits** on both a per-serving and per-100-kcal basis (the C15 entry has the qualitative scheme; this is the numeric version). Nutrition: Beneficial HENI > 0; Slightly detrimental 25th pctl–0 (per serving: −3.2 to 0); Detrimental ≤25th pctl (≤ −3.2/serving, ≤ −1.6/100 kcal). Environment (per serving, Low/Moderate/High at 50th/75th pctl), selected: GW shorter-term [0,0.32)/[0.32,0.61)/[0.61,∞) kg CO₂eq; land [0,0.24)/[0.24,0.70)/… ha-yr; water [0,20)/[20,45)/… L; freshwater eutrophication [0,0.23)/[0.23,0.67)/… g PO₄-P. The 0.32 and 0.61 kg CO₂eq GW cut-offs match the C15 green/red thresholds exactly — confirming those numbers. Full table to be reproduced in our Supplementary if we adopt a zone scheme.
+
+---
+
+#### Food-decomposition pipeline — S3.1–S3.3, pp. 38–43. Methodological precedent for our CNF→LCA matcher (§3.5).
+
+Stylianou maps WWEIA foods to LCI through a **tiered ingredient decomposition**: SR v.28 standard recipes (tier 1, 281 ingredients from 169 foods) → FCID agricultural commodities (tier 2, 98 ingredients) → FICRCD dairy commodities (tier 3); 344 unique ingredients total, 306 matched to 120 LCIs (~60% direct, ~40% proxy). This is the closest published analogue to **our AI-assisted food-to-LCA matcher (§3.5)** — worth citing as the manual, expert-judgment precedent that our LLM matcher aims to automate and scale. Their honest "~40% proxy LCIs by expert judgment" admission is exactly the laborious, non-reproducible matching our §3.5 is designed to replace.
+
+---
+
+#### Author-flagged limitations specific to the SI (for §7, supplementing the C15 list)
+
+- **TFA imputation (S2.8):** ~60% of foods have imputed TFA; component near-obsolete post-2013 — our pipeline inherits this if CNF lacks measured TFA.
+- **System boundary cradle-to-farm/processor-gate (S3.6, p. 55):** post-farm-gate stages omitted, so impacts underestimated; per Poore & Nemecek post-farm-gate adds ~18% to climate (processing 4%, transport 6%, packaging 5%, retail 3%). Relevant if we claim completeness for our LCA.
+- **Water use under-spatialised (S3.4–S3.6):** only ~15% of LCIs are US-specific; milk blue-water in WFLDB (15 L/kg) vs US actual (50–200 L/kg) — a 3–13× gap. A cautionary precedent for our Canadian water factors (§3.7).
+- **Loss/waste applied at ingredient level (S3.6, p. 56):** may overestimate food-level impacts; loss/waste is >60% of impact for fruit/veg, ~25% for beef/pork/lamb.
+
+---
+
+#### Three-sentence relevance note
+
+This supplement is the authoritative home of the **DRF μDALY/g factor table (Suppl. Table 3, p. 8)** that the C15 main-text entry could not supply, giving us all 16 risk-component values with 95% CIs to reconcile our `heni_calculator` against cell-by-cell, and it corrects two numbers we had carried (omega-3 upper CI is −110 not −113; sodium 13.9 not 14). It also pins down the **−0.53 min/μDALY constant** with its derivation, the **fully worked chicken-wing example (−3.3 min/serving)** for unit-testing, the **milk-calcium and fiber-source double-counting rules** our HENI module must encode, and the **complete GSD²/pedigree/Taylor-series uncertainty methodology (S3.5)** that is directly portable to our §3.6 (including per-category base GSD² priors and the CO₂=1 / other-GHG=1.4 GWP scheme). The standing caveat for our methods is that the environmental side uses **IMPACT World+ v1.4, not ReCiPe**, so the endpoint factors and zone thresholds here (Suppl. Tables 7, 11) cannot be transplanted into a ReCiPe pipeline without re-derivation; cite as Stylianou et al. 2021 Supplementary Information, Nat Food 2(8):616–627, doi:10.1038/s43016-021-00343-4.
+
+---
+
+### C16. Stylianou (2018) — Health-based food evaluation (PhD thesis): the 14-factor μDALY/g table [★★★]
+
+**Citation.** Stylianou KS. Nutritional and Environmental Impacts of Foods on Human Health (Ch. 4: health-based food evaluation). PhD thesis, University of Michigan, 2018. (Cited as ref. 81 in C15.)
+
+**✓ Factor table now retrieved — see C15-SI.** This entry was originally a placeholder held open because the wishlist marks the thesis as the origin of the per-risk μDALY/g factor table. **That table has now been obtained** in its published form as **Suppl. Table 3 of C15 (see entry C15-SI)**, so the numerical reconciliation no longer depends on retrieving the thesis PDF itself. The thesis (Ch. 4) is still the place to cite if we need the *original derivation* of the framework or the spatially-explicit PM2.5 characterisation factors (the thesis is also cited as ref. 62 in C15-SI for the PM2.5 CFs in Suppl. Table 8).
+
+**What we know so far.** The thesis develops the health-based food evaluation in which Stylianou's HENI uses dietary risk factors to compute a μDALY/g score quantifying the marginal health burden (positive or negative) of food consumption from Global Burden of Disease data. This is the **direct precursor to C15**. **Note on the "14-factor" framing:** the C15 published form is unambiguously **15 dietary risks / 16 risk components** (confirmed by C15-SI Suppl. Table 3, which lists 16 rows; fibre is split into f,v,l,w and other). The Dutch adaptation (C17) uses a 14-component list. The "14 factors" attributed to the thesis should be treated as provisional until the thesis PDF is seen — given the published table has 16 components, the count attribution in the wishlist may itself need correcting, and we should not assert "14" in the manuscript without the thesis in hand.
+
+**Action for us.** Treat **C15-SI (Suppl. Table 3) as the citable home of the μDALY/g factor values** and the algorithm; cite C16 (the thesis) only if we need to attribute the *original* framework derivation, discuss the evolution of the factor count, or cite the PM2.5 spatially-explicit CFs. No further numerical reconciliation is blocked on this entry.
+
+---
+
+### C17. Cardinaals, Verly, Jolliet et al. (2024) — Complementarity of nutrient density and disease burden for nLCA [★★★]
+
+**Citation.** Cardinaals RPM, Verly E Jr, Jolliet O, Van Zanten HHE, Huppertz T. The complementarity of nutrient density and disease burden for Nutritional Life Cycle Assessment. Front Sustain Food Syst. 2024;8:1304752.
+
+**DOI.** 10.3389/fsufs.2024.1304752 (open access, CC BY; received 29 Sep 2023, published 30 May 2024)
+
+**Type.** Original-research methodology paper comparing two nutrition indicators (a 24-nutrient Nutrient Rich Food index, NRF24, and HENI) against each other and against environmental indicators, for 1,826 Dutch foods. Jolliet (co-author of C14/C15) links this directly to the HENI lineage. Funding: none declared; authors declare no COI, though Huppertz is affiliated with FrieslandCampina (a dairy company), worth a quiet note.
+
+---
+
+#### Why this paper matters most to us: ReCiPe + HENI portability
+
+Two features make C17 unusually relevant:
+
+1. **It pairs HENI with ReCiPe 2016 (hierarchical), not IMPACT World+.** The environmental side uses ReCiPe 2016 H (Huijbregts et al. 2017, our **A1**) for GWP, land use and freshwater use. So C17 is a published precedent for exactly the HENI + ReCiPe combination our platform may adopt, in contrast to C15's HENI + IMPACT World+. This resolves the A-vs-IMPACT-World+ tension flagged in C15: it is legitimate to run HENI alongside ReCiPe.
+2. **It is the HENI portability blueprint.** HENI was recomputed for the Netherlands by **updating to GBD 2019 relative risks and substituting Dutch burden rates for US ones** (Methods 2.2). This is precisely the procedure our §3.7 needs for Canada and France: keep the algorithm, swap in local burden rates and the latest GBD RRs.
+
+---
+
+#### The two nutrition indicators (Methods 2.1–2.2)
+
+**NRF24 (nutrient density), per 100 kcal (Eq. 1):**
+
+$$\text{NRF24} = \left( \sum_{i=1}^{24} \frac{EN_i}{DRI_i} \right) \times \frac{100}{E}$$
+
+where EN_i is essential-nutrient content per 100 g, DRI_i the Dutch daily recommended (or adequate) intake, E the energy (kcal/100 g), each nutrient **capped at 100 % of its DRI**. The 24 essential nutrients: protein, three essential fatty acids (DHA, ALA, LA), sodium, potassium, calcium, phosphorus, magnesium, iron, copper, selenium, iodine, zinc, and vitamins A, C, D, E, B1, B2, B3, B6, B9, B12. NRF24 is a deliberate adaptation of NRF9.3 that **strips out the "limit" and disease-risk components (saturated fat, added sugar, fibre)** so it reflects only essential-nutrient adequacy, leaving disease risk entirely to HENI. For reference, NRF9.3 (Fulgoni et al. 2009, our **B-group lineage**) sums % RDI for 9 nutrients to encourage (protein, fibre, vitamins A/C/E, calcium, iron, magnesium, potassium) minus % RDA for 3 to limit (sodium, saturated fat, added sugar) per 100 kcal.
+
+**HENI (disease burden), per 100 kcal (Eq. 2):**
+
+$$\text{HENI} = -0.53 \times \left( \sum_{i=1}^{15} DRF_i \times R_i \right) \times \frac{100}{E}$$
+
+with DRF_i the dietary risk factor (μDALY/g), R_i the risk-component content per 100 g, E energy (kcal/100 g). **The −0.53 min/μDALY constant is identical to C15**, confirming that value.
+
+**⚠ 14-vs-15 component note (ties to C16).** The HENI summation here is written to 15, but the explicitly listed risk components number **14**: calcium, fibre, omega-3 from seafood, PUFA, trans fatty acids, sodium, fruits, vegetables, milk, legumes, nuts and seeds, red meat, processed meat, whole grains. SSBs are referenced separately in the Discussion as being captured in HENI (so possibly the 15th), and unlike C15 there is no separate fibre-source split. This matches the **14-factor formulation attributed to C16** and is fewer than C15's 15 risks / 16 components. We should record that the HENI factor count is not fixed across the literature: 14 (thesis C16, Dutch C17) vs 15/16 (US C15).
+
+**DRF computation (Dutch):** a non-linear optimisation fits the best dose-response curve to the GBD's **81 risk-outcome-specific relative risks** (far fewer than C15's 479, reflecting GBD 2019 + Dutch scope + 14 risks), giving change in risk per g change in intake; multiplied by Dutch observed burden rates (μDALY per 100,000 per year) to yield DRFs in μDALY/g. Risk-component content comes from the NEVO composition data (for calcium, fibre, omega-3, PUFA, TFA, sodium) or from the nature of the food (for fruits, vegetables, milk, legumes, nuts, red/processed meat, whole grains); composite foods use Albert Heijn retailer ingredient lists.
+
+**Double-counting carve-outs (extends C15's milk-calcium rule):** diseases already captured in the calcium, sodium and fibre DRFs are excluded from the disease sets of milk, processed meat, and fruit/vegetables/legumes respectively.
+
+---
+
+#### Environmental side (Methods 2.3)
+
+LCA for **200 of the 1,826 foods** (de Valk et al. 2016 / RIVM 2023): attributional, ISO 14040/44, cradle-to-consumer including end-of-life for losses and packaging. LCI from Agri-footprint + ecoinvent v3 + Blonk; economic allocation (physical for milk, IDF 2015). Characterised with **ReCiPe 2016 hierarchical** at midpoint: GWP (CO2/CH4/N2O as CO2-eq), land use (m²·yr), freshwater consumptive use (m³/kg), all recalculated per 100 kcal.
+
+---
+
+#### Key results (Results 3.1–3.4)
+
+- **NRF24 vs HENI is essentially uncorrelated overall:** Spearman r = 0.21 per 100 kcal (p < 0.05) in Results 3.1, cited as r = 0.32 in Discussion 4.1 (an internal inconsistency worth noting); either way "very weak." This is the paper's central finding: **nutrient density and disease burden are independent and complementary**, so a high-nutrient-density food is not necessarily low-disease-burden.
+- **Strongly food-group-dependent:** plant-source foods show positive NRF24-HENI correlation (r = 0.62; fruits 0.63, vegetables 0.62, tubers 0.53), animal-source negative (r = −0.13; significant negatives for poultry, fish, processed meat, red meat). Nuts/seeds (0.16) and legumes (0.12) not significant.
+- **Score ranges (per 100 kcal):** NRF24 0.0 to 12.0 (highest Fish, Vegetables; lowest Sweets & Snacks, Cereal grains, Condiments); HENI **−38.8 to +50.5 min** healthy life (highest Vegetables; lowest Red Meat, Processed Meat).
+- **Nutrition vs environment correlations are weak:** NRF24-GWP r = 0.69 (the strongest), NRF24-LU 0.37, NRF24-WU 0.42; HENI-GWP and HENI-LU not significant, HENI-WU only 0.35. HENI-vs-GWP is U-shaped (both very-low and very-high HENI foods can have high GWP).
+- **+/+ classification (Table 1):** threshold NRF24 ≥ 1.2 (= optimal 24 per 2000 kcal ÷ 20) and HENI ≥ 0. 44 % of foods are +/+, 11 % −/−. Vegetables 98 % +/+, fish 76 % +/+, red meat 97 % +/− (high density, high burden), processed meat 72 % +/−.
+
+---
+
+#### Sensitivity analyses (Results 3.3)
+
+- **Reference unit matters:** the weak overall NRF24-HENI correlation holds across bases (r = −0.16 per 100 g, r = 0.00 per serving), but food-group correlations shift; energy basis favours low-energy foods (fruits, vegetables) nutritionally while raising their per-100-kcal environmental impact.
+- **Sodium:** NRF23 (excluding sodium) vs NRF24 r = 0.99, so including sodium as an essential nutrient does not skew NRF24; sodium's detrimental effect is better left to HENI.
+- **NRF9.3 vs HENI** (r = 0.38) is higher than NRF24 vs HENI (r = 0.20) because NRF9.3 shares sodium and fibre with HENI and proxies added sugar via SSBs, i.e. overlap inflates the correlation, which is the argument for using the overlap-free NRF24 beside HENI.
+
+---
+
+#### Author-flagged limitations (Discussion 4.4–4.7) — for our §7
+
+1. **Indicator overlap / double counting.** NRF24 and HENI both include calcium and omega-3 (which are essential nutrients *and* GBD disease-risk components), so combining them may double-count those health effects; there is no evidence that the inadequate-intake and disease-risk channels are independent. Directly relevant if our platform reports both an NRF-type index and HENI.
+2. **HENI is marginal.** Valid only for marginal dietary shifts within the current food environment; not valid for radically redesigned diets, because DRFs rest on current exposure and LCA on current production. Reinforces the C15 marginality caveat.
+3. **Food-item vs diet level.** GBD risks are defined at the dietary level; HENI pushes them to the food-item level, and nutrient adequacy at the diet level can contradict food-item-level findings.
+4. **No generic cut-offs** exist for "high"/"low" environmental impact, complicating classification and labelling.
+5. **Reference-unit and food-group-definition choices** strongly affect interpretation; the authors recommend reporting multiple reference units and note within-group variability makes group-level conclusions reductive.
+6. **Portability is robust in one direction:** the lack of NRF-HENI correlation holds across US (C15), Switzerland (Ernstoff et al. 2020) and the Netherlands, so the complementarity finding is not an artefact of one data source.
+
+---
+
+#### Cross-links
+
+- **A1 (ReCiPe 2016, Huijbregts et al.)** is the LCIA method used here; C17 is our worked precedent for HENI + ReCiPe.
+- **C15 (HENI)** is the method this paper recomputes for the Netherlands; C17 confirms the −0.53 constant and the double-counting logic, and supplies the portability procedure.
+- **C16** is the origin of the 14-factor count that C17 uses.
+- **B-group NRF / nutrient-density indices** connect through NRF9.3/NRF24 (Fulgoni et al. 2009).
+
+---
+
+#### Three-sentence relevance note
+
+C17 is the most directly actionable Group C paper for our build because it does two things our platform needs: it runs HENI alongside ReCiPe 2016 (hierarchical), establishing that the HENI + ReCiPe combination is legitimate rather than requiring IMPACT World+, and it demonstrates HENI portability by recomputing the index for the Netherlands using GBD 2019 relative risks and Dutch burden rates, which is exactly the procedure our §3.7 must follow for Canada and France. Its central empirical finding, that essential-nutrient density (NRF24) and disease burden (HENI) are uncorrelated overall (r ≈ 0.2 to 0.3) and only weakly correlated with GWP, land and water, is the strongest available justification for our multi-indicator design and against collapsing health and environment into a single score. The key caveats for our §7 are the calcium/omega-3 double-counting risk when an NRF-type index is reported beside HENI, the strict marginality of HENI, and the food-item-versus-diet-level tension; cite as Cardinaals et al. 2024, Front Sustain Food Syst 8:1304752, doi:10.3389/fsufs.2024.1304752.
+
+---
+
+### C18. GBD 2017 Diet Collaborators (2019) — Health effects of dietary risks in 195 countries: the 15-risk-factor source dataset behind HENI [★★★]
+
+**Citation.** GBD 2017 Diet Collaborators (Afshin A, Sur PJ, Fay KA, Cornaby L, Ferrara G, Salama JS, Mullany EC, ... Willett WC, ... Murray CJL). Health effects of dietary risks in 195 countries, 1990–2017: a systematic analysis for the Global Burden of Disease Study 2017. Lancet. 2019;393(10184):1958–1972.
+
+**DOI.** 10.1016/S0140-6736(19)30041-8 (Open Access, CC BY 4.0; published online 3 April 2019; corrected version first appeared 24 June 2021). Funding: Bill & Melinda Gates Foundation; the funder had no role in design, analysis, interpretation, or writing (p. 1961, Role of the funding source).
+
+**Type.** Comparative risk-assessment (CRA) study, part of the GBD enterprise. This is the upstream epidemiological source for the dietary risk factors, exposure definitions, optimal intakes, and disease-burden machinery that HENI (C15/C16) operationalises at the food-item level. Lead author Afshin and senior authors Mozaffarian, Micha and Willett also appear across the HENI and Food Compass lineages, so this is the connective tissue between Groups B and C.
+
+---
+
+#### Why this paper matters most to us: it is the foundation HENI sits on
+
+HENI converts the GBD's diet-disease epidemiology into a per-gram μDALY factor (the DRF) for each risk component. This paper is where those risk components, their exposure definitions, and their optimal-intake midpoints come from. Three things our manuscript needs directly:
+
+1. **The canonical list of 15 dietary risk factors** (the table, p. 1960) — the master set from which HENI's 14-factor formulation (C16/C17) is drawn. This resolves part of the 14-vs-15-vs-16 count question we have been tracking: GBD 2017 defines **15** risk factors; HENI variants drop or merge some (e.g. the seafood-omega-3 / PUFA split, SSBs) to land at 14 in the thesis (C16) and Dutch (C17) implementations.
+2. **Optimal-intake levels (TMREL midpoints)** for every risk factor (p. 1960 table) — the reference points against which intake gaps are computed. Our §3.4 categorizer maps CNF foods to exactly these risk factors.
+3. **The comparative-risk-assessment method** (PAF × disease-specific deaths/DALYs; p. 1960 Disease burden of dietary risks) — the formal pipeline whose marginal-effect logic HENI inherits and whose limitations our §7 must engage with.
+
+**Important version note.** This is **GBD 2017**, using GBD 2017 relative risks and burden estimates. Our manuscript states HENI factor values currently rest on **GBD 2019** epidemiology (§7.4, manuscript line 263), and C17 recomputes HENI on **GBD 2019** relative risks. C18 is therefore the *methodological and definitional* reference (the 15-factor framework, exposure definitions, optimal intakes, CRA approach), **not** the numerical-RR source for our current factor table. When we cite specific RR or DRF values we must cite the GBD vintage actually used (2019), with C18 cited for the framework and definitions. Flag this explicitly so a reviewer does not read C18 as our RR source.
+
+---
+
+#### The 15 dietary risk factors, exposure definitions, and optimal intakes (Table, p. 1960)
+
+Reproduce this table in our SI (it is the definitional backbone of the §3.4 categorizer). Optimal level = midpoint of the optimal range; "high"/"low" intake is defined relative to that midpoint (p. 1961, top-left).
+
+| # | Risk factor | Exposure definition (abbreviated) | Optimal intake (range) | Data representativeness index |
+|---|---|---|---|---|
+| 1 | Diet low in fruits | Fresh/frozen/cooked/canned/dried fruits; excl. fruit juices, salted/pickled | 250 g/day (200–300) | 94.9% |
+| 2 | Diet low in vegetables | Excl. legumes, salted/pickled, juices, nuts, seeds, starchy veg (potatoes/corn) | 360 g/day (290–430) | 94.9% |
+| 3 | Diet low in legumes | Fresh/frozen/cooked/canned/dried legumes | 60 g/day (50–70) | 94.9% |
+| 4 | Diet low in whole grains | Bran/germ/endosperm in natural proportion (cereals, bread, rice, pasta, etc.) | 125 g/day (100–150) | 94.9% |
+| 5 | Diet low in nuts and seeds | Nut and seed foods | 21 g/day (16–25) | 94.9% |
+| 6 | Diet low in milk | Non-fat/low-fat/full-fat milk; excl. soy milk and plant derivatives | 435 g/day (350–520) | 94.9% |
+| 7 | Diet high in red meat | Beef, pork, lamb, goat; excl. poultry, fish, eggs, all processed meats | 23 g/day (18–27) | 94.9% |
+| 8 | Diet high in processed meat | Meat preserved by smoking, curing, salting, or chemical preservatives | 2 g/day (0–4) | 36.9% |
+| 9 | Diet high in sugar-sweetened beverages | Beverages ≥50 kcal per 226.8 g serving; excl. 100% fruit/veg juices | 3 g/day (0–5) | 36.9% |
+| 10 | Diet low in fibre | Fibre from all sources (fruits, veg, grains, legumes, pulses) | 24 g/day (19–28) | 94.9% |
+| 11 | Diet low in calcium | Calcium from all sources (milk, yogurt, cheese) | 1.25 g/day (1.00–1.50) | 94.9% |
+| 12 | Diet low in seafood omega-3 fatty acids | EPA + DHA | 250 mg/day (200–300) | 94.9% |
+| 13 | Diet low in polyunsaturated fatty acids | Omega-6 from all sources (mainly liquid vegetable oils) | 11% of total daily energy (9–13) | 94.9% |
+| 14 | Diet high in trans fatty acids | Trans fat from all sources (PHVOs, ruminant products) | 0.5% of total daily energy (0.0–1.0) | 36.9% |
+| 15 | Diet high in sodium | 24 h urinary sodium, g/day | 3 g/day (1–5)* | 26.2% |
+
+*Sodium optimal-intake uncertainty (table footnote, p. 1960): the 1–5 g/day range reflects that <2.3 g/day is associated with the lowest blood pressure in RCTs while 4–5 g/day is associated with the lowest CVD risk in observational studies. For sodium the optimal level itself was sampled from a uniform distribution in the uncertainty analysis (p. 1960, Optimal level of intake).
+
+**Selection criteria for the 15 factors (p. 1959, Selection of dietary risk factors):** importance to disease burden or policy; sufficient exposure data; strength of epidemiological evidence for a causal diet-disease relationship plus a quantifiable dose-response; and generalisability across populations.
+
+**For our categorizer:** note that 11 of 15 factors have a 94.9% data-representativeness index, but processed meat, SSBs, trans fat (36.9%) and sodium (26.2%) are far sparser. This is upstream exposure-data sparsity, separate from but worth distinguishing against our own categorization confidence.
+
+---
+
+#### Headline burden results (for framing in §1 / §6, with care)
+
+- **Global diet-attributable burden, 2017 (Findings, p. 1958; Results, p. 1961):** 11 million deaths (95% UI 10–12) = 22% (21–24) of all adult deaths, and 255 million DALYs (234–274) = 15% (14–17) of all adult DALYs.
+- **The three leading risks** (more than half of diet-related deaths and two-thirds of diet-related DALYs; p. 1965, Impact of individual components): high sodium (3 million deaths [1–5]; 70 million DALYs [34–118]); low whole grains (3 million deaths [2–4]; 82 million DALYs [59–109]); low fruits (2 million deaths [1–4]; 65 million DALYs [41–92]).
+- **Cardiovascular disease dominates** diet-related mortality: 10 million deaths (9–10) and 207 million DALYs (192–222), followed by cancers and type 2 diabetes (p. 1961).
+- **"One in five deaths"** framing (Discussion, p. 1967): improving diet could potentially prevent one in five deaths globally; suboptimal diet is responsible for more deaths than any other risk including tobacco. *(Use this carefully; it is the paper's headline and is widely quoted, but the authors temper it heavily in their own limitations.)*
+- **Ranking is robust to geography:** low whole grains was the most common leading risk for deaths (16 of 21 regions) and DALYs (17 of 21 regions); high sodium led in East Asia and high-income Asia Pacific (p. 1965).
+- **All statistical analyses in Python 3.5; 1000-draw Monte Carlo** for parameter and model uncertainty, reporting mean and 95% UI (p. 1961, Methods). This Monte Carlo precedent is a small cross-link to our own uncertainty approach (Group F), though our N = 10 000 is larger.
+
+---
+
+#### Methodological structure HENI inherits (Methods, pp. 1959–1961)
+
+1. **Exposure estimation:** spatiotemporal Gaussian process regression for mean intake by age/sex/country/year; 24 h diet recall treated as the gold standard, with availability/sales/household data adjusted to it.
+2. **Effect sizes:** relative risks from published meta-analyses of prospective observational studies; for diet-disease pairs with morbidity-only evidence, the morbidity RR was assumed to apply to mortality; age-trends of metabolic-risk RRs applied to CVD and T2D; sodium modelled via the urinary-sodium → systolic-BP → outcome chain.
+3. **Optimal intake (TMREL):** level minimising all-cause mortality risk, computed as the death-weighted mean of disease-specific lowest-risk levels, with ±20% uniform uncertainty.
+4. **Burden:** PAF per diet-disease pair × disease-specific deaths/DALYs from GBD 2017, by age/sex/country/year.
+
+This is exactly the chain HENI compresses into a single μDALY/g DRF. Our §3.4 and §7 should cite C18 for the definitions and the CRA structure, and C15/C16/C17 for the conversion of that structure into the per-food HENI factor.
+
+---
+
+#### Author-flagged limitations (Discussion, pp. 1968–1969) — directly usable in our §7
+
+These are the epidemiological-foundation caveats our HENI numbers inherit. The strongest ones for our §7:
+
+1. **Observational-evidence limitation (p. 1968–1969).** Effect sizes come mostly from meta-analyses of prospective observational studies; residual confounding cannot be excluded, and the strength of evidence is generally *weaker* than for established risks such as tobacco or systolic blood pressure, and varies across foods and nutrients. This is the single most important caveat to carry into our §7 when we report HENI: the disease-burden indicator rests on observational epidemiology of uneven strength.
+2. **Energy-adjustment / substitution ambiguity (p. 1968).** Because most cohorts adjust for total energy intake, diet components are defined as risks *in terms of share of diet, not absolute exposure*; an increase in one component implies a compensating decrease in another, but the meta-analytic RRs do not specify the substitution. This directly affects how our diet-shift counterfactuals (S5: beef→legumes, etc.) should be interpreted: the RR of a swap depends on what is substituted, and HENI's marginal logic (C15/C17) is the food-item projection of this same caveat.
+3. **Definitional heterogeneity (p. 1968).** The definition of dietary factors (e.g. "whole grains") varies across the source studies.
+4. **Correlated risk factors may inflate individual effect sizes (p. 1968).** Healthy factors are positively correlated with each other and inversely with harmful factors; the independence assumption across factors within a unit of analysis could over- or under-estimate combined effects. The authors quantified this using NHANES individual-level data and found the absolute difference in joint PAFs averaged <2% (p. 1969).
+5. **Publication bias and unpublished cohort data (p. 1969).**
+6. **No undernutrition or obesity** forms of malnutrition were evaluated (p. 1969).
+7. **Dietary-data sparsity and mixed sources** increase statistical uncertainty (Findings abstract p. 1958; p. 1969); sodium excluded spot-urine data, lowering its representativeness index (26.2%).
+8. **Local food-composition gaps (p. 1968):** many countries rely on foreign food-composition tables (e.g. USDA), and mixed-dish recipes and product formulations vary across countries and time. Relevant to our CNF-based pipeline: it underlines why a Canada-specific composition source (CNF) plus the Rana et al. free-sugars supplement matters.
+
+---
+
+#### Conflict-of-interest note (p. 1971, Declaration of interests)
+
+Several senior authors report food-industry relationships. Most relevant to our framework: **Dariush Mozaffarian** (also senior author of the Food Compass / FCS series, B9–B12) reports research funding from NIH and the Gates Foundation; personal fees from GOED, DSM, Nutrition Impact, Pollock Communications, Bunge, Indigo Agriculture, Amarin, Acasti Pharma, and America's Test Kitchen; advisory-board roles (some with stock options) with Elysium Health, Omada Health and DayTwo; and is co-inventor on two Tufts patents. **Renata Micha** reports grants from NIH, the Gates Foundation and Unilever, and personal fees from the World Bank and Bunge. We already disclose the Mozaffarian/Blumberg COI for Food Compass in §7.3; C18 reinforces that the same senior-author network spans the GBD diet, HENI and Food Compass literatures, which is worth a single clean disclosure rather than three scattered ones.
+
+---
+
+#### Cross-links
+
+- **C15 (HENI, Stylianou et al. 2021)** converts this paper's CRA structure into per-food μDALY/g DRFs; C18 is the definitional/epidemiological source those DRFs rest on.
+- **C16 (Stylianou thesis)** and **C17 (Cardinaals et al. 2024)** use a **14-factor** subset of the 15 defined here; C18 is where the master 15-factor list is defined, resolving the count-discrepancy lineage.
+- **C17** recomputes HENI on **GBD 2019** RRs and Dutch burden rates; C18 is the **GBD 2017** vintage, so cite C18 for framework/definitions and the appropriate GBD vintage for numerical RRs.
+- **Manuscript §3.4 / Highlight A2** ("maps food items to GBD dietary risk factors") and **§7.4** ("HENI factor values rest on GBD epidemiology, currently GBD 2019") should both cite C18 for the risk-factor definitions and the CRA approach.
+- **Reference #42 in C18's own bibliography is Heller, Keoleian & Willett (2013)** — our wishlist E32 / manuscript reference 23 — confirming that the diet-environment integration our paper performs was already being called for within the GBD diet network.
+- **Group F (uncertainty):** C18's 1000-draw Monte Carlo over exposure/RR/optimal-intake/mortality is a domain precedent for parameter-uncertainty propagation, though smaller than our N = 10 000.
+
+---
+
+#### Three-sentence relevance note
+
+C18 is the epidemiological foundation of our entire HENI indicator: it defines the 15 GBD dietary risk factors, their exposure definitions and optimal-intake midpoints (Table, p. 1960), and the comparative-risk-assessment machinery (PAF × disease-specific DALYs, p. 1960) that HENI compresses into a single per-gram μDALY factor, so our §3.4 categorizer and §7.4 must cite it for the risk-factor framework and definitions. Critically, this is the GBD 2017 vintage, whereas our pipeline uses GBD 2019 relative risks (per §7.4 and C17), so C18 should be cited for the framework and definitions and not as the numerical-RR source; we must keep that distinction explicit for reviewers. Its author-flagged limitations, the uneven and largely observational strength of the diet-disease evidence, the energy-adjustment/substitution ambiguity that bears directly on our diet-shift counterfactuals, and the correlated-risk-factor caveat (joint-PAF effect <2%, p. 1969), are the core inheritance our §7 must engage with when presenting HENI; cite as GBD 2017 Diet Collaborators, Lancet 2019;393:1958–1972, doi:10.1016/S0140-6736(19)30041-8.
+
+---
+
+### C19. GBD 2023 Disease and Injury and Risk Factor Collaborators (2025) — the most recent GBD vintage, the burden-of-proof method, and the trans-fat TMREL revision [★★★]
+
+**Citation.** GBD 2023 Disease and Injury and Risk Factor Collaborators (Hay SI, Ong KL, Santomauro DF, ... Brauer M, Vos T, Murray CJL, Gakidou E). Burden of 375 diseases and injuries, risk-attributable burden of 88 risk factors, and healthy life expectancy in 204 countries and territories, including 660 subnational locations, 1990–2023: a systematic analysis for the Global Burden of Disease Study 2023. Lancet. 2025;406(10512):1873–1922.
+
+**DOI.** 10.1016/S0140-6736(25)01637-X (Open Access, CC BY 4.0; published online 12 October 2025). Funding: Gates Foundation and Bloomberg Philanthropies; funders had no role in design, analysis, interpretation, or writing (p. 1880, Role of the funding source).
+
+**Type.** Combined GBD disease/injury burden and risk-attributable burden synthesis, the headline paper of the GBD 2023 cycle. **Scoping note for us:** unlike C18 (GBD 2017), this is *not* a dedicated dietary-risk paper. The 15 dietary risk factors appear here only inside the global summary-exposure-value (SEV) table (Table 2, pp. 1887–1888); per-diet-factor relative risks and attributable DALYs live in appendix 3 (tables S13, S17) and in the parallel risk-factor-specific Burden-of-Proof papers, not in this main text. C19 is therefore our reference for the **current GBD vintage, the current method, and the trans-fat TMREL change**, not a source of per-diet RR or DRF numbers.
+
+---
+
+#### Why this paper matters to us: it defines "current GBD" and one diet-factor change
+
+Our manuscript states HENI factor values "currently rest on GBD 2019" (§7.4) and C17 recomputed HENI on GBD 2019. C19 is the next vintage after that. Three concrete things it gives us:
+
+1. **The dietary risk factors persist unchanged in the GBD 2023 hierarchy.** GBD 2023 analysed 88 risk factors and 676 risk-outcome pairs (p. 1879); **no new risk factors were added** for 2023, though 50 new risk-outcome pairs were and two were removed (p. 1876, Methods). The 15 diet factors of C18 remain the operative diet set (Table 2 lists all 15: low fruits, vegetables, legumes, wholegrains, nuts and seeds, milk, calcium, seafood omega-3, omega-6 PUFA, fibre; high red meat, processed meat, SSBs, trans fat, sodium). This matters because it means a future GBD-2023-based HENI recompute would use the **same 15-factor scaffold** our pipeline already targets.
+2. **One diet-relevant TMREL revision.** "the TMREL was revised for one risk factor: diet high in trans fatty acids" (p. 1880, and Research-in-context p. 1875). This is the single dietary-factor methodological change in GBD 2023 and the one we must note if we ever move HENI from GBD 2019 to GBD 2023: the trans-fat optimal-intake counterfactual changed.
+3. **The current burden-of-proof (BPRF) method and mediation matrix.** GBD 2023 estimates relative risks for 256 of the 676 pairs via the burden-of-proof meta-regression (p. 1879), which fits non-linear ensemble-spline risk curves, trims outliers, and folds between-study heterogeneity into a star-rated risk-outcome score (ROS, 1–5 stars; appendix 2 table S8). Dietary risks are explicitly noted as mostly acting through mediating metabolic risks (e.g. high sodium to hypertensive heart disease via high SBP), handled by the GBD 2023 mediation matrix of 165 mediated pairs (p. 1879). This is the methodological machinery any GBD-2023 HENI recompute inherits.
+
+---
+
+#### The comparative-risk-assessment chain (Methods, pp. 1878–1880) — what HENI's DRFs would inherit at this vintage
+
+Same four-input CRA structure as C18, now with updated tooling:
+
+1. **Exposure:** mean exposure by age-sex-location-year via ST-GPR or DisMod-MR 2.1; distribution fitted as an ensemble of parametric distributions to predicted mean and SD; summarised as SEVs (p. 1879).
+2. **Relative risk:** from meta-analyses of RCTs and prospective cohorts; for 256 pairs the burden-of-proof framework replaces the older log-linear assumption (p. 1879).
+3. **TMREL:** counterfactual minimum-risk exposure, set to zero where achievable, empirically derived otherwise; **for protective risks (which includes the "low intake of X" diet factors) the TMREL is generally set at the 85th percentile of observed exposure** to avoid extrapolating beyond the data-rich range (p. 1903, Limitations). This 85th-percentile rule for protective dietary factors is worth flagging: it bounds how much benefit the model will attribute to higher intake of fruits, wholegrains, etc.
+4. **PAF and attributable burden:** PAF × disease-specific DALYs, mediation-adjusted (p. 1879).
+
+**Uncertainty:** mean across **250 draws** (reduced from 500 in GBD 2021), 95% UI from the 2.5th/97.5th percentiles; the reduction was shown to affect estimates minimally (p. 1880). Smaller draw count than C18's 1000 and our own N = 10,000, but the principle (Monte Carlo over parameter uncertainty) is the same; a minor Group F cross-link.
+
+**Software:** Python 3.10.4, Stata 13.1, R 4.2.1; statistical code publicly available (p. 1880).
+
+---
+
+#### Dietary-risk SEV data (Table 2, p. 1888) — the only diet numbers in the main text
+
+These are **summary exposure values** (0–100, reflecting how far a population sits from the TMREL weighted by relative harm), *not* relative risks or attributable DALYs. Global age-standardised SEVs, 2023, with annualised rate of change 2010–23:
+
+| Dietary risk factor | SEV 2023 | ARC 2010–23 |
+|---|---|---|
+| Dietary risks (aggregate) | 38.4 | 0.0% |
+| Diet low in fruits | 40.5 | 0.0% |
+| Diet low in vegetables | 26.1 | −0.1% |
+| Diet low in legumes | 42.2 | −0.3% |
+| Diet low in wholegrains | 40.5 | 0.1% |
+| Diet low in nuts and seeds | 42.0 | −0.6% |
+| Diet low in milk | 65.1 | 0.0% |
+| Diet high in red meat | 26.7 | 0.1% |
+| Diet high in processed meat | 13.7 | 0.4% |
+| Diet high in sugar-sweetened beverages | 16.7 | 1.6% |
+| Diet low in fibre | 20.7 | −1.5% |
+| Diet low in calcium | 20.3 | −0.9% |
+| Diet low in seafood omega-3 fatty acids | 28.9 | −1.5% |
+| Diet low in omega-6 PUFA | 57.8 | −0.5% |
+| Diet high in trans fatty acids | 29.5 | −2.7% |
+| Diet high in sodium | 41.1 | −0.2% |
+
+Note the trans-fat SEV fell fastest among diet factors (ARC −2.7%), consistent with global trans-fat-elimination policy; and that SSBs is the only diet exposure rising materially (+1.6%/yr). Diet-aggregate exposure is essentially flat (0.0%). These are exposure trends, useful only as context, not as inputs to our HENI factor table.
+
+**Where diet sits in the leading risks (Figure 7, p. 1890):** among the 25 leading level-3 risks by share of total DALYs in 2023, the diet factors that appear are diet low in fruits (13th, 1.7%), diet high in sodium (18th, 1.4%), diet low in wholegrains (20th, 1.1%), and diet low in vegetables (25th, 0.8%). High SBP leads overall (8.4% of DALYs). This is a useful framing point for §1 (diet remains a top-tier modifiable risk) but cite carefully: these are GBD 2023 ranks, and many diet effects are folded into the metabolic mediators (high SBP, high BMI, high FPG) rather than attributed to the diet factor directly.
+
+---
+
+#### Author-flagged limitations (Limitations, pp. 1902–1903) — for our §7
+
+The GBD-inheritance caveats relevant to HENI, at the 2023 vintage:
+
+1. **Mediation assumption (p. 1902).** Relative risks are mediation-adjusted assuming joint risks are **multiplicative**, but real combinations may be super- or sub-multiplicative; the authors flag this as "particularly relevant to analyses of dietary risk factors that yield protective effects, such as fruit or wholegrain intake." This is the most diet-specific limitation in the paper and belongs directly in our §7 when we discuss HENI's treatment of protective foods.
+2. **Constant-across-location-and-time RR assumption (p. 1903).** Risk-outcome relationships are assumed constant across location and time (with noted exceptions for temperature and BMI-breast-cancer). For diet this is the same portability caveat C17 addresses by swapping local burden rates: the *RR shape* is held constant, only exposure and background burden vary by place. Reinforces that HENI portability (our §3.7) rests on a GBD assumption, not an empirically re-fitted local dose-response.
+3. **Protective-risk TMREL at the 85th percentile (p. 1903).** A modelling choice that conservatively bounds attributable benefit for "low intake" factors; the authors note further refinements may be needed.
+4. **Burden-of-proof not yet applied to all pairs (p. 1903).** The flexible non-log-linear method covers 256 of 676 pairs; the rest use older approaches, so evidence-strength treatment is uneven across diet-disease pairs.
+5. **General GBD data-quality and sparsity limits (p. 1902).** Variable input-data availability and quality; COVID-19 delayed survey releases (only 19 STEPS surveys since 2020 vs 41 in the prior 4 years), which thins recent dietary-exposure data.
+
+---
+
+#### Conflict-of-interest and authorship note
+
+This is a mega-collaboration (more than 14,000 collaborators, p. 1880). The corresponding author is Simon I Hay; senior authors include Christopher Murray, Theo Vos, Michael Brauer and Emmanuela Gakidou (p. 1920). **Dariush Mozaffarian is not in the C19 author list** (unlike C18), so the Food-Compass-network COI we track via C18 and §7.3 does not directly attach to C19. The COI section (pp. 1903–1914) is enormous but concerns mostly clinical/pharma relationships of individual collaborators, none material to our diet-LCA framework. Statistical code is public (p. 1880), and full data are on the GBD 2023 Sources/Results tools (GHDx).
+
+---
+
+#### Cross-links
+
+- **C18 (GBD 2017 Diet)** defines the 15-factor diet framework and is the dedicated diet-risk paper; **C19 (GBD 2023)** is the current vintage of that same enterprise, confirms the 15 diet factors persist, and documents the single diet change (trans-fat TMREL). Cite C18 for the diet-factor definitions, C19 for "most recent GBD" and the trans-fat TMREL revision.
+- **C17 (Cardinaals et al. 2024)** recomputes HENI on **GBD 2019**; our manuscript §7.4 also says GBD 2019. C19 is the upgrade path: if we move HENI to GBD 2023 we inherit the burden-of-proof RRs, the 165-pair mediation matrix, and the revised trans-fat TMREL.
+- **C15 / C16 (HENI / Stylianou)** convert the GBD CRA structure into per-food μDALY/g DRFs; C19 is the latest GBD machinery those DRFs would draw on.
+- **Manuscript §3.4 / §7.4:** when we state the GBD vintage underpinning HENI, C18 + C19 together let us be precise (15-factor framework from GBD 2017; GBD 2019 RRs currently in our factor table per C17; GBD 2023 available as the newest vintage with a revised trans-fat TMREL).
+- **Group F (uncertainty):** C19's 250-draw Monte Carlo and burden-of-proof heterogeneity quantification are domain precedents, though our N = 10,000 propagation is larger and targets LCA characterization factors rather than epidemiological RRs.
+
+---
+
+#### Three-sentence relevance note
+
+C19 is the most recent GBD vintage and our reference for "current GBD" in the manuscript: it confirms that the 15 dietary risk factors defined in GBD 2017 (C18) persist unchanged in the GBD 2023 hierarchy of 88 risk factors and 676 risk-outcome pairs, and it documents the one diet-relevant methodological change, a revised theoretical-minimum-risk exposure level for diet high in trans fatty acids (p. 1880). Critically, this is a combined burden-and-risk synthesis, not a dedicated diet paper, so per-diet relative risks and attributable DALYs are in appendix 3 and the parallel risk-factor papers rather than the main text; C19 should be cited for the vintage, the burden-of-proof and mediation methodology, and the trans-fat TMREL revision, with C18 retained for the diet-factor definitions and C17 for the GBD 2019 RRs our factor table currently uses. The diet-specific limitation most useful for our §7 is the explicit multiplicative-mediation caveat the authors flag as "particularly relevant to analyses of dietary risk factors that yield protective effects, such as fruit or wholegrain intake" (p. 1902); cite as GBD 2023 Disease and Injury and Risk Factor Collaborators, Lancet 2025;406:1873–1922, doi:10.1016/S0140-6736(25)01637-X.
+
+---
+
+### C20. Weidema & Stylianou (2020) — Nutrition in food LCA, function vs impact, and the originating description of DANI [★★★]
+
+**Citation.** Weidema BP, Stylianou KS. Nutrition in the life cycle assessment of foods — function or impact? Int J Life Cycle Assess. 2020;25(7):1210–1216. (Received 13 Feb 2019; accepted 28 June 2019; published online 18 July 2019.)
+
+**DOI.** 10.1007/s11367-019-01658-y (Springer; part of the "Sustainable Food Production and Consumption" topical collection, responsible editor Bruno Notarnicola).
+
+**Type.** Conceptual / methodological position paper (not an empirical study). Two authors: Bo Weidema (Aalborg, LCA functional-unit theory) and Katerina Stylianou (Michigan; co-author of C14 CONE-LCA and the HENI lineage). This is the **wishlist's "DANI originating paper" (#20)** and the clearest published statement of where the DALY Nutritional Index (DANI) sits conceptually relative to HENI.
+
+---
+
+#### Why this paper matters to us, and the crucial DANI-vs-HENI distinction
+
+This is the paper that names and conceptually frames **DANI (DALY Nutritional Index)**. The single most important thing to extract is that **DANI and HENI are sibling indices from the same Stylianou/Jolliet/Fulgoni lineage but are not identical**, and the difference is precisely in the risk-component count our file has been tracking:
+
+- **HENI (C15/C15-SI):** 15 GBD dietary risks → **16 risk components** (fibre split into two source-specific components to avoid double-counting), expressed in net minutes of healthy life per serving, US-based, IMPACT World+ on the environmental side.
+- **DANI (this paper, p. 1211–1212):** "**based on 15 dietary risks from the GBD studies plus saturated fatty acids**" → **16 dietary risk components**, expressed in DALYs (μDALYs) per serving / per functional unit. The 16th component here is **saturated fatty acids**, NOT a fibre split.
+
+So both indices land on "16 components" but reach it differently: HENI's 16th is a fibre-source split; DANI's 16th is saturated fat added on top of the 15 GBD risks. This is a real distinction we must not blur, and it definitively extends the factor-count thread tracked in C15-SI (16 = 15 risks + fibre split) and C16/C17 (14 factors). **Recommended canonical statement for our notes: the count depends on the index — HENI = 16 (15 risks, fibre split); DANI = 16 (15 risks + saturated fat); the Dutch/thesis variants = 14.**
+
+For our manuscript this matters because §3.2 says HENI is "computed as Σ (g × μDALY/g) over 14 GBD risk factors." That "14" is now triply contestable (HENI uses 16 components, DANI uses 16, only the thesis/Dutch lineage uses 14). We should reconcile the §3.2 wording against C15-SI's 16-component table and decide explicitly which index and which count we implement.
+
+---
+
+#### The paper's central conceptual contribution: function vs impact (Results 3.1–3.2)
+
+The paper's thesis is that nutrition plays **two distinct roles** in food LCA that prior work conflated:
+
+1. **Nutrition as a function (the functional unit).** The authors argue *against* loading weighted nutrient-profiling scores into the functional unit. Their reasoning (p. 1211): a product property only belongs in the functional unit if it is *obligatory* (essential for the food to be a relevant alternative to customers), and desirable nutrients are usually "positioning" properties (like price), not obligatory ones. Nutrient-profiling scores in the denominator also create the problem that LCA results are impacts-per-FU, so putting key impacts in the denominator "leaves the question: what is then left in the numerator?" They flag that limiting-nutrient profiling can even yield *negative* functional units (a conceptual breakdown). **Their recommendation: satiety is the appropriate central nutritional attribute for the functional unit** ("how much / how long / how well" → portion size / satiety-weight / exclusion criteria), not continuous nutrient scores. They concede satiety data are not yet sufficient to quantify at the food-component level.
+
+2. **Nutrition as a risk factor / impact pathway.** This is where DANI lives: nutrition enters the *impact* side as the marginal health effect of adding or subtracting a specific food from an existing diet, quantified in DALYs via GBD epidemiology.
+
+**Relevance to us:** our pipeline keeps nutrition (HEFI, HSR, FCS) and health-burden (HENI) and environment (ReCiPe LCA) as *separate indicators* rather than collapsing nutrition into the LCA functional unit. C20 is the conceptual authority for exactly that separation: it argues nutrient profiling is "largely misplaced as part of the functional unit" and that health effects belong in a dedicated impact pathway. This supports our multi-indicator design (the same argument C17 makes empirically) and is citable in §1.2 / §2 / §6.4 when we justify not building a single composite score.
+
+---
+
+#### DANI mechanics as described here (Results 3.2, pp. 1212–1213)
+
+DANI requires two data sets, exactly mirroring HENI's structure:
+
+1. **Nutritional inventory flows:** the mass (kg) of each of the 16 dietary risk components per serving, aligned to the GBD definition of each risk, obtained via the **Fulgoni et al. (2018)** methodology for WWEIA/NHANES foods. (Fulgoni et al. 2018, Nutrients 10(10):1441 is the inventory-flow method paper; worth noting as a dependency for any DANI/HENI implementation.)
+2. **Nutritional characterization factors** (DALYs per kg of risk component): the marginal change in disease burden per additional intake. Developed for **US adults ≥25 y**, from **6,195 risk-outcome-strata-age-gender-burden pairs** and US-specific burden rates (Stylianou 2018 thesis; Stylianou et al. 2019). **Positive CF = detrimental; negative CF = protective.**
+
+DANI score = Σ (inventory flow × characterization factor), assuming dietary risks act **independently and additively** in the marginal context (small changes in intake). This independent-additive assumption is the same marginal-validity premise as HENI.
+
+**Note the "6,195 ... pairs" here vs C15-SI's "6,195 risk-outcome-strata-age-group-gender-burden pairs."** These match, confirming DANI and HENI's published US factor set share the same underlying GBD-derived RR expansion. So although the indices are conceptually distinct (saturated-fat 16th vs fibre-split 16th, DALYs vs minutes-of-life), they draw on the same epidemiological factor-development effort.
+
+---
+
+#### Worked example: the burrito comparison (Fig. 1, p. 1213) — usable as a DANI unit test
+
+The paper demonstrates DANI on two 140 g burritos in the US diet:
+
+| Food | DANI score | Driver breakdown |
+|---|---|---|
+| Beef ("meat") burrito | **+19.6 μDALY/serving** (net detrimental) | sodium +9.2, saturated fat +6.5, red meat +3.8 μDALY/serving |
+| Bean ("veggie") burrito | **−5.8 μDALY/serving** (net protective) | benefits dominated by legumes (−12.4 μDALY/serving), exceeding sodium/SFA detriments |
+
+Composition: meat burrito = 7% red meat + 61% neutral ingredients (poultry, white rice); veggie burrito = 38% legumes + 15% vegetables + 36% neutral. The meat burrito covers 7 of 16 DANI risks, the veggie burrito 9 of 16. **Double-counting carve-out:** fibre is split into "fibre from fruit/vegetable/legumes/whole grains" (benefits colorectal cancer only) vs "fibre from other sources" (benefits both colorectal cancer and ischemic heart disease), to avoid double-counting the cardiovascular fibre benefit (citing Gakidou et al. 2017). This is the **same fibre-source double-counting logic** documented for HENI in C15-SI, and worth flagging: even though DANI's nominal 16th component is saturated fat, it *also* carries the fibre split internally, so the "16" arithmetic across DANI and HENI is subtler than the headline counts suggest. We should reconcile this carefully against C15-SI before encoding either.
+
+This burrito pair is a clean unit-test analogue to the HENI test foods in C15 (chicken wings, beef hotdog, apple pie); cite both sets when validating our HENI/DANI kernel.
+
+---
+
+#### Author-flagged limitations (Results 3.2 discussion, pp. 1213–1214) — for our §7
+
+These are largely shared with HENI's caveats but stated crisply here:
+
+1. **Food-group, not food-item, granularity.** Epidemiology investigates food groups (for statistical power), so DANI "lacks epidemiological data supporting differentiated health effects between foods of the same food group." Worked example: SSBs have a robust dose-response on *amount of beverage*, but not on *sugar content*, so two SSBs of different sugar content get the same DANI health effect even though a nutrient-profiling model would score them differently. The authors concede that for added sugar an extrapolation "appears warranted" but flag it as stretching the evidence. **Directly relevant to our SSB→water counterfactual (S5)** and to any claim our pipeline makes about sugar-content gradients.
+2. **Generalisation beyond Europe/US.** Robust diet-disease associations from European/US cohorts may not transfer; e.g. some Asian studies (Lee et al. 2013) find a *beneficial* health effect of increased red-meat consumption, opposite to the European/US consensus (Forouzanfar et al. 2016). This is the geographic-portability caveat that bears on our Canada (and any France) HENI application, complementing C17's portability procedure.
+3. **Marginal-vs-diet-level (the big one).** DANI in its current form evaluates the *marginal* health effect of a food-level change and "fails to capture the aggregated health effect of nutrients and food groups at the diet level, which are multiplicative and not additive." Consequence stated explicitly: "using marginal DANI might lead to overestimating the nutritional benefits of 'healthy' diets and underestimate the benefits from 'unhealthy' diets." They call for a future **"diet-DANI"** that handles multiplicative aggregation, complemented with the Fern et al. (2015) nutrient-balance indicator. **This is the same marginality limitation HENI carries (C15, C17), and our §7 should state it once for both indices.** It also echoes GBD 2023's own multiplicative-mediation caveat (C19, p. 1902).
+4. **Nutrient-profiling models are only indirectly linked to health** (McCullough & Willett 2006), "limiting their ability to quantify health damages," so combining nutrient-profiling models with GBD food-group epidemiology "must be done with great care." Relevant to how we report FCS/HSR (nutrient-profiling) alongside HENI/DANI (epidemiology-based) in the same platform without conflating them.
+
+The authors' overall stance (Conclusions, p. 1214): nutrition is "not an either/or" — it enters the functional unit as satiety AND the impact calculation as marginal health effect; DANI is "a novel and promising approach" that "introduces a nutritional impact category" enabling environment-vs-health trade-off quantification, and "may be combined with the nutrient balance indicator."
+
+---
+
+#### A GBD-vintage / citation-hygiene note
+
+C20 cites GBD via **Forouzanfar et al. 2016 (GBD 2015)** and **Gakidou et al. 2017 (GBD 2016)** for the dietary risk definitions and TMRELs, and reports the burden figure "9.6% of the 2016 Global Burden of Disease or 229 million DALYs annually" (p. 1212, citing Forouzanfar 2016). Note these are **older GBD vintages** than our C18 (GBD 2017) / C19 (GBD 2023) references and than HENI's GBD 2016 base (C15). When we cite DANI's conceptual framing we use C20; when we cite the underlying diet-risk definitions we should anchor to the GBD vintage actually used (C18/C19), not to C20's 2015/2016 citations. The unbalanced-diet definition C20 quotes (low in fruits, vegetables, legumes, whole grains, nuts/seeds, milk, fibre, calcium, PUFA, omega-3; high in red meat, processed meat, SSBs, trans fat, sodium) is the same 15-factor list as C18.
+
+---
+
+#### Cross-links
+
+- **C14 (Stylianou et al. 2016, CONE-LCA):** C20 explicitly builds on CONE-LCA as "a first attempt" at the nutritional impact pathway, generalising it from single-component foods (milk) to any food via DANI's 16 risk components.
+- **C15 / C15-SI (HENI):** DANI's sibling. Same lineage, same ~6,195-pair US factor development, same fibre-source double-counting, same marginal-additivity assumption. **Key difference: DANI's 16th component is saturated fat (added to the 15 GBD risks) and its unit is μDALY/serving; HENI's 16th component is a fibre split and its unit is minutes of healthy life.** This is the cleanest place in the file to record that distinction.
+- **C16 (Stylianou 2018 thesis):** the source of both DANI's and HENI's US characterization-factor table; C20 cites it (with Stylianou et al. 2019) as the CF source.
+- **C17 (Cardinaals et al. 2024):** uses HENI (not DANI) and a 14-factor Dutch list; C20 + C15-SI together explain why the count differs across the literature.
+- **C18 (GBD 2017) / C19 (GBD 2023):** the diet-risk framework DANI rests on; cite these for current diet-factor definitions rather than C20's 2015/2016 GBD citations.
+- **Manuscript §1.2 / §2 / §6.4:** C20 is our conceptual authority for keeping nutrition out of the LCA functional unit and treating health as a dedicated impact pathway, supporting the multi-indicator (not single-composite) design.
+- **Manuscript §3.2:** the "14 GBD risk factors" wording for HENI should be reconciled against C15-SI (16 components) and this entry; flag the HENI-16 vs DANI-16 vs Dutch-14 distinction.
+- **Dependency note:** Fulgoni et al. 2018 (Nutrients 10(10):1441), the WWEIA/NHANES inventory-flow methodology, is a prerequisite for implementing either DANI or HENI inventory flows; not yet on our wishlist but worth retrieving if we build the kernel.
+
+---
+
+#### Three-sentence relevance note
+
+C20 is the originating conceptual description of DANI and the clearest published statement that nutrition plays two separate roles in food LCA, a functional-unit role (best captured by satiety, not by nutrient-profiling scores) and an impact-pathway role (the marginal health burden of a food, quantified in DALYs via GBD epidemiology), which is the strongest conceptual authority for our platform's decision to keep diet-quality, health-burden, and environmental indicators separate rather than collapsing them into one composite score. Its most consequential detail for our notes is that **DANI is built on "15 dietary risks from the GBD plus saturated fatty acids" for 16 components, whereas HENI reaches 16 by splitting fibre**, so the two sibling indices share a lineage and a ~6,195-pair US factor set but are not interchangeable, and our §3.2 "14 GBD risk factors" wording needs reconciling against this. The author-flagged limitations we carry into §7, the food-group (not food-item) granularity that prevents distinguishing same-group foods such as differently-sweetened SSBs, the Europe/US-to-other-population generalisation risk, and above all the marginal-versus-diet-level problem (marginal DANI may overestimate the benefit of healthy diets and underestimate the harm of unhealthy ones because real diet-level effects are multiplicative not additive), are shared with HENI and should be stated once for both; cite as Weidema & Stylianou 2020, Int J Life Cycle Assess 25(7):1210–1216, doi:10.1007/s11367-019-01658-y.
+
+---
+
+### C21. Lenaerts (2025, medRxiv v2) — a modified DALY method for fortification/biofortification using relative nutrient-intake metrics [★★☆]
+
+**Citation.** Lenaerts B. Quantifying the health impact of food interventions: revisiting the Disability-Adjusted Life Years approach. medRxiv 2024.08.26.24312574 (version 2, posted 15 December 2025). Preprint, not peer-reviewed. Sole author: Bert Lenaerts, Sustainable Impact through Rice-based Systems Platform, International Rice Research Institute (IRRI), Los Baños, Philippines.
+
+**DOI.** 10.1101/2024.08.26.24312574 (CC-BY-NC-ND 4.0). Acknowledges Erick Boy and Victor Taleon (HarvestPlus) for feedback and data.
+
+**Type.** Methods paper (development-economics / agricultural-nutrition framing). **This is wishlist #21.** Important scoping correction: despite a working description of this as a "DALY-methodology critique," it is **not a critique of the HENI/DANI dietary-risk approach**, and it sits in a *different branch of the DALY literature* from the rest of Group C. It proposes a modified DALY method for estimating the health impact of **fortification and biofortification interventions on micronutrient-deficiency burden** (iron, zinc, vitamin A, calories, protein), drawing on the GBD **nutritional-deficiency cause/risk factors**, not the GBD **dietary-risk factors** (high sodium, low fruit, etc.) that HENI (C15) and DANI (C20) are built on. Its star rating is downgraded to ★★☆ here to reflect that its relevance to our dish-level Canadian sustainability platform is real but limited and high-level, not central.
+
+---
+
+#### Why this paper matters to us, honestly scoped
+
+The rest of Group C is one coherent thread: the GBD comparative-risk-assessment framework for *dietary* risks, converted into per-food health-burden factors (HENI/DANI). C21 belongs to a *parallel* DALY literature, the Stein/Zimmermann-Qaim tradition of valuing crop-improvement and food-fortification interventions in low- and middle-income countries by the **deficiency burden they avert**. The two share only the DALY endpoint and a reliance on GBD/IHME burden data; their risk objects, populations, and policy questions are different.
+
+Three things in it are genuinely useful to us, all methodological rather than substantive:
+
+1. **A clean argument for relative over absolute intake metrics under data scarcity.** Lenaerts' central move (Section 2, pp. 2–3) is that current intake (CI), post-intervention intake (BI), and recommended dietary allowance (RDA) "exhibit considerable variation across sources" and that absolute estimates are unreliable, so he reformulates the efficacy calculation entirely in **relative** terms: a relative intake increase ϘCI = BI/CI > 1 (Eq. 3) and a relative intake gap ƒCI = CI/RDA < 1 (Eq. 4). His stated rationale, that relative parameters cancel systematic measurement error, enable cross-nutrient comparison, keep repeated measurements consistent, and can be re-tuned without recalibrating the whole system (p. 3), is a transferable data-gap-robustness argument we could cite in §7 when discussing how our platform handles uncertain or inconsistent input data, even though our problem (dish-level dietary-risk burden) is different.
+2. **A documented cross-source inconsistency in nutrient-intake data.** The paper shows (Section 2.3.3, p. 7) that intake estimates disagree badly across sources, e.g. Lividini & Masters (2022) report apparent vitamin A intake *exceeding* reference values in West Africa while IHME (2024) places West Africa's vitamin-A-deficiency burden in the highest global quintile; and several published per-capita-intake metrics correlate *low or negatively* with GDP per capita, ranking low-income countries among the highest-intake (Figure 2 correlograms; Table 2). This is a useful cautionary citation for any claim that nutrient-intake databases are interchangeable, complementing the data-quality caveats already logged for GBD itself (C18, C19).
+3. **A model-ensemble approach to filling intake gaps.** To estimate the relative intake gap where data are missing, he compares a **quadratic** inversion, a **random forest**, and a **Cubist** model (controlling for sanitation access and intestinal-infection burden), then takes an equal-weight **ensemble** as most robust (p. 7). A mild methods cross-link to our Group D (ML) and Group F (uncertainty/ensemble) threads, again at the level of technique rather than content.
+
+I would not force any tighter connection than these. This paper does not inform our HENI implementation, our dietary-risk factor list, or our Canadian case study directly.
+
+---
+
+#### The method, as stated
+
+**Classic approach (Section 1, p. 2).** The Stein et al. (2005) / Zimmermann & Qaim (2004) efficacy formula, Eq. 1, computes E, the relative reduction in hunger burden, from CI, BI and RDA via a log-and-linear bracket, bounded to 0 when CI ≥ RDA (no gap to close) and to 1 when intervention pushes intake past RDA. Health impact then follows as
+
+> DALYs_saved ≡ ΔDALYs_lost = E × DALYs_BAU  (Eq. 2)
+
+i.e. efficacy times the business-as-usual deficiency burden.
+
+**Relative reformulation (Sections 2.2–2.4).** Eq. 9 rewrites Eq. 1 purely in terms of ϘCI and ƒCI, yielding E ∈ [0,1]; Eq. 10 is the symmetric case for *declines* in nutrient supply (climate, price shocks, conflict) that *increase* hunger burden. The relative intake increase is itself decomposed (Eq. 6) as ϘCI = 1 + ΔrNS × ƒDIET × ƒTARGET × ƒCOV, where ΔrNS is the relative nutrient-supply gain (Eq. 7, combining yield gain ΔrY and fortification content gain ΔrFI), ƒDIET the share of a nutrient supplied by the commodity (FAOSTAT Supply Utilization Accounts), ƒTARGET the share of consumption targeted, and ƒCOV the intervention coverage. The relative intake gap ƒCI is recovered by inverting an empirical quadratic relating prevalence of undernourishment to relative calorie supply (Fischer et al. 2005; Robinson et al. 2015), Eq. 8, or by regression/ML (Section 2.3.2). Note ϘCI is bounded near 1, "most relative nutrient intake increases are not expected to exceed 1.125" (p. 9).
+
+**Burden data (Section 2.1, Table 1, pp. 3–4).** Deficiency burden in DALYs comes from **IHME GBD 2021** (with GBD 2019 also referenced). He distinguishes GBD **cause** factors (deficiency diseases that directly cause death/disability) from **risk** factors (causally associated with multiple downstream outcomes) and **recommends using risk factors where available** because they capture indirect effects. Chronic hunger is proxied by **child wasting** (Caulfield et al. 2006, since wasting is short-term and yield-responsive, unlike stunting); hidden hunger aggregates iodine, iron, zinc, vitamin A and "other" deficiencies (Gödecke et al. 2018), with maternal disease excluded and a manual **zinc-burden adjustment** because GBD 2019/2021 under-counts zinc for lack of data (Han et al. 2022; Hess et al. 2022). Table 1's headline 2021 DALY figures include child wasting → diarrhoeal diseases (0–4 y) 1.59 × 10⁷ DALYs, iron deficiency → dietary iron deficiency (10+ y) 2.24 × 10⁷, and child wasting → protein-energy malnutrition (0–4 y) 7.93 × 10⁶.
+
+---
+
+#### Author-flagged limitations and cautions (relevant to our §7 only at the level of method-transparency)
+
+The paper is candid that nutrient-intake data are unreliable and inconsistent across sources (the entire motivation for going relative), that the quadratic intake-gap relationship was empirically established by Fischer et al. (2005) only for **calories** and is *assumed* to transfer to micronutrients after normalisation (p. 5), and that the random-forest model is "sensitive to generating outliers" (e.g. implausible iron intake in Turkey, zinc/vitamin A in Nepal), which is why he prefers the ensemble (p. 7). These are honest method caveats; none bears directly on our dietary-risk pipeline, but the calorie-to-micronutrient transfer assumption and the ML-outlier caution are worth remembering if we ever borrow the relative-metric or ensemble technique.
+
+---
+
+#### GBD-vintage note
+
+C21 uses **GBD 2021** (IHME 2024) as its primary burden source, with **GBD 2019** also cited; its references include the GBD 2021 Risk Factors Collaborators (Lancet 2024;403:2162–203), which is the dedicated risk-factor paper that is *also* C19's own reference #13 and the place we identified for actual GBD diet relative risks. So C21 and C19 point to the same GBD 2021 risk-factor publication, though for different factor branches (deficiency vs dietary risk). When citing GBD vintages in our manuscript we continue to anchor diet-factor definitions to C18 (GBD 2017) and the current vintage to C19 (GBD 2023); C21's GBD 2021 usage is incidental to its own deficiency-burden problem.
+
+---
+
+#### Cross-links
+
+- **Different branch from C14–C20.** C21 uses GBD *nutritional-deficiency* cause/risk factors (iron, zinc, vitamin A, wasting); HENI (C15), DANI (C20), CONE-LCA (C14), and the GBD diet papers (C18, C19) use GBD *dietary-risk* factors. Both end in DALYs, but they are not the same factor set and should never be conflated in our writing.
+- **C18 / C19 (GBD vintages):** C21's GBD 2021 deficiency-burden usage shares the GBD 2021 Risk Factors paper with C19's bibliography; cite C18/C19 for our diet-factor framework, not C21.
+- **Group F (uncertainty):** the relative-metric robustness argument and the quadratic/RF/Cubist ensemble are method-level analogues to our uncertainty-propagation interest, though our N = 10,000 Monte Carlo over LCA characterization factors is a different construction.
+- **Group D (ML):** the random-forest / Cubist intake-gap models are a minor ML-for-nutrition cross-link.
+- **Manuscript relevance:** marginal. If our §1 or §6 ever situates dish-level dietary-risk health burden within the broader landscape of "food-health DALY methods," C21 is a legitimate citation for the *fortification/biofortification deficiency-burden* corner of that landscape, illustrating that the DALY endpoint is used across very different food-health problems. It does **not** support any methodological choice in our HENI implementation or Canadian case study.
+
+---
+
+#### Three-sentence relevance note
+
+C21 is a methods preprint proposing a modified Disability-Adjusted Life Years approach for valuing fortification and biofortification interventions by the micronutrient-deficiency burden they avert, reformulated entirely in relative nutrient-intake terms (relative intake increase ϘCI = BI/CI and relative intake gap ƒCI = CI/RDA) to overcome the unreliability and cross-source inconsistency of absolute intake and RDA data. It belongs to a different branch of the DALY literature from the rest of Group C, drawing on the GBD nutritional-deficiency cause/risk factors rather than the GBD dietary-risk factors that underpin HENI and DANI, so its relevance to our dish-level Canadian dietary-risk platform is limited and high-level: the genuinely transferable elements are its argument that relative metrics are more robust than absolute ones under data scarcity, its documentation that published nutrient-intake databases disagree sharply (and sometimes correlate negatively with GDP), and its quadratic/random-forest/Cubist ensemble for filling intake gaps. It is appropriately cited only as an example of the fortification/deficiency-burden corner of the broader food-health DALY landscape and not as support for any choice in our HENI methodology; cite as Lenaerts 2025, medRxiv 2024.08.26.24312574 v2, doi:10.1101/2024.08.26.24312574 (preprint, not peer-reviewed).
+
+---
+
+*Group C complete (C14–C21).*
 
 ## Group D. AI / LLMs for food classification and LCA
 
