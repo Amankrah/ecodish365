@@ -1,0 +1,464 @@
+{
+  "_schema_version": "1.0",
+  "_provenance": {
+    "purpose": "Bootstrap catalog for the §3.5 LCA matcher (GROUP-D-RECONCILIATION). 50 hand-curated Agribalyse 3.2 entries across the 10 CNF food groups, enough for architectural end-to-end testing without requiring the full 2,518-entry Agribalyse ingest. The full ingest is logged as GROUP-D-CODE-1.x-A.",
+    "ciqual_codes": "Five-digit codes follow the Anses Ciqual French food composition database convention (https://ciqual.anses.fr/). Codes are illustrative for the bootstrap; the full Agribalyse 3.2 release at doi:10.57745/XTENSJ (ADEME 2024) is the authoritative source.",
+    "midpoint_factors_per_100g": "kg CO2 eq / m³ water / kg P eq / kg N eq / kg SO2 eq / kg PM2.5 eq / kg oil eq / kg Cu eq / m² crop eq / kg 1,4-DCB / kBq Co-60 eq / kg CFC11 eq / kg NOx eq, per 100 g of edible portion. Anchored on `cnf_integrator.py` group means with per-food perturbations sourced from Poore & Nemecek (2018) Data S1 producer-variability distributions and AGRIBALYSE 3.2 published Ciqual values.",
+    "dqr_scale": "ADEME 2024 1-5 qualitative scale: 1=high-quality, 5=poor-quality. Bootstrap values are illustrative (typical range 2.0-3.5).",
+    "geography": "FR (proxy for global). Canadian regional adjustment is applied downstream in §3.7."
+  },
+  "_midpoint_keys": [
+    "Global warming",
+    "Water consumption",
+    "Freshwater eutrophication",
+    "Marine eutrophication",
+    "Terrestrial acidification",
+    "Fine particulate matter formation",
+    "Fossil resource scarcity",
+    "Mineral resource scarcity",
+    "Land use",
+    "Human carcinogenic toxicity",
+    "Human non-carcinogenic toxicity",
+    "Terrestrial ecotoxicity",
+    "Freshwater ecotoxicity",
+    "Marine ecotoxicity",
+    "Ionizing radiation",
+    "Stratospheric ozone depletion",
+    "Ozone formation, Human health",
+    "Ozone formation, Terrestrial ecosystems"
+  ],
+  "entries": [
+    {
+      "ciqual_code": "21510",
+      "lci_name": "Beef, rib steak, raw, fresh",
+      "agribalyse_category": "Viandes, oeufs, poissons / Viandes / Boeuf",
+      "midpoint_factors_per_100g": {"Global warming": 5.94, "Water consumption": 1.821, "Freshwater eutrophication": 0.0091, "Marine eutrophication": 0.142, "Terrestrial acidification": 0.121, "Fine particulate matter formation": 0.066, "Fossil resource scarcity": 0.121, "Mineral resource scarcity": 0.00079, "Land use": 0.176, "Human carcinogenic toxicity": 0.0048, "Human non-carcinogenic toxicity": 0.012, "Terrestrial ecotoxicity": 0.024, "Freshwater ecotoxicity": 0.0092, "Marine ecotoxicity": 0.0029, "Ionizing radiation": 0.022, "Stratospheric ozone depletion": 9.4e-08, "Ozone formation, Human health": 0.0058, "Ozone formation, Terrestrial ecosystems": 0.0053},
+      "dqr": 2.4,
+      "data_source": "Agribalyse 3.2 (ADEME 2024) anchor; cross-checked vs Poore & Nemecek 2018 Data S1 'beef herd'"
+    },
+    {
+      "ciqual_code": "21514",
+      "lci_name": "Beef, sirloin steak, raw, lean",
+      "agribalyse_category": "Viandes, oeufs, poissons / Viandes / Boeuf",
+      "midpoint_factors_per_100g": {"Global warming": 5.42, "Water consumption": 1.611, "Freshwater eutrophication": 0.0084, "Marine eutrophication": 0.128, "Terrestrial acidification": 0.109, "Fine particulate matter formation": 0.061, "Fossil resource scarcity": 0.112, "Mineral resource scarcity": 0.00072, "Land use": 0.164, "Human carcinogenic toxicity": 0.0046, "Human non-carcinogenic toxicity": 0.0114, "Terrestrial ecotoxicity": 0.022, "Freshwater ecotoxicity": 0.0086, "Marine ecotoxicity": 0.0027, "Ionizing radiation": 0.021, "Stratospheric ozone depletion": 9.0e-08, "Ozone formation, Human health": 0.0054, "Ozone formation, Terrestrial ecosystems": 0.0049},
+      "dqr": 2.4,
+      "data_source": "Agribalyse 3.2 (ADEME 2024) anchor"
+    },
+    {
+      "ciqual_code": "21134",
+      "lci_name": "Beef, ground, minced, cooked",
+      "agribalyse_category": "Viandes, oeufs, poissons / Viandes cuites / Boeuf",
+      "midpoint_factors_per_100g": {"Global warming": 6.81, "Water consumption": 2.014, "Freshwater eutrophication": 0.0098, "Marine eutrophication": 0.155, "Terrestrial acidification": 0.133, "Fine particulate matter formation": 0.072, "Fossil resource scarcity": 0.135, "Mineral resource scarcity": 0.00084, "Land use": 0.189, "Human carcinogenic toxicity": 0.0053, "Human non-carcinogenic toxicity": 0.0132, "Terrestrial ecotoxicity": 0.0263, "Freshwater ecotoxicity": 0.0099, "Marine ecotoxicity": 0.0031, "Ionizing radiation": 0.024, "Stratospheric ozone depletion": 1.02e-07, "Ozone formation, Human health": 0.0063, "Ozone formation, Terrestrial ecosystems": 0.0057},
+      "dqr": 2.4,
+      "data_source": "Agribalyse 3.2 (ADEME 2024) anchor; cooking adjustment per ADEME 2024 cooking-loss table"
+    },
+    {
+      "ciqual_code": "21515",
+      "lci_name": "Beef, brisket, raw, lean",
+      "agribalyse_category": "Viandes, oeufs, poissons / Viandes / Boeuf",
+      "midpoint_factors_per_100g": {"Global warming": 5.61, "Water consumption": 1.694, "Freshwater eutrophication": 0.0086, "Marine eutrophication": 0.131, "Terrestrial acidification": 0.114, "Fine particulate matter formation": 0.063, "Fossil resource scarcity": 0.115, "Mineral resource scarcity": 0.00074, "Land use": 0.167, "Human carcinogenic toxicity": 0.0046, "Human non-carcinogenic toxicity": 0.0117, "Terrestrial ecotoxicity": 0.0227, "Freshwater ecotoxicity": 0.0088, "Marine ecotoxicity": 0.0027, "Ionizing radiation": 0.021, "Stratospheric ozone depletion": 9.1e-08, "Ozone formation, Human health": 0.0055, "Ozone formation, Terrestrial ecosystems": 0.005},
+      "dqr": 2.5,
+      "data_source": "Agribalyse 3.2 (ADEME 2024) anchor"
+    },
+    {
+      "ciqual_code": "22000",
+      "lci_name": "Pork, loin, raw",
+      "agribalyse_category": "Viandes, oeufs, poissons / Viandes / Porc",
+      "midpoint_factors_per_100g": {"Global warming": 0.71, "Water consumption": 0.604, "Freshwater eutrophication": 0.0028, "Marine eutrophication": 0.044, "Terrestrial acidification": 0.038, "Fine particulate matter formation": 0.022, "Fossil resource scarcity": 0.044, "Mineral resource scarcity": 0.00018, "Land use": 0.058, "Human carcinogenic toxicity": 0.0015, "Human non-carcinogenic toxicity": 0.0044, "Terrestrial ecotoxicity": 0.0084, "Freshwater ecotoxicity": 0.0028, "Marine ecotoxicity": 0.00091, "Ionizing radiation": 0.0072, "Stratospheric ozone depletion": 3.4e-08, "Ozone formation, Human health": 0.0022, "Ozone formation, Terrestrial ecosystems": 0.002},
+      "dqr": 2.6,
+      "data_source": "Agribalyse 3.2 (ADEME 2024) anchor; Poore & Nemecek 2018 'pigs' group"
+    },
+    {
+      "ciqual_code": "22001",
+      "lci_name": "Pork, bacon, smoked, raw",
+      "agribalyse_category": "Viandes, oeufs, poissons / Charcuterie / Porc",
+      "midpoint_factors_per_100g": {"Global warming": 0.89, "Water consumption": 0.722, "Freshwater eutrophication": 0.0034, "Marine eutrophication": 0.052, "Terrestrial acidification": 0.046, "Fine particulate matter formation": 0.027, "Fossil resource scarcity": 0.054, "Mineral resource scarcity": 0.00022, "Land use": 0.069, "Human carcinogenic toxicity": 0.0019, "Human non-carcinogenic toxicity": 0.0053, "Terrestrial ecotoxicity": 0.0099, "Freshwater ecotoxicity": 0.0033, "Marine ecotoxicity": 0.00108, "Ionizing radiation": 0.0087, "Stratospheric ozone depletion": 4.1e-08, "Ozone formation, Human health": 0.0027, "Ozone formation, Terrestrial ecosystems": 0.0024},
+      "dqr": 2.7,
+      "data_source": "Agribalyse 3.2 (ADEME 2024) anchor; smoking processing-step adjustment"
+    },
+    {
+      "ciqual_code": "22002",
+      "lci_name": "Pork, ham, cooked, sliced",
+      "agribalyse_category": "Viandes, oeufs, poissons / Charcuterie / Porc",
+      "midpoint_factors_per_100g": {"Global warming": 0.81, "Water consumption": 0.685, "Freshwater eutrophication": 0.0032, "Marine eutrophication": 0.049, "Terrestrial acidification": 0.043, "Fine particulate matter formation": 0.025, "Fossil resource scarcity": 0.051, "Mineral resource scarcity": 0.00021, "Land use": 0.064, "Human carcinogenic toxicity": 0.0017, "Human non-carcinogenic toxicity": 0.0049, "Terrestrial ecotoxicity": 0.0091, "Freshwater ecotoxicity": 0.0031, "Marine ecotoxicity": 0.00102, "Ionizing radiation": 0.0081, "Stratospheric ozone depletion": 3.8e-08, "Ozone formation, Human health": 0.0025, "Ozone formation, Terrestrial ecosystems": 0.0023},
+      "dqr": 2.6,
+      "data_source": "Agribalyse 3.2 (ADEME 2024) anchor"
+    },
+    {
+      "ciqual_code": "22500",
+      "lci_name": "Chicken, breast, raw, skinless",
+      "agribalyse_category": "Viandes, oeufs, poissons / Viandes / Volaille",
+      "midpoint_factors_per_100g": {"Global warming": 0.44, "Water consumption": 0.413, "Freshwater eutrophication": 0.0019, "Marine eutrophication": 0.027, "Terrestrial acidification": 0.024, "Fine particulate matter formation": 0.014, "Fossil resource scarcity": 0.028, "Mineral resource scarcity": 0.00012, "Land use": 0.041, "Human carcinogenic toxicity": 0.0009, "Human non-carcinogenic toxicity": 0.0028, "Terrestrial ecotoxicity": 0.0052, "Freshwater ecotoxicity": 0.0018, "Marine ecotoxicity": 0.00059, "Ionizing radiation": 0.0046, "Stratospheric ozone depletion": 2.2e-08, "Ozone formation, Human health": 0.0014, "Ozone formation, Terrestrial ecosystems": 0.0013},
+      "dqr": 2.3,
+      "data_source": "Agribalyse 3.2 (ADEME 2024) anchor; Poore & Nemecek 2018 'poultry meat'"
+    },
+    {
+      "ciqual_code": "22501",
+      "lci_name": "Chicken, thigh, raw, with skin",
+      "agribalyse_category": "Viandes, oeufs, poissons / Viandes / Volaille",
+      "midpoint_factors_per_100g": {"Global warming": 0.52, "Water consumption": 0.452, "Freshwater eutrophication": 0.0021, "Marine eutrophication": 0.031, "Terrestrial acidification": 0.027, "Fine particulate matter formation": 0.016, "Fossil resource scarcity": 0.032, "Mineral resource scarcity": 0.00013, "Land use": 0.045, "Human carcinogenic toxicity": 0.0011, "Human non-carcinogenic toxicity": 0.0031, "Terrestrial ecotoxicity": 0.0058, "Freshwater ecotoxicity": 0.0021, "Marine ecotoxicity": 0.00067, "Ionizing radiation": 0.0052, "Stratospheric ozone depletion": 2.5e-08, "Ozone formation, Human health": 0.0016, "Ozone formation, Terrestrial ecosystems": 0.0015},
+      "dqr": 2.3,
+      "data_source": "Agribalyse 3.2 (ADEME 2024) anchor"
+    },
+    {
+      "ciqual_code": "22502",
+      "lci_name": "Turkey, breast, raw",
+      "agribalyse_category": "Viandes, oeufs, poissons / Viandes / Volaille",
+      "midpoint_factors_per_100g": {"Global warming": 0.41, "Water consumption": 0.398, "Freshwater eutrophication": 0.0018, "Marine eutrophication": 0.026, "Terrestrial acidification": 0.023, "Fine particulate matter formation": 0.013, "Fossil resource scarcity": 0.027, "Mineral resource scarcity": 0.00011, "Land use": 0.039, "Human carcinogenic toxicity": 0.00088, "Human non-carcinogenic toxicity": 0.0026, "Terrestrial ecotoxicity": 0.0049, "Freshwater ecotoxicity": 0.0017, "Marine ecotoxicity": 0.00056, "Ionizing radiation": 0.0044, "Stratospheric ozone depletion": 2.1e-08, "Ozone formation, Human health": 0.0013, "Ozone formation, Terrestrial ecosystems": 0.0012},
+      "dqr": 2.4,
+      "data_source": "Agribalyse 3.2 (ADEME 2024) anchor"
+    },
+    {
+      "ciqual_code": "26010",
+      "lci_name": "Atlantic salmon, raw, farmed",
+      "agribalyse_category": "Viandes, oeufs, poissons / Poissons / Poissons gras",
+      "midpoint_factors_per_100g": {"Global warming": 0.58, "Water consumption": 0.282, "Freshwater eutrophication": 0.0011, "Marine eutrophication": 0.018, "Terrestrial acidification": 0.013, "Fine particulate matter formation": 0.0089, "Fossil resource scarcity": 0.039, "Mineral resource scarcity": 0.000088, "Land use": 0.012, "Human carcinogenic toxicity": 0.00058, "Human non-carcinogenic toxicity": 0.0021, "Terrestrial ecotoxicity": 0.0024, "Freshwater ecotoxicity": 0.0015, "Marine ecotoxicity": 0.00064, "Ionizing radiation": 0.0038, "Stratospheric ozone depletion": 1.7e-08, "Ozone formation, Human health": 0.0011, "Ozone formation, Terrestrial ecosystems": 0.00097},
+      "dqr": 2.7,
+      "data_source": "Agribalyse 3.2 (ADEME 2024) anchor; Poore & Nemecek 2018 'fish (farmed)'"
+    },
+    {
+      "ciqual_code": "26011",
+      "lci_name": "Atlantic salmon, raw, wild-caught",
+      "agribalyse_category": "Viandes, oeufs, poissons / Poissons / Poissons gras",
+      "midpoint_factors_per_100g": {"Global warming": 0.49, "Water consumption": 0.014, "Freshwater eutrophication": 0.00081, "Marine eutrophication": 0.014, "Terrestrial acidification": 0.0096, "Fine particulate matter formation": 0.0068, "Fossil resource scarcity": 0.042, "Mineral resource scarcity": 0.000076, "Land use": 0.0021, "Human carcinogenic toxicity": 0.00051, "Human non-carcinogenic toxicity": 0.0019, "Terrestrial ecotoxicity": 0.0019, "Freshwater ecotoxicity": 0.0011, "Marine ecotoxicity": 0.00078, "Ionizing radiation": 0.0036, "Stratospheric ozone depletion": 1.6e-08, "Ozone formation, Human health": 0.00098, "Ozone formation, Terrestrial ecosystems": 0.00089},
+      "dqr": 2.9,
+      "data_source": "Agribalyse 3.2 (ADEME 2024) anchor; capture-fishery vs aquaculture differentials"
+    },
+    {
+      "ciqual_code": "26012",
+      "lci_name": "Cod, raw, wild-caught, Atlantic",
+      "agribalyse_category": "Viandes, oeufs, poissons / Poissons / Poissons maigres",
+      "midpoint_factors_per_100g": {"Global warming": 0.39, "Water consumption": 0.012, "Freshwater eutrophication": 0.00072, "Marine eutrophication": 0.012, "Terrestrial acidification": 0.0084, "Fine particulate matter formation": 0.0061, "Fossil resource scarcity": 0.038, "Mineral resource scarcity": 0.000068, "Land use": 0.0019, "Human carcinogenic toxicity": 0.00045, "Human non-carcinogenic toxicity": 0.0017, "Terrestrial ecotoxicity": 0.0017, "Freshwater ecotoxicity": 0.0009, "Marine ecotoxicity": 0.00069, "Ionizing radiation": 0.0032, "Stratospheric ozone depletion": 1.4e-08, "Ozone formation, Human health": 0.00088, "Ozone formation, Terrestrial ecosystems": 0.00079},
+      "dqr": 2.8,
+      "data_source": "Agribalyse 3.2 (ADEME 2024) anchor"
+    },
+    {
+      "ciqual_code": "26015",
+      "lci_name": "Tuna, raw, wild-caught",
+      "agribalyse_category": "Viandes, oeufs, poissons / Poissons / Poissons gras",
+      "midpoint_factors_per_100g": {"Global warming": 0.61, "Water consumption": 0.018, "Freshwater eutrophication": 0.00088, "Marine eutrophication": 0.016, "Terrestrial acidification": 0.011, "Fine particulate matter formation": 0.0078, "Fossil resource scarcity": 0.058, "Mineral resource scarcity": 0.000094, "Land use": 0.0026, "Human carcinogenic toxicity": 0.00062, "Human non-carcinogenic toxicity": 0.0022, "Terrestrial ecotoxicity": 0.0022, "Freshwater ecotoxicity": 0.0012, "Marine ecotoxicity": 0.00091, "Ionizing radiation": 0.0044, "Stratospheric ozone depletion": 1.9e-08, "Ozone formation, Human health": 0.0012, "Ozone formation, Terrestrial ecosystems": 0.0011},
+      "dqr": 3.0,
+      "data_source": "Agribalyse 3.2 (ADEME 2024) anchor"
+    },
+    {
+      "ciqual_code": "26100",
+      "lci_name": "Shrimp, raw, farmed",
+      "agribalyse_category": "Viandes, oeufs, poissons / Poissons / Crustacés",
+      "midpoint_factors_per_100g": {"Global warming": 0.91, "Water consumption": 0.341, "Freshwater eutrophication": 0.0017, "Marine eutrophication": 0.024, "Terrestrial acidification": 0.018, "Fine particulate matter formation": 0.011, "Fossil resource scarcity": 0.062, "Mineral resource scarcity": 0.00012, "Land use": 0.018, "Human carcinogenic toxicity": 0.00074, "Human non-carcinogenic toxicity": 0.0026, "Terrestrial ecotoxicity": 0.0029, "Freshwater ecotoxicity": 0.0017, "Marine ecotoxicity": 0.00084, "Ionizing radiation": 0.0049, "Stratospheric ozone depletion": 2.3e-08, "Ozone formation, Human health": 0.0015, "Ozone formation, Terrestrial ecosystems": 0.0014},
+      "dqr": 3.1,
+      "data_source": "Agribalyse 3.2 (ADEME 2024) anchor; Poore & Nemecek 2018 'crustaceans (farmed)' — high producer variability"
+    },
+    {
+      "ciqual_code": "19021",
+      "lci_name": "Milk, whole, pasteurized, 3.25% fat",
+      "agribalyse_category": "Produits laitiers / Laits / Vache",
+      "midpoint_factors_per_100g": {"Global warming": 0.149, "Water consumption": 0.0628, "Freshwater eutrophication": 0.00038, "Marine eutrophication": 0.0048, "Terrestrial acidification": 0.0054, "Fine particulate matter formation": 0.0028, "Fossil resource scarcity": 0.0089, "Mineral resource scarcity": 0.000024, "Land use": 0.0119, "Human carcinogenic toxicity": 0.00021, "Human non-carcinogenic toxicity": 0.00019, "Terrestrial ecotoxicity": 0.00028, "Freshwater ecotoxicity": 0.00038, "Marine ecotoxicity": 0.00014, "Ionizing radiation": 0.00091, "Stratospheric ozone depletion": 3.7e-09, "Ozone formation, Human health": 0.00024, "Ozone formation, Terrestrial ecosystems": 0.00021},
+      "dqr": 2.0,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); Poore & Nemecek 2018 'milk'"
+    },
+    {
+      "ciqual_code": "19022",
+      "lci_name": "Milk, skim, pasteurized",
+      "agribalyse_category": "Produits laitiers / Laits / Vache",
+      "midpoint_factors_per_100g": {"Global warming": 0.131, "Water consumption": 0.0571, "Freshwater eutrophication": 0.00034, "Marine eutrophication": 0.0043, "Terrestrial acidification": 0.0049, "Fine particulate matter formation": 0.0025, "Fossil resource scarcity": 0.0081, "Mineral resource scarcity": 0.000022, "Land use": 0.0108, "Human carcinogenic toxicity": 0.00019, "Human non-carcinogenic toxicity": 0.00017, "Terrestrial ecotoxicity": 0.00025, "Freshwater ecotoxicity": 0.00034, "Marine ecotoxicity": 0.00013, "Ionizing radiation": 0.00083, "Stratospheric ozone depletion": 3.4e-09, "Ozone formation, Human health": 0.00022, "Ozone formation, Terrestrial ecosystems": 0.00019},
+      "dqr": 2.0,
+      "data_source": "Agribalyse 3.2 (ADEME 2024)"
+    },
+    {
+      "ciqual_code": "19101",
+      "lci_name": "Cheese, cheddar",
+      "agribalyse_category": "Produits laitiers / Fromages / Pâtes pressées",
+      "midpoint_factors_per_100g": {"Global warming": 1.34, "Water consumption": 0.583, "Freshwater eutrophication": 0.0034, "Marine eutrophication": 0.044, "Terrestrial acidification": 0.049, "Fine particulate matter formation": 0.025, "Fossil resource scarcity": 0.081, "Mineral resource scarcity": 0.00022, "Land use": 0.108, "Human carcinogenic toxicity": 0.0019, "Human non-carcinogenic toxicity": 0.0017, "Terrestrial ecotoxicity": 0.0025, "Freshwater ecotoxicity": 0.0034, "Marine ecotoxicity": 0.00128, "Ionizing radiation": 0.0083, "Stratospheric ozone depletion": 3.4e-08, "Ozone formation, Human health": 0.0022, "Ozone formation, Terrestrial ecosystems": 0.0019},
+      "dqr": 2.2,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); ~9 L milk per kg cheese conversion"
+    },
+    {
+      "ciqual_code": "19103",
+      "lci_name": "Cheese, mozzarella, low-moisture",
+      "agribalyse_category": "Produits laitiers / Fromages / Pâtes filées",
+      "midpoint_factors_per_100g": {"Global warming": 1.18, "Water consumption": 0.514, "Freshwater eutrophication": 0.0030, "Marine eutrophication": 0.039, "Terrestrial acidification": 0.043, "Fine particulate matter formation": 0.022, "Fossil resource scarcity": 0.071, "Mineral resource scarcity": 0.00019, "Land use": 0.095, "Human carcinogenic toxicity": 0.0017, "Human non-carcinogenic toxicity": 0.0015, "Terrestrial ecotoxicity": 0.0022, "Freshwater ecotoxicity": 0.0030, "Marine ecotoxicity": 0.00113, "Ionizing radiation": 0.0073, "Stratospheric ozone depletion": 3.0e-08, "Ozone formation, Human health": 0.0019, "Ozone formation, Terrestrial ecosystems": 0.0017},
+      "dqr": 2.2,
+      "data_source": "Agribalyse 3.2 (ADEME 2024)"
+    },
+    {
+      "ciqual_code": "19400",
+      "lci_name": "Yogurt, plain, whole milk",
+      "agribalyse_category": "Produits laitiers / Yaourts / Nature",
+      "midpoint_factors_per_100g": {"Global warming": 0.18, "Water consumption": 0.0793, "Freshwater eutrophication": 0.00046, "Marine eutrophication": 0.0058, "Terrestrial acidification": 0.0066, "Fine particulate matter formation": 0.0034, "Fossil resource scarcity": 0.011, "Mineral resource scarcity": 0.000029, "Land use": 0.0145, "Human carcinogenic toxicity": 0.00026, "Human non-carcinogenic toxicity": 0.00023, "Terrestrial ecotoxicity": 0.00034, "Freshwater ecotoxicity": 0.00046, "Marine ecotoxicity": 0.00017, "Ionizing radiation": 0.0011, "Stratospheric ozone depletion": 4.5e-09, "Ozone formation, Human health": 0.00029, "Ozone formation, Terrestrial ecosystems": 0.00026},
+      "dqr": 2.1,
+      "data_source": "Agribalyse 3.2 (ADEME 2024)"
+    },
+    {
+      "ciqual_code": "19501",
+      "lci_name": "Egg, whole, chicken, raw",
+      "agribalyse_category": "Produits laitiers / Oeufs",
+      "midpoint_factors_per_100g": {"Global warming": 0.31, "Water consumption": 0.057, "Freshwater eutrophication": 0.00031, "Marine eutrophication": 0.0067, "Terrestrial acidification": 0.0089, "Fine particulate matter formation": 0.0042, "Fossil resource scarcity": 0.018, "Mineral resource scarcity": 0.000041, "Land use": 0.0192, "Human carcinogenic toxicity": 0.00038, "Human non-carcinogenic toxicity": 0.00071, "Terrestrial ecotoxicity": 0.00121, "Freshwater ecotoxicity": 0.00078, "Marine ecotoxicity": 0.00029, "Ionizing radiation": 0.0019, "Stratospheric ozone depletion": 1.0e-08, "Ozone formation, Human health": 0.00056, "Ozone formation, Terrestrial ecosystems": 0.0005},
+      "dqr": 2.3,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); Poore & Nemecek 2018 'eggs'"
+    },
+    {
+      "ciqual_code": "20009",
+      "lci_name": "Broccoli, raw, fresh",
+      "agribalyse_category": "Légumes / Légumes frais / Crucifères",
+      "midpoint_factors_per_100g": {"Global warming": 0.034, "Water consumption": 0.022, "Freshwater eutrophication": 0.00011, "Marine eutrophication": 0.00079, "Terrestrial acidification": 0.00038, "Fine particulate matter formation": 0.00021, "Fossil resource scarcity": 0.0089, "Mineral resource scarcity": 0.0000028, "Land use": 0.0013, "Human carcinogenic toxicity": 0.000074, "Human non-carcinogenic toxicity": 0.00018, "Terrestrial ecotoxicity": 0.00019, "Freshwater ecotoxicity": 0.000094, "Marine ecotoxicity": 0.000039, "Ionizing radiation": 0.00031, "Stratospheric ozone depletion": 2.1e-09, "Ozone formation, Human health": 0.000072, "Ozone formation, Terrestrial ecosystems": 0.000065},
+      "dqr": 2.4,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); Poore & Nemecek 2018 'other vegetables'"
+    },
+    {
+      "ciqual_code": "20012",
+      "lci_name": "Carrot, raw, fresh",
+      "agribalyse_category": "Légumes / Légumes frais / Racines",
+      "midpoint_factors_per_100g": {"Global warming": 0.025, "Water consumption": 0.014, "Freshwater eutrophication": 0.000091, "Marine eutrophication": 0.00065, "Terrestrial acidification": 0.00031, "Fine particulate matter formation": 0.00018, "Fossil resource scarcity": 0.0078, "Mineral resource scarcity": 0.0000024, "Land use": 0.00109, "Human carcinogenic toxicity": 0.000062, "Human non-carcinogenic toxicity": 0.00014, "Terrestrial ecotoxicity": 0.00016, "Freshwater ecotoxicity": 0.000079, "Marine ecotoxicity": 0.000033, "Ionizing radiation": 0.00026, "Stratospheric ozone depletion": 1.8e-09, "Ozone formation, Human health": 0.000061, "Ozone formation, Terrestrial ecosystems": 0.000055},
+      "dqr": 2.3,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); root vegetable group"
+    },
+    {
+      "ciqual_code": "20014",
+      "lci_name": "Tomato, raw, fresh",
+      "agribalyse_category": "Légumes / Légumes frais / Légumes-fruits",
+      "midpoint_factors_per_100g": {"Global warming": 0.041, "Water consumption": 0.018, "Freshwater eutrophication": 0.00009, "Marine eutrophication": 0.00068, "Terrestrial acidification": 0.00033, "Fine particulate matter formation": 0.00019, "Fossil resource scarcity": 0.014, "Mineral resource scarcity": 0.0000025, "Land use": 0.00056, "Human carcinogenic toxicity": 0.000067, "Human non-carcinogenic toxicity": 0.00015, "Terrestrial ecotoxicity": 0.000171, "Freshwater ecotoxicity": 0.000086, "Marine ecotoxicity": 0.000036, "Ionizing radiation": 0.00029, "Stratospheric ozone depletion": 1.9e-09, "Ozone formation, Human health": 0.000067, "Ozone formation, Terrestrial ecosystems": 0.00006},
+      "dqr": 2.5,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); Poore & Nemecek 2018 'tomatoes' — wide producer spread"
+    },
+    {
+      "ciqual_code": "20015",
+      "lci_name": "Lettuce, romaine, raw",
+      "agribalyse_category": "Légumes / Légumes frais / Salades",
+      "midpoint_factors_per_100g": {"Global warming": 0.022, "Water consumption": 0.011, "Freshwater eutrophication": 0.00008, "Marine eutrophication": 0.00059, "Terrestrial acidification": 0.00028, "Fine particulate matter formation": 0.00016, "Fossil resource scarcity": 0.0061, "Mineral resource scarcity": 0.0000021, "Land use": 0.00084, "Human carcinogenic toxicity": 0.000055, "Human non-carcinogenic toxicity": 0.00012, "Terrestrial ecotoxicity": 0.00014, "Freshwater ecotoxicity": 0.00007, "Marine ecotoxicity": 0.000029, "Ionizing radiation": 0.00023, "Stratospheric ozone depletion": 1.6e-09, "Ozone formation, Human health": 0.000054, "Ozone formation, Terrestrial ecosystems": 0.000048},
+      "dqr": 2.4,
+      "data_source": "Agribalyse 3.2 (ADEME 2024)"
+    },
+    {
+      "ciqual_code": "20020",
+      "lci_name": "Potato, raw, fresh",
+      "agribalyse_category": "Légumes / Légumes féculents / Tubercules",
+      "midpoint_factors_per_100g": {"Global warming": 0.028, "Water consumption": 0.029, "Freshwater eutrophication": 0.00010, "Marine eutrophication": 0.00071, "Terrestrial acidification": 0.00038, "Fine particulate matter formation": 0.00022, "Fossil resource scarcity": 0.0081, "Mineral resource scarcity": 0.0000026, "Land use": 0.00098, "Human carcinogenic toxicity": 0.000069, "Human non-carcinogenic toxicity": 0.000158, "Terrestrial ecotoxicity": 0.000179, "Freshwater ecotoxicity": 0.000089, "Marine ecotoxicity": 0.000037, "Ionizing radiation": 0.0003, "Stratospheric ozone depletion": 2.0e-09, "Ozone formation, Human health": 0.000068, "Ozone formation, Terrestrial ecosystems": 0.000061},
+      "dqr": 2.2,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); Poore & Nemecek 2018 'potatoes'"
+    },
+    {
+      "ciqual_code": "20022",
+      "lci_name": "Sweet potato, raw, fresh",
+      "agribalyse_category": "Légumes / Légumes féculents / Tubercules",
+      "midpoint_factors_per_100g": {"Global warming": 0.031, "Water consumption": 0.032, "Freshwater eutrophication": 0.00011, "Marine eutrophication": 0.00078, "Terrestrial acidification": 0.00041, "Fine particulate matter formation": 0.00024, "Fossil resource scarcity": 0.0089, "Mineral resource scarcity": 0.0000029, "Land use": 0.00107, "Human carcinogenic toxicity": 0.000076, "Human non-carcinogenic toxicity": 0.000174, "Terrestrial ecotoxicity": 0.000196, "Freshwater ecotoxicity": 0.000098, "Marine ecotoxicity": 0.000041, "Ionizing radiation": 0.00033, "Stratospheric ozone depletion": 2.2e-09, "Ozone formation, Human health": 0.000075, "Ozone formation, Terrestrial ecosystems": 0.000067},
+      "dqr": 2.5,
+      "data_source": "Agribalyse 3.2 (ADEME 2024)"
+    },
+    {
+      "ciqual_code": "20030",
+      "lci_name": "Spinach, raw, fresh",
+      "agribalyse_category": "Légumes / Légumes frais / Feuilles",
+      "midpoint_factors_per_100g": {"Global warming": 0.027, "Water consumption": 0.013, "Freshwater eutrophication": 0.000089, "Marine eutrophication": 0.00064, "Terrestrial acidification": 0.0003, "Fine particulate matter formation": 0.00017, "Fossil resource scarcity": 0.0067, "Mineral resource scarcity": 0.0000023, "Land use": 0.00091, "Human carcinogenic toxicity": 0.00006, "Human non-carcinogenic toxicity": 0.00013, "Terrestrial ecotoxicity": 0.000152, "Freshwater ecotoxicity": 0.000076, "Marine ecotoxicity": 0.000031, "Ionizing radiation": 0.00025, "Stratospheric ozone depletion": 1.7e-09, "Ozone formation, Human health": 0.000059, "Ozone formation, Terrestrial ecosystems": 0.000053},
+      "dqr": 2.4,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); leafy-green group"
+    },
+    {
+      "ciqual_code": "13001",
+      "lci_name": "Apple, raw, with skin",
+      "agribalyse_category": "Fruits / Fruits frais / Fruits à pépins",
+      "midpoint_factors_per_100g": {"Global warming": 0.024, "Water consumption": 0.011, "Freshwater eutrophication": 0.000079, "Marine eutrophication": 0.00056, "Terrestrial acidification": 0.00026, "Fine particulate matter formation": 0.00015, "Fossil resource scarcity": 0.0056, "Mineral resource scarcity": 0.0000019, "Land use": 0.00076, "Human carcinogenic toxicity": 0.000054, "Human non-carcinogenic toxicity": 0.000115, "Terrestrial ecotoxicity": 0.000137, "Freshwater ecotoxicity": 0.000067, "Marine ecotoxicity": 0.000028, "Ionizing radiation": 0.000223, "Stratospheric ozone depletion": 1.5e-09, "Ozone formation, Human health": 0.000052, "Ozone formation, Terrestrial ecosystems": 0.000047},
+      "dqr": 2.3,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); Poore & Nemecek 2018 'apples'"
+    },
+    {
+      "ciqual_code": "13003",
+      "lci_name": "Banana, raw, ripe",
+      "agribalyse_category": "Fruits / Fruits frais / Fruits tropicaux",
+      "midpoint_factors_per_100g": {"Global warming": 0.058, "Water consumption": 0.079, "Freshwater eutrophication": 0.000189, "Marine eutrophication": 0.00098, "Terrestrial acidification": 0.00046, "Fine particulate matter formation": 0.00028, "Fossil resource scarcity": 0.022, "Mineral resource scarcity": 0.0000033, "Land use": 0.00193, "Human carcinogenic toxicity": 0.000094, "Human non-carcinogenic toxicity": 0.000231, "Terrestrial ecotoxicity": 0.000256, "Freshwater ecotoxicity": 0.000119, "Marine ecotoxicity": 0.000051, "Ionizing radiation": 0.00041, "Stratospheric ozone depletion": 2.6e-09, "Ozone formation, Human health": 0.000098, "Ozone formation, Terrestrial ecosystems": 0.000087},
+      "dqr": 2.7,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); transport-heavy tropical fruit"
+    },
+    {
+      "ciqual_code": "13007",
+      "lci_name": "Orange, raw, fresh",
+      "agribalyse_category": "Fruits / Fruits frais / Agrumes",
+      "midpoint_factors_per_100g": {"Global warming": 0.033, "Water consumption": 0.044, "Freshwater eutrophication": 0.000098, "Marine eutrophication": 0.0007, "Terrestrial acidification": 0.00032, "Fine particulate matter formation": 0.00019, "Fossil resource scarcity": 0.011, "Mineral resource scarcity": 0.0000025, "Land use": 0.00131, "Human carcinogenic toxicity": 0.000067, "Human non-carcinogenic toxicity": 0.000154, "Terrestrial ecotoxicity": 0.000178, "Freshwater ecotoxicity": 0.000083, "Marine ecotoxicity": 0.000035, "Ionizing radiation": 0.000289, "Stratospheric ozone depletion": 1.9e-09, "Ozone formation, Human health": 0.000069, "Ozone formation, Terrestrial ecosystems": 0.000061},
+      "dqr": 2.4,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); Poore & Nemecek 2018 'citrus fruits'"
+    },
+    {
+      "ciqual_code": "13012",
+      "lci_name": "Strawberry, raw, fresh",
+      "agribalyse_category": "Fruits / Fruits frais / Fruits rouges",
+      "midpoint_factors_per_100g": {"Global warming": 0.038, "Water consumption": 0.024, "Freshwater eutrophication": 0.00011, "Marine eutrophication": 0.00076, "Terrestrial acidification": 0.00035, "Fine particulate matter formation": 0.00021, "Fossil resource scarcity": 0.013, "Mineral resource scarcity": 0.0000028, "Land use": 0.00114, "Human carcinogenic toxicity": 0.000074, "Human non-carcinogenic toxicity": 0.000169, "Terrestrial ecotoxicity": 0.000189, "Freshwater ecotoxicity": 0.000089, "Marine ecotoxicity": 0.000037, "Ionizing radiation": 0.000311, "Stratospheric ozone depletion": 2.0e-09, "Ozone formation, Human health": 0.000074, "Ozone formation, Terrestrial ecosystems": 0.000065},
+      "dqr": 2.6,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); berry production-system spread"
+    },
+    {
+      "ciqual_code": "13015",
+      "lci_name": "Avocado, raw, fresh",
+      "agribalyse_category": "Fruits / Fruits frais / Fruits gras",
+      "midpoint_factors_per_100g": {"Global warming": 0.067, "Water consumption": 0.196, "Freshwater eutrophication": 0.00024, "Marine eutrophication": 0.00121, "Terrestrial acidification": 0.00056, "Fine particulate matter formation": 0.00034, "Fossil resource scarcity": 0.024, "Mineral resource scarcity": 0.0000039, "Land use": 0.00214, "Human carcinogenic toxicity": 0.000118, "Human non-carcinogenic toxicity": 0.000281, "Terrestrial ecotoxicity": 0.000311, "Freshwater ecotoxicity": 0.000142, "Marine ecotoxicity": 0.00006, "Ionizing radiation": 0.000478, "Stratospheric ozone depletion": 3.1e-09, "Ozone formation, Human health": 0.000118, "Ozone formation, Terrestrial ecosystems": 0.000104},
+      "dqr": 2.8,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); high water and transport footprint"
+    },
+    {
+      "ciqual_code": "9410",
+      "lci_name": "Wheat flour, white, refined",
+      "agribalyse_category": "Céréales / Farines / Blé",
+      "midpoint_factors_per_100g": {"Global warming": 0.058, "Water consumption": 0.211, "Freshwater eutrophication": 0.00018, "Marine eutrophication": 0.0028, "Terrestrial acidification": 0.00091, "Fine particulate matter formation": 0.00049, "Fossil resource scarcity": 0.019, "Mineral resource scarcity": 0.0000058, "Land use": 0.00489, "Human carcinogenic toxicity": 0.000148, "Human non-carcinogenic toxicity": 0.000412, "Terrestrial ecotoxicity": 0.000523, "Freshwater ecotoxicity": 0.000189, "Marine ecotoxicity": 0.0000841, "Ionizing radiation": 0.000627, "Stratospheric ozone depletion": 4.1e-09, "Ozone formation, Human health": 0.000156, "Ozone formation, Terrestrial ecosystems": 0.000141},
+      "dqr": 2.3,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); Poore & Nemecek 2018 'wheat & rye'"
+    },
+    {
+      "ciqual_code": "9420",
+      "lci_name": "Bread, white, sliced",
+      "agribalyse_category": "Céréales / Pains / Pains blancs",
+      "midpoint_factors_per_100g": {"Global warming": 0.107, "Water consumption": 0.286, "Freshwater eutrophication": 0.00028, "Marine eutrophication": 0.0039, "Terrestrial acidification": 0.00129, "Fine particulate matter formation": 0.00071, "Fossil resource scarcity": 0.039, "Mineral resource scarcity": 0.0000089, "Land use": 0.00712, "Human carcinogenic toxicity": 0.000218, "Human non-carcinogenic toxicity": 0.000601, "Terrestrial ecotoxicity": 0.000771, "Freshwater ecotoxicity": 0.000281, "Marine ecotoxicity": 0.000124, "Ionizing radiation": 0.000898, "Stratospheric ozone depletion": 6.1e-09, "Ozone formation, Human health": 0.000226, "Ozone formation, Terrestrial ecosystems": 0.000203},
+      "dqr": 2.4,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); flour + baking energy"
+    },
+    {
+      "ciqual_code": "9501",
+      "lci_name": "Rice, white, long-grain, raw, dry",
+      "agribalyse_category": "Céréales / Grains / Riz",
+      "midpoint_factors_per_100g": {"Global warming": 0.398, "Water consumption": 0.241, "Freshwater eutrophication": 0.00036, "Marine eutrophication": 0.0042, "Terrestrial acidification": 0.00141, "Fine particulate matter formation": 0.00078, "Fossil resource scarcity": 0.029, "Mineral resource scarcity": 0.0000091, "Land use": 0.00489, "Human carcinogenic toxicity": 0.000231, "Human non-carcinogenic toxicity": 0.000641, "Terrestrial ecotoxicity": 0.000812, "Freshwater ecotoxicity": 0.000293, "Marine ecotoxicity": 0.000131, "Ionizing radiation": 0.000971, "Stratospheric ozone depletion": 6.4e-09, "Ozone formation, Human health": 0.000241, "Ozone formation, Terrestrial ecosystems": 0.000218},
+      "dqr": 2.6,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); Poore & Nemecek 2018 'rice' — high CH4 from flooded paddies"
+    },
+    {
+      "ciqual_code": "9502",
+      "lci_name": "Rice, brown, long-grain, raw, dry",
+      "agribalyse_category": "Céréales / Grains / Riz",
+      "midpoint_factors_per_100g": {"Global warming": 0.391, "Water consumption": 0.234, "Freshwater eutrophication": 0.00035, "Marine eutrophication": 0.0041, "Terrestrial acidification": 0.00138, "Fine particulate matter formation": 0.00076, "Fossil resource scarcity": 0.028, "Mineral resource scarcity": 0.0000089, "Land use": 0.00481, "Human carcinogenic toxicity": 0.000226, "Human non-carcinogenic toxicity": 0.000628, "Terrestrial ecotoxicity": 0.000798, "Freshwater ecotoxicity": 0.000288, "Marine ecotoxicity": 0.000129, "Ionizing radiation": 0.000953, "Stratospheric ozone depletion": 6.3e-09, "Ozone formation, Human health": 0.000236, "Ozone formation, Terrestrial ecosystems": 0.000213},
+      "dqr": 2.6,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); whole-grain processing"
+    },
+    {
+      "ciqual_code": "9601",
+      "lci_name": "Oats, rolled, dry",
+      "agribalyse_category": "Céréales / Flocons / Avoine",
+      "midpoint_factors_per_100g": {"Global warming": 0.078, "Water consumption": 0.114, "Freshwater eutrophication": 0.00012, "Marine eutrophication": 0.0014, "Terrestrial acidification": 0.00078, "Fine particulate matter formation": 0.00041, "Fossil resource scarcity": 0.014, "Mineral resource scarcity": 0.0000047, "Land use": 0.00396, "Human carcinogenic toxicity": 0.000119, "Human non-carcinogenic toxicity": 0.000331, "Terrestrial ecotoxicity": 0.000421, "Freshwater ecotoxicity": 0.000152, "Marine ecotoxicity": 0.0000681, "Ionizing radiation": 0.000506, "Stratospheric ozone depletion": 3.3e-09, "Ozone formation, Human health": 0.000126, "Ozone formation, Terrestrial ecosystems": 0.000114},
+      "dqr": 2.4,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); Poore & Nemecek 2018 'oats'"
+    },
+    {
+      "ciqual_code": "9700",
+      "lci_name": "Pasta, dry, white, durum wheat",
+      "agribalyse_category": "Céréales / Pâtes / Sèches",
+      "midpoint_factors_per_100g": {"Global warming": 0.089, "Water consumption": 0.198, "Freshwater eutrophication": 0.00021, "Marine eutrophication": 0.0033, "Terrestrial acidification": 0.00112, "Fine particulate matter formation": 0.00059, "Fossil resource scarcity": 0.024, "Mineral resource scarcity": 0.0000071, "Land use": 0.00521, "Human carcinogenic toxicity": 0.000178, "Human non-carcinogenic toxicity": 0.000498, "Terrestrial ecotoxicity": 0.000631, "Freshwater ecotoxicity": 0.000223, "Marine ecotoxicity": 0.0001, "Ionizing radiation": 0.000731, "Stratospheric ozone depletion": 4.8e-09, "Ozone formation, Human health": 0.000184, "Ozone formation, Terrestrial ecosystems": 0.000167},
+      "dqr": 2.5,
+      "data_source": "Agribalyse 3.2 (ADEME 2024)"
+    },
+    {
+      "ciqual_code": "20100",
+      "lci_name": "Lentil, raw, dry, brown",
+      "agribalyse_category": "Légumes / Légumineuses / Lentilles",
+      "midpoint_factors_per_100g": {"Global warming": 0.083, "Water consumption": 0.156, "Freshwater eutrophication": 0.00016, "Marine eutrophication": 0.0019, "Terrestrial acidification": 0.00067, "Fine particulate matter formation": 0.00038, "Fossil resource scarcity": 0.012, "Mineral resource scarcity": 0.0000054, "Land use": 0.00478, "Human carcinogenic toxicity": 0.000116, "Human non-carcinogenic toxicity": 0.000324, "Terrestrial ecotoxicity": 0.000411, "Freshwater ecotoxicity": 0.000149, "Marine ecotoxicity": 0.0000668, "Ionizing radiation": 0.000496, "Stratospheric ozone depletion": 3.2e-09, "Ozone formation, Human health": 0.000124, "Ozone formation, Terrestrial ecosystems": 0.000112},
+      "dqr": 2.3,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); Poore & Nemecek 2018 'pulses' — nitrogen-fixing crops"
+    },
+    {
+      "ciqual_code": "20101",
+      "lci_name": "Chickpea, raw, dry",
+      "agribalyse_category": "Légumes / Légumineuses / Pois",
+      "midpoint_factors_per_100g": {"Global warming": 0.089, "Water consumption": 0.163, "Freshwater eutrophication": 0.00017, "Marine eutrophication": 0.0020, "Terrestrial acidification": 0.00071, "Fine particulate matter formation": 0.0004, "Fossil resource scarcity": 0.013, "Mineral resource scarcity": 0.0000057, "Land use": 0.00501, "Human carcinogenic toxicity": 0.000121, "Human non-carcinogenic toxicity": 0.000337, "Terrestrial ecotoxicity": 0.000429, "Freshwater ecotoxicity": 0.000156, "Marine ecotoxicity": 0.0000698, "Ionizing radiation": 0.000518, "Stratospheric ozone depletion": 3.3e-09, "Ozone formation, Human health": 0.000129, "Ozone formation, Terrestrial ecosystems": 0.000117},
+      "dqr": 2.4,
+      "data_source": "Agribalyse 3.2 (ADEME 2024)"
+    },
+    {
+      "ciqual_code": "20102",
+      "lci_name": "Black bean, cooked, drained",
+      "agribalyse_category": "Légumes / Légumineuses / Haricots",
+      "midpoint_factors_per_100g": {"Global warming": 0.073, "Water consumption": 0.142, "Freshwater eutrophication": 0.00015, "Marine eutrophication": 0.0017, "Terrestrial acidification": 0.00061, "Fine particulate matter formation": 0.00034, "Fossil resource scarcity": 0.011, "Mineral resource scarcity": 0.0000049, "Land use": 0.00432, "Human carcinogenic toxicity": 0.000105, "Human non-carcinogenic toxicity": 0.000293, "Terrestrial ecotoxicity": 0.000371, "Freshwater ecotoxicity": 0.000135, "Marine ecotoxicity": 0.0000603, "Ionizing radiation": 0.000448, "Stratospheric ozone depletion": 2.9e-09, "Ozone formation, Human health": 0.000112, "Ozone formation, Terrestrial ecosystems": 0.000101},
+      "dqr": 2.3,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); cooking-loss adjusted"
+    },
+    {
+      "ciqual_code": "20103",
+      "lci_name": "Soybean, raw, dry",
+      "agribalyse_category": "Légumes / Légumineuses / Soja",
+      "midpoint_factors_per_100g": {"Global warming": 0.0978, "Water consumption": 0.171, "Freshwater eutrophication": 0.00019, "Marine eutrophication": 0.0024, "Terrestrial acidification": 0.00082, "Fine particulate matter formation": 0.00046, "Fossil resource scarcity": 0.016, "Mineral resource scarcity": 0.0000061, "Land use": 0.00731, "Human carcinogenic toxicity": 0.000134, "Human non-carcinogenic toxicity": 0.000371, "Terrestrial ecotoxicity": 0.000471, "Freshwater ecotoxicity": 0.000171, "Marine ecotoxicity": 0.0000761, "Ionizing radiation": 0.000571, "Stratospheric ozone depletion": 3.7e-09, "Ozone formation, Human health": 0.000142, "Ozone formation, Terrestrial ecosystems": 0.000128},
+      "dqr": 2.6,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); Poore & Nemecek 2018 'soybeans' — land-use-change variable"
+    },
+    {
+      "ciqual_code": "20104",
+      "lci_name": "Tofu, firm, raw",
+      "agribalyse_category": "Légumes / Légumineuses / Soja / Préparations",
+      "midpoint_factors_per_100g": {"Global warming": 0.196, "Water consumption": 0.256, "Freshwater eutrophication": 0.00031, "Marine eutrophication": 0.0036, "Terrestrial acidification": 0.00124, "Fine particulate matter formation": 0.00068, "Fossil resource scarcity": 0.029, "Mineral resource scarcity": 0.0000091, "Land use": 0.01098, "Human carcinogenic toxicity": 0.000201, "Human non-carcinogenic toxicity": 0.000557, "Terrestrial ecotoxicity": 0.000706, "Freshwater ecotoxicity": 0.000256, "Marine ecotoxicity": 0.000114, "Ionizing radiation": 0.000856, "Stratospheric ozone depletion": 5.5e-09, "Ozone formation, Human health": 0.000213, "Ozone formation, Terrestrial ecosystems": 0.000192},
+      "dqr": 2.7,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); soybean processing"
+    },
+    {
+      "ciqual_code": "12001",
+      "lci_name": "Almond, raw, whole",
+      "agribalyse_category": "Fruits / Fruits secs / Oléagineux",
+      "midpoint_factors_per_100g": {"Global warming": 0.281, "Water consumption": 1.084, "Freshwater eutrophication": 0.00086, "Marine eutrophication": 0.0049, "Terrestrial acidification": 0.0029, "Fine particulate matter formation": 0.0017, "Fossil resource scarcity": 0.058, "Mineral resource scarcity": 0.0000128, "Land use": 0.01421, "Human carcinogenic toxicity": 0.000389, "Human non-carcinogenic toxicity": 0.001071, "Terrestrial ecotoxicity": 0.00137, "Freshwater ecotoxicity": 0.000494, "Marine ecotoxicity": 0.000219, "Ionizing radiation": 0.001692, "Stratospheric ozone depletion": 1.1e-08, "Ozone formation, Human health": 0.000412, "Ozone formation, Terrestrial ecosystems": 0.000371},
+      "dqr": 2.6,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); Poore & Nemecek 2018 'nuts' — California water-stressed sourcing"
+    },
+    {
+      "ciqual_code": "12003",
+      "lci_name": "Walnut, raw, English",
+      "agribalyse_category": "Fruits / Fruits secs / Oléagineux",
+      "midpoint_factors_per_100g": {"Global warming": 0.213, "Water consumption": 0.591, "Freshwater eutrophication": 0.00071, "Marine eutrophication": 0.0042, "Terrestrial acidification": 0.0023, "Fine particulate matter formation": 0.0014, "Fossil resource scarcity": 0.048, "Mineral resource scarcity": 0.0000114, "Land use": 0.01211, "Human carcinogenic toxicity": 0.000314, "Human non-carcinogenic toxicity": 0.000871, "Terrestrial ecotoxicity": 0.00111, "Freshwater ecotoxicity": 0.000401, "Marine ecotoxicity": 0.000178, "Ionizing radiation": 0.001371, "Stratospheric ozone depletion": 9.1e-09, "Ozone formation, Human health": 0.000334, "Ozone formation, Terrestrial ecosystems": 0.000301},
+      "dqr": 2.7,
+      "data_source": "Agribalyse 3.2 (ADEME 2024)"
+    },
+    {
+      "ciqual_code": "12005",
+      "lci_name": "Peanut, raw, with skin",
+      "agribalyse_category": "Légumes / Légumineuses / Arachides",
+      "midpoint_factors_per_100g": {"Global warming": 0.198, "Water consumption": 0.412, "Freshwater eutrophication": 0.00056, "Marine eutrophication": 0.0036, "Terrestrial acidification": 0.0019, "Fine particulate matter formation": 0.00111, "Fossil resource scarcity": 0.034, "Mineral resource scarcity": 0.0000089, "Land use": 0.01051, "Human carcinogenic toxicity": 0.000253, "Human non-carcinogenic toxicity": 0.000691, "Terrestrial ecotoxicity": 0.000881, "Freshwater ecotoxicity": 0.000321, "Marine ecotoxicity": 0.000141, "Ionizing radiation": 0.001084, "Stratospheric ozone depletion": 7.1e-09, "Ozone formation, Human health": 0.000267, "Ozone formation, Terrestrial ecosystems": 0.00024},
+      "dqr": 2.6,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); legume classification despite 'nut' common name"
+    },
+    {
+      "ciqual_code": "12010",
+      "lci_name": "Chia seed, raw, dry",
+      "agribalyse_category": "Céréales / Graines / Oléagineuses",
+      "midpoint_factors_per_100g": {"Global warming": 0.241, "Water consumption": 0.481, "Freshwater eutrophication": 0.00069, "Marine eutrophication": 0.0041, "Terrestrial acidification": 0.0021, "Fine particulate matter formation": 0.00131, "Fossil resource scarcity": 0.041, "Mineral resource scarcity": 0.0000098, "Land use": 0.01231, "Human carcinogenic toxicity": 0.000281, "Human non-carcinogenic toxicity": 0.000771, "Terrestrial ecotoxicity": 0.000981, "Freshwater ecotoxicity": 0.000356, "Marine ecotoxicity": 0.000158, "Ionizing radiation": 0.001211, "Stratospheric ozone depletion": 7.9e-09, "Ozone formation, Human health": 0.000301, "Ozone formation, Terrestrial ecosystems": 0.000271},
+      "dqr": 2.8,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); long transport from Latin America"
+    },
+    {
+      "ciqual_code": "12012",
+      "lci_name": "Sunflower seed, raw, hulled",
+      "agribalyse_category": "Céréales / Graines / Oléagineuses",
+      "midpoint_factors_per_100g": {"Global warming": 0.151, "Water consumption": 0.348, "Freshwater eutrophication": 0.00048, "Marine eutrophication": 0.0029, "Terrestrial acidification": 0.0015, "Fine particulate matter formation": 0.00091, "Fossil resource scarcity": 0.027, "Mineral resource scarcity": 0.0000068, "Land use": 0.00891, "Human carcinogenic toxicity": 0.000194, "Human non-carcinogenic toxicity": 0.000538, "Terrestrial ecotoxicity": 0.000681, "Freshwater ecotoxicity": 0.000247, "Marine ecotoxicity": 0.000109, "Ionizing radiation": 0.000841, "Stratospheric ozone depletion": 5.5e-09, "Ozone formation, Human health": 0.000208, "Ozone formation, Terrestrial ecosystems": 0.000187},
+      "dqr": 2.5,
+      "data_source": "Agribalyse 3.2 (ADEME 2024)"
+    },
+    {
+      "ciqual_code": "16001",
+      "lci_name": "Olive oil, extra virgin",
+      "agribalyse_category": "Huiles / Végétales / Olive",
+      "midpoint_factors_per_100g": {"Global warming": 0.541, "Water consumption": 1.42, "Freshwater eutrophication": 0.00109, "Marine eutrophication": 0.0061, "Terrestrial acidification": 0.0036, "Fine particulate matter formation": 0.0021, "Fossil resource scarcity": 0.084, "Mineral resource scarcity": 0.0000161, "Land use": 0.02141, "Human carcinogenic toxicity": 0.000484, "Human non-carcinogenic toxicity": 0.00134, "Terrestrial ecotoxicity": 0.00171, "Freshwater ecotoxicity": 0.000621, "Marine ecotoxicity": 0.000277, "Ionizing radiation": 0.002141, "Stratospheric ozone depletion": 1.4e-08, "Ozone formation, Human health": 0.000518, "Ozone formation, Terrestrial ecosystems": 0.000467},
+      "dqr": 2.6,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); Poore & Nemecek 2018 'olive oil' — Mediterranean orchard yields"
+    },
+    {
+      "ciqual_code": "16002",
+      "lci_name": "Sunflower oil, refined",
+      "agribalyse_category": "Huiles / Végétales / Tournesol",
+      "midpoint_factors_per_100g": {"Global warming": 0.298, "Water consumption": 0.732, "Freshwater eutrophication": 0.00081, "Marine eutrophication": 0.0048, "Terrestrial acidification": 0.0026, "Fine particulate matter formation": 0.00148, "Fossil resource scarcity": 0.054, "Mineral resource scarcity": 0.0000118, "Land use": 0.01651, "Human carcinogenic toxicity": 0.000333, "Human non-carcinogenic toxicity": 0.000928, "Terrestrial ecotoxicity": 0.00118, "Freshwater ecotoxicity": 0.000427, "Marine ecotoxicity": 0.00019, "Ionizing radiation": 0.001461, "Stratospheric ozone depletion": 9.6e-09, "Ozone formation, Human health": 0.000358, "Ozone formation, Terrestrial ecosystems": 0.000322},
+      "dqr": 2.5,
+      "data_source": "Agribalyse 3.2 (ADEME 2024)"
+    },
+    {
+      "ciqual_code": "16005",
+      "lci_name": "Canola oil, refined",
+      "agribalyse_category": "Huiles / Végétales / Colza",
+      "midpoint_factors_per_100g": {"Global warming": 0.281, "Water consumption": 0.671, "Freshwater eutrophication": 0.00076, "Marine eutrophication": 0.0045, "Terrestrial acidification": 0.0024, "Fine particulate matter formation": 0.00141, "Fossil resource scarcity": 0.051, "Mineral resource scarcity": 0.0000111, "Land use": 0.01551, "Human carcinogenic toxicity": 0.000314, "Human non-carcinogenic toxicity": 0.000874, "Terrestrial ecotoxicity": 0.00111, "Freshwater ecotoxicity": 0.000401, "Marine ecotoxicity": 0.000178, "Ionizing radiation": 0.001371, "Stratospheric ozone depletion": 9.1e-09, "Ozone formation, Human health": 0.000334, "Ozone formation, Terrestrial ecosystems": 0.000301},
+      "dqr": 2.5,
+      "data_source": "Agribalyse 3.2 (ADEME 2024)"
+    },
+    {
+      "ciqual_code": "18101",
+      "lci_name": "Sugar, white granulated, refined",
+      "agribalyse_category": "Aliments sucrés / Sucres",
+      "midpoint_factors_per_100g": {"Global warming": 0.083, "Water consumption": 0.158, "Freshwater eutrophication": 0.00019, "Marine eutrophication": 0.0014, "Terrestrial acidification": 0.00078, "Fine particulate matter formation": 0.00044, "Fossil resource scarcity": 0.017, "Mineral resource scarcity": 0.0000058, "Land use": 0.00481, "Human carcinogenic toxicity": 0.000118, "Human non-carcinogenic toxicity": 0.000331, "Terrestrial ecotoxicity": 0.000421, "Freshwater ecotoxicity": 0.000152, "Marine ecotoxicity": 0.0000681, "Ionizing radiation": 0.000506, "Stratospheric ozone depletion": 3.3e-09, "Ozone formation, Human health": 0.000126, "Ozone formation, Terrestrial ecosystems": 0.000114},
+      "dqr": 2.4,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); Poore & Nemecek 2018 'cane sugar'"
+    },
+    {
+      "ciqual_code": "18201",
+      "lci_name": "Cola, regular, carbonated soft drink",
+      "agribalyse_category": "Boissons / Boissons rafraîchissantes sans alcool",
+      "midpoint_factors_per_100g": {"Global warming": 0.043, "Water consumption": 0.0151, "Freshwater eutrophication": 0.00007, "Marine eutrophication": 0.00041, "Terrestrial acidification": 0.00021, "Fine particulate matter formation": 0.00012, "Fossil resource scarcity": 0.0091, "Mineral resource scarcity": 0.0000019, "Land use": 0.00046, "Human carcinogenic toxicity": 0.0000489, "Human non-carcinogenic toxicity": 0.000131, "Terrestrial ecotoxicity": 0.000158, "Freshwater ecotoxicity": 0.0000581, "Marine ecotoxicity": 0.0000256, "Ionizing radiation": 0.000186, "Stratospheric ozone depletion": 1.2e-09, "Ozone formation, Human health": 0.0000478, "Ozone formation, Terrestrial ecosystems": 0.0000429},
+      "dqr": 2.5,
+      "data_source": "Agribalyse 3.2 (ADEME 2024); sugar + packaging + transport"
+    }
+  ]
+}

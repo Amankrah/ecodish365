@@ -1,25 +1,76 @@
 import logging
-from typing import Dict, Optional
+from typing import Any, Dict, List, Optional, Tuple
 import openai
 from ..database.cnf_integrator import HENICNFIntegrator
 from ..config.heni_factors import HENI_RISK_FACTOR_KEYS
 from .rule_based_categorizer import RuleBasedCategorizer
 import json
 
+
+_PROVIDER_DEFAULT_MODELS = {
+    "openai": "gpt-4o-mini",
+    "anthropic": "claude-haiku-4-5-20251001",
+    "gemini": "gemini-2.5-flash",
+}
+
+
 class LLMFoodCategorizer:
     """Efficient LLM-based food categorizer for HENI risk factors.
     Uses rule-based categorization first, LLM only as fallback or augmentation.
+
+    Supports per-provider routing for Scenario S1 multi-provider robustness
+    checks (Ase et al., 2026 — multi-model "dominant" consensus matched or
+    slightly beat any single model on every metric). The production default
+    remains `openai`/`gpt-4o-mini` at temperature 0; alternative providers
+    are lazy-imported so non-default Python clients (`anthropic`, `google-genai`)
+    stay out of the default install footprint.
     """
-    
-    def __init__(self, cnf_integrator: HENICNFIntegrator, api_key: str):
+
+    def __init__(
+        self,
+        cnf_integrator: HENICNFIntegrator,
+        api_key: str,
+        provider: str = "openai",
+        model: Optional[str] = None,
+    ):
         self.cnf_integrator = cnf_integrator
-        self.client = openai.OpenAI(api_key=api_key) if api_key else None
         self.heni_risk_factors = sorted(HENI_RISK_FACTOR_KEYS)
         self.categorization_cache = {}
         self.logger = logging.getLogger(__name__)
-        
+
+        # Provider routing — production default is openai/gpt-4o-mini.
+        if provider not in _PROVIDER_DEFAULT_MODELS:
+            raise ValueError(
+                f"Unknown provider {provider!r}; expected one of "
+                f"{sorted(_PROVIDER_DEFAULT_MODELS)}."
+            )
+        self.provider = provider
+        self.model = model or _PROVIDER_DEFAULT_MODELS[provider]
+
+        if provider == "openai":
+            self.client = openai.OpenAI(api_key=api_key) if api_key else None
+        elif provider == "anthropic":
+            try:
+                import anthropic  # lazy import; not in default requirements.
+            except ImportError as exc:  # pragma: no cover - explicit error path
+                raise ImportError(
+                    "provider='anthropic' requires the `anthropic` package "
+                    "(`pip install anthropic`). It is not in the default "
+                    "requirements.txt; see GROUP-D-CODE-1.x-C in code_action_items.md."
+                ) from exc
+            self.client = anthropic.Anthropic(api_key=api_key) if api_key else None
+        elif provider == "gemini":
+            try:
+                from google import genai  # lazy import; not in default requirements.
+            except ImportError as exc:  # pragma: no cover - explicit error path
+                raise ImportError(
+                    "provider='gemini' requires the `google-genai` package "
+                    "(`pip install google-genai`). It is not in the default "
+                    "requirements.txt; see GROUP-D-CODE-1.x-C in code_action_items.md."
+                ) from exc
+            self.client = genai.Client(api_key=api_key) if api_key else None
+
         # Cost efficiency settings
-        self.model = "gpt-4o-mini"  # Most cost-effective model
         self.max_tokens = 150  # Keep responses concise
         self.temperature = 0  # Deterministic responses
     
@@ -233,20 +284,143 @@ Task: Determine presence of these HENI risk factors (0-1 scale):
         return categories
 
     def _query_llm_efficient(self, prompt: str) -> str:
-        """Cost-efficient LLM query with optimized parameters."""
-        response = self.client.chat.completions.create(
-            model=self.model,  # gpt-4o-mini for cost efficiency
-            messages=[
-                {
-                    "role": "system", 
-                    "content": "You are a precise nutrition expert. Analyze foods for HENI health risk factors. Respond concisely with JSON only."
-                },
-                {"role": "user", "content": prompt}
-            ],
-            temperature=self.temperature,
-            max_tokens=self.max_tokens
+        """Cost-efficient LLM query with optimized parameters.
+
+        Routes through the active provider. All three providers run at
+        `self.temperature` (0) for determinism, deliberately distinct from
+        Ase et al. (2026) `temperature=1.0`; their numbers therefore are not
+        a like-for-like baseline for this categorizer.
+        """
+        system_prompt = (
+            "You are a precise nutrition expert. Analyze foods for HENI "
+            "health risk factors. Respond concisely with JSON only."
         )
-        return response.choices[0].message.content
+
+        if self.provider == "openai":
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=self.temperature,
+                max_tokens=self.max_tokens,
+            )
+            return response.choices[0].message.content
+
+        if self.provider == "anthropic":
+            response = self.client.messages.create(
+                model=self.model,
+                max_tokens=self.max_tokens,
+                temperature=self.temperature,
+                system=system_prompt,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            # Anthropic returns a list of content blocks; concatenate text.
+            return "".join(
+                block.text for block in response.content if getattr(block, "text", None)
+            )
+
+        if self.provider == "gemini":
+            # google-genai unified API.
+            response = self.client.models.generate_content(
+                model=self.model,
+                contents=f"{system_prompt}\n\n{prompt}",
+                config={
+                    "temperature": self.temperature,
+                    "max_output_tokens": self.max_tokens,
+                },
+            )
+            return response.text
+
+        raise RuntimeError(f"Unreachable: unknown provider {self.provider!r}")  # pragma: no cover
+
+    def categorize_food_with_audit(
+        self, food_id: int
+    ) -> Tuple[Dict[str, float], Dict[str, Any]]:
+        """Like categorize_food(), but additionally returns a structured audit dict.
+
+        Audit dict schema (for Scenario S1 per-factor reporting and per-provider
+        ablation):
+            {
+                "food_id": int,
+                "rule_confidence_per_factor": Dict[str, float],
+                "llm_invoked": bool,
+                "llm_provider": str | None,   # None when LLM not invoked
+                "llm_model": str | None,
+                "llm_factors_queried": List[str],
+                "llm_response_raw": str | None,
+                "merge_strategy": str,    # "rule_only" | "llm_fills_gaps"
+                "final_scores": Dict[str, float],
+            }
+
+        The existing categorize_food() signature is unchanged.
+        """
+        food_description = self.cnf_integrator.get_food_description(food_id)
+        nutrient_data = self.cnf_integrator.get_nutrient_data(food_id)
+        food_group = self.cnf_integrator.get_food_group(food_id)
+
+        rule_based_categories = RuleBasedCategorizer.categorize_heni_factors(
+            food_group, nutrient_data, food_description
+        )
+        rule_confidence_snapshot = dict(rule_based_categories)
+
+        audit: Dict[str, Any] = {
+            "food_id": food_id,
+            "rule_confidence_per_factor": rule_confidence_snapshot,
+            "llm_invoked": False,
+            "llm_provider": None,
+            "llm_model": None,
+            "llm_factors_queried": [],
+            "llm_response_raw": None,
+            "merge_strategy": "rule_only",
+            "final_scores": {},
+        }
+
+        final_categories = rule_based_categories.copy()
+
+        if self.client and self._should_use_llm(rule_based_categories, food_description):
+            try:
+                prompt = self._create_heni_prompt(
+                    food_description, food_group, rule_based_categories
+                )
+                if prompt:
+                    factors_queried: List[str] = []
+                    for factor in self.heni_risk_factors:
+                        if (
+                            factor not in rule_based_categories
+                            or rule_based_categories[factor] < 0.3
+                        ):
+                            factors_queried.append(factor)
+                    factors_queried = factors_queried[:5]
+
+                    llm_response_raw = self._query_llm_efficient(prompt)
+                    llm_categories = self._parse_llm_json_response(llm_response_raw)
+                    final_categories = self._merge_categorizations(
+                        rule_based_categories, llm_categories
+                    )
+
+                    audit.update(
+                        llm_invoked=True,
+                        llm_provider=self.provider,
+                        llm_model=self.model,
+                        llm_factors_queried=factors_queried,
+                        llm_response_raw=llm_response_raw,
+                        merge_strategy="llm_fills_gaps",
+                    )
+            except Exception as exc:  # noqa: BLE001 - audit-only fallthrough
+                self.logger.warning(
+                    f"LLM categorization failed for {food_id}, using rule-based only: {exc}"
+                )
+                audit["llm_response_raw"] = f"ERROR: {exc!r}"
+
+        final_categories = self._validate_and_adjust_categories(
+            final_categories, food_group, nutrient_data
+        )
+        audit["final_scores"] = dict(final_categories)
+
+        self.categorization_cache[food_id] = final_categories
+        return final_categories, audit
 
     def _parse_llm_json_response(self, response: str) -> Dict[str, float]:
         """Parse JSON response from LLM with error handling."""

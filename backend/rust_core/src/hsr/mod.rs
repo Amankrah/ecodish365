@@ -18,16 +18,29 @@ use threshold_data::bundle_for_category_value;
 /// Mirrors `ThresholdProvider.calculate_hsr_points` in
 /// `backend/hsr_calculator/hsr/providers/threshold_provider.py`.
 ///
-/// Semantics: points = number of leading thresholds the value meets or exceeds,
-/// stopping at the first threshold it does not exceed. An infinite first
-/// threshold (sentinel for "not applicable") returns 0.
+/// Semantics: points = number of leading thresholds the value *strictly
+/// exceeds*, stopping at the first miss. This implements v9's standard
+/// "≤X earns N points, >X earns N+1 points" convention (HSRC v9 Tables 1–6,
+/// HSRAC 10 December 2025).
+///
+/// Two sentinel handlings:
+/// - **Positive-infinity first threshold** (e.g. saturated fat for Cat 1):
+///   returns 0 unconditionally — the nutrient is "not applicable" for this
+///   category.
+/// - **Negative-infinity first threshold** (used for Cat 1 baseline energy
+///   per v9 Table 3, which has no zero-point bucket): always counts as
+///   exceeded, ensuring minimum 1 point even at energy = 0.
 pub(crate) fn calculate_hsr_points_inner(value: f64, thresholds: &[f64]) -> u32 {
-    if thresholds.is_empty() || thresholds[0].is_infinite() {
+    if thresholds.is_empty() {
+        return 0;
+    }
+    // Sentinel: "not applicable" — first threshold = +∞.
+    if thresholds[0].is_infinite() && thresholds[0].is_sign_positive() {
         return 0;
     }
     let mut points: u32 = 0;
     for &t in thresholds.iter() {
-        if value >= t {
+        if value > t {
             points += 1;
         } else {
             break;
@@ -232,27 +245,87 @@ mod tests {
     use super::*;
 
     #[test]
-    fn calculate_hsr_points_counts_leading_thresholds() {
-        assert_eq!(
-            calculate_hsr_points_inner(5.0, &[0.0, 2.0, 4.0, 6.0, 8.0]),
-            3
-        );
-        assert_eq!(calculate_hsr_points_inner(10.0, &[0.0, 2.0, 4.0]), 3);
+    fn calculate_hsr_points_strict_greater_semantics() {
+        // v9 convention: "≤X earns N points, >X earns N+1 points".
+        // For thresholds [0, 2, 4, 6, 8]:
+        //   value 5 → 5>0 yes, 5>2 yes, 5>4 yes, 5>6 no → 3 pts
+        //   value 4 → 4>0 yes, 4>2 yes, 4>4 NO         → 2 pts (was 3 under >=)
+        //   value 0 → 0>0 NO                            → 0 pts (was 1 under >=)
+        //   value 10 → 10>0,2,4,6,8 all yes              → 5 pts
+        //   value 1 → 1>0 yes, 1>2 no                   → 1 pt
+        assert_eq!(calculate_hsr_points_inner(5.0, &[0.0, 2.0, 4.0, 6.0, 8.0]), 3);
+        assert_eq!(calculate_hsr_points_inner(4.0, &[0.0, 2.0, 4.0]), 2);
+        assert_eq!(calculate_hsr_points_inner(0.0, &[0.0, 2.0, 4.0]), 0);
+        assert_eq!(calculate_hsr_points_inner(10.0, &[0.0, 2.0, 4.0, 6.0, 8.0]), 5);
         assert_eq!(calculate_hsr_points_inner(1.0, &[0.0, 2.0, 4.0]), 1);
     }
 
     #[test]
-    fn calculate_hsr_points_empty_or_infinite_first_returns_zero() {
+    fn calculate_hsr_points_v9_sodium_boundary() {
+        // v9 Cat 2 sodium: ≤90 → 0 pts, >90 → 1 pt, >180 → 2 pts.
+        let sod = &[90.0, 180.0, 270.0, 360.0];
+        assert_eq!(calculate_hsr_points_inner(0.0, sod), 0);
+        assert_eq!(calculate_hsr_points_inner(89.0, sod), 0);
+        assert_eq!(calculate_hsr_points_inner(90.0, sod), 0);  // ≤90 → 0 pts
+        assert_eq!(calculate_hsr_points_inner(91.0, sod), 1);  // >90 → 1 pt
+        assert_eq!(calculate_hsr_points_inner(180.0, sod), 1); // ≤180 → 1 pt
+        assert_eq!(calculate_hsr_points_inner(181.0, sod), 2); // >180 → 2 pts
+        assert_eq!(calculate_hsr_points_inner(500.0, sod), 4); // > all → 4 pts
+    }
+
+    #[test]
+    fn calculate_hsr_points_neg_infinity_first_always_counts() {
+        // Cat 1 energy uses NEG_INFINITY for the "no zero-point bucket" rule:
+        // any energy ≥ 0 still earns at least 1 point.
+        let energy_cat1 = &[f64::NEG_INFINITY, 31.0, 61.0, 91.0];
+        assert_eq!(calculate_hsr_points_inner(0.0, energy_cat1), 1);
+        assert_eq!(calculate_hsr_points_inner(31.0, energy_cat1), 1);
+        assert_eq!(calculate_hsr_points_inner(32.0, energy_cat1), 2);
+        assert_eq!(calculate_hsr_points_inner(100.0, energy_cat1), 4);
+    }
+
+    #[test]
+    fn calculate_hsr_points_empty_or_positive_infinite_first_returns_zero() {
         assert_eq!(calculate_hsr_points_inner(100.0, &[]), 0);
+        // Positive infinity = "not applicable" sentinel (sat fat for Cat 1, etc.).
         assert_eq!(calculate_hsr_points_inner(100.0, &[f64::INFINITY, 0.0]), 0);
     }
 
     #[test]
-    fn convert_score_to_stars_matches_lower_is_better() {
-        let stars = [4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0];
-        assert!((convert_score_to_stars_inner(3, &stars) - 5.0).abs() < f64::EPSILON);
-        assert!((convert_score_to_stars_inner(4, &stars) - 5.0).abs() < f64::EPSILON);
-        assert!((convert_score_to_stars_inner(5, &stars) - 4.5).abs() < f64::EPSILON);
+    fn convert_score_to_stars_matches_v9_cat1d() {
+        // v9 Table 7 Cat 1D: score ≤-2 → 5.0, -1 → 4.5, 0 → 4.0, 1 → 3.5,
+        //                    2 → 3.0, 3 → 2.5, 4 → 2.0, 5 → 1.5, 6 → 1.0, ≥7 → 0.5.
+        let stars = [-2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
+        assert!((convert_score_to_stars_inner(-3, &stars) - 5.0).abs() < f64::EPSILON);
+        assert!((convert_score_to_stars_inner(-2, &stars) - 5.0).abs() < f64::EPSILON);
+        assert!((convert_score_to_stars_inner(-1, &stars) - 4.5).abs() < f64::EPSILON);
+        assert!((convert_score_to_stars_inner(0, &stars) - 4.0).abs() < f64::EPSILON);
+        assert!((convert_score_to_stars_inner(6, &stars) - 1.0).abs() < f64::EPSILON);
+        assert!((convert_score_to_stars_inner(7, &stars) - 0.5).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn convert_score_to_stars_v9_cat2_reaches_5_stars() {
+        // v9 Table 7 Cat 2: score ≤ -11 → 5.0 stars (the top band, reachable
+        // numerically by foods like raw chia, plain rolled oats, vegetables).
+        let stars = [-11.0, -7.0, -2.0, 2.0, 6.0, 11.0, 15.0, 20.0, 24.0];
+        assert!((convert_score_to_stars_inner(-15, &stars) - 5.0).abs() < f64::EPSILON);
+        assert!((convert_score_to_stars_inner(-11, &stars) - 5.0).abs() < f64::EPSILON);
+        assert!((convert_score_to_stars_inner(-10, &stars) - 4.5).abs() < f64::EPSILON);
+        assert!((convert_score_to_stars_inner(24, &stars) - 1.0).abs() < f64::EPSILON);
+        assert!((convert_score_to_stars_inner(25, &stars) - 0.5).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn convert_score_to_stars_cat1_neg_inf_padding_unreachable_numerically() {
+        // v9 Table 7 Cat 1: 5.0 and 4.5 reserved for name overrides (Water /
+        // Unsweetened Flavoured water). Numeric scoring can never reach 5.0/4.5.
+        let stars = [f64::NEG_INFINITY, f64::NEG_INFINITY, 0.0, 1.0, 3.0, 5.0, 7.0, 9.0, 11.0];
+        // Any score below -∞ is impossible, so 4.0 is the highest numeric star.
+        assert!((convert_score_to_stars_inner(-100, &stars) - 4.0).abs() < f64::EPSILON);
+        assert!((convert_score_to_stars_inner(0, &stars) - 4.0).abs() < f64::EPSILON);
+        assert!((convert_score_to_stars_inner(1, &stars) - 3.5).abs() < f64::EPSILON);
+        assert!((convert_score_to_stars_inner(11, &stars) - 1.0).abs() < f64::EPSILON);
         assert!((convert_score_to_stars_inner(12, &stars) - 0.5).abs() < f64::EPSILON);
     }
 
@@ -272,7 +345,9 @@ mod tests {
         );
         let e = calculate_hsr_points_inner(1500.0, CATEGORY_2.energy) as i32;
         assert_eq!(s.energy_points, e);
-        let final_exp = (s.baseline_points - s.modifying_points).max(0);
+        // Final score after HSR-CODE-1 is no longer clamped at 0 — beneficial
+        // foods (high P/F/V) can yield strongly negative scores → 5.0 stars.
+        let final_exp = s.baseline_points - s.modifying_points;
         assert_eq!(s.final_score, final_exp);
     }
 }

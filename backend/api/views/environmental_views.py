@@ -14,6 +14,38 @@ from environmental_impact_model.src.cnf_integrator import get_cnf_integrator
 from environmental_impact_model.src.utils import format_impact_value, categorize_sustainability_score
 from api.seo_utils import seo_metadata
 
+import os
+import threading
+# §3.5 GROUP-D-RECONCILIATION: lazy-initialized, module-cached LCAMatcher.
+# Activation is gated on the `enable_lca_matcher` request flag (default false);
+# when off, the matcher is never constructed and the existing group-default
+# LCA path is bit-for-bit identical to the pre-matcher pipeline.
+_LCA_MATCHER_CACHE = {"instance": None, "tried": False}
+_LCA_MATCHER_LOCK = threading.Lock()
+
+
+def _get_default_lca_matcher():
+    """Return a singleton LCAMatcher (or None if construction failed or no
+    API key is available and we want to suppress the degraded retrieval-only
+    mode in production). Constructs on first call only.
+    """
+    with _LCA_MATCHER_LOCK:
+        if _LCA_MATCHER_CACHE["instance"] is not None or _LCA_MATCHER_CACHE["tried"]:
+            return _LCA_MATCHER_CACHE["instance"]
+        _LCA_MATCHER_CACHE["tried"] = True
+        try:
+            from environmental_impact_model.src.lca_matcher import build_default_matcher
+            api_key = os.environ.get("OPENAI_API_KEY")
+            matcher = build_default_matcher(api_key=api_key)
+            _LCA_MATCHER_CACHE["instance"] = matcher
+            return matcher
+        except Exception as exc:  # noqa: BLE001 - log + degrade
+            logging.getLogger(__name__).warning(
+                "Failed to construct default LCA matcher; falling back to "
+                "group-default LCA only: %s", exc,
+            )
+            return None
+
 logger = logging.getLogger(__name__)
 
 def get_user_explanations(user_type: str = "individual") -> Dict[str, Dict[str, str]]:
@@ -375,7 +407,10 @@ def environmental_impact(request):
         # Get request parameters
         food_data = request.data.get('foods', [])
         user_type = request.data.get('user_type', 'individual')  # individual, researcher, policy
-        
+        # §3.5 LCA matcher flag (default off — preserves existing behaviour bit-for-bit).
+        enable_lca_matcher = bool(request.data.get('enable_lca_matcher', False))
+        matcher = _get_default_lca_matcher() if enable_lca_matcher else None
+
         if not food_data:
             return Response({
                 "error": "No food data provided. Please include 'foods' array with food_id and quantity.",
@@ -402,7 +437,7 @@ def environmental_impact(request):
         meal = EnvMeal(foods)
         
         # Perform comprehensive analysis
-        comprehensive_analysis = _analyze_meal_comprehensive(meal, data_loader)
+        comprehensive_analysis = _analyze_meal_comprehensive(meal, data_loader, matcher=matcher)
         
         # Format results with user-appropriate explanations
         formatted_results = format_environmental_results(comprehensive_analysis, user_type)
@@ -447,8 +482,13 @@ def environmental_impact(request):
             "help": "Please try again or contact support if the problem persists."
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-def _analyze_meal_comprehensive(meal: EnvMeal, data_loader: EnvDataLoader) -> Dict[str, Any]:
-    """Perform comprehensive meal analysis including LCA, monetization, and reference comparisons."""
+def _analyze_meal_comprehensive(meal: EnvMeal, data_loader: EnvDataLoader, matcher=None) -> Dict[str, Any]:
+    """Perform comprehensive meal analysis including LCA, monetization, and reference comparisons.
+
+    When `matcher` is provided (§3.5 GROUP-D-RECONCILIATION), the per-food impact
+    factors come from the matcher's Agribalyse mapping at confidence ≥ threshold,
+    with logged fallback to the existing cnf_integrator group-default path.
+    """
     try:
         # Basic meal info
         # Basic meal info
@@ -515,7 +555,7 @@ def _analyze_meal_comprehensive(meal: EnvMeal, data_loader: EnvDataLoader) -> Di
         }
         
         # Life Cycle Assessment
-        lca = LifeCycleAssessment(meal)
+        lca = LifeCycleAssessment(meal, matcher=matcher)
         lca_results = lca.perform_lcia()
         endpoint_impacts = lca.calculate_endpoint_impacts()
         single_score = lca.calculate_single_score()
@@ -529,6 +569,12 @@ def _analyze_meal_comprehensive(meal: EnvMeal, data_loader: EnvDataLoader) -> Di
             # Methodology version + endpoint factor provenance (CODE-2).
             'data_quality': lca.get_data_quality_report(),
         }
+        # §3.5 GROUP-D-RECONCILIATION: surface matcher audit trail when active.
+        if matcher is not None:
+            lca_data['lca_matcher_decisions'] = lca.matcher_decisions
+            lca_data['lca_matcher_enabled'] = True
+        else:
+            lca_data['lca_matcher_enabled'] = False
 
         # Monetization
         monetization = Monetization(lca_results, data_loader)

@@ -2426,7 +2426,517 @@ C21 is a methods preprint proposing a modified Disability-Adjusted Life Years ap
 
 ## Group D. AI / LLMs for food classification and LCA
 
-*Pending: papers D22 through D27.*
+### D22. Ase, Borowicz, Rakocy & Piekarska (2026) — LLMs for real-world nutrition assessment: structured prompts, multi-model validation, expert oversight [★★★]
+
+> ⚠️ **CITATION CORRECTION — READ FIRST.** The wishlist (entry 22) and the current manuscript reference list (ref. 36) attribute this paper to **"Wijesinghe DGNG, et al."** This is **wrong.** The DOI (10.3390/nu18010023), title, journal, volume/issue and page (*Nutrients* 2026;18(1):23) all match the wishlist exactly, so it is the intended paper — but the actual authors are **Aia Ase, Jacek Borowicz, Kamil Rakocy and Barbara Piekarska** (Medical University of Warsaw). The "Wijesinghe" name appears nowhere in the article (not as author, not in the reference list). **Action:** correct ref. 36 in `manuscript_call1.md` and every in-text citation that currently reads "Wijesinghe et al., 2026" (§2.2, §3.4) to "Ase et al., 2026." All bracketed-URL citations in the draft (§1.1, §2.2) point to the correct DOI and need no URL change, only author-name correction where a name is given.
+
+**Citation.** Ase A, Borowicz J, Rakocy K, Piekarska B. Large Language Models for Real-World Nutrition Assessment: Structured Prompts, Multi-Model Validation and Expert Oversight. *Nutrients.* 2026;18(1):23. doi:10.3390/nu18010023.
+
+**DOI.** 10.3390/nu18010023
+
+**Access.** Open access (CC BY 4.0). Received 29 Oct 2025; accepted 17 Dec 2025; published 20 Dec 2025. 16 pp.
+
+**Type.** Original research — observational LLM-vs-expert classification benchmark on a real-world clinical dataset.
+
+---
+
+#### Study design at a glance (p. 3, §2.1; Figure 1, p. 6)
+
+- **Dataset.** 1992 food items drawn from the personal-cabinet ("off-menu") food supplies of residents in Polish long-term care facilities (LTCFs), within a larger 2017–2021 longitudinal cohort of 1000 LTCF residents funded by the Polish Ministry of Health (National Health Program 2016–2020). Items are foods purchased by residents or brought by family, i.e. *not* part of the prescribed facility diet — deliberately chosen to stress-test real-world, irregular descriptions.
+- **Language.** All items kept in **Polish** (native language retained on purpose; the authors argue Polish morphology aids LLM disambiguation, p. 10–11 §4.3, citing the RULER multilingual benchmark, ref. 26).
+- **Models (release dates given p. 3).** Claude Opus 4.5 (Anthropic, 24 Nov 2025); Gemini 3 pro (Google, 18 Nov 2025); GPT-5.1-chat-latest (OpenAI, 12 Nov 2025). All accessed via API on 30 Nov 2025.
+- **Temperature = 1.0 for all three models** (p. 5, §2.6) — chosen because Gemini's docs warn against lowering temperature below 1.0; the authors wanted "as-is" default behaviour. **NB for our §3.4:** our pipeline uses `temperature 0`; this is a deliberate design divergence, not an error, but it means this paper's numbers are *not* a like-for-like baseline for a temperature-0 categorizer.
+- **Task.** Binary **healthy / unhealthy** classification — *not* GBD-risk-factor mapping. UNHEALTHY = positive class for all metrics.
+- **Gold standard.** Two human experts: expert 1 classifies + justifies; expert 2 reviews and corrects expert 1 to form a consensus reference (p. 4–5, §2.5). Experts told to judge "holistically and generally," not tailored to LTCF clinical needs. **No inter-rater κ is reported** (the second expert corrects rather than independently rates), which contrasts with our S1 plan to report Cohen's κ between two dietitians.
+- **Reference distribution (p. 7, §3.1).** 41.9% healthy (n = 835); 58.1% unhealthy (n = 1157).
+
+---
+
+#### The two prompt designs (p. 3–4, §2.2–2.4) — directly relevant to our §3.4
+
+**Structured "double-step" prompt (NOVA + WHO):**
+1. *Step 1 — NOVA:* "Act as a helpful dietary assistant. Classify the following food products as 'healthy' or 'unhealthy'… consider foods unhealthy if they are… ultra-processed according to the NOVA classification system. For each product, provide details in the following format: {product, weight (g), calories, classification}. Finally, sum the total calories for each category."
+2. *Step 2 — WHO thresholds (only on items passed as HEALTHY in Step 1):* reclassify as unhealthy if exceeding WHO limits — **free sugars > 10% of total energy, saturated fat > 10%, sodium > 2 g/day.**
+
+**Simplified single-step prompt:** "Evaluate each product as healthy or unhealthy and explain why — in two columns: 'evaluation' and 'description.'"
+
+This is a clean, citable example of the *exact* structured-prompt-with-explicit-criteria-plus-JSON-shaped-output design our HENI categorizer uses, and a precedent for constraining the LLM to a defined rubric. Worth citing in §3.4 next to the Barrett et al. (2025) "LLMs could… facilitate… interpretation of ingredients lists" endorsement.
+
+---
+
+#### Tables to reference (do NOT need full reproduction; cite selectively in §4.1 framing)
+
+**Table 2 (p. 7) — double-step (NOVA+WHO) metrics, UNHEALTHY = positive (N = 1992):**
+
+| Model | Acc | Prec | Recall | F1 | Spec |
+|---|---|---|---|---|---|
+| GPT-5.1-chat-latest | 0.904 | 0.870 | 0.980 | 0.922 | 0.798 |
+| Claude Opus 4.5 | 0.913 | 0.895 | 0.963 | 0.928 | 0.844 |
+| Gemini 3 pro | 0.913 | 0.881 | 0.982 | 0.929 | 0.817 |
+| Dominant (consensus) | 0.910 | 0.881 | 0.977 | 0.927 | 0.818 |
+
+**Table 4 (p. 8) — simplified single-step metrics, same ground truth:**
+
+| Model | Acc | Prec | Recall | F1 | Spec |
+|---|---|---|---|---|---|
+| GPT-5.1-chat-latest | 0.936 | 0.928 | 0.964 | 0.946 | 0.897 |
+| Claude Opus 4.5 | 0.927 | 0.962 | 0.909 | 0.935 | 0.951 |
+| Gemini 3 pro | 0.928 | 0.958 | 0.916 | 0.937 | 0.944 |
+| Dominant (consensus) | 0.942 | 0.962 | 0.937 | 0.949 | 0.948 |
+
+**Headline numbers for in-text use:**
+- Overall LLM–expert agreement: **90.3–94.2%** across both prompts (the figure our draft already cites).
+- Double-step agreement 90.3–91.3% (Opus highest, 91.3%); simplified agreement 92.5–93.6% (GPT highest, 93.6%; dominant consensus 94.2%) — p. 7–8, §3.2–3.3.
+- F1 range **0.922–0.949** (UNHEALTHY positive class) — note this is far above the NutriRAG F1 ≈ 0.82 our §2.2 cites for D23; useful as the upper end of plausible S1 performance.
+- Share labelled unhealthy: **64.4% under double-step vs 56.6% under simplified** (p. 10, §4.2).
+- Pearson χ²: **all 36 pairwise comparisons significant, χ² 1174.5–1897.1, df = 1, p < 0.001** (Table 5, p. 9). Most divergent pair: WHO Gemini vs WHO Dominant (1897.1). LLMs vs human expert: χ² 1296.6–1547.6.
+
+---
+
+#### Findings worth flagging in our framing (§2.2 nuance + §4.1 / §4.6)
+
+1. **"Structured prompts" ≠ "higher agreement" here — important nuance for §2.2.** Our draft §2.2 currently says LLMs reach "near-expert classification with structured prompts (Wijesinghe et al., 2026)." In this paper the *structured* (double-step) prompt actually produced **lower** total agreement and lower specificity than the *simplified* prompt; its advantage was very high Recall on UNHEALTHY (0.963–0.982) at the cost of Specificity (0.798–0.844). The honest reading is: structured prompts maximise guideline adherence and sensitivity (safety-oriented), simplified prompts track holistic human judgment better. Recommend softening §2.2 to reflect the recall/specificity trade-off rather than implying structured prompts are uniformly superior.
+2. **Conservative ("safety") bias (p. 11, §4.4).** All models, especially under structured prompts, default to "unhealthy" when ingredient detail is incomplete. The authors frame false negatives as more harmful than false positives in clinical settings. This is a useful precedent for how we discuss our categorizer's error asymmetry in §4.1.
+3. **Multi-model consensus ("dominant") matched or slightly beat the best single model** across metrics under both prompts (e.g. dominant simplified Acc 0.942, F1 0.949). Supports any multi-model voting we propose; our pipeline is currently single-model (`gpt-4o-mini`), so this is a possible robustness extension to mention.
+4. **Workflow-efficiency argument (p. 11, §4.5)** mirrors our own motivation: with 90–94% pre-correct, experts shift from classifying-from-scratch to review-and-refine, focusing on the 6–10% borderline cases. This pairs well with our §1.2 ">75 RD-hours" Hutchinson (B8) point.
+
+---
+
+#### Author-flagged limitations (§4.7, p. 12 — for engagement in our §7)
+
+1. Accuracy is bounded by completeness of product descriptions; ambiguous/poorly-described items drive errors.
+2. Polish-language advantage may not transfer to less morphologically inflected languages — multilingual validation needed (relevant caveat: our pipeline is English-language CNF, so the Polish-specific gains here do **not** carry over and we should not over-claim from this paper).
+3. Current LLMs lack true multimodal reasoning (cannot read labels/ingredient photos directly).
+4. Population mismatch: experts judged "holistically/generally," not against LTCF-specific clinical needs, so the reference standard may not reflect the target population's actual nutritional constraints.
+
+---
+
+#### Three-sentence relevance note
+
+This is the most contemporaneous, directly-on-point benchmark of frontier LLMs (incl. Claude Opus 4.5) on expert-validated food classification, and it is the empirical anchor for our claim (§1.1, §2.2) that LLMs reach near-expert accuracy under structured prompts — properly recited as **Ase et al., 2026**, not Wijesinghe. Its structured NOVA+WHO double-step prompt with JSON-shaped output is a clean published precedent for the rule-anchored, criteria-explicit prompting our §3.4 categorizer uses, and its 90.3–94.2% agreement plus 0.922–0.949 F1 set a realistic upper expectation for our S1 benchmark (tempered by the facts that its task is binary healthy/unhealthy rather than 16-component GBD mapping, it ran at temperature 1.0 rather than our 0, and its gains are partly Polish-language-specific). The recall-vs-specificity trade-off it documents (structured = high recall/low specificity; simplified = balanced) should be folded into both our §2.2 description and our §4.1 discussion of categorizer error asymmetry, and its two-expert consensus design is a near-parallel to our planned S1 gold standard (though it reports no inter-rater κ, which we will).
+
+---
+
+### D23. Zhou, Chow, Harnack et al. (2025) — NutriRAG: retrieval-augmented LLMs for food identification and classification [★★★]
+
+> ⚠️ **CITATION / VERSION FLAGS — READ FIRST.**
+> 1. **This is a non-peer-reviewed medRxiv preprint** (doi:10.1101/2025.03.19.25324268, v1 posted 20 March 2025), explicitly stamped "not certified by peer review… should not be used to guide clinical practice." The wishlist (entry 23) and manuscript ref. 37 cite it as **"PMC PMC11957177."** A PMC accession usually implies a peer-reviewed *published* version. **Action:** reconcile these — if PMC11957177 is a published version of this exact work, (a) re-verify the F1 numbers against the published copy before final submission (preprint values can shift in review), (b) update the citation type from "preprint" to the published journal/venue, and (c) re-cite as **Zhou et al., 2025** (lead author Huixue Zhou; corresponding author Rui Zhang, U Minnesota). The manuscript ref. 37 currently reads "NutriRAG authors," which should become the proper author list.
+> 2. **Licence is CC-BY-ND 4.0** (No Derivatives). We may cite and quote within normal limits, but must NOT reproduce or adapt their figures/tables as derivatives. We don't need to reproduce any of their tables, so this is low-risk, but worth noting in case anyone wants to lift Figure 2.
+
+**Citation.** Zhou H, Chow LS, Harnack L, Panda S, Manoogian ENC, Li M, Xiao Y, Zhang R. NutriRAG: Unleashing the Power of Large Language Models for Food Identification and Classification through Retrieval Methods. *medRxiv* [preprint]. 2025 Mar 20. doi:10.1101/2025.03.19.25324268. (Wishlist/manuscript cite PMC11957177 — see flag above.)
+
+**DOI.** 10.1101/2025.03.19.25324268 (preprint). Word count 3286.
+
+**Type.** Methods preprint — a retrieval-augmented-generation (RAG) NER framework for classifying free-text diet-app food entries, applied within a 12-week RCT.
+
+---
+
+#### What the "F1 ≈ 0.82" in our §2.2 actually refers to (p. 11, Table)
+
+Our draft §2.2 states "Retrieval-augmented approaches reach F1 ≈ 0.82 on food identification and classification tasks (NutriRAG, 2025)." **Confirmed:** the number is the **retrieval-augmented GPT-4 Micro F1 = 82.24**, the single best model in their Table (vs **73.84** for standard, non-RAG GPT-4 — a +8.4-point RAG gain, the paper's headline finding, Results p. 11 and Discussion p. 17).
+
+**Critical qualifiers to keep our §2.2 honest:**
+- It is a **micro-averaged F1** on a **51-class** food-classification/NER task over **free-text diet-tracking-app entries**, evaluated on a **182-entry test set** (gold standard hand-labelled by NDSR-certified staff against the Nutrition Coordinating Center [NCC] Food Database's 51 classes). It is **not** a binary task (contrast D22's 0.92–0.95 F1, which was binary healthy/unhealthy) and **not** a database-linkage task. So 0.82 is the closest published RAG-NER analogue to our work, but it is not a like-for-like benchmark for either S1 (16 GBD risk factors on CNF) or S7 (CNF↔Agribalyse matching).
+- The 82.24 figure is from GPT-4-class models (2024 vintage), below the frontier models in D22.
+
+---
+
+#### Architecture — the direct precedent for our §3.5 matcher (and partly §3.4)
+
+NutriRAG's pipeline (Methods pp. 7–9, Figures 1–2) is **structurally the same** as the LLM-assisted food-to-LCA matcher we describe in §3.5:
+1. **Query formulation** — the free-text food string is the query.
+2. **Retrieval & prompt context** — an "LLM Similarity Calculator" computes **cosine similarity between the embedding of the query and embeddings of candidate examples** in a reference set, ranks them, and selects the **top-k**.
+3. **LLM processing** — the LLM is given instruction + retrieved top-k input→output exemplars + the query, and maps each food token to its class.
+4. **Output organisation** — LLM output is normalised to structured form via string matching.
+
+This is exactly our §3.5 design ("candidate Agribalyse entries are first retrieved by embedding similarity over food descriptions, then ranked by an LLM"). **Recommendation:** cite NutriRAG in §3.5 as the published precedent for the retrieve-then-rank RAG architecture, not only in §2.2. It also supports the few-shot, **no-parameter-tuning / in-context** approach our pipeline uses.
+
+**Design details we can borrow/cite:**
+- Retrieval depth swept from **k = 1–20 examples**; example ordering tested in three arrangements (highest→lowest similarity, and random) — useful precedent if a reviewer asks why we fixed our k or ordering.
+- Cosine-similarity retrieval formula given on p. 8 (standard `sim = e(q)·e(d) / (|e(q)||e(d)|)`).
+
+---
+
+#### Results table — key comparators (for §4.4 / S7 framing; do NOT reproduce as a derivative)
+
+Micro F1 (with Micro P / R), food classification, 51 classes:
+
+| Model | Micro P | Micro R | Micro F1 |
+|---|---|---|---|
+| BERT (fine-tuned) | 56.36 | 62.74 | 59.38 |
+| BlueBERT | 49.84 | 57.26 | 53.29 |
+| PubMedBERT/BioBERT | 56.82 | 59.71 | 58.22 |
+| GPT-3.5 (random examples) | 64.54 | 66.43 | 65.47 |
+| GPT-4 (random examples) | 75.97 | 71.53 | 73.84 |
+| RAG Llama-2-70b | 68.81 | 58.75 | 63.38 |
+| RAG Mixtral 8×7b | 76.07 | 79.89 | **77.93** (best open-source; 2nd overall) |
+| RAG GPT-3.5 | 75.00 | 80.29 | 77.55 |
+| **RAG GPT-4** | 79.10 | 85.64 | **82.24** (best overall) |
+
+Takeaways usable in our §4: (i) RAG lifts every base model; (ii) the best open-source RAG model (Mixtral, 77.93) nearly matched RAG GPT-3.5 and beat standard GPT-4 — relevant if we discuss cost/open-weight options for our matcher; (iii) fine-tuned BERT-family encoders (53–59 F1) were clearly beaten by RAG-LLMs, supporting our choice of an LLM-augmented rather than classical-ML approach.
+
+*Minor internal inconsistency in the source:* the food-classification table is labelled "Table 1" but referred to as "Table 2" in the Results text (p. 11); the actual "Table 2" is the RCT baseline data. Not material to us, but note it if quoting a table number.
+
+---
+
+#### Secondary content (not central to our manuscript)
+
+The second half applies the classifier within the parent RCT (NCT04259632; Oldenburg et al. 2025, *Obesity*): 77 analysable obese-without-diabetes participants (27 TRE / 25 CR / 25 UR), 12-week intervention, 32,825 free-text entries; eating-occasion (EO) timing analysis showing TRE/CR reduced daily EOs and shifted meal timing, with a breakfast-EO ↔ HOMA insulin-resistance association. **Not relevant to ecodish365** beyond demonstrating a downstream use of the classifier; we do not need any of these numbers.
+
+---
+
+#### Author-flagged limitations (Discussion p. 19 — for our §7)
+
+1. **RAG quality is bounded by retrieval-corpus quality** — performance degrades "in situations where relevant external data are limited or biased." This is the key transferable caveat: our §3.5 matcher's accuracy is similarly hostage to the coverage/representativeness of the Agribalyse candidate pool and the embedding index, and we should say so in §7.
+2. (Implicit) preprint status / single-cohort, single-app data source; English-only; no external validation.
+
+---
+
+#### Three-sentence relevance note
+
+NutriRAG is the empirical source of our §2.2 "F1 ≈ 0.82" claim (specifically the retrieval-augmented GPT-4 Micro F1 of 82.24 on a 51-class free-text food-classification task) and, more importantly, it is the closest published architectural precedent for the retrieve-by-embedding-then-rank-by-LLM design of our §3.5 food-to-LCA matcher — so it should be cited in §3.5, not only §2.2. Its core lesson, that RAG lifts every base model and that retrieval quality bounds output quality, transfers directly to our matcher and belongs in our §7 limitations. Two cautions before final submission: it is a non-peer-reviewed CC-BY-ND preprint cited in our draft via a PMC ID that implies a published version (reconcile and re-verify the numbers if so), and its 0.82 is a micro-F1 on a multi-class NER task that is not a like-for-like benchmark for either our S1 (16 GBD risk factors) or S7 (CNF↔Agribalyse linkage), so it should frame expectations rather than serve as a direct target.
+
+---
+
+### D24. Gjorgjevikj, Martinc, Cenikj et al. (2026) — FoodyLLM: a domain-specialized fine-tuned LLM for food/nutrition tasks [★★★]
+
+> ⚠️ **CITATION CORRECTION + USAGE CORRECTION — READ FIRST.**
+> 1. **Wrong venue/year in the draft.** Wishlist (entry 24) and manuscript ref. 38 cite this as **"FoodyLLM. 2025. PMC PMC12927182."** It is in fact a **peer-reviewed Elsevier journal article: Gjorgjevikj A, et al. *Current Research in Food Science* 2026;12:101351, doi:10.1016/j.crfs.2026.101351** (received 13 Nov 2025; accepted 13 Feb 2026; online 16 Feb 2026; open access, CC BY-NC-ND). **Action:** replace ref. 38 with the full author list and CRFS citation; lead author **Gjorgjevikj**, corresponding **Tome Eftimov** (Jožef Stefan Institute). Update the in-text "(FoodyLLM, 2025)" in §2.2 to "(Gjorgjevikj et al., 2026)."
+> 2. **The §2.2 sentence mischaracterizes this paper.** Our draft §2.2 reads: "Recent work demonstrates that LLMs can classify food items at near-expert accuracy when prompted with structured criteria and validated by domain experts ([Nutrients 2026]…; [FoodyLLM, 2025])." FoodyLLM is **not** a structured-prompting result — it is a **fine-tuning** result, and its headline finding is the *opposite* of what that sentence implies: general-purpose LLMs (Gemini 2.0, Llama 3 8B) **fail** these tasks even with five-shot prompting, and only **domain-specific fine-tuning** closes the gap. **Action:** remove FoodyLLM from that sentence (leave Ase et al. 2026 as the structured-prompting citation) and instead cite FoodyLLM where the manuscript discusses the prompting-vs-fine-tuning design choice (see "Tension" below). Citing it as-is invites a reviewer to point out we mis-read our own reference.
+
+**Citation.** Gjorgjevikj A, Martinc M, Cenikj G, Stojanov R, Drole J, Ispirova G, Menichetti G, Ogrinc N, Trajanov D, Džeroski S, Koroušić Seljak B, Eftimov T. Large language models in food and nutrition science: Opportunities, challenges, and the case of FoodyLLM. *Current Research in Food Science.* 2026;12:101351. doi:10.1016/j.crfs.2026.101351.
+
+**DOI.** 10.1016/j.crfs.2026.101351 (open access, CC BY-NC-ND 4.0 — no derivatives, so do not reproduce their figures/tables as adaptations; factual numbers may be reported).
+
+**Type.** Review + original methods. Introduces a fine-tuned domain LLM and benchmarks it on three food tasks.
+
+---
+
+#### What FoodyLLM actually is (§3, Appendix A)
+
+A **fine-tuned Llama 3 8B Instruct** model (LoRA, 4-bit; r = 16, α = 16, dropout 0.05, lr 2e-4, 1 epoch, max seq 1024), multi-task-trained on **~225k task-aligned QA pairs** for three tasks: (i) recipe macronutrient estimation, (ii) FSA traffic-light classification, and (iii) ontology-based food **named-entity recognition + linking (NER/NEL)** to FoodOn, SNOMED-CT and Hansard. Benchmarked against non-fine-tuned **Llama 3 8B** and **Gemini 2.0 Flash** under zero-/one-/five-shot prompting, five-fold evaluation. Recipe1M+ is the primary recipe source. Compute: ~500 A100-GPU-hours. Code: github.com/matejMartinc/FoodyLLM; weights: huggingface.co/Matej/FoodyLLM.
+
+**Training-data composition (Table 5, p. 15) — useful as a precedent for dataset scale:**
+recipe nutrient profile 29,410 QA (19,524 train / 9,886 test); traffic-light 29,410 (same split); food NER+NEL 21,027 (16,822 / 4,205); plus train-only auxiliaries — ingredient nutrition 9,196, food synonyms 11,463, household-measure conversion 65,955.
+
+---
+
+#### Headline results (Tables 1–4, 10–12; do NOT reproduce as derivatives — report figures only)
+
+- **Nutrient estimation, tolerance-based accuracy** (EU Reg. 1169/2011 tolerances, Appendix B): FoodyLLM **0.909–0.972** (protein 0.972, saturates 0.938, fat 0.920, sugar 0.917, salt 0.909) vs **Gemini 2.0 best (5-shot) 0.433–0.628** and Llama 3 8B far lower. Abstract summary: accuracy rises "from 0.43 to 0.63 to 0.91–0.97."
+- **Traffic-light classification, macro F1:** FoodyLLM **0.865–0.971** vs Gemini **0.453–0.797**. Abstract: "0.46 → 0.80 → 0.86–0.97."
+- **NEL on artificial data, macro F1:** FoodyLLM **0.942 (FoodOn), 0.975 (SNOMED), 0.932 (Hansard)** vs Gemini best (5-shot) **0.330 / 0.330 / 0.438** (Table 4/10).
+- **NER+NEL on real corpora, macro F1:** FoodyLLM **0.665–0.835** (CafeteriaFCD 0.823–0.835; CafeteriaSA 0.665–0.735) vs Gemini **0.240–0.505** and Llama 3 8B **0.161–0.417** (Tables 4, 11, 12). Beats prior BERT/BioBERT literature baselines (0.43–0.789).
+- **Generalization to branded foods (Open Food Facts, 2070 products): FoodyLLM drops to 0.29–0.46 accuracy** because branded products list ingredients *without quantities* (p. 8). This is the single most transferable warning for us (see below).
+
+---
+
+#### The tension this paper creates for our design (§3.4 / §3.5 / §7) — the most important takeaway
+
+FoodyLLM is the strongest published evidence that, on food classification / nutrient-estimation / ontology-linking tasks, **prompting general-purpose LLMs (even five-shot) substantially underperforms a fine-tuned domain model.** Our pipeline deliberately uses **rule + prompting** (§3.4) and **RAG prompting** (§3.5), *not* fine-tuning. A reviewer who knows this paper will ask "why didn't you fine-tune?" We should pre-empt that in §3.4/§7 with the principled reasons our draft already gestures at — auditability, openness, zero training cost, LLM confined to the ambiguous long tail — while honestly acknowledging FoodyLLM shows fine-tuning would likely raise accuracy. Two specific contrasts to fold in:
+- **For §3.5 (the matcher):** FoodyLLM's NEL numbers show general-purpose LLMs reach only **0.33–0.51 macro F1 on food→ontology linking even with five-shot prompts** (Table 4). Our matcher does food→Agribalyse linking by RAG prompting, which is conceptually the same problem. NutriRAG (D23) shows RAG *lifts* this (to ~0.82), but FoodyLLM shows the prompting-only floor is low — so our §3.5 success hinges on retrieval quality, and we should say so. Helpfully, **FoodyLLM's own authors recommend RAG as the mitigation** for the linking task's brittleness (Discussion p. 9, citing their forthcoming FoodOntoRAG / Drole et al. 2025) — i.e. our RAG choice in §3.5 is endorsed by this paper's authors.
+- **For §3.4 (the categorizer):** their tolerance-based-accuracy evaluation against a regulatory standard (EU 1169/2011) is a clean precedent for how to report classification accuracy, and the two-prompt (with/without title) ablation is a precedent for prompt-sensitivity reporting in our S1.
+
+Note: unlike our task, FoodyLLM *estimates* nutrient values from ingredients; ecodish365 reads CNF nutrient values directly, so the nutrient-estimation track is **not** something we replicate — it is context, not a method we adopt.
+
+---
+
+#### Author-flagged limitations (Discussion pp. 9–11, Conclusion — for our §7)
+
+1. **Coverage bound to training data:** FoodyLLM can only link ontology concepts **present in its training corpus** — "newly introduced ontology concepts that are absent from the training corpus cannot yet be linked" (Conclusion). This is the generic failure mode of fine-tuning vs. our RAG approach, which can in principle retrieve unseen targets — a point in favour of our §3.5 design.
+2. **Quantity-free inputs degrade performance** (branded-food drop to 0.29–0.46). Relevant: where our CNF entries or Agribalyse candidates lack quantity/composition detail, matcher/score quality will fall.
+3. **Non-negligible residual error** "from a clinical and public health perspective"; positioned explicitly as a **semi-automatic decision-support tool requiring human oversight** (AI Act / GDPR framing). Directly parallels our framing of AI as bounded, human-checked subsystems.
+4. **Cultural/linguistic bias not analyzed**; model reflects the (largely English, Recipe1M+) training distribution.
+
+---
+
+#### Three-sentence relevance note
+
+FoodyLLM is a peer-reviewed (CRFS 2026;12:101351 — not the 2025 PMC preprint our draft cites) demonstration that domain fine-tuning massively outperforms prompting on food nutrient-estimation, traffic-light, and ontology-linking tasks, which is why it should be removed from the §2.2 "structured-prompting near-expert" sentence (it shows the opposite) and instead cited where we justify our prompting-not-fine-tuning design. Its most useful contribution to our manuscript is the explicit prompting-vs-fine-tuning tension: general-purpose LLMs reach only 0.33–0.51 macro F1 on food→ontology linking even at five-shot, which both warns that our §3.5 RAG matcher's accuracy is hostage to retrieval quality and, helpfully, is the exact problem the FoodyLLM authors say RAG should mitigate (endorsing our §3.5 architecture and that of NutriRAG, D23). Its branded-food generalization drop (0.29–0.46 when quantities are absent) and its "coverage bounded to training data" limitation are concrete §7 material, the latter actually favouring our retrieval-based approach over fine-tuning for handling unseen CNF/Agribalyse entries.
+
+---
+
+### D25. Fridolfsson, Sjöberg, Thiwång & Pettersson (2025) — Performance of 3 LLMs for nutritional estimation from food images [★★ — framing only; image-based, not a method we adopt]
+
+> ⚠️ **CITATION + RELEVANCE FLAGS — READ FIRST.**
+> 1. **Citation.** Wishlist (entry 25) gives "PMC PMC12513282" and §2.2 cites it as a bare "[ScienceDirect 2025]" URL with no numbered reference. It is **Fridolfsson J, Sjöberg E, Thiwång M, Pettersson S. *Current Developments in Nutrition* 2025;9:107556, doi:10.1016/j.cdnut.2025.107556** (open access, CC BY; American Society for Nutrition / Elsevier). Lead author **Fridolfsson** (U Gothenburg). **Action:** add a proper numbered reference. Cross-reference: this is **ref. 7 in the Ase et al. (D22) paper** — same image-assessment subfield.
+> 2. **Relevance is framing only.** ecodish365 reads CNF nutrient values directly from `FoodID`; it does **no image-based estimation**. None of this paper's MAPE numbers are a benchmark for any ecodish365 task. It supports exactly one §2.2 sentence and otherwise serves as a vivid illustration of the misidentification-cascade failure mode that motivates our confidence-thresholding (§3.5) and rule-first (§3.4) design. Models tested are **mid-2024 vintage** (now dated); avoid over-relying on the absolute numbers.
+
+**Citation.** Fridolfsson J, Sjöberg E, Thiwång M, Pettersson S. Performance Evaluation of 3 Large Language Models for Nutritional Content Estimation from Food Images. *Current Developments in Nutrition.* 2025;9:107556. doi:10.1016/j.cdnut.2025.107556.
+
+**DOI.** 10.1016/j.cdnut.2025.107556 (open access, CC BY 4.0 — reproduction permitted with attribution; still default to paraphrase).
+
+**Type.** Validation study comparing three multimodal LLMs against weighed-reference + database nutritional values on standardized food photographs.
+
+---
+
+#### Design (Methods, pp. 2–3)
+
+- **Models:** ChatGPT-4o (OpenAI, 2024-05-13), Claude 3.5 Sonnet (Anthropic, 2024-06-21), Gemini 1.5 Pro (Google, 2024-04-09). Analyses run Sept 2024, fresh chat per image (no cross-image learning).
+- **Stimuli:** 52 standardized photographs (iPhone 13; white 24.3 cm plate, 19 cm fork / 20.5 cm knife as size references; 42° angle). Built from 12 base dishes (3 starch bases × protein/vegetable combinations + 3 prepackaged meals), in 3 portion sizes (small = 50%, medium, large = 150% of Swedish Food Agency standard portions).
+- **Reference:** calibrated weighing + Dietist NET software (which references the **USDA National Nutrient Database**), manufacturer labels for prepackaged items.
+- **Identical prompt for all models** (recognize components → estimate volume using objects for scale → assign nutrient values → tabulate weight/energy/CHO/fat/protein per component + total). Authors note adding plate dimensions or "act as nutritionist" framings gave no clear benefit; simpler prompt chosen for realism.
+- **Metrics:** MAPE (bootstrap 95% CI), Pearson r, mean bias, systematic-bias slope (regression of difference on reference), Bland–Altman.
+
+*Internal inconsistency to be aware of (not our problem to fix):* the abstract says "individual food components (n = 16) and complete meals (n = 36)," while Methods says "complete meals (n = 12) and individual components (n = 16)" and breaks the 52 photos down as 9 starch-only + 9 protein + 4 vegetable + 30 complete meal. Cite the paper's conclusions, not its component counts.
+
+---
+
+#### Key results (Table 1, p. 4 — report figures, do not reproduce the table)
+
+MAPE / Pearson r (UNHEALTHY n/a; continuous estimation):
+
+| Nutrient | ChatGPT-4o | Claude 3.5 Sonnet | Gemini 1.5 Pro |
+|---|---|---|---|
+| Weight | 36.3% / r 0.77 | 37.3% / r 0.81 | 65.0% / r 0.71 |
+| Energy | 35.8% / r 0.73 | 35.8% / r 0.78 | 64.2% / r 0.63 |
+| CHO | 47.9% / r 0.67 | 72.8% / r 0.75 | 66.1% / r 0.73 |
+| Protein | 60.7% / r 0.73 | 61.7% / r 0.75 | 109.9% / r 0.58 |
+| Fat | 51.8% / r 0.65 | 41.7% / r 0.72 | 89.6% / r 0.64 |
+
+- **ChatGPT ≈ Claude** (no significant MAPE difference except fat, where Claude better, p = 0.04); both significantly beat Gemini on weight/energy/protein (p < 0.01).
+- **All models systematically underestimate, worsening with portion size** (bias slopes −0.23 to −0.50); MAPE ~20–30% lower for small than large portions. Authors partly attribute this to vegetables placed in front obscuring calorie-dense starch/protein behind them as portions grew.
+- **Gemini** had large positive mean bias (weight +64.6 g, energy +65.0 kcal); ChatGPT/Claude near-zero, nonsignificant.
+- **Misidentification → catastrophic error:** Gemini called falafel "meatballs" (+360% protein); Claude called scrambled eggs "pasta" (+1788% CHO, which alone inflated Claude's CHO MAPE); ChatGPT under-weighed a lentil curry (255 g vs 480 g actual).
+- **Benchmark context:** authors compare to athlete estimated-diet-record validation (MAPE 26.5% ± 16.8%); ChatGPT/Claude at ~36% are "comparable with traditional self-report" but Gemini markedly worse. Conclusion: general-purpose LLMs **not yet suitable for precise dietary assessment** in clinical/athletic settings.
+
+---
+
+#### How this maps to our manuscript
+
+- **§2.2:** the one sentence it supports — "for images, GPT-class models approach but do not yet meet expert nutritional content estimation" — is fairly characterized. Tighten slightly: this paper benchmarks against *self-reported* methods, not experts directly; the "comparable to dietitian" claim comes from its internal citation to Lo et al. 2024 (GPT-4V mean abs error 46.3 g vs dietitian 48.5 g). Either keep the §2.2 sentence as-is with the Fridolfsson cite, or add Lo et al. 2024 (*IEEE J Biomed Health Inform* 28(12):7577) if we want the explicit dietitian comparison.
+- **§3.4 / §3.5 (failure-mode motivation):** the 1788%-CHO and 360%-protein misID cascades are the cleanest published illustration of *why* a single LLM output must not be trusted unguarded — directly motivating our rule-first gate (§3.4) and confidence-threshold-with-fallback (§3.5, fallback at confidence < 0.6). Worth a one-line cite there.
+- **§3.6 / uncertainty:** the authors' suggestion to run multiple stochastic inferences and report ranges/CIs rather than point estimates is philosophically aligned with our Monte Carlo uncertainty stance, though for a different source of variance (LLM stochasticity vs LCA factor uncertainty). Minor, optional.
+
+---
+
+#### Author-flagged limitations (Discussion pp. 6–7 — for our §7 if cited)
+
+Static single-angle 2D images; relatively simple plated presentations vs real mixed dishes; no food-specific fine-tuning; mid-2024 models (authors explicitly note reasoning models like o1 and food-specific LLMs may close the gap); volume-from-2D is the core hard problem; privacy/compute concerns from uploading photos to data centres.
+
+---
+
+#### Three-sentence relevance note
+
+This is a framing-only citation for ecodish365: it underpins the single §2.2 statement that image-based general-purpose LLMs approach but do not yet match expert/traditional nutritional estimation (ChatGPT/Claude ~36% MAPE on weight/energy, comparable to self-report; Gemini markedly worse), and nothing in it benchmarks any ecodish365 task because our pipeline reads CNF values directly rather than estimating from images. Its real utility is illustrative: the misidentification-driven error cascades (a single wrong food label producing a 1788% macronutrient error) are the most vivid published justification for our rule-first categorizer (§3.4) and confidence-thresholded matcher with fallback (§3.5). It needs a proper numbered reference (currently a bare URL in the draft), should be recited as Fridolfsson et al., 2025 (*Curr Dev Nutr* 9:107556), and its mid-2024 model vintage means we should lean on its qualitative lesson rather than its absolute error figures.
+
+---
+
+### D26. Hu, Ahmed & L'Abbé (2023) — NLP + ML for food categorization and nutrition-quality-score prediction vs traditional methods [★★★]
+
+> ⚠️ **CITATION CORRECTION — READ FIRST (this resolves the flag raised under D23/D25).**
+> The wishlist (entry 26) and the draft cite this as **"Eisenberg, M.D., et al. (2022). … *Am. J. Clin. Nutr.* 116. doi:10.1093/ajcn/nqac225."** The **title is verbatim identical**, confirming this is the intended paper, but the author, volume and DOI are all wrong. Correct citation: **Hu G, Ahmed M, L'Abbé MR. *Am J Clin Nutr.* 2023;117(3):553–563. doi:10.1016/j.ajcnut.2022.11.022** (received 14 Sep 2022; accepted 29 Nov 2022; online 23 Dec 2022; published vol. 117, 2023). This is the **same paper** that appears — correctly attributed to Hu/L'Abbé — as **refs 16 and 19 in the NutriRAG (D23) paper**. **Action:** in the draft, replace "Eisenberg et al., 2022" with **Hu et al., 2023**, fix the volume to 117(3):553–563 and the DOI to 10.1016/j.ajcnut.2022.11.022. (The "nqac225" Oxford-style DOI predates AJCN's 2023 move to Elsevier and does not resolve to this article as published.) Note this paper currently has **no in-text citation** in the draft — it should be added to §3.2/§3.4 (see below).
+
+**Citation.** Hu G, Ahmed M, L'Abbé MR. Natural language processing and machine learning approaches for food categorization and nutrition quality prediction compared with traditional methods. *Am J Clin Nutr.* 2023;117(3):553–563. doi:10.1016/j.ajcnut.2022.11.022.
+
+**DOI.** 10.1016/j.ajcnut.2022.11.022. © 2022 American Society for Nutrition / Elsevier (all rights reserved — paywalled; paraphrase only).
+
+**Type.** Original research — automating food categorization (classification) and nutrient-profiling-score prediction (regression) on a large **Canadian** branded-food database using sentence-BERT embeddings + classical ML, benchmarked against bag-of-words and structured-nutrient-facts models. L'Abbé group, U Toronto.
+
+---
+
+#### Why this is highly relevant to ecodish365 (shared Canadian dependencies)
+
+This is the most methodologically adjacent Group D paper to our actual pipeline, on three fronts the others don't touch:
+1. **Health Canada Table of Reference Amounts (TRA)** is the classification target here (24 major categories, 172 subcategories) — and **TRA 2016 is a mandatory external database in our §3.2** (HEFI-2019 reference amounts). Same canonical Canadian reference.
+2. **FSANZ nutrient-profiling score** is the regression target — and **FSANZ/NPSC is the algorithmic basis of our HSR** (§3.2). Their structured-vs-text comparison directly informs our HSR design choice.
+3. **FVNL (Fruit/Veg/Nut/Legume) estimation from ingredient lists without quantitative declarations** is a sub-problem they solve — and it is **exactly the problem our §3.2 HSR FVNL step faces** (we use Barrett et al. 2025 geometric weighting; they use the Vergeer et al. 2020 descending-ingredient-order method).
+
+---
+
+#### Methods (pp. 2–4)
+
+- **Data:** University of Toronto FLIP (Food Label Information and Price) database — Canadian branded packaged foods. FLIP2020 (n = 74,445; 46,020 after exclusions for TRA, 33,917 for FSANZ) for development (70/30 train/test); FLIP2017 (n = 19,720; 19,323 / 18,934 after exclusions) as an **external generalization test set**.
+- **Gold standard:** manual TRA categorization and FSANZ scoring by trained nutrition researchers (MSc/PhD), each verified by a second member; **inter-rater agreement >96% overall (≈96–99% by category)** — a useful benchmark for our own S1 two-dietitian κ target.
+- **Representation:** Siamese / sentence-BERT encoding of food-label text (name, brand, ingredients) into **384-dimensional dense vectors**; compared against bag-of-words (top 100/500/1000/2000 ingredients, one-hot) and, for FSANZ, against **structured nutrient-facts inputs** (nutrients per 100 g/mL).
+- **Classifiers/regressors:** elastic net, KNN, XGBoost. XGBoost best throughout.
+
+---
+
+#### Key results (Tables 1–3 — report figures, do not reproduce)
+
+**TRA food categorization (Table 1; sentence-BERT + XGBoost, name+brand+ingredients):**
+- Major category **accuracy 0.98** (balanced 0.96); subcategory **accuracy 0.96** (balanced 0.89).
+- Per-category F1 0.90–0.99; **115/145 subcategories (n > 5) had F1 > 0.9**.
+- Pretrained LM beat bag-of-words at equal dimensionality and was **more generalizable** to FLIP2017 (0.91 acc vs BoW-2000 0.90, at 768-dim vs 2000-dim) because top-ingredient lists drift across databases/years — directly relevant to our cross-database harmonisation concerns.
+- 80% of subcategory predictions reached F1 > 0.9 with the pretrained LM vs 32–70% (BoW) and 62% (structured nutrient facts).
+
+**FSANZ nutrient-quality-score prediction (Table 3) — the key result for our HSR design:**
+
+| Method | Input | R² | MSE |
+|---|---|---|---|
+| Structured nutrient facts | nutrients per 100 units | **0.98** | **2.5** |
+| Structured nutrient facts | nutrient facts table | 0.91 | 9.8 |
+| Pretrained LM | name+brand+ingredients | 0.87 | 14.4 |
+| Bag-of-words | top 2000 ingredients | 0.84 | 17.6 |
+| Bag-of-words | top 100 ingredients | 0.72 | 30.3 |
+
+**Takeaway that validates our HSR approach:** when structured nutrient values are available, computing/predicting the nutrient-profiling score from **structured nutrient data (R² 0.98)** vastly outperforms text-based prediction (R² 0.84–0.87). Our pipeline **computes HSR deterministically from CNF nutrient values** (§3.2) rather than predicting it from text — this paper is direct empirical support for that choice, and the text-based route is only a fallback when nutrient data are missing. (Avg manually-computed FSANZ scores: FLIP2017 = 7.1, FLIP2020 = 6.8.)
+
+---
+
+#### How to use it in the manuscript
+
+- **§3.2 (HSR):** cite as Canadian empirical support that nutrient-profiling scores are best computed from structured nutrient data (R² 0.98), justifying our direct-from-CNF HSR computation. Also cite the **Vergeer et al. 2020 FVNL-from-ingredient-order method (their ref. 14)** as the established Canadian alternative to our Barrett-2025 geometric FVNL weighting — a useful cross-check or sensitivity comparison for §3.2, since both confront the same "no quantitative ingredient declarations in Canada" problem.
+- **§3.4 (categorizer):** cite as a Canadian precedent that automated food→category mapping is highly tractable (TRA accuracy 0.98) and that **embedding-based representations generalize better across databases/years than ingredient-frequency features** — supporting our embedding-retrieval design over brittle keyword/frequency rules. Caveat: their target is the TRA taxonomy, not GBD dietary risk factors, so it shows feasibility, not a transferable accuracy figure.
+- **§4.1 (S1 benchmark design):** their >96% manual inter-rater agreement and second-reviewer verification is a clean precedent for our two-dietitian gold-standard protocol.
+
+---
+
+#### Author-flagged limitations (Discussion pp. 9 — for our §7)
+
+1. **General-corpus BERT, not food-specific** — authors state "further model training to leverage food-specific corpora is needed." Echoes FoodyLLM (D24): domain specialization helps. Relevant caveat for any embedding model we use in §3.5.
+2. **Small-class fragility:** subcategories with < ~350 training products had F1 0.55–0.84; accuracy is highly dependent on per-class sample size. Directly relevant to our long-tail GBD-risk-factor categories and rare CNF foods — the exact case where our §3.4 escalates to the LLM.
+3. **FVNL estimated from descending ingredient order** (no quantitative declarations in Canada) introduces error into FSANZ — the identical limitation our HSR FVNL step carries; we should acknowledge it in §7.
+4. Data limited to retailer-website information; e-commerce labelling unstandardized; imbalanced classes.
+
+---
+
+#### Three-sentence relevance note
+
+This is the most pipeline-adjacent Group D paper because it operates on the same Canadian infrastructure we do — Health Canada's Table of Reference Amounts (our HEFI-2019 dependency) and the FSANZ nutrient-profiling system (our HSR's algorithmic basis) — and it empirically establishes that nutrient-profiling scores are far better computed from structured nutrient data (R² 0.98) than predicted from label text (R² 0.84–0.87), which is direct support for our decision to compute HSR deterministically from CNF rather than infer it. Its TRA categorization result (0.98 accuracy, embeddings generalizing better than ingredient-frequency features across databases) is a Canadian precedent for the feasibility and design of our §3.4 categorizer, and its >96% two-reviewer manual gold standard is a model for our S1 protocol. It must be re-cited as Hu et al., 2023 (*AJCN* 117(3):553–563, not "Eisenberg 2022, vol 116, nqac225"), added as a new in-text citation in §3.2/§3.4, and its Vergeer et al. 2020 FVNL-from-ingredient-order method (its ref. 14) is worth citing in §3.2 as the established Canadian alternative/cross-check to our Barrett-2025 geometric FVNL weighting.
+
+---
+
+### D27. Krahmer (2024) — LEAF: predicting the environmental impact of food products from their name (food-text → Agribalyse LCA) [★★★ — the key prior-art test of our §3.5 novelty claim]
+
+> ⚠️ **NOVELTY-CLAIM IMPACT — READ FIRST.** This is the closest published prior art to our §3.5 LLM-assisted food→LCA matcher, and it **directly contradicts the blanket version** of our §2.2 / abstract claim. LEAF links a food product **name → an Agribalyse class → that class's Agribalyse life-cycle (EF) score**, and explicitly states it is "the first work exploring the usage of NLP methods specifically for the estimation of environmental impact of food products" (p. 133, §1.1). **Action:** we must (a) cite Krahmer 2024, and (b) **narrow our novelty claim** from "no published system uses LLMs to bridge nutrition databases with LCA inventories" to a defensible, distinction-based claim (see "Surviving novelty" below). Leaving the broad claim unqualified would be falsified by this single paper.
+
+**Citation.** Krahmer B. LEAF: Predicting the Environmental Impact of Food Products based on their Name. In: *Proceedings of the 1st Workshop on Natural Language Processing Meets Climate Change (ClimateNLP 2024)*, Bangkok: Association for Computational Linguistics; 2024. p. 133–142.
+
+**Venue/Access.** ACL Anthology, ClimateNLP 2024 workshop (peer-reviewed workshop; openly available, ACL © 2024, CC BY 4.0). Single author, independent researcher. Code/data/models released (GitHub baskrahmer/LEAF; HF baskra/leaf, leaf-base, leaf-large).
+
+**Type.** Methods paper — multilingual NLP model that predicts a food's PEF Environmental Footprint score from its product name via an Agribalyse-class intermediary.
+
+---
+
+#### What LEAF does (Figure 2; §2)
+
+Pipeline: **product name (any language) → NLP model → predicted Agribalyse class (of 2518) → Agribalyse lookup → EF score (mPt/kg) → optional discretization to an A–E Eco-Score.** This is the same *food-text → Agribalyse-LCA* bridge our §3.5 builds, but with four mechanistic differences that matter for our novelty framing (below).
+
+- **Data.** Open Food Facts (OFF), exported 31 Mar 2024; 800,589 products, filtered to those with an Agribalyse class; **2518 Agribalyse classes**. Multilingual (French 40%, English 32%, Spanish 10%). ODbL-licensed.
+- **Target = PEF Environmental Footprint, not ReCiPe.** EF score is the European Commission's **14-factor PEF** aggregate (mPt/kg), climate-dominated (CO₂eq); discretized to Eco-Score (analogous to but distinct from Nutri-Score). **This is exactly the PEF method our §3.2 explicitly argues is *not* interchangeable with ReCiPe** — so LEAF outputs the very metric we deliberately avoid.
+- **Model.** Frozen multilingual **sentence-embedding base** (distiluse-multilingual-base-v2, 135M; or bge-m3, 561M) + a **trained readout head** (LEAFc classification / LEAFr regression / LEAFh hybrid). The base is **not fine-tuned**; only the head is learned. So the production model is an **embedding-+-classifier**, *not* a generative LLM.
+
+---
+
+#### Key results (Tables 1–2)
+
+| Model | Accuracy | MAE (EF) |
+|---|---|---|
+| LEAFc (DU, 135M) | 0.731 | 0.071 |
+| LEAFc (M3, 561M) | **0.772** | **0.057** |
+| LEAFh (hybrid) | 0.696 | 0.224 |
+| LEAFr (regression) | n/a | 0.233 |
+| GPT-3.5-turbo zero-shot (175B) | 0.374 | 0.110 |
+| Cosine-similarity baseline (M3, untrained) | 0.193 | 0.300 |
+
+- **A small trained classifier head beats GPT-3.5 zero-shot by ~2× on accuracy** (0.73 vs 0.37) despite ~1000× fewer parameters; classification > regression for EF prediction. (GPT-3.5 had a *better* MAE than LEAFh, because its misclassifications stayed within tighter EF bounds.) Global EF σ = 0.448; LEAFc MAE 0.057–0.071.
+- **GPT-3.5 hallucinated non-existent class labels** at rate 0.19; the author notes this "can be prevented by limiting token generation to the possible class names" — reinforcing our §3.5 design of constraining the LLM to retrieved valid Agribalyse candidates.
+- Multilingual: strong for top-5 languages (fr/en/es/it/de, acc 0.63–0.80), collapses for low-resource (Chinese/Hindi/Bengali, tiny n).
+- **Cross-link:** LEAF's related-work cites **Hu et al. 2023 (our D26)** and Balaji et al. 2023 (CaML, zero-shot sentence-BERT emissions estimation of consumer products) — useful additional citations for our §2.2.
+
+---
+
+#### The surviving (narrowed) novelty for §2.2 / §3.5
+
+LEAF pre-empts the broad claim, but our §3.5 contribution survives on **four concrete distinctions**, which we should state explicitly rather than asserting blanket priority:
+1. **Source side:** LEAF links a **product-name string** (Open Food Facts); ecodish365 links **entries of a structured national nutrition database (CNF, with composition/serving fields)**. Bridging a *composition database* to LCA is a different task from name-string classification.
+2. **LCIA target:** LEAF outputs the **aggregate PEF/EF (single Eco-Score)** baked to French assumptions; ecodish365 re-scores inventories under **ReCiPe 2016 (17 midpoints / 3 endpoints), with Canadian regional layers and Monte Carlo uncertainty** — not a single aggregate.
+3. **Mechanism:** LEAF uses a **closed-set classifier head over 2518 fixed classes**; ecodish365 uses **open retrieval (embedding similarity) + LLM ranking with a 0–1 confidence score and logged fallback** to food-group defaults. Different machinery, and open-set vs closed-set.
+4. **"LLM" specifically:** LEAF's production model is a **frozen sentence-embedding + trained head**, not a generative LLM (its only LLM use, GPT-3.5, is a *losing baseline*). Our matcher uses a generative LLM for reasoning/ranking. *Caveat:* a reviewer may regard sentence-transformers as "language models," so do **not** rest the novelty solely on the LLM-vs-embedding distinction — lean primarily on distinctions 1–3 (structured-DB source, ReCiPe-not-PEF, open retrieve-rank-with-confidence-and-fallback).
+
+Recommended rewrite of the §2.2 sentence (currently "To our knowledge, no published system uses LLMs to bridge nutrition databases (CNF, FNDDS) with environmental LCA inventories"): something like — "Prior NLP work links food *names* to Agribalyse's aggregate PEF/Eco-Score (Krahmer, 2024) or interlinks composition and LCI databases via classification metadata [Interlinking paper, if obtained]; to our knowledge no system uses an LLM-assisted open retrieval-and-ranking matcher with confidence-scored fallback to link structured nutrition-database entries to peer-reviewed inventories re-scored under ReCiPe."
+
+---
+
+#### Author-flagged limitations (§5) — two are directly useful to us
+
+1. **"Fixed Consumption Location: models assume the product is consumed in France, per Agribalyse assumptions… transportation is location-specific… caution is needed for locations with significantly different food supply chains than France."** This is **independent third-party support for our §3.7 Canadian regional adaptation** — it confirms that Agribalyse's France-baked assumptions (especially transport) must be adjusted for other geographies, exactly the gap our Canadian factor layer fills. Cite in §3.7.
+2. **"Additional Data Sources": name-only is limited; ingredient lists, country of production/consumption, transport, packaging "could provide additional insights… A new model that combines different data sources under varying levels of uncertainty could be superior."** This both motivates our richer matcher inputs (we use descriptions/composition, not just names) and aligns with our uncertainty-aware design — a tidy citation for §3.5/§3.6.
+3. *Other:* limited within-class specificity (an apple is "apple" regardless of origin); LCA-class redundancy (3 almond classes, identical LCA).
+
+---
+
+#### Three-sentence relevance note
+
+LEAF is the single most important prior-art paper for our §3.5 contribution because it builds the same food-text → Agribalyse-LCA bridge and self-declares NLP-for-food-environmental-impact priority, so our §2.2/abstract novelty claim must be cited against it and narrowed to the defensible distinctions our system actually holds: a structured nutrition-database (CNF) source rather than product names, ReCiPe 2016 with regional layers and Monte Carlo uncertainty rather than the aggregate French PEF/Eco-Score, and an open LLM retrieve-rank matcher with confidence-scored fallback rather than a closed-set classifier head. Its empirical lesson — a small trained classifier beat GPT-3.5 zero-shot ~2× on food→Agribalyse-class accuracy, and GPT-3.5 hallucinated invalid classes at 0.19 — is a further caution (echoing FoodyLLM D24 and Fridolfsson D25) that our prompting-based matcher must constrain outputs to retrieved valid candidates and may underperform a trained classifier on the closed-set sub-problem. Its "Agribalyse assumes consumption in France" limitation is independent support for our §3.7 Canadian regionalization, and its call for multi-source, uncertainty-aware models aligns with our §3.5/§3.6 design; cite Krahmer 2024 in §2.2 (with Hu et al. 2023/D26 and Balaji et al. 2023, both in LEAF's related work), §3.5, and §3.7.
+
+---
+
+### D27b. Furrer, Sieh, Jank, Le Bras, Herrmann, Reguant-Closa & Nemecek (2024) — Semi-automated EuroFIR ↔ Agribalyse interlinkage via LanguaL™ harmonized descriptors (non-LLM, classification-metadata) [★★★ — the closest *task-level* prior art to our §3.5 matcher]
+
+> ⚠️ **NOVELTY-CLAIM IMPACT — COMPANION TO D27.** Where D27/LEAF is the closest *NLP*-prior art (food name → Agribalyse class via sentence-embeddings), Furrer et al. 2024 is the closest *task*-prior art: it directly interlinks a composition database (EuroFIR) with an LCI database (Agribalyse) at the food-item level. It is **non-LLM and classification-metadata-based**, so it does *not* falsify our LLM-specific framing, but it does pre-empt the broader "no published system bridges nutrition and LCI databases" claim. Cite alongside D27 in §2.2 and lean the surviving novelty on (a) **structured-DB source side (CNF vs EuroFIR)**, (b) **ReCiPe re-scoring vs PEF/EF inheritance**, (c) **open retrieve-rank with confidence vs closed descriptor-set matching**, and (d) **composite-food / meal support**, since Furrer et al. **explicitly exclude composite foods** from their case study (~22 % of EuroFIR, ~2 % of Agribalyse; §2.4 p. 3 + Table 7 p. 6).
+
+**Citation.** Furrer C, Sieh D, Jank A-M, Le Bras G, Herrmann M, Reguant-Closa A, Nemecek T. Interlinking environmental and food composition databases: An approach, potential and limitations. *Journal of Cleaner Production.* 2024;470:143198. doi:10.1016/j.jclepro.2024.143198.
+
+**Venue/Access.** *Journal of Cleaner Production* (Elsevier; Maria Teresa Moreira, handling editor). Received 23 Oct 2023; revised 30 June 2024; accepted 17 July 2024; published online 18 July 2024. **Open access under CC BY 4.0.** Funded by EU Horizon 2020 OptiSignFood (grant 971242, EIC Fast Track to Innovation). Authors at Agroscope LCA group (Zurich, Switzerland), Themakers.ai GmbH (Berlin), and The Makers Food GmbH (Berlin). **Data availability: confidential** (licensed EuroFIR data) — the connection list itself is not released as supplementary.
+
+**Type.** Methods paper — semi-automated procedure to merge food-item (FI) entries between an LCI database (Agribalyse v3.1) and an FCDB (EuroFIR licensed national data for CH, FR, DK, SI, EE, UK; 11,911 FI total) via a manually-curated "connection list" of harmonized LanguaL™ descriptors.
+
+---
+
+#### What Furrer et al. 2024 do (Fig. 1; §2)
+
+Pipeline: **per-DB FI extraction → exclude composite foods → build a manual "connection list" of harmonized LanguaL™ descriptors (5 categories: Name, Specification, Treatment, Processing, Production system) → auto-attach descriptors to FI in each DB using Python (regex + Levenshtein distance + Siamese-BERT-Networks/SBERT for synonym discovery + LanguaL™-code matching when EuroFIR carries them) → automatic interlinkage when matched descriptors align across both DBs (Fig. 4) → manual validation of a 54-entry sample (Table 9).** This is the same *FCDB ↔ LCI-DB linkage* task our §3.5 builds, with three mechanistic differences relevant to our novelty framing (below).
+
+- **Source side.** EuroFIR (multi-country European harmonized FCDB) ↔ Agribalyse v3.1 (French LCI / Ciqual food-code linked at agriculture, food, consumption-mix and transformation life-cycle stages). Single foods only — composite foods (pizza, lasagna, burger) are excluded by name-fragment filter and recipe-formulation complexity (§2.4 p. 3 + p. 6 col. 2).
+- **Harmonization spine: LanguaL™.** A controlled thesaurus from EFSA's FoodEx2 lineage that maps every food to a code (e.g., "A01DJ" = apple). EuroFIR carries LanguaL™ codes natively for all national entries (Table 4 p. 5); Agribalyse does *not*, so codes are assigned indirectly via synonym matching (§3.2 p. 6 + Table 6 p. 6). The most-completed code system, **EFSA FoodEx2 (4,524 LanguaL™ codes)**, was *not* used in EuroFIR — only Eurofir's own thesaurus (120 codes, but tagging 13,689 FI in the licensed national data), Eurocode 2, EFG, GS1 GPC, US CFR, USDA SR (Table 6 p. 6). This unevenness is why the team built a 5-category descriptor scheme rather than rely on a single classification.
+- **Validation.** 6 name-specification-treatment combinations (beef-minced-cooked, cashew-roasted, cheese-emmental, rice-flour, sunflower-oil, sweet-potato-cooked) × 7 countries → 54 entries manually compared (Table 9 p. 8). **2 of 54 incorrectly matched (≈3.7 % error)**: (a) "Tuna in sunflower oil, canned" matched to sunflower because the FI name contained "sunflower" and "oil"; (b) one strawberry entry pulled in an "additional cooking aid: cream" descriptor.
+
+---
+
+#### Key results (Tables 1, 6, 7, 9)
+
+| Quantity | Value | Source |
+|---|---|---|
+| EuroFIR licensed FI total (6 countries) | 11,911 | Table 1 + §3 |
+| Agribalyse v3.1 FI total | 1,321 | Table 7 |
+| EuroFIR single-foods after composite filter | 9,308 (78.1 %) | Table 7 |
+| EuroFIR composite-foods removed | 2,603 (21.9 %) | Table 7 |
+| Agribalyse single-foods | 1,298 (98.3 %) | Table 7 |
+| Agribalyse composite-foods removed | 23 (1.7 %) | Table 7 |
+| Manual validation error rate | 2 / 54 ≈ 3.7 % | §3.4 + Table 9 |
+| Highest-coverage classification system | Eurofir thesaurus (13,689 FI; only 120 codes) | Table 6 |
+| Most-completed system *unused* by EuroFIR | EFSA FoodEx2 (4,524 codes, 0 FI tagged) | Table 6 |
+
+- **Composite-food exclusion is structural, not incidental.** Recipe-level differences between databases for the same composite (e.g., a EuroFIR pizza recipe vs an Agribalyse pizza recipe) made interlinkage unreliable enough that the team excluded all composites from the case study (§2.4 p. 3 + §4.1 p. 7). For meal-level analysis (our entire use case) this is not just an out-of-scope choice — it is a structural limitation of name-fragment + descriptor matching.
+- **3.7 % manual error rate at the FI-level for single foods** is the best published benchmark for matcher accuracy on this task. Our §3.5 confidence-scoring and group-level fallback must be evaluated against this number.
+- **Asymmetric meta-data availability** (Table 3 p. 5): "country of origin" is fully in Agribalyse but absent in EuroFIR; "yield" and "production system" only in Agribalyse base data; "food specification" and "food processing" only in entry names, requiring extraction. This justifies our open-set matcher (different DBs surface different fields) over a rigid descriptor-spine like Furrer et al.'s.
+
+---
+
+#### The surviving (narrowed) novelty for §2.2 / §3.5 — companion distinctions to D27
+
+D27 (LEAF) pre-empted the *NLP*-priority claim; D27b pre-empts the broader *task*-level claim. Our §3.5 contribution still survives on **four concrete distinctions**, which directly extend the D27 narrowed-novelty framing:
+
+1. **Source side:** Furrer et al. link **EuroFIR (multi-country European FCDB)** to Agribalyse; ecodish365 links **CNF (Canadian Nutrient File)** to Agribalyse with a Canadian regional layer (§3.7). Different geography, different FCDB schema, different downstream consumers.
+2. **Composite-food / meal support:** Furrer et al. **explicitly exclude composite foods** (the 22 % of EuroFIR that are mixtures of single foods) because recipe-level differences make descriptor matching unreliable. ecodish365 is a *meal* scorer — composite foods are the unit of analysis, not the exclusion criterion. This is a hard structural distinction our pipeline holds.
+3. **LCIA target:** Furrer et al. establish FI ↔ FI links that **inherit Agribalyse's PEF/EF aggregate score directly** (the inherited score is climate-dominated and France-baked). ecodish365 re-scores inventories under **ReCiPe 2016 v1.1 (17 midpoints / 3 endpoints), with the audited endpoint factors, Canadian regional adjustments, and Monte Carlo uncertainty** documented in CODE-1 through CODE-7 — not a single aggregate, and not PEF.
+4. **Mechanism:** Furrer et al. match on a **manually-curated closed descriptor set** (one connection-list entry per harmonized term, 5 categories). ecodish365 uses **open retrieval (embedding similarity) + LLM ranking with a 0–1 confidence score and group-default fallback** — no pre-curated descriptor list, and the matcher is open-set by design. The author's own §4.6 ("Techniques for database interlinkage", p. 9 col. 2) explicitly flags AI/NLP as the next-step methodology the field needs to develop.
+
+Recommended rewrite of the §2.2 novelty sentence (refining the rewrite already staged in D27):
+
+> "Prior work links food *names* to Agribalyse's aggregate PEF/Eco-Score via sentence-embedding classification (Krahmer, 2024) and links EuroFIR ↔ Agribalyse food items via manually-curated LanguaL™ descriptor matching with composite foods excluded (Furrer et al., 2024); to our knowledge no published system uses an LLM-assisted open retrieval-and-ranking matcher with confidence-scored fallback to link structured Canadian nutrition-database entries — *including composite meals* — to peer-reviewed inventories re-scored under ReCiPe 2016 with regional adjustments and Monte Carlo uncertainty."
+
+---
+
+#### Author-flagged limitations (§4 + §5) — four are directly useful to us
+
+1. **"Agribalyse does not provide LanguaL™ codes for inventories" (§3.2 p. 6 + Table 6).** Without a native classification spine in the LCI database, every approach that relies on closed descriptor matching has to invent one (Furrer et al. via Python synonym discovery; we via open embedding retrieval). This is an independent third-party justification for our retrieval-based design choice.
+2. **"Foods such as 'strawberries' from the French EuroFIR database … could be that it was imported from other countries such as Spain or Italy. Similarly, there is also no indication of the type of variety of a FI" (§4.1 p. 7 col. 2 + §4.1 p. 7 col. 1).** This is exactly the geographic-representativeness gap our §3.7 Canadian factor layer addresses; cite as third-party confirmation that even "national" FCDBs do not encode the supply-chain geography needed for accurate LCA.
+3. **"Composite foods … connection of composite foods (e.g., pizza) between databases was found to be complex and expected to be unprecise due to limited information (e.g., missing recipe composition)" (§3.2 p. 6).** Cite in our §7 limitations section for the meal-level matcher: we *do* attempt composite-food matching (by ingredient decomposition + per-ingredient matching), but the recipe-composition gap is real and must be flagged.
+4. **"A lack of international standards for documentation has also been found for EuroFIR. Improperly documented datasets limit data integration" (§4.3 p. 9 col. 1) + "AI techniques could promote the development of standardization procedures and should be extensively investigated in future studies" (§4.6 p. 10 col. 1).** The authors themselves identify AI/NLP as the next-step methodology. This is the cleanest citation possible for our §1 / §2.2 motivation: an LCA-domain methods paper, peer-reviewed in *JCleanProd*, explicitly calling for the kind of work we are doing.
+
+---
+
+#### Three-sentence relevance note
+
+Furrer et al. 2024 is the closest published task-level prior art to our §3.5 matcher because it establishes the same FCDB ↔ LCI-DB linkage at the food-item level (EuroFIR ↔ Agribalyse), reports a 3.7 % manual-validation error rate on a 54-entry test sample, and explicitly motivates AI/NLP as the next-step methodology — so it must be cited in §2.2 alongside D27 (Krahmer 2024) and §3.5, with the §2.2 novelty sentence narrowed accordingly. The surviving novelty for our system rests on (a) CNF (Canadian) rather than EuroFIR (European) as the source FCDB, (b) **composite-food / meal-level support** where Furrer et al. structurally exclude composite foods (~22 % of EuroFIR) because of recipe-formulation incompatibility, (c) re-scoring under ReCiPe 2016 v1.1 with audited endpoint factors, Canadian regional adjustments, and Monte Carlo uncertainty rather than inheriting Agribalyse's PEF/EF aggregate, and (d) open retrieval-and-ranking with confidence-scored fallback rather than a manually-curated closed descriptor set. The author's own observations — that Agribalyse does not carry LanguaL™ codes natively, that "French" EuroFIR strawberries may have been imported from Spain or Italy, and that composite-food recipe gaps make descriptor matching unreliable — are independent third-party support for the open-retrieval design (§3.5), the Canadian regional layer (§3.7), and the meal-level composite-handling caveats (§7.3), respectively.
+
+---
+
+*Group D status: D22–D27, D27b complete. **No further Group D papers outstanding.** FoodSEM (Gjorgjevikj et al., 2025, Discovery Science) remains a FoodyLLM sibling (food→ontology NEL, no LCA bridge) and, if wanted, belongs as a supporting cite near D24 rather than as a food↔LCA paper.*
 
 ## Group E. Sustainability assessment frameworks
 

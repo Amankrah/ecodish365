@@ -17,9 +17,12 @@ by `calculate_endpoint_impacts`. Page-cited provenance for each is in
 """
 
 import logging
-from typing import Dict, Optional
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
 from src.meal import Meal
 from .cnf_integrator import get_cnf_integrator
+
+if TYPE_CHECKING:  # avoid circular / heavy import at module load
+    from .lca_matcher import LCAMatcher  # noqa: F401
 
 
 # ---------------------------------------------------------------------------
@@ -122,13 +125,20 @@ class LifeCycleAssessment:
     `_initialize_characterization_factors` is documentation-only.
     """
 
-    def __init__(self, meal: Meal):
+    def __init__(self, meal: Meal, matcher: Optional["LCAMatcher"] = None):
         self.meal = meal
         self.logger = logging.getLogger(__name__)
         self.cnf_integrator = get_cnf_integrator()
         self.midpoint_impacts = {}
         self.endpoint_impacts = {}
         self.characterization_factors = self._initialize_characterization_factors()
+
+        # §3.5 LCA matcher (GROUP-D-RECONCILIATION). When None (default), the
+        # existing group-default cnf_integrator path is used for every food.
+        # When set, the matcher is consulted per food and its decision is
+        # logged to `self.matcher_decisions` for API surfacing.
+        self.matcher = matcher
+        self.matcher_decisions: List[Dict[str, Any]] = []
 
         # Per-midpoint-category confidence, copied from module-level constant.
         # Maintained for backward compatibility with `sanity_check` and
@@ -258,31 +268,61 @@ class LifeCycleAssessment:
     
     def _get_food_environmental_impacts(self, food) -> Dict[str, float]:
         """
-        Get environmental impacts for a specific food item using the CNF integrator.
+        Get environmental impacts for a specific food item.
+
+        Resolution order (§3.5 GROUP-D-RECONCILIATION):
+          1. If `self.matcher` is set, query it for an Agribalyse-matched per-food
+             factor set. If the matcher returns `matched=True` (confidence ≥
+             threshold and LLM did not hallucinate a non-existent Ciqual code),
+             use the matched midpoint factors.
+          2. Otherwise (matcher is None, or matched=False, or any matcher
+             exception) fall back to the existing `cnf_integrator` per-food-group
+             group-default factors. Behaviour is bit-for-bit identical to the
+             pre-matcher pipeline when `self.matcher is None`.
+
+        The matcher's per-food decision is appended to `self.matcher_decisions`
+        for API audit-trail surfacing.
         """
-        try:
-            # Get impact factors from CNF integrator
-            impact_factors = self.cnf_integrator.get_environmental_impact_factors(food.food_id)
-            
-            # Scale by food quantity (food.quantity is in grams)
-            quantity_factor = food.quantity / 100.0  # Convert to per 100g basis
-            
-            # Calculate impacts (only numeric factors; skip metadata)
-            food_impacts = {}
-            for impact_category, factor in impact_factors.items():
-                # Skip metadata keys (e.g., _data_source) and non-numeric values
-                if isinstance(impact_category, str) and impact_category.startswith('_'):
-                    continue
-                if not isinstance(factor, (int, float)):
-                    continue
-                food_impacts[impact_category] = float(factor) * quantity_factor
-            
-            return food_impacts
-            
-        except Exception as e:
-            self.logger.warning(f"Could not get impacts for food ID {food.food_id}: {e}")
-            # Return minimal impact if data unavailable
-            return {category: 0.0 for category in ['Global warming', 'Land use', 'Water consumption']}
+        quantity_factor = food.quantity / 100.0  # Convert to per 100g basis
+        impact_factors: Optional[Dict[str, float]] = None
+        source = "group_default"
+
+        if self.matcher is not None:
+            try:
+                result = self.matcher.match(
+                    food_id=food.food_id,
+                    food_description=getattr(food, "food_name", "") or "",
+                    food_group=getattr(food, "food_group", None),
+                )
+                self.matcher_decisions.append(result.to_audit())
+                if result.matched and result.midpoint_factors:
+                    impact_factors = result.midpoint_factors
+                    source = f"agribalyse_match:{result.ciqual_code}"
+            except Exception as exc:  # noqa: BLE001 - log + fallback
+                self.logger.warning(
+                    "LCAMatcher raised for food_id=%s, falling back to group default: %s",
+                    food.food_id, exc,
+                )
+
+        if impact_factors is None:
+            try:
+                impact_factors = self.cnf_integrator.get_environmental_impact_factors(food.food_id)
+            except Exception as e:  # noqa: BLE001 - log + degraded fallback
+                self.logger.warning(f"Could not get impacts for food ID {food.food_id}: {e}")
+                return {category: 0.0 for category in ['Global warming', 'Land use', 'Water consumption']}
+
+        # Calculate impacts (only numeric factors; skip metadata)
+        food_impacts = {}
+        for impact_category, factor in impact_factors.items():
+            if isinstance(impact_category, str) and impact_category.startswith('_'):
+                continue
+            if not isinstance(factor, (int, float)):
+                continue
+            food_impacts[impact_category] = float(factor) * quantity_factor
+
+        # Record the source for API surfacing without changing the impact return shape.
+        food_impacts.setdefault("_source", source)  # consumed by callers that want it
+        return food_impacts
     
     def _get_canadian_regional_factors(self) -> Dict[str, float]:
         """
