@@ -1251,6 +1251,55 @@ export interface EnvironmentalImpactRequest {
     quantity: number;
   }>;
   user_type?: 'individual' | 'researcher' | 'policy';
+  /**
+   * AGRIBALYSE-INGEST §3.5 LCA matcher. When true, the backend runs the
+   * LLM-assisted retrieve-then-rank pipeline against the Agribalyse 3.2
+   * v32 catalog (2,425 entries) and overlays its per-food factors over
+   * the cnf_integrator group defaults for the 5 directly-equivalent
+   * EF→ReCiPe categories. Default false → unchanged behaviour.
+   */
+  enable_lca_matcher?: boolean;
+}
+
+/**
+ * Per-food matcher decision returned by the backend when
+ * `enable_lca_matcher: true`. Surfaced under
+ * `environmental_impacts.lca_matcher_decisions[]`.
+ */
+export interface LCAMatcherDecision {
+  food_id: number;
+  matched: boolean;
+  ciqual_code: string | null;
+  lci_name: string | null;
+  confidence: number;
+  justification: string;
+  fallback_reason: string | null;
+  n_candidates_considered: number;
+  dqr: number | null;
+  warnings: string[];
+  catalog_version: string | null;
+  /** Number of ReCiPe categories whose value came from the Agribalyse match. */
+  categories_from_match?: number;
+  /** Number of ReCiPe categories that fell back to the cnf_integrator group default. */
+  categories_from_group_default?: number;
+  /** True when the Canadian regional multiplier was applied (i.e. food fell back to group default). */
+  regional_scaling_applied?: boolean;
+  /** Full 16 EF 3.1 indicators in native units, present when matched=true. */
+  ef31_indicators?: Record<string, number>;
+  unit_metadata?: Record<string, string>;
+}
+
+/**
+ * Per-meal EF 3.1 sensitivity block. Aggregates matched-food EF indicators
+ * (all 16, in native units) for side-by-side comparison with the ReCiPe
+ * midpoints in the same response. EF and ReCiPe are NOT interchangeable —
+ * see manuscript §3.2 dual-namespace policy.
+ */
+export interface RecipeEF31SensitivityBlock {
+  matched_count: number;
+  ef31_aggregated_per_meal: Record<string, number>;
+  unit_metadata: Record<string, string>;
+  note: string;
 }
 
 export interface FoodComparisonRequest {
@@ -1360,6 +1409,17 @@ export interface EnvironmentalImpactResult {
       monetization: EnvironmentalMonetization;
       sustainability_score: SustainabilityScore;
       meal_composition: MealComposition;
+      /**
+       * AGRIBALYSE-INGEST §3.5 LCA matcher audit + EF 3.1 sensitivity.
+       * `enabled=false` and empty arrays when `enable_lca_matcher` was off
+       * in the request (default behaviour).
+       */
+      lca_matcher: {
+        enabled: boolean;
+        catalog_version: string | null;
+        decisions: LCAMatcherDecision[];
+        sensitivity: RecipeEF31SensitivityBlock | null;
+      };
     };
     user_explanation: UserExplanation;
     comparison_to_references: {
@@ -1500,6 +1560,15 @@ export class EnvironmentalImpactApiService {
             food_count: Array.isArray(mealInfo.composition) ? mealInfo.composition.length : 0,
             macronutrient_distribution: mealInfo.macronutrient_distribution || { protein_percent: 0, carbohydrate_percent: 0, fat_percent: 0 },
             food_breakdown: mealInfo.composition || []
+          },
+          // AGRIBALYSE-INGEST §3.5 matcher: surface the audit trail + EF 3.1
+          // sensitivity block when `enable_lca_matcher: true` was sent.
+          // Both arrays/objects are empty/null when the flag is off.
+          lca_matcher: {
+            enabled: envImpacts.lca_matcher_enabled === true,
+            catalog_version: envImpacts.catalog_version ?? null,
+            decisions: (envImpacts.lca_matcher_decisions as LCAMatcherDecision[] | undefined) || [],
+            sensitivity: (envImpacts.recipe2016_h_ef31_sensitivity as RecipeEF31SensitivityBlock | undefined) || null,
           }
         },
         user_explanation: {
@@ -1785,6 +1854,18 @@ export class EnvironmentalImpactApiService {
       },
     } as EnvironmentalImpactResult['data']['comparison_to_references'];
 
+    // AGRIBALYSE-INGEST §3.5 matcher: surface audit + sensitivity when
+    // the raw response carries them (additive — empty/disabled by default).
+    const matcherRaw = (maObj?.lca_matcher as Record<string, unknown> | undefined) ?? {};
+    const lca_matcher: EnvironmentalImpactResult['data']['meal_analysis']['lca_matcher'] = {
+      enabled: Boolean(matcherRaw?.enabled),
+      catalog_version: (matcherRaw?.catalog_version as string | null) ?? null,
+      decisions: Array.isArray(matcherRaw?.decisions)
+        ? (matcherRaw.decisions as LCAMatcherDecision[])
+        : [],
+      sensitivity: (matcherRaw?.sensitivity as RecipeEF31SensitivityBlock | null) ?? null,
+    };
+
     const normalized: EnvironmentalImpactResult = {
       success: Boolean((root?.success as boolean | undefined) ?? true),
       data: {
@@ -1795,6 +1876,7 @@ export class EnvironmentalImpactApiService {
           monetization,
           sustainability_score,
           meal_composition,
+          lca_matcher,
         },
         user_explanation,
         comparison_to_references,

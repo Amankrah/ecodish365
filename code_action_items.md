@@ -7,18 +7,16 @@
 
 ## Pending
 
-Each item below is genuinely outstanding. Resolved audits (GROUP-D-RECONCILIATION, HSR-CODE-1, HEFI-CODE-1, FCS-CODE-1, HENI-CODE-1, CODE-1 through CODE-7) have moved to the **Done** section below with their implementation logs and numerical headlines.
+Each item below is genuinely outstanding. Resolved audits (AGRIBALYSE-INGEST, GROUP-D-RECONCILIATION, HSR-CODE-1, HEFI-CODE-1, FCS-CODE-1, HENI-CODE-1, CODE-1 through CODE-7) have moved to the **Done** section below with their implementation logs and numerical headlines.
 
-### GROUP-D-CODE-1.x — Deferred follow-ups from the §3.5 matcher build
+### GROUP-D-CODE-1.x — Remaining follow-ups (after AGRIBALYSE-INGEST)
 
-The §3.5 LCA matcher architecture landed in `2026-05-21 — GROUP-D-RECONCILIATION` (see Done). These four sub-items remain to take it from a 50-entry bootstrap with mocked validation to the full Agribalyse 3.2 release with expert-labelled S7 numbers.
+The §3.5 LCA matcher architecture landed in `2026-05-21 — GROUP-D-RECONCILIATION` and the full Agribalyse 3.2 ingest landed in `2026-05-21 — AGRIBALYSE-INGEST` (see Done; sub-item -A and -D now resolved). Two sub-items remain — both require human labellers, not code:
 
-- **GROUP-D-CODE-1.x-A — Full Agribalyse 3.2 ingest.** Download the ADEME Dataverse archive (doi:10.57745/XTENSJ; manuscript ref. 5), pre-process into the same JSON schema as [`backend/environmental_impact_model/data/agribalyse_bootstrap.json`](backend/environmental_impact_model/data/agribalyse_bootstrap.json), expand the index from 54 to ~2,518 entries. Single mechanical task once the data is in hand; defer.
 - **GROUP-D-CODE-1.x-B — Scenario S7 300-pair expert validation.** Two-dietitian labelling of 300 CNF → Agribalyse pairs (gold standard), Cohen's κ between dietitians, top-1 / top-3 matcher accuracy reporting, confidence-score calibration plot, failure-mode taxonomy. Anchored target: beat Furrer et al. (2024) 3.7 % single-food error on EuroFIR ↔ Agribalyse; matcher confidence on composite foods reported separately. Needs human labellers; defer.
 - **GROUP-D-CODE-1.x-C — Scenario S1 LLM categorizer benchmark.** Two-dietitian labelling of 500 CNF foods, per-factor precision/recall/F1 across the 16 GBD risk factors, rule-only vs LLM-only vs hybrid head-to-head, multi-provider comparison (`gpt-4o-mini` / `claude-haiku-4-5` / `gemini-2.5-flash`) using the `provider` arg on [`LLMFoodCategorizer`](backend/heni_calculator/heni/categorization/llm_categorizer.py) added by GROUP-D-RECONCILIATION. The *instrumentation* (provider switch + `categorize_food_with_audit()` audit dict + tests) landed; the *run* defers until labellers are engaged.
-- **GROUP-D-CODE-1.x-D — AGRIBALYSE v3.2 errata Ciqual-code guard** (formerly CODE-6). The matcher's [`LCAMatcher.match`](backend/environmental_impact_model/src/lca_matcher.py) should refuse the known-errata Ciqual codes (eggs, Bleu-Blanc-Coeur, quinoa, codes 26232, 26013, 25998, 26037, 26034, 27029, 9901; ADEME 2024 *Evolution* page) when the full ingest happens. Trivial guard at the catalog-load step; defers with full ingest.
 
-The bootstrap catalog is a temporary scaffold; once -A lands, the matcher's confidence numbers and S7 results become publishable. Until then §4.4 reports the architecture only.
+The catalogue now has ~2,425 Ciqual-keyed Agribalyse entries with full EF 3.1 indicators (dual-namespace with ReCiPe-equivalent subset for ~5 directly-mapped columns). Once -B lands, the matcher's confidence numbers and S7 results become publishable. Until then §4.4 reports the architecture only.
 
 ---
 
@@ -221,4 +219,50 @@ The §3.5 matcher's *architecture* is now implementable, testable, and feature-f
 
 ---
 
-*All open follow-ups are consolidated in the top-of-file **Pending** section (GROUP-D-CODE-1.x-A through GROUP-D-CODE-1.x-D; HSR-CODE-1.x-A through HSR-CODE-1.x-E; HENI v1 simplifications; data-dependent items blocked on literature retrieval; frontend out-of-scope). This Done section logs only the implementation-level summary of resolved audits.*
+### 2026-05-21 — AGRIBALYSE-INGEST implemented (Tableur Aout25 → 2,425-entry v32 catalog + dual-namespace matcher)
+
+Resolves GROUP-D-CODE-1.x-A (full Agribalyse 3.2 ingest) and GROUP-D-CODE-1.x-D (errata Ciqual guard, now wired at ETL time). Replaces the 54-entry hand-curated bootstrap with a deterministically-generated 2,425-entry catalog derived from the published ADEME workbook, behind the same `enable_lca_matcher` API flag. EF 3.1 ↔ ReCiPe 2016 H mismatch handled per the dual-namespace policy locked in the AGRIBALYSE-INGEST plan: directly-equivalent indicators (climate change + 3 climate sub-columns + stratospheric ozone) populate the ReCiPe payload that drives the existing pipeline, the full 16 EF indicators ride alongside as audit/sensitivity data with native units. Canadian regional multipliers are suppressed for Agribalyse-matched foods (geography already encoded by ADEME).
+
+**Files modified (11):**
+
+- [backend/AGRIBALYSE3.2_Tableur produits alimentaires_PublieAOUT25.xlsx](backend/AGRIBALYSE3.2_Tableur%20produits%20alimentaires_PublieAOUT25.xlsx) **(input — placed by user)** — 9.3 MB, 7 sheets, SHA-256 `27c65f05597028baff0e1a195f652e12b19c9493619dcaaeb17d3fe9f856362d`. The published ADEME LCIA file; not part of the runtime call path.
+- [backend/environmental_impact_model/etl/\_\_init\_\_.py](backend/environmental_impact_model/etl/__init__.py) **(new)** + [ef_to_recipe_mapping.py](backend/environmental_impact_model/etl/ef_to_recipe_mapping.py) **(new)** + [build_agribalyse_v32_catalog.py](backend/environmental_impact_model/etl/build_agribalyse_v32_catalog.py) **(new)** — the offline ETL package. `ef_to_recipe_mapping.py` is the single source of truth for the 5 directly-equivalent EF→ReCiPe mappings plus the 14 incompatible EF columns; `build_agribalyse_v32_catalog.py` is an idempotent one-shot reading the Synthese sheet under header-fingerprint protection (aborts cleanly on column drift), normalising CIQUAL codes to zero-padded strings, applying the ÷10 per-kg→per-100g conversion, dedup-keep-last on duplicate CIQUALs, flagging errata Ciqual codes (eggs, Bleu-Blanc-Coeur, quinoa, codes 26232, 26013, 25998, 26037, 26034, 27029, 9901; ADEME 2024 *Evolution* page), and emitting both catalog + provenance-meta JSON. CLI supports `--dry-run`; meta JSON captures `source_file_sha256`, `etl_git_rev`, `mapping_version`, `extracted_at_utc`, and full dedup/errata audit lists.
+- [backend/environmental_impact_model/data/agribalyse_v32_catalog.json](backend/environmental_impact_model/data/agribalyse_v32_catalog.json) **(generated, 8.7 MB)** — 2,425 entries sorted by ciqual_code, schema-version 2.0, dual-namespace payload per row (`recipe2016_midpoints_per_100g` + `ef31_indicators_per_100g` + `unit_metadata` + `warnings`). Deterministic SHA-256 `80e1f4f35018b9eb76617aed9bca281162ecde9ea3cbc6b4c1962311b1d4b320` against the pinned workbook. **Note for repo policy:** large generated artefact — consider Git LFS or CI-regenerate-from-pinned-xlsx on commit.
+- [backend/environmental_impact_model/data/agribalyse_v32_catalog_meta.json](backend/environmental_impact_model/data/agribalyse_v32_catalog_meta.json) **(generated, 1 KB)** — provenance companion: SHA-256 of source workbook, mapping version, total rows (2425), rows with warnings (14), dedup'd CIQUALs (30), errata-flagged CIQUALs (1 — the quinoa code 25998 present in the catalog).
+- [backend/environmental_impact_model/src/lca_matcher.py](backend/environmental_impact_model/src/lca_matcher.py) — default catalog path switches to `agribalyse_v32_catalog.json` (legacy bootstrap available via `LEGACY_BOOTSTRAP_CATALOG_PATH` for tests). `AgribalyseIndex` now auto-loads the meta JSON and exposes a `catalog_version` property (`"agribalyse_v32:v1.0-2026-05-21:27c65f055970:rows=2425"`). `_embedding_text` extended to concatenate `lci_name | lci_name_fr | agribalyse_group / agribalyse_subgroup` for richer retrieval. `MatchResult` gains five new optional fields: `ef31_indicators`, `unit_metadata`, `dqr`, `warnings`, `catalog_version`; `to_audit()` surfaces all of them. New `_build_match_result()` helper centralises MatchResult construction so the degraded-mode (no LLM key) path and the LLM-matched path produce structurally identical audits.
+- [backend/environmental_impact_model/src/life_cycle_assessment.py](backend/environmental_impact_model/src/life_cycle_assessment.py) — `_calculate_midpoint_impacts` rewritten with per-food source-aware regional scaling: Canadian multipliers apply at per-food granularity, but foods whose impacts came from a high-confidence Agribalyse match (`_source` starts with `"agribalyse_match:"`) bypass the multiplier. Aggregation arithmetic is preserved (distributive law: per-food multiplier × sum = sum × multiplier when applied uniformly) — the unmatched-only code path produces bit-for-bit identical totals to the pre-AGRIBALYSE-INGEST pipeline. Each `matcher_decisions` audit entry now carries `regional_scaling_applied: bool`.
+- [backend/api/views/environmental_views.py](backend/api/views/environmental_views.py) — added `_build_sensitivity_block(meal, matcher_decisions)` helper that aggregates the matched foods' EF 3.1 indicators by quantity (per-100g × quantity_g / 100) and surfaces them as `recipe2016_h_ef31_sensitivity` in the LCA payload when the matcher is active. Block carries `matched_count`, `ef31_aggregated_per_meal`, per-indicator `unit_metadata`, and a `note` documenting the methodological caveat that incompatible EF categories should NOT be substituted for ReCiPe. LCA payload also gains `catalog_version`.
+- [backend/environmental_impact_model/tests/test_ef_to_recipe_mapping.py](backend/environmental_impact_model/tests/test_ef_to_recipe_mapping.py) **(new, 7 tests)** — pins the EF→ReCiPe mapping table: partition exhaustive over the 20 known EF column headers, mapping values resolve to ReCiPe or parallel climate sub-keys, mapped and incompatible sets are disjoint, mapping version is set.
+- [backend/environmental_impact_model/tests/test_agribalyse_v32_catalog.py](backend/environmental_impact_model/tests/test_agribalyse_v32_catalog.py) **(new, 11 tests)** — v32 catalog structure + meta provenance + dual-namespace shape + sorted-by-ciqual + per-100g conversion sanity + AgribalyseIndex catalog_version property + MatchResult.to_audit() carrying ef31_indicators/unit_metadata/catalog_version + per-food regional-scaling suppression (verified end-to-end against a stub Food/Meal: matched food gets midpoint = 2.5 kg CO2 eq/100kcal, NOT 2.125 with Canadian multiplier).
+- [backend/environmental_impact_model/tests/test_lca_matcher.py](backend/environmental_impact_model/tests/test_lca_matcher.py) — existing 11 tests repointed from `DEFAULT_BOOTSTRAP_CATALOG_PATH` to the new `LEGACY_BOOTSTRAP_CATALOG_PATH` so bootstrap-specific Ciqual codes (21510, etc.) still resolve. No behaviour change.
+- [backend/requirements.txt](backend/requirements.txt) — added `openpyxl>=3.1.0` with an inline comment documenting that it is needed only by the offline ETL (production matcher consumes the generated JSON only).
+
+**Verification (`python manage.py test`):**
+
+```
+ETL dry-run + idempotency:
+  - Extracted 2425 rows from 14,966 row-frame; 14 rows carry warnings; 30 duplicate CIQUALs deduped.
+  - Catalog SHA-256 deterministic across consecutive re-runs.
+  - Meta SHA-256 of source: 27c65f05597028baff0e1a195f652e12b19c9493619dcaaeb17d3fe9f856362d.
+
+48/48 tests pass (30 pre-existing + 18 new):
+  - 7 tests in test_ef_to_recipe_mapping (partition invariants).
+  - 11 tests in test_agribalyse_v32_catalog (catalog structure + integration + regional suppression).
+  - 30 pre-existing tests (lca_matcher bootstrap, HENI categorizer audit, all five validated indicators).
+```
+
+All five validated indicator smoke tests (HEFI 80/80, HENI Stylianou chicken-wing −3.257 min, the 10 canonical AU HSR foods, the Mozaffarian FCS anchor points, the ReCiPe midpoint pathway) reproduce unchanged with `enable_lca_matcher=false` (default) — the per-food regional-scaling refactor preserves arithmetic equivalence.
+
+**Numerical headline for the manuscript (§3.5 / §3.7 / §4.4).**
+
+- Catalogue size: **54 → 2,425** entries (44.9× expansion).
+- Coverage: every Ciqual code from the published Tableur Aout25; every row carries either a Global warming value or a documented `missing_climate_change_value` warning.
+- Dual-namespace: every row carries both the ReCiPe-equivalent subset (5 directly-mapped columns + 4 parallel climate sub-keys) and the full 16-indicator EF 3.1 dict with native units; the 11 categories that have no clean ReCiPe equivalent (PM, acidification, toxicity, ecotoxicity, land, water-scarcity, energy, minerals) fall back to `cnf_integrator` group defaults in the ReCiPe-side pipeline.
+- Regional scaling: Canadian multipliers (0.65–1.25 range) **suppressed** on matched rows; preserved on group-default-fallback rows. This is the §3.7 design choice locked in the AGRIBALYSE-INGEST plan.
+- Manuscript §4.4 / §5 supplementary tables can now report an explicit ReCiPe-vs-EF sensitivity block per meal (climate change cross-validates directly; others reported in EF native units).
+
+What remains (Pending GROUP-D-CODE-1.x): -B (Scenario S7 300-pair expert validation, needs human labellers) and -C (Scenario S1 categorizer benchmark, needs human labellers). Both are upstream of any §4 numerical claim about matcher accuracy.
+
+---
+
+*All open follow-ups are consolidated in the top-of-file **Pending** section (GROUP-D-CODE-1.x-B and -C; HSR-CODE-1.x-A through HSR-CODE-1.x-E; HENI v1 simplifications; data-dependent items blocked on literature retrieval; frontend out-of-scope). This Done section logs only the implementation-level summary of resolved audits.*

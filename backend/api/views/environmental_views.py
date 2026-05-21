@@ -24,6 +24,55 @@ _LCA_MATCHER_CACHE = {"instance": None, "tried": False}
 _LCA_MATCHER_LOCK = threading.Lock()
 
 
+def _build_sensitivity_block(meal, matcher_decisions):
+    """Aggregate per-food EF 3.1 indicators (from the matcher's dual-namespace
+    payload) by quantity, and return a side-by-side ReCiPe ⇄ EF table for the
+    directly-equivalent categories (climate change + climate sub-columns +
+    stratospheric ozone). Used as supplementary §4.4 / §5 sensitivity data.
+
+    AGRIBALYSE-INGEST §3.2 / §3.5: this block is the public surface of the
+    "EF-vs-ReCiPe is sensitivity, not primary" framing. The matched
+    EF columns are reported in their native units (mPt/kg, mol H+ eq/kg, ...);
+    consumers must NOT silently aggregate them with the ReCiPe midpoints.
+    """
+    if not matcher_decisions:
+        return {"matched_count": 0, "ef31_aggregated_per_meal": {}, "unit_metadata": {}, "note": "matcher returned no matched rows"}
+
+    food_id_to_quantity = {f.food_id: f.quantity for f in meal.foods}
+    aggregated: Dict[str, float] = {}
+    unit_metadata: Dict[str, str] = {}
+    matched_count = 0
+    for dec in matcher_decisions:
+        if not dec.get("matched"):
+            continue
+        matched_count += 1
+        ef = dec.get("ef31_indicators") or {}
+        units = dec.get("unit_metadata") or {}
+        qty_g = food_id_to_quantity.get(dec.get("food_id"), 0.0)
+        qty_factor = qty_g / 100.0  # EF factors are per 100 g.
+        for ind_name, per_100g_val in ef.items():
+            if not isinstance(per_100g_val, (int, float)):
+                continue
+            aggregated[ind_name] = aggregated.get(ind_name, 0.0) + per_100g_val * qty_factor
+            unit_metadata.setdefault(ind_name, units.get(ind_name, ""))
+    # Replace per-kg unit fragment with per-meal in the surfaced unit string.
+    unit_metadata_per_meal = {k: v.replace("/kg de produit", "/meal").replace("/kg", "/meal") for k, v in unit_metadata.items()}
+    return {
+        "matched_count": matched_count,
+        "ef31_aggregated_per_meal": aggregated,
+        "unit_metadata": unit_metadata_per_meal,
+        "note": (
+            "EF 3.1 (Agribalyse) indicators aggregated across matched foods. "
+            "Reported in native units; categories without a direct ReCiPe "
+            "equivalent (PM, acidification, toxicity, ecotoxicity, water "
+            "scarcity, land EF score) should be interpreted alongside the "
+            "ReCiPe midpoints rather than substituted for them. Climate "
+            "change EF ≡ ReCiPe Global warming (kg CO2 eq) and is the only "
+            "indicator that cross-validates directly."
+        ),
+    }
+
+
 def _get_default_lca_matcher():
     """Return a singleton LCAMatcher (or None if construction failed or no
     API key is available and we want to suppress the degraded retrieval-only
@@ -240,6 +289,12 @@ def format_environmental_results(meal_data: Dict[str, Any], user_type: str = "in
         # (additive — existing consumers ignore unknown keys).
         "factor_confidence_by_category": lca_data.get('factor_confidence_by_category', {}),
         "data_quality": lca_data.get('data_quality', {}),
+        # AGRIBALYSE-INGEST: §3.5 LCA matcher additive fields. Always present
+        # in the response shape; populated when enable_lca_matcher=true.
+        "lca_matcher_enabled": lca_data.get('lca_matcher_enabled', False),
+        "lca_matcher_decisions": lca_data.get('lca_matcher_decisions', []),
+        "catalog_version": lca_data.get('catalog_version'),
+        "recipe2016_h_ef31_sensitivity": lca_data.get('recipe2016_h_ef31_sensitivity'),
     }
     
     # Surface sustainability scores (numeric) calculated server-side so the UI
@@ -569,10 +624,19 @@ def _analyze_meal_comprehensive(meal: EnvMeal, data_loader: EnvDataLoader, match
             # Methodology version + endpoint factor provenance (CODE-2).
             'data_quality': lca.get_data_quality_report(),
         }
-        # §3.5 GROUP-D-RECONCILIATION: surface matcher audit trail when active.
+        # §3.5 GROUP-D-RECONCILIATION + AGRIBALYSE-INGEST: surface matcher
+        # audit trail and dual-namespace EF sensitivity block when active.
         if matcher is not None:
             lca_data['lca_matcher_decisions'] = lca.matcher_decisions
             lca_data['lca_matcher_enabled'] = True
+            # Catalog version from the first matcher decision (same for all).
+            lca_data['catalog_version'] = (
+                lca.matcher_decisions[0].get('catalog_version')
+                if lca.matcher_decisions else None
+            )
+            lca_data['recipe2016_h_ef31_sensitivity'] = _build_sensitivity_block(
+                meal, lca.matcher_decisions
+            )
         else:
             lca_data['lca_matcher_enabled'] = False
 

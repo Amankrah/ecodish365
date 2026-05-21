@@ -43,8 +43,16 @@ import numpy as np
 _MODULE_DIR = os.path.dirname(os.path.abspath(__file__))
 _DATA_DIR = os.path.normpath(os.path.join(_MODULE_DIR, "..", "data"))
 
-DEFAULT_BOOTSTRAP_CATALOG_PATH = os.path.join(_DATA_DIR, "agribalyse_bootstrap.json")
-DEFAULT_EMBEDDINGS_CACHE_PATH = os.path.join(_DATA_DIR, "agribalyse_bootstrap_embeddings.npy")
+# Default: the AGRIBALYSE-INGEST v32 catalog (~2,425 entries, deterministically
+# generated from the Tableur Aout25 workbook). The bootstrap path is kept
+# available as an explicit constructor arg for backwards compatibility and
+# offline tests.
+DEFAULT_BOOTSTRAP_CATALOG_PATH = os.path.join(_DATA_DIR, "agribalyse_v32_catalog.json")
+DEFAULT_EMBEDDINGS_CACHE_PATH = os.path.join(_DATA_DIR, "agribalyse_v32_embeddings.npy")
+DEFAULT_META_PATH = os.path.join(_DATA_DIR, "agribalyse_v32_catalog_meta.json")
+# Pre-AGRIBALYSE-INGEST bootstrap (54-entry hand-curated; kept for tests).
+LEGACY_BOOTSTRAP_CATALOG_PATH = os.path.join(_DATA_DIR, "agribalyse_bootstrap.json")
+LEGACY_BOOTSTRAP_EMBEDDINGS_PATH = os.path.join(_DATA_DIR, "agribalyse_bootstrap_embeddings.npy")
 
 DEFAULT_EMBEDDING_MODEL = "text-embedding-3-small"  # 1536-dim; $0.02/1M tokens
 DEFAULT_RANKING_MODEL = "gpt-4o-mini"  # match HENI categorizer
@@ -61,6 +69,11 @@ class MatchResult:
     `matched=True` means a high-confidence Agribalyse mapping was made.
     `matched=False` means the matcher fell back to the existing group-default
     LCA pipeline (the audit trail records why).
+
+    Dual-namespace payload (AGRIBALYSE-INGEST): `midpoint_factors` carries the
+    ReCiPe-side subset that the existing pipeline consumes; `ef31_indicators`
+    carries the full EF 3.1 set with native units, surfaced as sensitivity
+    data in `recipe2016_h_ef31_sensitivity`.
     """
 
     food_id: int
@@ -72,9 +85,15 @@ class MatchResult:
     midpoint_factors: Optional[Dict[str, float]] = None
     fallback_reason: Optional[str] = None  # "low_confidence" | "hallucinated_code" | "no_llm_client" | "no_candidates" | "exception"
     candidates_considered: List[Dict[str, Any]] = field(default_factory=list)
+    # AGRIBALYSE-INGEST additions:
+    ef31_indicators: Optional[Dict[str, float]] = None
+    unit_metadata: Optional[Dict[str, str]] = None
+    dqr: Optional[float] = None
+    warnings: List[str] = field(default_factory=list)
+    catalog_version: Optional[str] = None
 
     def to_audit(self) -> Dict[str, Any]:
-        return {
+        audit: Dict[str, Any] = {
             "food_id": self.food_id,
             "matched": self.matched,
             "ciqual_code": self.ciqual_code,
@@ -83,17 +102,26 @@ class MatchResult:
             "justification": self.justification,
             "fallback_reason": self.fallback_reason,
             "n_candidates_considered": len(self.candidates_considered),
+            "dqr": self.dqr,
+            "warnings": list(self.warnings),
+            "catalog_version": self.catalog_version,
         }
+        if self.ef31_indicators:
+            # Keep the audit payload light: full EF dict only when matched.
+            audit["ef31_indicators"] = self.ef31_indicators
+            audit["unit_metadata"] = self.unit_metadata
+        return audit
 
 
 class AgribalyseIndex:
-    """Bootstrap Agribalyse 3.2 catalog + precomputed sentence embeddings.
+    """Agribalyse 3.2 catalog + precomputed sentence embeddings.
 
-    The catalog is loaded from `agribalyse_bootstrap.json` (50–80 entries spanning
-    the 10 CNF food groups). Embeddings are loaded from the `.npy` cache if
-    present, otherwise computed via `embedding_client.embeddings.create(...)`
-    and persisted. Production scale (2,518 entries, full Agribalyse 3.2) is
-    deferred to GROUP-D-CODE-1.x-A.
+    Default path is the AGRIBALYSE-INGEST v32 catalog (~2,425 deterministically
+    generated entries; see `etl/build_agribalyse_v32_catalog.py`). Pass an
+    explicit `catalog_path` to use the legacy bootstrap (54 hand-curated rows).
+
+    Embeddings are loaded from the `.npy` cache if present, otherwise computed
+    via `embedding_client.embeddings.create(...)` and persisted.
     """
 
     def __init__(
@@ -102,19 +130,27 @@ class AgribalyseIndex:
         embeddings_cache_path: str = DEFAULT_EMBEDDINGS_CACHE_PATH,
         embedding_client: Optional[Any] = None,
         embedding_model: str = DEFAULT_EMBEDDING_MODEL,
+        meta_path: Optional[str] = None,
     ):
         self.catalog_path = catalog_path
         self.embeddings_cache_path = embeddings_cache_path
         self.embedding_client = embedding_client
         self.embedding_model = embedding_model
+        # Meta path defaults to the canonical v32 meta when the catalog is the
+        # v32 file; otherwise None (bootstrap has no meta).
+        if meta_path is None and catalog_path == DEFAULT_BOOTSTRAP_CATALOG_PATH:
+            meta_path = DEFAULT_META_PATH
+        self.meta_path = meta_path
         self._catalog: List[Dict[str, Any]] = []
         self._embeddings: Optional[np.ndarray] = None  # (n, dim)
+        self._meta: Dict[str, Any] = {}
         self._load_catalog()
+        self._load_meta()
 
     def _load_catalog(self) -> None:
         with open(self.catalog_path, "r", encoding="utf-8") as fh:
             payload = json.load(fh)
-        # JSON schema: top-level dict with "entries" list (see agribalyse_bootstrap.json).
+        # JSON schema: top-level dict with "entries" list (v32 + bootstrap).
         # Backwards-compat: also accept a bare list at the top level.
         if isinstance(payload, list):
             self._catalog = payload
@@ -122,6 +158,22 @@ class AgribalyseIndex:
             self._catalog = payload.get("entries", [])
         if not self._catalog:
             raise ValueError(f"Agribalyse catalog at {self.catalog_path} is empty.")
+
+    def _load_meta(self) -> None:
+        if self.meta_path and os.path.exists(self.meta_path):
+            with open(self.meta_path, "r", encoding="utf-8") as fh:
+                self._meta = json.load(fh)
+
+    @property
+    def catalog_version(self) -> str:
+        """Human-readable catalog version for audit trails."""
+        if self._meta:
+            return (
+                f"agribalyse_v32:{self._meta.get('mapping_version', '?')}"
+                f":{self._meta.get('source_file_sha256', '?')[:12]}"
+                f":rows={self._meta.get('total_rows', len(self._catalog))}"
+            )
+        return f"bootstrap:rows={len(self._catalog)}"
 
     def ensure_embeddings(self) -> None:
         """Load or compute the embedding matrix. Caches to .npy on first build."""
@@ -146,12 +198,22 @@ class AgribalyseIndex:
                 "pre-populate the cache."
             )
         texts = [self._embedding_text(e) for e in self._catalog]
-        response = self.embedding_client.embeddings.create(
-            model=self.embedding_model,
-            input=texts,
-        )
-        # OpenAI SDK 1.x: response.data is a list of objects with .embedding.
-        vectors = np.asarray([row.embedding for row in response.data], dtype=np.float32)
+        # OpenAI /v1/embeddings caps input array at 2,048 items. Batch.
+        all_vectors: List[List[float]] = []
+        batch_size = 1024
+        for start in range(0, len(texts), batch_size):
+            batch = texts[start:start + batch_size]
+            response = self.embedding_client.embeddings.create(
+                model=self.embedding_model,
+                input=batch,
+            )
+            all_vectors.extend(row.embedding for row in response.data)
+        vectors = np.asarray(all_vectors, dtype=np.float32)
+        if vectors.shape[0] != len(self._catalog):
+            raise RuntimeError(
+                f"Embedding shape mismatch: got {vectors.shape[0]} vectors "
+                f"for {len(self._catalog)} catalog entries."
+            )
         self._embeddings = vectors
         os.makedirs(os.path.dirname(self.embeddings_cache_path), exist_ok=True)
         np.save(self.embeddings_cache_path, vectors)
@@ -159,8 +221,22 @@ class AgribalyseIndex:
 
     @staticmethod
     def _embedding_text(entry: Dict[str, Any]) -> str:
-        """Concatenate LCI name + category path for richer retrieval context."""
-        return f"{entry.get('lci_name', '')} | {entry.get('agribalyse_category', '')}".strip()
+        """Concatenate English LCI name, French product name, and Agribalyse
+        category path for richer retrieval. v32 entries carry separate
+        `agribalyse_group`/`agribalyse_subgroup` fields; bootstrap entries
+        carry a combined `agribalyse_category` string. Both paths produce
+        useful retrieval text."""
+        parts = [
+            entry.get("lci_name", ""),
+            entry.get("lci_name_fr", ""),
+        ]
+        group = entry.get("agribalyse_group", "")
+        subgroup = entry.get("agribalyse_subgroup", "")
+        if group or subgroup:
+            parts.append(f"{group} / {subgroup}".strip(" /"))
+        else:
+            parts.append(entry.get("agribalyse_category", ""))
+        return " | ".join(p for p in parts if p)
 
     @property
     def catalog(self) -> List[Dict[str, Any]]:
@@ -282,16 +358,16 @@ class LCAMatcher:
             # Degraded mode: return retrieval-only top-1 with similarity as
             # confidence. Useful for offline/test environments without an API key.
             top, top_sim = candidates[0]
-            result = MatchResult(
+            matched = top_sim >= self.confidence_threshold
+            result = self._build_match_result(
                 food_id=food_id,
-                matched=top_sim >= self.confidence_threshold,
-                ciqual_code=top["ciqual_code"],
-                lci_name=top.get("lci_name"),
+                matched=matched,
+                entry=top if matched else None,
+                proposed_code=top["ciqual_code"],
                 confidence=top_sim,
                 justification="embedding-similarity-only (no LLM key configured)",
-                midpoint_factors=top.get("midpoint_factors_per_100g") if top_sim >= self.confidence_threshold else None,
-                fallback_reason=None if top_sim >= self.confidence_threshold else "low_confidence",
-                candidates_considered=candidate_records,
+                fallback_reason=None if matched else "low_confidence",
+                candidate_records=candidate_records,
             )
             self._cache[food_id] = result
             return result
@@ -346,18 +422,72 @@ class LCAMatcher:
             return result
 
         matched_entry = candidate_codes[proposed_code]
-        result = MatchResult(
+        result = self._build_match_result(
             food_id=food_id,
             matched=True,
-            ciqual_code=proposed_code,
-            lci_name=matched_entry.get("lci_name"),
+            entry=matched_entry,
+            proposed_code=proposed_code,
             confidence=confidence,
             justification=justification,
-            midpoint_factors=matched_entry.get("midpoint_factors_per_100g"),
-            candidates_considered=candidate_records,
+            fallback_reason=None,
+            candidate_records=candidate_records,
         )
         self._cache[food_id] = result
         return result
+
+    def _build_match_result(
+        self,
+        *,
+        food_id: int,
+        matched: bool,
+        entry: Optional[Dict[str, Any]],
+        proposed_code: Optional[str],
+        confidence: float,
+        justification: str,
+        fallback_reason: Optional[str],
+        candidate_records: List[Dict[str, Any]],
+    ) -> MatchResult:
+        """Common MatchResult construction respecting the dual-namespace payload.
+
+        v32 entries carry `recipe2016_midpoints_per_100g` + `ef31_indicators_per_100g`
+        + `unit_metadata` + `dqr` + `warnings`. Legacy bootstrap entries carry
+        the old `midpoint_factors_per_100g` key — fall back to that for
+        backwards compatibility.
+        """
+        midpoint_factors: Optional[Dict[str, float]] = None
+        ef31_indicators: Optional[Dict[str, float]] = None
+        unit_metadata: Optional[Dict[str, str]] = None
+        dqr: Optional[float] = None
+        warnings: List[str] = []
+        lci_name: Optional[str] = None
+        if matched and entry is not None:
+            midpoint_factors = entry.get("recipe2016_midpoints_per_100g") or entry.get("midpoint_factors_per_100g")
+            ef31_indicators = entry.get("ef31_indicators_per_100g")
+            unit_metadata = entry.get("unit_metadata")
+            dqr = entry.get("dqr")
+            warnings = list(entry.get("warnings") or [])
+            lci_name = entry.get("lci_name")
+        elif entry is not None:
+            # Even on fallback (low confidence, etc.), surface the candidate's
+            # lci_name and dqr so the audit trail is informative.
+            lci_name = entry.get("lci_name")
+            dqr = entry.get("dqr")
+        return MatchResult(
+            food_id=food_id,
+            matched=matched,
+            ciqual_code=proposed_code,
+            lci_name=lci_name,
+            confidence=confidence,
+            justification=justification,
+            midpoint_factors=midpoint_factors,
+            fallback_reason=fallback_reason,
+            candidates_considered=candidate_records,
+            ef31_indicators=ef31_indicators,
+            unit_metadata=unit_metadata,
+            dqr=dqr,
+            warnings=warnings,
+            catalog_version=self.index.catalog_version,
+        )
 
     def _build_prompt(
         self,

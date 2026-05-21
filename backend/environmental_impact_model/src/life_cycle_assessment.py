@@ -245,48 +245,78 @@ class LifeCycleAssessment:
             'Water consumption': 0.0,  # m3
         }
         
-        # Calculate impacts for each food in the meal
+        # Apply Canadian regional factors per-(food, category) per the
+        # AGRIBALYSE-INGEST policy: suppress the multiplier for categories
+        # whose value came from an Agribalyse match (Agribalyse already
+        # encodes FR/EU geography), keep it for categories that fell back
+        # to the cnf_integrator group default (those are global Poore &
+        # Nemecek means that the Canadian layer is meant to localise).
+        regional_factors = self._get_canadian_regional_factors()
+
         for food in self.meal.foods:
             food_impacts = self._get_food_environmental_impacts(food)
+            category_sources = food_impacts.get("_category_sources", {}) if isinstance(food_impacts, dict) else {}
+            food_source = food_impacts.get("_source", "group_default") if isinstance(food_impacts, dict) else "group_default"
+            categories_with_match = 0
+            categories_with_default = 0
             for impact_category in total_impacts:
-                total_impacts[impact_category] += food_impacts.get(impact_category, 0.0)
-        
-        # Apply functional unit normalization (per 100 kcal)
+                value = food_impacts.get(impact_category, 0.0)
+                cat_source = category_sources.get(impact_category, "group_default")
+                if cat_source == "group_default":
+                    value *= regional_factors.get(impact_category, 1.0)
+                    categories_with_default += 1
+                else:
+                    categories_with_match += 1
+                total_impacts[impact_category] += value
+            # Tag the matching matcher_decisions audit entry with the
+            # per-category accounting (only when matcher fired for this food).
+            if self.matcher_decisions:
+                last_decision = self.matcher_decisions[-1]
+                if last_decision.get("food_id") == getattr(food, "food_id", None):
+                    is_match = isinstance(food_source, str) and food_source.startswith("agribalyse_match:")
+                    last_decision["regional_scaling_applied"] = not is_match
+                    last_decision["categories_from_match"] = categories_with_match
+                    last_decision["categories_from_group_default"] = categories_with_default
+
+        # Apply functional unit normalization (per 100 kcal).
         total_calories = self.meal.calculate_total_calories()
         functional_unit_factor = 100 / total_calories if total_calories > 0 else 1
-        
-        # Apply scientifically-validated Canadian regional factors
-        regional_factors = self._get_canadian_regional_factors()
-        
         for impact_category in total_impacts:
             total_impacts[impact_category] *= functional_unit_factor
-            # Apply regional correction factor
-            regional_factor = regional_factors.get(impact_category, 1.0)
-            total_impacts[impact_category] *= regional_factor
-        
+
         return total_impacts
     
     def _get_food_environmental_impacts(self, food) -> Dict[str, float]:
         """
         Get environmental impacts for a specific food item.
 
-        Resolution order (§3.5 GROUP-D-RECONCILIATION):
-          1. If `self.matcher` is set, query it for an Agribalyse-matched per-food
-             factor set. If the matcher returns `matched=True` (confidence ≥
-             threshold and LLM did not hallucinate a non-existent Ciqual code),
-             use the matched midpoint factors.
-          2. Otherwise (matcher is None, or matched=False, or any matcher
-             exception) fall back to the existing `cnf_integrator` per-food-group
-             group-default factors. Behaviour is bit-for-bit identical to the
-             pre-matcher pipeline when `self.matcher is None`.
-
-        The matcher's per-food decision is appended to `self.matcher_decisions`
-        for API audit-trail surfacing.
+        Resolution order (§3.5 / §3.7 AGRIBALYSE-INGEST):
+          1. Always fetch the cnf_integrator group-default factors (Poore &
+             Nemecek per-food-group means).
+          2. If `self.matcher` is set AND returns a high-confidence match,
+             OVERLAY the matched Agribalyse factors over the group defaults
+             (the v32 catalog's `recipe2016_midpoints_per_100g` only carries
+             the ~5 EF↔ReCiPe directly-equivalent categories; the other 13
+             ReCiPe categories stay on group defaults per the dual-namespace
+             plan).
+          3. Record per-category source so `_calculate_midpoint_impacts` can
+             apply Canadian regional scaling selectively — suppress on
+             matched categories (Agribalyse already encodes FR/EU geography),
+             keep on group-default categories (the Canadian layer is the
+             whole point of `_get_canadian_regional_factors`).
         """
         quantity_factor = food.quantity / 100.0  # Convert to per 100g basis
-        impact_factors: Optional[Dict[str, float]] = None
-        source = "group_default"
 
+        # Step 1: always start from the group-default Poore & Nemecek factors.
+        try:
+            group_default_factors = self.cnf_integrator.get_environmental_impact_factors(food.food_id)
+        except Exception as e:  # noqa: BLE001 - log + degraded fallback
+            self.logger.warning(f"Could not get impacts for food ID {food.food_id}: {e}")
+            return {category: 0.0 for category in ['Global warming', 'Land use', 'Water consumption']}
+
+        # Step 2: optionally overlay matcher-supplied factors.
+        matched_factors: Dict[str, float] = {}
+        food_source = "group_default"
         if self.matcher is not None:
             try:
                 result = self.matcher.match(
@@ -296,32 +326,40 @@ class LifeCycleAssessment:
                 )
                 self.matcher_decisions.append(result.to_audit())
                 if result.matched and result.midpoint_factors:
-                    impact_factors = result.midpoint_factors
-                    source = f"agribalyse_match:{result.ciqual_code}"
+                    matched_factors = {
+                        k: v for k, v in result.midpoint_factors.items()
+                        if isinstance(v, (int, float))
+                    }
+                    food_source = f"agribalyse_match:{result.ciqual_code}"
             except Exception as exc:  # noqa: BLE001 - log + fallback
                 self.logger.warning(
                     "LCAMatcher raised for food_id=%s, falling back to group default: %s",
                     food.food_id, exc,
                 )
 
-        if impact_factors is None:
-            try:
-                impact_factors = self.cnf_integrator.get_environmental_impact_factors(food.food_id)
-            except Exception as e:  # noqa: BLE001 - log + degraded fallback
-                self.logger.warning(f"Could not get impacts for food ID {food.food_id}: {e}")
-                return {category: 0.0 for category in ['Global warming', 'Land use', 'Water consumption']}
-
-        # Calculate impacts (only numeric factors; skip metadata)
-        food_impacts = {}
-        for impact_category, factor in impact_factors.items():
-            if isinstance(impact_category, str) and impact_category.startswith('_'):
+        # Step 3: merge — matched factors WIN where keys overlap; group
+        # defaults FILL the gaps. Track per-category source.
+        food_impacts: Dict[str, float] = {}
+        category_sources: Dict[str, str] = {}
+        for category, factor in group_default_factors.items():
+            if isinstance(category, str) and category.startswith('_'):
                 continue
             if not isinstance(factor, (int, float)):
                 continue
-            food_impacts[impact_category] = float(factor) * quantity_factor
+            food_impacts[category] = float(factor) * quantity_factor
+            category_sources[category] = "group_default"
+        # Overlay matched factors. The v32 catalog may also introduce keys
+        # that the cnf_integrator never returns (e.g. parallel climate
+        # sub-columns like "Global warming (fossil)"); include them too.
+        for category, factor in matched_factors.items():
+            if isinstance(category, str) and category.startswith('_'):
+                continue
+            food_impacts[category] = float(factor) * quantity_factor
+            category_sources[category] = food_source
 
-        # Record the source for API surfacing without changing the impact return shape.
-        food_impacts.setdefault("_source", source)  # consumed by callers that want it
+        # Underscore-prefixed keys are filtered by aggregation loops.
+        food_impacts["_source"] = food_source
+        food_impacts["_category_sources"] = category_sources
         return food_impacts
     
     def _get_canadian_regional_factors(self) -> Dict[str, float]:

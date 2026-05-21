@@ -29,6 +29,11 @@ packaging==24.2
 pandas==2.3.2; python_version >= "3.11"
 pandas==2.2.3; python_version < "3.11"
 pillow==11.3.0
+# openpyxl is needed only by the offline ETL
+# (environmental_impact_model/etl/build_agribalyse_v32_catalog.py) to read
+# the ADEME Tableur .xlsx. The runtime matcher consumes the generated JSON
+# only, so this dep is not on any hot path.
+openpyxl>=3.1.0
 psycopg2-binary==2.9.10
 pydantic==2.10.6
 pydantic_core==2.27.2

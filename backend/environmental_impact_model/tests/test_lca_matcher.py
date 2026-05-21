@@ -22,11 +22,19 @@ import numpy as np
 
 from environmental_impact_model.src.lca_matcher import (
     DEFAULT_BOOTSTRAP_CATALOG_PATH,
+    LEGACY_BOOTSTRAP_CATALOG_PATH,
     AgribalyseIndex,
     EmbeddingRetriever,
     LCAMatcher,
     MatchResult,
 )
+
+# Existing tests in this file were written against the 54-row hand-curated
+# bootstrap. After AGRIBALYSE-INGEST the default catalog is the v32 file
+# (~2,425 entries with different Ciqual codes), so pin these tests to the
+# legacy bootstrap path explicitly. v32-specific assertions live in
+# test_agribalyse_v32_catalog.py.
+BOOTSTRAP_CATALOG_PATH = LEGACY_BOOTSTRAP_CATALOG_PATH
 
 
 def _make_mock_openai_client(catalog_size: int, embedding_dim: int = 32):
@@ -75,7 +83,7 @@ def _make_mock_openai_client(catalog_size: int, embedding_dim: int = 32):
 
 class AgribalyseIndexTests(unittest.TestCase):
     def test_bootstrap_catalog_loads(self):
-        index = AgribalyseIndex(catalog_path=DEFAULT_BOOTSTRAP_CATALOG_PATH)
+        index = AgribalyseIndex(catalog_path=BOOTSTRAP_CATALOG_PATH)
         self.assertGreaterEqual(len(index), 40, "bootstrap must contain at least 40 entries")
         self.assertGreaterEqual(len(index), 50, "plan target is 50–80 entries")
         # Required keys on every entry.
@@ -94,7 +102,7 @@ class AgribalyseIndexTests(unittest.TestCase):
             cache_path = os.path.join(tmpdir, "emb.npy")
             client = _make_mock_openai_client(catalog_size=50)
             index = AgribalyseIndex(
-                catalog_path=DEFAULT_BOOTSTRAP_CATALOG_PATH,
+                catalog_path=BOOTSTRAP_CATALOG_PATH,
                 embeddings_cache_path=cache_path,
                 embedding_client=client,
             )
@@ -106,7 +114,7 @@ class AgribalyseIndexTests(unittest.TestCase):
             # Reload from cache — must not call embeddings again.
             client.embeddings.create.reset_mock()
             index2 = AgribalyseIndex(
-                catalog_path=DEFAULT_BOOTSTRAP_CATALOG_PATH,
+                catalog_path=BOOTSTRAP_CATALOG_PATH,
                 embeddings_cache_path=cache_path,
                 embedding_client=client,
             )
@@ -121,7 +129,7 @@ class EmbeddingRetrieverTests(unittest.TestCase):
         self.cache_path = os.path.join(self.tmpdir.name, "emb.npy")
         self.client = _make_mock_openai_client(catalog_size=50)
         self.index = AgribalyseIndex(
-            catalog_path=DEFAULT_BOOTSTRAP_CATALOG_PATH,
+            catalog_path=BOOTSTRAP_CATALOG_PATH,
             embeddings_cache_path=self.cache_path,
             embedding_client=self.client,
         )
@@ -159,7 +167,7 @@ class LCAMatcherTests(unittest.TestCase):
         self.cache_path = os.path.join(self.tmpdir.name, "emb.npy")
         self.embedding_client = _make_mock_openai_client(catalog_size=50)
         self.index = AgribalyseIndex(
-            catalog_path=DEFAULT_BOOTSTRAP_CATALOG_PATH,
+            catalog_path=BOOTSTRAP_CATALOG_PATH,
             embeddings_cache_path=self.cache_path,
             embedding_client=self.embedding_client,
         )
