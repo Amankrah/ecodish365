@@ -67,9 +67,21 @@ def compute_hefi(inputs: HEFIInputs, config: HEFIConfig = HEFIConfig()) -> HEFIR
         **{k: float(scores_dict[k]) for k in _COMPONENT_KEYS}
     )
     ratios: Dict[str, float] = {k: float(v) for k, v in out["ratios"].items()}
+    # Standard free-sugars imputation disclosure. Surfaced through HEFIResult
+    # so downstream consumers can warn that C9 uses CNF SUGARS, TOTAL as a
+    # proxy until the Rana et al. 2021 free-sugars supplement is integrated.
+    # See Brassard 2022a Discussion p. 603.
+    c9_imputation_note = (
+        "C9 free sugars uses CNF SUGARS, TOTAL as a proxy; "
+        "Rana et al. 2021 free-sugars supplement integration is pending. "
+        "For foods with significant intrinsic sugars (whole fruit, milk, "
+        "plain yogurt) this systematically over-counts free sugars and "
+        "under-scores C9. See Brassard 2022a Discussion p. 603."
+    )
     return HEFIResult(
         inputs=inputs,
         ratios=ratios,
         component_scores=component_scores,
         total_score=float(out["total_score"]),
+        c9_imputation_note=c9_imputation_note,
     )

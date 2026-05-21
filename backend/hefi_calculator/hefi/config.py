@@ -27,7 +27,7 @@ class HEFIThresholds:
     # Moderation component thresholds (max points at/below these values) - HEFI-2019 official
     sfa_percent_max: float = 10.0  # <= 10% of energy from SFA gets max points - official HEFI-2019
     free_sugars_percent_max: float = 10.0  # <= 10% of energy from free sugars gets max points - official HEFI-2019  
-    sodium_density_min: float = 1.0  # <= 1 mg/kcal gets max points - official HEFI-2019 (2300mg/2300kcal)
+    sodium_density_min: float = 0.9  # < 0.9 mg/kcal gets max 10 pts; Brassard 2022a Table 2 p. 600. (Pre-audit value was 1.0.)
 
 
 @dataclass

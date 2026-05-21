@@ -37,11 +37,20 @@ class FCSRustIntegrationTests(TestCase):
         self.assertLessEqual(result["fcs"], 100.0)
 
     def test_golden_food_29_scores_stable(self):
-        """Update expected values only when FCS methodology intentionally changes."""
+        """Golden FCS for food_id 29. Recomputed 2026-05-21 under FCS-CODE-1
+        (Mozaffarian 2021 SI Table S3 rescaling). Pre-audit value was 48.41
+        under the incorrect [-70, +70] linear stretch; the new value is the
+        Mozaffarian formula applied to the same upstream raw score (-2.96):
+        100 - ((26.1 - (-2.96)) / 36.7) × 99 ≈ 21.60.
+        (36.7 is the denominator Mozaffarian publishes verbatim, rounded from
+        the derived range 26.1 - (-10.7) = 36.8.)
+
+        Update expected values only when FCS methodology intentionally changes.
+        """
         food_item = FoodItem("Golden test")
         create_cnf_integrator().extract_nutrients_enhanced([29], food_item)
         result = FoodAnalyzer().analyze_food_item(food_item)
 
         self.assertEqual(result["original_score"], -2.96)
-        self.assertEqual(result["fcs"], 48.41)
+        self.assertEqual(result["fcs"], 21.61)
         self.assertEqual(result["nova_category"], "PROCESSED_FOODS")

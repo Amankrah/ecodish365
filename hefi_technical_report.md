@@ -93,9 +93,11 @@ The score of this component is based on the ratio of unsaturated fat to saturate
 **Formula:** Sugar_Percent = (Free_Sugars_g × 4) / Total_Energy_kcal × 100
 
 #### Component 10: Sodium (10 points)
-**Formula:** Sodium_Density = Sodium_mg / Total_Energy_kcal × 1000
+**Formula:** Sodium_Density = Sodium_mg / Total_Energy_kcal (units: mg/kcal)
 
-The CFG-2019 sets the recommended limit for sodium at the 2300 mg/day chronic disease risk reduction threshold established by the National Academies of Sciences, Engineering, and Medicine (NASEM).
+**Source.** Brassard et al. 2022a APNM 47(5):595-610, Table 2 p. 600. Linear interpolation between the max-score threshold < 0.9 mg/kcal (10 pts) and the zero-score threshold ≥ 2.0 mg/kcal (0 pts). The CFG-2019 recommended limit for sodium is the 2300 mg/day chronic disease risk reduction threshold from the National Academies of Sciences, Engineering, and Medicine (NASEM); Brassard derived the 0.9 mg/kcal max-score threshold from 2300 mg/day ÷ 2600 kcal/day (the 90th percentile of usual energy intake among Canadians ≥ 2 y in the 2015 CCHS-Nutrition).
+
+**Audit history (2026-05-21, HEFI-CODE-1).** Earlier versions of this report had a stray `× 1000` (yielding mg/1000-kcal) and a 1.0 mg/kcal max-score threshold. The ×1000 multiplier propagated into [`backend/rust_core/src/hefi/scoring.rs`](backend/rust_core/src/hefi/scoring.rs) where it produced a SODDEN ratio 1000× larger than the threshold band, causing C10 to return 0 points for every realistic meal. Both the formula and the threshold (0.9, not 1.0) now match Brassard 2022a Table 2 verbatim.
 
 ## 4. Scoring Algorithm Implementation
 

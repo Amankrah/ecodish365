@@ -1,8 +1,12 @@
 //! HEFI-2019 ratio computation and component scoring.
 //!
-//! Byte-for-byte mirror of `backend/hefi_calculator/hefi/algorithm.py`.
-//! Behavior is preserved exactly, including quirks in SODDEN scaling,
-//! so diff-testing against the Python baseline holds.
+//! Implements Brassard et al. (2022a) APNM 47:595-610 Table 2 (p. 600) and
+//! the linear-interpolation scoring of Results p. 599. Component-by-component
+//! threshold values live in `thresholds.rs::DEFAULT`. After the 2026-05-21
+//! HEFI-CODE-1 audit, sodium density (SODDEN) is in mg/kcal — the Brassard
+//! published unit — and the max-score threshold is 0.9 mg/kcal (pre-audit:
+//! mg/1000-kcal with a 1.0 max threshold, which produced 0 sodium points for
+//! every realistic meal).
 
 use crate::hefi::thresholds::{HefiThresholds, DEFAULT};
 
@@ -119,15 +123,20 @@ pub fn compute_ratios(inputs: &HefiInputs) -> HefiRatios {
         0.0
     };
 
-    // Exactly mirror Python expression precedence:
-    //   (sfa_g * 9.0) / kcal * 100.0
-    //   (free_sugars_g * 4.0) / kcal * 100.0
-    //   sodium_mg / kcal * 1000.0
+    // Brassard 2022a Table 2 p. 600 unit conventions:
+    //   sfa_perc   = (SFA_g × 9 kcal/g) / energy_kcal × 100   (% energy from SFA)
+    //   sug_perc   = (free_sugars_g × 4 kcal/g) / energy_kcal × 100  (% energy)
+    //   sodden     = sodium_mg / energy_kcal                  (mg/kcal)
+    //
+    // Pre-audit the SODDEN ratio multiplied by 1000 (yielding mg/1000-kcal),
+    // which was inherited from a transcription error in
+    // `hefi_technical_report.md` and incompatible with the thresholds in
+    // `thresholds.rs`. The ×1000 has been removed (HEFI-CODE-1A, 2026-05-21).
     let (sfa_perc, sug_perc, sodden) = if kcal > 0.0 {
         (
             (inputs.sfa_g * 9.0) / kcal * 100.0,
             (inputs.free_sugars_g * 4.0) / kcal * 100.0,
-            inputs.sodium_mg / kcal * 1000.0,
+            inputs.sodium_mg / kcal,
         )
     } else {
         (0.0, 0.0, 0.0)
@@ -252,6 +261,12 @@ mod tests {
         approx(s.c8_sfat, 2.5);
     }
 
+    /// Perfect-diet inputs with a REALISTIC sodium load. Pre-HEFI-CODE-1 this
+    /// test used `sodium_mg = 1.0` (one milligram per 2000-kcal day — an
+    /// impossible value) to dodge the SODDEN ×1000 unit bug. With the audit
+    /// fix in place, a realistic 1500 mg / 2000 kcal = 0.75 mg/kcal (below
+    /// the Brassard 2022a 0.9 mg/kcal max-score threshold) yields the full
+    /// 10/10 sodium component and total = 80/80.
     #[test]
     fn perfect_diet_maxes_components() {
         let inputs = HefiInputs {
@@ -264,13 +279,86 @@ mod tests {
             total_beverages_g: 1000.0,
             recommended_beverages_g: 1000.0,
             energy_kcal: 2000.0,
-            sfa_g: 10.0,     // 10*9/2000*100 = 4.5%
+            sfa_g: 10.0,         // 10×9/2000×100 = 4.5 %E  (≤ 10 %E max)
             mufa_g: 20.0,
-            pufa_g: 10.0,    // unsat/sat = 3.0 > 2.6
-            free_sugars_g: 20.0, // 20*4/2000*100 = 4%
-            sodium_mg: 1.0,  // sodden = 1/2000*1000 = 0.5
+            pufa_g: 10.0,        // (MUFA+PUFA)/SFA = 30/10 = 3.0  (≥ 2.6 max)
+            free_sugars_g: 20.0, // 20×4/2000×100 = 4 %E  (≤ 10 %E max)
+            sodium_mg: 1500.0,   // 1500/2000 = 0.75 mg/kcal  (< 0.9 max)
         };
         let r = compute_hefi(&inputs);
         approx(r.total, 80.0);
+        // Component-by-component: every one must be at max.
+        approx(r.scores.c1_vf, 20.0);
+        approx(r.scores.c2_wholegr, 5.0);
+        approx(r.scores.c3_grratio, 5.0);
+        approx(r.scores.c4_profoods, 5.0);
+        approx(r.scores.c5_plantpro, 5.0);
+        approx(r.scores.c6_beverages, 10.0);
+        approx(r.scores.c7_fattyacid, 5.0);
+        approx(r.scores.c8_sfat, 5.0);
+        approx(r.scores.c9_freesugars, 10.0);
+        approx(r.scores.c10_sodium, 10.0);
+    }
+
+    /// Brassard 2022a Table 2 p. 600: C10 sodium component interpolates linearly
+    /// between 10 pts at < 0.9 mg/kcal and 0 pts at ≥ 2.0 mg/kcal. Verify the
+    /// curve at seven canonical points. Pre-HEFI-CODE-1 (×1000 SODDEN bug),
+    /// every one of these points returned 0.0 because the ratio was 1000×
+    /// too large.
+    #[test]
+    fn brassard_sodium_scoring_curve() {
+        let cases: [(f64, f64); 7] = [
+            (0.5, 10.0),
+            (0.8, 10.0),
+            (0.9, 10.0),
+            (0.95, 10.0 * (2.0 - 0.95) / (2.0 - 0.9)), // ≈ 9.545
+            (1.0, 10.0 * (2.0 - 1.0) / (2.0 - 0.9)),   // ≈ 9.091
+            (1.5, 10.0 * (2.0 - 1.5) / (2.0 - 0.9)),   // ≈ 4.545
+            (2.0, 0.0),
+        ];
+        for (mg_per_kcal, expected) in cases {
+            let inputs = HefiInputs {
+                total_foods_ra: 10.0,
+                energy_kcal: 2000.0,
+                sodium_mg: mg_per_kcal * 2000.0,
+                ..HefiInputs::default()
+            };
+            let r = compute_hefi(&inputs);
+            let actual = r.scores.c10_sodium;
+            assert!(
+                (actual - expected).abs() < 1e-3,
+                "sodium {mg_per_kcal} mg/kcal: expected {expected:.3}, got {actual:.3}"
+            );
+        }
+    }
+
+    /// Brassard 2022b Table A2 p. 591 reports a national HEFI mean of 43.1/80
+    /// with a 1st-99th percentile range of [22.1, 62.9] across Canadians
+    /// aged ≥ 2 y. A meal panel sized to the national means must score inside
+    /// this range. Approximate inputs derived from Table A2 component means.
+    #[test]
+    fn national_mean_in_brassard_published_range() {
+        let inputs = HefiInputs {
+            total_foods_ra: 10.0,
+            vf_ra: 2.3,
+            whole_grains_ra: 0.6,
+            total_grains_ra: 2.0,
+            protein_foods_ra: 2.2,
+            plant_protein_foods_ra: 0.7,
+            total_beverages_g: 1000.0,
+            recommended_beverages_g: 750.0,
+            energy_kcal: 2000.0,
+            sfa_g: 24.5,
+            mufa_g: 27.0,
+            pufa_g: 10.0,
+            free_sugars_g: 50.0,
+            sodium_mg: 2400.0, // 1.2 mg/kcal — between max (0.9) and min (2.0) thresholds
+        };
+        let r = compute_hefi(&inputs);
+        assert!(
+            (22.1..=62.9).contains(&r.total),
+            "expected national 1-99 pctl range [22.1, 62.9], got {}",
+            r.total
+        );
     }
 }

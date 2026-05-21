@@ -113,17 +113,28 @@ Task: Determine presence of these HENI risk factors (0-1 scale):
         if nutrient_data.get("CALCIUM", 0) > 200:
             categories["calcium"] = max(categories.get("calcium", 0), 0.8)
         
-        # Remove fiber from beverages
-        if "Beverages" in food_group and "fiber" in categories:
-            del categories["fiber"]
-            self.logger.info(f"Removed 'fiber' category from beverage: {food_group}")
-        
-        # Ensure initially categorized items are not lost
-        for category, score in initial_categories.items():
-            if category not in categories:
-                categories[category] = score
-                self.logger.warning(f"Restored initial category {category} with score {score}")
-        
+        # Migrate legacy `fiber` key to source-split fiber_other/fiber_fvlw.
+        # Per Stylianou 2021 SI §S2.9 (pp. 35-36), fibre routes to fiber_fvlw
+        # when f/v/l/w is co-present, fiber_other otherwise.
+        if "fiber" in categories:
+            legacy_fiber = categories.pop("fiber")
+            has_fvlw = any(
+                k in categories for k in ("fruits", "vegetables", "legumes", "whole_grains")
+            )
+            target = "fiber_fvlw" if has_fvlw else "fiber_other"
+            categories[target] = max(categories.get(target, 0.0), legacy_fiber)
+            self.logger.info(
+                f"Migrated legacy 'fiber' → '{target}' (food_group={food_group})"
+            )
+
+        # Remove all fibre signals from beverages (water, tea, coffee, broth,
+        # juices: not a fibre source even if a label claims trace fibre).
+        if "Beverages" in food_group:
+            for fk in ("fiber_other", "fiber_fvlw"):
+                if fk in categories:
+                    del categories[fk]
+                    self.logger.info(f"Removed '{fk}' from beverage: {food_group}")
+
         return {k: v for k, v in categories.items() if v >= 0.1}
     
     def _should_use_llm(self, rule_based_result: Dict[str, float], food_description: str) -> bool:
@@ -155,22 +166,30 @@ Task: Determine presence of these HENI risk factors (0-1 scale):
         return False  # Use rule-based only for clear, simple cases
     
     def _get_factor_description(self, factor: str) -> str:
-        """Get concise description of HENI risk factors for LLM."""
+        """Get concise description of HENI risk factors for the LLM prompt.
+
+        Descriptions follow GBD 2017 Diet Collaborators (Lancet 2019;393:1960)
+        exposure definitions and Stylianou 2021 SI §S2.9 fibre source-split.
+        """
         descriptions = {
-            'omega_3': 'Omega-3 fatty acids (EPA/DHA from fish, ALA from plants)',
-            'calcium': 'Calcium content (dairy, leafy greens, fortified foods)',
-            'fiber': 'Dietary fiber content (whole grains, fruits, vegetables)',
-            'polyunsaturated_fatty_acids': 'PUFA content (vegetable oils, nuts, seeds)',
-            'trans_fat': 'Trans fatty acids (processed foods, hydrogenated oils)',
-            'sodium': 'Sodium content (salt, processed foods)',
-            'nuts_seeds': 'Nuts and seeds as primary ingredient',
-            'whole_grains': 'Whole grain content (brown rice, whole wheat, oats)',
-            'fruits': 'Fresh, dried, or minimally processed fruits',
-            'vegetables': 'Fresh, frozen, or minimally processed vegetables',
-            'milk': 'Dairy products (milk, yogurt, cheese)',
-            'sugar_sweetened_beverages': 'Added sugar drinks (sodas, juices with added sugar)',
-            'red_meat': 'Red meat content (beef, pork, lamb)',
-            'processed_meat': 'Processed meats (bacon, sausage, deli meats, ham)'
+            # Nutrient factors
+            'omega_3': 'Omega-3 fatty acids EPA + DHA from seafood (excludes ALA from plants per GBD 2017).',
+            'calcium': 'Calcium content (dairy, leafy greens, fortified foods); g/serving.',
+            'fiber_other': 'Dietary fibre from sources OTHER than fruits, vegetables, legumes or whole grains (CRC + IHD benefit per Stylianou SI S2.9).',
+            'fiber_fvlw': 'Dietary fibre from fruits, vegetables, legumes, or whole grains (CRC benefit only; IHD already counted via f/v/l/w DRFs).',
+            'polyunsaturated_fatty_acids': 'PUFA from all sources, mainly omega-6 vegetable oils (per GBD 2017 PUFA = omega-6).',
+            'trans_fat': 'Trans fatty acids from PHVOs and ruminant products.',
+            'sodium': 'Sodium content (salt, processed foods); g/serving (urinary→dietary factor 0.85).',
+            # Food-group factors
+            'nuts_seeds': 'Nuts and seeds as a primary ingredient.',
+            'whole_grains': 'Whole-grain foods (bran/germ/endosperm in natural proportion per GBD 2017).',
+            'fruits': 'Fresh, frozen, cooked, canned or dried fruits; EXCLUDES fruit juices, salted, or pickled.',
+            'vegetables': 'Fresh, frozen, cooked, canned or dried vegetables; EXCLUDES legumes, salted/pickled, juices, nuts, seeds, starchy veg (potatoes/corn).',
+            'legumes': 'Fresh, frozen, cooked, canned or dried legumes (lentils, chickpeas, beans, soybeans, tofu).',
+            'milk': 'Non-fat / low-fat / full-fat dairy milk; EXCLUDES soy milk and plant derivatives per GBD 2017.',
+            'sugar_sweetened_beverages': 'Beverages ≥ 50 kcal per 226.8 g serving; EXCLUDES 100% fruit/veg juices, water, tea, coffee.',
+            'red_meat': 'Beef, pork, lamb, goat; EXCLUDES poultry, fish, eggs, all processed meats.',
+            'processed_meat': 'Meat preserved by smoking, curing, salting, or chemical preservatives.',
         }
         return descriptions.get(factor, f'{factor.replace("_", " ").title()} content')
     

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict, Optional
 
 
@@ -53,5 +53,12 @@ class HEFIResult:
     ratios: Dict[str, float]
     component_scores: HEFIComponentScores
     total_score: float
+    # Additive: imputation/provenance note for the free-sugars component (C9).
+    # Currently CNF carries TOTAL sugars only; Brassard 2022a Discussion p. 603
+    # mandates the Rana et al. 2021 (Nutrients 13(5):1471) free-sugars
+    # supplement. Until that supplement is integrated, C9 uses total sugars as
+    # a conservative proxy that systematically over-counts free sugars for foods
+    # with significant intrinsic sugars (whole fruit, milk, plain yogurt).
+    c9_imputation_note: str = ""
 
 

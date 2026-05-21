@@ -49,5 +49,8 @@ pub const DEFAULT: HefiThresholds = HefiThresholds {
 
     sfa_percent_max: 10.0,
     free_sugars_percent_max: 10.0,
-    sodium_density_min: 1.0,
+    // Brassard 2022a Table 2 p. 600: max-score threshold for sodium density is
+    // < 0.9 mg/kcal (10 pts). Linear-interpolated down to 0 pts at ≥ 2.0
+    // mg/kcal. Pre-audit value was 1.0 (HEFI-CODE-1B fix, 2026-05-21).
+    sodium_density_min: 0.9,
 };

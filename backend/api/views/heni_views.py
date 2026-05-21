@@ -83,10 +83,35 @@ def heni_calculate(request):
             "success": True,
             "data": comprehensive_result,
             "metadata": {
-                "calculation_method": "DALY-based HENI scoring (rust_core.heni)",
-                "reference": "Global Burden of Disease epidemiological evidence",
-                "last_updated": "2024",
-                "units": "μDALY (micro-Disability Adjusted Life Years)"
+                "calculation_method": "HENI (Stylianou et al. 2021), Rust kernel via rust_core.heni",
+                "factor_source": (
+                    "Stylianou KS, Fulgoni VL III, Jolliet O. Nat Food. 2021;2(8):616-627. "
+                    "Supplementary Information, Suppl. Table 3 p. 8."
+                ),
+                "epidemiology_vintage": "GBD 2016 (Stylianou 2021 base)",
+                "units": {
+                    "total_heni_score": "μDALY (signed; positive = detrimental per Stylianou sign convention)",
+                    "heni_per_100_kcal": "μDALY / 100 kcal",
+                    "heni_per_100_grams": "μDALY / 100 g",
+                    "heni_per_serving": "μDALY / serving",
+                    "health_impact_minutes": "minutes of healthy life (positive = beneficial)",
+                },
+                "conversion_constant": (
+                    "-0.5256 min/μDALY (Stylianou 2021 SI p. 98; 1 μDALY = 0.5256 min, "
+                    "negative sign flips damage→benefit so positive minutes = good)"
+                ),
+                "methodology_version": "Stylianou2021-Suppl-Table-3 (HENI-CODE-1 audit, 2026-05-21)",
+                "double_counting_carve_outs_applied": [
+                    "milk_vs_calcium (Stylianou 2021 Methods p. 626)",
+                    "fiber_source_split (Stylianou 2021 SI §S2.9 pp. 35-36)",
+                ],
+                "known_caveats": [
+                    "Marginal index; not valid for radically restructured diets (Stylianou 2021 Discussion pp. 622-624).",
+                    "trans_fat is zeroed-with-warning when CNF lacks measured TFA (Stylianou 2021 SI §S2.1 p. 12).",
+                    "Disease-breakdown weights are equal-share per outcome from Stylianou 2021 SI Table 1; "
+                    "rederivation from 6,195-pair GBD 2016 RR matrix is logged as HENI-CODE-1.x.",
+                ],
+                "last_updated": "2026-05-21",
             }
         }
         
