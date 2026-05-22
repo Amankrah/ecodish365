@@ -233,7 +233,10 @@ UNCERTAINTY_BAND_RATIOS_BY_GROUP: Dict[str, Dict[str, Dict[str, float]]] = {
     },
     'Dairy and Egg Products': {
         'Global warming':     {'low_ratio': 0.20, 'high_ratio': 3.0},  # milk 0.32 vs cheese 2.4 — group blend wide
-        'Land use':           {'low_ratio': 0.11, 'high_ratio': 3.0},  # cheese 4.4 / mean 41 P&N
+        # Land low_ratio raised from 0.11 (cheese-internal 10th/mean) to 0.20
+        # to reflect the new 3-component blend central (cheese 9.02, milk 0.86,
+        # egg 0.68 → blend 3.5). Lower bound = min component / blend ≈ 0.19.
+        'Land use':           {'low_ratio': 0.20, 'high_ratio': 3.0},
         'Water consumption':  {'low_ratio': 0.45, 'high_ratio': 2.5},  # milk 0.009 vs cheese 0.041
     },
     'Vegetables and Vegetable Products': {

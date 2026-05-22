@@ -126,6 +126,149 @@ class FoodLevelTrimTests(unittest.TestCase):
         self.assertEqual(set(impacts.keys()) & TRIMMED_AWAY, set())
 
 
+class CnfIntegratorPanelDerivationTests(unittest.TestCase):
+    """Independent panel-anchored validation of the per-group GHG + Land centrals.
+
+    Recomputes each group's central from the raw P&N panel values + the
+    explicit derivation constants (protein fractions, kcal/100g density)
+    and asserts the shipped central matches. Catches drift in EITHER the
+    raw panel values OR the conversion math — without falling into the
+    tautology of validating the shipped value against itself.
+
+    Pinned against literature_extractions.md lines 431-518 (P&N 2018 Fig. 1
+    panels A-F as reproduced in the manuscript).
+    """
+
+    def test_pn_panel_values_match_literature_extractions(self):
+        """Raw P&N Fig. 1 panel centrals must match literature_extractions.md.
+        Edit either side without the other in a future PR will fail this."""
+        from environmental_impact_model.src.cnf_integrator import _PN_PANEL_CENTRALS
+        # Panel A — per 100 g protein (literature_extractions.md lines 431-449)
+        cases = [
+            ('beef_herd',       50,   164),
+            ('beef_dairy_herd', 17,   22),
+            ('pork',            7.6,  11),
+            ('poultry',         5.7,  7.1),
+            ('farmed_fish',     6.0,  3.7),
+            ('cheese',          11,   41),
+            ('eggs',            4.2,  5.7),
+            ('nuts',            0.3,  7.9),
+        ]
+        for anchor, ghg, land in cases:
+            with self.subTest(anchor=anchor):
+                self.assertEqual(_PN_PANEL_CENTRALS[anchor]['ghg'], ghg)
+                self.assertEqual(_PN_PANEL_CENTRALS[anchor]['land'], land)
+        # Panel B — milk (per L)
+        self.assertEqual(_PN_PANEL_CENTRALS['milk']['ghg'], 3.2)
+        self.assertEqual(_PN_PANEL_CENTRALS['milk']['land'], 8.9)
+
+    def test_beef_central_is_beef_herd_only_with_protein_fraction(self):
+        """Pin the 2026-05-22 fix: beef GHG + Land both use beef-herd ONLY
+        (consistent with each other and with CNF "Beef Products" group
+        composition). Previously GHG averaged beef-herd + dairy-herd while
+        Land used beef-herd only, yielding an under-statement of GHG."""
+        from environmental_impact_model.src.cnf_integrator import (
+            _PN_PANEL_CENTRALS, _DERIVATION_CONSTANTS, _DERIVED_GROUP_CENTRALS,
+        )
+        pf = _DERIVATION_CONSTANTS['protein_fraction']['beef']
+        expected_ghg = _PN_PANEL_CENTRALS['beef_herd']['ghg'] * pf
+        expected_land = _PN_PANEL_CENTRALS['beef_herd']['land'] * pf
+        beef = _DERIVED_GROUP_CENTRALS['Beef Products']
+        self.assertAlmostEqual(beef['ghg'], expected_ghg, places=10)
+        self.assertAlmostEqual(beef['land'], expected_land, places=10)
+        # Concrete pin: with pf=0.20, beef-herd 50/164 → 10.0/32.8 per 100g product.
+        self.assertAlmostEqual(beef['ghg'], 10.0, places=6)
+        self.assertAlmostEqual(beef['land'], 32.8, places=6)
+
+    def test_dairy_egg_is_three_component_blend_not_cheese_only(self):
+        """Pin the 2026-05-22 fix: Dairy/Egg Land uses the cheese + milk + egg
+        arithmetic blend (~3.5), NOT cheese-only (9.0). The old cheese-only
+        value over-stated dairy/egg Land impact by 2.5x for typical
+        milk-dominant dietary patterns."""
+        from environmental_impact_model.src.cnf_integrator import (
+            _PN_PANEL_CENTRALS, _DERIVATION_CONSTANTS, _DERIVED_GROUP_CENTRALS,
+        )
+        pf = _DERIVATION_CONSTANTS['protein_fraction']
+        dens = _DERIVATION_CONSTANTS['density_kg_per_L']['milk']
+        cheese_land = _PN_PANEL_CENTRALS['cheese']['land'] * pf['cheese']     # 9.02
+        milk_land = _PN_PANEL_CENTRALS['milk']['land'] / dens / 10            # 0.86
+        egg_land = _PN_PANEL_CENTRALS['eggs']['land'] * pf['eggs']            # 0.68
+        expected_land = (cheese_land + milk_land + egg_land) / 3              # ~3.52
+        dairy = _DERIVED_GROUP_CENTRALS['Dairy and Egg Products']
+        self.assertAlmostEqual(dairy['land'], expected_land, places=6)
+        # Sanity: NOT cheese-only (9.0).
+        self.assertLess(dairy['land'], 4.5,
+            msg="Dairy/Egg Land reverted to cheese-only — should be ~3.5 blend")
+
+    def test_cereals_uses_200_kcal_per_100g_not_350(self):
+        """Pin the 2026-05-22 fix: cereal kcal-density is 200 (cooked-as-consumed
+        mid: rice 130, pasta 158, bread 265, dry flour 350). Previously 350
+        was used (dry-grain assumption), over-stating GHG + Land by ~1.75x for
+        the typical CNF as-consumed entry."""
+        from environmental_impact_model.src.cnf_integrator import (
+            _PN_PANEL_CENTRALS, _DERIVATION_CONSTANTS, _DERIVED_GROUP_CENTRALS,
+        )
+        kc = _DERIVATION_CONSTANTS['kcal_per_100g']['grain_mix']
+        self.assertEqual(kc, 200, msg="grain_mix kcal density drift")
+        expected_ghg = _PN_PANEL_CENTRALS['grain_avg']['ghg'] * kc / 1000
+        cereals = _DERIVED_GROUP_CENTRALS['Cereals, Grains and Pasta']
+        self.assertAlmostEqual(cereals['ghg'], expected_ghg, places=10)
+        # Concrete pin: 0.9 × 200/1000 = 0.18.
+        self.assertAlmostEqual(cereals['ghg'], 0.18, places=6)
+        self.assertAlmostEqual(cereals['land'], 0.28, places=6)
+
+    def test_all_ten_groups_derive_correctly(self):
+        """Every shipped group central is the result of applying its derivation
+        formula to its panel anchor and constants. No hand-edited values."""
+        from environmental_impact_model.src.cnf_integrator import (
+            _DERIVED_GROUP_CENTRALS, _PN_PANEL_CENTRALS, _DERIVATION_CONSTANTS,
+        )
+        PF = _DERIVATION_CONSTANTS['protein_fraction']
+        DENS = _DERIVATION_CONSTANTS['density_kg_per_L']
+        KC = _DERIVATION_CONSTANTS['kcal_per_100g']
+
+        def panel_A(anchor, pf):
+            r = _PN_PANEL_CENTRALS[anchor]
+            return {'ghg': r['ghg'] * pf, 'land': r['land'] * pf}
+
+        def panel_B(anchor, d):
+            r = _PN_PANEL_CENTRALS[anchor]
+            return {'ghg': r['ghg'] / d / 10, 'land': r['land'] / d / 10}
+
+        def panel_C(anchor, kc):
+            r = _PN_PANEL_CENTRALS[anchor]
+            return {'ghg': r['ghg'] * kc / 1000, 'land': r['land'] * kc / 1000}
+
+        def panel_kg(anchor):
+            r = _PN_PANEL_CENTRALS[anchor]
+            return {'ghg': r['ghg'] / 10, 'land': r['land'] / 10}
+
+        expected = {
+            'Beef Products':                     panel_A('beef_herd',   PF['beef']),
+            'Pork Products':                     panel_A('pork',        PF['pork']),
+            'Poultry Products':                  panel_A('poultry',     PF['poultry']),
+            'Finfish and Shellfish Products':    panel_A('farmed_fish', PF['fish']),
+            'Vegetables and Vegetable Products': panel_kg('veg_midpoint'),
+            'Fruits and fruit juices':           panel_kg('fruit_midpoint'),
+            'Cereals, Grains and Pasta':         panel_C('grain_avg', KC['grain_mix']),
+            'Legumes and Legume Products':       panel_A('pulses', PF['pulses']),
+            'Nuts and Seeds':                    panel_A('nuts',   PF['nuts']),
+        }
+        # Dairy/Egg is a 3-component blend
+        cheese_a = panel_A('cheese', PF['cheese'])
+        milk_b   = panel_B('milk',   DENS['milk'])
+        egg_a    = panel_A('eggs',   PF['eggs'])
+        expected['Dairy and Egg Products'] = {
+            'ghg':  (cheese_a['ghg']  + milk_b['ghg']  + egg_a['ghg'])  / 3,
+            'land': (cheese_a['land'] + milk_b['land'] + egg_a['land']) / 3,
+        }
+        for group, exp in expected.items():
+            with self.subTest(group=group):
+                got = _DERIVED_GROUP_CENTRALS[group]
+                self.assertAlmostEqual(got['ghg'],  exp['ghg'],  places=10)
+                self.assertAlmostEqual(got['land'], exp['land'], places=10)
+
+
 class CnfIntegratorShapeTrimTests(unittest.TestCase):
     """Lock-in: the cnf_integrator factor block ships ONLY the 3 consumed
     midpoint categories per food group. The 15 non-consumed ReCiPe categories
