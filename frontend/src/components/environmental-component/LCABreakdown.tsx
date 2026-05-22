@@ -89,6 +89,27 @@ const NON_CONSUMED_CATEGORIES = [
   { name: 'Fossil resource scarcity',   why: 'No per-food-group literature target' },
 ];
 
+// Zone-badge palette (Low / Moderate / High from literature percentiles).
+const ZONE_BADGE_CLASSES: Record<string, string> = {
+  Low:      'bg-emerald-100 text-emerald-800 ring-1 ring-emerald-300',
+  Moderate: 'bg-amber-100   text-amber-800   ring-1 ring-amber-300',
+  High:     'bg-rose-100    text-rose-800    ring-1 ring-rose-300',
+  Unknown:  'bg-gray-100    text-gray-700    ring-1 ring-gray-300',
+};
+
+const ZoneBadge: React.FC<{ zone?: string }> = ({ zone }) => {
+  if (!zone) return null;
+  const cls = ZONE_BADGE_CLASSES[zone] || ZONE_BADGE_CLASSES.Unknown;
+  return (
+    <span
+      className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide ${cls}`}
+      title={`Stylianou 2021 SI Table 11B zone (per-serving percentile)`}
+    >
+      {zone}
+    </span>
+  );
+};
+
 export const LCABreakdown: React.FC<LCABreakdownProps> = ({ results }) => {
   const [showMethodology, setShowMethodology] = useState(false);
   const [showEndpoints, setShowEndpoints] = useState(false);
@@ -99,6 +120,11 @@ export const LCABreakdown: React.FC<LCABreakdownProps> = ({ results }) => {
   const bands: LCABands = (analysis?.lca_results_bands as LCABands) || {};
   const endpoints: Partial<EndpointImpacts> = analysis?.endpoint_impacts || {};
   const endpointBands: EndpointBands = (analysis?.endpoint_impacts_bands as EndpointBands) || {};
+  // Per-category dominant zones from the literature-anchored sustainability
+  // scoring (Stylianou 2021 SI Table 11B + P&N 2018 land panel).
+  const categoryZones: Record<string, string> = (
+    analysis?.sustainability_score?.category_zones || {}
+  ) as Record<string, string>;
 
   return (
     <div className="space-y-4">
@@ -130,8 +156,11 @@ export const LCABreakdown: React.FC<LCABreakdownProps> = ({ results }) => {
               <div className="flex items-start gap-3 mb-3">
                 <Icon className={`h-5 w-5 ${palette.accent} mt-0.5`} />
                 <div className="flex-1">
-                  <div className="flex items-baseline justify-between">
-                    <h3 className={`font-semibold ${palette.text}`}>{cat.name}</h3>
+                  <div className="flex items-baseline justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <h3 className={`font-semibold ${palette.text}`}>{cat.name}</h3>
+                      <ZoneBadge zone={categoryZones[cat.key]} />
+                    </div>
                     <span className="text-xs text-gray-500">per 100 kcal of meal</span>
                   </div>
                   <p className="text-xs text-gray-600 mt-1">{cat.description}</p>

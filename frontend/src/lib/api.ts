@@ -1396,9 +1396,15 @@ export interface SustainabilityScore {
   overall_sustainability_score: number;
   sustainability_rating: string;
   environmental_score: number;
+  environmental_rating?: string;
   nutritional_score: number;
   processing_score: number;
   category_scores: Record<string, number>;
+  // v1 literature-anchored zone scoring: per-category Low/Moderate/High
+  // dominant zone (Stylianou 2021 SI Table 11B + P&N 2018 land panel).
+  category_zones?: Record<string, 'Low' | 'Moderate' | 'High' | 'Unknown'>;
+  methodology_note?: string;
+  overall_weights?: { environmental: number; nutritional: number; processing: number };
   recommendations: string[];
 }
 
@@ -1586,9 +1592,14 @@ export class EnvironmentalImpactApiService {
             overall_sustainability_score: sustainability.overall_sustainability_score ?? 50,
             sustainability_rating: sustainability.sustainability_rating ?? (overallAssessment.rating || 'Unknown'),
             environmental_score: sustainability.environmental_score ?? 0,
+            environmental_rating: sustainability.environmental_rating,
             nutritional_score: sustainability.nutritional_score ?? 0,
             processing_score: sustainability.processing_score ?? 0,
             category_scores: sustainability.category_scores || {},
+            // v1 literature-anchored zone scoring (Stylianou 2021 + P&N 2018).
+            category_zones: sustainability.category_zones || {},
+            methodology_note: sustainability.methodology_note,
+            overall_weights: sustainability.overall_weights,
             recommendations: Array.isArray(sustainability.recommendations) && sustainability.recommendations.length > 0
               ? sustainability.recommendations
               : (overallAssessment.recommendation ? [overallAssessment.recommendation] : [])

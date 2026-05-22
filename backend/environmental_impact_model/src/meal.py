@@ -156,17 +156,17 @@ class Meal:
             return {'overall_sustainability_score': 50, 'sustainability_rating': 'Unknown'}
     
     def _get_sustainability_rating(self, score: float) -> str:
-        """Convert numerical sustainability score to rating."""
-        if score >= 80:
-            return "Excellent"
-        elif score >= 70:
-            return "Good"
-        elif score >= 60:
-            return "Fair"
-        elif score >= 40:
-            return "Poor"
-        else:
-            return "Very Poor"
+        """Convert numerical sustainability score to rating.
+
+        Bands harmonised with `LifeCycleAssessment._sustainability_rating`
+        so the same score produces the same label regardless of which entry
+        point (meal vs LCA) computed it.
+        """
+        if score >= 80: return "Excellent"
+        if score >= 65: return "Good"
+        if score >= 50: return "Moderate"
+        if score >= 35: return "Poor"
+        return "Very Poor"
     
     def get_nutritional_quality_score(self) -> Dict[str, float]:
         """

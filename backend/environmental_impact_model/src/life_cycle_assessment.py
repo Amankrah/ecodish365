@@ -164,6 +164,12 @@ class LifeCycleAssessment:
         # logged to `self.matcher_decisions` for API surfacing.
         self.matcher = matcher
         self.matcher_decisions: List[Dict[str, Any]] = []
+        # Cache of per-food impact dicts keyed by food_id. Prevents the
+        # matcher_decisions list from being duplicated when downstream
+        # callers (e.g. `calculate_matcher_aware_sustainability_score`)
+        # re-request the same food's impacts after `perform_lcia` has
+        # already processed it.
+        self._food_impacts_cache: Dict[int, Dict[str, Any]] = {}
 
         # Per-midpoint-category confidence — v1 scope trim filters to only the
         # categories actually consumed by `_calculate_midpoint_impacts`. The
@@ -351,6 +357,10 @@ class LifeCycleAssessment:
         """
         Get environmental impacts for a specific food item.
 
+        Cached per `food.food_id` on `self._food_impacts_cache` to avoid
+        duplicating `self.matcher_decisions` entries when re-requested by
+        downstream callers (e.g. `calculate_matcher_aware_sustainability_score`).
+
         Resolution order (§3.5 / §3.7 AGRIBALYSE-INGEST):
           1. Always fetch the cnf_integrator group-default factors (Poore &
              Nemecek per-food-group means).
@@ -366,6 +376,12 @@ class LifeCycleAssessment:
              keep on group-default categories (the Canadian layer is the
              whole point of `_get_canadian_regional_factors`).
         """
+        # Memoised: same food_id returns the cached impacts dict without
+        # re-firing the matcher (avoids appending to matcher_decisions twice).
+        cache_key = getattr(food, 'food_id', None)
+        if cache_key is not None and cache_key in self._food_impacts_cache:
+            return self._food_impacts_cache[cache_key]
+
         quantity_factor = food.quantity / 100.0  # Convert to per 100g basis
 
         # Step 1: always start from the group-default Poore & Nemecek factors.
@@ -454,6 +470,8 @@ class LifeCycleAssessment:
         food_impacts["_source"] = food_source
         food_impacts["_category_sources"] = category_sources
         food_impacts["_bands"] = food_impacts_bands
+        if cache_key is not None:
+            self._food_impacts_cache[cache_key] = food_impacts
         return food_impacts
     
     def _get_canadian_regional_factors(self) -> Dict[str, float]:

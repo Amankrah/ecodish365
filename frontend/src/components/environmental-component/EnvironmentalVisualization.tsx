@@ -17,6 +17,25 @@ import {
 import type { EnvironmentalImpactResult, LCAResults, EndpointImpacts, SustainabilityScore, LCABands } from '../../lib/api';
 import { UncertaintyBandBar } from './UncertaintyBandBar';
 
+const ZONE_BADGE_CLASSES: Record<string, string> = {
+  Low:      'bg-emerald-100 text-emerald-800 ring-1 ring-emerald-300',
+  Moderate: 'bg-amber-100   text-amber-800   ring-1 ring-amber-300',
+  High:     'bg-rose-100    text-rose-800    ring-1 ring-rose-300',
+  Unknown:  'bg-gray-100    text-gray-700    ring-1 ring-gray-300',
+};
+const ZoneBadge: React.FC<{ zone?: string }> = ({ zone }) => {
+  if (!zone) return null;
+  const cls = ZONE_BADGE_CLASSES[zone] || ZONE_BADGE_CLASSES.Unknown;
+  return (
+    <span
+      className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide ${cls}`}
+      title="Stylianou 2021 SI Table 11B zone (per-serving percentile)"
+    >
+      {zone}
+    </span>
+  );
+};
+
 interface EnvironmentalVisualizationProps {
   results: EnvironmentalImpactResult;
 }
@@ -28,6 +47,7 @@ export const EnvironmentalVisualization: React.FC<EnvironmentalVisualizationProp
   const bands: LCABands = (analysis?.lca_results_bands as LCABands) || {};
   const endpoints = (analysis?.endpoint_impacts || {}) as Partial<EndpointImpacts>;
   const sustainability = (analysis?.sustainability_score || {}) as Partial<SustainabilityScore>;
+  const categoryZones = (sustainability.category_zones || {}) as Record<string, string>;
 
   // v1 scope trim: only the 3 literature-anchored midpoint categories are
   // consumed. Acidification, fine PM, eutrophication and the other 12 used
@@ -112,6 +132,7 @@ export const EnvironmentalVisualization: React.FC<EnvironmentalVisualizationProp
                     <span className="text-sm font-medium text-gray-900">
                       {impact.label}
                     </span>
+                    <ZoneBadge zone={categoryZones[impact.key]} />
                   </div>
                   <span className="text-sm font-bold text-gray-900 tabular-nums">
                     {formatImpactValue(impact.value, impact.unit)}
@@ -261,11 +282,14 @@ export const EnvironmentalVisualization: React.FC<EnvironmentalVisualizationProp
           </p>
           {/* Removed cross-category "Top Impact" comparison */}
           <p>
-            <strong>Benchmark:</strong> This meal&apos;s sustainability score of{' '}
-            {(sustainability.overall_sustainability_score ?? 0).toFixed(0)}/100 indicates{' '}
-            {(sustainability.overall_sustainability_score ?? 0) >= 60 ? 'above-average' : 
-             (sustainability.overall_sustainability_score ?? 0) >= 40 ? 'average' : 'below-average'} 
-            environmental and nutritional performance
+            <strong>Benchmark:</strong> This meal&apos;s overall sustainability score of{' '}
+            {(sustainability.overall_sustainability_score ?? 0).toFixed(0)}/100 blends
+            environmental ({(sustainability.environmental_score ?? 0).toFixed(0)},{' '}
+            <em>{sustainability.environmental_rating ?? 'Unknown'}</em>),
+            nutritional ({(sustainability.nutritional_score ?? 0).toFixed(0)}), and
+            processing ({(sustainability.processing_score ?? 0).toFixed(0)}) components at
+            weights {sustainability.overall_weights ? `${(sustainability.overall_weights.environmental * 100).toFixed(0)}/${(sustainability.overall_weights.nutritional * 100).toFixed(0)}/${(sustainability.overall_weights.processing * 100).toFixed(0)}` : '50/30/20'}.
+            Environmental sub-scores use Stylianou et al. 2021 (SI Table 11B) per-serving Low/Moderate/High zones for GW and Water, and P&amp;N 2018 panel medians for Land.
           </p>
         </div>
       </div>

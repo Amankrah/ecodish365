@@ -304,16 +304,23 @@ def format_environmental_results(meal_data: Dict[str, Any], user_type: str = "in
     }
     
     # Surface sustainability scores (numeric) calculated server-side so the UI
-    # does not need to infer them. Keep a minimal, stable shape.
+    # does not need to infer them. Keep a minimal, stable shape — additive
+    # keys (environmental_rating, category_zones, methodology_note,
+    # overall_weights) are passed through for v1 literature-anchored zone
+    # display. Frontend consumers ignore unknown keys.
     sustainability_raw = meal_data.get('sustainability', {}) or {}
     formatted_sustainability = {
         "overall_sustainability_score": sustainability_raw.get('overall_sustainability_score', 50),
         "sustainability_rating": sustainability_raw.get('sustainability_rating', 'Unknown'),
-        # Optional granular scores (if we add them in the future). Keep empty defaults for now.
         "environmental_score": sustainability_raw.get('environmental_score'),
+        "environmental_rating": sustainability_raw.get('environmental_rating'),
         "nutritional_score": sustainability_raw.get('nutritional_score'),
         "processing_score": sustainability_raw.get('processing_score'),
         "category_scores": sustainability_raw.get('category_scores', {}),
+        # v1 literature-anchored per-category zones (Stylianou 2021 SI Table 11B + P&N 2018).
+        "category_zones": sustainability_raw.get('category_zones', {}),
+        "methodology_note": sustainability_raw.get('methodology_note', ''),
+        "overall_weights": sustainability_raw.get('overall_weights'),
         # Provide a simple recommendation aligned with overall assessment below
         "recommendations": []
     }
@@ -710,17 +717,41 @@ def _analyze_meal_comprehensive(meal: EnvMeal, data_loader: EnvDataLoader, match
                 reference_comparisons[meal_type] = {'error': str(e)}
         
         # Sustainability scoring.
-        # Uses the LCA's matcher-aware per-food impacts so the score reflects
-        # the same Agribalyse-overlay value as the displayed Climate Impact —
-        # not the group-default fallback that `meal.get_sustainability_score()`
-        # would compute against. Scoring math is literature-anchored on
+        # ALL scoring uses the LCA's matcher-aware per-food impacts plus
         # Stylianou et al. 2021 SI Table 11B per-serving zones (GW + Water)
-        # and P&N 2018 panel medians (Land); see Food.get_sustainability_score
-        # docstring and LITERATURE_ZONE_THRESHOLDS in food.py.
-        base_sustainability = lca.calculate_matcher_aware_sustainability_score()
+        # and P&N 2018 panel medians (Land). The previous
+        # `_compute_environmental_component_scores` per-100-kcal max-value
+        # path is RETIRED to prevent the conflict that displayed
+        # Environmental=98 next to Overall=25 on the same meal — see
+        # Food.get_sustainability_score docstring + LITERATURE_ZONE_THRESHOLDS
+        # in food.py.
+        env_sustainability = lca.calculate_matcher_aware_sustainability_score()
+        environmental_score = float(env_sustainability.get('overall_sustainability_score', 50) or 50)
+        env_rating = env_sustainability.get('sustainability_rating', 'Unknown')
 
-        # Derive environmental component and per-category scores from meal-level LCA results
-        env_component = _compute_environmental_component_scores(lca_results)
+        # Derive per-category scores (Low/Mod/High zone + numeric 0-100) by
+        # quantity-weighting the per-food zone scores. Surfaced so the UI
+        # can render Low/Mod/High chips beside each category card.
+        category_scores: Dict[str, float] = {}
+        category_zones: Dict[str, str] = {}
+        for cat in ('Global warming', 'Land use', 'Water consumption'):
+            num = denom = 0.0
+            zone_counts: Dict[str, float] = {}
+            for fs in env_sustainability.get('individual_food_scores', []):
+                qty = float(fs.get('quantity_g') or 0)
+                cat_score = fs.get(cat)
+                cat_zone = fs.get(f'{cat}_zone')
+                if isinstance(cat_score, (int, float)) and qty > 0:
+                    num += cat_score * qty
+                    denom += qty
+                    if cat_zone:
+                        zone_counts[cat_zone] = zone_counts.get(cat_zone, 0) + qty
+            if denom > 0:
+                category_scores[cat] = num / denom
+                # Dominant zone by quantity-weight (deterministic tie-break by zone severity).
+                if zone_counts:
+                    severity = {'Low': 0, 'Moderate': 1, 'High': 2}
+                    category_zones[cat] = max(zone_counts, key=lambda z: (zone_counts[z], severity.get(z, 0)))
 
         # Nutritional quality score (0-100) from meal nutrition
         nutrition_quality = meal.get_nutritional_quality_score()
@@ -729,18 +760,38 @@ def _analyze_meal_comprehensive(meal: EnvMeal, data_loader: EnvDataLoader, match
         # Processing level heuristic score (0-100, higher is better = less processed)
         processing_score = _estimate_processing_score(meal)
 
+        # Overall = explicit blend of the three sub-scores (env, nutritional,
+        # processing) with documented weights. Previously this was env-only,
+        # which silently dropped nutritional+processing from the headline
+        # number even though they were shown as separate tiles. Weighting
+        # 0.5 env / 0.3 nutritional / 0.2 processing reflects the §3.x
+        # "environment is the dominant driver, nutrition is the second-order
+        # signal, processing is heuristic" framing.
+        overall_blend = (
+            0.5 * environmental_score
+            + 0.3 * nutritional_score
+            + 0.2 * processing_score
+        )
+        # Blended rating uses the same rating bands as env (Excellent/Good/...)
+        from environmental_impact_model.src.life_cycle_assessment import LifeCycleAssessment as _LCA
+        overall_rating = _LCA._sustainability_rating(overall_blend)
+
         # Compose enhanced sustainability block consumed by the frontend
         sustainability = {
-            'overall_sustainability_score': float(base_sustainability.get('overall_sustainability_score', 50) or 50),
-            'sustainability_rating': base_sustainability.get('sustainability_rating', 'Unknown'),
-            'environmental_score': env_component['environmental_score'],
+            'overall_sustainability_score': overall_blend,
+            'sustainability_rating': overall_rating,
+            'environmental_score': environmental_score,
+            'environmental_rating': env_rating,
             'nutritional_score': nutritional_score,
             'processing_score': processing_score,
-            'category_scores': env_component['category_scores'],
-            'individual_food_scores': base_sustainability.get('individual_food_scores', []),
+            'category_scores': category_scores,
+            'category_zones': category_zones,
+            'individual_food_scores': env_sustainability.get('individual_food_scores', []),
             # Literature-anchored scoring methodology (Stylianou 2021 SI Table 11B
             # zones + P&N 2018 land panel). Surfaced so UI tooltips can cite.
-            'methodology_note': base_sustainability.get('methodology_note', ''),
+            'methodology_note': env_sustainability.get('methodology_note', ''),
+            # Explicit weights so consumers can interpret the overall blend.
+            'overall_weights': {'environmental': 0.5, 'nutritional': 0.3, 'processing': 0.2},
         }
         
         return {
