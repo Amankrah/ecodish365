@@ -1,0 +1,118 @@
+{
+  "_schema_version": "1.0",
+  "acceptance": {
+    "distinct_ge_4": true,
+    "spearman_negative": false,
+    "stdev_ge_0_10": true
+  },
+  "generated_at_utc": "20260522T172755Z",
+  "per_probe": [
+    {
+      "decomposition_confidence": 0.0,
+      "fallback_reason": "too_few_ingredients:1<2",
+      "food_id": 502049,
+      "hand_difficulty": 0.1,
+      "ingredient_count": 1,
+      "label": "Lasagna with meat and tomato sauce",
+      "latency_seconds": 3.64,
+      "quantity_g": 250,
+      "resolved": false
+    },
+    {
+      "decomposition_confidence": 0.0,
+      "fallback_reason": "too_few_ingredients:1<2",
+      "food_id": 501958,
+      "hand_difficulty": 0.2,
+      "ingredient_count": 1,
+      "label": "Macaroni and cheese, prepared",
+      "latency_seconds": 1.64,
+      "quantity_g": 250,
+      "resolved": false
+    },
+    {
+      "decomposition_confidence": 0.0,
+      "fallback_reason": "too_few_ingredients:1<2",
+      "food_id": 501981,
+      "hand_difficulty": 0.3,
+      "ingredient_count": 1,
+      "label": "Chicken noodle soup, canned, prepared",
+      "latency_seconds": 2.33,
+      "quantity_g": 250,
+      "resolved": false
+    },
+    {
+      "decomposition_confidence": 0.0,
+      "fallback_reason": "hallucinated_ciqual_code:unresolved",
+      "food_id": 501999,
+      "hand_difficulty": 0.55,
+      "ingredient_count": 0,
+      "label": "Poutine",
+      "latency_seconds": 4.74,
+      "quantity_g": 250,
+      "resolved": false
+    },
+    {
+      "decomposition_confidence": 0.78,
+      "fallback_reason": null,
+      "food_id": 502000,
+      "hand_difficulty": 0.6,
+      "ingredient_count": 2,
+      "label": "Shepherd's pie with corn",
+      "latency_seconds": 2.03,
+      "quantity_g": 250,
+      "resolved": true
+    },
+    {
+      "decomposition_confidence": 0.0,
+      "fallback_reason": "too_few_ingredients:1<2",
+      "food_id": 4082,
+      "hand_difficulty": 0.75,
+      "ingredient_count": 1,
+      "label": "Bannock",
+      "latency_seconds": 2.29,
+      "quantity_g": 100,
+      "resolved": false
+    },
+    {
+      "decomposition_confidence": 0.35,
+      "fallback_reason": null,
+      "food_id": 501844,
+      "hand_difficulty": 0.8,
+      "ingredient_count": 3,
+      "label": "Butter tart, with raisins, homemade",
+      "latency_seconds": 4.25,
+      "quantity_g": 50,
+      "resolved": true
+    },
+    {
+      "decomposition_confidence": 0.45,
+      "fallback_reason": null,
+      "food_id": 502097,
+      "hand_difficulty": 0.85,
+      "ingredient_count": 3,
+      "label": "Tourtiere, homemade",
+      "latency_seconds": 5.39,
+      "quantity_g": 150,
+      "resolved": true
+    }
+  ],
+  "summary": {
+    "confidence_values_sorted": [
+      0.0,
+      0.35,
+      0.45,
+      0.78
+    ],
+    "distinct_confidence_values": 4,
+    "hard_below_median_count": 0,
+    "mean": 0.198,
+    "median": 0.0,
+    "model": "claude-haiku-4-5",
+    "provider": "anthropic",
+    "sample_size": 8,
+    "spearman_rho_difficulty_vs_conf": 0.655,
+    "stdev": 0.298,
+    "total_elapsed_seconds": 26.3,
+    "trivial_above_median_count": 0
+  }
+}

@@ -82,6 +82,35 @@ class MatcherBenchmarkShapeTests(unittest.TestCase):
         self.assertTrue(math.isfinite(s['median_latency_seconds']))
         self.assertGreater(s['total_cost_usd'], 0)
 
+    def test_latency_percentiles_present_when_emitted(self):
+        """When the harness emits the new latency_seconds block (post
+        2026-05-22 extension), every percentile is finite and monotonic."""
+        lat = self.b['summary'].get('latency_seconds')
+        if lat is None:
+            self.skipTest('legacy artefact predates latency_seconds field')
+        for k in ('p50', 'p75', 'p90', 'p95', 'p99', 'mean', 'min', 'max'):
+            self.assertIn(k, lat)
+            self.assertTrue(math.isfinite(lat[k]))
+        self.assertLessEqual(lat['p50'], lat['p75'])
+        self.assertLessEqual(lat['p75'], lat['p90'])
+        self.assertLessEqual(lat['p90'], lat['p95'])
+        self.assertLessEqual(lat['p95'], lat['p99'])
+
+    def test_bootstrap_cis_present_when_emitted(self):
+        """When the harness emits the per-group 95% bootstrap CI block, every
+        group has well-formed (n, observed, ci_lo, ci_hi) with the point
+        estimate inside the CI."""
+        cis = self.b['summary'].get('by_group_bootstrap_ci_95')
+        if cis is None:
+            self.skipTest('legacy artefact predates by_group_bootstrap_ci_95 field')
+        for g, c in cis.items():
+            for k in ('n', 'observed', 'ci_lo', 'ci_hi'):
+                self.assertIn(k, c, msg=f'{g} missing {k}')
+            self.assertLessEqual(c['ci_lo'], c['observed'])
+            self.assertLessEqual(c['observed'], c['ci_hi'])
+            self.assertGreaterEqual(c['ci_lo'], 0.0)
+            self.assertLessEqual(c['ci_hi'], 1.0)
+
     def test_every_per_food_row_has_required_fields(self):
         required = {
             'food_id', 'cnf_name', 'cnf_group', 'matched', 'ciqual_code',

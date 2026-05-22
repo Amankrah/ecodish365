@@ -223,14 +223,23 @@ def _matched_entry_lookup(ciqual_code: Optional[str]) -> Dict[str, Any]:
     return {}
 
 
-def run_benchmark(sample_size: int = 200, seed: int = 42) -> Dict[str, Any]:
-    """Execute the benchmark + return the summary + per-food rows."""
+def run_benchmark(sample_size: int = 200, seed: int = 42,
+                  with_decomposer: bool = False) -> Dict[str, Any]:
+    """Execute the benchmark + return the summary + per-food rows.
+
+    When `with_decomposer=True`, each /environmental-impact/ POST also passes
+    enable_recipe_decomposer=true; the Tier γ audit (`recipe_decomposition_decisions[0]`)
+    is then captured on each per_food row. Adds ≈ 24-30 extra LLM calls per
+    184-food run (only composite-group borderline matches trigger Tier γ),
+    bringing total cost from ≈ $0.026 to ≈ $0.035.
+    """
     from django.test import Client
 
     n_groups = 23
     n_per_group = max(1, sample_size // n_groups)
 
-    hr(f'Matcher validation benchmark — {sample_size}-food sample (n_per_group={n_per_group})')
+    hr(f'Matcher validation benchmark — {sample_size}-food sample (n_per_group={n_per_group}'
+       + (', with Tier γ decomposer)' if with_decomposer else ')'))
     sample = _stratified_cnf_sample(n_per_group=n_per_group, seed=seed)
     # Trim to exactly sample_size (random shuffle for determinism per seed)
     random.seed(seed)
@@ -247,10 +256,18 @@ def run_benchmark(sample_size: int = 200, seed: int = 42) -> Dict[str, Any]:
         if n_progress % 25 == 0:
             print(f'  ... {n_progress}/{len(sample)}', flush=True)
         t = time.time()
-        r = c.post('/api/environmental-impact/', data=json.dumps({
+        # When the caller passes --with-decomposer, the API runs Tier γ on
+        # borderline composite matches; we capture the decomposer audit
+        # alongside the matcher decision so the benchmark reflects the full
+        # production resolution stack (matcher → optional Tier γ → fallback).
+        post_body = {
             'foods': [{'food_id': food_id, 'quantity': 100}],
             'enable_lca_matcher': True,
-        }), content_type='application/json')
+        }
+        if with_decomposer:
+            post_body['enable_recipe_decomposer'] = True
+        r = c.post('/api/environmental-impact/', data=json.dumps(post_body),
+                   content_type='application/json')
         elapsed = time.time() - t
         latencies.append(elapsed)
         try:
@@ -264,6 +281,8 @@ def run_benchmark(sample_size: int = 200, seed: int = 42) -> Dict[str, Any]:
         matched_ciqual = m.get('ciqual_code')
         matched_lci = m.get('lci_name') or ''
         justification = m.get('justification') or ''
+        decomp_decisions = env.get('recipe_decomposition_decisions') or []
+        decomp = decomp_decisions[0] if decomp_decisions else None
 
         # Pull the matched entry's Agribalyse group + per-100g GW for the
         # group-consistency and magnitude-plausibility checks. The matcher
@@ -279,7 +298,7 @@ def run_benchmark(sample_size: int = 200, seed: int = 42) -> Dict[str, Any]:
         tok_pass = _check_token_overlap(cnf_name, matched_lci, matched_lci_fr) if matched else False
         verdict = _classify(matched, confidence, gc_pass, mag_pass, tok_pass)
 
-        rows.append({
+        row = {
             'food_id': food_id,
             'cnf_name': cnf_name,
             'cnf_group': cnf_group,
@@ -299,7 +318,27 @@ def run_benchmark(sample_size: int = 200, seed: int = 42) -> Dict[str, Any]:
             'cnf_group_default_gw_per_100g': cnf_default_gw,
             'magnitude_ratio': mag_ratio,
             'latency_seconds': round(elapsed, 3),
-        })
+        }
+        # Decomposer audit (Tier γ). Only populated when --with-decomposer is
+        # set AND the matcher routed this food to the decomposer (composite
+        # group + matcher conf < HIGH_CONFIDENCE_THRESHOLD). For non-composite
+        # groups the decomposer never attempts, so these stay None.
+        if with_decomposer:
+            if decomp:
+                row['decomposer_attempted'] = True
+                row['decomposer_resolved'] = bool(decomp.get('matched'))
+                row['decomposer_confidence'] = float(decomp.get('decomposition_confidence') or 0.0)
+                row['decomposer_n_ingredients'] = int(decomp.get('ingredient_count') or 0)
+                row['decomposer_triggered_by'] = decomp.get('triggered_by')
+                row['decomposer_fallback_reason'] = decomp.get('fallback_reason')
+            else:
+                row['decomposer_attempted'] = False
+                row['decomposer_resolved'] = False
+                row['decomposer_confidence'] = None
+                row['decomposer_n_ingredients'] = None
+                row['decomposer_triggered_by'] = None
+                row['decomposer_fallback_reason'] = None
+        rows.append(row)
 
     # ---- Aggregate summary ----
     overall = {'clean': 0, 'borderline': 0, 'flagged': 0}
@@ -328,19 +367,41 @@ def run_benchmark(sample_size: int = 200, seed: int = 42) -> Dict[str, Any]:
 
     # Cost estimate: each /environmental-impact/ POST fires one embedding +
     # one chat completion. text-embedding-3-small ≈ $0.02/M tokens × ~20 tok
-    # = $4e-7 per query; gpt-4o-mini ≈ $0.15/M input + $0.60/M output × ~700
-    # input + 50 output tokens = ~$1.4e-4 per call. Total per food ≈ $0.00014.
+    # = $4e-7 per query; the configured ranking LLM ≈ $0.40/$1.60 per 1M
+    # input/output tokens (gpt-4.1-mini, post-2026-05-22 default) × ~700 in +
+    # 50 out ≈ $1.4e-4 per call. Total per food ≈ $0.00014 (≈ same as the
+    # pre-upgrade gpt-4o-mini cost because output tokens dominate by count
+    # only modestly and the prompt is short).
     cost_per_food_usd = 0.00014
     total_cost_usd = round(len(sample) * cost_per_food_usd, 4)
+
+    # Per-group bootstrap CIs (95% percentile method, B=1000 resamples).
+    # n=8 per group is statistically thin — point estimates can land 25-40 pp
+    # apart by chance alone, so the manuscript should report CIs alongside
+    # rates. Implemented inline (no scipy dep) since it's just resampling.
+    per_group_cis = _bootstrap_per_group_flagged_ci(rows, seed=seed)
+
+    # Decomposer aggregate (only when --with-decomposer was set)
+    decomp_summary = _aggregate_decomposer(rows) if with_decomposer else None
+
+    # Latency percentiles. The harness already reports median + mean, but the
+    # tail can be 20-30x median on slow LLM responses; p90/p95/p99 surface
+    # this for UX/batching tuning.
+    latency_pcts = _latency_percentiles(latencies)
 
     summary = {
         'overall': {**overall, 'total': len(rows)},
         'by_group': by_group,
+        'by_group_bootstrap_ci_95': per_group_cis,
         'by_confidence_band': by_band,
         'total_cost_usd': total_cost_usd,
-        'median_latency_seconds': round(statistics.median(latencies), 2) if latencies else 0,
-        'mean_latency_seconds':   round(statistics.mean(latencies), 2)   if latencies else 0,
+        'latency_seconds': latency_pcts,
+        # Backwards-compatible aliases (pre-2026-05-22 schema):
+        'median_latency_seconds': latency_pcts.get('p50', 0),
+        'mean_latency_seconds':   latency_pcts.get('mean', 0),
     }
+    if decomp_summary is not None:
+        summary['decomposer'] = decomp_summary
 
     return {
         '_schema_version': '1.0',
@@ -351,6 +412,103 @@ def run_benchmark(sample_size: int = 200, seed: int = 42) -> Dict[str, Any]:
         'seed': seed,
         'summary': summary,
         'per_food': rows,
+    }
+
+
+def _latency_percentiles(latencies: List[float]) -> Dict[str, float]:
+    """Return p50/p75/p90/p95/p99 + min/max/mean over latency samples.
+
+    Critical for production-UX claims because the mean is misleading when the
+    tail is heavy: on the n=184 panel the new gpt-4.1-mini ranker has
+    p50=2.2 s but p99=54 s — the tail of ~5 % of foods drives the mean.
+    """
+    if not latencies:
+        return {'p50': 0.0, 'p75': 0.0, 'p90': 0.0, 'p95': 0.0, 'p99': 0.0,
+                'min': 0.0, 'max': 0.0, 'mean': 0.0, 'n': 0}
+    s = sorted(latencies)
+    n = len(s)
+    def _pct(p: float) -> float:
+        idx = min(n - 1, max(0, int(p * n)))
+        return round(s[idx], 2)
+    return {
+        'p50': _pct(0.50), 'p75': _pct(0.75), 'p90': _pct(0.90),
+        'p95': _pct(0.95), 'p99': _pct(0.99),
+        'min': round(s[0], 2), 'max': round(s[-1], 2),
+        'mean': round(statistics.mean(s), 2), 'n': n,
+    }
+
+
+def _bootstrap_per_group_flagged_ci(
+    rows: List[Dict[str, Any]],
+    seed: int,
+    n_resamples: int = 1000,
+    alpha: float = 0.05,
+) -> Dict[str, Dict[str, float]]:
+    """Per-group 95% percentile bootstrap CI on the flagged-rate.
+
+    n_per_group is small (typically 8) so the point estimate has wide
+    uncertainty. We resample with replacement B times and report the alpha/2
+    and 1-alpha/2 quantiles of the bootstrap distribution. Reported alongside
+    the point estimate so reviewers can see e.g. "Beef 50% [13-88%]" rather
+    than treating 50% as a precise figure.
+    """
+    rng = random.Random(seed)
+    by_group: Dict[str, List[int]] = {}
+    for r in rows:
+        flag = 1 if r.get('automated_verdict') == 'flagged' else 0
+        by_group.setdefault(r['cnf_group'], []).append(flag)
+    out: Dict[str, Dict[str, float]] = {}
+    for g, flags in by_group.items():
+        n = len(flags)
+        if n == 0:
+            continue
+        obs = sum(flags) / n
+        boot = []
+        for _ in range(n_resamples):
+            sample = [flags[rng.randrange(n)] for _ in range(n)]
+            boot.append(sum(sample) / n)
+        boot.sort()
+        lo_idx = int((alpha / 2) * n_resamples)
+        hi_idx = int((1 - alpha / 2) * n_resamples) - 1
+        out[g] = {
+            'n': n,
+            'observed': round(obs, 3),
+            'ci_lo': round(boot[lo_idx], 3),
+            'ci_hi': round(boot[hi_idx], 3),
+        }
+    return out
+
+
+def _aggregate_decomposer(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Summarise the Tier γ decomposer audit across the panel.
+
+    Reports: attempted (matcher routed to Tier γ), resolved (passed all
+    validation gates), rejection-reason breakdown, and a per-CNF-group
+    attempt/resolve table for the composite groups where Tier γ is in
+    scope. Only meaningful when --with-decomposer was set.
+    """
+    attempted = [r for r in rows if r.get('decomposer_attempted')]
+    resolved = [r for r in attempted if r.get('decomposer_resolved')]
+    reasons: Dict[str, int] = {}
+    for r in attempted:
+        if not r.get('decomposer_resolved'):
+            reason = r.get('decomposer_fallback_reason') or 'unknown'
+            # Normalise reasons like 'low_confidence:0.40' → 'low_confidence'
+            head = reason.split(':', 1)[0] if isinstance(reason, str) else 'unknown'
+            reasons[head] = reasons.get(head, 0) + 1
+    by_group: Dict[str, Dict[str, int]] = {}
+    for r in attempted:
+        g = r['cnf_group']
+        gb = by_group.setdefault(g, {'attempted': 0, 'resolved': 0})
+        gb['attempted'] += 1
+        if r.get('decomposer_resolved'):
+            gb['resolved'] += 1
+    return {
+        'attempted': len(attempted),
+        'resolved': len(resolved),
+        'resolved_rate': round(len(resolved) / max(1, len(attempted)), 3),
+        'rejection_reasons': dict(sorted(reasons.items(), key=lambda kv: -kv[1])),
+        'by_group': by_group,
     }
 
 
@@ -413,7 +571,13 @@ def _print_summary(benchmark: Dict[str, Any]) -> None:
     print(f'Git rev:           {benchmark["git_rev"]}')
     print(f'Matcher pack:      {benchmark["matcher_pack_version"]}')
     print(f'Cost:              ${s["total_cost_usd"]:.4f}')
-    print(f'Latency median:    {s["median_latency_seconds"]:.2f} s  (mean {s["mean_latency_seconds"]:.2f} s)')
+    lat = s.get('latency_seconds', {})
+    if lat:
+        print(f'Latency (s):       p50={lat["p50"]:5.2f}  p75={lat["p75"]:5.2f}  '
+              f'p90={lat["p90"]:5.2f}  p95={lat["p95"]:5.2f}  p99={lat["p99"]:5.2f}  '
+              f'max={lat["max"]:5.2f}  (mean {lat["mean"]:.2f})')
+    else:
+        print(f'Latency median:    {s["median_latency_seconds"]:.2f} s  (mean {s["mean_latency_seconds"]:.2f} s)')
     print()
     print(f'Overall verdicts:')
     n = o["total"]
@@ -429,15 +593,35 @@ def _print_summary(benchmark: Dict[str, Any]) -> None:
         print(f'  {band:10s}  n={n_band:3d}  clean={b["clean"]:3d}  borderline={b["borderline"]:3d}  '
               f'flagged={b["flagged"]:3d}  (flagged_rate={b["flagged_rate"]:.2%})')
     print()
-    print(f'By CNF FoodGroup (sorted by flagged_rate desc):')
+    print(f'By CNF FoodGroup (sorted by flagged_rate desc; 95% bootstrap CI shown):')
+    cis = s.get('by_group_bootstrap_ci_95', {})
     sorted_groups = sorted(
         s['by_group'].items(),
         key=lambda kv: -(kv[1]['flagged'] / max(1, kv[1]['n']))
     )
     for g, b in sorted_groups:
         fr = b['flagged'] / max(1, b['n'])
+        ci = cis.get(g, {})
+        ci_str = (f"[{ci['ci_lo']*100:3.0f}%, {ci['ci_hi']*100:3.0f}%]"
+                  if ci else '[-, -]')
         print(f'  {g:<45s}  n={b["n"]:2d}  clean={b["clean"]:2d}  borderline={b["borderline"]:2d}  '
-              f'flagged={b["flagged"]:2d}  (flagged_rate={fr:.0%})')
+              f'flagged={b["flagged"]:2d}  (rate={fr:.0%}  CI95={ci_str})')
+
+    decomp = s.get('decomposer')
+    if decomp:
+        print()
+        print(f'Tier γ decomposer (composite-group borderline routing):')
+        print(f'  attempted:  {decomp["attempted"]:3d}')
+        print(f'  resolved:   {decomp["resolved"]:3d}  ({100*decomp["resolved_rate"]:.0f}%)')
+        if decomp['rejection_reasons']:
+            print(f'  rejection reasons:')
+            for reason, count in decomp['rejection_reasons'].items():
+                print(f'    {reason:<35s} {count}')
+        if decomp['by_group']:
+            print(f'  by composite group:')
+            for g, b in sorted(decomp['by_group'].items()):
+                rate = b['resolved'] / max(1, b['attempted'])
+                print(f'    {g:<43s} attempted={b["attempted"]:2d}  resolved={b["resolved"]:2d}  ({rate:.0%})')
 
 
 def main():
@@ -445,6 +629,9 @@ def main():
     parser.add_argument('--sample-size', type=int, default=200,
                         help='Total foods to benchmark (default 200)')
     parser.add_argument('--seed', type=int, default=42)
+    parser.add_argument('--with-decomposer', action='store_true',
+                        help='Also exercise the Tier γ recipe decomposer on borderline composite matches '
+                             '(adds ≈ 24–30 LLM calls; total cost ≈ $0.035 vs $0.026 matcher-only)')
     args = parser.parse_args()
 
     if not os.environ.get('OPENAI_API_KEY'):
@@ -452,7 +639,8 @@ def main():
         sys.exit(1)
     print(f'Using OpenAI key sk-***{os.environ["OPENAI_API_KEY"][-6:]}')
 
-    bench = run_benchmark(sample_size=args.sample_size, seed=args.seed)
+    bench = run_benchmark(sample_size=args.sample_size, seed=args.seed,
+                          with_decomposer=args.with_decomposer)
     json_path, md_path = _write_artefacts(bench)
     _print_summary(bench)
     print()

@@ -175,17 +175,32 @@ def _parse_json_permissive(raw: str) -> dict:
 def coerce_chat_json_client(
     client: Any, *, model: Optional[str] = None,
 ) -> Optional[ChatJSONClient]:
-    """Best-effort coercion. Returns the client unchanged if it already
-    quacks like a ChatJSONClient (has `chat_completion_json`); otherwise
-    wraps an OpenAI-style client (real or mock) via the legacy adapter.
-    Returns None when given None. Used by matcher/decomposer constructors
-    to accept either the new ChatJSONClient or the legacy raw OpenAI client.
+    """Best-effort coercion. Returns the client unchanged if it is already
+    an instance of one of the known ChatJSONClient classes; if it has an
+    OpenAI-style `.chat.completions.create` interface (covers real
+    openai.OpenAI() and test MagicMocks shaped the same way), wraps it via
+    the legacy adapter. Returns None when given None.
+
+    The instanceof check is *intentional* over a generic
+    `hasattr(client, "chat_completion_json")` test: MagicMock instances
+    auto-create that attribute on first access, which would let test
+    fixtures shaped as raw OpenAI clients silently bypass the adapter and
+    return a MagicMock instead of the configured response.
     """
     if client is None:
         return None
+    if isinstance(client, (OpenAIChatJSONClient, AnthropicChatJSONClient)):
+        return client
+    # Anything else that exposes `.chat.completions.create` — real openai
+    # client OR a test mock shaped that way — goes through the adapter.
+    chat = getattr(client, "chat", None)
+    if chat is not None and getattr(chat, "completions", None) is not None:
+        return OpenAIChatJSONClient.from_client(client, model=model)
+    # Last-ditch: trust the duck type if the call site explicitly built a
+    # ChatJSONClient-compatible object outside our class hierarchy.
     if hasattr(client, "chat_completion_json"):
         return client
-    return OpenAIChatJSONClient.from_client(client, model=model)
+    return None
 
 
 def build_chat_json_client(

@@ -515,7 +515,7 @@ class LCAMatcher:
             for c, sim in candidates
         ]
 
-        if self.ranking_client is None:
+        if self.chat_json_client is None:
             # Degraded mode: return retrieval-only top-1 with similarity as
             # confidence. Useful for offline/test environments without an API key.
             top, top_sim = candidates[0]
@@ -685,31 +685,36 @@ class LCAMatcher:
         )
         return "\n".join(lines)
 
-    def _query_llm(self, prompt: str) -> str:
-        """Currently only OpenAI client is supported for the matcher (HENI
-        categorizer carries multi-provider routing; matcher follows in
-        GROUP-D-CODE-1.x-C as needed)."""
-        response = self.ranking_client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": self.SYSTEM_PROMPT},
-                {"role": "user", "content": prompt},
-            ],
+    def _query_llm(self, prompt: str) -> Dict[str, Any]:
+        """Delegate to the configured ChatJSONClient. Multi-provider via
+        `LLM_PROVIDER` env var (openai / anthropic) — see
+        `environmental_impact_model.src.llm_client`."""
+        return self.chat_json_client.chat_completion_json(
+            system=self.SYSTEM_PROMPT,
+            user=prompt,
             temperature=self.temperature,
             max_tokens=self.max_tokens,
-            response_format={"type": "json_object"},
         )
-        return response.choices[0].message.content or "{}"
 
     @staticmethod
-    def _parse_llm_json(raw: str) -> Dict[str, Any]:
+    def _parse_llm_json(raw: Any) -> Dict[str, Any]:
+        # _query_llm now returns a dict directly (ChatJSONClient handles JSON
+        # parsing). This helper is preserved for callers that may pass raw
+        # strings (e.g. tests round-tripping the old interface).
+        if isinstance(raw, dict):
+            return raw
+        if not isinstance(raw, str):
+            return {}
         try:
             return json.loads(raw)
         except json.JSONDecodeError:
             start = raw.find("{")
             end = raw.rfind("}") + 1
             if start != -1 and end > start:
-                return json.loads(raw[start:end])
+                try:
+                    return json.loads(raw[start:end])
+                except json.JSONDecodeError:
+                    pass
             return {}
 
 
@@ -720,26 +725,37 @@ def build_default_matcher(
     top_k: int = DEFAULT_TOP_K,
 ) -> LCAMatcher:
     """Convenience constructor used by the API layer and the verification
-    snippet in the GROUP-D-RECONCILIATION plan. Reads the OpenAI API key
-    from the supplied `api_key` arg or, failing that, the `OPENAI_API_KEY`
-    env var. When no key is available, returns a matcher in degraded
+    snippet in the GROUP-D-RECONCILIATION plan.
+
+    Embedding side: always OpenAI (the only provider with a usable embedding
+    API as of 2026-05). Reads `OPENAI_API_KEY` from env if `api_key` is not
+    supplied.
+
+    Ranking side: uses `build_chat_json_client()` which respects the
+    `LLM_PROVIDER` env var ("openai" default or "anthropic"). The two
+    paths can therefore use different providers — e.g. OPENAI_API_KEY for
+    embeddings + LLM_PROVIDER=anthropic + ANTHROPIC_API_KEY for ranking.
+
+    When no embedding key is available, returns a matcher in degraded
     (retrieval-only) mode — useful for offline/test environments.
     """
+    from .llm_client import build_chat_json_client
     key = api_key or os.environ.get("OPENAI_API_KEY")
-    client = None
+    embedding_client = None
     if key:
         try:
             import openai
-            client = openai.OpenAI(api_key=key)
+            embedding_client = openai.OpenAI(api_key=key)
         except ImportError:  # pragma: no cover - openai is in requirements.txt
             logger.warning("openai package not importable; matcher in degraded mode")
-            client = None
-    index = AgribalyseIndex(embedding_client=client)
-    retriever = EmbeddingRetriever(index, embedding_client=client)
+            embedding_client = None
+    chat_client = build_chat_json_client()
+    index = AgribalyseIndex(embedding_client=embedding_client)
+    retriever = EmbeddingRetriever(index, embedding_client=embedding_client)
     return LCAMatcher(
         index=index,
         retriever=retriever,
-        ranking_client=client,
+        chat_json_client=chat_client,
         confidence_threshold=confidence_threshold,
         top_k=top_k,
     )

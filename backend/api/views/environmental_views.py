@@ -164,31 +164,35 @@ def _get_default_recipe_decomposer(matcher=None):
         _RECIPE_DECOMPOSER_CACHE["tried"] = True
         try:
             from environmental_impact_model.src.recipe_decomposer import RecipeDecomposer
-            # Reuse the matcher's index/retriever if available; otherwise build fresh.
+            from environmental_impact_model.src.llm_client import build_chat_json_client
+            # Reuse the matcher's index/retriever + chat client if available;
+            # otherwise build fresh from env config.
             if matcher is not None:
                 index = matcher.index
                 retriever = matcher.retriever
-                ranking_client = matcher.ranking_client
+                chat_json_client = matcher.chat_json_client
             else:
                 from environmental_impact_model.src.lca_matcher import (
                     AgribalyseIndex, EmbeddingRetriever,
                 )
                 api_key = os.environ.get("OPENAI_API_KEY")
                 if not api_key:
-                    return None  # Decomposer needs an LLM; no point building shell
+                    return None  # Embeddings still require OpenAI key
                 try:
                     from openai import OpenAI
-                    client = OpenAI(api_key=api_key)
+                    embedding_client = OpenAI(api_key=api_key)
                 except Exception as exc:
                     logging.getLogger(__name__).warning(
                         "openai client init failed in decomposer setup: %s", exc,
                     )
                     return None
-                index = AgribalyseIndex(embedding_client=client)
-                retriever = EmbeddingRetriever(index, embedding_client=client)
-                ranking_client = client
+                index = AgribalyseIndex(embedding_client=embedding_client)
+                retriever = EmbeddingRetriever(index, embedding_client=embedding_client)
+                chat_json_client = build_chat_json_client()  # respects LLM_PROVIDER
+            if chat_json_client is None:
+                return None  # No ranking client available; decomposer needs LLM
             decomposer = RecipeDecomposer(
-                index=index, retriever=retriever, ranking_client=ranking_client,
+                index=index, retriever=retriever, chat_json_client=chat_json_client,
             )
             _RECIPE_DECOMPOSER_CACHE["instance"] = decomposer
             return decomposer

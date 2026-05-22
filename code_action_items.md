@@ -58,6 +58,44 @@ These were explicitly logged as v1 simplifications during HENI-CODE-1 implementa
 
 ## Done
 
+### 2026-05-22 — Model upgrade (gpt-4o-mini → gpt-4.1-mini), prompt rewrite (Tian et al. 2023), multi-provider Claude support, calibration probe
+
+**Why this matters.** The 0.40 confidence anchor on `gpt-4o-mini` was a workaround target — the architectural fix (threshold 0.60 → 0.30, structural gates carry the QA load) shipped earlier the same day, but the underlying calibration bug persisted and limited the signal we could extract from `decomposition_confidence`. Three concurrent changes resolve it: (a) swap the OpenAI model to `gpt-4.1-mini`, which has known better instruction-following at the same constrained-JSON cost envelope; (b) rewrite both the matcher and decomposer system prompts per Tian et al. 2023 ("Just Ask for Calibration", arXiv:2305.14975) using probability-of-correctness phrasing + discrete numeric anchors + Lin et al. 2022 indirect elicitation; (c) add a multi-provider abstraction so the same ranking + decomposition calls can route to Anthropic `claude-haiku-4-5` via `LLM_PROVIDER=anthropic` env var — addressing a recurring reviewer ask that no single vendor's idiosyncrasies dominate downstream results.
+
+**Calibration probe (8 composites, trivial → hard) before vs after:**
+
+| Provider / model | Distinct confidence values (≥4 = PASS) | Std-dev (≥0.10 = PASS) | Spearman ρ vs difficulty (<0 = PASS) | Acceptance |
+|---|---|---|---|---|
+| `gpt-4o-mini` (baseline) | 1 (0.40 anchor on 7/8) | ≈ 0 | n/a (no variance) | **0/3** |
+| `gpt-4.1-mini` (new default) | **5** ({0.0, 0.6, 0.7, 0.75, 0.85}) | **0.371** | **−0.417** | **3/3** PASS |
+| `claude-haiku-4-5` (alt) | 4 ({0.0, 0.35, 0.45, 0.78}) | 0.298 | +0.655 (wrong dir) | 2/3 |
+
+The Claude path fails the Spearman direction because the prompt encourages the model to express simple composites as 1-ingredient responses (which our `min_ingredients = 2` gate rejects); production default therefore stays `openai/gpt-4.1-mini` with Claude available as an alternative for provider-bias robustness checks. Per-probe artefacts ship at `backend/environmental_impact_model/data/confidence_probe_<provider>_<model>_<utc>.json`.
+
+**Files touched.**
+
+New:
+- `backend/environmental_impact_model/src/llm_client.py` — `ChatJSONClient` Protocol + `OpenAIChatJSONClient` / `AnthropicChatJSONClient` adapters + `build_chat_json_client()` factory (respects `LLM_PROVIDER` env) + `coerce_chat_json_client()` back-compat seam for legacy raw-OpenAI clients.
+- `backend/environmental_impact_model/tests/test_llm_client.py` — 16 unit tests (provider defaults pinned, env dispatch, missing-key paths, MagicMock coercion, JSON-permissive parser, Anthropic prefill).
+- `backend/_smoke_confidence_probe.py` — 8-composite calibration probe; writes per-provider JSON artefacts + acceptance flags to stdout.
+- `backend/environmental_impact_model/data/confidence_probe_openai_gpt-4.1-mini_<utc>.json` and `confidence_probe_anthropic_claude-haiku-4-5_<utc>.json`.
+
+Modified:
+- `backend/environmental_impact_model/src/lca_matcher.py` — `DEFAULT_RANKING_MODEL = "gpt-4.1-mini"` (was `gpt-4o-mini`); matcher SYSTEM_PROMPT rewritten with Tian et al. 2023 probability-of-correctness phrasing + 6-anchor calibration scale; constructor accepts `chat_json_client=...` alongside legacy `ranking_client=...`; `_query_llm` delegates to ChatJSONClient; `build_default_matcher` uses `build_chat_json_client()` for the ranking side while keeping OpenAI-only for embeddings.
+- `backend/environmental_impact_model/src/recipe_decomposer.py` — SYSTEM_PROMPT confidence block rewritten with indirect elicitation ("if you ran this 10 times, what fraction would still be LCA-equivalent?") + 5-anchor calibration scale; constructor accepts `chat_json_client=...`; `_query_llm` delegates to ChatJSONClient; `_build_prompt` renamed `_build_user_message` (system prompt is now supplied separately at the ChatJSONClient call site).
+- `backend/api/views/environmental_views.py` — decomposer setup uses `build_chat_json_client()` (respects `LLM_PROVIDER`) when no upstream matcher provides one; still requires `OPENAI_API_KEY` for embeddings.
+- `backend/environmental_impact_model/tests/test_lca_matcher.py` — new `DefaultModelPinTests` class pins `DEFAULT_RANKING_MODEL == "gpt-4.1-mini"` to catch accidental reverts.
+- `backend/requirements.txt` — added `anthropic>=0.40.0` (lazy-imported; only required when `LLM_PROVIDER=anthropic`).
+- `backend/.env.example` — added `LLM_PROVIDER=openai` toggle; uncommented `ANTHROPIC_API_KEY=` with docs noting it's required if `LLM_PROVIDER=anthropic`.
+- `manuscript_call1.md` §3.5 — three new paragraphs documenting the model swap, the Tian et al. 2023 / Lin et al. 2022 prompt rewrite with calibration-probe numbers, and the multi-provider abstraction. Inline `gpt-4o-mini` references in the LLM-ranking and S7-benchmark passages updated to reflect the new default while preserving the original 184-food benchmark result as the pre-upgrade baseline.
+
+**Verification.**
+
+- Full env-model test suite: **156/156 pass** (was 139 baseline + 16 new llm_client + 1 new model-pin = 156).
+- Live calibration probe vs gpt-4.1-mini: **3/3 acceptance signals PASS** (5 distinct conf values, std 0.371, Spearman −0.417).
+- Live calibration probe vs claude-haiku-4-5: **2/3 acceptance signals PASS** (4 distinct conf values, std 0.298, Spearman positive — Claude prefers single-ingredient responses for trivial composites).
+- No production-default behavioural change with `LLM_PROVIDER` unset (defaults to openai/gpt-4.1-mini).
+
 ### 2026-05-22 — Tier γ acceptance-gate calibration (decomposer now actually resolves)
 
 **Why this matters.** The Tier γ refinement shipped earlier the same day fixed the TRIGGER (decomposer now correctly fires on borderline-confidence composite matches via `HIGH_CONFIDENCE_THRESHOLD=0.85`), but the live decomposer smoke surfaced a second, separate problem: of the 7/7 Canadian composites the decomposer now correctly attempted, **0/7 actually resolved**. All 7 attempts were rejected by the `decomposition_confidence ≥ 0.60` gate at a uniform self-reported confidence of 0.40 — suggesting the threshold was empirically unreachable, not that the decompositions were genuinely bad.

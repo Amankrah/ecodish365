@@ -246,10 +246,19 @@ class RecipeDecomposer:
         max_ingredients: int = DEFAULT_MAX_INGREDIENTS,
         model: str = DEFAULT_RANKING_MODEL,
         temperature: float = 0.0,
+        chat_json_client: Optional[Any] = None,
     ):
         self.index = index
         self.retriever = retriever
-        self.ranking_client = ranking_client
+        # Internal authoritative interface (see LCAMatcher.__init__ for the
+        # full rationale). Accept either the legacy raw OpenAI-style client
+        # or a pre-built ChatJSONClient; coerce to the latter.
+        from .llm_client import coerce_chat_json_client
+        if chat_json_client is not None:
+            self.chat_json_client = chat_json_client
+        else:
+            self.chat_json_client = coerce_chat_json_client(ranking_client, model=model)
+        self.ranking_client = ranking_client if ranking_client is not None else self.chat_json_client
         self.confidence_threshold = confidence_threshold
         self.top_k = top_k
         self.max_ingredients = max_ingredients
@@ -295,7 +304,7 @@ class RecipeDecomposer:
         if food_id in self._cache:
             return self._cache[food_id]
 
-        if self.ranking_client is None:
+        if self.chat_json_client is None:
             result = DecomposedRecipe(
                 food_id=food_id, matched=False,
                 fallback_reason='no_llm_client',
@@ -324,11 +333,10 @@ class RecipeDecomposer:
             if entry.get('ciqual_code')
         }
 
-        # Step 3: build prompt + query LLM (temperature 0, JSON response).
-        prompt = self._build_prompt(food_description, food_quantity_g, candidates)
+        # Step 3: build user message + query LLM (temperature 0, JSON response).
+        user_msg = self._build_user_message(food_description, food_quantity_g, candidates)
         try:
-            raw = self._query_llm(prompt)
-            parsed = self._parse_json(raw)
+            parsed = self._query_llm(user_msg)
         except Exception as exc:  # noqa: BLE001
             logger.warning("RecipeDecomposer LLM call failed for food_id=%s: %s", food_id, exc)
             result = DecomposedRecipe(
@@ -345,20 +353,21 @@ class RecipeDecomposer:
             target_mass_g=food_quantity_g,
             parsed=parsed,
             candidates_by_code=candidates_by_code,
-            raw=raw,
+            raw=json.dumps(parsed) if isinstance(parsed, dict) else str(parsed),
         )
         with self._cache_lock:
             self._cache[food_id] = result
         return result
 
-    def _build_prompt(
+    def _build_user_message(
         self,
         food_description: str,
         food_quantity_g: float,
         candidates: List[Tuple[Dict[str, Any], float]],
-    ) -> List[Dict[str, str]]:
-        """Constrained-vocabulary prompt; ingredient Ciqual codes are the
-        only valid output."""
+    ) -> str:
+        """Constrained-vocabulary user message; ingredient Ciqual codes are
+        the only valid output. System prompt is supplied separately by the
+        ChatJSONClient call site."""
         candidate_lines = []
         for entry, sim in candidates:
             code = entry.get('ciqual_code') or '?'
@@ -367,7 +376,7 @@ class RecipeDecomposer:
             candidate_lines.append(f"  [{code}] {name} ({group})")
         candidate_block = '\n'.join(candidate_lines)
 
-        user_msg = (
+        return (
             f"CNF food: {food_description!r}\n"
             f"Serving size: {food_quantity_g:.1f} g\n\n"
             f"Candidate ingredients (top {len(candidates)} by retrieval):\n"
@@ -388,33 +397,16 @@ class RecipeDecomposer:
             f"  - At most {self.max_ingredients} ingredients (pick the dominant ones).\n"
             "  - Set decomposition_confidence low (< 0.5) if no candidate plausibly fits."
         )
-        return [
-            {'role': 'system', 'content': self.SYSTEM_PROMPT},
-            {'role': 'user', 'content': user_msg},
-        ]
 
-    def _query_llm(self, messages: List[Dict[str, str]]) -> str:
-        """OpenAI chat completion at temperature 0, JSON-mode if supported."""
-        # OpenAI Chat Completions API: response_format JSON mode
-        rsp = self.ranking_client.chat.completions.create(
-            model=self.model,
-            messages=messages,
+    def _query_llm(self, user_msg: str) -> Dict[str, Any]:
+        """Delegate to the configured ChatJSONClient. Multi-provider via
+        `LLM_PROVIDER` env var (openai / anthropic) — see
+        `environmental_impact_model.src.llm_client`."""
+        return self.chat_json_client.chat_completion_json(
+            system=self.SYSTEM_PROMPT,
+            user=user_msg,
             temperature=self.temperature,
-            response_format={'type': 'json_object'},
         )
-        return rsp.choices[0].message.content or ""
-
-    @staticmethod
-    def _parse_json(raw: str) -> Dict[str, Any]:
-        """Permissive JSON extraction — strips ```json fences if present."""
-        cleaned = raw.strip()
-        if cleaned.startswith('```'):
-            # Strip code fences
-            cleaned = cleaned.strip('`')
-            if cleaned.lower().startswith('json'):
-                cleaned = cleaned[4:]
-            cleaned = cleaned.strip()
-        return json.loads(cleaned)
 
     def _validate_and_build(
         self,
