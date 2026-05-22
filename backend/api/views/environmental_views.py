@@ -128,10 +128,10 @@ def get_user_explanations(user_type: str = "individual") -> Dict[str, Dict[str, 
         "researcher": {
             "monetization": {
                 "title": "Economic Valuation of Environmental Externalities",
-                "simple_explanation": "Monetary valuation of environmental impacts using established economic methods.",
-                "detailed_explanation": "Environmental externalities are monetized using peer-reviewed valuation methods including: Social Cost of Carbon (Environment Canada, 2024), health impact valuations (DALY-based), ecosystem service valuations, and resource scarcity costs. Values are adjusted for Canadian context and inflation.",
-                "what_it_means": "Represents the economic cost to society of environmental damage caused by food production and consumption.",
-                "action_tips": "Use for cost-benefit analysis, policy evaluation, and comparing intervention scenarios."
+                "simple_explanation": "Monetary valuation of environmental impacts using published valuation factors.",
+                "detailed_explanation": "Climate cost: CAD 221 / tonne CO₂-eq (ECCC 2023 SC-GHG Technical Update, base year 2021 CAD). Other categories draw on CE Delft Environmental Prices Handbook and True Price Foundation per-category factors with Canadian regional adjustments — see `monetization.py` for per-category source attribution. Health-impact and ecosystem-service valuations are not separately computed in v1 (they are absorbed into the per-category Environmental Prices figures rather than DALY-derived).",
+                "what_it_means": "Approximate societal externality cost of the meal under the chosen valuation framework; numbers are framework-dependent and not directly comparable across studies that use different SC-GHG vintages or valuation handbooks.",
+                "action_tips": "Use as a relative-ranking tool within this pipeline; for cost-benefit analyses outside it, document the underlying valuation factors used."
             },
             "reference_meals": {
                 "title": "Standardized Meal Compositions for Scientific Comparison",
@@ -142,17 +142,17 @@ def get_user_explanations(user_type: str = "individual") -> Dict[str, Dict[str, 
             },
             "lca_results": {
                 "title": "Life Cycle Assessment Using ReCiPe 2016 Methodology",
-                "simple_explanation": "Comprehensive environmental impact assessment using internationally recognized LCA standards.",
-                "detailed_explanation": "Midpoint impacts calculated using ReCiPe 2016 methodology with Canadian regional factors. Includes 18 impact categories covering climate change, human health, ecosystem quality, and resource depletion. Functional unit normalized to per 100 kcal for nutritional comparability.",
-                "what_it_means": "Scientifically robust environmental assessment suitable for peer review and academic publication.",
-                "action_tips": "Results are comparable with international LCA databases and can be used in meta-analyses."
+                "simple_explanation": "Environmental impact assessment using ReCiPe 2016 H midpoint factors, restricted in v1 to three literature-anchored categories.",
+                "detailed_explanation": "v1 release: ReCiPe 2016 v1.1 Hierarchist midpoint factors with Canadian regional adjustments, restricted to three categories that have per-food-group numerical literature grounding — Global warming (Poore & Nemecek 2018), Land use (P&N 2018), and Water consumption (Mekonnen & Hoekstra 2011/2012 blue-water-only). The other 15 standard ReCiPe midpoints are not consumed in v1 because per-food-group literature grounding is unavailable; see §7.5 of the methodology. Functional unit normalized to per 100 kcal.",
+                "what_it_means": "Results are directly comparable to studies that use the same three indicators on the same per-100-kcal basis; broader 18-indicator comparison requires the v2 licensed AGRIBALYSE-LCI re-scoring work.",
+                "action_tips": "Cite Poore & Nemecek 2018 (Science) and Mekonnen & Hoekstra 2011/2012 alongside ReCiPe 2016 (Huijbregts et al. 2017) when reporting; document the v1 three-category scope explicitly."
             }
         },
         "policy": {
             "monetization": {
                 "title": "Policy-Relevant Environmental Cost Estimates",
                 "simple_explanation": "Economic estimates of environmental damages for policy analysis and decision-making.",
-                "detailed_explanation": "Monetized impacts provide policy-relevant cost estimates for regulatory impact assessment, carbon pricing mechanisms, and public investment decisions. Based on Government of Canada's Social Cost of Carbon ($185/tonne CO2, 2024) and established environmental economics literature with Canadian-specific adjustments.",
+                "detailed_explanation": "Monetized impacts provide policy-relevant cost estimates for regulatory impact assessment, carbon pricing mechanisms, and public investment decisions. Climate cost uses CAD 221 / tonne CO₂-eq from the ECCC 2023 SC-GHG Technical Update (base year 2021 CAD); other categories draw on CE Delft Environmental Prices Handbook and True Price Foundation valuations with Canadian regional adjustments — see `monetization.py` for per-category sources.",
                 "what_it_means": "Quantifies the economic rationale for environmental policies and interventions in the food system.",
                 "action_tips": "Use for policy cost-effectiveness analysis, taxation/subsidy design, and public health investment prioritization."
             },
@@ -165,10 +165,10 @@ def get_user_explanations(user_type: str = "individual") -> Dict[str, Dict[str, 
             },
             "lca_results": {
                 "title": "Environmental Performance Indicators for Food Policy",
-                "simple_explanation": "Standardized environmental metrics aligned with international climate and sustainability commitments.",
-                "detailed_explanation": "Impact categories align with Canada's climate commitments (Net Zero 2050), UN Sustainable Development Goals, and international environmental agreements. Methodology consistent with ISO 14044 LCA standards and UNEP-SETAC guidelines for food system assessment.",
-                "what_it_means": "Provides evidence base for food-related environmental policies and regulatory frameworks.",
-                "action_tips": "Results support evidence-based policy development, progress monitoring, and international reporting."
+                "simple_explanation": "Three ReCiPe 2016 H midpoint indicators (GW, Land use, blue-water consumption), reported per 100 kcal.",
+                "detailed_explanation": "v1 release ships three literature-anchored ReCiPe 2016 H midpoints with documented sources (P&N 2018 for GW + Land; M&H 2011/2012 blue-water-only for Water). Methodology follows the framework of ISO 14040/14044 LCA standards; the licensed AGRIBALYSE-LCI re-scoring needed to extend to all 18 ReCiPe midpoints under Canada-specific characterisation factors is deferred to v2. Indicators map to Canada's Net Zero 2050 (climate) and broader food-system SDG targets at a thematic level rather than to specific numeric targets.",
+                "what_it_means": "Provides a structured baseline for food-related environmental policy framing on the three indicators above; reach beyond these requires v2 work or external LCA data.",
+                "action_tips": "Use for relative ranking and intervention-target setting on GW / Land / Water; document the v1 three-indicator scope when citing in policy documents."
             }
         }
     }
@@ -347,14 +347,21 @@ def _get_cost_interpretation(total_cost: float, user_type: str) -> Dict[str, str
             "high": "This meal has a high environmental cost. Try reducing meat portions or choosing more sustainable ingredients."
         },
         "researcher": {
-            "low": "Below median environmental cost for this meal category.",
-            "medium": "Within expected range for mixed dietary patterns.",
-            "high": "Above 75th percentile for environmental cost, indicating high-impact food choices."
+            # NB: the low/medium/high cutoffs (CAD 0.05 / 0.20) are pragmatic
+            # heuristic thresholds, not empirical percentiles. Phrasing avoids
+            # implying a published distribution we have not computed.
+            "low":  "Below the heuristic CAD 0.05 / meal cost threshold — comparatively low monetised externality.",
+            "medium": "Between CAD 0.05 and 0.20 / meal — mid-range monetised externality.",
+            "high": "Above CAD 0.20 / meal — comparatively high monetised externality on this heuristic scale.",
         },
         "policy": {
-            "low": "Aligned with sustainable dietary targets and climate objectives.",
-            "medium": "Moderate environmental externalities requiring policy attention.",
-            "high": "Significant externalities warranting regulatory consideration or intervention."
+            # Removed claim of "alignment with sustainable dietary targets and
+            # climate objectives" — the score is not computed against a
+            # specific Net Zero 2050 sub-target or Canada Food Guide
+            # quantitative threshold. Wording reflects the heuristic nature.
+            "low":  "Low monetised externality on the configured valuation scale; flag for context, not as a policy benchmark.",
+            "medium": "Moderate monetised externality; informative for intervention triage rather than absolute compliance.",
+            "high": "Comparatively high monetised externality; flag for further evaluation under the relevant policy framework.",
         }
     }
     
@@ -422,37 +429,47 @@ def _get_overall_assessment(meal_data: Dict[str, Any], user_type: str) -> Dict[s
     cost = meal_data.get('monetization', {}).get('total_cost', 0)
     
     if user_type == "individual":
-        if sustainability_score >= 70 and cost < 0.1:
+        # Bands harmonised with `LifeCycleAssessment._sustainability_rating`
+        # (Excellent >= 80, Good >= 65, Moderate >= 50, Poor >= 35, else Very Poor).
+        # Previously this gated Excellent at >= 70, which produced "Excellent
+        # Choice!" labels for meals that the score tile showed as "Good".
+        if sustainability_score >= 80 and cost < 0.1:
             return {
                 "rating": "Excellent Choice! 🌟",
                 "message": "Your meal is both environmentally friendly and nutritious. Keep up the great work!",
                 "recommendation": "Share your sustainable eating choices with friends and family."
             }
-        elif sustainability_score >= 50:
+        elif sustainability_score >= 65:
             return {
                 "rating": "Good Choice 👍",
-                "message": "Your meal has moderate environmental impact with room for improvement.",
-                "recommendation": "Try replacing some animal products with plant-based alternatives or choose local, seasonal ingredients."
+                "message": "Your meal scores well overall, with some room to lower the environmental impact further.",
+                "recommendation": "Consider seasonal produce, smaller animal-product portions, or substituting in legumes."
+            }
+        elif sustainability_score >= 50:
+            return {
+                "rating": "Moderate 🟡",
+                "message": "Your meal has a mixed sustainability profile.",
+                "recommendation": "Look for the highest-impact category in the per-category cards and target a substitution there."
             }
         else:
             return {
                 "rating": "Room for Improvement 🔄",
-                "message": "Your meal has significant environmental impact.",
-                "recommendation": "Focus on adding more vegetables, reducing meat portions, and choosing less processed foods."
+                "message": "Your meal has a high environmental impact in at least one category.",
+                "recommendation": "Reducing red-meat or large dairy portions usually gives the biggest single improvement."
             }
     
     elif user_type == "researcher":
         return {
             "rating": f"Sustainability Score: {sustainability_score:.1f}/100",
-            "message": "Quantitative assessment suitable for academic analysis and publication.",
-            "recommendation": "Results can be used for comparative studies and meta-analyses with appropriate citations."
+            "message": "Quantitative score blending three literature-anchored ReCiPe categories (50%), a nutritional density signal (30%), and a heuristic processing-intensity proxy (20%).",
+            "recommendation": "Suitable for relative ranking within this panel; cross-method comparison (e.g. against IMPACT World+ studies) requires re-derivation per §7.5 caveats."
         }
-    
+
     else:  # policy
         return {
-            "rating": f"Policy Alignment Score: {sustainability_score:.1f}/100",
-            "message": "Assessment relative to national dietary and environmental targets.",
-            "recommendation": "Results inform policy development for sustainable food system transformation."
+            "rating": f"Indicative Sustainability Score: {sustainability_score:.1f}/100",
+            "message": "Heuristic three-component score; not calibrated against a specific Net Zero 2050 sub-target or Canada Food Guide quantitative threshold.",
+            "recommendation": "Use as a relative-ranking signal across food choices; pair with the per-category ReCiPe and monetisation outputs for any policy-relevant claim."
         }
 
 @api_view(['POST'])
@@ -716,83 +733,10 @@ def _analyze_meal_comprehensive(meal: EnvMeal, data_loader: EnvDataLoader, match
                 logger.warning(f"Failed to create {meal_type} reference meal: {e}")
                 reference_comparisons[meal_type] = {'error': str(e)}
         
-        # Sustainability scoring.
-        # ALL scoring uses the LCA's matcher-aware per-food impacts plus
-        # Stylianou et al. 2021 SI Table 11B per-serving zones (GW + Water)
-        # and P&N 2018 panel medians (Land). The previous
-        # `_compute_environmental_component_scores` per-100-kcal max-value
-        # path is RETIRED to prevent the conflict that displayed
-        # Environmental=98 next to Overall=25 on the same meal — see
-        # Food.get_sustainability_score docstring + LITERATURE_ZONE_THRESHOLDS
-        # in food.py.
-        env_sustainability = lca.calculate_matcher_aware_sustainability_score()
-        environmental_score = float(env_sustainability.get('overall_sustainability_score', 50) or 50)
-        env_rating = env_sustainability.get('sustainability_rating', 'Unknown')
-
-        # Derive per-category scores (Low/Mod/High zone + numeric 0-100) by
-        # quantity-weighting the per-food zone scores. Surfaced so the UI
-        # can render Low/Mod/High chips beside each category card.
-        category_scores: Dict[str, float] = {}
-        category_zones: Dict[str, str] = {}
-        for cat in ('Global warming', 'Land use', 'Water consumption'):
-            num = denom = 0.0
-            zone_counts: Dict[str, float] = {}
-            for fs in env_sustainability.get('individual_food_scores', []):
-                qty = float(fs.get('quantity_g') or 0)
-                cat_score = fs.get(cat)
-                cat_zone = fs.get(f'{cat}_zone')
-                if isinstance(cat_score, (int, float)) and qty > 0:
-                    num += cat_score * qty
-                    denom += qty
-                    if cat_zone:
-                        zone_counts[cat_zone] = zone_counts.get(cat_zone, 0) + qty
-            if denom > 0:
-                category_scores[cat] = num / denom
-                # Dominant zone by quantity-weight (deterministic tie-break by zone severity).
-                if zone_counts:
-                    severity = {'Low': 0, 'Moderate': 1, 'High': 2}
-                    category_zones[cat] = max(zone_counts, key=lambda z: (zone_counts[z], severity.get(z, 0)))
-
-        # Nutritional quality score (0-100) from meal nutrition
-        nutrition_quality = meal.get_nutritional_quality_score()
-        nutritional_score = float(nutrition_quality.get('nutritional_quality_score', 0) or 0)
-
-        # Processing level heuristic score (0-100, higher is better = less processed)
-        processing_score = _estimate_processing_score(meal)
-
-        # Overall = explicit blend of the three sub-scores (env, nutritional,
-        # processing) with documented weights. Previously this was env-only,
-        # which silently dropped nutritional+processing from the headline
-        # number even though they were shown as separate tiles. Weighting
-        # 0.5 env / 0.3 nutritional / 0.2 processing reflects the §3.x
-        # "environment is the dominant driver, nutrition is the second-order
-        # signal, processing is heuristic" framing.
-        overall_blend = (
-            0.5 * environmental_score
-            + 0.3 * nutritional_score
-            + 0.2 * processing_score
-        )
-        # Blended rating uses the same rating bands as env (Excellent/Good/...)
-        from environmental_impact_model.src.life_cycle_assessment import LifeCycleAssessment as _LCA
-        overall_rating = _LCA._sustainability_rating(overall_blend)
-
-        # Compose enhanced sustainability block consumed by the frontend
-        sustainability = {
-            'overall_sustainability_score': overall_blend,
-            'sustainability_rating': overall_rating,
-            'environmental_score': environmental_score,
-            'environmental_rating': env_rating,
-            'nutritional_score': nutritional_score,
-            'processing_score': processing_score,
-            'category_scores': category_scores,
-            'category_zones': category_zones,
-            'individual_food_scores': env_sustainability.get('individual_food_scores', []),
-            # Literature-anchored scoring methodology (Stylianou 2021 SI Table 11B
-            # zones + P&N 2018 land panel). Surfaced so UI tooltips can cite.
-            'methodology_note': env_sustainability.get('methodology_note', ''),
-            # Explicit weights so consumers can interpret the overall blend.
-            'overall_weights': {'environmental': 0.5, 'nutritional': 0.3, 'processing': 0.2},
-        }
+        # Sustainability scoring — delegated to the shared helper used by
+        # both `/environmental-impact/` and `/environmental-impact/compare-foods/`
+        # so the same food always scores the same regardless of endpoint.
+        sustainability = _compose_blended_sustainability(meal, lca)
         
         return {
             'meal_info': meal_info,
@@ -805,6 +749,93 @@ def _analyze_meal_comprehensive(meal: EnvMeal, data_loader: EnvDataLoader, match
     except Exception as e:
         logger.error(f"Error in comprehensive meal analysis: {e}")
         raise
+
+# Blend weights for the headline sustainability score across endpoints.
+# Documented in §3.x: environment is the dominant driver, nutrition is the
+# second-order signal, processing is heuristic. Centralised here so that
+# both `/environmental-impact/` and `/environmental-impact/compare-foods/`
+# produce identical numbers for identical inputs.
+SUSTAINABILITY_BLEND_WEIGHTS = {'environmental': 0.5, 'nutritional': 0.3, 'processing': 0.2}
+
+
+def _compose_blended_sustainability(meal: EnvMeal, lca: LifeCycleAssessment) -> Dict[str, Any]:
+    """Single source of truth for the sustainability-score block returned by
+    the environmental-impact API endpoints.
+
+    Inputs:
+      - `meal`  : the EnvMeal under analysis (used for nutritional + processing).
+      - `lca`   : the already-constructed LifeCycleAssessment for that meal
+                  (matcher-aware via its `_get_food_environmental_impacts` cache).
+
+    Returns the same dict shape consumed by both the main and the comparison
+    endpoints. Centralisation prevents the previous divergence where the
+    main endpoint showed a blended 68 / 100 for beans-lima 100 g while the
+    comparison endpoint showed env-only 87 / 100 for the SAME food.
+    """
+    from environmental_impact_model.src.life_cycle_assessment import (
+        LifeCycleAssessment as _LCA,
+    )
+
+    # Environmental (literature-anchored, matcher-aware) ---------------------
+    env_sustainability = lca.calculate_matcher_aware_sustainability_score()
+    environmental_score = float(env_sustainability.get('overall_sustainability_score', 50) or 50)
+    env_rating = env_sustainability.get('sustainability_rating', 'Unknown')
+
+    # Quantity-weighted per-category scores + dominant Low/Mod/High zone.
+    category_scores: Dict[str, float] = {}
+    category_zones: Dict[str, str] = {}
+    for cat in ('Global warming', 'Land use', 'Water consumption'):
+        num = denom = 0.0
+        zone_counts: Dict[str, float] = {}
+        for fs in env_sustainability.get('individual_food_scores', []):
+            qty = float(fs.get('quantity_g') or 0)
+            cat_score = fs.get(cat)
+            cat_zone = fs.get(f'{cat}_zone')
+            if isinstance(cat_score, (int, float)) and qty > 0:
+                num += cat_score * qty
+                denom += qty
+                if cat_zone:
+                    zone_counts[cat_zone] = zone_counts.get(cat_zone, 0) + qty
+        if denom > 0:
+            category_scores[cat] = num / denom
+            if zone_counts:
+                severity = {'Low': 0, 'Moderate': 1, 'High': 2}
+                category_zones[cat] = max(zone_counts, key=lambda z: (zone_counts[z], severity.get(z, 0)))
+
+    # Nutritional + processing (left untouched; pre-existing helpers) --------
+    try:
+        nutrition_quality = meal.get_nutritional_quality_score()
+        nutritional_score = float(nutrition_quality.get('nutritional_quality_score', 0) or 0)
+    except Exception:
+        nutritional_score = 0.0
+    try:
+        processing_score = float(_estimate_processing_score(meal))
+    except Exception:
+        processing_score = 0.0
+
+    # Blended overall + harmonised rating bands ------------------------------
+    w = SUSTAINABILITY_BLEND_WEIGHTS
+    overall_blend = (
+        w['environmental'] * environmental_score
+        + w['nutritional'] * nutritional_score
+        + w['processing']  * processing_score
+    )
+    overall_rating = _LCA._sustainability_rating(overall_blend)
+
+    return {
+        'overall_sustainability_score': overall_blend,
+        'sustainability_rating':        overall_rating,
+        'environmental_score':          environmental_score,
+        'environmental_rating':         env_rating,
+        'nutritional_score':            nutritional_score,
+        'processing_score':             processing_score,
+        'category_scores':              category_scores,
+        'category_zones':               category_zones,
+        'individual_food_scores':       env_sustainability.get('individual_food_scores', []),
+        'methodology_note':             env_sustainability.get('methodology_note', ''),
+        'overall_weights':              dict(w),
+    }
+
 
 def _compute_environmental_component_scores(lca_midpoints: Dict[str, float]) -> Dict[str, Any]:
     """Compute environmental component score and category scores (0-100, higher better) from LCA midpoints.
@@ -871,7 +902,17 @@ def _compute_environmental_component_scores(lca_midpoints: Dict[str, float]) -> 
 def _estimate_processing_score(meal: EnvMeal) -> float:
     """Estimate a processing score (0-100, higher is better = less processed) heuristically.
 
-    Uses food group heuristics as proxy for processing intensity when NOVA/FCS is unavailable.
+    Uses food group heuristics as proxy for processing intensity when NOVA/FCS
+    is unavailable.
+
+    KNOWN LIMITATION: the per-group multipliers conflate animal-product impact
+    with processing intensity (e.g. "Beef Products" is rated 0.55 even when
+    the food is raw beef, which is NOVA-1 minimally-processed). The proxy
+    therefore double-counts against the environmental score in the overall
+    blend for animal-protein foods. A NOVA- or FCS-10-based score per food
+    would resolve this; see code_action_items.md HENI-CODE-1 / FCS-CODE-1
+    for ingredient-level processing scoring already implemented for HENI
+    and FCS pipelines but not yet wired into this LCA path.
     """
     breakdown = meal.get_food_breakdown()
     if not breakdown:
@@ -979,7 +1020,17 @@ def compare_foods_environmental(request):
                 lca_endpoints_normalized = lca_endpoints
                 cost_total = item_total_cost
 
-                sustainability_score = food.get_sustainability_score()
+                # Sustainability score via the shared blended-score helper so the
+                # comparison endpoint produces the SAME numeric score and rating
+                # as the main `/environmental-impact/` endpoint for the same
+                # food + quantity. Previously this used `food.get_sustainability_score()`
+                # (env-only, group-default, no matcher) which made beans-lima
+                # show 87/100 here but 68/100 in the main calculator panel.
+                sustainability_block = _compose_blended_sustainability(single_meal, lca)
+                sustainability_score = {
+                    'overall': sustainability_block['overall_sustainability_score'],
+                    **sustainability_block,
+                }
 
                 food_comparisons.append({
                     "food_info": {
@@ -995,6 +1046,16 @@ def compare_foods_environmental(request):
                         "land_use": lca_midpoints_normalized.get('Land use', 0.0),
                     },
                     "sustainability_score": sustainability_score.get('overall', 50),
+                    # v1: also expose the harmonised rating + per-category zones
+                    # so the comparison UI can render the same chips as the main
+                    # analysis view (consistent with §3.x sustainability scoring).
+                    "sustainability_rating":   sustainability_score.get('sustainability_rating', 'Unknown'),
+                    "environmental_score":     sustainability_score.get('environmental_score'),
+                    "environmental_rating":    sustainability_score.get('environmental_rating'),
+                    "nutritional_score":       sustainability_score.get('nutritional_score'),
+                    "processing_score":        sustainability_score.get('processing_score'),
+                    "category_zones":          sustainability_score.get('category_zones', {}),
+                    "overall_weights":         sustainability_score.get('overall_weights'),
                     # Keep legacy field name mapped to midpoint impacts per 100g
                     "all_impacts": lca_midpoints_normalized,
                     # Provide structured LCA outputs mirroring the comprehensive endpoint
@@ -1080,12 +1141,22 @@ def food_environmental_profile(request, food_id):
         
         # Get comprehensive data
         environmental_impact = food.get_environmental_impact()
-        sustainability_score = food.get_sustainability_score()
-        
+
         # Create single-food meal for LCA analysis
         meal = EnvMeal([food])
         lca = LifeCycleAssessment(meal)
         lca_results = lca.perform_lcia()
+
+        # Sustainability score via the shared helper — same blend (env + nut +
+        # processing at 50/30/20) and same rating bands as the main and
+        # comparison endpoints. Previously this endpoint called
+        # `food.get_sustainability_score()` directly (env-only, group-default,
+        # no matcher), making it diverge from the other two endpoints.
+        sustainability_block = _compose_blended_sustainability(meal, lca)
+        sustainability_score = {
+            'overall': sustainability_block['overall_sustainability_score'],
+            **sustainability_block,
+        }
         
         # Monetization
         monetization = Monetization(lca_results, data_loader)
@@ -1185,11 +1256,19 @@ def _generate_food_comparison_insights(comparisons: List[Dict], user_type: str) 
     best_sustainability = max(comparisons, key=lambda x: x['sustainability_score'])
     worst_sustainability = min(comparisons, key=lambda x: x['sustainability_score'])
     
+    # Guard against div-by-zero when the lowest carbon footprint is exactly 0
+    # (matched-only meals with the v1 bands, or matcher rows that report 0 GW).
+    lo_cf = float(best_carbon['environmental_impact_per_100g']['carbon_footprint'] or 0)
+    hi_cf = float(worst_carbon['environmental_impact_per_100g']['carbon_footprint'] or 0)
+    diff_str = (
+        f"{hi_cf / lo_cf:.1f}x difference" if lo_cf > 0
+        else "lowest = 0; ratio not estimable"
+    )
     insights = {
         "winners": {
             "lowest_carbon_footprint": {
                 "food": best_carbon['food_info']['name'],
-                "value": f"{best_carbon['environmental_impact_per_100g']['carbon_footprint']:.2f} kg CO₂-eq per 100g"
+                "value": f"{lo_cf:.2f} kg CO₂-eq per 100 kcal"
             },
             "most_sustainable": {
                 "food": best_sustainability['food_info']['name'],
@@ -1198,15 +1277,18 @@ def _generate_food_comparison_insights(comparisons: List[Dict], user_type: str) 
         },
         "environmental_differences": {
             "carbon_footprint_range": {
-                "lowest": best_carbon['environmental_impact_per_100g']['carbon_footprint'],
-                "highest": worst_carbon['environmental_impact_per_100g']['carbon_footprint'],
-                "difference": f"{worst_carbon['environmental_impact_per_100g']['carbon_footprint'] / best_carbon['environmental_impact_per_100g']['carbon_footprint']:.1f}x difference"
+                "lowest": lo_cf,
+                "highest": hi_cf,
+                "difference": diff_str,
             }
         },
         "key_takeaways": []
     }
     
-    # Generate user-appropriate takeaways
+    # Generate user-appropriate takeaways. Use the guarded diff_str / lo_cf
+    # from above so divide-by-zero on a 0 lowest-carbon doesn't crash the
+    # endpoint.
+    ratio_text = f"{hi_cf / lo_cf:.1f}x" if lo_cf > 0 else "not estimable (lowest = 0)"
     if user_type == "individual":
         insights["key_takeaways"] = [
             f"🌱 {best_carbon['food_info']['name']} has the lowest carbon footprint",
@@ -1215,9 +1297,9 @@ def _generate_food_comparison_insights(comparisons: List[Dict], user_type: str) 
         ]
     elif user_type == "researcher":
         insights["key_takeaways"] = [
-            f"Carbon footprint varies by {worst_carbon['environmental_impact_per_100g']['carbon_footprint'] / best_carbon['environmental_impact_per_100g']['carbon_footprint']:.1f}x across compared foods",
+            f"Carbon footprint varies by {ratio_text} across compared foods",
             f"Sustainability scores range from {worst_sustainability['sustainability_score']:.0f} to {best_sustainability['sustainability_score']:.0f}",
-            "Results suitable for dietary intervention studies and environmental impact assessments"
+            "Within-product spread can exceed between-product spread (P&N 2018 Fig. 3); cross-validate with primary LCI data before drawing causal conclusions",
         ]
     else:  # policy
         insights["key_takeaways"] = [
@@ -1242,17 +1324,26 @@ def _get_carbon_rating(carbon_per_100g: float) -> Dict[str, str]:
         return {"rating": "Very High", "color": "red", "description": "Very high carbon footprint"}
 
 def _get_water_rating(water_per_100g: float) -> Dict[str, str]:
-    """Get water consumption rating."""
-    if water_per_100g <= 0.1:
-        return {"rating": "Excellent", "color": "green", "description": "Very low water use"}
-    elif water_per_100g <= 0.5:
-        return {"rating": "Good", "color": "lightgreen", "description": "Low water use"}
-    elif water_per_100g <= 2.0:
-        return {"rating": "Moderate", "color": "yellow", "description": "Moderate water use"}
-    elif water_per_100g <= 5.0:
-        return {"rating": "High", "color": "orange", "description": "High water use"}
+    """Get water consumption rating.
+
+    Thresholds recalibrated for the v1 water-value retune: cnf_integrator now
+    ships M&H 2011/2012 BLUE-WATER-ONLY consumptive footprints (not the
+    green+blue+grey total). Pre-retune thresholds (0.1 / 0.5 / 2.0 / 5.0) were
+    calibrated against total-footprint magnitudes 10-30× higher; after the
+    retune those bands would rate every food "Excellent" or "Good".
+    New scale anchored on M&H blue-water typical values:
+      veg ~0.006 / cereal ~0.025 / beef ~0.062 / nuts ~0.8 m³/100g (almonds extreme).
+    """
+    if water_per_100g <= 0.01:
+        return {"rating": "Excellent", "color": "green", "description": "Very low blue-water use"}
+    elif water_per_100g <= 0.05:
+        return {"rating": "Good", "color": "lightgreen", "description": "Low blue-water use"}
+    elif water_per_100g <= 0.20:
+        return {"rating": "Moderate", "color": "yellow", "description": "Moderate blue-water use"}
+    elif water_per_100g <= 1.00:
+        return {"rating": "High", "color": "orange", "description": "High blue-water use"}
     else:
-        return {"rating": "Very High", "color": "red", "description": "Very high water use"}
+        return {"rating": "Very High", "color": "red", "description": "Very high blue-water use (e.g. tree nuts)"}
 
 def _get_land_rating(land_per_100g: float) -> Dict[str, str]:
     """Get land use rating."""
@@ -1275,10 +1366,12 @@ def _get_overall_environmental_rating(environmental_impact: Dict, quantity: floa
     water = (environmental_impact.get('Water consumption', 0) / denom) if denom else 0.0
     land = (environmental_impact.get('Land use', 0) / denom) if denom else 0.0
     
-    # Simple scoring based on thresholds
+    # Simple scoring based on thresholds. Water threshold recalibrated for
+    # the M&H blue-water-only retune (was 0.5 m³/100g for total-footprint
+    # values — too generous after the retune; everything would pass).
     score = 0
     if carbon <= 2.0: score += 1
-    if water <= 0.5: score += 1
+    if water <= 0.05: score += 1
     if land <= 5.0: score += 1
     
     if score == 3:
@@ -1291,19 +1384,19 @@ def _get_overall_environmental_rating(environmental_impact: Dict, quantity: floa
         return {"rating": "High Impact", "color": "orange", "description": "High environmental impact - consider alternatives"}
 
 def _get_sustainability_rating_text(score: float) -> str:
-    """Convert sustainability score to text rating."""
-    if score >= 80:
-        return "Excellent - Highly sustainable choice"
-    elif score >= 70:
-        return "Very Good - Sustainable with minor improvements possible"
-    elif score >= 60:
-        return "Good - Reasonably sustainable"
-    elif score >= 50:
-        return "Fair - Moderate sustainability concerns"
-    elif score >= 40:
-        return "Poor - Significant sustainability issues"
-    else:
-        return "Very Poor - Major sustainability concerns"
+    """Convert sustainability score to text rating.
+
+    Bands harmonised with `LifeCycleAssessment._sustainability_rating` and
+    `Meal._get_sustainability_rating` so the same score yields the same
+    label everywhere. Previously this used non-aligned bands (>=70 "Very
+    Good", >=60 "Good", >=50 "Fair") that made the comparison endpoint
+    show "Fair" for foods the main endpoint rated "Good" / "Moderate".
+    """
+    if score >= 80: return "Excellent - Highly sustainable choice"
+    if score >= 65: return "Good - Reasonably sustainable with room to improve"
+    if score >= 50: return "Moderate - Mixed sustainability profile"
+    if score >= 35: return "Poor - Significant sustainability issues"
+    return "Very Poor - Major sustainability concerns"
 
 def _get_food_group_context(food_group: str) -> str:
     """Get context about typical environmental impact for food group."""
@@ -1342,10 +1435,15 @@ def _get_food_recommendations(food, sustainability_score: float, user_type: str)
                 "📚 Learn about the environmental impact of your food choices"
             ])
         
-        # Food group specific recommendations
+        # Food group specific recommendations.
+        # Note: removed prior "choose grass-fed beef" suggestion — per-kg GHG of
+        # grass-fed beef is typically HIGHER than feedlot beef (longer growing
+        # time, lower productivity; Poore & Nemecek 2018 Fig. 1), so that
+        # advice was environmentally misleading.
         if food.food_group in ["Beef Products", "Lamb, Veal and Game"]:
-            recommendations.append("🥩 Try reducing portion sizes or choosing grass-fed options")
+            recommendations.append("🥩 Try smaller portions, or substitute with poultry, legumes, or fish for lower-impact protein")
         elif food.food_group in ["Vegetables and Vegetable Products", "Legumes and Legume Products"]:
-            recommendations.append("🌟 Excellent choice! These foods are environmentally friendly")
+            # Qualified — greenhouse / air-freighted produce can have ~5× field-grown GHG.
+            recommendations.append("🌟 Generally low-impact; prefer in-season and field-grown to avoid hothouse / air-freight premiums")
     
     return recommendations
