@@ -285,6 +285,12 @@ def format_environmental_results(meal_data: Dict[str, Any], user_type: str = "in
         },
         "all_impacts": lca_data.get('midpoint_impacts', {}),
         "endpoint_impacts": lca_data.get('endpoint_impacts', {}),
+        # v1 'demote, don't perfect' uncertainty bands. Parallel to all_impacts
+        # and endpoint_impacts; each consumed category maps to {low, central, high}.
+        # Resources is intentionally absent from endpoint_impacts_bands when the
+        # underlying Resources endpoint is None (v1 trim).
+        "all_impacts_bands": lca_data.get('midpoint_impacts_bands', {}),
+        "endpoint_impacts_bands": lca_data.get('endpoint_impacts_bands', {}),
         # CODE-5: per-category confidence rating and methodology provenance
         # (additive — existing consumers ignore unknown keys).
         "factor_confidence_by_category": lca_data.get('factor_confidence_by_category', {}),
@@ -619,6 +625,12 @@ def _analyze_meal_comprehensive(meal: EnvMeal, data_loader: EnvDataLoader, match
             'midpoint_impacts': lca_results,
             'endpoint_impacts': endpoint_impacts,
             'single_score': single_score,
+            # v1 'demote, don't perfect': expose worst/best-case envelope bands
+            # alongside the central values. Bands present only for the 3
+            # literature-anchored midpoint categories (Global warming, Land use,
+            # Water consumption); other categories not in the consumed vector.
+            'midpoint_impacts_bands': lca.midpoint_impacts_bands,
+            'endpoint_impacts_bands': lca.endpoint_impacts_bands,
             # Per-category confidence rating (CODE-5; additive).
             'factor_confidence_by_category': lca.get_factor_confidence_by_category(),
             # Methodology version + endpoint factor provenance (CODE-2).
@@ -697,9 +709,15 @@ def _analyze_meal_comprehensive(meal: EnvMeal, data_loader: EnvDataLoader, match
                 logger.warning(f"Failed to create {meal_type} reference meal: {e}")
                 reference_comparisons[meal_type] = {'error': str(e)}
         
-        # Sustainability scoring
-        # Base overall score (primarily environment-driven from Food/Meal methods)
-        base_sustainability = meal.get_sustainability_score()
+        # Sustainability scoring.
+        # Uses the LCA's matcher-aware per-food impacts so the score reflects
+        # the same Agribalyse-overlay value as the displayed Climate Impact —
+        # not the group-default fallback that `meal.get_sustainability_score()`
+        # would compute against. Scoring math is literature-anchored on
+        # Stylianou et al. 2021 SI Table 11B per-serving zones (GW + Water)
+        # and P&N 2018 panel medians (Land); see Food.get_sustainability_score
+        # docstring and LITERATURE_ZONE_THRESHOLDS in food.py.
+        base_sustainability = lca.calculate_matcher_aware_sustainability_score()
 
         # Derive environmental component and per-category scores from meal-level LCA results
         env_component = _compute_environmental_component_scores(lca_results)
@@ -719,7 +737,10 @@ def _analyze_meal_comprehensive(meal: EnvMeal, data_loader: EnvDataLoader, match
             'nutritional_score': nutritional_score,
             'processing_score': processing_score,
             'category_scores': env_component['category_scores'],
-            'individual_food_scores': base_sustainability.get('individual_food_scores', [])
+            'individual_food_scores': base_sustainability.get('individual_food_scores', []),
+            # Literature-anchored scoring methodology (Stylianou 2021 SI Table 11B
+            # zones + P&N 2018 land panel). Surfaced so UI tooltips can cite.
+            'methodology_note': base_sustainability.get('methodology_note', ''),
         }
         
         return {
@@ -737,26 +758,42 @@ def _analyze_meal_comprehensive(meal: EnvMeal, data_loader: EnvDataLoader, match
 def _compute_environmental_component_scores(lca_midpoints: Dict[str, float]) -> Dict[str, Any]:
     """Compute environmental component score and category scores (0-100, higher better) from LCA midpoints.
 
-    Mirrors the normalization approach in `Food.get_sustainability_score` for key categories,
-    then aggregates with weights to an overall environmental score.
+    v1 trim alignment: the consumed midpoint vector is now the 3 literature-anchored
+    categories (Global warming, Land use, Water consumption). Previously this
+    function weighted in Terrestrial acidification, Freshwater eutrophication,
+    and Marine eutrophication; those keys are no longer present in `lca_midpoints`,
+    so `.get(category, 0.0)` would silently return 0 for each, mechanically scoring
+    them at the maximum 100 — boosting the headline environmental_score by the
+    sum of the trimmed-category weights (0.3 of 1.0). Now: iterate only over the
+    consumed-vector categories and re-normalise weights to sum to 1.0 across them,
+    matching the same renormalisation that `LifeCycleAssessment.calculate_single_score`
+    applies when Resources endpoint is None.
     """
-    # Typical maximum values per 100 kcal used for normalization
+    # Per-100-kcal normalisation maxima for the v1 trimmed midpoint set.
+    # The pre-v1 maxima (GW=100, Land=200, Water=20) were calibrated for a
+    # 6-category score where acidification + eutrophications carried the
+    # lower-scoring share. After the v1 trim those 3 are gone, and the old
+    # maxima were so generous that any real meal scored ~99.9/100 (a beef-only
+    # meal trips at GW=5 kg CO2/100 kcal => score=95 with the old GW max=100;
+    # a balanced meal hits GW=0.1 kg CO2/100 kcal => score=99.9). That's the
+    # "silently inflated env_score" defect the e2e smoke caught. Retuned to
+    # realistic worst-case per-100-kcal values from the LCA literature:
+    #   GWP   : beef-heavy meal ~3-5 kg CO2 / 100 kcal (Stylianou 2021 SI Table 11B
+    #           green/red zone thresholds at 0.32 / 0.61 kg CO2 / serving suggest
+    #           that "high impact" sits ~1.5-5 kg / 100 kcal; use 5 as the
+    #           full-scale max so a beef-heavy meal scores ~0 / 100).
+    #   Land  : beef-heavy meal ~20-30 m2a / 100 kcal (P&N beef herd 164 m2a /
+    #           100g protein x 0.20 / 200 kcal = 16 m2a / 100 kcal); use 30.
+    #   Water : nut/almond-heavy meal ~1-2 m3 blue / 100 kcal; use 2.
     max_values = {
-        'Global warming': 100.0,           # kg CO2 eq
-        'Land use': 200.0,                # m2a crop eq
-        'Water consumption': 20.0,        # m3
-        'Terrestrial acidification': 0.5, # kg SO2 eq
-        'Freshwater eutrophication': 0.02,# kg P eq
-        'Marine eutrophication': 0.2,     # kg N eq
+        'Global warming':    5.0,   # kg CO2 eq per 100 kcal (worst-case beef-heavy)
+        'Land use':          30.0,  # m2a crop eq per 100 kcal (worst-case beef)
+        'Water consumption': 2.0,   # m3 blue per 100 kcal (worst-case almonds)
     }
-
     weights = {
-        'Global warming': 0.3,
-        'Land use': 0.2,
-        'Water consumption': 0.2,
-        'Terrestrial acidification': 0.1,
-        'Freshwater eutrophication': 0.1,
-        'Marine eutrophication': 0.1,
+        'Global warming':    0.43,
+        'Land use':          0.29,
+        'Water consumption': 0.28,
     }
 
     category_scores: Dict[str, float] = {}
@@ -765,7 +802,6 @@ def _compute_environmental_component_scores(lca_midpoints: Dict[str, float]) -> 
 
     for category, max_val in max_values.items():
         impact_val = float(lca_midpoints.get(category, 0.0) or 0.0)
-        # Normalize to 0-100 where lower impact => higher score
         normalized = min(100.0, (impact_val / max_val) * 100.0) if max_val > 0 else 0.0
         score = max(0.0, 100.0 - normalized)
         category_scores[category] = score
@@ -1058,6 +1094,10 @@ def food_environmental_profile(request, food_id):
             "lca_quality": {
                 "factor_confidence_by_category": lca.get_factor_confidence_by_category(),
                 "data_quality": lca.get_data_quality_report(),
+                # v1 'demote, don't perfect' uncertainty bands per consumed
+                # midpoint and endpoint category. Mirrors the main endpoint shape.
+                "midpoint_impacts_bands": lca.midpoint_impacts_bands,
+                "endpoint_impacts_bands": lca.endpoint_impacts_bands,
             },
             "nutritional_context": {
                 "calories_per_100g": meal.calculate_total_calories() / (quantity/100),

@@ -217,16 +217,23 @@ export const EnvironmentalResultsCard: React.FC<EnvironmentalResultsCardProps> =
             </div>
           </div>
 
-          <div className="bg-purple-50 p-4 rounded-lg">
+          {/* v1 scope trim: the 4th tile previously showed Terrestrial
+              acidification, which is no longer in the consumed midpoint
+              vector (no per-food-group ReCiPe-unit literature grounding;
+              §7.5). The tile now explains the scope instead of silently
+              showing 0. */}
+          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
             <div className="flex items-center gap-2 mb-2">
-              <Factory className="h-5 w-5 text-purple-600" />
-              <span className="font-medium text-purple-900">Ecosystem Impact</span>
+              <Factory className="h-5 w-5 text-gray-500" />
+              <span className="font-medium text-gray-900">Other ecosystem impacts</span>
             </div>
-            <div className="text-2xl font-bold text-purple-900">
-              {formatImpactValue(lca?.['Terrestrial acidification'] || 0, 'kg SO₂-eq')}
+            <div className="text-sm font-medium text-orange-700">
+              Not assessed in v1
             </div>
-            <div className="text-sm text-purple-700 mt-1">
-              Terrestrial Acidification
+            <div className="text-xs text-gray-600 mt-1">
+              15 of 18 ReCiPe midpoint categories (acidification, eutrophication,
+              toxicity, ozone, PM, resources) are not consumed in v1; see the LCA
+              Breakdown methodology accordion.
             </div>
           </div>
         </div>
@@ -342,15 +349,16 @@ export const EnvironmentalResultsCard: React.FC<EnvironmentalResultsCardProps> =
               </div>
             </div>
 
-            <div className="bg-blue-50 p-4 rounded-lg">
+            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
               <div className="flex items-center gap-2 mb-2">
-                <span className="font-medium text-blue-900">Resource Scarcity</span>
+                <span className="font-medium text-gray-900">Resource Scarcity</span>
               </div>
-              <div className="text-lg font-bold text-blue-900">
-                {formatEndpointValue(analysis?.endpoint_impacts?.['Resources'] ?? 0, 'USD')}
+              <div className="text-sm font-medium text-orange-700">
+                Not estimable in v1
               </div>
-              <div className="text-sm text-blue-700 mt-1">
-                Resource Depletion Cost
+              <div className="text-xs text-gray-600 mt-1">
+                Both Fossil and Mineral resource scarcity midpoints are excluded
+                from the v1 consumed vector (returns when TODO-CODE-LCA-2 lands).
               </div>
             </div>
           </div>

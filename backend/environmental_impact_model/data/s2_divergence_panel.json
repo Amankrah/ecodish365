@@ -1,0 +1,1871 @@
+{
+  "per_food": [
+    {
+      "food_id": 7,
+      "label": "Beef pot roast w/ veg",
+      "expected_group": "Mixed Dishes",
+      "serving_g": 150,
+      "kcal": 268.5,
+      "direct_pairs": [
+        {
+          "ef_col": "Changement climatique",
+          "recipe_key": "Global warming",
+          "unit": "kg CO2 eq",
+          "ef_value": 3.4499999999999997,
+          "recipe_value": 3.4499999999999997,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions fossiles",
+          "recipe_key": "Global warming (fossil)",
+          "unit": "kg CO2 eq",
+          "ef_value": 1.0334999999999999,
+          "recipe_value": 1.0334999999999999,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions biogéniques",
+          "recipe_key": "Global warming (biogenic)",
+          "unit": "kg CO2 eq",
+          "ef_value": 2.415,
+          "recipe_value": 2.415,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions liées au changement d'affectation des sols",
+          "recipe_key": "Global warming (LUC)",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.00046950000000000003,
+          "recipe_value": 0.00046950000000000003,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Appauvrissement de la couche d'ozone",
+          "recipe_key": "Stratospheric ozone depletion",
+          "unit": "kg CFC11 eq",
+          "ef_value": 1.7849999999999998e-08,
+          "recipe_value": 1.7849999999999998e-08,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        }
+      ],
+      "unit_incompatible_pairs": [
+        {
+          "ef_col": "Particules fines",
+          "recipe_key": "Fine particulate matter formation",
+          "unit_note": "EF disease inc./kg  vs  ReCiPe kg PM2.5 eq",
+          "ef_value": 3.1650000000000006e-07,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Acidification terrestre et eaux douces",
+          "recipe_key": "Terrestrial acidification",
+          "unit_note": "EF mol H+ eq        vs  ReCiPe kg SO2 eq",
+          "ef_value": 0.04635,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation eaux douces",
+          "recipe_key": "Freshwater eutrophication",
+          "unit_note": "EF kg P eq (different fate model)",
+          "ef_value": 0.00016199999999999998,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation marine",
+          "recipe_key": "Marine eutrophication",
+          "unit_note": "EF kg N eq (different fate model)",
+          "ef_value": 0.010155,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation terrestre",
+          "recipe_key": "(no ReCiPe equivalent)",
+          "unit_note": "EF mol N eq        no ReCiPe slot",
+          "ef_value": 0.20400000000000001,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Écotoxicité pour écosystèmes aquatiques d'eau douce",
+          "recipe_key": "Freshwater ecotoxicity (+terr +marine in ReCiPe)",
+          "unit_note": "EF CTUe (FW only)  vs  ReCiPe 3 ecotox cats",
+          "ef_value": 18.75,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Utilisation du sol",
+          "recipe_key": "Land use",
+          "unit_note": "EF Pt (LANCA score) vs  ReCiPe m2a crop-eq",
+          "ef_value": 216.0,
+          "recipe_value": 0.585
+        },
+        {
+          "ef_col": "Épuisement des ressources eau",
+          "recipe_key": "Water consumption",
+          "unit_note": "EF m3 deprivation (AWARE) vs ReCiPe m3 blue",
+          "ef_value": 1.1280000000000001,
+          "recipe_value": 0.024375000000000004
+        },
+        {
+          "ef_col": "Épuisement des ressources énergétiques",
+          "recipe_key": "(rolled into Fossil resource scarcity)",
+          "unit_note": "EF MJ  no ReCiPe slot",
+          "ef_value": 10.844999999999999,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Épuisement des ressources minéraux",
+          "recipe_key": "Mineral resource scarcity",
+          "unit_note": "EF kg Sb eq        vs  ReCiPe kg Cu eq",
+          "ef_value": 4.875e-06,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Rayonnements ionisants",
+          "recipe_key": "Ionizing radiation",
+          "unit_note": "EF kBq U-235 eq    vs  ReCiPe kBq Co-60 eq",
+          "ef_value": 0.186,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Formation photochimique d'ozone",
+          "recipe_key": "Ozone formation (HH + Terrestrial in ReCiPe)",
+          "unit_note": "EF kg NMVOC eq vs ReCiPe 2 ozone cats",
+          "ef_value": 0.00528,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Effets toxicologiques sur la santé humaine : substances cancérogènes",
+          "recipe_key": "Human carcinogenic toxicity",
+          "unit_note": "EF CTUh           vs  ReCiPe kg 1,4-DCB eq",
+          "ef_value": 1.3755e-09,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Effets toxicologiques sur la santé humaine : substances non-cancérogènes",
+          "recipe_key": "Human non-carcinogenic toxicity",
+          "unit_note": "EF CTUh           vs  ReCiPe kg 1,4-DCB eq",
+          "ef_value": 4.965e-08,
+          "recipe_value": null
+        }
+      ],
+      "ef_single_score_per_meal": 0.33000000000000007
+    },
+    {
+      "food_id": 2650,
+      "label": "Beef brain raw",
+      "expected_group": "Beef Products",
+      "serving_g": 100,
+      "kcal": 143.0,
+      "direct_pairs": [
+        {
+          "ef_col": "Changement climatique",
+          "recipe_key": "Global warming",
+          "unit": "kg CO2 eq",
+          "ef_value": 2.2600000000000002,
+          "recipe_value": 2.26,
+          "ratio_ef_over_recipe": 1.0000000000000002,
+          "log10_ratio": 9.64327466553287e-17
+        },
+        {
+          "ef_col": "Changement climatique - émissions fossiles",
+          "recipe_key": "Global warming (fossil)",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.836,
+          "recipe_value": 0.836,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions biogéniques",
+          "recipe_key": "Global warming (biogenic)",
+          "unit": "kg CO2 eq",
+          "ef_value": 1.22,
+          "recipe_value": 1.22,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions liées au changement d'affectation des sols",
+          "recipe_key": "Global warming (LUC)",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.202,
+          "recipe_value": 0.202,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Appauvrissement de la couche d'ozone",
+          "recipe_key": "Stratospheric ozone depletion",
+          "unit": "kg CFC11 eq",
+          "ef_value": 2.56e-08,
+          "recipe_value": 2.56e-08,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        }
+      ],
+      "unit_incompatible_pairs": [
+        {
+          "ef_col": "Particules fines",
+          "recipe_key": "Fine particulate matter formation",
+          "unit_note": "EF disease inc./kg  vs  ReCiPe kg PM2.5 eq",
+          "ef_value": 1.82e-07,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Acidification terrestre et eaux douces",
+          "recipe_key": "Terrestrial acidification",
+          "unit_note": "EF mol H+ eq        vs  ReCiPe kg SO2 eq",
+          "ef_value": 0.026000000000000002,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation eaux douces",
+          "recipe_key": "Freshwater eutrophication",
+          "unit_note": "EF kg P eq (different fate model)",
+          "ef_value": 0.000156,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation marine",
+          "recipe_key": "Marine eutrophication",
+          "unit_note": "EF kg N eq (different fate model)",
+          "ef_value": 0.00701,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation terrestre",
+          "recipe_key": "(no ReCiPe equivalent)",
+          "unit_note": "EF mol N eq        no ReCiPe slot",
+          "ef_value": 0.11200000000000002,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Écotoxicité pour écosystèmes aquatiques d'eau douce",
+          "recipe_key": "Freshwater ecotoxicity (+terr +marine in ReCiPe)",
+          "unit_note": "EF CTUe (FW only)  vs  ReCiPe 3 ecotox cats",
+          "ef_value": 30.1,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Utilisation du sol",
+          "recipe_key": "Land use",
+          "unit_note": "EF Pt (LANCA score) vs  ReCiPe m2a crop-eq",
+          "ef_value": 103.0,
+          "recipe_value": 25.74
+        },
+        {
+          "ef_col": "Épuisement des ressources eau",
+          "recipe_key": "Water consumption",
+          "unit_note": "EF m3 deprivation (AWARE) vs ReCiPe m3 blue",
+          "ef_value": 0.306,
+          "recipe_value": 0.0403
+        },
+        {
+          "ef_col": "Épuisement des ressources énergétiques",
+          "recipe_key": "(rolled into Fossil resource scarcity)",
+          "unit_note": "EF MJ  no ReCiPe slot",
+          "ef_value": 10.6,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Épuisement des ressources minéraux",
+          "recipe_key": "Mineral resource scarcity",
+          "unit_note": "EF kg Sb eq        vs  ReCiPe kg Cu eq",
+          "ef_value": 4.22e-06,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Rayonnements ionisants",
+          "recipe_key": "Ionizing radiation",
+          "unit_note": "EF kBq U-235 eq    vs  ReCiPe kBq Co-60 eq",
+          "ef_value": 0.144,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Formation photochimique d'ozone",
+          "recipe_key": "Ozone formation (HH + Terrestrial in ReCiPe)",
+          "unit_note": "EF kg NMVOC eq vs ReCiPe 2 ozone cats",
+          "ef_value": 0.00396,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Effets toxicologiques sur la santé humaine : substances cancérogènes",
+          "recipe_key": "Human carcinogenic toxicity",
+          "unit_note": "EF CTUh           vs  ReCiPe kg 1,4-DCB eq",
+          "ef_value": 1.16e-09,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Effets toxicologiques sur la santé humaine : substances non-cancérogènes",
+          "recipe_key": "Human non-carcinogenic toxicity",
+          "unit_note": "EF CTUh           vs  ReCiPe kg 1,4-DCB eq",
+          "ef_value": 2.49e-08,
+          "recipe_value": null
+        }
+      ],
+      "ef_single_score_per_meal": 0.209
+    },
+    {
+      "food_id": 1755,
+      "label": "Pork shoulder raw",
+      "expected_group": "Pork Products",
+      "serving_g": 150,
+      "kcal": 564.0,
+      "direct_pairs": [
+        {
+          "ef_col": "Changement climatique",
+          "recipe_key": "Global warming",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.9870000000000001,
+          "recipe_value": 0.987,
+          "ratio_ef_over_recipe": 1.0000000000000002,
+          "log10_ratio": 9.64327466553287e-17
+        },
+        {
+          "ef_col": "Changement climatique - émissions fossiles",
+          "recipe_key": "Global warming (fossil)",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.558,
+          "recipe_value": 0.558,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions biogéniques",
+          "recipe_key": "Global warming (biogenic)",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.33899999999999997,
+          "recipe_value": 0.33899999999999997,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions liées au changement d'affectation des sols",
+          "recipe_key": "Global warming (LUC)",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.09,
+          "recipe_value": 0.09,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Appauvrissement de la couche d'ozone",
+          "recipe_key": "Stratospheric ozone depletion",
+          "unit": "kg CFC11 eq",
+          "ef_value": 1.515e-08,
+          "recipe_value": 1.515e-08,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        }
+      ],
+      "unit_incompatible_pairs": [
+        {
+          "ef_col": "Particules fines",
+          "recipe_key": "Fine particulate matter formation",
+          "unit_note": "EF disease inc./kg  vs  ReCiPe kg PM2.5 eq",
+          "ef_value": 1.0950000000000001e-07,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Acidification terrestre et eaux douces",
+          "recipe_key": "Terrestrial acidification",
+          "unit_note": "EF mol H+ eq        vs  ReCiPe kg SO2 eq",
+          "ef_value": 0.01494,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation eaux douces",
+          "recipe_key": "Freshwater eutrophication",
+          "unit_note": "EF kg P eq (different fate model)",
+          "ef_value": 0.00013230000000000002,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation marine",
+          "recipe_key": "Marine eutrophication",
+          "unit_note": "EF kg N eq (different fate model)",
+          "ef_value": 0.00429,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation terrestre",
+          "recipe_key": "(no ReCiPe equivalent)",
+          "unit_note": "EF mol N eq        no ReCiPe slot",
+          "ef_value": 0.06405,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Écotoxicité pour écosystèmes aquatiques d'eau douce",
+          "recipe_key": "Freshwater ecotoxicity (+terr +marine in ReCiPe)",
+          "unit_note": "EF CTUe (FW only)  vs  ReCiPe 3 ecotox cats",
+          "ef_value": 28.200000000000003,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Utilisation du sol",
+          "recipe_key": "Land use",
+          "unit_note": "EF Pt (LANCA score) vs  ReCiPe m2a crop-eq",
+          "ef_value": 52.349999999999994,
+          "recipe_value": 2.5740000000000003
+        },
+        {
+          "ef_col": "Épuisement des ressources eau",
+          "recipe_key": "Water consumption",
+          "unit_note": "EF m3 deprivation (AWARE) vs ReCiPe m3 blue",
+          "ef_value": 0.32400000000000007,
+          "recipe_value": 0.04485000000000001
+        },
+        {
+          "ef_col": "Épuisement des ressources énergétiques",
+          "recipe_key": "(rolled into Fossil resource scarcity)",
+          "unit_note": "EF MJ  no ReCiPe slot",
+          "ef_value": 8.475000000000001,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Épuisement des ressources minéraux",
+          "recipe_key": "Mineral resource scarcity",
+          "unit_note": "EF kg Sb eq        vs  ReCiPe kg Cu eq",
+          "ef_value": 3.884999999999999e-06,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Rayonnements ionisants",
+          "recipe_key": "Ionizing radiation",
+          "unit_note": "EF kBq U-235 eq    vs  ReCiPe kBq Co-60 eq",
+          "ef_value": 0.195,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Formation photochimique d'ozone",
+          "recipe_key": "Ozone formation (HH + Terrestrial in ReCiPe)",
+          "unit_note": "EF kg NMVOC eq vs ReCiPe 2 ozone cats",
+          "ef_value": 0.00234,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Effets toxicologiques sur la santé humaine : substances cancérogènes",
+          "recipe_key": "Human carcinogenic toxicity",
+          "unit_note": "EF CTUh           vs  ReCiPe kg 1,4-DCB eq",
+          "ef_value": 7.17e-10,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Effets toxicologiques sur la santé humaine : substances non-cancérogènes",
+          "recipe_key": "Human non-carcinogenic toxicity",
+          "unit_note": "EF CTUh           vs  ReCiPe kg 1,4-DCB eq",
+          "ef_value": 1.086e-08,
+          "recipe_value": null
+        }
+      ],
+      "ef_single_score_per_meal": 0.12285
+    },
+    {
+      "food_id": 555,
+      "label": "Chicken broiler raw",
+      "expected_group": "Poultry Products",
+      "serving_g": 150,
+      "kcal": 319.5,
+      "direct_pairs": [
+        {
+          "ef_col": "Changement climatique",
+          "recipe_key": "Global warming",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.627,
+          "recipe_value": 0.627,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions fossiles",
+          "recipe_key": "Global warming (fossil)",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.46199999999999997,
+          "recipe_value": 0.46199999999999997,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions biogéniques",
+          "recipe_key": "Global warming (biogenic)",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.023100000000000002,
+          "recipe_value": 0.023100000000000002,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions liées au changement d'affectation des sols",
+          "recipe_key": "Global warming (LUC)",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.14250000000000002,
+          "recipe_value": 0.14250000000000002,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Appauvrissement de la couche d'ozone",
+          "recipe_key": "Stratospheric ozone depletion",
+          "unit": "kg CFC11 eq",
+          "ef_value": 1.3365000000000001e-08,
+          "recipe_value": 1.3365000000000001e-08,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        }
+      ],
+      "unit_incompatible_pairs": [
+        {
+          "ef_col": "Particules fines",
+          "recipe_key": "Fine particulate matter formation",
+          "unit_note": "EF disease inc./kg  vs  ReCiPe kg PM2.5 eq",
+          "ef_value": 1.2944999999999998e-07,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Acidification terrestre et eaux douces",
+          "recipe_key": "Terrestrial acidification",
+          "unit_note": "EF mol H+ eq        vs  ReCiPe kg SO2 eq",
+          "ef_value": 0.01755,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation eaux douces",
+          "recipe_key": "Freshwater eutrophication",
+          "unit_note": "EF kg P eq (different fate model)",
+          "ef_value": 0.00011895,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation marine",
+          "recipe_key": "Marine eutrophication",
+          "unit_note": "EF kg N eq (different fate model)",
+          "ef_value": 0.0039,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation terrestre",
+          "recipe_key": "(no ReCiPe equivalent)",
+          "unit_note": "EF mol N eq        no ReCiPe slot",
+          "ef_value": 0.07680000000000001,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Écotoxicité pour écosystèmes aquatiques d'eau douce",
+          "recipe_key": "Freshwater ecotoxicity (+terr +marine in ReCiPe)",
+          "unit_note": "EF CTUe (FW only)  vs  ReCiPe 3 ecotox cats",
+          "ef_value": 19.799999999999997,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Utilisation du sol",
+          "recipe_key": "Land use",
+          "unit_note": "EF Pt (LANCA score) vs  ReCiPe m2a crop-eq",
+          "ef_value": 40.05,
+          "recipe_value": 1.8720000000000003
+        },
+        {
+          "ef_col": "Épuisement des ressources eau",
+          "recipe_key": "Water consumption",
+          "unit_note": "EF m3 deprivation (AWARE) vs ReCiPe m3 blue",
+          "ef_value": 0.28500000000000003,
+          "recipe_value": 0.030225000000000002
+        },
+        {
+          "ef_col": "Épuisement des ressources énergétiques",
+          "recipe_key": "(rolled into Fossil resource scarcity)",
+          "unit_note": "EF MJ  no ReCiPe slot",
+          "ef_value": 5.9399999999999995,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Épuisement des ressources minéraux",
+          "recipe_key": "Mineral resource scarcity",
+          "unit_note": "EF kg Sb eq        vs  ReCiPe kg Cu eq",
+          "ef_value": 2.8050000000000002e-06,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Rayonnements ionisants",
+          "recipe_key": "Ionizing radiation",
+          "unit_note": "EF kBq U-235 eq    vs  ReCiPe kBq Co-60 eq",
+          "ef_value": 0.066,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Formation photochimique d'ozone",
+          "recipe_key": "Ozone formation (HH + Terrestrial in ReCiPe)",
+          "unit_note": "EF kg NMVOC eq vs ReCiPe 2 ozone cats",
+          "ef_value": 0.0024149999999999996,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Effets toxicologiques sur la santé humaine : substances cancérogènes",
+          "recipe_key": "Human carcinogenic toxicity",
+          "unit_note": "EF CTUh           vs  ReCiPe kg 1,4-DCB eq",
+          "ef_value": 7.08e-10,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Effets toxicologiques sur la santé humaine : substances non-cancérogènes",
+          "recipe_key": "Human non-carcinogenic toxicity",
+          "unit_note": "EF CTUh           vs  ReCiPe kg 1,4-DCB eq",
+          "ef_value": 1.0335e-08,
+          "recipe_value": null
+        }
+      ],
+      "ef_single_score_per_meal": 0.11024999999999999
+    },
+    {
+      "food_id": 461,
+      "label": "Fish oil salmon",
+      "expected_group": "Fats and Oils",
+      "serving_g": 30,
+      "kcal": 270.6,
+      "direct_pairs": [
+        {
+          "ef_col": "Changement climatique",
+          "recipe_key": "Global warming",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.0915,
+          "recipe_value": 0.0915,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions fossiles",
+          "recipe_key": "Global warming (fossil)",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.0906,
+          "recipe_value": 0.0906,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions biogéniques",
+          "recipe_key": "Global warming (biogenic)",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.000705,
+          "recipe_value": 0.000705,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions liées au changement d'affectation des sols",
+          "recipe_key": "Global warming (LUC)",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.0001482,
+          "recipe_value": 0.0001482,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Appauvrissement de la couche d'ozone",
+          "recipe_key": "Stratospheric ozone depletion",
+          "unit": "kg CFC11 eq",
+          "ef_value": 4.2e-09,
+          "recipe_value": 4.2e-09,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        }
+      ],
+      "unit_incompatible_pairs": [
+        {
+          "ef_col": "Particules fines",
+          "recipe_key": "Fine particulate matter formation",
+          "unit_note": "EF disease inc./kg  vs  ReCiPe kg PM2.5 eq",
+          "ef_value": 7.62e-09,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Acidification terrestre et eaux douces",
+          "recipe_key": "Terrestrial acidification",
+          "unit_note": "EF mol H+ eq        vs  ReCiPe kg SO2 eq",
+          "ef_value": 0.000741,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation eaux douces",
+          "recipe_key": "Freshwater eutrophication",
+          "unit_note": "EF kg P eq (different fate model)",
+          "ef_value": 1.146e-05,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation marine",
+          "recipe_key": "Marine eutrophication",
+          "unit_note": "EF kg N eq (different fate model)",
+          "ef_value": 0.0001857,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation terrestre",
+          "recipe_key": "(no ReCiPe equivalent)",
+          "unit_note": "EF mol N eq        no ReCiPe slot",
+          "ef_value": 0.0018,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Écotoxicité pour écosystèmes aquatiques d'eau douce",
+          "recipe_key": "Freshwater ecotoxicity (+terr +marine in ReCiPe)",
+          "unit_note": "EF CTUe (FW only)  vs  ReCiPe 3 ecotox cats",
+          "ef_value": 0.705,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Utilisation du sol",
+          "recipe_key": "Land use",
+          "unit_note": "EF Pt (LANCA score) vs  ReCiPe m2a crop-eq",
+          "ef_value": 0.504,
+          "recipe_value": 0.11699999999999999
+        },
+        {
+          "ef_col": "Épuisement des ressources eau",
+          "recipe_key": "Water consumption",
+          "unit_note": "EF m3 deprivation (AWARE) vs ReCiPe m3 blue",
+          "ef_value": 0.0309,
+          "recipe_value": 0.004875
+        },
+        {
+          "ef_col": "Épuisement des ressources énergétiques",
+          "recipe_key": "(rolled into Fossil resource scarcity)",
+          "unit_note": "EF MJ  no ReCiPe slot",
+          "ef_value": 1.3019999999999998,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Épuisement des ressources minéraux",
+          "recipe_key": "Mineral resource scarcity",
+          "unit_note": "EF kg Sb eq        vs  ReCiPe kg Cu eq",
+          "ef_value": 3.45e-07,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Rayonnements ionisants",
+          "recipe_key": "Ionizing radiation",
+          "unit_note": "EF kBq U-235 eq    vs  ReCiPe kBq Co-60 eq",
+          "ef_value": 0.00942,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Formation photochimique d'ozone",
+          "recipe_key": "Ozone formation (HH + Terrestrial in ReCiPe)",
+          "unit_note": "EF kg NMVOC eq vs ReCiPe 2 ozone cats",
+          "ef_value": 0.000579,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Effets toxicologiques sur la santé humaine : substances cancérogènes",
+          "recipe_key": "Human carcinogenic toxicity",
+          "unit_note": "EF CTUh           vs  ReCiPe kg 1,4-DCB eq",
+          "ef_value": 4.41e-11,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Effets toxicologiques sur la santé humaine : substances non-cancérogènes",
+          "recipe_key": "Human non-carcinogenic toxicity",
+          "unit_note": "EF CTUh           vs  ReCiPe kg 1,4-DCB eq",
+          "ef_value": 8.25e-10,
+          "recipe_value": null
+        }
+      ],
+      "ef_single_score_per_meal": 0.00894
+    },
+    {
+      "food_id": 51,
+      "label": "Processed cheddar",
+      "expected_group": "Dairy and Egg Products",
+      "serving_g": 50,
+      "kcal": 165.5,
+      "direct_pairs": [
+        {
+          "ef_col": "Changement climatique",
+          "recipe_key": "Global warming",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.26349999999999996,
+          "recipe_value": 0.26349999999999996,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions fossiles",
+          "recipe_key": "Global warming (fossil)",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.097,
+          "recipe_value": 0.097,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions biogéniques",
+          "recipe_key": "Global warming (biogenic)",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.14350000000000002,
+          "recipe_value": 0.14350000000000002,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions liées au changement d'affectation des sols",
+          "recipe_key": "Global warming (LUC)",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.023100000000000002,
+          "recipe_value": 0.023100000000000002,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Appauvrissement de la couche d'ozone",
+          "recipe_key": "Stratospheric ozone depletion",
+          "unit": "kg CFC11 eq",
+          "ef_value": 4.57e-09,
+          "recipe_value": 4.57e-09,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        }
+      ],
+      "unit_incompatible_pairs": [
+        {
+          "ef_col": "Particules fines",
+          "recipe_key": "Fine particulate matter formation",
+          "unit_note": "EF disease inc./kg  vs  ReCiPe kg PM2.5 eq",
+          "ef_value": 2.215e-08,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Acidification terrestre et eaux douces",
+          "recipe_key": "Terrestrial acidification",
+          "unit_note": "EF mol H+ eq        vs  ReCiPe kg SO2 eq",
+          "ef_value": 0.00312,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation eaux douces",
+          "recipe_key": "Freshwater eutrophication",
+          "unit_note": "EF kg P eq (different fate model)",
+          "ef_value": 2.6200000000000003e-05,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation marine",
+          "recipe_key": "Marine eutrophication",
+          "unit_note": "EF kg N eq (different fate model)",
+          "ef_value": 0.00088,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation terrestre",
+          "recipe_key": "(no ReCiPe equivalent)",
+          "unit_note": "EF mol N eq        no ReCiPe slot",
+          "ef_value": 0.0134,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Écotoxicité pour écosystèmes aquatiques d'eau douce",
+          "recipe_key": "Freshwater ecotoxicity (+terr +marine in ReCiPe)",
+          "unit_note": "EF CTUe (FW only)  vs  ReCiPe 3 ecotox cats",
+          "ef_value": 3.1550000000000002,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Utilisation du sol",
+          "recipe_key": "Land use",
+          "unit_note": "EF Pt (LANCA score) vs  ReCiPe m2a crop-eq",
+          "ef_value": 12.0,
+          "recipe_value": 3.51
+        },
+        {
+          "ef_col": "Épuisement des ressources eau",
+          "recipe_key": "Water consumption",
+          "unit_note": "EF m3 deprivation (AWARE) vs ReCiPe m3 blue",
+          "ef_value": 0.0298,
+          "recipe_value": 0.006500000000000001
+        },
+        {
+          "ef_col": "Épuisement des ressources énergétiques",
+          "recipe_key": "(rolled into Fossil resource scarcity)",
+          "unit_note": "EF MJ  no ReCiPe slot",
+          "ef_value": 1.395,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Épuisement des ressources minéraux",
+          "recipe_key": "Mineral resource scarcity",
+          "unit_note": "EF kg Sb eq        vs  ReCiPe kg Cu eq",
+          "ef_value": 5.900000000000001e-07,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Rayonnements ionisants",
+          "recipe_key": "Ionizing radiation",
+          "unit_note": "EF kBq U-235 eq    vs  ReCiPe kBq Co-60 eq",
+          "ef_value": 0.026350000000000002,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Formation photochimique d'ozone",
+          "recipe_key": "Ozone formation (HH + Terrestrial in ReCiPe)",
+          "unit_note": "EF kg NMVOC eq vs ReCiPe 2 ozone cats",
+          "ef_value": 0.0004890000000000001,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Effets toxicologiques sur la santé humaine : substances cancérogènes",
+          "recipe_key": "Human carcinogenic toxicity",
+          "unit_note": "EF CTUh           vs  ReCiPe kg 1,4-DCB eq",
+          "ef_value": 1.225e-10,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Effets toxicologiques sur la santé humaine : substances non-cancérogènes",
+          "recipe_key": "Human non-carcinogenic toxicity",
+          "unit_note": "EF CTUh           vs  ReCiPe kg 1,4-DCB eq",
+          "ef_value": 3.1e-09,
+          "recipe_value": null
+        }
+      ],
+      "ef_single_score_per_meal": 0.0252
+    },
+    {
+      "food_id": 61,
+      "label": "Milk 2% fluid",
+      "expected_group": "Dairy and Egg Products",
+      "serving_g": 244,
+      "kcal": 122.0,
+      "direct_pairs": [
+        {
+          "ef_col": "Changement climatique",
+          "recipe_key": "Global warming",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.30988,
+          "recipe_value": 0.30988,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions fossiles",
+          "recipe_key": "Global warming (fossil)",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.137372,
+          "recipe_value": 0.137372,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions biogéniques",
+          "recipe_key": "Global warming (biogenic)",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.149572,
+          "recipe_value": 0.149572,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions liées au changement d'affectation des sols",
+          "recipe_key": "Global warming (LUC)",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.023936400000000004,
+          "recipe_value": 0.023936400000000004,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Appauvrissement de la couche d'ozone",
+          "recipe_key": "Stratospheric ozone depletion",
+          "unit": "kg CFC11 eq",
+          "ef_value": 5.2703999999999995e-09,
+          "recipe_value": 5.2703999999999995e-09,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        }
+      ],
+      "unit_incompatible_pairs": [
+        {
+          "ef_col": "Particules fines",
+          "recipe_key": "Fine particulate matter formation",
+          "unit_note": "EF disease inc./kg  vs  ReCiPe kg PM2.5 eq",
+          "ef_value": 2.5376000000000002e-08,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Acidification terrestre et eaux douces",
+          "recipe_key": "Terrestrial acidification",
+          "unit_note": "EF mol H+ eq        vs  ReCiPe kg SO2 eq",
+          "ef_value": 0.0033428000000000004,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation eaux douces",
+          "recipe_key": "Freshwater eutrophication",
+          "unit_note": "EF kg P eq (different fate model)",
+          "ef_value": 2.7327999999999997e-05,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation marine",
+          "recipe_key": "Marine eutrophication",
+          "unit_note": "EF kg N eq (different fate model)",
+          "ef_value": 0.0009076800000000001,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation terrestre",
+          "recipe_key": "(no ReCiPe equivalent)",
+          "unit_note": "EF mol N eq        no ReCiPe slot",
+          "ef_value": 0.014274,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Écotoxicité pour écosystèmes aquatiques d'eau douce",
+          "recipe_key": "Freshwater ecotoxicity (+terr +marine in ReCiPe)",
+          "unit_note": "EF CTUe (FW only)  vs  ReCiPe 3 ecotox cats",
+          "ef_value": 3.5136,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Utilisation du sol",
+          "recipe_key": "Land use",
+          "unit_note": "EF Pt (LANCA score) vs  ReCiPe m2a crop-eq",
+          "ef_value": 13.249199999999998,
+          "recipe_value": 17.128800000000002
+        },
+        {
+          "ef_col": "Épuisement des ressources eau",
+          "recipe_key": "Water consumption",
+          "unit_note": "EF m3 deprivation (AWARE) vs ReCiPe m3 blue",
+          "ef_value": 0.038064,
+          "recipe_value": 0.031720000000000005
+        },
+        {
+          "ef_col": "Épuisement des ressources énergétiques",
+          "recipe_key": "(rolled into Fossil resource scarcity)",
+          "unit_note": "EF MJ  no ReCiPe slot",
+          "ef_value": 1.99348,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Épuisement des ressources minéraux",
+          "recipe_key": "Mineral resource scarcity",
+          "unit_note": "EF kg Sb eq        vs  ReCiPe kg Cu eq",
+          "ef_value": 7.4664e-07,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Rayonnements ionisants",
+          "recipe_key": "Ionizing radiation",
+          "unit_note": "EF kBq U-235 eq    vs  ReCiPe kBq Co-60 eq",
+          "ef_value": 0.031720000000000005,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Formation photochimique d'ozone",
+          "recipe_key": "Ozone formation (HH + Terrestrial in ReCiPe)",
+          "unit_note": "EF kg NMVOC eq vs ReCiPe 2 ozone cats",
+          "ef_value": 0.00066856,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Effets toxicologiques sur la santé humaine : substances cancérogènes",
+          "recipe_key": "Human carcinogenic toxicity",
+          "unit_note": "EF CTUh           vs  ReCiPe kg 1,4-DCB eq",
+          "ef_value": 1.52988e-10,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Effets toxicologiques sur la santé humaine : substances non-cancérogènes",
+          "recipe_key": "Human non-carcinogenic toxicity",
+          "unit_note": "EF CTUh           vs  ReCiPe kg 1,4-DCB eq",
+          "ef_value": 3.6356e-09,
+          "recipe_value": null
+        }
+      ],
+      "ef_single_score_per_meal": 0.029035999999999996
+    },
+    {
+      "food_id": 2380,
+      "label": "Carrot raw",
+      "expected_group": "Vegetables and Vegetable Products",
+      "serving_g": 100,
+      "kcal": 41.0,
+      "direct_pairs": [
+        {
+          "ef_col": "Changement climatique",
+          "recipe_key": "Global warming",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.0396,
+          "recipe_value": 0.039599999999999996,
+          "ratio_ef_over_recipe": 1.0000000000000002,
+          "log10_ratio": 9.64327466553287e-17
+        },
+        {
+          "ef_col": "Changement climatique - émissions fossiles",
+          "recipe_key": "Global warming (fossil)",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.036199999999999996,
+          "recipe_value": 0.036199999999999996,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions biogéniques",
+          "recipe_key": "Global warming (biogenic)",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.0034000000000000002,
+          "recipe_value": 0.0034000000000000002,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions liées au changement d'affectation des sols",
+          "recipe_key": "Global warming (LUC)",
+          "unit": "kg CO2 eq",
+          "ef_value": 1.96e-05,
+          "recipe_value": 1.96e-05,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Appauvrissement de la couche d'ozone",
+          "recipe_key": "Stratospheric ozone depletion",
+          "unit": "kg CFC11 eq",
+          "ef_value": 1.94e-09,
+          "recipe_value": 1.94e-09,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        }
+      ],
+      "unit_incompatible_pairs": [
+        {
+          "ef_col": "Particules fines",
+          "recipe_key": "Fine particulate matter formation",
+          "unit_note": "EF disease inc./kg  vs  ReCiPe kg PM2.5 eq",
+          "ef_value": 2.54e-09,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Acidification terrestre et eaux douces",
+          "recipe_key": "Terrestrial acidification",
+          "unit_note": "EF mol H+ eq        vs  ReCiPe kg SO2 eq",
+          "ef_value": 0.00020400000000000003,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation eaux douces",
+          "recipe_key": "Freshwater eutrophication",
+          "unit_note": "EF kg P eq (different fate model)",
+          "ef_value": 5.729999999999999e-06,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation marine",
+          "recipe_key": "Marine eutrophication",
+          "unit_note": "EF kg N eq (different fate model)",
+          "ef_value": 0.000138,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation terrestre",
+          "recipe_key": "(no ReCiPe equivalent)",
+          "unit_note": "EF mol N eq        no ReCiPe slot",
+          "ef_value": 0.000624,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Écotoxicité pour écosystèmes aquatiques d'eau douce",
+          "recipe_key": "Freshwater ecotoxicity (+terr +marine in ReCiPe)",
+          "unit_note": "EF CTUe (FW only)  vs  ReCiPe 3 ecotox cats",
+          "ef_value": 1.8199999999999998,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Utilisation du sol",
+          "recipe_key": "Land use",
+          "unit_note": "EF Pt (LANCA score) vs  ReCiPe m2a crop-eq",
+          "ef_value": 0.954,
+          "recipe_value": 0.042899999999999994
+        },
+        {
+          "ef_col": "Épuisement des ressources eau",
+          "recipe_key": "Water consumption",
+          "unit_note": "EF m3 deprivation (AWARE) vs ReCiPe m3 blue",
+          "ef_value": 0.036199999999999996,
+          "recipe_value": 0.0039
+        },
+        {
+          "ef_col": "Épuisement des ressources énergétiques",
+          "recipe_key": "(rolled into Fossil resource scarcity)",
+          "unit_note": "EF MJ  no ReCiPe slot",
+          "ef_value": 0.553,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Épuisement des ressources minéraux",
+          "recipe_key": "Mineral resource scarcity",
+          "unit_note": "EF kg Sb eq        vs  ReCiPe kg Cu eq",
+          "ef_value": 2.2599999999999999e-07,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Rayonnements ionisants",
+          "recipe_key": "Ionizing radiation",
+          "unit_note": "EF kBq U-235 eq    vs  ReCiPe kBq Co-60 eq",
+          "ef_value": 0.00621,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Formation photochimique d'ozone",
+          "recipe_key": "Ozone formation (HH + Terrestrial in ReCiPe)",
+          "unit_note": "EF kg NMVOC eq vs ReCiPe 2 ozone cats",
+          "ef_value": 0.000147,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Effets toxicologiques sur la santé humaine : substances cancérogènes",
+          "recipe_key": "Human carcinogenic toxicity",
+          "unit_note": "EF CTUh           vs  ReCiPe kg 1,4-DCB eq",
+          "ef_value": 2.59e-11,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Effets toxicologiques sur la santé humaine : substances non-cancérogènes",
+          "recipe_key": "Human non-carcinogenic toxicity",
+          "unit_note": "EF CTUh           vs  ReCiPe kg 1,4-DCB eq",
+          "ef_value": 9.98e-10,
+          "recipe_value": null
+        }
+      ],
+      "ef_single_score_per_meal": 0.00453
+    },
+    {
+      "food_id": 1696,
+      "label": "Apple raw with skin",
+      "expected_group": "Fruits and fruit juices",
+      "serving_g": 150,
+      "kcal": 78.0,
+      "direct_pairs": [
+        {
+          "ef_col": "Changement climatique",
+          "recipe_key": "Global warming",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.06119999999999999,
+          "recipe_value": 0.0612,
+          "ratio_ef_over_recipe": 0.9999999999999999,
+          "log10_ratio": -4.821637332766436e-17
+        },
+        {
+          "ef_col": "Changement climatique - émissions fossiles",
+          "recipe_key": "Global warming (fossil)",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.05535,
+          "recipe_value": 0.05535,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions biogéniques",
+          "recipe_key": "Global warming (biogenic)",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.00588,
+          "recipe_value": 0.00588,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions liées au changement d'affectation des sols",
+          "recipe_key": "Global warming (LUC)",
+          "unit": "kg CO2 eq",
+          "ef_value": 3.1650000000000004e-05,
+          "recipe_value": 3.1650000000000004e-05,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Appauvrissement de la couche d'ozone",
+          "recipe_key": "Stratospheric ozone depletion",
+          "unit": "kg CFC11 eq",
+          "ef_value": 3.78e-09,
+          "recipe_value": 3.78e-09,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        }
+      ],
+      "unit_incompatible_pairs": [
+        {
+          "ef_col": "Particules fines",
+          "recipe_key": "Fine particulate matter formation",
+          "unit_note": "EF disease inc./kg  vs  ReCiPe kg PM2.5 eq",
+          "ef_value": 3.57e-09,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Acidification terrestre et eaux douces",
+          "recipe_key": "Terrestrial acidification",
+          "unit_note": "EF mol H+ eq        vs  ReCiPe kg SO2 eq",
+          "ef_value": 0.000261,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation eaux douces",
+          "recipe_key": "Freshwater eutrophication",
+          "unit_note": "EF kg P eq (different fate model)",
+          "ef_value": 6.915e-06,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation marine",
+          "recipe_key": "Marine eutrophication",
+          "unit_note": "EF kg N eq (different fate model)",
+          "ef_value": 0.00011084999999999998,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation terrestre",
+          "recipe_key": "(no ReCiPe equivalent)",
+          "unit_note": "EF mol N eq        no ReCiPe slot",
+          "ef_value": 0.0010140000000000001,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Écotoxicité pour écosystèmes aquatiques d'eau douce",
+          "recipe_key": "Freshwater ecotoxicity (+terr +marine in ReCiPe)",
+          "unit_note": "EF CTUe (FW only)  vs  ReCiPe 3 ecotox cats",
+          "ef_value": 1.59,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Utilisation du sol",
+          "recipe_key": "Land use",
+          "unit_note": "EF Pt (LANCA score) vs  ReCiPe m2a crop-eq",
+          "ef_value": 2.46,
+          "recipe_value": 0.16380000000000006
+        },
+        {
+          "ef_col": "Épuisement des ressources eau",
+          "recipe_key": "Water consumption",
+          "unit_note": "EF m3 deprivation (AWARE) vs ReCiPe m3 blue",
+          "ef_value": 0.08145,
+          "recipe_value": 0.004875000000000001
+        },
+        {
+          "ef_col": "Épuisement des ressources énergétiques",
+          "recipe_key": "(rolled into Fossil resource scarcity)",
+          "unit_note": "EF MJ  no ReCiPe slot",
+          "ef_value": 0.8519999999999999,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Épuisement des ressources minéraux",
+          "recipe_key": "Mineral resource scarcity",
+          "unit_note": "EF kg Sb eq        vs  ReCiPe kg Cu eq",
+          "ef_value": 3.5999999999999994e-07,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Rayonnements ionisants",
+          "recipe_key": "Ionizing radiation",
+          "unit_note": "EF kBq U-235 eq    vs  ReCiPe kBq Co-60 eq",
+          "ef_value": 0.009750000000000002,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Formation photochimique d'ozone",
+          "recipe_key": "Ozone formation (HH + Terrestrial in ReCiPe)",
+          "unit_note": "EF kg NMVOC eq vs ReCiPe 2 ozone cats",
+          "ef_value": 0.000246,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Effets toxicologiques sur la santé humaine : substances cancérogènes",
+          "recipe_key": "Human carcinogenic toxicity",
+          "unit_note": "EF CTUh           vs  ReCiPe kg 1,4-DCB eq",
+          "ef_value": 5.8049999999999996e-11,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Effets toxicologiques sur la santé humaine : substances non-cancérogènes",
+          "recipe_key": "Human non-carcinogenic toxicity",
+          "unit_note": "EF CTUh           vs  ReCiPe kg 1,4-DCB eq",
+          "ef_value": 1.2359999999999999e-09,
+          "recipe_value": null
+        }
+      ],
+      "ef_single_score_per_meal": 0.006585
+    },
+    {
+      "food_id": 219,
+      "label": "Barley grain",
+      "expected_group": "Cereals, Grains and Pasta",
+      "serving_g": 100,
+      "kcal": 367.0,
+      "direct_pairs": [
+        {
+          "ef_col": "Changement climatique",
+          "recipe_key": "Global warming",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.0586,
+          "recipe_value": 0.0586,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions fossiles",
+          "recipe_key": "Global warming (fossil)",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.058199999999999995,
+          "recipe_value": 0.058199999999999995,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions biogéniques",
+          "recipe_key": "Global warming (biogenic)",
+          "unit": "kg CO2 eq",
+          "ef_value": 0.000258,
+          "recipe_value": 0.000258,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Changement climatique - émissions liées au changement d'affectation des sols",
+          "recipe_key": "Global warming (LUC)",
+          "unit": "kg CO2 eq",
+          "ef_value": 6.36e-05,
+          "recipe_value": 6.36e-05,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        },
+        {
+          "ef_col": "Appauvrissement de la couche d'ozone",
+          "recipe_key": "Stratospheric ozone depletion",
+          "unit": "kg CFC11 eq",
+          "ef_value": 1.74e-09,
+          "recipe_value": 1.74e-09,
+          "ratio_ef_over_recipe": 1.0,
+          "log10_ratio": 0.0
+        }
+      ],
+      "unit_incompatible_pairs": [
+        {
+          "ef_col": "Particules fines",
+          "recipe_key": "Fine particulate matter formation",
+          "unit_note": "EF disease inc./kg  vs  ReCiPe kg PM2.5 eq",
+          "ef_value": 7.53e-09,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Acidification terrestre et eaux douces",
+          "recipe_key": "Terrestrial acidification",
+          "unit_note": "EF mol H+ eq        vs  ReCiPe kg SO2 eq",
+          "ef_value": 0.000977,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation eaux douces",
+          "recipe_key": "Freshwater eutrophication",
+          "unit_note": "EF kg P eq (different fate model)",
+          "ef_value": 1.2899999999999998e-05,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation marine",
+          "recipe_key": "Marine eutrophication",
+          "unit_note": "EF kg N eq (different fate model)",
+          "ef_value": 0.00107,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Eutrophisation terrestre",
+          "recipe_key": "(no ReCiPe equivalent)",
+          "unit_note": "EF mol N eq        no ReCiPe slot",
+          "ef_value": 0.00398,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Écotoxicité pour écosystèmes aquatiques d'eau douce",
+          "recipe_key": "Freshwater ecotoxicity (+terr +marine in ReCiPe)",
+          "unit_note": "EF CTUe (FW only)  vs  ReCiPe 3 ecotox cats",
+          "ef_value": 1.06,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Utilisation du sol",
+          "recipe_key": "Land use",
+          "unit_note": "EF Pt (LANCA score) vs  ReCiPe m2a crop-eq",
+          "ef_value": 8.190000000000001,
+          "recipe_value": 0.38220000000000004
+        },
+        {
+          "ef_col": "Épuisement des ressources eau",
+          "recipe_key": "Water consumption",
+          "unit_note": "EF m3 deprivation (AWARE) vs ReCiPe m3 blue",
+          "ef_value": 0.10300000000000001,
+          "recipe_value": 0.01625
+        },
+        {
+          "ef_col": "Épuisement des ressources énergétiques",
+          "recipe_key": "(rolled into Fossil resource scarcity)",
+          "unit_note": "EF MJ  no ReCiPe slot",
+          "ef_value": 0.747,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Épuisement des ressources minéraux",
+          "recipe_key": "Mineral resource scarcity",
+          "unit_note": "EF kg Sb eq        vs  ReCiPe kg Cu eq",
+          "ef_value": 3.55e-07,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Rayonnements ionisants",
+          "recipe_key": "Ionizing radiation",
+          "unit_note": "EF kBq U-235 eq    vs  ReCiPe kBq Co-60 eq",
+          "ef_value": 0.00943,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Formation photochimique d'ozone",
+          "recipe_key": "Ozone formation (HH + Terrestrial in ReCiPe)",
+          "unit_note": "EF kg NMVOC eq vs ReCiPe 2 ozone cats",
+          "ef_value": 0.00021099999999999998,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Effets toxicologiques sur la santé humaine : substances cancérogènes",
+          "recipe_key": "Human carcinogenic toxicity",
+          "unit_note": "EF CTUh           vs  ReCiPe kg 1,4-DCB eq",
+          "ef_value": 3.73e-11,
+          "recipe_value": null
+        },
+        {
+          "ef_col": "Effets toxicologiques sur la santé humaine : substances non-cancérogènes",
+          "recipe_key": "Human non-carcinogenic toxicity",
+          "unit_note": "EF CTUh           vs  ReCiPe kg 1,4-DCB eq",
+          "ef_value": 3.67e-09,
+          "recipe_value": null
+        }
+      ],
+      "ef_single_score_per_meal": 0.0108
+    }
+  ],
+  "aggregated_per_group": {
+    "Beef Products": {
+      "Global warming": {
+        "median_log10_ratio": 9.64327466553287e-17,
+        "median_ratio": 1.0000000000000002,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (LUC)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (biogenic)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (fossil)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Stratospheric ozone depletion": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      }
+    },
+    "Cereals, Grains and Pasta": {
+      "Global warming": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (LUC)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (biogenic)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (fossil)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Stratospheric ozone depletion": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      }
+    },
+    "Dairy and Egg Products": {
+      "Global warming": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 2,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (LUC)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 2,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (biogenic)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 2,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (fossil)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 2,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Stratospheric ozone depletion": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 2,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      }
+    },
+    "Fats and Oils": {
+      "Global warming": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (LUC)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (biogenic)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (fossil)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Stratospheric ozone depletion": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      }
+    },
+    "Fruits and fruit juices": {
+      "Global warming": {
+        "median_log10_ratio": -4.821637332766436e-17,
+        "median_ratio": 0.9999999999999999,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (LUC)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (biogenic)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (fossil)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Stratospheric ozone depletion": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      }
+    },
+    "Mixed Dishes": {
+      "Global warming": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (LUC)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (biogenic)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (fossil)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Stratospheric ozone depletion": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      }
+    },
+    "Pork Products": {
+      "Global warming": {
+        "median_log10_ratio": 9.64327466553287e-17,
+        "median_ratio": 1.0000000000000002,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (LUC)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (biogenic)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (fossil)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Stratospheric ozone depletion": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      }
+    },
+    "Poultry Products": {
+      "Global warming": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (LUC)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (biogenic)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (fossil)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Stratospheric ozone depletion": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      }
+    },
+    "Vegetables and Vegetable Products": {
+      "Global warming": {
+        "median_log10_ratio": 9.64327466553287e-17,
+        "median_ratio": 1.0000000000000002,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (LUC)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (biogenic)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Global warming (fossil)": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      },
+      "Stratospheric ozone depletion": {
+        "median_log10_ratio": 0.0,
+        "median_ratio": 1.0,
+        "n": 1,
+        "tag": "EF ~= ReCiPe (transfer-identity)"
+      }
+    }
+  },
+  "aggregated_overall": {
+    "Global warming": {
+      "median_log10_ratio": 0.0,
+      "median_ratio": 1.0,
+      "n": 10
+    },
+    "Global warming (LUC)": {
+      "median_log10_ratio": 0.0,
+      "median_ratio": 1.0,
+      "n": 10
+    },
+    "Global warming (biogenic)": {
+      "median_log10_ratio": 0.0,
+      "median_ratio": 1.0,
+      "n": 10
+    },
+    "Global warming (fossil)": {
+      "median_log10_ratio": 0.0,
+      "median_ratio": 1.0,
+      "n": 10
+    },
+    "Stratospheric ozone depletion": {
+      "median_log10_ratio": 0.0,
+      "median_ratio": 1.0,
+      "n": 10
+    }
+  }
+}

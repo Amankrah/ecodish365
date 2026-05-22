@@ -20,6 +20,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = []
+# Avoid WhiteNoise/UserWarning when the collected-static directory is missing (fresh clone /
+# dev before first collectstatic).
+STATIC_ROOT.mkdir(parents=True, exist_ok=True)
 
 # Template configuration
 TEMPLATES = [
@@ -52,7 +55,11 @@ sys.path.extend([
 ])
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', get_random_secret_key())
+# Use `or` (not `os.environ.get(..., default)`) so that an EMPTY .env value
+# (`DJANGO_SECRET_KEY=`) falls through to `get_random_secret_key()` for dev
+# instead of crashing every request with ImproperlyConfigured. Production
+# deployments MUST set a real value via env var or .env.
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY') or get_random_secret_key()
 
 # Development/Production Configuration
 IS_DEVELOPMENT = os.environ.get('DJANGO_ENV', 'development') == 'development'

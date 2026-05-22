@@ -21,6 +21,26 @@ from typing import Any, Dict, List, Optional, TYPE_CHECKING
 from src.meal import Meal
 from .cnf_integrator import get_cnf_integrator
 
+
+def _matched_band_ratios_for_group(group_default_factors: Dict[str, Any]) -> Dict[str, Dict[str, float]]:
+    """Recover {category: {low_ratio, high_ratio}} from a cnf_integrator
+    factor block — used to apply the same uncertainty width to matcher-supplied
+    centrals as to group-default centrals (instead of a flat +/-1.5x proxy).
+
+    The group_default_factors dict already carries `_uncertainty_bands` with
+    {low, central, high}; we recover the ratios as low/central and high/central.
+    """
+    bands = group_default_factors.get('_uncertainty_bands') or {}
+    ratios: Dict[str, Dict[str, float]] = {}
+    for cat, band in bands.items():
+        c = band.get('central') or 0.0
+        if c > 0:
+            ratios[cat] = {
+                'low_ratio':  band.get('low', c) / c,
+                'high_ratio': band.get('high', c) / c,
+            }
+    return ratios
+
 if TYPE_CHECKING:  # avoid circular / heavy import at module load
     from .lca_matcher import LCAMatcher  # noqa: F401
 
@@ -130,7 +150,12 @@ class LifeCycleAssessment:
         self.logger = logging.getLogger(__name__)
         self.cnf_integrator = get_cnf_integrator()
         self.midpoint_impacts = {}
+        # v1 uncertainty bands ('demote, don't perfect'). Parallel field;
+        # each midpoint category maps to {'low': X, 'central': Y, 'high': Z}.
+        # central matches `self.midpoint_impacts` (backward compat).
+        self.midpoint_impacts_bands: Dict[str, Dict[str, float]] = {}
         self.endpoint_impacts = {}
+        self.endpoint_impacts_bands: Dict[str, Optional[Dict[str, float]]] = {}
         self.characterization_factors = self._initialize_characterization_factors()
 
         # §3.5 LCA matcher (GROUP-D-RECONCILIATION). When None (default), the
@@ -140,13 +165,18 @@ class LifeCycleAssessment:
         self.matcher = matcher
         self.matcher_decisions: List[Dict[str, Any]] = []
 
-        # Per-midpoint-category confidence, copied from module-level constant.
-        # Maintained for backward compatibility with `sanity_check` and
-        # `get_data_quality_report`. See LCA_FACTOR_CONFIDENCE for rationale.
+        # Per-midpoint-category confidence — v1 scope trim filters to only the
+        # categories actually consumed by `_calculate_midpoint_impacts`. The
+        # module-level `LCA_FACTOR_CONFIDENCE` table is the source of truth for
+        # the ratings, retained at full 18 categories for forward-compat with
+        # TODO-CODE-LCA-2 restoration. `sanity_check` and `get_data_quality_report`
+        # only ever iterate present categories, so trimming here cannot
+        # silently mis-rate something that isn't being computed.
+        consumed = {'Global warming', 'Land use', 'Water consumption'}
         self.factor_confidence = {
-            'high':   [k for k, v in LCA_FACTOR_CONFIDENCE.items() if v['level'] == 'high'],
-            'medium': [k for k, v in LCA_FACTOR_CONFIDENCE.items() if v['level'] == 'medium'],
-            'low':    [k for k, v in LCA_FACTOR_CONFIDENCE.items() if v['level'] == 'low'],
+            'high':   [k for k, v in LCA_FACTOR_CONFIDENCE.items() if v['level'] == 'high' and k in consumed],
+            'medium': [k for k, v in LCA_FACTOR_CONFIDENCE.items() if v['level'] == 'medium' and k in consumed],
+            'low':    [k for k, v in LCA_FACTOR_CONFIDENCE.items() if v['level'] == 'low' and k in consumed],
         }
 
     def _initialize_characterization_factors(self) -> Dict[str, Dict[str, float]]:
@@ -221,28 +251,45 @@ class LifeCycleAssessment:
 
     def _calculate_midpoint_impacts(self) -> Dict[str, float]:
         """
-        Calculate midpoint impact categories using corrected methodology with Canadian regional factors.
-        Integrates with CNF data for accurate food-specific assessments.
+        Calculate midpoint impact categories using ReCiPe 2016 H factors.
+
+        v1 SCOPE TRIMMED to the 3 categories the pipeline can defend per-food-group
+        from published literature (`_smoke_validate_cnf_integrator.py` audit):
+          - `Global warming`     : Poore & Nemecek 2018 Fig. 1 (kg CO2 eq / 100 g)
+          - `Land use`           : Poore & Nemecek 2018 Fig. 1 (m2a crop eq / 100 g)
+          - `Water consumption`  : Mekonnen & Hoekstra 2011/2012 blue-water-only (m3 / 100 g)
+
+        The previously-shipped 15 additional categories (terrestrial acidification,
+        the two eutrophications, both ozone-formation pathways, fine PM, ionising
+        radiation, stratospheric ozone depletion, the toxicity pair, the three
+        ecotoxicities, mineral + fossil resource scarcity) are NOT aggregated in
+        v1: 3 of them are unit-incompatible with the available P&N grounding and
+        12 have no per-food-group numerical literature target on any basis. Shipping
+        them as conservative defaults presented false multidimensional rigor; honest
+        narrow coverage beats invented breadth. They re-enter the consumed set when
+        TODO-CODE-LCA-2 (licensed AGRIBALYSE-LCI re-scored under ReCiPe) lands;
+        see `code_action_items.md` and the §7.5 limitation in the manuscript.
+
+        EF climate sub-keys (`Global warming (fossil|biogenic|LUC)`) supplied by
+        the matcher still ride through `food_impacts` for the per-meal audit block
+        but are deliberately NOT folded into `midpoint_impacts` (EF identity
+        total = sum(sub-cols) holds within 1% across all 2,425 v32 rows;
+        summing both would double-count climate against
+        `climate_change_human` / `climate_change_ecosystem` downstream).
         """
         total_impacts = {
-            'Global warming': 0.0,  # kg CO2 eq
-            'Stratospheric ozone depletion': 0.0,  # kg CFC11 eq
-            'Ionizing radiation': 0.0,  # kBq Co-60 eq
-            'Ozone formation, Human health': 0.0,  # kg NOx eq
-            'Fine particulate matter formation': 0.0,  # kg PM2.5 eq
-            'Ozone formation, Terrestrial ecosystems': 0.0,  # kg NOx eq
-            'Terrestrial acidification': 0.0,  # kg SO2 eq
-            'Freshwater eutrophication': 0.0,  # kg P eq
-            'Marine eutrophication': 0.0,  # kg N eq
-            'Terrestrial ecotoxicity': 0.0,  # kg 1,4-DCB
-            'Freshwater ecotoxicity': 0.0,  # kg 1,4-DCB
-            'Marine ecotoxicity': 0.0,  # kg 1,4-DCB
-            'Human carcinogenic toxicity': 0.0,  # kg 1,4-DCB
-            'Human non-carcinogenic toxicity': 0.0,  # kg 1,4-DCB
-            'Land use': 0.0,  # m2a crop eq
-            'Mineral resource scarcity': 0.0,  # kg Cu eq
-            'Fossil resource scarcity': 0.0,  # kg oil eq
+            'Global warming': 0.0,     # kg CO2 eq
+            'Land use': 0.0,           # m2a crop eq
             'Water consumption': 0.0,  # m3
+        }
+        # Parallel band aggregation. Each category accumulates
+        # low / central / high sums independently. Meal-level "low" = sum of
+        # per-food lows; this is a worst/best envelope under the simplifying
+        # assumption that producer percentiles co-vary across foods within
+        # a meal — true for the demote-don't-perfect framing, not for a real
+        # 90% CI. Full PDF propagation requires Monte-Carlo (deferred).
+        total_impacts_bands: Dict[str, Dict[str, float]] = {
+            cat: {'low': 0.0, 'central': 0.0, 'high': 0.0} for cat in total_impacts
         }
         
         # Apply Canadian regional factors per-(food, category) per the
@@ -256,18 +303,28 @@ class LifeCycleAssessment:
         for food in self.meal.foods:
             food_impacts = self._get_food_environmental_impacts(food)
             category_sources = food_impacts.get("_category_sources", {}) if isinstance(food_impacts, dict) else {}
-            food_source = food_impacts.get("_source", "group_default") if isinstance(food_impacts, dict) else "group_default"
+            food_bands = food_impacts.get("_bands", {}) if isinstance(food_impacts, dict) else {}
+            food_source = food_impacts.get("_source", "fallback_low_confidence:group_default") if isinstance(food_impacts, dict) else "fallback_low_confidence:group_default"
             categories_with_match = 0
             categories_with_default = 0
             for impact_category in total_impacts:
                 value = food_impacts.get(impact_category, 0.0)
-                cat_source = category_sources.get(impact_category, "group_default")
-                if cat_source == "group_default":
-                    value *= regional_factors.get(impact_category, 1.0)
+                cat_source = category_sources.get(impact_category, "fallback_low_confidence:group_default")
+                # Treat both the legacy "group_default" tag and the v1 explicit
+                # "fallback_low_confidence:group_default" tag as the fallback path.
+                is_fallback = cat_source.startswith("fallback_low_confidence") or cat_source == "group_default"
+                regional_mult = regional_factors.get(impact_category, 1.0) if is_fallback else 1.0
+                if is_fallback:
                     categories_with_default += 1
                 else:
                     categories_with_match += 1
-                total_impacts[impact_category] += value
+                total_impacts[impact_category] += value * regional_mult
+                # Propagate bands with the same Canadian regional multiplier
+                # applied to all three (low/central/high) for fallback foods.
+                cat_band = food_bands.get(impact_category)
+                if cat_band:
+                    for side in ('low', 'central', 'high'):
+                        total_impacts_bands[impact_category][side] += cat_band[side] * regional_mult
             # Tag the matching matcher_decisions audit entry with the
             # per-category accounting (only when matcher fired for this food).
             if self.matcher_decisions:
@@ -283,7 +340,11 @@ class LifeCycleAssessment:
         functional_unit_factor = 100 / total_calories if total_calories > 0 else 1
         for impact_category in total_impacts:
             total_impacts[impact_category] *= functional_unit_factor
+            for side in ('low', 'central', 'high'):
+                total_impacts_bands[impact_category][side] *= functional_unit_factor
 
+        # Persist bands at meal level for downstream consumers / API surface.
+        self.midpoint_impacts_bands = total_impacts_bands
         return total_impacts
     
     def _get_food_environmental_impacts(self, food) -> Dict[str, float]:
@@ -340,26 +401,59 @@ class LifeCycleAssessment:
         # Step 3: merge — matched factors WIN where keys overlap; group
         # defaults FILL the gaps. Track per-category source.
         food_impacts: Dict[str, float] = {}
+        food_impacts_bands: Dict[str, Dict[str, float]] = {}
         category_sources: Dict[str, str] = {}
+        group_default_bands = group_default_factors.get('_uncertainty_bands') or {}
         for category, factor in group_default_factors.items():
             if isinstance(category, str) and category.startswith('_'):
                 continue
             if not isinstance(factor, (int, float)):
                 continue
             food_impacts[category] = float(factor) * quantity_factor
-            category_sources[category] = "group_default"
+            # v1 audit-trail labelling: group-mean fallback is the last-resort
+            # tier and should NEVER be silently mixed with per-food matched
+            # values. Tag it as `fallback_low_confidence:group_default` so any
+            # consumer can see what's a measurement vs an extrapolation.
+            category_sources[category] = "fallback_low_confidence:group_default"
+            # v1 bands: only present for the 3 grounded categories
+            # (Global warming, Land use, Water consumption).
+            band = group_default_bands.get(category)
+            if band:
+                food_impacts_bands[category] = {
+                    side: band[side] * quantity_factor
+                    for side in ('low', 'central', 'high')
+                }
         # Overlay matched factors. The v32 catalog may also introduce keys
         # that the cnf_integrator never returns (e.g. parallel climate
         # sub-columns like "Global warming (fossil)"); include them too.
+        # Matcher-supplied factors are point estimates without published
+        # uncertainty. The previous proxy was a flat +/-1.5x band; the
+        # literature-validation smoke test (`_smoke_api_vs_literature.py`)
+        # revealed that 1.5x is too narrow to honestly bracket the
+        # documented 2-4x inter-method spread (P&N anchoring vs Stylianou
+        # IMPACT World+). We now reuse the SAME group-default uncertainty
+        # ratios on the matched central — this gives a width that reflects
+        # within-product spread on the per-food central, rather than
+        # pretending the matched value is uncertainty-free at ±50 %.
+        group_band_ratios = (group_default_bands.get('_ratios')
+                             or _matched_band_ratios_for_group(group_default_factors))
         for category, factor in matched_factors.items():
             if isinstance(category, str) and category.startswith('_'):
                 continue
-            food_impacts[category] = float(factor) * quantity_factor
+            scaled = float(factor) * quantity_factor
+            food_impacts[category] = scaled
             category_sources[category] = food_source
+            ratios = group_band_ratios.get(category, {'low_ratio': 0.5, 'high_ratio': 2.0})
+            food_impacts_bands[category] = {
+                'low':     scaled * ratios['low_ratio'],
+                'central': scaled,
+                'high':    scaled * ratios['high_ratio'],
+            }
 
         # Underscore-prefixed keys are filtered by aggregation loops.
         food_impacts["_source"] = food_source
         food_impacts["_category_sources"] = category_sources
+        food_impacts["_bands"] = food_impacts_bands
         return food_impacts
     
     def _get_canadian_regional_factors(self) -> Dict[str, float]:
@@ -406,14 +500,25 @@ class LifeCycleAssessment:
         - Ecosystems (species.yr) — aggregated terrestrial + freshwater + marine
         - Resources (USD2013) — fossils resolved per-resource (see CODE-7 / note below)
 
-        Caveats:
-        - Toxicity-related endpoint factors carry an explicit low-confidence flag
+        v1 TRIMMED SCOPE (consistent with `_calculate_midpoint_impacts`):
+        - Human Health is driven only by Global warming and Water consumption in v1
+          (the other 6 HH-contributing midpoints are not consumed; missing keys
+          default to 0 here, so the endpoint is mathematically intact but
+          quantitatively a lower bound rather than a full ReCiPe HH endpoint).
+        - Ecosystems is driven only by Global warming, Water consumption, and Land
+          use — the other 7 ecosystem-contributing midpoints are not consumed.
+        - Resources is identically 0 in v1 (both Fossil and Mineral resource
+          scarcity are not consumed at midpoint; we set the field to None rather
+          than 0 to make it obvious it is not estimable and should not enter
+          single-score weighting). When TODO-CODE-LCA-2 lands the trimmed
+          midpoints come back, the endpoint computation is unchanged.
+
+        Caveats (pre-existing):
+        - Toxicity endpoint factors carry an explicit low-confidence flag
           (RIVM 2017 §1.3 p. 20; Huijbregts 2017 §4 pp. 144-145).
         - Fossil resource scarcity has no constant midpoint-to-endpoint factor
-          (RIVM 2017 footnote 3 to Table 1.5, p. 25). The current pipeline does
-          not differentiate fossil substances, so the midpoint `Fossil resource
-          scarcity` (kg oil-eq) is multiplied by the crude-oil endpoint factor as
-          an approximation; per-substance resolution requires an LCI upgrade.
+          (RIVM 2017 footnote 3 to Table 1.5, p. 25); per-substance resolution
+          requires an LCI upgrade.
         - Water-use endpoint (yr/m3 to HH; species.yr/m3 to ecosystems) is
           distinct from the *monetary* valuation of water in `monetization.py`.
         """
@@ -424,56 +529,89 @@ class LifeCycleAssessment:
             ef = self.characterization_factors['endpoint']
             mid = self.midpoint_impacts
 
-            # Human Health (DALY)
-            human_health = (
-                mid.get('Global warming', 0)                    * ef['climate_change_human'] +
-                mid.get('Stratospheric ozone depletion', 0)     * ef['ozone_depletion_human'] +
-                mid.get('Ionizing radiation', 0)                * ef['ionizing_radiation_human'] +
-                mid.get('Fine particulate matter formation', 0) * ef['particulate_matter_human'] +
-                mid.get('Ozone formation, Human health', 0)     * ef['photochemical_ozone_human'] +
-                mid.get('Human carcinogenic toxicity', 0)       * ef['human_toxicity_cancer'] +
-                mid.get('Human non-carcinogenic toxicity', 0)   * ef['human_toxicity_non_cancer'] +
-                mid.get('Water consumption', 0)                 * ef['water_use_human']
+            self.endpoint_impacts = self._endpoint_from_midpoint_vector(mid, ef)
+            # Bands: re-run the same endpoint math on low/central/high envelopes.
+            self.endpoint_impacts_bands = self._endpoint_bands_from_midpoint_bands(
+                self.midpoint_impacts_bands, ef
             )
-
-            # Ecosystems (species.yr) — terrestrial + freshwater + marine
-            ecosystems = (
-                # terrestrial
-                mid.get('Global warming', 0)                       * ef['climate_change_ecosystem'] +
-                mid.get('Ozone formation, Terrestrial ecosystems', 0) * ef['photochemical_ozone_ecosystem'] +
-                mid.get('Terrestrial acidification', 0)            * ef['terrestrial_acidification_ecosystem'] +
-                mid.get('Terrestrial ecotoxicity', 0)              * ef['terrestrial_ecotoxicity_ecosystem'] +
-                mid.get('Water consumption', 0)                    * ef['water_use_ecosystem_terrestrial'] +
-                mid.get('Land use', 0)                             * ef['land_use_ecosystem'] +
-                # freshwater
-                mid.get('Global warming', 0)                       * ef['climate_change_ecosystem_freshwater'] +
-                mid.get('Freshwater eutrophication', 0)            * ef['freshwater_eutrophication_ecosystem'] +
-                mid.get('Freshwater ecotoxicity', 0)               * ef['freshwater_ecotoxicity_ecosystem'] +
-                mid.get('Water consumption', 0)                    * ef['water_use_ecosystem_freshwater'] +
-                # marine
-                mid.get('Marine ecotoxicity', 0)                   * ef['marine_ecotoxicity_ecosystem'] +
-                mid.get('Marine eutrophication', 0)                * ef['marine_eutrophication_ecosystem']
-            )
-
-            # Resources (USD2013). Fossils approximated as crude-oil-equivalent
-            # because the midpoint inventory is not resolved per substance; see
-            # CODE-7 in code_action_items.md.
-            resources = (
-                mid.get('Fossil resource scarcity', 0)  * ef['fossil_scarcity_crude_oil'] +
-                mid.get('Mineral resource scarcity', 0) * ef['mineral_scarcity']
-            )
-
-            self.endpoint_impacts = {
-                'Human Health': human_health,
-                'Ecosystems':   ecosystems,
-                'Resources':    resources,
-            }
-
             return self.endpoint_impacts
 
         except Exception as e:
             self.logger.error(f"Error calculating endpoint impacts: {str(e)}", exc_info=True)
             raise
+
+    def _endpoint_from_midpoint_vector(
+        self, mid: Dict[str, float], ef: Dict[str, float]
+    ) -> Dict[str, Optional[float]]:
+        """Pure function: midpoint vector + endpoint CFs -> {HH, Ecosystems, Resources}.
+
+        Extracted so the same math can be reused for the central scalar and for
+        the low/high band envelopes. Returns Resources=None when neither fossil
+        nor mineral scarcity is present in the trimmed midpoint set (v1).
+        """
+        # Human Health (DALY) — keep all upstream contributors; missing keys
+        # default to 0 in the trimmed-v1 case, so the result is mathematically
+        # intact but quantitatively a lower bound on the full ReCiPe endpoint.
+        human_health = (
+            mid.get('Global warming', 0)                    * ef['climate_change_human'] +
+            mid.get('Stratospheric ozone depletion', 0)     * ef['ozone_depletion_human'] +
+            mid.get('Ionizing radiation', 0)                * ef['ionizing_radiation_human'] +
+            mid.get('Fine particulate matter formation', 0) * ef['particulate_matter_human'] +
+            mid.get('Ozone formation, Human health', 0)     * ef['photochemical_ozone_human'] +
+            mid.get('Human carcinogenic toxicity', 0)       * ef['human_toxicity_cancer'] +
+            mid.get('Human non-carcinogenic toxicity', 0)   * ef['human_toxicity_non_cancer'] +
+            mid.get('Water consumption', 0)                 * ef['water_use_human']
+        )
+        ecosystems = (
+            mid.get('Global warming', 0)                          * ef['climate_change_ecosystem'] +
+            mid.get('Ozone formation, Terrestrial ecosystems', 0) * ef['photochemical_ozone_ecosystem'] +
+            mid.get('Terrestrial acidification', 0)               * ef['terrestrial_acidification_ecosystem'] +
+            mid.get('Terrestrial ecotoxicity', 0)                 * ef['terrestrial_ecotoxicity_ecosystem'] +
+            mid.get('Water consumption', 0)                       * ef['water_use_ecosystem_terrestrial'] +
+            mid.get('Land use', 0)                                * ef['land_use_ecosystem'] +
+            mid.get('Global warming', 0)                          * ef['climate_change_ecosystem_freshwater'] +
+            mid.get('Freshwater eutrophication', 0)               * ef['freshwater_eutrophication_ecosystem'] +
+            mid.get('Freshwater ecotoxicity', 0)                  * ef['freshwater_ecotoxicity_ecosystem'] +
+            mid.get('Water consumption', 0)                       * ef['water_use_ecosystem_freshwater'] +
+            mid.get('Marine ecotoxicity', 0)                      * ef['marine_ecotoxicity_ecosystem'] +
+            mid.get('Marine eutrophication', 0)                   * ef['marine_eutrophication_ecosystem']
+        )
+        has_resource_midpoints = (
+            mid.get('Fossil resource scarcity') is not None or
+            mid.get('Mineral resource scarcity') is not None
+        )
+        if has_resource_midpoints:
+            resources: Optional[float] = (
+                mid.get('Fossil resource scarcity', 0)  * ef['fossil_scarcity_crude_oil'] +
+                mid.get('Mineral resource scarcity', 0) * ef['mineral_scarcity']
+            )
+        else:
+            resources = None
+        return {
+            'Human Health': human_health,
+            'Ecosystems':   ecosystems,
+            'Resources':    resources,
+        }
+
+    def _endpoint_bands_from_midpoint_bands(
+        self,
+        midpoint_bands: Dict[str, Dict[str, float]],
+        ef: Dict[str, float],
+    ) -> Dict[str, Optional[Dict[str, float]]]:
+        """Re-run endpoint math on low/central/high envelopes."""
+        if not midpoint_bands:
+            return {}
+        endpoint_bands: Dict[str, Dict[str, float]] = {
+            'Human Health': {}, 'Ecosystems': {}, 'Resources': {}
+        }
+        for side in ('low', 'central', 'high'):
+            mid_side = {cat: bands[side] for cat, bands in midpoint_bands.items() if side in bands}
+            ep = self._endpoint_from_midpoint_vector(mid_side, ef)
+            for k, v in ep.items():
+                if v is not None:
+                    endpoint_bands[k][side] = v
+        # Drop endpoint bands that have no sides (e.g. Resources in v1 trim).
+        return {k: v for k, v in endpoint_bands.items() if v}
 
     def calculate_single_score(
         self,
@@ -517,12 +655,18 @@ class LifeCycleAssessment:
             )
 
         # Equal weighting across areas of protection (standard ReCiPe approach).
+        # v1 trim: Resources may be None (when both fossil + mineral scarcity
+        # are absent from the trimmed midpoint set); re-distribute its weight
+        # to the remaining endpoints rather than coerce None to 0 (which would
+        # silently bias the score toward 0 / under-estimate impact).
         weighting_factors = {'Human Health': 1 / 3, 'Ecosystems': 1 / 3, 'Resources': 1 / 3}
-
+        present_endpoints = {k: v for k, v in self.endpoint_impacts.items() if v is not None}
+        total_weight = sum(weighting_factors[k] for k in present_endpoints)
         single_score = 0.0
-        for endpoint, impact in self.endpoint_impacts.items():
+        for endpoint, impact in present_endpoints.items():
             normalized = impact / normalization_factors[endpoint]
-            single_score += normalized * weighting_factors[endpoint]
+            renormalised_weight = weighting_factors[endpoint] / total_weight
+            single_score += normalized * renormalised_weight
         return single_score
 
     def get_impact_breakdown(self) -> Dict[str, Dict[str, float]]:
@@ -530,12 +674,75 @@ class LifeCycleAssessment:
         Get detailed breakdown of impacts by food item.
         """
         breakdown = {}
-        
+
         for food in self.meal.foods:
             food_impacts = self._get_food_environmental_impacts(food)
             breakdown[f"{food.food_name} ({food.quantity}g)"] = food_impacts
-            
+
         return breakdown
+
+    def calculate_matcher_aware_sustainability_score(self) -> Dict[str, Any]:
+        """Compute a meal-level sustainability score that uses the LCA's
+        matcher-aware per-food impacts (Agribalyse overlay when matched,
+        group default otherwise), instead of `Food.get_environmental_impact()`'s
+        group-default-only path.
+
+        Fixes the consistency defect where the LCA panel showed (matched)
+        2.5 kg CO2/100g for canned beef stew while the sustainability score
+        was computed against the (group-default) 0.25 kg/100g Mixed Dishes
+        value — making the score artificially generous on every matched
+        meat / dairy / fast-food entry.
+
+        Returns the same shape as `Meal.get_sustainability_score()` plus a
+        `methodology` block per food.
+        """
+        per_food_scores: List[Dict[str, Any]] = []
+        weighted_sum = 0.0
+        total_weight = 0.0
+        total_quantity = sum(getattr(f, 'quantity', 0) for f in self.meal.foods) or 1.0
+
+        for food in self.meal.foods:
+            # Per-food impacts from the LCA matcher-aware merge (drops
+            # underscore-prefixed metadata keys; impacts are already scaled
+            # by quantity to the food's actual serving).
+            food_impacts_raw = self._get_food_environmental_impacts(food)
+            impacts = {
+                k: v for k, v in food_impacts_raw.items()
+                if not (isinstance(k, str) and k.startswith('_'))
+                and isinstance(v, (int, float))
+            }
+            food_score = food.get_sustainability_score(impacts=impacts)
+            food_score['food_id'] = getattr(food, 'food_id', None)
+            food_score['food_name'] = getattr(food, 'food_name', None)
+            food_score['quantity_g'] = getattr(food, 'quantity', None)
+            food_score['source_tag'] = food_impacts_raw.get('_source', 'unknown')
+            per_food_scores.append(food_score)
+
+            weight = getattr(food, 'quantity', 0) / total_quantity
+            weighted_sum += float(food_score.get('overall', 50)) * weight
+            total_weight += weight
+
+        overall = weighted_sum / total_weight if total_weight > 0 else 50.0
+        return {
+            'overall_sustainability_score': overall,
+            'sustainability_rating': self._sustainability_rating(overall),
+            'individual_food_scores': per_food_scores,
+            'methodology_note': (
+                'Per-category sustainability scores anchored on literature-published '
+                'population-percentile zones (Stylianou et al. 2021 SI Table 11B for '
+                'GW and Water; P&N 2018 panel medians for Land). Computed against '
+                'LCA-matcher-aware per-food impacts, so matched foods reflect the '
+                'Agribalyse overlay value rather than the cnf_integrator group default.'
+            ),
+        }
+
+    @staticmethod
+    def _sustainability_rating(score: float) -> str:
+        if score >= 80: return 'Excellent'
+        if score >= 65: return 'Good'
+        if score >= 50: return 'Moderate'
+        if score >= 35: return 'Poor'
+        return 'Very Poor'
 
     def get_factor_confidence_by_category(self) -> Dict[str, Dict[str, str]]:
         """

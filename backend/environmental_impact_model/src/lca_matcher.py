@@ -110,6 +110,11 @@ class MatchResult:
             # Keep the audit payload light: full EF dict only when matched.
             audit["ef31_indicators"] = self.ef31_indicators
             audit["unit_metadata"] = self.unit_metadata
+        if self.midpoint_factors:
+            # ReCiPe-side overlay (5 keys: GW + 3 climate sub-cols + Strat-OD).
+            # Needed by §4.2 divergence panel to inspect matched ReCiPe values
+            # for categories trimmed from the v1 consumed midpoint vector.
+            audit["midpoint_factors"] = self.midpoint_factors
         return audit
 
 

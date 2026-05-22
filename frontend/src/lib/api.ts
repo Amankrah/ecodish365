@@ -1317,31 +1317,61 @@ export interface EnvironmentalProfileRequest {
   user_type?: 'individual' | 'researcher' | 'policy';
 }
 
+// v1 LCA scope trim: backend consumes only the 3 literature-anchored midpoint
+// categories (Global warming, Land use, Water consumption). The other 15 are
+// not part of the consumed vector — see backend §7.5 manuscript and
+// `_smoke_validate_cnf_integrator.py`. Trimmed-category fields are typed
+// optional so legacy consumers don't crash, but they will be `undefined` in
+// v1 responses.
 export interface LCAResults {
-  'Global warming': number;
-  'Fine particulate matter formation': number;
-  'Terrestrial acidification': number;
-  'Freshwater eutrophication': number;
-  'Marine eutrophication': number;
-  'Stratospheric ozone depletion': number;
-  'Fossil resource scarcity': number;
-  'Mineral resource scarcity': number;
-  'Water consumption': number;
-  'Land use': number;
-  'Terrestrial ecotoxicity': number;
-  'Freshwater ecotoxicity': number;
-  'Marine ecotoxicity': number;
-  'Human carcinogenic toxicity': number;
-  'Human non-carcinogenic toxicity': number;
-  'Ionizing radiation': number;
-  'Ozone formation, Human health': number;
-  'Ozone formation, Terrestrial ecosystems': number;
+  'Global warming'?: number;
+  'Land use'?: number;
+  'Water consumption'?: number;
+  // The following 15 are NOT returned in v1 (kept optional for legacy code paths).
+  'Fine particulate matter formation'?: number;
+  'Terrestrial acidification'?: number;
+  'Freshwater eutrophication'?: number;
+  'Marine eutrophication'?: number;
+  'Stratospheric ozone depletion'?: number;
+  'Fossil resource scarcity'?: number;
+  'Mineral resource scarcity'?: number;
+  'Terrestrial ecotoxicity'?: number;
+  'Freshwater ecotoxicity'?: number;
+  'Marine ecotoxicity'?: number;
+  'Human carcinogenic toxicity'?: number;
+  'Human non-carcinogenic toxicity'?: number;
+  'Ionizing radiation'?: number;
+  'Ozone formation, Human health'?: number;
+  'Ozone formation, Terrestrial ecosystems'?: number;
+}
+
+// v1 'demote, don't perfect' uncertainty bands. Each consumed category maps
+// to a {low, central, high} envelope derived from P&N 10th-percentile/mean
+// ratios + M&H spatial spread. Not a 90% CI — a worst/best-case bound.
+export interface UncertaintyBand {
+  low: number;
+  central: number;
+  high: number;
+}
+
+export interface LCABands {
+  'Global warming'?: UncertaintyBand;
+  'Land use'?: UncertaintyBand;
+  'Water consumption'?: UncertaintyBand;
 }
 
 export interface EndpointImpacts {
-  'Human Health': number;
-  'Ecosystems': number;
-  'Resources': number;
+  'Human Health'?: number;
+  'Ecosystems'?: number;
+  // Resources is null in v1 because both Fossil + Mineral scarcity midpoints
+  // are not consumed; surfaced as `null` rather than `0` to signal not-estimable.
+  'Resources'?: number | null;
+}
+
+export interface EndpointBands {
+  'Human Health'?: UncertaintyBand;
+  'Ecosystems'?: UncertaintyBand;
+  // Resources intentionally omitted in v1 (None at the scalar level).
 }
 
 export interface EnvironmentalMonetization {
@@ -1405,6 +1435,11 @@ export interface EnvironmentalImpactResult {
     meal_analysis: {
       lca_results: LCAResults;
       endpoint_impacts: EndpointImpacts;
+      // v1 'demote, don't perfect' uncertainty bands. Parallel to
+      // lca_results / endpoint_impacts; each consumed category maps to
+      // {low, central, high}. Present only for the 3 grounded midpoints.
+      lca_results_bands?: LCABands;
+      endpoint_impacts_bands?: EndpointBands;
       single_score: number;
       monetization: EnvironmentalMonetization;
       sustainability_score: SustainabilityScore;
@@ -1533,6 +1568,10 @@ export class EnvironmentalImpactApiService {
         meal_analysis: {
           lca_results: envImpacts.all_impacts || {},
           endpoint_impacts: envImpacts.endpoint_impacts || {},
+          // v1 bands — wired through from backend `all_impacts_bands` /
+          // `endpoint_impacts_bands` parallel fields.
+          lca_results_bands: envImpacts.all_impacts_bands || {},
+          endpoint_impacts_bands: envImpacts.endpoint_impacts_bands || {},
           single_score: typeof envImpacts.summary_score?.value === 'number' ? envImpacts.summary_score.value : (outerData?.data?.environmental_impacts?.summary_score?.value ?? 0),
           monetization: {
             monetized_impacts: monetData.results?.monetized_impacts || {},
@@ -1866,12 +1905,34 @@ export class EnvironmentalImpactApiService {
       sensitivity: (matcherRaw?.sensitivity as RecipeEF31SensitivityBlock | null) ?? null,
     };
 
+    // v1 uncertainty-band parsing (parallel to lca_results / endpoint_impacts).
+    const lca_results_bands_raw = (maObj as Record<string, unknown>)['lca_results_bands']
+      || (maObj as Record<string, unknown>)['all_impacts_bands'];
+    const endpoint_impacts_bands_raw = (maObj as Record<string, unknown>)['endpoint_impacts_bands'];
+    const coerceBands = (raw: unknown): Record<string, UncertaintyBand> | undefined => {
+      if (!raw || typeof raw !== 'object') return undefined;
+      const out: Record<string, UncertaintyBand> = {};
+      for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
+        if (v && typeof v === 'object') {
+          const o = v as Record<string, unknown>;
+          out[k] = {
+            low:     safeNumber(o.low, 0),
+            central: safeNumber(o.central, 0),
+            high:    safeNumber(o.high, 0),
+          };
+        }
+      }
+      return out;
+    };
+
     const normalized: EnvironmentalImpactResult = {
       success: Boolean((root?.success as boolean | undefined) ?? true),
       data: {
         meal_analysis: {
           lca_results,
           endpoint_impacts,
+          lca_results_bands: coerceBands(lca_results_bands_raw) as LCABands | undefined,
+          endpoint_impacts_bands: coerceBands(endpoint_impacts_bands_raw) as EndpointBands | undefined,
           single_score: safeNumber(maObj?.single_score, 0),
           monetization,
           sustainability_score,

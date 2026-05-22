@@ -11,12 +11,11 @@ import {
   Globe,
   Droplets,
   TreePine,
-  Factory,
   Zap,
   AlertTriangle,
-  
 } from 'lucide-react';
-import type { EnvironmentalImpactResult, LCAResults, EndpointImpacts, SustainabilityScore } from '../../lib/api';
+import type { EnvironmentalImpactResult, LCAResults, EndpointImpacts, SustainabilityScore, LCABands } from '../../lib/api';
+import { UncertaintyBandBar } from './UncertaintyBandBar';
 
 interface EnvironmentalVisualizationProps {
   results: EnvironmentalImpactResult;
@@ -26,71 +25,49 @@ export const EnvironmentalVisualization: React.FC<EnvironmentalVisualizationProp
   type MealAnalysis = Required<EnvironmentalImpactResult>['data']['meal_analysis'];
   const analysis = (results?.data?.meal_analysis || {}) as Partial<MealAnalysis>;
   const lca = (analysis?.lca_results || {}) as Partial<LCAResults>;
+  const bands: LCABands = (analysis?.lca_results_bands as LCABands) || {};
   const endpoints = (analysis?.endpoint_impacts || {}) as Partial<EndpointImpacts>;
   const sustainability = (analysis?.sustainability_score || {}) as Partial<SustainabilityScore>;
 
-  // Define impact categories with their icons and colors
+  // v1 scope trim: only the 3 literature-anchored midpoint categories are
+  // consumed. Acidification, fine PM, eutrophication and the other 12 used
+  // to be visualised here but were silently 0 after the trim — removed
+  // entirely; the full methodology + reasoning lives in the LCABreakdown
+  // accordion.
   const keyImpacts = [
     {
-      key: 'Global warming',
+      key: 'Global warming' as const,
       label: 'Climate Change',
       icon: Globe,
       color: 'text-red-600',
-      bgColor: 'bg-red-100',
+      bandColor: 'rose' as const,
       value: lca['Global warming'] || 0,
+      band: bands['Global warming'],
       unit: 'kg CO₂-eq',
-      description: 'Contribution to global warming and climate change'
+      description: 'IPCC AR5 100-year global warming potential, per 100 kcal of meal'
     },
     {
-      key: 'Water consumption',
-      label: 'Water Usage',
-      icon: Droplets,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-100',
-      value: lca['Water consumption'] || 0,
-      unit: 'm³',
-      description: 'Freshwater consumption for production'
-    },
-    {
-      key: 'Land use',
-      label: 'Land Impact',
+      key: 'Land use' as const,
+      label: 'Land Use',
       icon: TreePine,
       color: 'text-green-600',
-      bgColor: 'bg-green-100',
+      bandColor: 'emerald' as const,
       value: lca['Land use'] || 0,
+      band: bands['Land use'],
       unit: 'm²a crop-eq',
-      description: 'Agricultural land transformation and occupation'
+      description: 'Agricultural land transformation and occupation, per 100 kcal'
     },
     {
-      key: 'Terrestrial acidification',
-      label: 'Acidification',
-      icon: Factory,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-100',
-      value: lca['Terrestrial acidification'] || 0,
-      unit: 'kg SO₂-eq',
-      description: 'Impact on soil and terrestrial ecosystems'
-    },
-    {
-      key: 'Fine particulate matter formation',
-      label: 'Air Quality',
-      icon: AlertTriangle,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-100',
-      value: lca['Fine particulate matter formation'] || 0,
-      unit: 'kg PM2.5-eq',
-      description: 'Impact on air quality and human respiratory health'
-    },
-    {
-      key: 'Freshwater eutrophication',
-      label: 'Water Quality',
+      key: 'Water consumption' as const,
+      label: 'Water Use',
       icon: Droplets,
-      color: 'text-cyan-600',
-      bgColor: 'bg-cyan-100',
-      value: lca['Freshwater eutrophication'] || 0,
-      unit: 'kg P-eq',
-      description: 'Nutrient enrichment of freshwater ecosystems'
-    }
+      color: 'text-blue-600',
+      bandColor: 'sky' as const,
+      value: lca['Water consumption'] || 0,
+      band: bands['Water consumption'],
+      unit: 'm³',
+      description: 'Blue-water consumptive use (Mekonnen & Hoekstra), per 100 kcal'
+    },
   ];
 
   // Removed cross-indicator scaling; display absolute values only
@@ -124,11 +101,11 @@ export const EnvironmentalVisualization: React.FC<EnvironmentalVisualizationProp
           <Zap className="h-5 w-5" />
           Environmental Impact Categories
         </h4>
-        <div className="space-y-3">
+        <div className="space-y-4">
           {keyImpacts.map((impact) => {
             const IconComponent = impact.icon;
             return (
-              <div key={impact.key} className="space-y-1">
+              <div key={impact.key} className="space-y-2 border-b border-gray-100 pb-3 last:border-0">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <IconComponent className={`h-4 w-4 ${impact.color}`} />
@@ -136,15 +113,16 @@ export const EnvironmentalVisualization: React.FC<EnvironmentalVisualizationProp
                       {impact.label}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-gray-900">
-                      {formatImpactValue(impact.value, impact.unit)}
-                    </span>
-                  </div>
+                  <span className="text-sm font-bold text-gray-900 tabular-nums">
+                    {formatImpactValue(impact.value, impact.unit)}
+                  </span>
                 </div>
                 <div className="text-xs text-gray-600">
                   {impact.description}
                 </div>
+                {impact.band && (
+                  <UncertaintyBandBar band={impact.band} unit={impact.unit} color={impact.bandColor} />
+                )}
               </div>
             );
           })}
@@ -179,15 +157,15 @@ export const EnvironmentalVisualization: React.FC<EnvironmentalVisualizationProp
             </div>
           </div>
 
-          <div className="bg-blue-50 p-3 rounded-lg">
+          <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-sm font-medium text-blue-900">Resource Scarcity Impact</span>
-              <span className="text-sm font-bold text-blue-900">
-                {formatEndpointValue(endpoints?.['Resources'] ?? 0, 'USD')}
-              </span>
+              <span className="text-sm font-medium text-gray-900">Resource Scarcity Impact</span>
+              <span className="text-xs font-medium text-orange-700">Not estimable in v1</span>
             </div>
-            <div className="text-xs text-blue-700 mt-1">
-              Economic value of resource depletion impacts
+            <div className="text-xs text-gray-600 mt-1">
+              Both Fossil and Mineral resource scarcity midpoints are excluded from the v1
+              consumed vector (no per-food-group literature grounding). Restored when
+              licensed AGRIBALYSE-LCI re-scoring lands.
             </div>
           </div>
         </div>

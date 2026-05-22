@@ -1,0 +1,233 @@
+{
+  "source": "Dekker et al. (2020) Int J LCA 25:2315-2324, ESM Table S1; DOI 10.1007/s11367-019-01653-3",
+  "note": "Classification mapping only. The ESM contains NO per-food midpoint/endpoint numeric values; those exist only in figures S2-S13.",
+  "n_products": 152,
+  "categories": {
+    "Beverages": {
+      "aggregated_globodiet_groups": [
+        "Alcoholic beverages",
+        "Non-alcoholic beverages",
+        "Soy milk"
+      ],
+      "n_products": 19,
+      "products": [
+        "Beer pilsner",
+        "Coffee Cappuccino freshly made",
+        "Coffee prepared",
+        "Drink soya natural",
+        "Gin young Dutch",
+        "Ice tea",
+        "Juice apple",
+        "Juice drink Dubbelfrisss",
+        "Juice drink Wicky",
+        "Juice orange freshly squeezed",
+        "Juice orange pasteurized",
+        "Mineral water average",
+        "Mineral water Bar le Duc",
+        "Mineral water Spa",
+        "Soft drink cola w caffeine",
+        "Tea",
+        "Wine dry white",
+        "Wine red",
+        "Wine rose"
+      ]
+    },
+    "Cereals": {
+      "aggregated_globodiet_groups": [
+        "Cereals and cereal products",
+        "Cakes and snacks"
+      ],
+      "n_products": 14,
+      "products": [
+        "Baguette white",
+        "Bread multigrain average w seeds",
+        "Bread rye average",
+        "Bread white water based",
+        "Bread wholemeal average",
+        "Bun currant/raisin",
+        "Chips pre-fried",
+        "Croissant",
+        "Dough for pizza and savoury pie",
+        "Flour wheat-",
+        "Pasta white boiled",
+        "Roll white hard",
+        "Roll white soft",
+        "Snack sausage roll puff pastry"
+      ]
+    },
+    "Dairy": {
+      "aggregated_globodiet_groups": [
+        "Dairy",
+        "Ice cream",
+        "Butter"
+      ],
+      "n_products": 24,
+      "products": [
+        "Butter salted",
+        "Butter unsalted",
+        "Buttermilk",
+        "Cheese 20+",
+        "Cheese Edam 40+",
+        "Cheese goat fresh",
+        "Cheese Gouda 48+ average",
+        "Cheese Old Amsterdam 48+",
+        "Cheese spread 48+",
+        "Cream whipping",
+        "Custard several flavours full fat",
+        "Custard vanilla full fat",
+        "Fromage frais full fat",
+        "Ice cream dairy cream based",
+        "Milk chocolate-flavoured full fat",
+        "Milk chocolate-flavoured semi-skimmed",
+        "Milk semi-skimmed",
+        "Milk skimmed",
+        "Milk whole",
+        "Yoghurt drink Optimel with sweetners",
+        "Yoghurt full fat",
+        "Yoghurt half fat",
+        "Yoghurt low fat",
+        "Yoghurt low fat with fruit"
+      ]
+    },
+    "Fat": {
+      "aggregated_globodiet_groups": [],
+      "n_products": 5,
+      "products": [
+        "Frying fat horeca",
+        "Low fat margarine 40% fat <17 g saturated",
+        "Margarine 80% fat <24 g saturated",
+        "Oil olive-",
+        "Oil sunflower-"
+      ]
+    },
+    "Fish": {
+      "aggregated_globodiet_groups": [],
+      "n_products": 18,
+      "products": [
+        "Alaska Pollack fillet",
+        "Claresse fillet (catfish)",
+        "Cod fillet",
+        "Fish fingers",
+        "Herring in tomato sauce",
+        "Herring marinated",
+        "Herring soused",
+        "Kibbeling",
+        "Lekkerbekje",
+        "Mackerel",
+        "Pangasius fillet",
+        "Plaice fillet",
+        "Salmon fillet, from aquaculture",
+        "Salmon fillet, wild caught",
+        "Shrimps Dutch peeled boiled",
+        "Tilapia fillet",
+        "Trout",
+        "Tuna"
+      ]
+    },
+    "Fruit": {
+      "aggregated_globodiet_groups": [
+        "Fruits",
+        "Nuts and Seeds"
+      ],
+      "n_products": 15,
+      "products": [
+        "Apple with skin average",
+        "Apple without skin average",
+        "Banana",
+        "Cashew nuts unsalted",
+        "Grapes with skin average",
+        "Kiwi fruit",
+        "Manderins",
+        "Orange",
+        "Peach without skin",
+        "Peanuts unsalted",
+        "Pineapple",
+        "Strawberries, greenhouse",
+        "Strawberries, open field",
+        "Strawberries",
+        "Walnuts"
+      ]
+    },
+    "Meat": {
+      "aggregated_globodiet_groups": [
+        "Egg"
+      ],
+      "n_products": 30,
+      "products": [
+        "Bacon rashers streaky",
+        "Beef frying steak prepared",
+        "Beef roast prepared",
+        "Beef rump steak prepared",
+        "Beef smoke-dried",
+        "Beef steak tartare spiced filet americ",
+        "Chicken fillet prepared",
+        "Chicken with skin prepared",
+        "Croquette meat ragout deep-fried",
+        "Eggs chicken boiled average",
+        "Ham lean boiled",
+        "Ham shoulder medium fat boiled",
+        "Hamburger prepared",
+        "Lamb >10 g fat raw average",
+        "Liver pate sausage",
+        "Minced beef shallow fried",
+        "Minced beef/pork shallow fried",
+        "Minced meat loaf fried",
+        "Pork <5% fat raw",
+        "Pork 5-14% fat raw",
+        "Pork shoulder chop prepared",
+        "Salami sausage saveloy",
+        "Sandwich meat chicken",
+        "Sausage cooked",
+        "Sausage Dutch Frikandel deep-fried",
+        "Sausage frankfurter tinned",
+        "Sausage luncheon meat",
+        "Sausage pork Braadworst prepared",
+        "Sausage raw beef",
+        "Sausage smoked beef cooked"
+      ]
+    },
+    "Vegetables": {
+      "aggregated_globodiet_groups": [
+        "Vegetables",
+        "Potatoes",
+        "Legumes"
+      ],
+      "n_products": 26,
+      "products": [
+        "Beans French boiled",
+        "Beans French frozen boiled",
+        "Beans French tinned",
+        "Broccoli boiled",
+        "Brown beans tinned/glas",
+        "Carrots boiled average",
+        "Cauliflower boiled",
+        "Chicory boiled",
+        "Courgettes boiled",
+        "Crisps potato average",
+        "Cucumber w skin raw",
+        "Cucumber wo skin raw",
+        "Kale curly boiled",
+        "Lettuce average raw",
+        "Lettuce head raw",
+        "Mashed potatoes made with semi-skimed milk",
+        "Mushroom boiled",
+        "Onions boiled",
+        "Peas and carrots tinned",
+        "Peas frozen boiled",
+        "Potatoes wo skins boiled average",
+        "Spinach frozen boiled",
+        "Sweetcorn glas",
+        "Sweetcorn tinned",
+        "Tomato average boiled",
+        "Tomato average raw"
+      ]
+    },
+    "Other": {
+      "aggregated_globodiet_groups": [],
+      "n_products": 1,
+      "products": [
+        "Sugar granulated"
+      ]
+    }
+  }
+}

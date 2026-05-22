@@ -1,0 +1,40 @@
+{
+  "purpose": "Bridge between Dekker et al. (2020) Int J LCA 9-category GloboDiet aggregation and the 10 CNF FoodGroupName buckets that cnf_integrator.get_environmental_impact_factors keys on. Used as documentation of the coarse-grouping precedent and as a future remapping table if per-Dekker-group ReCiPe midpoints become available (e.g. via author request for raw SimaPro outputs — see code_action_items.md TODO-CODE-LCA-1).",
+  "note": "Direction is 1-to-many: each Dekker GloboDiet group corresponds to one or more CNF FoodGroupName buckets, and each CNF bucket may need to combine multiple Dekker groups (eggs are bundled with meat in Dekker; nuts with fruit; legumes/potatoes with vegetables).",
+  "dekker_to_cnf": {
+    "Beverages":  ["Beverages"],
+    "Cereals":    ["Cereals, Grains and Pasta", "Baked Products"],
+    "Dairy":      ["Dairy and Egg Products"],
+    "Fat":        ["Fats and Oils"],
+    "Fish":       ["Finfish and Shellfish Products"],
+    "Fruit":      ["Fruits and fruit juices", "Nuts and Seeds"],
+    "Meat":       ["Beef Products", "Pork Products", "Poultry Products", "Lamb, Veal and Game", "Sausages and Luncheon meats"],
+    "Vegetables": ["Vegetables and Vegetable Products", "Legumes and Legume Products"],
+    "Other":      ["Sweets", "Sugars and Syrups"]
+  },
+  "cnf_to_dekker": {
+    "Beef Products":                       "Meat",
+    "Pork Products":                       "Meat",
+    "Poultry Products":                    "Meat",
+    "Lamb, Veal and Game":                 "Meat",
+    "Sausages and Luncheon meats":         "Meat",
+    "Dairy and Egg Products":              "Dairy (note: eggs in Dekker are bundled into Meat)",
+    "Finfish and Shellfish Products":      "Fish",
+    "Vegetables and Vegetable Products":   "Vegetables",
+    "Legumes and Legume Products":         "Vegetables",
+    "Fruits and fruit juices":             "Fruit",
+    "Nuts and Seeds":                      "Fruit",
+    "Cereals, Grains and Pasta":           "Cereals",
+    "Baked Products":                      "Cereals",
+    "Fats and Oils":                       "Fat",
+    "Beverages":                           "Beverages",
+    "Sweets":                              "Other",
+    "Sugars and Syrups":                   "Other"
+  },
+  "asymmetries": [
+    "Dekker bundles eggs into Meat; CNF bundles eggs into Dairy and Egg Products.",
+    "Dekker bundles nuts/seeds into Fruit; CNF separates them.",
+    "Dekker bundles potatoes + legumes into Vegetables; CNF separates Legumes."
+  ],
+  "implication_for_grounding": "If per-Dekker-group ReCiPe midpoint means were obtained from the authors, the cross-walk above is necessary but not sufficient: e.g. mapping Dekker 'Meat' (which contains eggs and a wide protein spread from lamb to chicken to ham) onto CNF 'Beef Products' would inherit the wrong magnitude without further re-weighting by sub-category protein content. A direct license-and-rescore path (TODO-CODE-LCA-2) avoids this aggregation lossiness."
+}

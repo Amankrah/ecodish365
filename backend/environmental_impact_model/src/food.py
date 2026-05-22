@@ -3,6 +3,86 @@ from typing import Dict
 from .data_loader import DataLoader
 from .cnf_integrator import get_cnf_integrator
 
+
+# Literature-anchored per-serving sustainability-score zone thresholds.
+# Replaces the previous arbitrary `max_values` (which made a canned beef stew
+# at 2.5 kg CO2/100g score 100/100 because the threshold was 100 kg CO2/100g).
+#
+# Stylianou et al. 2021, Nat Food 2(8):616-627, Supplementary Information
+# Table 11B reports per-serving 50th and 75th percentile environmental impact
+# cut-offs across a 5,853-food WWEIA-2011-2016 panel. Verified verbatim
+# against `literature_extractions.md` line 1920. We use the per-serving
+# values directly because `Food.get_environmental_impact` returns values
+# scaled by `food.quantity / 100` — i.e. per the actual user-submitted
+# serving size in grams. So food.quantity g IS the serving for the zone test.
+#
+# Score curve (piecewise linear, anchored at the published percentiles):
+#   value = 0        -> 100  (best of best)
+#   value = p50      -> 50   (median food in the panel)
+#   value = p75      -> 25   (75th-percentile worst)
+#   value = 2 * p75  -> 0    (extreme high; saturates at 0 beyond)
+LITERATURE_ZONE_THRESHOLDS = {
+    'Global warming': {
+        'p50': 0.32,   # kg CO2 eq per serving
+        'p75': 0.61,
+        'unit': 'kg CO2-eq / serving',
+        'source': 'Stylianou et al. 2021, Nat Food 2:616-627, SI Table 11B',
+    },
+    'Water consumption': {
+        'p50': 0.020,  # m3 per serving (= 20 L; Stylianou L → m3)
+        'p75': 0.045,  # m3 per serving (= 45 L)
+        'unit': 'm3 blue water / serving',
+        'source': 'Stylianou et al. 2021, Nat Food 2:616-627, SI Table 11B',
+    },
+    # Land use: Stylianou SI Table 11B reports ha-yr per serving at 0.24 / 0.70,
+    # which we could not independently verify (magnitude implies a 2,400 m²-yr
+    # 50th-percentile food, two orders of magnitude above the Poore & Nemecek
+    # 2018 panel). Conservative fallback derived from P&N 2018 Fig. 1 panel
+    # medians: ~0.5 m²a/100g is a mid-impact food (cereal/legume); ~5 m²a/100g
+    # is a high-impact food (cheese/poultry); ~30 m²a/100g approaches the
+    # beef-herd maximum. Documented as P&N-derived in the per-category source.
+    'Land use': {
+        'p50': 0.5,    # m2a crop-eq per serving (P&N panel midpoint)
+        'p75': 5.0,    # m2a crop-eq per serving (P&N panel upper range)
+        'unit': 'm2a crop-eq / serving',
+        'source': 'P&N 2018 Fig. 1 panel medians (Stylianou SI Table 11B Land units could not be independently verified)',
+    },
+}
+
+
+def _zone_score(value: float, p50: float, p75: float) -> float:
+    """Piecewise-linear sustainability score (0-100, higher = better) from a
+    per-serving impact value, anchored on the published 50th / 75th
+    percentile cut-offs of a population food panel.
+
+    Inverts the impact direction (lower impact => higher score) and uses
+    asymmetric zone widths reflecting Stylianou's published Low / Moderate /
+    High zoning (50th and 75th percentiles).
+    """
+    if value is None or value < 0:
+        return 50.0
+    if value <= 0:
+        return 100.0
+    if value <= p50:
+        # Low zone: linear 100 -> 50
+        return 100.0 - (value / p50) * 50.0
+    if value <= p75:
+        # Moderate zone: linear 50 -> 25
+        return 50.0 - ((value - p50) / (p75 - p50)) * 25.0
+    # High zone: linear 25 -> 0 across a second p75-width window; saturate at 0.
+    return max(0.0, 25.0 - ((value - p75) / p75) * 25.0)
+
+
+def _zone_label(value: float, p50: float, p75: float) -> str:
+    """Return the Stylianou-style Low / Moderate / High label for a value."""
+    if value is None or value < 0:
+        return 'Unknown'
+    if value < p50:
+        return 'Low'
+    if value < p75:
+        return 'Moderate'
+    return 'High'
+
 class Food:
     """
     Enhanced Food class that integrates with the CNF singleton for improved data access
@@ -104,35 +184,53 @@ class Food:
         #waste_factor = 0.319  # 31.9% waste
         return self.quantity #/ (1 - waste_factor)
 
+    # v1 LCA scope trim: the per-food impact dict returned to consumers
+    # contains only the 3 literature-anchored categories. The cnf_integrator
+    # factor table itself still carries the legacy 18-category values for
+    # backwards compatibility with internal callers, but they MUST NOT leak
+    # to the API surface or to per-food consumer outputs — that re-introduces
+    # the "fabricated breadth" defect the v1 trim was designed to remove.
+    # Consistent with `LifeCycleAssessment._calculate_midpoint_impacts`.
+    _V1_CONSUMED_CATEGORIES = frozenset({
+        'Global warming', 'Land use', 'Water consumption',
+    })
+
     def get_environmental_impact(self) -> Dict[str, float]:
         """
         Calculate environmental impact using the CNF integrator's improved impact factors.
         Based on current LCA science and Canadian-specific data.
-        
+
+        v1 trim: returns only the 3 literature-anchored categories
+        (Global warming, Land use, Water consumption). See
+        `Food._V1_CONSUMED_CATEGORIES` and §7.5 of the manuscript.
+
         :return: Dictionary with impact categories as keys and impact values as values
         """
         try:
             # Get impact factors from the CNF integrator
             impact_factors = self.cnf_integrator.get_environmental_impact_factors(self.food_id)
-            
+
             # Calculate actual quantity including food waste
             actual_quantity = self.get_total_quantity()
             quantity_factor = actual_quantity / 100.0  # Convert to per 100g basis
-            
-            # Scale impacts by quantity; skip metadata and non-numeric factors
+
+            # Scale impacts by quantity; skip metadata and non-numeric factors;
+            # apply the v1 consumed-category trim.
             impacts = {}
             for impact_category, factor_per_100g in impact_factors.items():
                 if isinstance(impact_category, str) and impact_category.startswith('_'):
                     continue
+                if impact_category not in self._V1_CONSUMED_CATEGORIES:
+                    continue
                 if not isinstance(factor_per_100g, (int, float)):
                     continue
                 impacts[impact_category] = float(factor_per_100g) * quantity_factor
-            
+
             # Apply nutritional density adjustments
             nutritional_adjustments = self._calculate_nutritional_adjustments()
             for impact_category in impacts:
                 impacts[impact_category] *= nutritional_adjustments.get(impact_category, 1.0)
-            
+
             return impacts
             
         except Exception as e:
@@ -189,52 +287,87 @@ class Food:
         
         return adjustments
     
-    def get_sustainability_score(self) -> Dict[str, float]:
+    def get_sustainability_score(self, impacts: Dict[str, float] | None = None) -> Dict[str, float]:
         """
-        Calculate a comprehensive sustainability score considering multiple factors.
+        Calculate a per-category and overall sustainability score using
+        literature-anchored zone thresholds.
+
+        Replaces the previous `max_values = {GW: 100, Land: 200, Water: 20}`
+        anchors — which were ~10-100x too generous for real food impacts and
+        mechanically guaranteed scores of 99-100 for any meal. The new score
+        uses Stylianou et al. 2021 (Nat Food 2:616-627) SI Table 11B
+        per-serving 50th and 75th percentile cut-offs as anchor points; see
+        `LITERATURE_ZONE_THRESHOLDS` at module scope for sources.
+
+        :param impacts: optional pre-computed per-food impacts dict (the
+            per-serving values from `get_environmental_impact()`). When
+            None (default), this method calls `self.get_environmental_impact()`
+            internally — which is the group-default fallback path with NO
+            LCA-matcher overlay. To get matcher-aware sustainability scoring,
+            pass the per-food impacts dict from
+            `LifeCycleAssessment._get_food_environmental_impacts(self)` here,
+            which carries Agribalyse-matched values where the matcher fired.
+
+        Returned dict shape:
+          - `<category>`        : float 0-100 (per-category score)
+          - `<category>_zone`   : str   Low / Moderate / High
+          - `overall`           : float 0-100 (weighted average of present categories)
+          - `methodology`       : dict  per-category {p50, p75, unit, source}
         """
-        impacts = self.get_environmental_impact()
-        
-        # Normalize impacts to 0-100 scale (lower environmental impact = higher score)
-        # These are typical maximum values per 100g food
-        max_values = {
-            'Global warming': 100,  # kg CO2 eq
-            'Land use': 200,  # m2a crop eq
-            'Water consumption': 20,  # m3
-            'Terrestrial acidification': 0.5,  # kg SO2 eq
-            'Freshwater eutrophication': 0.02,  # kg P eq
-            'Marine eutrophication': 0.2,  # kg N eq
+        if impacts is None:
+            impacts = self.get_environmental_impact()
+
+        # Score each consumed category against its literature-anchored zone.
+        sustainability_scores: Dict[str, float] = {}
+        methodology: Dict[str, Dict] = {}
+        for category, value in impacts.items():
+            if category.startswith('_'):
+                continue
+            thresholds = LITERATURE_ZONE_THRESHOLDS.get(category)
+            if thresholds is None:
+                # No literature zone available for this category (e.g. a
+                # trimmed v1 category that snuck through). Skip rather than
+                # invent.
+                continue
+            p50 = thresholds['p50']
+            p75 = thresholds['p75']
+            sustainability_scores[category] = _zone_score(value, p50, p75)
+            sustainability_scores[f'{category}_zone'] = _zone_label(value, p50, p75)
+            methodology[category] = {
+                'value_at_serving': float(value),
+                'p50': p50,
+                'p75': p75,
+                'unit': thresholds['unit'],
+                'source': thresholds['source'],
+            }
+
+        # Overall sustainability = weighted average across the present
+        # categories. Weights are renormalised across categories that
+        # actually have data, so missing categories don't silently inflate
+        # or deflate the score (matches the renormalisation pattern used by
+        # `LifeCycleAssessment.calculate_single_score` for the v1 trim).
+        base_weights = {
+            'Global warming':    0.45,
+            'Land use':          0.30,
+            'Water consumption': 0.25,
         }
-        
-        sustainability_scores = {}
-        for impact_category, impact_value in impacts.items():
-            if impact_category in max_values:
-                # Convert to 0-100 scale (100 = best, 0 = worst)
-                normalized = min(100, (impact_value / max_values[impact_category]) * 100)
-                sustainability_scores[impact_category] = max(0, 100 - normalized)
-        
-        # Overall sustainability score (weighted average)
-        weights = {
-            'Global warming': 0.3,
-            'Land use': 0.2,
-            'Water consumption': 0.2,
-            'Terrestrial acidification': 0.1,
-            'Freshwater eutrophication': 0.1,
-            'Marine eutrophication': 0.1
-        }
-        
-        overall_score = 0
-        total_weight = 0
-        for category, weight in weights.items():
-            if category in sustainability_scores:
-                overall_score += sustainability_scores[category] * weight
-                total_weight += weight
-        
+        present_weights = {k: w for k, w in base_weights.items() if k in sustainability_scores}
+        total_weight = sum(present_weights.values())
         if total_weight > 0:
-            sustainability_scores['overall'] = overall_score / total_weight
+            overall = sum(sustainability_scores[k] * (w / total_weight)
+                          for k, w in present_weights.items())
+            sustainability_scores['overall'] = overall
+            sustainability_scores['overall_zone'] = _zone_label(
+                100 - overall,  # invert: lower score = higher impact = "High" zone
+                100 - 50,        # score 50 == median food
+                100 - 25,        # score 25 == 75th-percentile worst
+            )
         else:
-            sustainability_scores['overall'] = 50  # Neutral score if no data
-        
+            # No data — neutral default with explicit signal.
+            sustainability_scores['overall'] = 50.0
+            sustainability_scores['overall_zone'] = 'Unknown'
+        sustainability_scores['methodology'] = methodology  # type: ignore[assignment]
+
         return sustainability_scores
     
     def __str__(self) -> str:
