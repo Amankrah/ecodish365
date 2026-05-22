@@ -90,6 +90,7 @@ LCA_FACTOR_CONFIDENCE: Dict[str, Dict[str, str]] = {
 
 VALID_PERSPECTIVES = ('I', 'H', 'E')
 VALID_CONSUMER_PERSPECTIVES = ('global', 'national')
+VALID_BASES = ('per_serving', 'per_100g_product', 'per_100_kcal', 'per_100g_protein')
 
 
 class LifeCycleAssessment:
@@ -109,6 +110,8 @@ class LifeCycleAssessment:
         perspective: str = 'H',
         country: Optional[str] = None,
         consumer_perspective: str = 'global',
+        basis: str = 'per_100_kcal',
+        decomposer: Optional[Any] = None,
     ):
         self.meal = meal
         self.logger = logging.getLogger(__name__)
@@ -124,9 +127,14 @@ class LifeCycleAssessment:
                 f"Invalid consumer_perspective {consumer_perspective!r}. "
                 f"Use one of {VALID_CONSUMER_PERSPECTIVES}."
             )
+        if basis not in VALID_BASES:
+            raise ValueError(
+                f"Invalid basis {basis!r}. Use one of {VALID_BASES}."
+            )
         self.perspective = perspective
         self.consumer_perspective = consumer_perspective
         self.country = country  # None means world-average
+        self.basis = basis  # selects which basis is the "headline" output
 
         # Methodology pack (factor data)
         self.pack: MethodologyFactorPack = get_methodology_pack(methodology)
@@ -137,16 +145,29 @@ class LifeCycleAssessment:
             )
 
         # State
+        # `midpoint_impacts` and `endpoint_impacts` point to the chosen `basis`
+        # (backward-compatible default per_100_kcal). The full multi-basis
+        # dicts live alongside as `midpoint_impacts_by_basis[basis][category]`
+        # and `endpoint_impacts_by_basis[basis][aop]`.
         self.midpoint_impacts: Dict[str, float] = {}
         self.midpoint_impacts_bands: Dict[str, Dict[str, float]] = {}
+        self.midpoint_impacts_by_basis: Dict[str, Dict[str, float]] = {}
+        self.midpoint_impacts_bands_by_basis: Dict[str, Dict[str, Dict[str, float]]] = {}
         self.endpoint_impacts: Dict[str, Optional[float]] = {}
         self.endpoint_impacts_bands: Dict[str, Optional[Dict[str, float]]] = {}
+        self.endpoint_impacts_by_basis: Dict[str, Dict[str, Optional[float]]] = {}
+        self.endpoint_impacts_bands_by_basis: Dict[str, Dict[str, Optional[Dict[str, float]]]] = {}
+        # Per-basis functional-unit factors (raw → basis); set at perform_lcia.
+        self.basis_factors: Dict[str, float] = {}
         # Per-pathway audit trail: 'world_average' or e.g. 'country_specific:CAN'
         self.endpoint_factor_sources: Dict[str, str] = {}
 
         # Optional LCA matcher (§3.5 GROUP-D-RECONCILIATION)
         self.matcher = matcher
         self.matcher_decisions: List[Dict[str, Any]] = []
+        # Optional Tier γ recipe decomposer (composite-food fallback)
+        self.decomposer = decomposer
+        self.recipe_decomposition_decisions: List[Dict[str, Any]] = []
         # Cache of per-food impact dicts keyed by food_id (avoids duplicating
         # matcher_decisions entries when called multiple times for the same food).
         self._food_impacts_cache: Dict[int, Dict[str, Any]] = {}
@@ -191,9 +212,47 @@ class LifeCycleAssessment:
             self.logger.error(f"Error performing LCIA: {str(e)}", exc_info=True)
             raise
 
+    def _compute_basis_factors(self) -> Dict[str, float]:
+        """Compute the four functional-unit scaling factors from raw meal totals.
+
+        Each factor multiplies the RAW per-meal impact (in absolute kg CO2-eq,
+        m²·yr, m³ — at the meal's actual mass) to produce the value in the
+        named basis. `per_serving = 1.0` because the user-submitted quantity
+        IS the serving (the meal-as-input is the unit). The other three divide
+        by meal mass, calorie content, or protein content respectively.
+
+        Returns a dict keyed on VALID_BASES; missing denominators map to 0.0
+        so callers can detect when a basis is not computable (e.g. zero-calorie
+        meal disables per_100_kcal).
+        """
+        def _safe_float(x: Any) -> float:
+            """Coerce to float, return 0.0 for anything non-numeric (incl. MagicMock)."""
+            try:
+                return float(x)
+            except (TypeError, ValueError):
+                return 0.0
+        total_mass_g = _safe_float(sum(_safe_float(getattr(f, 'quantity', 0)) for f in self.meal.foods))
+        total_calories = _safe_float(self.meal.calculate_total_calories())
+        try:
+            total_protein_g = _safe_float(self.meal.get_nutrient_amount('PROTEIN'))
+        except Exception:  # noqa: BLE001 - defensive
+            total_protein_g = 0.0
+        return {
+            'per_serving':       1.0,
+            'per_100g_product':  (100.0 / total_mass_g)   if total_mass_g   > 0 else 0.0,
+            'per_100_kcal':      (100.0 / total_calories) if total_calories > 0 else 0.0,
+            'per_100g_protein':  (100.0 / total_protein_g) if total_protein_g > 0 else 0.0,
+        }
+
     def _calculate_midpoint_impacts(self) -> Dict[str, float]:
         """Aggregate v1 midpoint impacts {Global warming, Land use, Water consumption}
-        across the meal's foods, normalised to per-100-kcal functional unit.
+        across the meal's foods, expressed in ALL FOUR functional-unit bases
+        (per_serving, per_100g_product, per_100_kcal, per_100g_protein).
+
+        Returns the dict for the `self.basis` selection (backward-compat:
+        callers using `self.midpoint_impacts` get the chosen-basis values).
+        Full multi-basis dicts are populated on
+        `self.midpoint_impacts_by_basis` and `self.midpoint_impacts_bands_by_basis`.
 
         v1 SCOPE TRIMMED. The 15 other ReCiPe midpoints are NOT aggregated:
         3 are unit-incompatible with P&N grounding, 12 have no per-food-group
@@ -207,13 +266,15 @@ class LifeCycleAssessment:
         the endpoint conversion step (where the workbook authoritatively
         supports it for the spatially-explicit categories).
         """
-        total_impacts = {
-            'Global warming': 0.0,     # kg CO2 eq
+        # Step 1: raw aggregation in absolute units (kg CO2 / m2a / m3 for the
+        # meal at its actual mass). No functional-unit scaling here.
+        raw_impacts = {
+            'Global warming': 0.0,     # kg CO2 eq for the meal
             'Land use': 0.0,           # m2a crop eq
             'Water consumption': 0.0,  # m3
         }
-        total_impacts_bands: Dict[str, Dict[str, float]] = {
-            cat: {'low': 0.0, 'central': 0.0, 'high': 0.0} for cat in total_impacts
+        raw_impacts_bands: Dict[str, Dict[str, float]] = {
+            cat: {'low': 0.0, 'central': 0.0, 'high': 0.0} for cat in raw_impacts
         }
 
         for food in self.meal.foods:
@@ -223,7 +284,7 @@ class LifeCycleAssessment:
             food_source = food_impacts.get("_source", "fallback_low_confidence:group_default") if isinstance(food_impacts, dict) else "fallback_low_confidence:group_default"
             categories_with_match = 0
             categories_with_default = 0
-            for impact_category in total_impacts:
+            for impact_category in raw_impacts:
                 value = food_impacts.get(impact_category, 0.0)
                 cat_source = category_sources.get(impact_category, "fallback_low_confidence:group_default")
                 is_fallback = cat_source.startswith("fallback_low_confidence") or cat_source == "group_default"
@@ -231,11 +292,11 @@ class LifeCycleAssessment:
                     categories_with_default += 1
                 else:
                     categories_with_match += 1
-                total_impacts[impact_category] += value
+                raw_impacts[impact_category] += value
                 cat_band = food_bands.get(impact_category)
                 if cat_band:
                     for side in ('low', 'central', 'high'):
-                        total_impacts_bands[impact_category][side] += cat_band[side]
+                        raw_impacts_bands[impact_category][side] += cat_band[side]
             # Annotate audit entry for the matched food, if any
             if self.matcher_decisions:
                 last_decision = self.matcher_decisions[-1]
@@ -245,16 +306,31 @@ class LifeCycleAssessment:
                     last_decision["categories_from_match"] = categories_with_match
                     last_decision["categories_from_group_default"] = categories_with_default
 
-        # Functional unit normalization (per 100 kcal)
-        total_calories = self.meal.calculate_total_calories()
-        functional_unit_factor = 100 / total_calories if total_calories > 0 else 1
-        for impact_category in total_impacts:
-            total_impacts[impact_category] *= functional_unit_factor
-            for side in ('low', 'central', 'high'):
-                total_impacts_bands[impact_category][side] *= functional_unit_factor
+        # Step 2: scale to all four bases in parallel.
+        self.basis_factors = self._compute_basis_factors()
+        for basis, factor in self.basis_factors.items():
+            self.midpoint_impacts_by_basis[basis] = {
+                cat: raw_impacts[cat] * factor for cat in raw_impacts
+            }
+            self.midpoint_impacts_bands_by_basis[basis] = {
+                cat: {side: raw_impacts_bands[cat][side] * factor
+                      for side in ('low', 'central', 'high')}
+                for cat in raw_impacts_bands
+            }
 
-        self.midpoint_impacts_bands = total_impacts_bands
-        return total_impacts
+        # Step 3: surface the chosen-basis dict on the backward-compat fields.
+        chosen = self.basis
+        # If chosen basis is uncomputable (e.g. per_100g_protein for a
+        # zero-protein meal), fall back to per_serving so the headline values
+        # are still meaningful.
+        if self.basis_factors.get(chosen, 0.0) == 0.0 and chosen != 'per_serving':
+            self.logger.warning(
+                "Chosen basis %r yields zero factor for this meal (denominator missing). "
+                "Falling back to per_serving for headline output.", chosen,
+            )
+            chosen = 'per_serving'
+        self.midpoint_impacts_bands = self.midpoint_impacts_bands_by_basis[chosen]
+        return dict(self.midpoint_impacts_by_basis[chosen])
 
     def _get_food_environmental_impacts(self, food) -> Dict[str, float]:
         """Per-food impacts resolved via cnf_integrator group defaults overlaid
@@ -278,23 +354,78 @@ class LifeCycleAssessment:
 
         matched_factors: Dict[str, float] = {}
         food_source = "group_default"
+        match_result = None  # Captured for the Tier γ trigger check below
         if self.matcher is not None:
             try:
-                result = self.matcher.match(
+                match_result = self.matcher.match(
                     food_id=food.food_id,
                     food_description=getattr(food, "food_name", "") or "",
                     food_group=getattr(food, "food_group", None),
                 )
-                self.matcher_decisions.append(result.to_audit())
-                if result.matched and result.midpoint_factors:
+                self.matcher_decisions.append(match_result.to_audit())
+                if match_result.matched and match_result.midpoint_factors:
                     matched_factors = {
-                        k: v for k, v in result.midpoint_factors.items()
+                        k: v for k, v in match_result.midpoint_factors.items()
                         if isinstance(v, (int, float))
                     }
-                    food_source = f"agribalyse_match:{result.ciqual_code}"
+                    food_source = f"agribalyse_match:{match_result.ciqual_code}"
             except Exception as exc:  # noqa: BLE001
                 self.logger.warning(
                     "LCAMatcher raised for food_id=%s, falling back to group default: %s",
+                    food.food_id, exc,
+                )
+
+        # Tier γ: composite recipe decomposition fallback. Triggered when
+        # `RecipeDecomposer.should_decompose` returns True for this food —
+        # i.e. (a) the food's CNF group looks composite (Mixed Dishes, Soups,
+        # Fast Foods, Babyfoods, Sausages, Sweets, Snacks, Baked Products),
+        # AND (b) the direct matcher either failed (`matched=False`) OR
+        # succeeded with confidence below the high-confidence threshold
+        # (0.85, i.e. likely a stretched LCA-distant near-miss). The
+        # decomposer asks an LLM for an ingredient list constrained to
+        # retrieved v32 entries; each ingredient routes through the matcher
+        # individually and impacts are mass-weighted summed. A successful
+        # decomposition OVERWRITES the matcher's borderline match.
+        if self.decomposer is not None:
+            from .recipe_decomposer import RecipeDecomposer  # noqa: F401 (type hint clarity)
+            try:
+                if RecipeDecomposer.should_decompose(getattr(food, "food_group", None), match_result):
+                    decomposition = self.decomposer.decompose(
+                        food_id=food.food_id,
+                        food_description=getattr(food, "food_name", "") or "",
+                        food_quantity_g=float(getattr(food, "quantity", 0) or 0),
+                        food_group=getattr(food, "food_group", None),
+                    )
+                    # Audit trail: record WHY the decomposer fired (matcher
+                    # outright failed vs. matched with low confidence). Useful
+                    # for downstream analysis of borderline-match rates.
+                    if match_result is None or not match_result.matched:
+                        triggered_by = 'matcher_failed'
+                    else:
+                        triggered_by = f'low_matcher_confidence:{match_result.confidence:.2f}'
+                    audit = decomposition.to_audit()
+                    audit['triggered_by'] = triggered_by
+                    self.recipe_decomposition_decisions.append(audit)
+                    if decomposition.is_resolved():
+                        # Run each ingredient through the existing matcher to
+                        # get per-100g impacts, then mass-weighted-aggregate
+                        # to a single per-food matched_factors dict. This
+                        # OVERWRITES any borderline matcher match.
+                        per_ingredient = self._matcher_impacts_for_ingredients(decomposition.ingredients)
+                        aggregated = decomposition.mass_weighted_impacts(per_ingredient)
+                        if aggregated:
+                            # Convert kg-total to per-100g-food (matcher
+                            # convention) — divide by food.quantity / 100.
+                            qty_factor_inv = 100.0 / float(food.quantity) if food.quantity else 0.0
+                            matched_factors = {
+                                k: v * qty_factor_inv for k, v in aggregated.items()
+                            }
+                            food_source = (
+                                f"recipe_decomposed:{decomposition.ingredient_count}_ingredients"
+                            )
+            except Exception as exc:  # noqa: BLE001
+                self.logger.warning(
+                    "RecipeDecomposer raised for food_id=%s, falling back to group default: %s",
                     food.food_id, exc,
                 )
 
@@ -338,6 +469,33 @@ class LifeCycleAssessment:
             self._food_impacts_cache[cache_key] = food_impacts
         return food_impacts
 
+    def _matcher_impacts_for_ingredients(self, ingredients) -> Dict[str, Dict[str, float]]:
+        """Tier γ helper: look up per-100g midpoint impacts for each
+        decomposed ingredient by Ciqual code, against the matcher's index.
+
+        Returns {ciqual_code: {category: per-100g value}}. Ingredients with
+        no resolvable midpoint factors in the v32 catalog map to {} and
+        contribute zero to the mass-weighted aggregate.
+        """
+        if not self.matcher:
+            return {}
+        per_ingredient: Dict[str, Dict[str, float]] = {}
+        # AgribalyseIndex.catalog is the full v32 entries list; build a small
+        # lookup once. The matcher's index is on self.matcher.index.
+        try:
+            catalog = self.matcher.index.catalog
+        except AttributeError:
+            return {}
+        by_code = {e.get('ciqual_code'): e for e in catalog if e.get('ciqual_code')}
+        for ing in ingredients:
+            entry = by_code.get(ing.ciqual_code)
+            if entry is None:
+                continue
+            midpoints = entry.get('recipe2016_midpoints_per_100g') or {}
+            if midpoints:
+                per_ingredient[ing.ciqual_code] = dict(midpoints)
+        return per_ingredient
+
     # ------------------------------------------------------------------
     # Endpoint conversion
     # ------------------------------------------------------------------
@@ -357,12 +515,26 @@ class LifeCycleAssessment:
         if not self.midpoint_impacts:
             self.perform_lcia()
         try:
-            # Reset audit trail for this run
+            # Reset audit trail; it will be repopulated by the first basis pass
+            # (factor sources are basis-invariant, so we don't double-record).
             self.endpoint_factor_sources = {}
-            self.endpoint_impacts = self._endpoint_from_midpoint_vector(self.midpoint_impacts)
-            self.endpoint_impacts_bands = self._endpoint_bands_from_midpoint_bands(
-                self.midpoint_impacts_bands
-            )
+            # Compute per-basis endpoint impacts. Endpoint conversion is linear
+            # in midpoints, so the per-basis endpoints would also be a linear
+            # rescaling of the per-serving endpoints — but running the full
+            # `_endpoint_from_midpoint_vector` per basis keeps the country-CF
+            # substitution audit trail clean and avoids any factor-source
+            # leakage between bases.
+            for basis, mid_by_cat in self.midpoint_impacts_by_basis.items():
+                ep = self._endpoint_from_midpoint_vector(mid_by_cat)
+                self.endpoint_impacts_by_basis[basis] = ep
+                bands_by_cat = self.midpoint_impacts_bands_by_basis.get(basis, {})
+                self.endpoint_impacts_bands_by_basis[basis] = (
+                    self._endpoint_bands_from_midpoint_bands(bands_by_cat)
+                )
+            # Surface the chosen-basis pair on backward-compat fields.
+            chosen = self.basis if self.basis in self.endpoint_impacts_by_basis else 'per_serving'
+            self.endpoint_impacts = self.endpoint_impacts_by_basis[chosen]
+            self.endpoint_impacts_bands = self.endpoint_impacts_bands_by_basis[chosen]
             return self.endpoint_impacts
         except Exception as e:
             self.logger.error(f"Error calculating endpoint impacts: {str(e)}", exc_info=True)
@@ -442,16 +614,24 @@ class LifeCycleAssessment:
     def calculate_normalized_midpoints(self) -> Dict[str, Dict[str, float]]:
         """Per-category normalised midpoint contributions in person-year equivalents.
 
-        Returns {category: {value, person_years}} where person_years is the
-        midpoint impact divided by the World 2010 per-person-per-year norm
-        for that category, expressed as a fraction of one global average
-        citizen's annual midpoint footprint.
+        Returns {category: {midpoint_value, world_norm_per_person_yr,
+        person_years_equivalent}} where `midpoint_value` is the meal's RAW
+        absolute impact (kg CO2-eq for the full meal-as-input) and
+        `person_years_equivalent = midpoint_value / world_norm_per_person_yr`
+        is the dimensionless fraction of one global average citizen's annual
+        midpoint footprint represented by this meal.
+
+        Uses the per_serving (raw) basis, not per_100_kcal — earlier versions
+        passed the per-100-kcal-scaled value into the division, producing a
+        dimensionally mixed quantity. Person-year normalisation is correctly
+        defined against absolute per-meal impact.
         """
-        if not self.midpoint_impacts:
+        if not self.midpoint_impacts_by_basis:
             self.perform_lcia()
         norms = self.pack.normalization('midpoint', self.perspective)
+        raw_impacts = self.midpoint_impacts_by_basis.get('per_serving', {})
         normalized: Dict[str, Dict[str, float]] = {}
-        for category, value in self.midpoint_impacts.items():
+        for category, value in raw_impacts.items():
             norm = norms.get(category)
             if norm is None or norm == 0:
                 continue
@@ -495,7 +675,13 @@ class LifeCycleAssessment:
 
         normalization_factors = self.pack.normalization('aop', self.perspective)
         weighting_factors = {'Human Health': 1 / 3, 'Ecosystems': 1 / 3, 'Resources': 1 / 3}
-        present_endpoints = {k: v for k, v in self.endpoint_impacts.items() if v is not None}
+        # Single score uses the per_serving (raw absolute) endpoint values so
+        # the per-person-year normalisation is dimensionally correct: the
+        # resulting score is the dimensionless fraction of one global
+        # citizen's annual single-score damage that this meal contributes.
+        # Using a per-100-kcal-scaled endpoint here would mix functional units.
+        raw_endpoints = self.endpoint_impacts_by_basis.get('per_serving', self.endpoint_impacts)
+        present_endpoints = {k: v for k, v in raw_endpoints.items() if v is not None}
         total_weight = sum(weighting_factors[k] for k in present_endpoints)
         single_score = 0.0
         for endpoint, impact in present_endpoints.items():

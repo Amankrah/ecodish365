@@ -95,7 +95,9 @@ class DefaultBehaviorParityTests(unittest.TestCase):
 
     def test_defaults_single_score_renormalises_resources(self):
         """When Resources is None, single_score must use renormalised weights
-        for HH + Ecosystems (1/2 each), not the 3-way 1/3 split."""
+        for HH + Ecosystems (1/2 each), not the 3-way 1/3 split. Single score
+        uses the per_serving (raw absolute) endpoint values for dimensional
+        consistency with the per-person-year AoP normalisation."""
         for food_id, label, _ in REPRESENTATIVE_FOODS:
             with self.subTest(food=label):
                 meal = _make_meal(food_id)
@@ -103,7 +105,7 @@ class DefaultBehaviorParityTests(unittest.TestCase):
                 lca.calculate_endpoint_impacts()
                 ss = lca.calculate_single_score()
                 norm = lca.pack.normalization('aop', 'H')
-                ep = lca.endpoint_impacts
+                ep = lca.endpoint_impacts_by_basis['per_serving']
                 expected = 0.5 * (ep["Human Health"] / norm["Human Health"]) + \
                            0.5 * (ep["Ecosystems"] / norm["Ecosystems"])
                 self.assertAlmostEqual(ss, expected, places=12,

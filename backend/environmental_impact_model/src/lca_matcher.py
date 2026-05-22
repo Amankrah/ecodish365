@@ -5,7 +5,8 @@ Architecture (per GROUP-D-RECONCILIATION plan, anchored on Zhou et al. 2025
 NutriRAG, Krahmer 2024 LEAF, and Furrer et al. 2024):
 
   food description ──▶ EmbeddingRetriever (cosine sim, top-k=20) ──▶
-                       LLM ranking (gpt-4o-mini, T=0, JSON-only, output
+                       LLM ranking (gpt-4.1-mini default; multi-provider
+                       via ChatJSONClient, T=0, JSON-only, output
                        constrained to retrieved candidates) ──▶
                        MatchResult{ciqual_code, confidence, justification}
                        ──▶ if confidence < threshold OR LLM hallucinates a
@@ -55,7 +56,12 @@ LEGACY_BOOTSTRAP_CATALOG_PATH = os.path.join(_DATA_DIR, "agribalyse_bootstrap.js
 LEGACY_BOOTSTRAP_EMBEDDINGS_PATH = os.path.join(_DATA_DIR, "agribalyse_bootstrap_embeddings.npy")
 
 DEFAULT_EMBEDDING_MODEL = "text-embedding-3-small"  # 1536-dim; $0.02/1M tokens
-DEFAULT_RANKING_MODEL = "gpt-4o-mini"  # match HENI categorizer
+# 2026-05-22: upgraded from "gpt-4o-mini" to "gpt-4.1-mini". gpt-4o-mini
+# anchored verbalised confidence at 0.40 on 7/8 probes regardless of
+# difficulty — a hard model-default bias. gpt-4.1-mini matches gpt-4o on
+# IFEval (84.1 %) at ~83 % lower cost than gpt-4o, has strict JSON Schema
+# support, and is the recommended drop-in for constrained-JSON ranking.
+DEFAULT_RANKING_MODEL = "gpt-4.1-mini"
 DEFAULT_CONFIDENCE_THRESHOLD = 0.6  # manuscript §3.5
 DEFAULT_TOP_K = 20  # NutriRAG k=5-20 sweep upper end
 
@@ -255,10 +261,96 @@ class AgribalyseIndex:
         return len(self._catalog)
 
 
+# ---------------------------------------------------------------------------
+# Tier β: text canonicalisation + subgroup routing helpers
+# ---------------------------------------------------------------------------
+
+# CNF descriptions encode food state as comma-separated modifiers
+# ("Squash, summer, crookneck, frozen, unprepared"). Stripping these tokens
+# and surfacing them as a separate state_tag improves both retrieval (the
+# base_name has higher overlap with Agribalyse entries) and LLM ranking
+# (the state_tag tells the ranker to prefer matching-state candidates).
+_STATE_TOKENS = frozenset({
+    'raw', 'cooked', 'boiled', 'baked', 'broiled', 'fried', 'roasted',
+    'grilled', 'steamed', 'sauteed', 'pan-fried', 'pan fried', 'stir-fried',
+    'stir fried', 'microwaved',
+    'frozen', 'canned', 'dried', 'dehydrated', 'fresh',
+    'prepared', 'unprepared', 'homemade',
+    'with skin', 'without skin', 'skin removed', 'skin on',
+    'low fat', 'fat free', 'reduced fat', 'whole', 'partly skimmed',
+    'salted', 'unsalted', 'sweetened', 'unsweetened',
+    'jarred', 'all stages', 'condensed',
+    'with bones', 'boneless', 'lean only', 'meat only', 'meat and skin',
+    'drained', 'undrained',
+})
+
+
+def _canonicalize_food_state(description: str) -> Tuple[str, str]:
+    """Split a CNF food description into (base_name, state_tag).
+
+    Examples:
+      "Squash, summer, crookneck, frozen, unprepared"
+        -> ("Squash summer crookneck", "frozen unprepared")
+      "Beef, brain, pan-fried"
+        -> ("Beef brain", "pan-fried")
+      "Milk, fluid, partly skimmed, 2% M.F."
+        -> ("Milk fluid 2% M.F.", "partly skimmed")
+
+    base_name goes to embedding retrieval; state_tag is appended to the LLM
+    ranking prompt so the ranker can prefer matching-state Agribalyse entries.
+    Stripping is conservative — tokens not in `_STATE_TOKENS` are preserved
+    as part of the base name.
+    """
+    if not description:
+        return "", ""
+    parts = [p.strip() for p in description.split(',') if p.strip()]
+    base_parts: List[str] = []
+    state_parts: List[str] = []
+    for p in parts:
+        if p.lower() in _STATE_TOKENS:
+            state_parts.append(p.lower())
+        else:
+            base_parts.append(p)
+    return " ".join(base_parts), " ".join(state_parts)
+
+
+# Mapping CNF FoodGroupName -> Agribalyse top-level `agribalyse_group` to
+# pre-filter retrieval. When CNF group is in this dict, retrieval is
+# constrained to candidates whose v32 `agribalyse_group` matches the value.
+# Lifts the worst-coverage groups (babyfoods, soups, mixed dishes, fast foods)
+# from competing against all 2,425 entries to competing within their natural
+# Agribalyse cohort.
+_CNF_TO_AGRIBALYSE_SUBGROUP: Dict[str, str] = {
+    'Babyfoods':                       'aliments infantiles',
+    'Soups, Sauces and Gravies':       'entrées et plats composés',
+    'Fast Foods':                      'entrées et plats composés',
+    'Mixed Dishes':                    'entrées et plats composés',
+    'Sausages and Luncheon meats':     'viandes, œufs, poissons',
+    'Beverages':                       'boissons',
+    'Fats and Oils':                   'matières grasses',
+    'Sweets':                          'produits sucrés',
+    # Note: the remaining ~15 CNF groups are left un-routed because their
+    # mapping to a single Agribalyse top-level group would discard relevant
+    # candidates (e.g. "Cereals, Grains and Pasta" spans multiple Agribalyse
+    # subgroups: cereals, baked goods, ready-meals).
+}
+
+
+def _agribalyse_subgroup_for_cnf(cnf_group: Optional[str]) -> Optional[str]:
+    """Return the Agribalyse `agribalyse_group` value to pre-filter on, or
+    None when the CNF group has no clean single-group counterpart."""
+    if not cnf_group:
+        return None
+    return _CNF_TO_AGRIBALYSE_SUBGROUP.get(cnf_group)
+
+
 class EmbeddingRetriever:
     """Cosine-similarity top-k retrieval over an AgribalyseIndex.
 
     Uses the same OpenAI embedding model as the index for query vectors.
+    Supports an optional `agribalyse_group_filter` that restricts retrieval
+    to a subset of catalog entries — used by Tier β subgroup routing for
+    composite-y CNF groups (babyfoods, soups, mixed dishes, fast foods).
     """
 
     def __init__(
@@ -271,8 +363,18 @@ class EmbeddingRetriever:
         self.embedding_client = embedding_client or index.embedding_client
         self.embedding_model = embedding_model
 
-    def retrieve(self, query: str, k: int = DEFAULT_TOP_K) -> List[Tuple[Dict[str, Any], float]]:
-        """Return top-k (catalog_entry, cosine_similarity) pairs, ranked descending."""
+    def retrieve(
+        self,
+        query: str,
+        k: int = DEFAULT_TOP_K,
+        agribalyse_group_filter: Optional[str] = None,
+    ) -> List[Tuple[Dict[str, Any], float]]:
+        """Return top-k (catalog_entry, cosine_similarity) pairs, ranked descending.
+
+        When `agribalyse_group_filter` is set, the search is restricted to
+        catalog entries whose `agribalyse_group` exactly matches. The filter
+        is silently ignored if it would produce < k candidates (falls back
+        to full-catalog retrieval to avoid starving the LLM ranker)."""
         self.index.ensure_embeddings()
         embeddings = self.index.embeddings
         if embeddings is None or len(self.index) == 0:
@@ -287,15 +389,28 @@ class EmbeddingRetriever:
             input=[query],
         )
         q = np.asarray(response.data[0].embedding, dtype=np.float32)
-        # Normalize for cosine (avoid recomputing norm of catalog every call:
-        # we accept the per-query cost here for simplicity at bootstrap scale).
+        # Normalize for cosine
         q_norm = q / (np.linalg.norm(q) + 1e-12)
         m_norms = embeddings / (np.linalg.norm(embeddings, axis=1, keepdims=True) + 1e-12)
         sims = m_norms @ q_norm  # (n,)
+
+        # Tier β subgroup routing: mask to the requested Agribalyse group
+        # if at least k candidates remain after filtering; otherwise fall
+        # back to full catalog to avoid starving the ranker.
+        if agribalyse_group_filter:
+            mask = np.array(
+                [e.get('agribalyse_group') == agribalyse_group_filter for e in self.index.catalog],
+                dtype=bool,
+            )
+            if mask.sum() >= k:
+                # Mask out non-matching candidates by setting sim to -inf
+                sims = np.where(mask, sims, -np.inf)
+
         k = min(k, len(self.index))
         top_idx = np.argpartition(-sims, k - 1)[:k]
         top_idx_sorted = top_idx[np.argsort(-sims[top_idx])]
-        return [(self.index.catalog[i], float(sims[i])) for i in top_idx_sorted]
+        return [(self.index.catalog[i], float(sims[i])) for i in top_idx_sorted
+                if sims[i] > -np.inf]
 
 
 class LCAMatcher:
@@ -308,12 +423,28 @@ class LCAMatcher:
     This lets the test suite run without an API key.
     """
 
+    # Prompt rewrite 2026-05-22 per Tian et al. 2023 ("Just Ask for
+    # Calibration", arXiv:2305.14975): verbalised "probability that it is
+    # correct" reduces ECE ~50 % vs generic "confidence" on RLHF-tuned
+    # models. Anchors are operational LCA-equivalence bands, not generic
+    # uncertainty descriptors, so the LLM has discrete targets to land on
+    # rather than collapsing to a single default value.
     SYSTEM_PROMPT = (
         "You are matching a Canadian Nutrient File (CNF) food entry to its "
         "closest Agribalyse 3.2 life-cycle inventory (LCI) entry. Pick exactly "
         "ONE candidate from the provided list (you may not invent a Ciqual code). "
-        "Reason over food composition, processing route, and provenance. Respond "
-        "with JSON only."
+        "Reason over food composition, processing route, and provenance.\n\n"
+        "CONFIDENCE: report `confidence` as the probability (0.00–1.00) that "
+        "an LCA expert reviewing your choice would mark it as the correct "
+        "match — NOT a generic \"how sure am I\" score. Calibration anchors:\n"
+        "  - 0.95 = near-identical (same commodity, same processing, same form)\n"
+        "  - 0.80 = same commodity family, minor processing/form differences\n"
+        "  - 0.60 = same broad food group; ingredient-equivalent but not exact\n"
+        "  - 0.40 = stretched (different processing or composition; usable as proxy)\n"
+        "  - 0.20 = poor match; would prefer no match over this\n"
+        "  - 0.00 = no acceptable candidate exists\n"
+        "Vary your confidence — do not default to a single value.\n\n"
+        "Respond with JSON only."
     )
 
     def __init__(
@@ -327,10 +458,23 @@ class LCAMatcher:
         model: str = DEFAULT_RANKING_MODEL,
         max_tokens: int = 200,
         temperature: float = 0.0,
+        chat_json_client: Optional[Any] = None,
     ):
         self.index = index
         self.retriever = retriever
-        self.ranking_client = ranking_client
+        # Internal authoritative interface: a ChatJSONClient (Protocol) that
+        # exposes `chat_completion_json(system, user, ...)`. Callers may pass
+        # either a raw OpenAI-style client (`ranking_client`, legacy) or a
+        # pre-built ChatJSONClient (`chat_json_client`); we coerce to the
+        # latter on the way in so the rest of the class has a single path.
+        from .llm_client import coerce_chat_json_client
+        if chat_json_client is not None:
+            self.chat_json_client = chat_json_client
+        else:
+            self.chat_json_client = coerce_chat_json_client(ranking_client, model=model)
+        # Preserve `ranking_client` attribute for any external callers still
+        # reading it (e.g. test fixtures, RecipeDecomposer setup in views).
+        self.ranking_client = ranking_client if ranking_client is not None else self.chat_json_client
         self.confidence_threshold = confidence_threshold
         self.top_k = top_k
         self.model = model
@@ -344,7 +488,19 @@ class LCAMatcher:
         if food_id in self._cache:
             return self._cache[food_id]
 
-        candidates = self.retriever.retrieve(food_description, k=self.top_k)
+        # Tier β: canonicalise CNF description to (base_name, state_tag).
+        # base_name goes to retrieval; state_tag is appended to the LLM prompt
+        # so the ranker can prefer matching-state candidates.
+        base_name, state_tag = _canonicalize_food_state(food_description)
+        retrieval_query = base_name or food_description
+
+        # Tier β: subgroup routing for composite-y CNF groups.
+        agribalyse_filter = _agribalyse_subgroup_for_cnf(food_group)
+
+        candidates = self.retriever.retrieve(
+            retrieval_query, k=self.top_k,
+            agribalyse_group_filter=agribalyse_filter,
+        )
         if not candidates:
             result = MatchResult(
                 food_id=food_id, matched=False, fallback_reason="no_candidates"
@@ -377,8 +533,13 @@ class LCAMatcher:
             self._cache[food_id] = result
             return result
 
-        # LLM ranking with constrained-set output.
-        prompt = self._build_prompt(food_description, food_group, candidates)
+        # LLM ranking with constrained-set output. Append the canonicalised
+        # state_tag to the food_description visible to the ranker so it can
+        # prefer matching-state Agribalyse candidates.
+        ranked_description = (
+            f"{food_description}  [state: {state_tag}]" if state_tag else food_description
+        )
+        prompt = self._build_prompt(ranked_description, food_group, candidates)
         try:
             raw_response = self._query_llm(prompt)
             parsed = self._parse_llm_json(raw_response)
@@ -518,8 +679,9 @@ class LCAMatcher:
             '"confidence": <float 0-1>, "justification": "<≤30 words>"}'
         )
         lines.append(
-            "confidence = your subjective probability this is the correct match "
-            "given food composition, processing and provenance."
+            "confidence = P(an LCA expert would call this the correct match). "
+            "Anchors in the system message: 0.95 near-identical / 0.80 same family / "
+            "0.60 same broad group / 0.40 stretched / 0.20 poor / 0.00 no acceptable."
         )
         return "\n".join(lines)
 

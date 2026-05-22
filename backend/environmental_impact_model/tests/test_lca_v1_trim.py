@@ -378,11 +378,15 @@ class LcaTrimAndBandsTests(unittest.TestCase):
         endpoints (HH + Ecosystems) divide the full weight (not silently dilute
         the score by treating Resources as a zero-contribution endpoint)."""
         # Reconstruct the expected score from HH + Ecosystems alone, equally
-        # weighted (1/2 each because Resources is omitted). Normalisation now
-        # comes from the methodology pack rather than a module constant.
+        # weighted (1/2 each because Resources is omitted). Single score now
+        # uses the per_serving (raw absolute) endpoint values for dimensional
+        # consistency with the per-person-year AoP normalisation; the chosen
+        # `self.endpoints` basis (per_100_kcal by default) is the display
+        # value, not the score input.
         norm = self.lca.pack.normalization('aop', self.lca.perspective)
-        hh = self.endpoints['Human Health']
-        eco = self.endpoints['Ecosystems']
+        raw_ep = self.lca.endpoint_impacts_by_basis['per_serving']
+        hh = raw_ep['Human Health']
+        eco = raw_ep['Ecosystems']
         expected = 0.5 * (hh / norm['Human Health']) + 0.5 * (eco / norm['Ecosystems'])
         self.assertAlmostEqual(self.single, expected, places=12)
 

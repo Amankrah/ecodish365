@@ -1247,6 +1247,7 @@ export class HENIApiService {
 // Environmental Impact Types
 export type LcaPerspective = 'I' | 'H' | 'E';
 export type LcaConsumerPerspective = 'global' | 'national';
+export type LcaBasis = 'per_serving' | 'per_100g_product' | 'per_100_kcal' | 'per_100g_protein';
 
 export interface EnvironmentalImpactRequest {
   foods: Array<{
@@ -1262,6 +1263,17 @@ export interface EnvironmentalImpactRequest {
    * EF→ReCiPe categories. Default false → unchanged behaviour.
    */
   enable_lca_matcher?: boolean;
+  /**
+   * Tier γ composite-food recipe decomposition. When true AND the food's
+   * CNF group is composite (Mixed Dishes, Soups, Fast Foods, Babyfoods,
+   * Sausages, Sweets, Snacks, Baked Products) AND the matcher returns
+   * matched=False OR confidence < 0.85, the backend asks an LLM to express
+   * the dish as a mass-weighted ingredient list constrained to retrieved
+   * v32 entries; each ingredient routes through the matcher and impacts
+   * are mass-weighted summed. Adds ~$0.0003 per composite; requires
+   * OpenAI key on the backend. Default false.
+   */
+  enable_recipe_decomposer?: boolean;
   /**
    * LCA methodology pack. Default `recipe2016`. Reserved for future EF 3.1 /
    * IMPACT World+ packs once their workbooks are ingested.
@@ -1286,6 +1298,14 @@ export interface EnvironmentalImpactRequest {
    * it (currently the three water-consumption pathways).
    */
   consumer_perspective?: LcaConsumerPerspective;
+  /**
+   * Functional-unit basis. Default `per_100_kcal` preserves prior behaviour.
+   * All four bases are computed and returned regardless; this field only
+   * controls which one is the "headline" output (`all_impacts` and
+   * `endpoint_impacts`). Full multi-basis dicts are always available under
+   * `impacts_by_basis` and `endpoint_impacts_by_basis`.
+   */
+  basis?: LcaBasis;
 }
 
 /**
@@ -1343,6 +1363,32 @@ export interface LCAMatcherDecision {
   /** Full 16 EF 3.1 indicators in native units, present when matched=true. */
   ef31_indicators?: Record<string, number>;
   unit_metadata?: Record<string, string>;
+}
+
+/**
+ * Single Tier γ recipe-decomposition audit row. Populated when
+ * `enable_recipe_decomposer: true` AND the decomposer was triggered for the
+ * food (CNF group composite + matcher failed/borderline). `matched=true`
+ * here means the decomposition passed all four validation gates and its
+ * mass-weighted aggregate replaced the direct matcher value.
+ */
+export interface RecipeDecompositionDecision {
+  food_id: number;
+  matched: boolean;
+  ingredient_count: number;
+  ingredients: Array<{
+    ciqual_code: string;
+    lci_name: string;
+    mass_g: number;
+    rationale: string;
+  }>;
+  total_recipe_mass_g: number;
+  decomposition_confidence: number;
+  unresolved_mass_g: number;
+  /** When matched=false, the validation gate that rejected this decomposition. */
+  fallback_reason: string | null;
+  /** Why the decomposer fired: 'matcher_failed' or 'low_matcher_confidence:<conf>'. */
+  triggered_by?: string;
 }
 
 /**
@@ -1516,6 +1562,17 @@ export interface EnvironmentalImpactResult {
         catalog_version: string | null;
         decisions: LCAMatcherDecision[];
         sensitivity: RecipeEF31SensitivityBlock | null;
+      };
+      /**
+       * Tier γ recipe-decomposition audit. `enabled=false` and empty
+       * decisions array when `enable_recipe_decomposer` was off in the
+       * request (default behaviour). Decisions are populated even on
+       * decomposition failure — `matched=false` rows carry the
+       * `fallback_reason` from one of the four validation gates.
+       */
+      recipe_decomposer?: {
+        enabled: boolean;
+        decisions: RecipeDecompositionDecision[];
       };
     };
     user_explanation: UserExplanation;
@@ -1691,7 +1748,13 @@ export class EnvironmentalImpactApiService {
             catalog_version: envImpacts.catalog_version ?? null,
             decisions: (envImpacts.lca_matcher_decisions as LCAMatcherDecision[] | undefined) || [],
             sensitivity: (envImpacts.recipe2016_h_ef31_sensitivity as RecipeEF31SensitivityBlock | undefined) || null,
-          }
+          },
+          // Tier γ recipe decomposer: surface audit trail when
+          // `enable_recipe_decomposer: true` was sent (default off).
+          recipe_decomposer: {
+            enabled: envImpacts.recipe_decomposer_enabled === true,
+            decisions: (envImpacts.recipe_decomposition_decisions as RecipeDecompositionDecision[] | undefined) || [],
+          },
         },
         user_explanation: {
           summary: envImpacts.explanation?.simple_explanation || '',

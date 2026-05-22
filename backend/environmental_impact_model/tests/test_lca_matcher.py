@@ -22,6 +22,7 @@ import numpy as np
 
 from environmental_impact_model.src.lca_matcher import (
     DEFAULT_BOOTSTRAP_CATALOG_PATH,
+    DEFAULT_RANKING_MODEL,
     LEGACY_BOOTSTRAP_CATALOG_PATH,
     AgribalyseIndex,
     EmbeddingRetriever,
@@ -263,6 +264,15 @@ class LCAMatcherTests(unittest.TestCase):
         result = matcher.match(food_id=5, food_description="beef sirloin steak raw")
         self.assertFalse(result.matched)
         self.assertEqual(result.fallback_reason, "exception")
+
+
+class DefaultModelPinTests(unittest.TestCase):
+    """Pin the production model default so accidental reverts to gpt-4o-mini
+    (which anchors verbalised confidence at 0.40 — see manuscript §3.5) are
+    caught at test time."""
+
+    def test_default_ranking_model_pinned(self):
+        self.assertEqual(DEFAULT_RANKING_MODEL, "gpt-4.1-mini")
 
 
 class MatchResultTests(unittest.TestCase):

@@ -58,6 +58,97 @@ These were explicitly logged as v1 simplifications during HENI-CODE-1 implementa
 
 ## Done
 
+### 2026-05-22 — Tier γ acceptance-gate calibration (decomposer now actually resolves)
+
+**Why this matters.** The Tier γ refinement shipped earlier the same day fixed the TRIGGER (decomposer now correctly fires on borderline-confidence composite matches via `HIGH_CONFIDENCE_THRESHOLD=0.85`), but the live decomposer smoke surfaced a second, separate problem: of the 7/7 Canadian composites the decomposer now correctly attempted, **0/7 actually resolved**. All 7 attempts were rejected by the `decomposition_confidence ≥ 0.60` gate at a uniform self-reported confidence of 0.40 — suggesting the threshold was empirically unreachable, not that the decompositions were genuinely bad.
+
+**Empirical investigation.** A controlled probe ran the decomposer against 8 composite foods spanning trivial (lasagna, scrambled eggs, tomato soup) to genuinely-hard (poutine, bannock, tourtière) and recorded the self-reported `decomposition_confidence`. **7 of 8 returned exactly 0.40**; one returned 0.00. This is a hard model-default bias on `gpt-4o-mini`, not calibrated uncertainty. The 0.60 threshold was therefore unreachable by design — Tier γ was decorative.
+
+**Four targeted fixes (in `recipe_decomposer.py`):**
+
+1. **Lower `DEFAULT_DECOMPOSITION_CONFIDENCE_THRESHOLD` from 0.60 → 0.30**. Below the empirical 0.40 floor; still rejects "I have no idea" (conf=0.00) responses. Documented in source with the empirical evidence.
+
+2. **Mass-shortfall auto-credit**. New `AUTO_CREDIT_UNRESOLVED = True` flag: when the LLM's ingredient sum is short of target by an amount in (tolerance, 10 % of target] AND `unresolved_mass_g=0`, the shortfall is auto-credited into `unresolved_mass_g` rather than rejected as `mass_imbalance`. This catches LLM arithmetic sloppiness (Shepherd's pie returned 150+50+40=240 g + 0 unresolved for a 250 g target — the 10 g gap is real residual, not a structural error). The `MAX_UNRESOLVED_FRACTION` cap still bounds total unresolved mass.
+
+3. **`DEFAULT_MIN_INGREDIENTS = 2` structural gate**. A "decomposition" with 1 ingredient is the matcher's job, not the decomposer's — reject.
+
+4. **Tightened system prompt**. Explicit mass-closure rule ("put the residual in `unresolved_mass_g`; do NOT leave the mass unbalanced") + confidence calibration guidance ("report `decomposition_confidence` as a true uncertainty estimate; do NOT default to 0.4"). The latter may not fully overcome the model's default bias but at least disambiguates the field's intended semantics.
+
+**Architectural intent**: structural gates (mass closure + constrained vocabulary + ≥2 ingredients + Ciqual validity) carry the QA load; `decomposition_confidence` is a soft secondary check.
+
+**Live decomposer smoke (2026-05-22, post-fix)**: **7/7 Canadian composites now RESOLVE** (vs 0/7 before). Per-food GW changes vs the old matcher-only path:
+
+| Food | matcher-only GW | decomposition GW | Δ |
+|---|---|---|---|
+| Bannock | 0.0453 | 0.0242 | −47 % |
+| Tourtière | 0.4449 | 0.1390 | −69 % |
+| Poutine | 0.1739 | 0.0999 | −43 % |
+| Butter tart | 0.0495 | 0.0633 | +28 % |
+| Shepherd's pie with corn | 0.8333 | 0.5381 | −35 % |
+| Babyfood, beef + vegetables | 0.3571 | **1.7789** | **+398 %** |
+| Babyfood, chicken + cheese pasta + veg | 0.3169 | 0.2054 | −35 % |
+
+Most decompositions LOWER the GW because the matcher had stretched to higher-impact LCI entries (e.g. Tourtière → "Riesling wine and pork pie") that the decomposition correctly replaces with mass-weighted components. The babyfood-beef case INCREASES dramatically because the matcher's coarse "Vegetable dish for baby with meat/fish and starch" entry under-weighted the real meat content; the decomposition correctly attributes ~30 g of cooked beef stewing meat as the GHG-dominant ingredient. This is exactly the within-group-variance problem TODO-CODE-LCA-3 was designed to surface.
+
+**Files touched.**
+
+Modified:
+- `backend/environmental_impact_model/src/recipe_decomposer.py` — `DEFAULT_DECOMPOSITION_CONFIDENCE_THRESHOLD 0.60 → 0.30`; new `DEFAULT_MIN_INGREDIENTS = 2`; new `AUTO_CREDIT_UNRESOLVED = True`; new mass auto-credit logic in `_validate_and_build`; new min-ingredients gate; rewritten `SYSTEM_PROMPT` with explicit mass-closure rule + confidence-calibration guidance.
+- `backend/environmental_impact_model/tests/test_recipe_decomposer.py` — 3 new tests pinning the new behaviour (`test_empirical_default_confidence_040_accepted`, `test_too_few_ingredients_rejected`, `test_mass_shortfall_auto_credits_to_unresolved`); existing `test_mass_tolerance_scales_with_target` rebaselined to multi-ingredient inputs; `setUp` updated to use the new production default (0.30) instead of legacy 0.60.
+- `backend/_smoke_decomposer_live.py` — SUMMARY text rewritten ("decomposer ATTEMPTED N/7" + "decomposer RESOLVED N/7") to disambiguate trigger-fired vs. validation-passed.
+- `manuscript_call1.md` §3.5 — disclosed the empirical 0.40 model-default bias, the 0.30 acceptance floor, the auto-credit rule, the min-2-ingredients gate, and the 7/7 live evidence.
+
+**Verification.**
+
+- Decomposer unit tests: **20/20 pass** (17 baseline + 3 new). Run: `python -m pytest environmental_impact_model/tests/test_recipe_decomposer.py -v`.
+- Full LCA test suite: **139/139 pass** (no regressions).
+- Live decomposer smoke: 7/7 Canadian composites RESOLVED (run: `python _smoke_decomposer_live.py`).
+- API E2E smoke (defaults preserved): PASS.
+
+### 2026-05-22 — Matcher validation harness + Tier γ trigger refinement + frontend decomposer toggle
+
+**Why this matters.** The Tier α+β+γ architecture shipped earlier the same day was structurally complete but had three production-inert behaviours surfaced by live-LLM smoke testing: (1) the LLM matcher's 0.6 confidence threshold was too permissive — it returned `matched=True` on stretched LCA-distant near-misses (Bannock → "Biscuit, extruded and grilled, fruits filling" at 0.65; Tourtière → "Riesling wine and pork pie" at 0.60), which prevented the `RecipeDecomposer.should_decompose` trigger predicate from ever firing in practice; (2) the decomposer's mass-balance gate at ±5 g was too strict for 250 g+ servings (Shepherd's pie's mass-correct ingredient list was rejected at 240 g vs 250 g target, a 4 % gap within typical recipe-rounding); (3) the matcher's accuracy across the full CNF panel was unmeasured — the manuscript's §4.4 Scenario S7 was placeholder text with no underlying data artefact. The frontend `enable_recipe_decomposer` toggle was also deliberately deferred during the original Tier γ landing.
+
+**Three deliverables shipped (per `tranquil-coalescing-acorn.md` plan):**
+
+**(A) Extensive matcher validation harness.** New `backend/_smoke_matcher_benchmark.py` runs the live matcher against a stratified random 184-food CNF sample (8 per FoodGroup × 23 groups, `random.seed(42)` reproducible) and applies four automated quality heuristics per match:
+
+1. **Group consistency** — matched `agribalyse_group` is in the expected acceptance set for the CNF FoodGroup (extends `_CNF_TO_AGRIBALYSE_SUBGROUP` with a per-CNF-group acceptance map; wildcard for `Snacks` / `Spices and Herbs`).
+2. **Magnitude plausibility** — matched per-100 g GW within ±3× of cnf_integrator group default for the CNF group.
+3. **Token overlap** — matched LCI name (English + French combined) shares ≥1 content token (≥4 chars, stoplist filtered) with the canonicalised CNF description.
+4. **Confidence band** — clean ≥ 0.85; borderline 0.60–0.85; low < 0.60.
+
+Per-food verdict: `clean` (all 4 pass + conf ≥ 0.85) / `borderline` (all 4 pass at lower confidence) / `flagged` (any 1–3 fails OR matched=False). Outputs a checksummed JSON artefact (`data/matcher_benchmark_<git-rev>_<utc>.json` — same write pattern as `s2_divergence_panel.json` and the ReCiPe pack ETL) plus a `matcher_benchmark_flagged_for_review.md` reviewer hand-off with the per-row JSON-editable `reviewer_verdict` + `reviewer_notes` fields pre-allocated as `null`. Cost: $0.026 per 184-food run (median latency 1.62 s per food).
+
+**First-run results** (git rev `16a5ca7`, 2026-05-22): **28 % clean / 35 % borderline / 37 % flagged**. Confidence-band calibration is meaningful: at ≥ 0.85 the flagged rate is 26 %; at 0.60–0.85 it is 43 %. This empirically grounds the `HIGH_CONFIDENCE_THRESHOLD = 0.85` chosen for the refined Tier γ trigger (B.2). Worst CNF groups by flagged rate: Nuts and Seeds 100 % (peanut flour matched peanut butter, GW 7.5× group default — likely a real LCA distinction routed to reviewer rather than a defect), Legumes 88 %, Finfish / Fats / Breakfast cereals 62 %. Best: Lamb / Soups 0 %, Babyfoods / Fast Foods / Snacks 12 % (subgroup routing helping).
+
+**(B) Tier γ trigger + mass-tolerance refinements** in `recipe_decomposer.py`:
+
+- **B.1 Mass tolerance** — `MAX_MASS_GAP_G = 5.0` and `MAX_MASS_GAP_FRACTION = 0.02` with new helper `_mass_tolerance(target_mass_g) = max(5, 2% of target)`. 250 g target → unchanged ±5 g; 500 g → ±10 g (was rejected at +6 g over the 5 g floor; now admitted at +10 g); 1 kg → ±20 g.
+- **B.2 `should_decompose` trigger** — fires when CNF group is composite AND (`matched=False` OR `confidence < HIGH_CONFIDENCE_THRESHOLD = 0.85`). Composite groups: `{Mixed Dishes, Soups Sauces and Gravies, Fast Foods, Babyfoods, Sausages and Luncheon meats, Sweets, Snacks, Baked Products}`. Under the live-LLM smokes: Lasagna (conf 0.90) still direct-matches; Bannock (0.65) / Tourtière (0.60) / Shepherd's pie (0.80) / Babyfoods (0.75) now route to the decomposer.
+- **B.3 Audit field** — `recipe_decomposition_decisions[].triggered_by` records `matcher_failed` vs `low_matcher_confidence:<conf>` so reviewers can disambiguate hard-failure vs. borderline-routing in downstream analysis.
+
+Integration in `life_cycle_assessment.py:_get_food_environmental_impacts` updated: removed the `(not matched_factors) and ...` short-circuit so `should_decompose` is evaluated even when matcher returned a borderline-confidence match. Successful decompositions overwrite the matcher's borderline result; failed decompositions keep the matcher's result (best available) AND record the failure in `recipe_decomposition_decisions[]`.
+
+**(C) Frontend `enable_recipe_decomposer` toggle.** Added to `EnvironmentalCalculator.tsx` Advanced panel (collapsed; chip in toggle row when activated; UX subtext describes cost + OpenAI-key dependency). New `RecipeDecompositionDecision` TypeScript type + `recipe_decomposer` block under `meal_analysis` in `EnvironmentalImpactResult`. New collapsible "🧪 Recipe decomposition audit" panel in `LCABreakdown.tsx` that surfaces per-food decomposition decisions (RESOLVED vs REJECTED status badge, per-ingredient Ciqual + mass list, fallback reason for rejected decompositions).
+
+**Files touched.**
+
+New: `backend/_smoke_matcher_benchmark.py`, `backend/environmental_impact_model/data/matcher_benchmark_<git-rev>_<utc>.json` (first artefact: `matcher_benchmark_16a5ca7_20260522T161706Z.json`), `backend/environmental_impact_model/data/matcher_benchmark_flagged_for_review.md`, `backend/environmental_impact_model/tests/test_matcher_benchmark.py` (10 shape-pinning tests).
+
+Modified: `backend/environmental_impact_model/src/recipe_decomposer.py` (`_mass_tolerance` helper + `HIGH_CONFIDENCE_THRESHOLD` constant + `should_decompose` rewrite), `backend/environmental_impact_model/src/life_cycle_assessment.py` (decomposer integration point + audit field), `backend/environmental_impact_model/tests/test_recipe_decomposer.py` (updated `test_mass_imbalance_rejected` + 3 new tests: `test_mass_tolerance_scales_with_target`, `test_composite_group_with_borderline_match_triggers`, `test_borderline_match_on_NON_composite_group_does_not_trigger`), `frontend/src/lib/api.ts` (`RecipeDecompositionDecision` type + `recipe_decomposer` block in `EnvironmentalImpactResult` + `enable_recipe_decomposer` request field + normaliser wiring), `frontend/src/components/environmental-component/EnvironmentalCalculator.tsx` (checkbox + chip + state), `frontend/src/components/environmental-component/LCABreakdown.tsx` (decomposition audit panel), `manuscript_call1.md` (§3.5 trigger threshold note; §4.4 Scenario S7 full fill-in with empirical numbers).
+
+**Verification.**
+
+- Decomposer unit tests: **17/17 pass** (14 baseline + 3 new). Run: `python -m pytest environmental_impact_model/tests/test_recipe_decomposer.py -v`.
+- Benchmark shape tests: **10/10 pass** against the persisted JSON artefact. Run: `python -m pytest environmental_impact_model/tests/test_matcher_benchmark.py -v`.
+- Full LCA test suite: **136/136 pass** (123 baseline + 3 decomposer + 10 benchmark shape). No regressions.
+- Live benchmark: $0.026, 1.62 s median per-food latency, JSON + markdown artefacts written.
+- API E2E smoke (defaults unchanged when `enable_recipe_decomposer=False`): PASS.
+- Frontend `npx tsc --noEmit`: clean.
+
+**Reviewer follow-up.** Spot-check the 68 `flagged` rows in `matcher_benchmark_flagged_for_review.md` and add `reviewer_verdict` + `reviewer_notes` to the JSON; the next benchmark run can then surface annotated rates. Two-phase delivery is intentional: harness + flagged-row list shipped now; reviewer-verdict-driven accuracy table in a follow-up.
+
 ### 2026-05-22 — RECIPE2016-PACK landed (multi-country, perspective-aware methodology integration)
 
 **Why this matters.** The hand-typed `RECIPE_ENDPOINT_FACTOR_PROVENANCE` (26 endpoint factors) and `NORMALIZATION_FACTORS_*` constants were silently drifting from the authoritative RIVM workbooks. Cross-checking against the now-acquired `ReCiPe2016_CFs_v1.1_20180117.xlsx` revealed `terrestrial_ecotoxicity_ecosystem` was **4,737× too high** (5.4e-8 vs canonical 1.14e-11) and `human_toxicity_non_cancer` was **34× too low** (6.7e-9 vs 2.28e-7), latent today because of the v1 trim but armed to bite the moment any of those categories returned. Separately, the `_get_canadian_regional_factors` block applied unsourced midpoint multipliers (water 0.65, land 0.78, …) that had no published LCA-literature basis. This integration replaces all factor numbers with workbook-derived JSON packs and parameterises the LCA pipeline on country + perspective + consumer-perspective so the platform is no longer Canada/Hierarchist-only.

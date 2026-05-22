@@ -20,6 +20,7 @@ from api.seo_utils import seo_metadata
 
 _VALID_PERSPECTIVES = ("I", "H", "E")
 _VALID_CONSUMER_PERSPECTIVES = ("global", "national")
+_VALID_BASES = ("per_serving", "per_100g_product", "per_100_kcal", "per_100g_protein")
 
 
 def _validate_methodology_params(
@@ -27,6 +28,7 @@ def _validate_methodology_params(
     perspective: str,
     country: Optional[str],
     consumer_perspective: str,
+    basis: str = "per_100_kcal",
 ) -> Optional[Dict[str, Any]]:
     """Return None when all values are acceptable; otherwise return an error
     payload suitable for a 400 response. Centralises validation across the 3
@@ -47,6 +49,12 @@ def _validate_methodology_params(
             "error": f"Invalid consumer_perspective {consumer_perspective!r}.",
             "valid_consumer_perspectives": list(_VALID_CONSUMER_PERSPECTIVES),
             "hint": "global (default) keeps world-average factors; national substitutes country-specific endpoint CFs.",
+        }
+    if basis not in _VALID_BASES:
+        return {
+            "error": f"Invalid basis {basis!r}.",
+            "valid_bases": list(_VALID_BASES),
+            "hint": "per_serving = raw absolute meal impact; per_100g_product = mass-normalised; per_100_kcal (default) = caloric-density-fair; per_100g_protein = useful for comparing protein sources.",
         }
     if country is not None:
         try:
@@ -69,6 +77,9 @@ import threading
 # LCA path is bit-for-bit identical to the pre-matcher pipeline.
 _LCA_MATCHER_CACHE = {"instance": None, "tried": False}
 _LCA_MATCHER_LOCK = threading.Lock()
+# Tier γ: parallel singleton cache for the recipe decomposer
+_RECIPE_DECOMPOSER_CACHE = {"instance": None, "tried": False}
+_RECIPE_DECOMPOSER_LOCK = threading.Lock()
 
 
 def _build_sensitivity_block(meal, matcher_decisions):
@@ -139,6 +150,52 @@ def _get_default_lca_matcher():
             logging.getLogger(__name__).warning(
                 "Failed to construct default LCA matcher; falling back to "
                 "group-default LCA only: %s", exc,
+            )
+            return None
+
+
+def _get_default_recipe_decomposer(matcher=None):
+    """Return a singleton RecipeDecomposer (Tier γ). Reuses the matcher's
+    AgribalyseIndex + EmbeddingRetriever if a matcher is already constructed,
+    so we don't double-load the embeddings."""
+    with _RECIPE_DECOMPOSER_LOCK:
+        if _RECIPE_DECOMPOSER_CACHE["instance"] is not None or _RECIPE_DECOMPOSER_CACHE["tried"]:
+            return _RECIPE_DECOMPOSER_CACHE["instance"]
+        _RECIPE_DECOMPOSER_CACHE["tried"] = True
+        try:
+            from environmental_impact_model.src.recipe_decomposer import RecipeDecomposer
+            # Reuse the matcher's index/retriever if available; otherwise build fresh.
+            if matcher is not None:
+                index = matcher.index
+                retriever = matcher.retriever
+                ranking_client = matcher.ranking_client
+            else:
+                from environmental_impact_model.src.lca_matcher import (
+                    AgribalyseIndex, EmbeddingRetriever,
+                )
+                api_key = os.environ.get("OPENAI_API_KEY")
+                if not api_key:
+                    return None  # Decomposer needs an LLM; no point building shell
+                try:
+                    from openai import OpenAI
+                    client = OpenAI(api_key=api_key)
+                except Exception as exc:
+                    logging.getLogger(__name__).warning(
+                        "openai client init failed in decomposer setup: %s", exc,
+                    )
+                    return None
+                index = AgribalyseIndex(embedding_client=client)
+                retriever = EmbeddingRetriever(index, embedding_client=client)
+                ranking_client = client
+            decomposer = RecipeDecomposer(
+                index=index, retriever=retriever, ranking_client=ranking_client,
+            )
+            _RECIPE_DECOMPOSER_CACHE["instance"] = decomposer
+            return decomposer
+        except Exception as exc:  # noqa: BLE001 - log + degrade
+            logging.getLogger(__name__).warning(
+                "Failed to construct default RecipeDecomposer; Tier γ disabled: %s",
+                exc,
             )
             return None
 
@@ -338,6 +395,15 @@ def format_environmental_results(meal_data: Dict[str, Any], user_type: str = "in
         # underlying Resources endpoint is None (v1 trim).
         "all_impacts_bands": lca_data.get('midpoint_impacts_bands', {}),
         "endpoint_impacts_bands": lca_data.get('endpoint_impacts_bands', {}),
+        # Tier α: multi-basis functional-unit exposure. The headline `all_impacts`
+        # / `endpoint_impacts` above reflect the request's `basis` choice
+        # (default per_100_kcal); the by-basis dicts give all four bases
+        # (per_serving, per_100g_product, per_100_kcal, per_100g_protein)
+        # for transparent re-display without re-querying.
+        "impacts_by_basis":         lca_data.get('midpoint_impacts_by_basis', {}),
+        "impacts_bands_by_basis":   lca_data.get('midpoint_impacts_bands_by_basis', {}),
+        "endpoint_impacts_by_basis": lca_data.get('endpoint_impacts_by_basis', {}),
+        "basis_factors":            lca_data.get('basis_factors', {}),
         # CODE-5: per-category confidence rating and methodology provenance
         # (additive — existing consumers ignore unknown keys).
         "factor_confidence_by_category": lca_data.get('factor_confidence_by_category', {}),
@@ -348,6 +414,11 @@ def format_environmental_results(meal_data: Dict[str, Any], user_type: str = "in
         "lca_matcher_decisions": lca_data.get('lca_matcher_decisions', []),
         "catalog_version": lca_data.get('catalog_version'),
         "recipe2016_h_ef31_sensitivity": lca_data.get('recipe2016_h_ef31_sensitivity'),
+        # Tier γ: composite recipe decomposition audit trail. Populated only
+        # when `enable_recipe_decomposer=true` AND the matcher fell back on
+        # a composite-y CNF food (Mixed Dishes, Soups, Fast Foods, Babyfoods, ...).
+        "recipe_decomposer_enabled": lca_data.get('recipe_decomposer_enabled', False),
+        "recipe_decomposition_decisions": lca_data.get('recipe_decomposition_decisions', []),
     }
     
     # Surface sustainability scores (numeric) calculated server-side so the UI
@@ -542,17 +613,23 @@ def environmental_impact(request):
         # §3.5 LCA matcher flag (default off — preserves existing behaviour bit-for-bit).
         enable_lca_matcher = bool(request.data.get('enable_lca_matcher', False))
         matcher = _get_default_lca_matcher() if enable_lca_matcher else None
+        # Tier γ: composite-food recipe decomposition. Default off (preserves
+        # existing behaviour bit-for-bit). Reuses the matcher's index +
+        # embedding client if available, so no double-load.
+        enable_recipe_decomposer = bool(request.data.get('enable_recipe_decomposer', False))
+        decomposer = _get_default_recipe_decomposer(matcher=matcher) if enable_recipe_decomposer else None
 
-        # Methodology / perspective / country (all optional; defaults preserve
-        # today's H + global-supply-chain behaviour). Validate here so an
-        # invalid value gives a 400 with a helpful message instead of an
-        # internal 500 from LifeCycleAssessment.__init__.
+        # Methodology / perspective / country / basis (all optional; defaults
+        # preserve today's H + global-supply-chain + per-100-kcal behaviour).
+        # Validate here so an invalid value gives a 400 with a helpful message
+        # instead of an internal 500 from LifeCycleAssessment.__init__.
         methodology = request.data.get('methodology', 'recipe2016')
         perspective = request.data.get('perspective', 'H')
         country = request.data.get('country')  # ISO-3 or None
         consumer_perspective = request.data.get('consumer_perspective', 'global')
+        basis = request.data.get('basis', 'per_100_kcal')
         param_error = _validate_methodology_params(
-            methodology, perspective, country, consumer_perspective,
+            methodology, perspective, country, consumer_perspective, basis,
         )
         if param_error is not None:
             return Response(param_error, status=status.HTTP_400_BAD_REQUEST)
@@ -587,6 +664,8 @@ def environmental_impact(request):
             meal, data_loader, matcher=matcher,
             methodology=methodology, perspective=perspective,
             country=country, consumer_perspective=consumer_perspective,
+            basis=basis,
+            decomposer=decomposer,
         )
 
         # Format results with user-appropriate explanations
@@ -651,6 +730,8 @@ def _analyze_meal_comprehensive(
     perspective: str = 'H',
     country: Optional[str] = None,
     consumer_perspective: str = 'global',
+    basis: str = 'per_100_kcal',
+    decomposer=None,
 ) -> Dict[str, Any]:
     """Perform comprehensive meal analysis including LCA, monetization, and reference comparisons.
 
@@ -729,12 +810,15 @@ def _analyze_meal_comprehensive(
         }
         
         # Life Cycle Assessment — methodology pack + perspective + country
+        # + basis + (optional) recipe decomposer (Tier γ composite fallback)
         lca = LifeCycleAssessment(
             meal, matcher=matcher,
             methodology=methodology,
             perspective=perspective,
             country=country,
             consumer_perspective=consumer_perspective,
+            basis=basis,
+            decomposer=decomposer,
         )
         lca_results = lca.perform_lcia()
         endpoint_impacts = lca.calculate_endpoint_impacts()
@@ -763,9 +847,24 @@ def _analyze_meal_comprehensive(
                 'perspective': perspective,
                 'country': country,
                 'consumer_perspective': consumer_perspective,
+                'basis': basis,
             },
             'endpoint_factor_sources': dict(lca.endpoint_factor_sources),
             'normalized_contributions_per_person': normalized_midpoints,
+            # Tier α: full 4-basis impact dicts for transparency. The headline
+            # `midpoint_impacts` / `endpoint_impacts` above reflect the chosen
+            # `basis`; consumers wanting per-100-g-product or per-100-g-protein
+            # output can read directly from these without re-querying.
+            'midpoint_impacts_by_basis': lca.midpoint_impacts_by_basis,
+            'midpoint_impacts_bands_by_basis': lca.midpoint_impacts_bands_by_basis,
+            'endpoint_impacts_by_basis': lca.endpoint_impacts_by_basis,
+            'basis_factors': lca.basis_factors,
+            # Tier γ: composite recipe decomposition audit trail (parallel
+            # to `lca_matcher_decisions`). Populated when
+            # `enable_recipe_decomposer=True` AND the matcher fell back on
+            # a composite CNF food.
+            'recipe_decomposition_decisions': lca.recipe_decomposition_decisions,
+            'recipe_decomposer_enabled': decomposer is not None,
         }
         # §3.5 GROUP-D-RECONCILIATION + AGRIBALYSE-INGEST: surface matcher
         # audit trail and dual-namespace EF sensitivity block when active.
@@ -826,6 +925,7 @@ def _analyze_meal_comprehensive(
                     perspective=perspective,
                     country=country,
                     consumer_perspective=consumer_perspective,
+                    basis=basis,
                 )
                 ref_impacts = ref_lca.perform_lcia()
                 ref_monetization = Monetization(ref_impacts, data_loader, country=country)
@@ -1092,8 +1192,9 @@ def compare_foods_environmental(request):
         perspective = request.data.get('perspective', 'H')
         country = request.data.get('country')
         consumer_perspective = request.data.get('consumer_perspective', 'global')
+        basis = request.data.get('basis', 'per_100_kcal')
         param_error = _validate_methodology_params(
-            methodology, perspective, country, consumer_perspective,
+            methodology, perspective, country, consumer_perspective, basis,
         )
         if param_error is not None:
             return Response(param_error, status=status.HTTP_400_BAD_REQUEST)
@@ -1135,6 +1236,7 @@ def compare_foods_environmental(request):
                     perspective=perspective,
                     country=country,
                     consumer_perspective=consumer_perspective,
+                    basis=basis,
                 )
                 lca_midpoints = lca.perform_lcia()
                 lca_endpoints = lca.calculate_endpoint_impacts()
@@ -1269,8 +1371,9 @@ def food_environmental_profile(request, food_id):
         perspective = request.GET.get('perspective', 'H')
         country = request.GET.get('country') or None
         consumer_perspective = request.GET.get('consumer_perspective', 'global')
+        basis = request.GET.get('basis', 'per_100_kcal')
         param_error = _validate_methodology_params(
-            methodology, perspective, country, consumer_perspective,
+            methodology, perspective, country, consumer_perspective, basis,
         )
         if param_error is not None:
             return Response(param_error, status=status.HTTP_400_BAD_REQUEST)
@@ -1289,6 +1392,7 @@ def food_environmental_profile(request, food_id):
             perspective=perspective,
             country=country,
             consumer_perspective=consumer_perspective,
+            basis=basis,
         )
         lca_results = lca.perform_lcia()
 

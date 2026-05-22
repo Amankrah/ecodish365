@@ -135,6 +135,12 @@ export const LCABreakdown: React.FC<LCABreakdownProps> = ({ results }) => {
   const methodologyParams = methodologyMeta.parameters || {};
   const showCountryChip = methodologyParams.country && methodologyParams.consumer_perspective === 'national';
 
+  // Tier γ recipe decomposition audit trail (when `enable_recipe_decomposer`
+  // was true and at least one food triggered decomposition).
+  const decomposerBlock = analysis?.recipe_decomposer;
+  const decompDecisions = decomposerBlock?.decisions || [];
+  const showDecompPanel = !!decomposerBlock?.enabled && decompDecisions.length > 0;
+
   return (
     <div className="space-y-4">
       {/* Header / methodology summary */}
@@ -169,7 +175,58 @@ export const LCABreakdown: React.FC<LCABreakdownProps> = ({ results }) => {
               consumer: global supply chain
             </span>
           )}
+          {showDecompPanel && (
+            <span className="inline-flex items-center px-2 py-1 rounded-full bg-purple-50 border border-purple-200 text-purple-800">
+              recipe decomposer: <strong className="ml-1">on</strong> ({decompDecisions.filter(d => d.matched).length}/{decompDecisions.length} resolved)
+            </span>
+          )}
         </div>
+      )}
+
+      {/* Tier γ recipe decomposition audit panel */}
+      {showDecompPanel && (
+        <details className="border border-purple-200 bg-purple-50/30 rounded-md">
+          <summary className="cursor-pointer px-3 py-2 text-sm font-medium text-purple-900">
+            🧪 Recipe decomposition audit ({decompDecisions.length} composite{decompDecisions.length === 1 ? '' : 's'} processed)
+          </summary>
+          <div className="px-3 py-2 space-y-3 text-xs text-gray-700">
+            <p className="text-gray-500 italic">
+              Composite CNF foods routed through the Tier γ decomposer when no high-confidence direct match exists in Agribalyse v32. Each ingredient resolved via the LCA matcher; impacts are mass-weighted summed.
+            </p>
+            {decompDecisions.map((d, idx) => (
+              <div key={`decomp-${d.food_id}-${idx}`} className="border-l-2 border-purple-300 pl-2">
+                <div className="flex items-center gap-2">
+                  <span className={`px-1.5 py-0.5 rounded text-xs font-semibold ${
+                    d.matched
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : 'bg-amber-100 text-amber-800'
+                  }`}>
+                    {d.matched ? 'RESOLVED' : 'REJECTED'}
+                  </span>
+                  <span className="text-gray-600">food_id={d.food_id}</span>
+                  <span className="text-gray-500">conf={d.decomposition_confidence.toFixed(2)}</span>
+                  {d.triggered_by && (
+                    <span className="text-gray-400">trigger: {d.triggered_by}</span>
+                  )}
+                </div>
+                {d.matched && d.ingredients.length > 0 && (
+                  <ul className="mt-1 space-y-0.5 ml-2 text-gray-700">
+                    {d.ingredients.map((i, j) => (
+                      <li key={`ing-${j}`} className="flex gap-2">
+                        <span className="text-gray-400 font-mono">[{i.ciqual_code}]</span>
+                        <span className="text-gray-600">{i.mass_g.toFixed(0)}g</span>
+                        <span>{i.lci_name}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {!d.matched && d.fallback_reason && (
+                  <div className="text-amber-700 mt-1">↳ {d.fallback_reason}</div>
+                )}
+              </div>
+            ))}
+          </div>
+        </details>
       )}
 
       {/* The 3 consumed midpoint categories with band visualisation */}
