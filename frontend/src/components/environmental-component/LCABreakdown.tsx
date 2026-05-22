@@ -126,6 +126,15 @@ export const LCABreakdown: React.FC<LCABreakdownProps> = ({ results }) => {
     analysis?.sustainability_score?.category_zones || {}
   ) as Record<string, string>;
 
+  // Methodology pack metadata exposed by the backend's data.metadata block.
+  // Shows the active perspective / country / consumer-perspective so reviewers
+  // can see what configuration produced these numbers without inspecting
+  // network responses.
+  type MetaShape = { methodology?: string; methodology_pack?: string; parameters?: { perspective?: string; country?: string | null; consumer_perspective?: string } };
+  const methodologyMeta = (results.metadata || {}) as MetaShape;
+  const methodologyParams = methodologyMeta.parameters || {};
+  const showCountryChip = methodologyParams.country && methodologyParams.consumer_perspective === 'national';
+
   return (
     <div className="space-y-4">
       {/* Header / methodology summary */}
@@ -138,6 +147,30 @@ export const LCABreakdown: React.FC<LCABreakdownProps> = ({ results }) => {
           see <button type="button" className="underline" onClick={() => setShowMethodology(true)}>methodology</button>.
         </div>
       </div>
+
+      {/* Active methodology chip */}
+      {(methodologyMeta.methodology || methodologyMeta.methodology_pack) && (
+        <div className="flex flex-wrap items-center gap-2 text-xs text-gray-600">
+          <span className="inline-flex items-center px-2 py-1 rounded-full bg-gray-100 border border-gray-200 font-mono">
+            {methodologyMeta.methodology || 'ReCiPe 2016 v1.1'}
+          </span>
+          {methodologyParams.perspective && (
+            <span className="inline-flex items-center px-2 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800">
+              perspective: <strong className="ml-1">{methodologyParams.perspective}</strong>
+            </span>
+          )}
+          {showCountryChip && (
+            <span className="inline-flex items-center px-2 py-1 rounded-full bg-green-50 border border-green-200 text-green-800">
+              country: <strong className="ml-1">{methodologyParams.country}</strong> ({methodologyParams.consumer_perspective})
+            </span>
+          )}
+          {!showCountryChip && (
+            <span className="inline-flex items-center px-2 py-1 rounded-full bg-gray-50 border border-gray-200 text-gray-600">
+              consumer: global supply chain
+            </span>
+          )}
+        </div>
+      )}
 
       {/* The 3 consumed midpoint categories with band visualisation */}
       <div className="space-y-3">

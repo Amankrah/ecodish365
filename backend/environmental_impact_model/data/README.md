@@ -2,6 +2,27 @@
 
 **Runtime:** The Django API / LCA matcher load only the **`*.json`** (and embeddings where used) artefacts built from official sources. Offline **reference documents** below are for validation, manuscript provenance, and future ETL—**they are not imported by application code.**
 
+## ReCiPe 2016 v1.1 factor packs (multi-country, perspective-aware)
+
+| File | Description |
+|------|-------------|
+| `ReCiPe2016_CFs_v1.1_20180117.xlsx` | Source RIVM workbook — per-substance midpoint CFs for all 18 ReCiPe 2016 categories AND midpoint-to-endpoint conversion factors for all 26 endpoint pathways at all three cultural perspectives (Individualist / Hierarchist / Egalitarian). |
+| `Normalization scores ReCiPe2016v1.1_20190514.xlsx` | World 2010 per-person-per-year normalisation scores at midpoint AND endpoint, all three perspectives. |
+| `ReCiPe2016_country factors_v1.1_20171221.xlsx` | Country-specific CFs for the 5 spatially-explicit categories (Water consumption: 288 country rows; Terrestrial acidification: 224; Freshwater eutrophication: 159; Photochemical ozone formation: 70; Particulate matter formation: 66). |
+| `recipe2016_endpoint_factors.json` | **Generated**: midpoint→endpoint CFs for I/H/E perspectives, 26 pathways each. |
+| `recipe2016_normalization.json` | **Generated**: per-midpoint + per-endpoint + per-AoP World 2010 norm scores. |
+| `recipe2016_country_factors.json` | **Generated**: per-country, per-category midpoint and endpoint CFs (246 ISO-3 codes covered after name normalisation). |
+| `recipe2016_factor_packs_meta.json` | **Generated**: provenance, SHA-256s of source workbooks and output packs, ETL git rev, extraction timestamp. |
+| `country_iso3_map.json` | **Generated**: workbook country string -> ISO 3166-1 alpha-3 code (embedded inline in the ETL script for reviewability). |
+
+**Rebuild** the four generated files with:
+
+```bash
+python -m environmental_impact_model.etl.build_recipe2016_factor_packs
+```
+
+The runtime loader is `environmental_impact_model.src.methodology_factors.get_methodology_pack('recipe2016')`. It validates SHA-256 against meta on load and exposes country / perspective / endpoint-factor-source accessors to `LifeCycleAssessment`.
+
 ## Offline reference literature (pinned copies)
 
 | File | Description |

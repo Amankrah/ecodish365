@@ -1245,6 +1245,9 @@ export class HENIApiService {
 }
 
 // Environmental Impact Types
+export type LcaPerspective = 'I' | 'H' | 'E';
+export type LcaConsumerPerspective = 'global' | 'national';
+
 export interface EnvironmentalImpactRequest {
   foods: Array<{
     food_id: number;
@@ -1259,6 +1262,59 @@ export interface EnvironmentalImpactRequest {
    * EF→ReCiPe categories. Default false → unchanged behaviour.
    */
   enable_lca_matcher?: boolean;
+  /**
+   * LCA methodology pack. Default `recipe2016`. Reserved for future EF 3.1 /
+   * IMPACT World+ packs once their workbooks are ingested.
+   */
+  methodology?: string;
+  /**
+   * ReCiPe 2016 cultural perspective:
+   *  - 'H' (default, Hierarchist) — 100-yr GW horizon, RIVM convention
+   *  - 'I' (Individualist) — 20-yr horizon, optimistic
+   *  - 'E' (Egalitarian) — 1000-yr horizon, pessimistic (≈13× H on GW)
+   */
+  perspective?: LcaPerspective;
+  /**
+   * ISO-3 country code (e.g. 'CAN', 'USA'). Default `null` = world-average.
+   * When set + `consumer_perspective='national'`, the backend substitutes
+   * country-specific endpoint CFs for the water-consumption pathways.
+   */
+  country?: string | null;
+  /**
+   * 'global' (default) uses world-average endpoint CFs for every pathway.
+   * 'national' substitutes country-specific CFs where the workbook supports
+   * it (currently the three water-consumption pathways).
+   */
+  consumer_perspective?: LcaConsumerPerspective;
+}
+
+/**
+ * Methodology info response — shape returned by GET /environmental-impact/methodology/
+ * Used by the frontend's Advanced methodology panel to populate dropdowns.
+ */
+export interface MethodologyInfo {
+  available_methodologies: string[];
+  active_methodology: string;
+  active_methodology_version: string;
+  available_perspectives: LcaPerspective[];
+  available_consumer_perspectives: LcaConsumerPerspective[];
+  available_countries: string[];          // ISO-3 codes
+  country_aware_pathways: string[];
+  country_aware_categories: string[];
+  perspective_descriptions: Record<LcaPerspective, string>;
+  consumer_perspective_descriptions: Record<LcaConsumerPerspective, string>;
+  methodology_provenance: {
+    methodology: string;
+    methodology_version: string;
+    schema_version: string;
+    etl_git_rev: string;
+    extracted_at_utc: string;
+    endpoint_pack_sha256: string;
+    normalization_pack_sha256: string;
+    country_pack_sha256: string;
+    checksum_status: Record<string, string>;
+    source_workbooks: string[];
+  };
 }
 
 /**
@@ -1546,6 +1602,22 @@ export interface FoodEnvironmentalProfile {
 
 // Environmental Impact API Service Class
 export class EnvironmentalImpactApiService {
+  /**
+   * Cached singleton fetch of methodology metadata. The data rarely changes
+   * (only when the methodology pack is rebuilt) so we hit the backend once
+   * per page load and reuse.
+   */
+  private static _methodologyInfoCache: MethodologyInfo | null = null;
+  static async getMethodologyInfo(force: boolean = false): Promise<MethodologyInfo> {
+    if (!force && this._methodologyInfoCache) {
+      return this._methodologyInfoCache;
+    }
+    const response = await api.get('/environmental-impact/methodology/');
+    const info = (response.data?.data || response.data) as MethodologyInfo;
+    this._methodologyInfoCache = info;
+    return info;
+  }
+
   static async analyzeMealEnvironmentalImpact(request: EnvironmentalImpactRequest): Promise<EnvironmentalImpactResult> {
     const response = await api.post('/environmental-impact/', request);
     

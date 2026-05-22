@@ -1,0 +1,48 @@
+{
+  "etl_git_rev": "84b00cd",
+  "extracted_at_utc": "2026-05-22T12:41:16+00:00",
+  "methodology": "recipe2016",
+  "methodology_version": "v1.1",
+  "packs": {
+    "country_factors": {
+      "file": "recipe2016_country_factors.json",
+      "n_countries_total": 246,
+      "sha256": "d588ea76f77a4729079665f3325db0eb012a80fd8c8ec89500b44738155ab6d3",
+      "source_file": "ReCiPe2016_country factors_v1.1_20171221.xlsx",
+      "source_file_sha256": "4806afbdcbb7f184e35263a136e5043ce3fa60f01faa9eeffab5803b3d6f9d43",
+      "unmapped_workbook_names": []
+    },
+    "endpoint_factors": {
+      "file": "recipe2016_endpoint_factors.json",
+      "n_factors_per_perspective": {
+        "E": 26,
+        "H": 24,
+        "I": 24
+      },
+      "sha256": "cc5faba76ee045246f6cd4260bab932c2e0ba9a444dad47585f9aa10e92d2c75",
+      "source_file": "ReCiPe2016_CFs_v1.1_20180117.xlsx",
+      "source_file_sha256": "7024ad5faf5916d15ec106224749b3397c3e3f9f917e14fbb7ec5a433cdc7387",
+      "unmapped_labels": []
+    },
+    "normalization": {
+      "file": "recipe2016_normalization.json",
+      "n_endpoint_pathways": {
+        "E": 19,
+        "H": 19,
+        "I": 19
+      },
+      "n_midpoint_categories": {
+        "E": 21,
+        "H": 21,
+        "I": 21
+      },
+      "sha256": "c90f32c4fd9b66bd83bb158cc4a33c8e1f7c04853794cb5bdcece067ca419311",
+      "source_file": "Normalization scores ReCiPe2016v1.1_20190514.xlsx",
+      "source_file_sha256": "2c1cf542f987e55889a09b1236935901df92684282bf89b44a1f6c48c8d5bc71",
+      "unmapped_labels": [
+        "Fossil resource scarcity"
+      ]
+    }
+  },
+  "schema_version": "1.0"
+}

@@ -11,31 +11,60 @@ import math
 logger = logging.getLogger(__name__)
 
 # Global constants
-FOOD_WASTE_FACTOR = 0.319  # 31.9% food waste (Canadian average)
+# Canadian household + retail + food-service food waste rate: ~31.9% of
+# purchased food never eaten (Statistics Canada / Second Harvest 2023).
+# Global FAO 2011 average is closer to 30%; per-country numbers vary widely
+# (UK: 22%, US: 32%, India: 18%). Use `get_food_waste_factor(country)` for
+# country-aware code paths; the bare constant preserves prior behaviour.
+FOOD_WASTE_FACTOR = 0.319
 MACRONUTRIENT_CALORIES = {
     'protein': 4.0,  # kcal/g
-    'carbohydrate': 4.0,  # kcal/g  
+    'carbohydrate': 4.0,  # kcal/g
     'fat': 9.0,  # kcal/g
     'alcohol': 7.0  # kcal/g
 }
 
-def calculate_waste(meal_weight: float) -> float:
-    """
-    Calculate food waste based on Canadian food waste statistics.
-    
+# Per-country food-waste factors. None falls back to the Canadian default. Add
+# entries as authoritative data lands (e.g. UNEP Food Waste Index 2024).
+_FOOD_WASTE_BY_COUNTRY: Dict[str, float] = {
+    "CAN": 0.319,  # StatCan 2023 / Second Harvest
+}
+_FAO_GLOBAL_MEAN_WASTE = 0.30  # FAO 2011 global post-production-loss mean
+
+
+def get_food_waste_factor(country: Optional[str] = None) -> float:
+    """Return the food-waste factor for an ISO-3 country, or the Canadian
+    default when country is None. Unknown countries fall back to the FAO 2011
+    global mean with an informational log message."""
+    if country is None:
+        return FOOD_WASTE_FACTOR
+    if country in _FOOD_WASTE_BY_COUNTRY:
+        return _FOOD_WASTE_BY_COUNTRY[country]
+    logger.info(
+        "No per-country food-waste factor for %s; using FAO 2011 global mean (%.3f).",
+        country, _FAO_GLOBAL_MEAN_WASTE,
+    )
+    return _FAO_GLOBAL_MEAN_WASTE
+
+
+def calculate_waste(meal_weight: float, country: Optional[str] = None) -> float:
+    """Calculate food waste based on country-specific (default: Canadian) statistics.
+
     :param meal_weight: Weight of meal in grams
+    :param country:     ISO-3 code; None = Canadian default
     :return: Weight of waste in grams
     """
-    return meal_weight * FOOD_WASTE_FACTOR
+    return meal_weight * get_food_waste_factor(country)
 
-def calculate_total_quantity_with_waste(base_quantity: float) -> float:
-    """
-    Calculate total food quantity needed including waste.
-    
+def calculate_total_quantity_with_waste(base_quantity: float, country: Optional[str] = None) -> float:
+    """Calculate total food quantity needed including waste.
+
     :param base_quantity: Base food quantity in grams
+    :param country:       ISO-3 code; None = Canadian default
     :return: Total quantity including waste in grams
     """
-    return base_quantity / (1 - FOOD_WASTE_FACTOR)
+    factor = get_food_waste_factor(country)
+    return base_quantity / (1 - factor)
 
 def estimate_calories_from_macronutrients(protein: float, carbs: float, 
                                         fat: float, alcohol: float = 0) -> float:

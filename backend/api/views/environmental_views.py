@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -11,8 +11,55 @@ from environmental_impact_model.src.life_cycle_assessment import LifeCycleAssess
 from environmental_impact_model.src.monetization import Monetization
 from environmental_impact_model.src.reference_meals import ReferenceMeals
 from environmental_impact_model.src.cnf_integrator import get_cnf_integrator
+from environmental_impact_model.src.methodology_factors import (
+    get_methodology_pack, list_available_methodologies,
+)
 from environmental_impact_model.src.utils import format_impact_value, categorize_sustainability_score
 from api.seo_utils import seo_metadata
+
+
+_VALID_PERSPECTIVES = ("I", "H", "E")
+_VALID_CONSUMER_PERSPECTIVES = ("global", "national")
+
+
+def _validate_methodology_params(
+    methodology: str,
+    perspective: str,
+    country: Optional[str],
+    consumer_perspective: str,
+) -> Optional[Dict[str, Any]]:
+    """Return None when all values are acceptable; otherwise return an error
+    payload suitable for a 400 response. Centralises validation across the 3
+    public endpoints so error messages stay consistent."""
+    if methodology not in list_available_methodologies():
+        return {
+            "error": f"Unknown methodology {methodology!r}.",
+            "valid_methodologies": list_available_methodologies(),
+        }
+    if perspective not in _VALID_PERSPECTIVES:
+        return {
+            "error": f"Invalid perspective {perspective!r}.",
+            "valid_perspectives": list(_VALID_PERSPECTIVES),
+            "hint": "H (default) = Hierarchist; I = Individualist; E = Egalitarian.",
+        }
+    if consumer_perspective not in _VALID_CONSUMER_PERSPECTIVES:
+        return {
+            "error": f"Invalid consumer_perspective {consumer_perspective!r}.",
+            "valid_consumer_perspectives": list(_VALID_CONSUMER_PERSPECTIVES),
+            "hint": "global (default) keeps world-average factors; national substitutes country-specific endpoint CFs.",
+        }
+    if country is not None:
+        try:
+            pack = get_methodology_pack(methodology)
+        except Exception:  # noqa: BLE001
+            return {"error": f"Methodology pack {methodology!r} failed to load."}
+        if not pack.supports_country(country):
+            return {
+                "error": f"Country {country!r} not present in {methodology} pack.",
+                "valid_countries_count": len(pack.list_countries()),
+                "hint": "Use the /environmental-impact/methodology/ endpoint to list valid ISO-3 codes.",
+            }
+    return None
 
 import os
 import threading
@@ -496,6 +543,20 @@ def environmental_impact(request):
         enable_lca_matcher = bool(request.data.get('enable_lca_matcher', False))
         matcher = _get_default_lca_matcher() if enable_lca_matcher else None
 
+        # Methodology / perspective / country (all optional; defaults preserve
+        # today's H + global-supply-chain behaviour). Validate here so an
+        # invalid value gives a 400 with a helpful message instead of an
+        # internal 500 from LifeCycleAssessment.__init__.
+        methodology = request.data.get('methodology', 'recipe2016')
+        perspective = request.data.get('perspective', 'H')
+        country = request.data.get('country')  # ISO-3 or None
+        consumer_perspective = request.data.get('consumer_perspective', 'global')
+        param_error = _validate_methodology_params(
+            methodology, perspective, country, consumer_perspective,
+        )
+        if param_error is not None:
+            return Response(param_error, status=status.HTTP_400_BAD_REQUEST)
+
         if not food_data:
             return Response({
                 "error": "No food data provided. Please include 'foods' array with food_id and quantity.",
@@ -522,11 +583,32 @@ def environmental_impact(request):
         meal = EnvMeal(foods)
         
         # Perform comprehensive analysis
-        comprehensive_analysis = _analyze_meal_comprehensive(meal, data_loader, matcher=matcher)
-        
+        comprehensive_analysis = _analyze_meal_comprehensive(
+            meal, data_loader, matcher=matcher,
+            methodology=methodology, perspective=perspective,
+            country=country, consumer_perspective=consumer_perspective,
+        )
+
         # Format results with user-appropriate explanations
         formatted_results = format_environmental_results(comprehensive_analysis, user_type)
-        
+
+        # Surface the methodology pack version + parameters in the envelope so
+        # the UI can render an active-configuration chip without parsing nested
+        # `lca` fields. (Backward-compatible: existing fields preserved.)
+        lca_block = comprehensive_analysis.get('lca', {}) if isinstance(comprehensive_analysis, dict) else {}
+        methodology_metadata = {
+            "user_type": user_type,
+            "methodology_pack": lca_block.get('methodology_pack'),
+            "parameters": lca_block.get('parameters', {}),
+            "methodology": (
+                f"ReCiPe 2016 v1.1 ({perspective})"
+                + (f" — consumer={consumer_perspective}, country={country}" if country else "")
+            ),
+            "data_source": "Canadian Nutrient File (Health Canada)",
+            "currency": "CAD",
+            "functional_unit": "per 100 kcal",
+        }
+
         # Create final response (reuse enriched meal_info with macronutrient distribution)
         result = {
             "data": formatted_results,
@@ -535,14 +617,7 @@ def environmental_impact(request):
                 "total_calories": meal.calculate_total_calories(),
                 "total_weight": meal.get_total_weight(),
             }),
-            "metadata": {
-                "user_type": user_type,
-                "methodology": "ReCiPe 2016 LCA with Canadian regional factors",
-                "data_source": "Canadian Nutrient File (Health Canada)",
-                "currency": "CAD",
-                "functional_unit": "per meal",
-                "timestamp": "2024"
-            },
+            "metadata": methodology_metadata,
             "seo_metadata": {
                 "title": f"Environmental Impact Assessment - {user_type.title()} View | DISH Research",
                 "description": f"Comprehensive environmental impact assessment tailored for {user_type}s. Get clear explanations of your meal's carbon footprint, environmental costs, and sustainability rating.",
@@ -567,12 +642,26 @@ def environmental_impact(request):
             "help": "Please try again or contact support if the problem persists."
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-def _analyze_meal_comprehensive(meal: EnvMeal, data_loader: EnvDataLoader, matcher=None) -> Dict[str, Any]:
+def _analyze_meal_comprehensive(
+    meal: EnvMeal,
+    data_loader: EnvDataLoader,
+    matcher=None,
+    *,
+    methodology: str = 'recipe2016',
+    perspective: str = 'H',
+    country: Optional[str] = None,
+    consumer_perspective: str = 'global',
+) -> Dict[str, Any]:
     """Perform comprehensive meal analysis including LCA, monetization, and reference comparisons.
 
     When `matcher` is provided (§3.5 GROUP-D-RECONCILIATION), the per-food impact
     factors come from the matcher's Agribalyse mapping at confidence ≥ threshold,
     with logged fallback to the existing cnf_integrator group-default path.
+
+    Country / perspective / consumer-perspective parameters thread through to
+    `LifeCycleAssessment` (which loads the methodology pack) and `Monetization`
+    (which selects per-country economic adjustments). Defaults reproduce
+    today's Hierarchist + global-supply-chain + Canadian-monetary behaviour.
     """
     try:
         # Basic meal info
@@ -639,11 +728,18 @@ def _analyze_meal_comprehensive(meal: EnvMeal, data_loader: EnvDataLoader, match
             'macronutrient_distribution': macronutrient_distribution,
         }
         
-        # Life Cycle Assessment
-        lca = LifeCycleAssessment(meal, matcher=matcher)
+        # Life Cycle Assessment — methodology pack + perspective + country
+        lca = LifeCycleAssessment(
+            meal, matcher=matcher,
+            methodology=methodology,
+            perspective=perspective,
+            country=country,
+            consumer_perspective=consumer_perspective,
+        )
         lca_results = lca.perform_lcia()
         endpoint_impacts = lca.calculate_endpoint_impacts()
         single_score = lca.calculate_single_score()
+        normalized_midpoints = lca.calculate_normalized_midpoints()
 
         lca_data = {
             'midpoint_impacts': lca_results,
@@ -657,8 +753,19 @@ def _analyze_meal_comprehensive(meal: EnvMeal, data_loader: EnvDataLoader, match
             'endpoint_impacts_bands': lca.endpoint_impacts_bands,
             # Per-category confidence rating (CODE-5; additive).
             'factor_confidence_by_category': lca.get_factor_confidence_by_category(),
-            # Methodology version + endpoint factor provenance (CODE-2).
+            # Methodology pack version + provenance + per-pathway factor source
+            # (world-average vs country-specific) so the UI can render
+            # transparent attribution.
             'data_quality': lca.get_data_quality_report(),
+            'methodology_pack': lca.pack.version_string(),
+            'parameters': {
+                'methodology': methodology,
+                'perspective': perspective,
+                'country': country,
+                'consumer_perspective': consumer_perspective,
+            },
+            'endpoint_factor_sources': dict(lca.endpoint_factor_sources),
+            'normalized_contributions_per_person': normalized_midpoints,
         }
         # §3.5 GROUP-D-RECONCILIATION + AGRIBALYSE-INGEST: surface matcher
         # audit trail and dual-namespace EF sensitivity block when active.
@@ -676,8 +783,9 @@ def _analyze_meal_comprehensive(meal: EnvMeal, data_loader: EnvDataLoader, match
         else:
             lca_data['lca_matcher_enabled'] = False
 
-        # Monetization
-        monetization = Monetization(lca_results, data_loader)
+        # Monetization — accepts country to select per-country regional
+        # adjustments (Canadian default).
+        monetization = Monetization(lca_results, data_loader, country=country)
         total_calories = meal_info['total_calories']
         total_protein = meal.get_nutrient_amount('PROTEIN')
 
@@ -710,10 +818,17 @@ def _analyze_meal_comprehensive(meal: EnvMeal, data_loader: EnvDataLoader, match
                 elif meal_type == 'balanced':
                     ref_meal = reference_meals.create_balanced_meal('lunch')
                 
-                # Calculate reference meal impacts
-                ref_lca = LifeCycleAssessment(ref_meal)
+                # Calculate reference meal impacts using the SAME parameters
+                # as the user's meal so the comparison is apples-to-apples.
+                ref_lca = LifeCycleAssessment(
+                    ref_meal,
+                    methodology=methodology,
+                    perspective=perspective,
+                    country=country,
+                    consumer_perspective=consumer_perspective,
+                )
                 ref_impacts = ref_lca.perform_lcia()
-                ref_monetization = Monetization(ref_impacts, data_loader)
+                ref_monetization = Monetization(ref_impacts, data_loader, country=country)
                 ref_cost = ref_monetization.get_total_monetized_impact()
                 ref_carbon = ref_impacts.get('Global warming', 0)
                 
@@ -973,7 +1088,16 @@ def compare_foods_environmental(request):
     try:
         foods_data = request.data.get('foods', [])
         user_type = request.data.get('user_type', 'individual')
-        
+        methodology = request.data.get('methodology', 'recipe2016')
+        perspective = request.data.get('perspective', 'H')
+        country = request.data.get('country')
+        consumer_perspective = request.data.get('consumer_perspective', 'global')
+        param_error = _validate_methodology_params(
+            methodology, perspective, country, consumer_perspective,
+        )
+        if param_error is not None:
+            return Response(param_error, status=status.HTTP_400_BAD_REQUEST)
+
         if not foods_data or len(foods_data) < 2:
             return Response({
                 "error": "Please provide at least 2 foods for comparison",
@@ -1005,13 +1129,19 @@ def compare_foods_environmental(request):
 
                 # Build a single-food meal and run the same LCA/monetization flow used by the main endpoint
                 single_meal = EnvMeal([food])
-                lca = LifeCycleAssessment(single_meal)
+                lca = LifeCycleAssessment(
+                    single_meal,
+                    methodology=methodology,
+                    perspective=perspective,
+                    country=country,
+                    consumer_perspective=consumer_perspective,
+                )
                 lca_midpoints = lca.perform_lcia()
                 lca_endpoints = lca.calculate_endpoint_impacts()
                 lca_single_score = lca.calculate_single_score()
 
                 # Monetization based on LCA midpoints
-                item_monetization = Monetization(lca_midpoints, data_loader)
+                item_monetization = Monetization(lca_midpoints, data_loader, country=country)
                 item_total_cost = item_monetization.get_total_monetized_impact()
 
                 # Align units with main analysis: use the same LCA outputs (per 100 kcal functional unit)
@@ -1135,16 +1265,31 @@ def food_environmental_profile(request, food_id):
     try:
         user_type = request.GET.get('user_type', 'individual')
         quantity = float(request.GET.get('quantity', 100))  # Default 100g
-        
+        methodology = request.GET.get('methodology', 'recipe2016')
+        perspective = request.GET.get('perspective', 'H')
+        country = request.GET.get('country') or None
+        consumer_perspective = request.GET.get('consumer_perspective', 'global')
+        param_error = _validate_methodology_params(
+            methodology, perspective, country, consumer_perspective,
+        )
+        if param_error is not None:
+            return Response(param_error, status=status.HTTP_400_BAD_REQUEST)
+
         data_loader = EnvDataLoader()
         food = EnvFood(food_id=food_id, quantity=quantity, data_loader=data_loader)
-        
+
         # Get comprehensive data
         environmental_impact = food.get_environmental_impact()
 
         # Create single-food meal for LCA analysis
         meal = EnvMeal([food])
-        lca = LifeCycleAssessment(meal)
+        lca = LifeCycleAssessment(
+            meal,
+            methodology=methodology,
+            perspective=perspective,
+            country=country,
+            consumer_perspective=consumer_perspective,
+        )
         lca_results = lca.perform_lcia()
 
         # Sustainability score via the shared helper — same blend (env + nut +
@@ -1158,9 +1303,9 @@ def food_environmental_profile(request, food_id):
             **sustainability_block,
         }
         
-        # Monetization
-        monetization = Monetization(lca_results, data_loader)
-        
+        # Monetization (country-aware)
+        monetization = Monetization(lca_results, data_loader, country=country)
+
         # Format based on user type
         explanations = get_user_explanations(user_type)
         
@@ -1445,5 +1590,48 @@ def _get_food_recommendations(food, sustainability_score: float, user_type: str)
         elif food.food_group in ["Vegetables and Vegetable Products", "Legumes and Legume Products"]:
             # Qualified — greenhouse / air-freighted produce can have ~5× field-grown GHG.
             recommendations.append("🌟 Generally low-impact; prefer in-season and field-grown to avoid hothouse / air-freight premiums")
-    
+
     return recommendations
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def methodology_info(request):
+    """List available LCA methodologies, perspectives, countries, and
+    country-aware impact pathways. The frontend uses this to populate the
+    Advanced methodology dropdowns without bundling the data client-side.
+    """
+    try:
+        methodology = request.GET.get('methodology', 'recipe2016')
+        if methodology not in list_available_methodologies():
+            return Response({
+                "error": f"Unknown methodology {methodology!r}.",
+                "valid_methodologies": list_available_methodologies(),
+            }, status=status.HTTP_400_BAD_REQUEST)
+        pack = get_methodology_pack(methodology)
+        return Response({
+            "available_methodologies": list_available_methodologies(),
+            "active_methodology": methodology,
+            "active_methodology_version": pack.version_string(),
+            "available_perspectives": pack.list_perspectives(),
+            "available_consumer_perspectives": list(_VALID_CONSUMER_PERSPECTIVES),
+            "available_countries": pack.list_countries(),
+            "country_aware_pathways": pack.list_country_aware_pathways(),
+            "country_aware_categories": pack.list_country_aware_categories(),
+            "methodology_provenance": pack.methodology_provenance(),
+            "perspective_descriptions": {
+                "I": "Individualist — short timeframe (20 yr), optimistic; lower DALY/kg CO2.",
+                "H": "Hierarchist — default 100 yr horizon (RIVM convention).",
+                "E": "Egalitarian — long timeframe (1000 yr), pessimistic; ~13× higher GW DALY than H.",
+            },
+            "consumer_perspective_descriptions": {
+                "global": "Use world-average endpoint CFs for every pathway (default; appropriate when food supply chains span multiple countries).",
+                "national": "Substitute country-specific endpoint CFs where the workbook supports it (currently the three water-consumption pathways). Best for in-country produced + consumed analysis.",
+            },
+        })
+    except Exception as exc:  # noqa: BLE001
+        logger.error("methodology_info error: %s", exc, exc_info=True)
+        return Response(
+            {"error": "Failed to load methodology metadata.", "details": str(exc)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )

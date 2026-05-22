@@ -33,6 +33,9 @@ urlpatterns = [
     path('environmental-impact/', environmental_views.environmental_impact, name='environmental_impact'),
     path('environmental-impact/compare-foods/', environmental_views.compare_foods_environmental, name='compare_foods_environmental'),
     path('environmental-impact/food/<int:food_id>/profile/', environmental_views.food_environmental_profile, name='food_environmental_profile'),
+    # Methodology metadata: lists available methodologies / perspectives /
+    # countries / country-aware pathways for the frontend's Advanced panel.
+    path('environmental-impact/methodology/', environmental_views.methodology_info, name='environmental_methodology_info'),
 
     # Enhanced food search
     path('search-food/', food_views.search_food_api, name='search_food_api'),

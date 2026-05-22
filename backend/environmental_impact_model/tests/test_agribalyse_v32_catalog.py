@@ -192,17 +192,18 @@ class V32IndexAndMatcherTests(unittest.TestCase):
 
 
 @unittest.skipUnless(_has_v32_catalog(), "v32 catalog not generated; run the ETL first")
-class RegionalScalingSuppressionTests(unittest.TestCase):
-    """Verify the AGRIBALYSE-INGEST policy: Canadian regional multipliers
-    are suppressed for foods that came through the matcher (matched=True),
-    and still applied for foods that fell back to the group default."""
+class MatcherOverlayAuditTrailTests(unittest.TestCase):
+    """The unsourced Canadian midpoint multipliers were retired when the
+    methodology pack landed (per the ReCiPe2016 integration plan). What
+    remains is the matched-vs-group-default merge logic + per-food audit
+    trail, which these tests pin in place. Country-aware adaptation now
+    lives at the endpoint conversion step (`life_cycle_assessment._ef`)
+    and is exercised in test_lca_default_behavior_parity.py."""
 
-    def test_matched_food_skips_canadian_multiplier(self):
+    def test_matched_overlay_replaces_group_default_for_overlapping_key(self):
         from unittest.mock import patch
         from environmental_impact_model.src.life_cycle_assessment import LifeCycleAssessment
 
-        # Stub objects emulating a Food + Meal without touching the real
-        # CNF integrator data files.
         food_a = MagicMock()
         food_a.food_id = 1
         food_a.food_name = "matched food"
@@ -213,10 +214,6 @@ class RegionalScalingSuppressionTests(unittest.TestCase):
         meal.foods = [food_a]
         meal.calculate_total_calories.return_value = 200.0
 
-        # Stub matcher returns a high-confidence match. The dual-namespace
-        # ReCiPe payload carries ONLY Global warming (the only directly-
-        # equivalent EF→ReCiPe key for this test). All other categories
-        # must fall back to the cnf_integrator group default (Bug A fix).
         match = MagicMock()
         match.matched = True
         match.midpoint_factors = {"Global warming": 5.0}  # per 100 g
@@ -237,9 +234,9 @@ class RegionalScalingSuppressionTests(unittest.TestCase):
         matcher = MagicMock()
         matcher.match.return_value = match
 
-        # Stub group-default factors so the merge produces predictable values
-        # for two categories: Global warming (matched overlay → no Canadian
-        # multiplier) and Land use (group default → Canadian 0.78× applies).
+        # Stub group-default factors with one overlapping key (Global warming
+        # — matched overlay wins) and one non-overlapping key (Land use —
+        # group default flows through).
         stub_group_defaults = {"Global warming": 1.0, "Land use": 4.0}
 
         lca = LifeCycleAssessment(meal, matcher=matcher)
@@ -247,28 +244,25 @@ class RegionalScalingSuppressionTests(unittest.TestCase):
                           return_value=stub_group_defaults):
             midpoints = lca.perform_lcia()
 
-        # Expected Global warming (Bug A + Bug B fixes):
-        #   matched value 5.0/100g × 100g = 5.0 raw  (overlay over group default)
-        #   regional multiplier SUPPRESSED (matched category)
-        #   × functional_unit (100/200=0.5) = 2.5
+        # Global warming: matched value 5.0/100g × 100g = 5.0 raw × functional
+        # unit (100/200=0.5) = 2.5. No regional multipliers anywhere now.
         self.assertAlmostEqual(midpoints["Global warming"], 2.5, places=4,
-                               msg="matched category must NOT receive Canadian multiplier")
+                               msg="matched value should drive Global warming")
 
-        # Expected Land use (Bug A + Bug B fixes):
-        #   group-default value 4.0/100g × 100g = 4.0 raw  (no matcher overlay)
-        #   Canadian multiplier 0.78 APPLIED (group-default category)
-        #   × functional_unit (0.5) = 4.0 × 0.78 × 0.5 = 1.56
-        self.assertAlmostEqual(midpoints["Land use"], 1.56, places=4,
-                               msg="group-default category MUST receive Canadian multiplier")
+        # Land use: group-default 4.0/100g × 100g = 4.0 raw × functional unit
+        # (0.5) = 2.0. The retired Canadian 0.78× multiplier no longer applies.
+        self.assertAlmostEqual(midpoints["Land use"], 2.0, places=4,
+                               msg="group-default category receives no midpoint multiplier")
 
         # Audit trail records per-(food, category) accounting.
         self.assertEqual(len(lca.matcher_decisions), 1)
         dec = lca.matcher_decisions[0]
+        # Regional scaling at midpoint is retired — flag is permanently False.
         self.assertFalse(dec["regional_scaling_applied"])
         self.assertEqual(dec["categories_from_match"], 1)  # Global warming only
         self.assertGreater(dec["categories_from_group_default"], 0)  # Land use etc.
 
-    def test_unmatched_food_still_receives_canadian_multiplier(self):
+    def test_unmatched_food_uses_only_group_defaults(self):
         from environmental_impact_model.src.life_cycle_assessment import LifeCycleAssessment
 
         food_a = MagicMock()
@@ -281,13 +275,9 @@ class RegionalScalingSuppressionTests(unittest.TestCase):
         meal.foods = [food_a]
         meal.calculate_total_calories.return_value = 200.0
 
-        # No matcher (None) → existing group-default path; Canadian
-        # multiplier (Global warming = 0.85) must apply uniformly.
-        # We expect totals to equal previous-behaviour values.
+        # No matcher: existing group-default path; midpoints flow through
+        # without any regional scaling. Smoke check only.
         lca_no_matcher = LifeCycleAssessment(meal, matcher=None)
-        # We can't easily compute the exact expected value without the CNF
-        # integrator data path, so just verify the call works and the
-        # matcher_decisions list stays empty.
         midpoints = lca_no_matcher.perform_lcia()
         self.assertIsInstance(midpoints, dict)
         self.assertEqual(lca_no_matcher.matcher_decisions, [])

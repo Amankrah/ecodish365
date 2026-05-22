@@ -1,24 +1,57 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 import logging
 import os
 from datetime import datetime
 from src.data_loader import DataLoader
 from .cnf_integrator import get_cnf_integrator
 
+# Per-country regional monetization adjustments. Canada is the only entry
+# today (validated against ECCC + Canadian valuation literature). For any
+# other ISO-3 code the multipliers collapse to identity ({}) and a clear
+# log message is emitted explaining the Canadian calibration of the absolute
+# CAD prices is unchanged. Add entries as authoritative per-country economic
+# valuation studies become available.
+_REGIONAL_MONETIZATION_BY_COUNTRY: Dict[str, Dict[str, float]] = {
+    "CAN": {
+        'Global warming': 1.15,  # Arctic amplification (Canada warming ~2x global rate)
+        'Water consumption': 0.7,  # Abundant freshwater (~7% global renewable supply)
+        'Land use': 0.8,  # Abundant land resources (minimal conversion rates)
+        'Fossil resource scarcity': 1.1,  # Oil sands extraction intensity
+    },
+}
+
+
 class Monetization:
     """
-    Enhanced Monetization class with corrected economic factors and Canadian-specific adjustments.
-    Uses current environmental valuation methodologies including official Environment Canada 
-    social cost of carbon and verified Canadian market pricing.
+    Convert LCA midpoint impacts to monetary values (CAD).
+
+    Base monetary factors (`monetary_values`) are CAD-calibrated using ECCC
+    SC-GHG, CE Delft Environmental Prices Handbook 2024 (EUR -> CAD via PPP),
+    and True Price 2024 inputs. Per-country regional adjustments
+    (`regional_factors`) are applied on top.
+
+    The `country` parameter (ISO-3, default `None` -> Canada) selects which
+    country's regional adjustment block applies. For unrecognised countries
+    the multipliers collapse to identity (1.0) and a log message is emitted —
+    the absolute CAD prices are NOT re-priced (that requires per-country
+    economic valuation studies we do not yet have).
     """
-    
-    def __init__(self, lca_results: Dict[str, float], data_loader: DataLoader):
+
+    def __init__(
+        self,
+        lca_results: Dict[str, float],
+        data_loader: DataLoader,
+        country: Optional[str] = None,
+    ):
         self.lca_results = lca_results
         self.data_loader = data_loader
         self.cnf_integrator = get_cnf_integrator()
         self.logger = logging.getLogger(__name__)
         self.base_year = 2021  # Matches ECCC SC-GHG base year (2021 CAD)
         self.current_year = datetime.now().year
+        # Normalize country: None or 'CAN' -> Canadian defaults; anything else
+        # -> identity regional adjustments + informational log message.
+        self.country = country or "CAN"
 
         # Monetary valuation factors (CAD per indicator unit). Values are
         # unchanged in this revision; per-value source attribution is recorded
@@ -116,13 +149,16 @@ class Monetization:
             },
         }
         
-        # Canadian regional adjustment factors (validated against scientific literature)
-        self.regional_factors = {
-            'Global warming': 1.15,  # Higher due to Arctic amplification (Canada warming 2x global rate)
-            'Water consumption': 0.7,  # Lower due to abundant freshwater (7% global renewable supply)
-            'Land use': 0.8,  # Lower due to abundant land resources (minimal conversion rates)
-            'Fossil resource scarcity': 1.1,  # Adjusted for oil sands intensity (2.2x extraction emissions)
-        }
+        # Per-country regional adjustment factors. Selected from the module-level
+        # table by `self.country`; unknown countries fall back to an empty dict
+        # (identity multipliers) with a logged informational message.
+        self.regional_factors = _REGIONAL_MONETIZATION_BY_COUNTRY.get(self.country, {})
+        if self.country not in _REGIONAL_MONETIZATION_BY_COUNTRY:
+            self.logger.info(
+                "Monetization country %s has no published regional adjustment; "
+                "using identity multipliers. Absolute CAD prices remain Canadian-calibrated.",
+                self.country,
+            )
 
         # Allow environment-based override for water pricing to reflect local tariffs
         try:
