@@ -22,6 +22,18 @@ import {
 } from 'lucide-react';
 import type { EnvironmentalImpactResult } from '../../lib/api';
 
+const BASIS_LABELS: Record<string, string> = {
+  per_serving: 'this portion (totals)',
+  per_100g_product: 'per 100 g product',
+  per_100_kcal: 'per 100 kcal',
+  per_100g_protein: 'per 100 g protein',
+};
+
+function basisLabel(basis: string | undefined): string {
+  if (!basis) return 'selected basis';
+  return BASIS_LABELS[basis] ?? basis.replace(/_/g, ' ');
+}
+
 interface EnvironmentalResultsCardProps {
   results: EnvironmentalImpactResult;
   compact?: boolean;
@@ -38,6 +50,28 @@ export const EnvironmentalResultsCard: React.FC<EnvironmentalResultsCardProps> =
   const monetization = analysis?.monetization || {};
   const sustainability = analysis?.sustainability_score || { overall_sustainability_score: 0 };
   const composition = analysis?.meal_composition || { total_energy_kcal: 0, total_weight_grams: 0 };
+
+  /** Raw aggregated impacts for the grams actually entered (`per_serving` on the API). */
+  const mealTotalsLca = analysis?.impacts_by_basis?.per_serving ?? lca;
+  const headlineGw = Number(lca?.['Global warming'] ?? 0);
+  const mealGw = Number(mealTotalsLca?.['Global warming'] ?? headlineGw);
+  const monetizationScale =
+    headlineGw > 1e-15 && Number.isFinite(mealGw) && Number.isFinite(headlineGw)
+      ? mealGw / headlineGw
+      : 1;
+  const previewTotalCost = (monetization?.total_cost || 0) * monetizationScale;
+  const kcalForPortion = composition?.total_energy_kcal || 0;
+  const previewCostPerCalorie =
+    kcalForPortion > 0 ? previewTotalCost / kcalForPortion : (monetization?.cost_per_calorie || 0);
+  const previewCostPerProtein = (monetization?.cost_per_protein || 0) * monetizationScale;
+
+  const reportingBasis = analysis?.reporting_basis;
+  const showNormalizedHint =
+    Boolean(
+      reportingBasis &&
+        reportingBasis !== 'per_serving' &&
+        analysis?.impacts_by_basis?.per_serving,
+    );
 
   // Get sustainability color and icon
   const getSustainabilityInfo = (score: number) => {
@@ -70,6 +104,10 @@ export const EnvironmentalResultsCard: React.FC<EnvironmentalResultsCardProps> =
     return `${value.toFixed(3)} ${unit}`;
   };
 
+  const normalizedFootnoteCompact = showNormalizedHint
+    ? `Advanced basis (${basisLabel(reportingBasis)}): climate ${formatImpactValue(headlineGw, 'kg CO₂-eq')}.`
+    : null;
+
   if (compact) {
     return (
       <div className="space-y-4">
@@ -80,8 +118,12 @@ export const EnvironmentalResultsCard: React.FC<EnvironmentalResultsCardProps> =
               <Globe className="h-4 w-4 text-blue-600" />
               <span className="text-sm font-medium text-blue-900">Carbon Footprint</span>
             </div>
+            <div className="text-xs text-blue-700 mb-1">
+              For ~{(composition?.total_weight_grams || 0).toFixed(0)} g as entered
+              {showNormalizedHint ? ' (see advanced basis below)' : ''}
+            </div>
             <div className="text-lg font-bold text-blue-900">
-              {formatImpactValue(lca?.['Global warming'] || 0, 'kg CO₂-eq')}
+              {formatImpactValue(mealTotalsLca?.['Global warming'] || 0, 'kg CO₂-eq')}
             </div>
           </div>
 
@@ -91,7 +133,7 @@ export const EnvironmentalResultsCard: React.FC<EnvironmentalResultsCardProps> =
               <span className="text-sm font-medium text-green-900">Environmental Cost</span>
             </div>
             <div className="text-lg font-bold text-green-900">
-              CAD ${(monetization?.total_cost || 0).toFixed(3)}
+              CAD ${previewTotalCost.toFixed(3)}
             </div>
           </div>
         </div>
@@ -122,24 +164,34 @@ export const EnvironmentalResultsCard: React.FC<EnvironmentalResultsCardProps> =
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div className="flex justify-between">
             <span className="text-gray-600">Water Use:</span>
-            <span className="font-medium">{formatImpactValue(lca?.['Water consumption'] || 0, 'm³')}</span>
+            <span className="font-medium">{formatImpactValue(mealTotalsLca?.['Water consumption'] || 0, 'm³')}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">Land Use:</span>
-            <span className="font-medium">{formatImpactValue(lca?.['Land use'] || 0, 'm²a')}</span>
+            <span className="font-medium">{formatImpactValue(mealTotalsLca?.['Land use'] || 0, 'm²a')}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">Per Calorie:</span>
-            <span className="font-medium">CAD {(monetization?.cost_per_calorie || 0).toFixed(5)}</span>
+            <span className="font-medium">CAD {previewCostPerCalorie.toFixed(5)}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">Single Score:</span>
             <span className="font-medium">{(analysis?.single_score || 0).toFixed(4)} pts</span>
           </div>
         </div>
+        {normalizedFootnoteCompact && (
+          <p className="text-xs text-gray-500 leading-snug">{normalizedFootnoteCompact}</p>
+        )}
       </div>
     );
   }
+
+  const normalizedFootnoteDetailed = showNormalizedHint
+    ? `Impacts shown below are totals for ~${(composition?.total_weight_grams || 0).toFixed(0)} g. ` +
+      `Advanced functional unit (${basisLabel(reportingBasis)}): climate ${formatImpactValue(headlineGw, 'kg CO₂-eq')}; ` +
+      `water ${formatImpactValue(Number(lca?.['Water consumption'] ?? 0), 'm³')}; ` +
+      `land ${formatImpactValue(Number(lca?.['Land use'] ?? 0), 'm²a crop-eq')}.`
+    : null;
 
   return (
     <div className="space-y-6">
@@ -171,12 +223,21 @@ export const EnvironmentalResultsCard: React.FC<EnvironmentalResultsCardProps> =
         </div>
       </div>
 
+      {normalizedFootnoteDetailed && (
+        <div className="rounded-md border border-blue-100 bg-blue-50/80 px-3 py-2 text-sm text-blue-900">
+          {normalizedFootnoteDetailed}
+        </div>
+      )}
+
       {/* Core Environmental Impacts */}
       <div>
-        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
           <Globe className="h-5 w-5" />
           Key Environmental Impacts
         </h3>
+        <p className="text-sm text-gray-600 mb-4">
+          Values are aggregated for your analyzed portion (~{(composition?.total_weight_grams || 0).toFixed(0)} g total).
+        </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-blue-50 p-4 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
@@ -184,7 +245,7 @@ export const EnvironmentalResultsCard: React.FC<EnvironmentalResultsCardProps> =
               <span className="font-medium text-blue-900">Climate Impact</span>
             </div>
             <div className="text-2xl font-bold text-blue-900">
-              {formatImpactValue(lca?.['Global warming'] || 0, 'kg CO₂-eq')}
+              {formatImpactValue(mealTotalsLca?.['Global warming'] || 0, 'kg CO₂-eq')}
             </div>
             <div className="text-sm text-blue-700 mt-1">
               Global Warming Potential
@@ -197,7 +258,7 @@ export const EnvironmentalResultsCard: React.FC<EnvironmentalResultsCardProps> =
               <span className="font-medium text-cyan-900">Water Impact</span>
             </div>
             <div className="text-2xl font-bold text-cyan-900">
-              {formatImpactValue(lca?.['Water consumption'] || 0, 'm³')}
+              {formatImpactValue(mealTotalsLca?.['Water consumption'] || 0, 'm³')}
             </div>
             <div className="text-sm text-cyan-700 mt-1">
               Freshwater Consumption
@@ -210,7 +271,7 @@ export const EnvironmentalResultsCard: React.FC<EnvironmentalResultsCardProps> =
               <span className="font-medium text-green-900">Land Impact</span>
             </div>
             <div className="text-2xl font-bold text-green-900">
-              {formatImpactValue(lca?.['Land use'] || 0, 'm²a crop-eq')}
+              {formatImpactValue(mealTotalsLca?.['Land use'] || 0, 'm²a crop-eq')}
             </div>
             <div className="text-sm text-green-700 mt-1">
               Agricultural Land Use
@@ -250,19 +311,19 @@ export const EnvironmentalResultsCard: React.FC<EnvironmentalResultsCardProps> =
             <div>
               <span className="text-sm text-yellow-700">Total Cost:</span>
               <div className="text-xl font-bold text-yellow-900">
-                CAD ${(monetization?.total_cost || 0).toFixed(3)}
+                CAD ${previewTotalCost.toFixed(3)}
               </div>
             </div>
             <div>
               <span className="text-sm text-yellow-700">Per Calorie:</span>
               <div className="text-xl font-bold text-yellow-900">
-                CAD ${(monetization?.cost_per_calorie || 0).toFixed(5)}
+                CAD ${previewCostPerCalorie.toFixed(5)}
               </div>
             </div>
             <div>
               <span className="text-sm text-yellow-700">Per Protein:</span>
               <div className="text-xl font-bold text-yellow-900">
-                CAD ${(monetization?.cost_per_protein || 0).toFixed(5)}
+                CAD ${previewCostPerProtein.toFixed(5)}
               </div>
             </div>
             <div>

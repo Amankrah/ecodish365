@@ -331,6 +331,18 @@ def run_benchmark(sample_size: int = 200, seed: int = 42,
                 row['decomposer_n_ingredients'] = int(decomp.get('ingredient_count') or 0)
                 row['decomposer_triggered_by'] = decomp.get('triggered_by')
                 row['decomposer_fallback_reason'] = decomp.get('fallback_reason')
+                # Capture the decomposer's chosen ingredient ciqual codes so we
+                # can check "decomposer's first/only ingredient == matcher's
+                # chosen ciqual_code" — the agreement signal that motivates the
+                # "decomposer-confirmed direct match" gate refinement.
+                row['decomposer_ingredients'] = [
+                    {
+                        'ciqual_code': i.get('ciqual_code'),
+                        'mass_g': i.get('mass_g'),
+                        'lci_name': i.get('lci_name'),
+                    }
+                    for i in (decomp.get('ingredients') or [])
+                ]
             else:
                 row['decomposer_attempted'] = False
                 row['decomposer_resolved'] = False
@@ -338,6 +350,7 @@ def run_benchmark(sample_size: int = 200, seed: int = 42,
                 row['decomposer_n_ingredients'] = None
                 row['decomposer_triggered_by'] = None
                 row['decomposer_fallback_reason'] = None
+                row['decomposer_ingredients'] = None
         rows.append(row)
 
     # ---- Aggregate summary ----

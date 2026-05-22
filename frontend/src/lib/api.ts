@@ -1385,7 +1385,16 @@ export interface RecipeDecompositionDecision {
   total_recipe_mass_g: number;
   decomposition_confidence: number;
   unresolved_mass_g: number;
-  /** When matched=false, the validation gate that rejected this decomposition. */
+  /**
+   * Audit tag. When matched=false: the validation gate that rejected
+   * this decomposition (e.g. 'mass_imbalance', 'unresolved_mass_too_large',
+   * 'too_few_ingredients', 'low_confidence', 'hallucinated_ciqual_code').
+   * When matched=true: usually null. The exception is the value
+   * 'decomposer_confirmed_direct_match', which signals that the decomposer
+   * returned exactly 1 ingredient equal to the matcher's borderline-confidence
+   * direct match (a "confirmation" rather than a real ingredient-level
+   * decomposition; the LCA value equals exactly the matcher-direct path).
+   */
   fallback_reason: string | null;
   /** Why the decomposer fired: 'matcher_failed' or 'low_matcher_confidence:<conf>'. */
   triggered_by?: string;
@@ -1574,6 +1583,15 @@ export interface EnvironmentalImpactResult {
         enabled: boolean;
         decisions: RecipeDecompositionDecision[];
       };
+      /**
+       * Server-computed midpoint dicts keyed by functional unit (`per_serving`,
+       * `per_100g_product`, …). `per_serving` is the raw aggregated impact for
+       * the actual grams entered — use for “this portion” previews when
+       * `reporting_basis` is a normalized column.
+       */
+      impacts_by_basis?: Record<string, Partial<LCAResults>>;
+      /** Advanced-panel basis matching `lca_results` normalization. */
+      reporting_basis?: string;
     };
     user_explanation: UserExplanation;
     comparison_to_references: {
@@ -1690,6 +1708,24 @@ export class EnvironmentalImpactApiService {
     const sustainability = backendData.sustainability || {};
     const refComparisons = backendData.reference_comparisons || {};
     const mealInfo = outerData.meal_info || {};
+
+    const impactsByBasisRaw = envImpacts.impacts_by_basis;
+    const impacts_by_basis =
+      impactsByBasisRaw && typeof impactsByBasisRaw === 'object'
+        ? (Object.fromEntries(
+            Object.entries(impactsByBasisRaw as Record<string, Record<string, unknown>>).map(
+              ([basis, mids]) => [
+                basis,
+                Object.fromEntries(
+                  Object.entries(mids || {}).map(([cat, val]) => {
+                    const n = typeof val === 'string' ? Number(val) : val;
+                    return [cat, typeof n === 'number' && Number.isFinite(n) ? n : 0];
+                  }),
+                ),
+              ],
+            ),
+          ) as EnvironmentalImpactResult['data']['meal_analysis']['impacts_by_basis'])
+        : undefined;
     
     console.log('DEBUG - envImpacts:', envImpacts);
     console.log('DEBUG - envImpacts.all_impacts:', envImpacts.all_impacts);
@@ -1755,6 +1791,11 @@ export class EnvironmentalImpactApiService {
             enabled: envImpacts.recipe_decomposer_enabled === true,
             decisions: (envImpacts.recipe_decomposition_decisions as RecipeDecompositionDecision[] | undefined) || [],
           },
+          impacts_by_basis,
+          reporting_basis:
+            typeof envImpacts.reporting_basis === 'string'
+              ? envImpacts.reporting_basis
+              : 'per_100_kcal',
         },
         user_explanation: {
           summary: envImpacts.explanation?.simple_explanation || '',

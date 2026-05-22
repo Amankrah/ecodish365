@@ -109,6 +109,27 @@ AUTO_CREDIT_UNRESOLVED: bool = True
 # decomposer should be allowed to propose an ingredient-level reconstruction.
 HIGH_CONFIDENCE_THRESHOLD: float = 0.85
 
+# Matcher-agreement floor (Hypothesis B, 2026-05-22 Phase B analysis): when
+# the decomposer returns exactly 1 ingredient AND that ingredient's
+# ciqual_code equals the matcher's chosen ciqual_code AND the matcher's
+# confidence was ≥ this floor, accept the decomposition as a
+# "decomposer-confirmed direct match" instead of rejecting at the
+# min_ingredients gate. Empirically: across the 60 Tier γ attempts in the
+# 2026-05-22 184-food benchmark, 2 cases hit this pattern (food_ids 4652
+# submarine sandwich, 5691 deli chicken breast — both at matcher conf 0.80),
+# zero genuine lazy 1-ingredient rejections (category E in
+# `decomposer_agreement_analysis.md`). The floor is 0.75 (not 0.85) because
+# these cases sit in the 0.75–0.85 borderline band where the matcher is
+# calibrated-but-not-certain; below 0.75 we don't trust the matcher enough
+# to accept a single-row decomposition.
+#
+# When this gate accepts: matched=True, ingredients=[the single ingredient],
+# fallback_reason='decomposer_confirmed_direct_match'. The LCA value is
+# identical to the matcher-only direct-match path (one ingredient at 100% of
+# the target mass produces the same per-100g impact as the matcher's chosen
+# ciqual_code); only the audit trail differs (cleaner, honest).
+MATCHER_AGREEMENT_CONFIDENCE_FLOOR: float = 0.75
+
 
 def _mass_tolerance(target_mass_g: float) -> float:
     """Per-serving mass-balance tolerance.
@@ -299,8 +320,19 @@ class RecipeDecomposer:
         food_description: str,
         food_quantity_g: float,
         food_group: Optional[str] = None,
+        match_result: Optional[MatchResult] = None,
     ) -> DecomposedRecipe:
-        """Attempt to decompose a CNF composite food into v32 ingredients."""
+        """Attempt to decompose a CNF composite food into v32 ingredients.
+
+        `match_result` (optional) is the upstream matcher's decision for this
+        food. When supplied, it enables the "decomposer-confirmed direct
+        match" gate refinement: a 1-ingredient decomposition equal to the
+        matcher's chosen ciqual_code at matcher confidence ≥
+        `MATCHER_AGREEMENT_CONFIDENCE_FLOOR` (0.75) is accepted as matched=True
+        with `fallback_reason='decomposer_confirmed_direct_match'`, rather
+        than rejected at the min_ingredients gate. Callers that don't supply
+        match_result get the strict legacy behaviour (back-compat).
+        """
         if food_id in self._cache:
             return self._cache[food_id]
 
@@ -354,6 +386,7 @@ class RecipeDecomposer:
             parsed=parsed,
             candidates_by_code=candidates_by_code,
             raw=json.dumps(parsed) if isinstance(parsed, dict) else str(parsed),
+            match_result=match_result,
         )
         with self._cache_lock:
             self._cache[food_id] = result
@@ -415,6 +448,7 @@ class RecipeDecomposer:
         parsed: Dict[str, Any],
         candidates_by_code: Dict[str, Dict[str, Any]],
         raw: str,
+        match_result: Optional[MatchResult] = None,
     ) -> DecomposedRecipe:
         # Required keys
         if 'ingredients' not in parsed or not isinstance(parsed['ingredients'], list):
@@ -463,10 +497,47 @@ class RecipeDecomposer:
                 raw_llm_response=raw,
             )
 
-        # Min-ingredients gate: a "decomposition" with 1 ingredient is the
-        # matcher's job, not the decomposer's. Reject so the matcher's
-        # borderline result remains as the best-available output.
+        # Min-ingredients gate: a "decomposition" with 1 ingredient is
+        # usually the matcher's job, not the decomposer's. Reject so the
+        # matcher's borderline result remains as the best-available output.
+        #
+        # Exception (Hypothesis B, 2026-05-22 Phase B analysis): when the
+        # decomposer returns exactly 1 ingredient AND that ingredient
+        # equals the matcher's chosen ciqual_code AND the matcher's
+        # confidence is ≥ MATCHER_AGREEMENT_CONFIDENCE_FLOOR (0.75), the
+        # decomposer is CONFIRMING the matcher's borderline pick rather
+        # than failing to find more ingredients. Accept as
+        # matched=True with `fallback_reason='decomposer_confirmed_direct_match'`
+        # (a benign audit tag, not a real failure). The resulting LCA value
+        # equals exactly the matcher-direct path because the one ingredient
+        # at 100 % of mass produces the same per-100 g impact as the
+        # matcher's chosen ciqual_code; only the audit trail differs.
         if len(ingredients) < DEFAULT_MIN_INGREDIENTS:
+            if (
+                len(ingredients) == 1
+                and match_result is not None
+                and match_result.matched
+                and match_result.ciqual_code is not None
+                and ingredients[0].ciqual_code == match_result.ciqual_code
+                and match_result.confidence >= MATCHER_AGREEMENT_CONFIDENCE_FLOOR
+                # The single ingredient must occupy substantially all of the
+                # target mass — LLM signaled "this dish IS X" rather than
+                # "X plus some unspecified rest" (which would route to a
+                # different audit story, not a direct-match confirmation).
+                and ingredients[0].mass_g >= target_mass_g * 0.8
+            ):
+                # Decomposer-confirmed direct match. Set mass to target
+                # exactly (the single ingredient = the full dish at 100 %).
+                ingredients[0].mass_g = target_mass_g
+                return DecomposedRecipe(
+                    food_id=food_id, matched=True,
+                    ingredients=ingredients,
+                    total_recipe_mass_g=target_mass_g,
+                    decomposition_confidence=float(parsed.get('decomposition_confidence', 0.0) or 0.0),
+                    unresolved_mass_g=0.0,
+                    fallback_reason='decomposer_confirmed_direct_match',
+                    raw_llm_response=raw,
+                )
             return DecomposedRecipe(
                 food_id=food_id, matched=False,
                 ingredients=ingredients,

@@ -395,6 +395,7 @@ class LifeCycleAssessment:
                         food_description=getattr(food, "food_name", "") or "",
                         food_quantity_g=float(getattr(food, "quantity", 0) or 0),
                         food_group=getattr(food, "food_group", None),
+                        match_result=match_result,  # enables "decomposer-confirmed direct match" gate
                     )
                     # Audit trail: record WHY the decomposer fired (matcher
                     # outright failed vs. matched with low confidence). Useful

@@ -336,6 +336,142 @@ class ValidationGateTests(unittest.TestCase):
         self.assertAlmostEqual(result.unresolved_mass_g, 10.0, places=1)
 
 
+class DecomposerConfirmedDirectMatchTests(unittest.TestCase):
+    """Hypothesis B gate refinement (2026-05-22 Phase B analysis): when the
+    decomposer returns exactly 1 ingredient matching the matcher's borderline-
+    confidence direct match, accept as `decomposer_confirmed_direct_match`
+    rather than rejecting at the min_ingredients gate.
+
+    Pins the four boundary cases:
+      1. Agreement + matcher conf ≥ 0.75 + mass ≥ 80% of target → accept
+      2. No agreement (decomposer picks different code) → reject
+      3. Matcher conf below 0.75 floor → reject
+      4. No match_result passed (back-compat) → reject under strict gate
+    """
+
+    def setUp(self):
+        self.index, self.retriever = _make_stub_index_and_retriever()
+        self.client = MagicMock()
+        self.decomposer = RecipeDecomposer(
+            index=self.index, retriever=self.retriever, ranking_client=self.client,
+        )
+
+    def _matcher_result(self, ciqual_code='21000', confidence=0.80, matched=True):
+        return MatchResult(
+            food_id=42, matched=matched, ciqual_code=ciqual_code,
+            lci_name='Beef, ground, raw',
+            confidence=confidence, justification='direct match',
+            midpoint_factors={'Global warming': 2.5},
+        )
+
+    def test_decomposer_confirmed_direct_match_accepted(self):
+        """1 ingredient equal to matcher's choice + matcher conf 0.80 + full
+        target mass → accept as decomposer_confirmed_direct_match.
+        Reproduces the live food_id=4652 / 5691 cases from the 2026-05-22
+        Phase B analysis."""
+        self.client.chat.completions.create.return_value = _make_llm_response({
+            'ingredients': [
+                {'ciqual_code': '21000', 'mass_g': 100.0, 'rationale': 'whole dish is this entry'},
+            ],
+            'total_recipe_mass_g': 100.0,
+            'decomposition_confidence': 0.7,
+            'unresolved_mass_g': 0.0,
+        })
+        match = self._matcher_result(ciqual_code='21000', confidence=0.80)
+        result = self.decomposer.decompose(
+            food_id=4652, food_description='Sub sandwich', food_quantity_g=100.0,
+            match_result=match,
+        )
+        self.assertTrue(result.matched,
+                        msg=f'expected matched=True; got fallback={result.fallback_reason}')
+        self.assertEqual(result.fallback_reason, 'decomposer_confirmed_direct_match')
+        self.assertEqual(result.ingredient_count, 1)
+        self.assertEqual(result.ingredients[0].ciqual_code, '21000')
+        self.assertAlmostEqual(result.ingredients[0].mass_g, 100.0, places=1)
+        self.assertTrue(result.is_resolved())
+
+    def test_decomposer_lone_ingredient_no_matcher_agreement_rejected(self):
+        """Decomposer's single ingredient differs from matcher's choice →
+        the strict min_ingredients gate fires. Prevents accidental acceptance
+        of arbitrary 1-ingredient decompositions."""
+        self.client.chat.completions.create.return_value = _make_llm_response({
+            'ingredients': [
+                {'ciqual_code': '19062', 'mass_g': 100.0, 'rationale': 'tomato'},
+            ],
+            'total_recipe_mass_g': 100.0,
+            'decomposition_confidence': 0.7,
+            'unresolved_mass_g': 0.0,
+        })
+        # Matcher picked 21000 (beef); decomposer picks 19062 (tomato) — no agreement.
+        match = self._matcher_result(ciqual_code='21000', confidence=0.80)
+        result = self.decomposer.decompose(
+            food_id=99, food_description='X', food_quantity_g=100.0,
+            match_result=match,
+        )
+        self.assertFalse(result.matched)
+        self.assertTrue(result.fallback_reason.startswith('too_few_ingredients'))
+
+    def test_decomposer_lone_ingredient_low_matcher_conf_rejected(self):
+        """Decomposer agrees with matcher's code BUT matcher confidence 0.65
+        is below the MATCHER_AGREEMENT_CONFIDENCE_FLOOR (0.75) — reject.
+        Stops us from accepting on too-borderline matcher hits."""
+        self.client.chat.completions.create.return_value = _make_llm_response({
+            'ingredients': [
+                {'ciqual_code': '21000', 'mass_g': 100.0, 'rationale': 'beef'},
+            ],
+            'total_recipe_mass_g': 100.0,
+            'decomposition_confidence': 0.7,
+            'unresolved_mass_g': 0.0,
+        })
+        match = self._matcher_result(ciqual_code='21000', confidence=0.65)  # below 0.75 floor
+        result = self.decomposer.decompose(
+            food_id=99, food_description='X', food_quantity_g=100.0,
+            match_result=match,
+        )
+        self.assertFalse(result.matched)
+        self.assertTrue(result.fallback_reason.startswith('too_few_ingredients'))
+
+    def test_decomposer_no_match_result_passed_falls_back_to_strict_min_ingredients(self):
+        """When the caller doesn't supply a match_result (back-compat: prior to
+        Phase C the API didn't plumb it through), the strict min_ingredients=2
+        gate fires unchanged. Verifies we don't accidentally regress the old
+        behaviour."""
+        self.client.chat.completions.create.return_value = _make_llm_response({
+            'ingredients': [
+                {'ciqual_code': '21000', 'mass_g': 100.0, 'rationale': 'beef'},
+            ],
+            'total_recipe_mass_g': 100.0,
+            'decomposition_confidence': 0.7,
+            'unresolved_mass_g': 0.0,
+        })
+        result = self.decomposer.decompose(
+            food_id=99, food_description='X', food_quantity_g=100.0,
+            # No match_result kwarg passed
+        )
+        self.assertFalse(result.matched)
+        self.assertTrue(result.fallback_reason.startswith('too_few_ingredients'))
+
+    def test_decomposer_confirmed_direct_match_partial_mass_rejected(self):
+        """Safety guard: if the LLM's single ingredient occupies < 80% of
+        target mass, reject (the LLM was signaling 'matched ingredient +
+        unspecified rest', NOT a clean direct-match confirmation)."""
+        self.client.chat.completions.create.return_value = _make_llm_response({
+            'ingredients': [
+                {'ciqual_code': '21000', 'mass_g': 50.0, 'rationale': 'beef (half)'},
+            ],
+            'total_recipe_mass_g': 100.0,
+            'decomposition_confidence': 0.7,
+            'unresolved_mass_g': 50.0,
+        })
+        match = self._matcher_result(ciqual_code='21000', confidence=0.80)
+        result = self.decomposer.decompose(
+            food_id=99, food_description='X', food_quantity_g=100.0,
+            match_result=match,
+        )
+        self.assertFalse(result.matched)
+        self.assertTrue(result.fallback_reason.startswith('too_few_ingredients'))
+
+
 class SuccessfulDecompositionTests(unittest.TestCase):
     """Well-formed LLM output produces matched=True with the expected ingredient list."""
 

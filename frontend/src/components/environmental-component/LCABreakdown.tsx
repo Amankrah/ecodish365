@@ -193,38 +193,52 @@ export const LCABreakdown: React.FC<LCABreakdownProps> = ({ results }) => {
             <p className="text-gray-500 italic">
               Composite CNF foods routed through the Tier γ decomposer when no high-confidence direct match exists in Agribalyse v32. Each ingredient resolved via the LCA matcher; impacts are mass-weighted summed.
             </p>
-            {decompDecisions.map((d, idx) => (
-              <div key={`decomp-${d.food_id}-${idx}`} className="border-l-2 border-purple-300 pl-2">
-                <div className="flex items-center gap-2">
-                  <span className={`px-1.5 py-0.5 rounded text-xs font-semibold ${
-                    d.matched
-                      ? 'bg-emerald-100 text-emerald-800'
-                      : 'bg-amber-100 text-amber-800'
-                  }`}>
-                    {d.matched ? 'RESOLVED' : 'REJECTED'}
-                  </span>
-                  <span className="text-gray-600">food_id={d.food_id}</span>
-                  <span className="text-gray-500">conf={d.decomposition_confidence.toFixed(2)}</span>
-                  {d.triggered_by && (
-                    <span className="text-gray-400">trigger: {d.triggered_by}</span>
+            {decompDecisions.map((d, idx) => {
+              // Three audit states: REJECTED (matched=false), CONFIRMED (decomposer
+              // returned a single ingredient equal to the matcher's borderline
+              // direct match → see manuscript §4.4), RESOLVED (real multi-ingredient
+              // decomposition that replaced the matcher's borderline result).
+              const isConfirmed = d.matched && d.fallback_reason === 'decomposer_confirmed_direct_match';
+              const badgeClass = !d.matched
+                ? 'bg-amber-100 text-amber-800'
+                : isConfirmed
+                  ? 'bg-sky-100 text-sky-800'
+                  : 'bg-emerald-100 text-emerald-800';
+              const badgeText = !d.matched ? 'REJECTED' : isConfirmed ? 'CONFIRMED' : 'RESOLVED';
+              return (
+                <div key={`decomp-${d.food_id}-${idx}`} className="border-l-2 border-purple-300 pl-2">
+                  <div className="flex items-center gap-2">
+                    <span className={`px-1.5 py-0.5 rounded text-xs font-semibold ${badgeClass}`}>
+                      {badgeText}
+                    </span>
+                    <span className="text-gray-600">food_id={d.food_id}</span>
+                    <span className="text-gray-500">conf={d.decomposition_confidence.toFixed(2)}</span>
+                    {d.triggered_by && (
+                      <span className="text-gray-400">trigger: {d.triggered_by}</span>
+                    )}
+                  </div>
+                  {isConfirmed && (
+                    <div className="text-sky-700 mt-1 italic">
+                      ↳ decomposer confirmed matcher&apos;s borderline direct match (single-ingredient agreement)
+                    </div>
+                  )}
+                  {d.matched && d.ingredients.length > 0 && (
+                    <ul className="mt-1 space-y-0.5 ml-2 text-gray-700">
+                      {d.ingredients.map((i, j) => (
+                        <li key={`ing-${j}`} className="flex gap-2">
+                          <span className="text-gray-400 font-mono">[{i.ciqual_code}]</span>
+                          <span className="text-gray-600">{i.mass_g.toFixed(0)}g</span>
+                          <span>{i.lci_name}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {!d.matched && d.fallback_reason && (
+                    <div className="text-amber-700 mt-1">↳ {d.fallback_reason}</div>
                   )}
                 </div>
-                {d.matched && d.ingredients.length > 0 && (
-                  <ul className="mt-1 space-y-0.5 ml-2 text-gray-700">
-                    {d.ingredients.map((i, j) => (
-                      <li key={`ing-${j}`} className="flex gap-2">
-                        <span className="text-gray-400 font-mono">[{i.ciqual_code}]</span>
-                        <span className="text-gray-600">{i.mass_g.toFixed(0)}g</span>
-                        <span>{i.lci_name}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                {!d.matched && d.fallback_reason && (
-                  <div className="text-amber-700 mt-1">↳ {d.fallback_reason}</div>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         </details>
       )}

@@ -110,6 +110,14 @@ else:
         "https://www.ecodish365.com",
     ]
 
+# Optional extra origins when `DJANGO_ENV` is not development (comma-separated).
+# Typical use: a production-like `.env` used with `runserver` + Next.js at localhost:3000.
+_extra_cors = os.environ.get("EXTRA_CORS_ALLOWED_ORIGINS", "")
+if _extra_cors.strip():
+    for origin in (_o.strip() for _o in _extra_cors.split(",") if _o.strip()):
+        if origin not in CORS_ALLOWED_ORIGINS:
+            CORS_ALLOWED_ORIGINS.append(origin)
+
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_METHODS = [
@@ -247,19 +255,19 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 CNF_FOLDER = str(RAW_CNF_DIR)
 
-# Security settings - only enable in production
+# Security settings when DJANGO_ENV is not "development"
+#
+# This module stays importable via `manage.py runserver`, which speaks HTTP only.
+# Enabling HTTPS redirects / HSTS / secure-only cookies here (under a production
+# `DJANGO_ENV` + copied `.env`) breaks local SPA calls from http://localhost:3000
+# — redirects and TLS failures show up as CORS / Axios "Network Error" in the browser.
+#
+# Fully hardened deployments should use dish_project.settings_production behind a
+# TLS-terminating reverse proxy (see settings_production.py for SECURE_* and CORS).
 if not IS_DEVELOPMENT:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    X_FRAME_OPTIONS = 'DENY'
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
-    USE_X_FORWARDED_HOST = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    X_FRAME_OPTIONS = "DENY"
 
 # Development-specific settings
 if IS_DEVELOPMENT:

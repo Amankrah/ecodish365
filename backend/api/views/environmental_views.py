@@ -408,6 +408,11 @@ def format_environmental_results(meal_data: Dict[str, Any], user_type: str = "in
         "impacts_bands_by_basis":   lca_data.get('midpoint_impacts_bands_by_basis', {}),
         "endpoint_impacts_by_basis": lca_data.get('endpoint_impacts_by_basis', {}),
         "basis_factors":            lca_data.get('basis_factors', {}),
+        # Mirrors `basis` on the originating `LifeCycleAssessment` so the SPA
+        # can label headline `all_impacts` vs absolute `impacts_by_basis.per_serving`.
+        "reporting_basis": (
+            (lca_data.get("parameters") or {}).get("basis", "per_100_kcal")
+        ),
         # CODE-5: per-category confidence rating and methodology provenance
         # (additive — existing consumers ignore unknown keys).
         "factor_confidence_by_category": lca_data.get('factor_confidence_by_category', {}),

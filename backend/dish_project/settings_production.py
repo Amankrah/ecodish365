@@ -59,6 +59,12 @@ _csrf = os.environ.get("CSRF_TRUSTED_ORIGINS", _cors)
 if _csrf:
     CSRF_TRUSTED_ORIGINS = [o.strip() for o in _csrf.split(",") if o.strip()]
 
+_extra_dev_cors = os.environ.get("EXTRA_CORS_ALLOWED_ORIGINS", "")
+if _extra_dev_cors.strip():
+    for origin in (o.strip() for o in _extra_dev_cors.split(",") if o.strip()):
+        if origin not in CORS_ALLOWED_ORIGINS:
+            CORS_ALLOWED_ORIGINS.append(origin)
+
 # ---------------------------------------------------------------------------
 # Database — SQLite with WAL mode for concurrent read performance
 # ---------------------------------------------------------------------------
