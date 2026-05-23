@@ -1,0 +1,154 @@
+{
+  "_provenance": {
+    "date_utc": "2026-05-23T15:32:19Z",
+    "embedding_model": "text-embedding-3-small",
+    "ranking_model": "gpt-4.1-mini",
+    "top_k": 20,
+    "min_bridge_confidence": 0.5,
+    "cnf_total": 18,
+    "fndds_total": 5432,
+    "cnf_bridged": 23,
+    "cnf_unbridged": 0
+  },
+  "bridges": {
+    "2": {
+      "fdc_id": 2705792,
+      "food_code": 14630200,
+      "confidence": 0.9,
+      "rationale": "Exact match with the same name and preparation as Cheese souffle."
+    },
+    "4": {
+      "fdc_id": 2706724,
+      "food_code": 27360120,
+      "confidence": 0.9,
+      "rationale": "This entry is chow mein or chop suey with various types of meat and noodles, closely matching the CNF canned chop suey with meat."
+    },
+    "5": {
+      "fdc_id": 2706687,
+      "food_code": 27343910,
+      "confidence": 0.9,
+      "rationale": "This entry specifically describes chicken chow mein with noodles, matching the CNF food's main ingredients and preparation."
+    },
+    "6": {
+      "fdc_id": 2710047,
+      "food_code": 75411020,
+      "confidence": 0.9,
+      "rationale": "FNDDS entry 'Fritter, corn' is a direct equivalent to CNF 'Corn fritter' with matching preparation and ingredients."
+    },
+    "7": {
+      "fdc_id": 2706596,
+      "food_code": 27311605,
+      "confidence": 0.7,
+      "rationale": "This entry includes beef, potatoes, and vegetables excluding certain types, closely matching the CNF dish of beef pot roast with browned potatoes, peas, and corn."
+    },
+    "113": {
+      "fdc_id": 2705385,
+      "food_code": 11111000,
+      "confidence": 0.9,
+      "rationale": "Milk, whole in FNDDS matches the CNF whole milk 3.25% M.F. as a direct equivalent."
+    },
+    "629": {
+      "fdc_id": 2706057,
+      "food_code": 24162130,
+      "confidence": 0.9,
+      "rationale": "Exact match for chicken wing, roasted with skin, directly equivalent to CNF food."
+    },
+    "1185": {
+      "fdc_id": 2706167,
+      "food_code": 25210210,
+      "confidence": 0.9,
+      "rationale": "Hot dog, beef is a direct equivalent to Wiener (frankfurter), beef in preparation and ingredients."
+    },
+    "1413": {
+      "fdc_id": 2708388,
+      "food_code": 56203087,
+      "confidence": 0.9,
+      "rationale": "This entry is instant plain oatmeal made with water and fat added, closely matching the CNF instant oats dry cereal."
+    },
+    "1495": {
+      "fdc_id": 2709320,
+      "food_code": 64104010,
+      "confidence": 0.9,
+      "rationale": "Exact match for 100% apple juice without added vitamin C, same preparation and ingredients."
+    },
+    "1936": {
+      "fdc_id": 2705889,
+      "food_code": 22601000,
+      "confidence": 0.7,
+      "rationale": "Both are pork bacon, cured and raw in CNF vs cooked in FNDDS, representing a close analog with minor preparation difference."
+    },
+    "2026": {
+      "fdc_id": 2709646,
+      "food_code": 72201212,
+      "confidence": 0.9,
+      "rationale": "Broccoli, frozen, cooked, no added fat matches the CNF food of frozen broccoli spears boiled and drained exactly in preparation and ingredients."
+    },
+    "2511": {
+      "fdc_id": 2707590,
+      "food_code": 43108010,
+      "confidence": 0.95,
+      "rationale": "Exact match for dried chia seeds with same preparation and ingredient."
+    },
+    "2791": {
+      "fdc_id": 2705850,
+      "food_code": 21416000,
+      "confidence": 0.9,
+      "rationale": "Exact match for canned corned beef, same preparation and ingredients."
+    },
+    "3054": {
+      "fdc_id": 2706293,
+      "food_code": 26139180,
+      "confidence": 0.7,
+      "rationale": "Canned sardines are the same food, though the CNF specifies tomato sauce and bones, while the FNDDS entry does not specify sauce or bones explicitly."
+    },
+    "3941": {
+      "fdc_id": 2707995,
+      "food_code": 53301000,
+      "confidence": 0.9,
+      "rationale": "Exact match for commercial apple pie with two crusts, directly equivalent."
+    },
+    "4066": {
+      "fdc_id": 2707598,
+      "food_code": 51101000,
+      "confidence": 0.9,
+      "rationale": "Exact match for commercial white bread, same preparation and ingredients."
+    },
+    "4318": {
+      "fdc_id": 2710258,
+      "food_code": 91101010,
+      "confidence": 0.9,
+      "rationale": "Sugar, white, granulated or lump is a direct equivalent to Canadian granulated sugar."
+    },
+    "4644": {
+      "fdc_id": 2706168,
+      "food_code": 25210280,
+      "confidence": 0.7,
+      "rationale": "Hot dog, meat and poultry is a close analog to a plain hot dog with similar ingredients and preparation."
+    },
+    "4962": {
+      "fdc_id": 2708636,
+      "food_code": 58106514,
+      "confidence": 0.9,
+      "rationale": "Exact match for frozen cooked pepperoni pizza with medium crust, closely matching CNF description."
+    },
+    "5862": {
+      "fdc_id": 2708661,
+      "food_code": 58106702,
+      "confidence": 0.85,
+      "rationale": "This entry is a frozen pizza with meat and vegetables and a medium crust, closely matching the CNF description of a frozen, cooked pizza with cheese, meat, vegetables, and regular crust."
+    },
+    "502188": {
+      "fdc_id": 2705424,
+      "food_code": 11411420,
+      "confidence": 0.9,
+      "rationale": "Exact match for Greek style plain nonfat yogurt, matching fat content and style."
+    },
+    "502442": {
+      "fdc_id": 2705407,
+      "food_code": 11350000,
+      "confidence": 0.85,
+      "rationale": "Almond milk, sweetened is the closest match to the CNF almond plant-based beverage with vanilla flavor and enrichment."
+    }
+  },
+  "unbridged": []
+}

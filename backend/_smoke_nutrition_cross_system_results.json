@@ -1,0 +1,179 @@
+{
+  "panel_description": "Cross-system nutrition meal-panel (Scenario S4)",
+  "rationale": "For each meal, computes HENI minutes / HEFI score / HSR stars and checks (a) Spearman rank correlation across systems >= 0.6 and (b) per-meal expected_quality direction matches.",
+  "spearman": {
+    "heni_vs_hefi": 0.8857142857142857,
+    "heni_vs_hsr": 0.6571428571428571,
+    "hefi_vs_hsr": 0.7714285714285715,
+    "n_valid_meals": 6
+  },
+  "directional_sanity": {
+    "passes": 4,
+    "total_evaluable": 6
+  },
+  "meals": [
+    {
+      "label": "Processed-meat anti-pattern",
+      "foods": [
+        [
+          4644,
+          150.0,
+          "Fast foods, hot dog, plain"
+        ],
+        [
+          4962,
+          150.0,
+          "Pizza, pepperoni, frozen, cooked"
+        ]
+      ],
+      "expected_quality": "low",
+      "rationale": "High sodium, high sat fat, processed meat. Should rank BELOW midpoint on all 3 systems.",
+      "heni_minutes": -10.8,
+      "hefi_score": 15.159722571778286,
+      "hsr_stars": 2.0
+    },
+    {
+      "label": "Refined-sugar dessert",
+      "foods": [
+        [
+          4157,
+          150.0,
+          "Dessert, frozen, ice cream, vanilla, rich, 16% M.F."
+        ],
+        [
+          3941,
+          100.0,
+          "Pie, apple, commercial, 2 crust"
+        ]
+      ],
+      "expected_quality": "low",
+      "rationale": "High free sugars, sat fat, low protein. Should rank low on HEFI sugars/sat-fat, low HSR (other-food cat), HENI mildly negative.",
+      "heni_minutes": 4.6,
+      "hefi_score": 11.42517341138424,
+      "hsr_stars": 2.0
+    },
+    {
+      "label": "Mixed-balanced lunch",
+      "foods": [
+        [
+          4067,
+          60.0,
+          "Bread, whole wheat, commercial (2 slices)"
+        ],
+        [
+          3081,
+          90.0,
+          "Fish, tuna, light, canned in water, drained, salted"
+        ],
+        [
+          2380,
+          80.0,
+          "Carrot, raw"
+        ],
+        [
+          1696,
+          100.0,
+          "Apple, raw, with skin"
+        ]
+      ],
+      "expected_quality": "mid",
+      "rationale": "Standard mixed lunch: whole grain, lean protein, veg, fruit. Should rank mid-to-high on all 3 systems.",
+      "heni_minutes": 11.3,
+      "hefi_score": 39.84095428085102,
+      "hsr_stars": 4.0
+    },
+    {
+      "label": "Plant-forward dinner",
+      "foods": [
+        [
+          5917,
+          180.0,
+          "Grains, quinoa, cooked"
+        ],
+        [
+          3404,
+          120.0,
+          "Tofu, regular, firm"
+        ],
+        [
+          2026,
+          100.0,
+          "Broccoli, frozen, boiled"
+        ],
+        [
+          2380,
+          60.0,
+          "Carrot, raw"
+        ],
+        [
+          422,
+          10.0,
+          "Vegetable oil, olive"
+        ]
+      ],
+      "expected_quality": "high",
+      "rationale": "Whole grain + plant protein + 2 vegetables. Should rank HIGH on all 3 systems.",
+      "heni_minutes": 39.8,
+      "hefi_score": 51.440366972477065,
+      "hsr_stars": 4.0
+    },
+    {
+      "label": "Sardines + greens (HENI +ve extremum)",
+      "foods": [
+        [
+          3054,
+          100.0,
+          "Fish, sardine, Pacific, canned in tomato sauce"
+        ],
+        [
+          2132,
+          80.0,
+          "New Zealand spinach, raw"
+        ],
+        [
+          1696,
+          100.0,
+          "Apple, raw, with skin"
+        ]
+      ],
+      "expected_quality": "high",
+      "rationale": "Omega-3-rich sardines + dark leafy + fruit. HENI Fig 4 sardine extremum is +82 min/serving; HEFI/HSR should also score high.",
+      "heni_minutes": 11.0,
+      "hefi_score": 36.20983714899343,
+      "hsr_stars": 4.0
+    },
+    {
+      "label": "Sweet-beverage + refined-grain breakfast",
+      "foods": [
+        [
+          4066,
+          60.0,
+          "Bread, white, commercial"
+        ],
+        [
+          16,
+          15.0,
+          "Butter, whipped"
+        ],
+        [
+          70,
+          250.0,
+          "Milk, fluid, chocolate, partly skimmed, 2% M.F."
+        ],
+        [
+          1495,
+          200.0,
+          "Apple juice, canned"
+        ]
+      ],
+      "expected_quality": "low",
+      "rationale": "SSB + refined grain + sat fat. Should rank low across all 3 systems on Beverages, Sugars, Sodium components.",
+      "heni_minutes": 11.1,
+      "hefi_score": 27.78318908198398,
+      "hsr_stars": 3.0
+    }
+  ],
+  "caveats": [
+    "HENI scores affected by extraction bugs (PUFA 10x, sodium inflation, food-mass-as-nutrient confusion) surfaced in _smoke_heni_literature_panel_results.json. Cross-system rank correlations involving HENI are expected to be distorted."
+  ]
+}

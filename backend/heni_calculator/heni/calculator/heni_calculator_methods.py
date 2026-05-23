@@ -20,6 +20,8 @@ Supplementary Information, S2.9 pp. 35-36 and Methods p. 626.
 from typing import Dict, List, Tuple
 import logging
 
+from ..data.composition_loader import get_composition_for_food
+
 logger = logging.getLogger(__name__)
 
 
@@ -55,6 +57,70 @@ def _is_plant_milk(food_description_lower: str) -> bool:
 
 def _is_non_ssb_beverage(food_description_lower: str) -> bool:
     return any(ind in food_description_lower for ind in _NON_SSB_BEVERAGE_INDICATORS)
+
+
+def _legacy_food_group_attribution(
+    food_group: str,
+    food_description: str,
+    nutrient_data: Dict[str, float],
+    risk_factors: Dict[str, float],
+) -> None:
+    """Legacy literal-100 food-group attribution for CNF foods NOT in the
+    FPED-grounded composition lookup. Mutates `risk_factors` in place.
+
+    Kept as the fallback path so unbridged CNF foods still get an attribution
+    (no worse than pre-2026-05-23 behaviour). The composition lookup at
+    `heni_calculator.heni.data.composition_loader` is the preferred path; see
+    HENI-CODE-1.y cause A in `code_action_items.md`.
+    """
+    food_group_mapping = {
+        "Nuts and Seeds": "nuts_seeds",
+        "Cereals, Grains and Pasta": "whole_grains",
+        "Fruits and fruit juices": "fruits",
+        "Vegetables and Vegetable Products": "vegetables",
+        "Legumes and Legume Products": "legumes",
+        "Milk Products": "milk",
+        "Dairy and Egg Products": "milk",
+        "Beverages": "sugar_sweetened_beverages",
+        "Beef Products": "red_meat",
+        "Pork Products": "red_meat",
+        "Lamb, Veal and Game": "red_meat",
+        "Poultry Products": "_poultry_neutral",
+    }
+
+    for group_name, heni_factor in food_group_mapping.items():
+        if group_name not in food_group:
+            continue
+        if heni_factor == "_poultry_neutral":
+            if any(t in food_description for t in
+                   ("sausage", "deli", "processed", "cured", "smoked", "ham", "bacon")):
+                risk_factors["processed_meat"] = 100.0
+        elif heni_factor == "whole_grains":
+            if any(t in food_description for t in (
+                "whole grain", "whole-grain", "whole wheat", "100% whole",
+                "wheat bran", "wheat germ", "oats, rolled", "oats, steel cut",
+                "rolled oats", "quinoa", "brown rice",
+            )):
+                risk_factors[heni_factor] = 100.0
+        elif heni_factor == "sugar_sweetened_beverages":
+            if _is_non_ssb_beverage(food_description):
+                continue
+            if nutrient_data.get("SUGARS, TOTAL", 0) > 5:
+                risk_factors[heni_factor] = 100.0
+        elif heni_factor == "milk":
+            if _is_plant_milk(food_description):
+                continue
+            risk_factors[heni_factor] = 100.0
+        elif heni_factor == "red_meat":
+            if any(t in food_description for t in (
+                "processed", "sausage", "ham", "bacon", "deli", "cured", "smoked",
+                "hot dog", "bologna", "salami", "pepperoni", "jerky",
+            )):
+                risk_factors["processed_meat"] = 100.0
+            else:
+                risk_factors["red_meat"] = 100.0
+        else:
+            risk_factors[heni_factor] = 100.0
 
 
 def _apply_double_counting_carve_outs(
@@ -166,88 +232,48 @@ def extract_risk_factors_from_ingredient(calculator, ingredient) -> Dict[str, fl
         ingredient.food_id
     ).lower()
 
-    # Map food groups to HENI risk factors (assuming 100g serving if in that group)
-    food_group_mapping = {
-        "Nuts and Seeds": "nuts_seeds",
-        "Cereals, Grains and Pasta": "whole_grains",
-        "Fruits and fruit juices": "fruits",
-        "Vegetables and Vegetable Products": "vegetables",
-        "Legumes and Legume Products": "legumes",
-        "Milk Products": "milk",
-        "Dairy and Egg Products": "milk",
-        "Beverages": "sugar_sweetened_beverages",
-        "Beef Products": "red_meat",
-        "Pork Products": "red_meat",
-        "Lamb, Veal and Game": "red_meat",
-        "Poultry Products": "_poultry_neutral",  # neutral per HENI; emit nothing
-    }
+    # 2026-05-23 (HENI-CODE-1.y cause A SHIPPED): food-group risk factors now
+    # read from the USDA FPED-grounded composition lookup (built one-time via
+    # `heni_calculator.heni.etl.build_cnf_heni_composition`). CNF foods not
+    # in the bridge fall back to the legacy literal-100 attribution below.
+    # The composition values are grams of risk-component category per 100g
+    # of CNF food; the downstream scaler at `heni_calculator.py` multiplies
+    # by (ingredient.amount / 100) to get per-serving masses.
+    composition = get_composition_for_food(ingredient.food_id)
+    if composition:
+        for risk_key, mass_per_100g in composition.items():
+            if mass_per_100g <= 0:
+                continue
+            # Plant-milk exclusion (GBD 2017 p. 1960): plant-based "milks"
+            # don't count as `milk` even if FPED attributes dairy mass.
+            if risk_key == 'milk' and _is_plant_milk(food_description):
+                continue
+            risk_factors[risk_key] = mass_per_100g
+        # SSB attribution is independent of FPED (no SSB column). Still
+        # apply the existing keyword-driven SSB rule on Beverages-group
+        # foods that pass the non-SSB exclusion + sugar threshold.
+        if 'Beverages' in food_group and not _is_non_ssb_beverage(food_description):
+            sugar_content = nutrient_data.get('SUGARS, TOTAL', 0)
+            if sugar_content > 5:
+                risk_factors['sugar_sweetened_beverages'] = 100.0
+    else:
+        # Legacy literal-100 attribution for CNF foods not bridged to FNDDS/FPED.
+        _legacy_food_group_attribution(
+            food_group, food_description, nutrient_data, risk_factors,
+        )
 
-    # Check for food group matches
-    for group_name, heni_factor in food_group_mapping.items():
-        if group_name in food_group:
-            if heni_factor == "_poultry_neutral":
-                # Poultry is health-neutral in HENI's GBD 2016 risk set; nutrient
-                # contributions (sodium, PUFA, trans fat, etc.) still apply via
-                # the nutrient-mapping pass above. Check for processed cuts only.
-                if any(
-                    term in food_description
-                    for term in [
-                        "sausage", "deli", "processed", "cured", "smoked",
-                        "ham", "bacon",
-                    ]
-                ):
-                    risk_factors["processed_meat"] = 100.0
-            elif heni_factor == "whole_grains":
-                # Only count as whole grains if description contains whole-grain
-                # indicators (GBD 2017 definition p. 1960: "bran/germ/endosperm in
-                # natural proportion").
-                if any(
-                    term in food_description
-                    for term in ["whole", "brown", "bran", "wheat germ", "oats", "quinoa"]
-                ):
-                    risk_factors[heni_factor] = 100.0
-            elif heni_factor == "sugar_sweetened_beverages":
-                # GBD 2017 SSB definition (p. 1960): beverages ≥ 50 kcal per 226.8 g
-                # serving, EXCLUDING 100% fruit/vegetable juices, water, tea, coffee.
-                if _is_non_ssb_beverage(food_description):
-                    continue  # water/tea/coffee/juice: not an SSB
-                sugar_content = nutrient_data.get("SUGARS, TOTAL", 0)
-                if sugar_content > 5:  # >5 g sugar per 100 g
-                    risk_factors[heni_factor] = 100.0
-            elif heni_factor == "milk":
-                # GBD 2017 milk definition (p. 1960): non-fat/low-fat/full-fat
-                # milk; EXCLUDES soy milk and plant derivatives. Plant-based
-                # "milks" must not receive the dairy-milk DRF.
-                if _is_plant_milk(food_description):
-                    continue  # plant-based "milk": skip dairy DRF
-                risk_factors[heni_factor] = 100.0
-            elif heni_factor == "red_meat":
-                # Check if meat is processed (Stylianou splits red vs processed).
-                if any(
-                    term in food_description
-                    for term in [
-                        "processed", "sausage", "ham", "bacon", "deli", "cured",
-                        "smoked", "hot dog", "bologna", "salami", "pepperoni",
-                        "jerky",
-                    ]
-                ):
-                    risk_factors["processed_meat"] = 100.0
-                else:
-                    risk_factors["red_meat"] = 100.0
-            else:
-                risk_factors[heni_factor] = 100.0  # Full serving weight
-
-    # Use LLM categorizer for complex cases if available
-    if calculator.categorizer:
-        try:
-            llm_categories = calculator.categorizer.categorize_food(ingredient.food_id)
-            for category, confidence in llm_categories.items():
-                if category in calculator.heni_factor_keys and confidence > 0.1:
-                    risk_factors[category] = confidence * 100.0  # Scale by confidence
-        except Exception as e:
-            logger.warning(
-                f"LLM categorization failed for food {ingredient.food_id}: {e}"
-            )
+    # 2026-05-23 (HENI-CODE-1.y quick-fix subset): the previous block here
+    # invoked `calculator.categorizer.categorize_food()` and treated the
+    # returned 0-1 presence scores as gram amounts via `confidence * 100.0`.
+    # That was a category error: the LLM categorizer is documented to return
+    # `{factor: presence_0_to_1}` ("Score 0 = not present, 1 = strongly present"),
+    # not gram amounts. Multiplying a probability by 100 and writing it as
+    # g/100g over-extracted PUFA by ~10x on poultry, treated sodium as 100
+    # g/100g on processed-meat rows (TMREL-capped downstream but still wrong
+    # upstream), and inflated food-group factors. The categorizer's outputs
+    # are used correctly inside the categorizer itself; they should never
+    # leave that module as a mass.
+    _ = calculator  # categorizer intentionally not invoked here
 
     # Apply Stylianou 2021 SI §S2.9 double-counting carve-outs BEFORE returning.
     risk_factors, carve_out_audit = _apply_double_counting_carve_outs(risk_factors)

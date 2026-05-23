@@ -1,0 +1,321 @@
+{
+  "panel_description": "HEFI-2019 canonical-diets smoke (Brassard 2022 directional gates)",
+  "gate_policy": "directional (CFG-ideal >= 55, mixed 35-55, anti-pattern <= 30) + rank order",
+  "summary": {
+    "n_pass": 3,
+    "n_total": 3,
+    "directional_rank_pass": true
+  },
+  "diets": [
+    {
+      "label": "Deep-fried fast-food anti-pattern",
+      "rationale": "High-sodium / high-sat-fat / low-V&F / no-whole-grain pattern. Expected to score in p10 or lower (Brassard 2022 p10 = 27/80).",
+      "foods": [
+        [
+          4644,
+          200.0,
+          "Fast foods, hot dog, plain (1.3 hot dogs)"
+        ],
+        [
+          4962,
+          220.0,
+          "Pizza, pepperoni, frozen, cooked (2 slices)"
+        ],
+        [
+          1185,
+          100.0,
+          "Wiener (frankfurter), beef"
+        ],
+        [
+          4066,
+          90.0,
+          "Bread, white, commercial (3 slices)"
+        ],
+        [
+          16,
+          30.0,
+          "Butter, whipped"
+        ],
+        [
+          4157,
+          150.0,
+          "Ice cream, vanilla, rich, 16% M.F."
+        ],
+        [
+          70,
+          500.0,
+          "Milk, fluid, chocolate, partly skimmed, 2% M.F. (SSB proxy \u2014 cola not directly indexable in this CNF revision)"
+        ]
+      ],
+      "target_low": 0.0,
+      "target_high": 30.0,
+      "target_description": "one-sided: HEFI <= 30/80 (below population p10)",
+      "total_score": 13.629870415035205,
+      "within_gate": true,
+      "verdict": "PASS",
+      "diagnostics": {
+        "percentage": 17.037338018794006,
+        "components": {
+          "C1_VF": 0.0,
+          "C2_WHOLEGR": 0.0,
+          "C3_GRRATIO": 0.0,
+          "C4_PROFOODS": 5.0,
+          "C5_PLANTPRO": 0.0,
+          "C6_BEVERAGES": 0.0,
+          "C7_FATTYACID": 1.9099927584136853,
+          "C8_SFAT": 0.0,
+          "C9_FREESUGARS": 5.281714483235394,
+          "C10_SODIUM": 1.4381631733861244
+        },
+        "ratios": {
+          "RATIO_VF": 0.0,
+          "RATIO_WGTOT": 0.0,
+          "RATIO_WGGR": 0.0,
+          "RATIO_PRO": 0.33354797166773986,
+          "RATIO_PLANT": 0.0,
+          "RATIO_BEV": 0.0,
+          "RATIO_UNSFAT": 0.9931962343751164,
+          "SFA_PERC": 23.187175941928796,
+          "SUG_PERC": 14.718285516764606,
+          "SODDEN": 1.8418020509275264
+        },
+        "inputs": {
+          "total_foods_ra": 10.353333333333333,
+          "energy_kcal": 2603.7,
+          "vf_ra": 0.0,
+          "whole_grains_ra": 0.0,
+          "total_grains_ra": 1.2,
+          "protein_foods_ra": 3.453333333333333,
+          "plant_protein_foods_ra": 0.0,
+          "total_beverages_g": 0.0,
+          "recommended_beverages_g": 0.0,
+          "sfa_g": 67.0805,
+          "mufa_g": 53.4871,
+          "pufa_g": 13.137,
+          "free_sugars_g": 95.805,
+          "sodium_mg": 4795.5
+        }
+      }
+    },
+    {
+      "label": "Mixed-balanced 1-day diet (representative)",
+      "rationale": "Realistic North American 1-day intake: oatmeal + fruit + milk; tuna sandwich + carrot; chicken + rice + broccoli; coffee. Population-mean band (Brassard mean 43.1, p25-p75 ~ 35-50).",
+      "foods": [
+        [
+          1413,
+          40.0,
+          "Cereal, hot, oats, instant: regular, dry"
+        ],
+        [
+          1696,
+          150.0,
+          "Apple, raw, with skin"
+        ],
+        [
+          61,
+          200.0,
+          "Milk, fluid, partly skimmed, 2% M.F."
+        ],
+        [
+          4067,
+          60.0,
+          "Bread, whole wheat, commercial (2 slices)"
+        ],
+        [
+          3081,
+          90.0,
+          "Fish, tuna, light, canned in water, drained, salted"
+        ],
+        [
+          2380,
+          80.0,
+          "Carrot, raw"
+        ],
+        [
+          1220,
+          100.0,
+          "Deli-meat, chicken breast, cooked, extra lean"
+        ],
+        [
+          4497,
+          150.0,
+          "Grains, rice, brown, long-grain, cooked"
+        ],
+        [
+          2026,
+          120.0,
+          "Broccoli, frozen, boiled"
+        ],
+        [
+          2873,
+          250.0,
+          "Coffee, brewed (with tap water)"
+        ]
+      ],
+      "target_low": 35.0,
+      "target_high": 55.0,
+      "target_description": "Brassard 2022 p25-p75 band (population mean 43.1/80)",
+      "total_score": 51.52495098309356,
+      "within_gate": true,
+      "verdict": "PASS",
+      "diagnostics": {
+        "percentage": 64.40618872886695,
+        "components": {
+          "C1_VF": 14.999163459929733,
+          "C2_WHOLEGR": 4.098544420277731,
+          "C3_GRRATIO": 5.0,
+          "C4_PROFOODS": 5.0,
+          "C5_PLANTPRO": 0.0,
+          "C6_BEVERAGES": 10.0,
+          "C7_FATTYACID": 2.9766652951894734,
+          "C8_SFAT": 5.0,
+          "C9_FREESUGARS": 4.45057780769662,
+          "C10_SODIUM": 0.0
+        },
+        "ratios": {
+          "RATIO_VF": 0.3749790864982433,
+          "RATIO_WGTOT": 0.20492722101388655,
+          "RATIO_WGGR": 1.0,
+          "RATIO_PRO": 0.3762924544085662,
+          "RATIO_PLANT": 0.0,
+          "RATIO_BEV": 1.0,
+          "RATIO_UNSFAT": 1.5478659534985262,
+          "SFA_PERC": 4.625210366879839,
+          "SUG_PERC": 15.54942219230338,
+          "SODDEN": 2.6165152025131837
+        },
+        "inputs": {
+          "total_foods_ra": 9.132161955691368,
+          "energy_kcal": 891.3,
+          "vf_ra": 3.42436974789916,
+          "whole_grains_ra": 1.8714285714285714,
+          "total_grains_ra": 1.8714285714285714,
+          "protein_foods_ra": 3.4363636363636365,
+          "plant_protein_foods_ra": 0.0,
+          "total_beverages_g": 250.0,
+          "recommended_beverages_g": 250.0,
+          "sfa_g": 4.580500000000001,
+          "mufa_g": 3.655,
+          "pufa_g": 3.4349999999999996,
+          "free_sugars_g": 34.648,
+          "sodium_mg": 2332.1000000000004
+        }
+      }
+    },
+    {
+      "label": "CFG-2019 aligned ideal diet",
+      "rationale": "Plant-forward, whole-grain, low-sodium pattern aligned to Canada's Food Guide 2019 plate. Expected to score in p90+ range (Brassard 2022 reports CFG-recipe-based 3-day diets at 67.1/80).",
+      "foods": [
+        [
+          5917,
+          180.0,
+          "Grains, quinoa, cooked"
+        ],
+        [
+          4497,
+          150.0,
+          "Grains, rice, brown, long-grain, cooked"
+        ],
+        [
+          4067,
+          90.0,
+          "Bread, whole wheat, commercial (3 slices)"
+        ],
+        [
+          3404,
+          150.0,
+          "Tofu, regular, firm \u2014 primary plant protein"
+        ],
+        [
+          2113,
+          100.0,
+          "Lentils, sprouted, raw"
+        ],
+        [
+          2026,
+          120.0,
+          "Broccoli, frozen, boiled"
+        ],
+        [
+          2380,
+          100.0,
+          "Carrot, raw"
+        ],
+        [
+          2132,
+          80.0,
+          "New Zealand spinach, raw"
+        ],
+        [
+          1696,
+          200.0,
+          "Apple, raw, with skin (1 medium-large)"
+        ],
+        [
+          422,
+          12.0,
+          "Vegetable oil, olive (~1 tbsp)"
+        ],
+        [
+          2589,
+          28.0,
+          "Nuts, walnuts, black, dried (~1 oz)"
+        ],
+        [
+          5241,
+          250.0,
+          "Plant-based beverage, soy, unenriched"
+        ]
+      ],
+      "target_low": 55.0,
+      "target_high": 80.0,
+      "target_description": "one-sided: HEFI >= 55/80 (CFG-recipe-based diets ~67)",
+      "total_score": 58.78687814742408,
+      "within_gate": true,
+      "verdict": "PASS",
+      "diagnostics": {
+        "percentage": 73.4835976842801,
+        "components": {
+          "C1_VF": 19.80511406027447,
+          "C2_WHOLEGR": 3.6666591304741014,
+          "C3_GRRATIO": 3.1927710843373496,
+          "C4_PROFOODS": 2.848680789491533,
+          "C5_PLANTPRO": 1.5066356175532998,
+          "C6_BEVERAGES": 0.0,
+          "C7_FATTYACID": 5.0,
+          "C8_SFAT": 5.0,
+          "C9_FREESUGARS": 7.767017465293327,
+          "C10_SODIUM": 10.0
+        },
+        "ratios": {
+          "RATIO_VF": 0.4951278515068617,
+          "RATIO_WGTOT": 0.18333295652370507,
+          "RATIO_WGGR": 0.6385542168674699,
+          "RATIO_PRO": 0.14243403947457664,
+          "RATIO_PLANT": 0.07533178087766498,
+          "RATIO_BEV": 0.0,
+          "RATIO_UNSFAT": 6.462404830228739,
+          "SFA_PERC": 3.7966230967308556,
+          "SUG_PERC": 12.232982534706673,
+          "SODDEN": 0.6401841692789969
+        },
+        "inputs": {
+          "total_foods_ra": 12.389635854341737,
+          "energy_kcal": 1429.12,
+          "vf_ra": 6.1344537815126055,
+          "whole_grains_ra": 2.2714285714285714,
+          "total_grains_ra": 3.557142857142857,
+          "protein_foods_ra": 1.7647058823529411,
+          "plant_protein_foods_ra": 0.9333333333333333,
+          "total_beverages_g": 250.0,
+          "recommended_beverages_g": 0.0,
+          "sfa_g": 6.0287,
+          "mufa_g": 18.06508,
+          "pufa_g": 20.89482,
+          "free_sugars_g": 43.706,
+          "sodium_mg": 914.9
+        }
+      }
+    }
+  ]
+}

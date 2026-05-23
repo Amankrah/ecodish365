@@ -38,7 +38,7 @@ def get_cnf_integrator() -> HENICNFIntegrator:
 
 
 def resolve_llm_api_key(explicit: Optional[str] = None) -> str:
-    if explicit is not None:
+    if explicit:
         return explicit
     try:
         from django.conf import settings
@@ -49,7 +49,8 @@ def resolve_llm_api_key(explicit: Optional[str] = None) -> str:
                 return str(v)
     except Exception:
         pass
-    return ""
+    import os
+    return os.environ.get("OPENAI_API_KEY", "")
 
 
 def calculate_meal_heni_response(

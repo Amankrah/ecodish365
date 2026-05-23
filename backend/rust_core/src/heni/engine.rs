@@ -43,14 +43,53 @@ pub struct HeniComputed {
 /// diminishing-returns taper is applied (the canonical methodology is
 /// marginal-at-current-intake bounded by the theoretical-minimum-risk
 /// effective intake).
-fn effective_amount_and_warning(risk_factor: &str, amount: f64) -> (f64, Option<String>) {
-    if let Some(&(min_r, max_r)) = EFFECTIVE_INTAKE_RANGES.get(risk_factor) {
-        let _ = min_r;
+///
+/// Energy-relative TMRELs (PUFA at 11 % of energy; trans-fat at 0.5 % of
+/// energy) are evaluated against `total_energy_kcal` and converted to grams
+/// via the standard 9 kcal/g lipid energy density. When both an
+/// absolute-gram cap and an energy-relative cap are defined for a risk
+/// factor, the tighter cap (the SMALLER cap) is enforced — Stylianou
+/// 2021 SI Table 1 footnote semantics. 2026-05-23 (HENI-CODE-1.y
+/// quick-fix subset): added the PUFA / TFA energy-relative caps that the
+/// previous revision left uncapped with an advisory warning only.
+fn effective_amount_and_warning(
+    risk_factor: &str,
+    amount: f64,
+    total_energy_kcal: f64,
+) -> (f64, Option<String>) {
+    // Energy-relative caps (Stylianou 2021 SI Table 1 pp. 4-5; lipid
+    // energy density 9 kcal/g per FAO/WHO/UNU 2004 macronutrient table).
+    let energy_relative_cap: Option<(f64, &'static str)> = match risk_factor {
+        "polyunsaturated_fatty_acids" if total_energy_kcal > 0.0 => {
+            Some((0.11 * total_energy_kcal / 9.0, "PUFA 11 % of energy"))
+        }
+        "trans_fat" if total_energy_kcal > 0.0 => {
+            Some((0.005 * total_energy_kcal / 9.0, "trans-fat 0.5 % of energy"))
+        }
+        _ => None,
+    };
+
+    // Absolute-gram cap (existing EFFECTIVE_INTAKE_RANGES table).
+    let absolute_cap = EFFECTIVE_INTAKE_RANGES
+        .get(risk_factor)
+        .map(|&(_, max_r)| (max_r, "absolute-gram TMREL"));
+
+    // Effective cap = tighter of the two (or whichever is defined).
+    let cap = match (energy_relative_cap, absolute_cap) {
+        (Some((e, e_lbl)), Some((a, a_lbl))) => {
+            if e <= a { Some((e, e_lbl)) } else { Some((a, a_lbl)) }
+        }
+        (Some(e), None) => Some(e),
+        (None, Some(a)) => Some(a),
+        (None, None) => None,
+    };
+
+    if let Some((max_r, kind)) = cap {
         if amount > max_r {
             let msg = format!(
-                "{}: {:.3} g exceeds TMREL ({:.3} g); contribution capped at TMREL \
-                 per Stylianou 2021 SI Table 1 pp. 4–5.",
-                risk_factor, amount, max_r,
+                "{}: {:.3} g exceeds TMREL ({:.3} g, {}); contribution capped at \
+                 TMREL per Stylianou 2021 SI Table 1 pp. 4–5.",
+                risk_factor, amount, max_r, kind,
             );
             return (max_r, Some(msg));
         }
@@ -62,7 +101,10 @@ fn effective_amount_and_warning(risk_factor: &str, amount: f64) -> (f64, Option<
 /// Apportion the meal-level μDALY contribution from each risk factor across
 /// the disease outcomes mapped to it in `RISK_FACTOR_DISEASE_WEIGHTS`. Used
 /// for reporting only; does NOT affect `total_heni_score`.
-fn disease_breakdown(risk_factor_amounts: &HashMap<String, f64>) -> HashMap<String, f64> {
+fn disease_breakdown(
+    risk_factor_amounts: &HashMap<String, f64>,
+    total_energy_kcal: f64,
+) -> HashMap<String, f64> {
     let mut acc: HashMap<String, f64> = HashMap::new();
     for (risk, amount) in risk_factor_amounts {
         let Some(factor) = HENI_FACTORS.get(risk.as_str()) else {
@@ -71,7 +113,8 @@ fn disease_breakdown(risk_factor_amounts: &HashMap<String, f64>) -> HashMap<Stri
         let Some(weights) = RISK_FACTOR_DISEASE_WEIGHTS.get(risk.as_str()) else {
             continue;
         };
-        let (effective_amount, _warn) = effective_amount_and_warning(risk, *amount);
+        let (effective_amount, _warn) =
+            effective_amount_and_warning(risk, *amount, total_energy_kcal);
         let contribution_udaly = effective_amount * factor;
         for (disease, w) in weights {
             *acc.entry((*disease).to_string()).or_insert(0.0) += contribution_udaly * w;
@@ -183,7 +226,8 @@ pub fn compute_heni_score(
         let Some(heni_factor) = HENI_FACTORS.get(risk_factor.as_str()) else {
             continue;
         };
-        let (effective_amount, warn) = effective_amount_and_warning(risk_factor, *amount);
+        let (effective_amount, warn) =
+            effective_amount_and_warning(risk_factor, *amount, total_energy_kcal);
         if let Some(w) = warn {
             effective_range_warnings.push(w);
         }
@@ -218,7 +262,7 @@ pub fn compute_heni_score(
         0.0
     };
 
-    let disease_burden_breakdown = disease_breakdown(&risk_factor_amounts);
+    let disease_burden_breakdown = disease_breakdown(&risk_factor_amounts, total_energy_kcal);
     // Convert μDALY → minutes of healthy life. The negative constant flips the
     // damage-oriented sum so user-facing "positive minutes = beneficial".
     let health_impact_minutes = total_heni_udaly * MINUTES_PER_UDALY;

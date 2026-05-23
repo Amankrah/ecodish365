@@ -1,0 +1,381 @@
+{
+  "panel_description": "HSR canonical-food smoke (HSRAC v9 algorithm)",
+  "gate_policy": "+- 0.5 stars (HSR half-star quantization)",
+  "notes": [
+    "Plain water omitted from this 9-food panel: HSRAC v9 \u00a74.2 name-based 5.0-star override for plain water is logged as HSR-CODE-1.x in code_action_items.md and not yet shipped.",
+    "CNF has no granulated table sugar entry that fully matches FSANZ NUTTAB; CNF 4318 Sweets, sugars, granulated used as closest analog.",
+    "CNF has no cola entry; CNF 1495 Apple juice used as the closest SSB analog (similar sugars per 100ml, no fibre).",
+    "Almond beverage tested is sweetened (CNF lacks unsweetened); target adjusted from FSANZ unsweetened 4.5 to sweetened 3.5."
+  ],
+  "summary": {
+    "n_pass": 6,
+    "n_fail": 3,
+    "n_total": 9,
+    "panel_size_full_canonical": 10,
+    "foods_skipped": [
+      "plain water (name override not shipped)"
+    ]
+  },
+  "rows": [
+    {
+      "label": "Table sugar (granulated)",
+      "cnf_food_id": 4318,
+      "serving_g": 100.0,
+      "target_stars": 0.5,
+      "rationale": "CNF 4318 Sweets, sugars, granulated. ~400 kcal/100g pure sucrose, zero protective nutrients \u2192 minimum-floor 0.5 stars in HSRAC non-dairy beverage / other category.",
+      "actual_stars": 0.5,
+      "within_gate": true,
+      "deviation_half_stars": 0.0,
+      "verdict": "PASS",
+      "diagnostics": {
+        "level": "poor",
+        "category": "2",
+        "score_breakdown": {
+          "final_score": 29,
+          "baseline_points": 29,
+          "modifying_points": 0,
+          "components": {
+            "energy": 4,
+            "saturated_fat": 0,
+            "sugar": 25,
+            "sodium": 0,
+            "protein": 0,
+            "fiber": 0,
+            "fvnl": 0
+          },
+          "calculation_method": {
+            "baseline_formula": "energy + saturated_fat + sugar + sodium",
+            "modifying_formula": "protein + fiber + fvnl",
+            "final_formula": "max(0, baseline - modifying)",
+            "category_specific": true
+          }
+        },
+        "meal_categorization": {
+          "final_category": "Category 2 - General Foods",
+          "category_code": "2",
+          "methodology": "Official HSR categorization based on primary food characteristics"
+        }
+      }
+    },
+    {
+      "label": "Apple juice (SSB-analog)",
+      "cnf_food_id": 1495,
+      "serving_g": 250.0,
+      "target_stars": 2.0,
+      "rationale": "CNF 1495 Apple juice, canned or bottled, no added vit C. Closest CNF analog to a regular sugar-sweetened beverage (cola not indexable in CNF). ~50 kcal/100g, ~10g sugars, no fibre \u2192 1.5-2.0 stars in HSRAC non-dairy beverage cat.",
+      "actual_stars": 1.0,
+      "within_gate": false,
+      "deviation_half_stars": 2.0,
+      "verdict": "FAIL",
+      "diagnostics": {
+        "level": "poor",
+        "category": "1",
+        "score_breakdown": {
+          "final_score": 10,
+          "baseline_points": 14,
+          "modifying_points": 4,
+          "components": {
+            "energy": 7,
+            "saturated_fat": 0,
+            "sugar": 7,
+            "sodium": 0,
+            "protein": 0,
+            "fiber": 0,
+            "fvnl": 4
+          },
+          "calculation_method": {
+            "baseline_formula": "energy + saturated_fat + sugar + sodium",
+            "modifying_formula": "protein + fiber + fvnl",
+            "final_formula": "max(0, baseline - modifying)",
+            "category_specific": true
+          }
+        },
+        "meal_categorization": {
+          "final_category": "Category 1 - Beverages",
+          "category_code": "1",
+          "methodology": "Official HSR categorization based on primary food characteristics"
+        }
+      }
+    },
+    {
+      "label": "Bacon (pork cured, raw)",
+      "cnf_food_id": 1936,
+      "serving_g": 100.0,
+      "target_stars": 1.5,
+      "rationale": "CNF 1936 Pork, cured, bacon, raw. High sodium + saturated fat dominate; protein partial offset. ~1.0-2.0 stars in HSRAC other-food category.",
+      "actual_stars": 1.0,
+      "within_gate": true,
+      "deviation_half_stars": 1.0,
+      "verdict": "PASS",
+      "diagnostics": {
+        "level": "poor",
+        "category": "2",
+        "score_breakdown": {
+          "final_score": 24,
+          "baseline_points": 24,
+          "modifying_points": 0,
+          "components": {
+            "energy": 5,
+            "saturated_fat": 12,
+            "sugar": 0,
+            "sodium": 7,
+            "protein": 0,
+            "fiber": 0,
+            "fvnl": 0
+          },
+          "calculation_method": {
+            "baseline_formula": "energy + saturated_fat + sugar + sodium",
+            "modifying_formula": "protein + fiber + fvnl",
+            "final_formula": "max(0, baseline - modifying)",
+            "category_specific": true
+          }
+        },
+        "meal_categorization": {
+          "final_category": "Category 2 - General Foods",
+          "category_code": "2",
+          "methodology": "Official HSR categorization based on primary food characteristics"
+        }
+      }
+    },
+    {
+      "label": "Whole milk (3.25% M.F.)",
+      "cnf_food_id": 113,
+      "serving_g": 250.0,
+      "target_stars": 3.5,
+      "rationale": "CNF 113 Milk, fluid, whole, pasteurized, homogenized, 3.25% M.F. HSRAC dairy-beverage category: protein + calcium modifying points offset moderate energy + sat fat \u2192 3.5 stars.",
+      "actual_stars": 3.5,
+      "within_gate": true,
+      "deviation_half_stars": 0.0,
+      "verdict": "PASS",
+      "diagnostics": {
+        "level": "good",
+        "category": "1D",
+        "score_breakdown": {
+          "final_score": 1,
+          "baseline_points": 2,
+          "modifying_points": 1,
+          "components": {
+            "energy": 0,
+            "saturated_fat": 1,
+            "sugar": 1,
+            "sodium": 0,
+            "protein": 1,
+            "fiber": 0,
+            "fvnl": 0
+          },
+          "calculation_method": {
+            "baseline_formula": "energy + saturated_fat + sugar + sodium",
+            "modifying_formula": "protein + fiber + fvnl",
+            "final_formula": "max(0, baseline - modifying)",
+            "category_specific": true
+          }
+        },
+        "meal_categorization": {
+          "final_category": "Category 1D - Dairy Beverages",
+          "category_code": "1D",
+          "methodology": "Official HSR categorization based on primary food characteristics"
+        }
+      }
+    },
+    {
+      "label": "White bread (commercial)",
+      "cnf_food_id": 4066,
+      "serving_g": 30.0,
+      "target_stars": 2.5,
+      "rationale": "CNF 4066 Bread, white, commercial. Refined grain, moderate sodium, some protein but low fibre \u2192 2.0-3.0 stars in HSRAC other-food category.",
+      "actual_stars": 3.5,
+      "within_gate": false,
+      "deviation_half_stars": 2.0,
+      "verdict": "FAIL",
+      "diagnostics": {
+        "level": "good",
+        "category": "2",
+        "score_breakdown": {
+          "final_score": 1,
+          "baseline_points": 9,
+          "modifying_points": 8,
+          "components": {
+            "energy": 3,
+            "saturated_fat": 0,
+            "sugar": 1,
+            "sodium": 5,
+            "protein": 5,
+            "fiber": 3,
+            "fvnl": 0
+          },
+          "calculation_method": {
+            "baseline_formula": "energy + saturated_fat + sugar + sodium",
+            "modifying_formula": "protein + fiber + fvnl",
+            "final_formula": "max(0, baseline - modifying)",
+            "category_specific": true
+          }
+        },
+        "meal_categorization": {
+          "final_category": "Category 2 - General Foods",
+          "category_code": "2",
+          "methodology": "Official HSR categorization based on primary food characteristics"
+        }
+      }
+    },
+    {
+      "label": "Greek yogurt (plain, fat-free)",
+      "cnf_food_id": 502188,
+      "serving_g": 100.0,
+      "target_stars": 4.5,
+      "rationale": "CNF 502188 Yogourt, Greek style, plain, fat free (0-0.5% M.F.). High protein + calcium, no sugar, zero sat fat \u2192 4.0-5.0 stars in HSRAC other-dairy category.",
+      "actual_stars": 5.0,
+      "within_gate": true,
+      "deviation_half_stars": 1.0,
+      "verdict": "PASS",
+      "diagnostics": {
+        "level": "excellent",
+        "category": "2D",
+        "score_breakdown": {
+          "final_score": -6,
+          "baseline_points": 0,
+          "modifying_points": 6,
+          "components": {
+            "energy": 0,
+            "saturated_fat": 0,
+            "sugar": 0,
+            "sodium": 0,
+            "protein": 6,
+            "fiber": 0,
+            "fvnl": 0
+          },
+          "calculation_method": {
+            "baseline_formula": "energy + saturated_fat + sugar + sodium",
+            "modifying_formula": "protein + fiber + fvnl",
+            "final_formula": "max(0, baseline - modifying)",
+            "category_specific": true
+          }
+        },
+        "meal_categorization": {
+          "final_category": "Category 2 - General Foods",
+          "category_code": "2D",
+          "methodology": "Official HSR categorization based on primary food characteristics"
+        }
+      }
+    },
+    {
+      "label": "Almond beverage (sweetened, vanilla)",
+      "cnf_food_id": 502442,
+      "serving_g": 250.0,
+      "target_stars": 3.5,
+      "rationale": "CNF 502442 Plant-based beverage, almond, enriched, sweetened, vanilla flavoured. Low energy + sat fat, but sweetened (CNF lacks unsweetened almond beverage) \u2192 3.0-4.0 stars (HSRAC non-dairy beverage); unsweetened version would reach 4.5 stars.",
+      "actual_stars": 1.0,
+      "within_gate": false,
+      "deviation_half_stars": 5.0,
+      "verdict": "FAIL",
+      "diagnostics": {
+        "level": "poor",
+        "category": "1",
+        "score_breakdown": {
+          "final_score": 10,
+          "baseline_points": 11,
+          "modifying_points": 1,
+          "components": {
+            "energy": 6,
+            "saturated_fat": 0,
+            "sugar": 5,
+            "sodium": 0,
+            "protein": 0,
+            "fiber": 0,
+            "fvnl": 1
+          },
+          "calculation_method": {
+            "baseline_formula": "energy + saturated_fat + sugar + sodium",
+            "modifying_formula": "protein + fiber + fvnl",
+            "final_formula": "max(0, baseline - modifying)",
+            "category_specific": true
+          }
+        },
+        "meal_categorization": {
+          "final_category": "Category 1 - Beverages",
+          "category_code": "1",
+          "methodology": "Official HSR categorization based on primary food characteristics"
+        }
+      }
+    },
+    {
+      "label": "Rolled oats (instant, dry)",
+      "cnf_food_id": 1413,
+      "serving_g": 40.0,
+      "target_stars": 4.5,
+      "rationale": "CNF 1413 Cereal, hot, oats, instant: regular, dry. Whole grain, high fibre, low sodium, low sat fat \u2192 4.0-5.0 stars in HSRAC other-food category (cereal sub-class).",
+      "actual_stars": 4.0,
+      "within_gate": true,
+      "deviation_half_stars": 1.0,
+      "verdict": "PASS",
+      "diagnostics": {
+        "level": "good",
+        "category": "2",
+        "score_breakdown": {
+          "final_score": -5,
+          "baseline_points": 12,
+          "modifying_points": 17,
+          "components": {
+            "energy": 4,
+            "saturated_fat": 1,
+            "sugar": 0,
+            "sodium": 7,
+            "protein": 7,
+            "fiber": 10,
+            "fvnl": 0
+          },
+          "calculation_method": {
+            "baseline_formula": "energy + saturated_fat + sugar + sodium",
+            "modifying_formula": "protein + fiber + fvnl",
+            "final_formula": "max(0, baseline - modifying)",
+            "category_specific": true
+          }
+        },
+        "meal_categorization": {
+          "final_category": "Category 2 - General Foods",
+          "category_code": "2",
+          "methodology": "Official HSR categorization based on primary food characteristics"
+        }
+      }
+    },
+    {
+      "label": "Chia seeds (raw, dried)",
+      "cnf_food_id": 2511,
+      "serving_g": 15.0,
+      "target_stars": 4.5,
+      "rationale": "CNF 2511 Seeds, chia seeds, dried. Very high fibre + omega-3 + protein, modest energy density per serving \u2192 4.0-5.0 stars (HSRAC other-food / fruit-vegetable cat).",
+      "actual_stars": 5.0,
+      "within_gate": true,
+      "deviation_half_stars": 1.0,
+      "verdict": "PASS",
+      "diagnostics": {
+        "level": "excellent",
+        "category": "2",
+        "score_breakdown": {
+          "final_score": -17,
+          "baseline_points": 9,
+          "modifying_points": 26,
+          "components": {
+            "energy": 6,
+            "saturated_fat": 3,
+            "sugar": 0,
+            "sodium": 0,
+            "protein": 8,
+            "fiber": 15,
+            "fvnl": 3
+          },
+          "calculation_method": {
+            "baseline_formula": "energy + saturated_fat + sugar + sodium",
+            "modifying_formula": "protein + fiber + fvnl",
+            "final_formula": "max(0, baseline - modifying)",
+            "category_specific": true
+          }
+        },
+        "meal_categorization": {
+          "final_category": "Category 2 - General Foods",
+          "category_code": "2",
+          "methodology": "Official HSR categorization based on primary food characteristics"
+        }
+      }
+    }
+  ]
+}

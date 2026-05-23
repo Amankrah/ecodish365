@@ -1,5 +1,4 @@
 import logging
-from django.conf import settings
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -70,7 +69,9 @@ def heni_calculate(request):
             )
             ingredients.append(ingredient)
 
-        if not getattr(settings, "OPENAI_API_KEY", None):
+        # Match resolve_llm_api_key(): key may live only in os.environ (.env via env_bootstrap),
+        # not as a Django setting attribute.
+        if not resolve_llm_api_key():
             logger.warning("No OpenAI API key configured, HENI categorization may be limited")
 
         comprehensive_result = calculate_meal_heni_response(

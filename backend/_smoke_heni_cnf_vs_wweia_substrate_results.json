@@ -1,0 +1,110 @@
+{
+  "panel_description": "CNF-native HENI vs Stylianou 2021 published per-food values",
+  "separates_from": "_smoke_heni_literature_panel.py (which is the implementation regression at +-0.1 min gate)",
+  "envelope": {
+    "n": 7,
+    "median_abs_dev_min": 29.3,
+    "mean_abs_dev_min": 30.685714285714287,
+    "max_abs_dev_min": 83.7
+  },
+  "rows": [
+    {
+      "label": "Chicken wing (CNF 629 vs Stylianou \u00a7S2.2 WWEIA reference)",
+      "cnf_food_id": 629,
+      "serving_g": 85.0,
+      "stylianou_published_min": -3.3,
+      "stylianou_ci_low": -3.9,
+      "stylianou_ci_high": -2.5,
+      "citation": "Stylianou 2021 SI \u00a7S2.2 p. 13 (canonical worked example)",
+      "rationale": "CNF 629: roasted plain wing meat+skin (98 mg Na/100g). Stylianou WWEIA reference: likely restaurant/buffalo wing (579 mg Na/100g). Sodium load differs by 6x.",
+      "cnf_native_min": 0.1,
+      "divergence_min": 3.4,
+      "cnf_sodium_mg_per_100g": 98.0,
+      "cnf_kcal_per_100g": 254.0
+    },
+    {
+      "label": "Beef hotdog on bun (CNF 4644 vs Stylianou Fig 4)",
+      "cnf_food_id": 4644,
+      "serving_g": 150.0,
+      "stylianou_published_min": -36.0,
+      "stylianou_ci_low": -45.0,
+      "stylianou_ci_high": -22.0,
+      "citation": "Stylianou 2021 Fig 4 (beef hotdog on bun)",
+      "rationale": "CNF \"Fast foods, hot dog, plain\" includes bun; lower sodium than typical US fast-food + Stylianou worked example.",
+      "cnf_native_min": -6.7,
+      "divergence_min": 29.3,
+      "cnf_sodium_mg_per_100g": 684.0,
+      "cnf_kcal_per_100g": 247.0
+    },
+    {
+      "label": "Frankfurter sandwich (CNF 1185+3985 vs Stylianou Fig 2-4)",
+      "cnf_food_id": 1185,
+      "serving_g": 60.0,
+      "stylianou_published_min": -35.0,
+      "stylianou_ci_low": -41.0,
+      "stylianou_ci_high": -31.0,
+      "citation": "Stylianou 2021 Fig 2-4 line 1740 (frankfurter sandwich category median, IQR 31-41)",
+      "rationale": "Stylianou measures full sandwich; CNF row here is just the frankfurter component (60 g).",
+      "cnf_native_min": -5.2,
+      "divergence_min": 29.8,
+      "cnf_sodium_mg_per_100g": 987.0,
+      "cnf_kcal_per_100g": 250.0
+    },
+    {
+      "label": "Vegetable pizza (CNF 5862 vs Stylianou Fig 4)",
+      "cnf_food_id": 5862,
+      "serving_g": 150.0,
+      "stylianou_published_min": -1.4,
+      "stylianou_ci_low": -2.8,
+      "stylianou_ci_high": -0.061,
+      "citation": "Stylianou 2021 Fig 4 (vegetable pizza)",
+      "rationale": "CNF row is \"meat and vegetable\" pizza (not pure vegetable); expect more negative.",
+      "cnf_native_min": -3.9,
+      "divergence_min": -2.5,
+      "cnf_sodium_mg_per_100g": 555.0,
+      "cnf_kcal_per_100g": 276.0
+    },
+    {
+      "label": "Apple pie (CNF 3941 vs Stylianou Fig 4)",
+      "cnf_food_id": 3941,
+      "serving_g": 150.0,
+      "stylianou_published_min": 1.3,
+      "stylianou_ci_low": -0.42,
+      "stylianou_ci_high": 2.9,
+      "citation": "Stylianou 2021 Fig 4 (apple pie)",
+      "rationale": "",
+      "cnf_native_min": 6.8,
+      "divergence_min": 5.5,
+      "cnf_sodium_mg_per_100g": 201.0,
+      "cnf_kcal_per_100g": 237.0
+    },
+    {
+      "label": "Sardines in tomato sauce (CNF 3054 vs Stylianou Fig 4 extremum)",
+      "cnf_food_id": 3054,
+      "serving_g": 100.0,
+      "stylianou_published_min": 82.0,
+      "stylianou_ci_low": 37.0,
+      "stylianou_ci_high": 115.0,
+      "citation": "Stylianou 2021 Fig 4 (sardines tomato sauce, +ve extremum)",
+      "rationale": "Stylianou's very-high HENI for sardines is driven by omega-3 (EPA+DHA) DRF at -81 uDALY/g. Our CNF 3054 extraction may have lower EPA+DHA than Stylianou's WWEIA reference, and the food-group \"vegetables\" attribution for tomato sauce is missing.",
+      "cnf_native_min": -1.7,
+      "divergence_min": -83.7,
+      "cnf_sodium_mg_per_100g": 414.0,
+      "cnf_kcal_per_100g": 185.0
+    },
+    {
+      "label": "Corned beef (CNF 2791 vs Stylianou Fig 4 -ve extremum)",
+      "cnf_food_id": 2791,
+      "serving_g": 150.0,
+      "stylianou_published_min": -71.0,
+      "stylianou_ci_low": -91.0,
+      "stylianou_ci_high": -38.0,
+      "citation": "Stylianou 2021 Fig 4 (corned beef + tomato sauce, -ve extremum)",
+      "rationale": "Stylianou measures the composite \"corned beef + tomato sauce\" with very high sodium; CNF 2791 is canned corned beef alone (no added tomato sauce sodium).",
+      "cnf_native_min": -10.4,
+      "divergence_min": 60.6,
+      "cnf_sodium_mg_per_100g": 897.0,
+      "cnf_kcal_per_100g": 250.0
+    }
+  ]
+}

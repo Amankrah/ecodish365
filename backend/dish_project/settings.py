@@ -61,6 +61,9 @@ sys.path.extend([
 # deployments MUST set a real value via env var or .env.
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY') or get_random_secret_key()
 
+# LLM / embeddings (loaded from env or backend/.env via env_bootstrap)
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+
 # Development/Production Configuration
 IS_DEVELOPMENT = os.environ.get('DJANGO_ENV', 'development') == 'development'
 DEBUG = IS_DEVELOPMENT
