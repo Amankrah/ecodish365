@@ -46,7 +46,8 @@
           "calculation_method": {
             "baseline_formula": "energy + saturated_fat + sugar + sodium",
             "modifying_formula": "protein + fiber + fvnl",
-            "final_formula": "max(0, baseline - modifying)",
+            "final_formula": "baseline \u2212 modifying (can be negative; lower is better)",
+            "protein_eligibility_rule": "HSRAC v9 p. 26: if baseline \u2265 13 and V points < 5, P points = 0.",
             "category_specific": true
           }
         },
@@ -86,7 +87,8 @@
           "calculation_method": {
             "baseline_formula": "energy + saturated_fat + sugar + sodium",
             "modifying_formula": "protein + fiber + fvnl",
-            "final_formula": "max(0, baseline - modifying)",
+            "final_formula": "baseline \u2212 modifying (can be negative; lower is better)",
+            "protein_eligibility_rule": "HSRAC v9 p. 26: if baseline \u2265 13 and V points < 5, P points = 0.",
             "category_specific": true
           }
         },
@@ -126,7 +128,8 @@
           "calculation_method": {
             "baseline_formula": "energy + saturated_fat + sugar + sodium",
             "modifying_formula": "protein + fiber + fvnl",
-            "final_formula": "max(0, baseline - modifying)",
+            "final_formula": "baseline \u2212 modifying (can be negative; lower is better)",
+            "protein_eligibility_rule": "HSRAC v9 p. 26: if baseline \u2265 13 and V points < 5, P points = 0.",
             "category_specific": true
           }
         },
@@ -166,7 +169,8 @@
           "calculation_method": {
             "baseline_formula": "energy + saturated_fat + sugar + sodium",
             "modifying_formula": "protein + fiber + fvnl",
-            "final_formula": "max(0, baseline - modifying)",
+            "final_formula": "baseline \u2212 modifying (can be negative; lower is better)",
+            "protein_eligibility_rule": "HSRAC v9 p. 26: if baseline \u2265 13 and V points < 5, P points = 0.",
             "category_specific": true
           }
         },
@@ -206,7 +210,8 @@
           "calculation_method": {
             "baseline_formula": "energy + saturated_fat + sugar + sodium",
             "modifying_formula": "protein + fiber + fvnl",
-            "final_formula": "max(0, baseline - modifying)",
+            "final_formula": "baseline \u2212 modifying (can be negative; lower is better)",
+            "protein_eligibility_rule": "HSRAC v9 p. 26: if baseline \u2265 13 and V points < 5, P points = 0.",
             "category_specific": true
           }
         },
@@ -246,7 +251,8 @@
           "calculation_method": {
             "baseline_formula": "energy + saturated_fat + sugar + sodium",
             "modifying_formula": "protein + fiber + fvnl",
-            "final_formula": "max(0, baseline - modifying)",
+            "final_formula": "baseline \u2212 modifying (can be negative; lower is better)",
+            "protein_eligibility_rule": "HSRAC v9 p. 26: if baseline \u2265 13 and V points < 5, P points = 0.",
             "category_specific": true
           }
         },
@@ -286,7 +292,8 @@
           "calculation_method": {
             "baseline_formula": "energy + saturated_fat + sugar + sodium",
             "modifying_formula": "protein + fiber + fvnl",
-            "final_formula": "max(0, baseline - modifying)",
+            "final_formula": "baseline \u2212 modifying (can be negative; lower is better)",
+            "protein_eligibility_rule": "HSRAC v9 p. 26: if baseline \u2265 13 and V points < 5, P points = 0.",
             "category_specific": true
           }
         },
@@ -326,7 +333,8 @@
           "calculation_method": {
             "baseline_formula": "energy + saturated_fat + sugar + sodium",
             "modifying_formula": "protein + fiber + fvnl",
-            "final_formula": "max(0, baseline - modifying)",
+            "final_formula": "baseline \u2212 modifying (can be negative; lower is better)",
+            "protein_eligibility_rule": "HSRAC v9 p. 26: if baseline \u2265 13 and V points < 5, P points = 0.",
             "category_specific": true
           }
         },
@@ -366,7 +374,8 @@
           "calculation_method": {
             "baseline_formula": "energy + saturated_fat + sugar + sodium",
             "modifying_formula": "protein + fiber + fvnl",
-            "final_formula": "max(0, baseline - modifying)",
+            "final_formula": "baseline \u2212 modifying (can be negative; lower is better)",
+            "protein_eligibility_rule": "HSRAC v9 p. 26: if baseline \u2265 13 and V points < 5, P points = 0.",
             "category_specific": true
           }
         },

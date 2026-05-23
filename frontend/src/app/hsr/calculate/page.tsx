@@ -173,6 +173,19 @@ export default function HSRCalculate() {
     }
   };
 
+  // FIX (HSR audit #4 2026-05-23): mirror the band classifier in
+  // backend/api/views/hsr_explanations.py (`_star_band` + `_band_phrase`) so
+  // the Star Rating card label agrees with the ExplanationsPanel headline.
+  // Previously the card said "Average" while the explanations said "Moderate
+  // within its category" — two labels for the same score on the same page.
+  const hsrBandLabel = (starRating: number): string => {
+    if (starRating >= 4.5) return 'Excellent within its category';
+    if (starRating >= 3.5) return 'Good within its category';
+    if (starRating >= 2.5) return 'Moderate within its category';
+    if (starRating >= 1.5) return 'Below average within its category';
+    return 'Poor within its category';
+  };
+
   const getStarRatingColor = (rating: number) => {
     if (rating >= 4.5) return 'text-green-500';
     if (rating >= 3.5) return 'text-green-400';
@@ -223,45 +236,53 @@ export default function HSRCalculate() {
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Add Foods</h2>
               
-              {/* Analysis Options */}
-              <div className="mb-6 space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Analysis Level
-                  </label>
-                  <select
-                    value={analysisLevel}
-                    onChange={(e) => setAnalysisLevel(e.target.value as 'simple' | 'detailed')}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    aria-label="Analysis Level"
-                  >
-                    <option value="simple">Simple (Star rating only)</option>
-                    <option value="detailed">Detailed (Full analysis)</option>
-                  </select>
+              {/* FIX (HSR audit #8): Analysis Level + alternatives + meal-
+                  insights options were visible in Individual mode despite
+                  being expert-facing knobs (a lay user has no basis to choose
+                  Simple vs Detailed). Gated researcher / policy only;
+                  Individual mode silently uses the same defaults (detailed,
+                  alternatives on, insights on) so the underlying behaviour is
+                  unchanged. */}
+              {userType !== 'individual' && (
+                <div className="mb-6 space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Analysis Level
+                    </label>
+                    <select
+                      value={analysisLevel}
+                      onChange={(e) => setAnalysisLevel(e.target.value as 'simple' | 'detailed')}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      aria-label="Analysis Level"
+                    >
+                      <option value="simple">Simple (Star rating only)</option>
+                      <option value="detailed">Detailed (Full analysis)</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={includeAlternatives}
+                        onChange={(e) => setIncludeAlternatives(e.target.checked)}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="ml-2 text-sm text-gray-700">Include healthier alternatives</span>
+                    </label>
+
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={includeMealInsights}
+                        onChange={(e) => setIncludeMealInsights(e.target.checked)}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="ml-2 text-sm text-gray-700">Include meal insights</span>
+                    </label>
+                  </div>
                 </div>
-                
-                <div className="space-y-2">
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={includeAlternatives}
-                      onChange={(e) => setIncludeAlternatives(e.target.checked)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">Include healthier alternatives</span>
-                  </label>
-                  
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={includeMealInsights}
-                      onChange={(e) => setIncludeMealInsights(e.target.checked)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">Include meal insights</span>
-                  </label>
-                </div>
-              </div>
+              )}
 
               {/* Search Filters */}
               {filters && (
@@ -546,7 +567,8 @@ export default function HSRCalculate() {
                       />
                     </div>
                     <div className="text-xl font-semibold text-gray-900 mb-2">
-                      {result.hsr_result.rating.level.charAt(0).toUpperCase() + result.hsr_result.rating.level.slice(1).replace('_', ' ')}
+                      {/* FIX (HSR audit #4): align card label with ExplanationsPanel band terminology. */}
+                      {hsrBandLabel(result.hsr_result.rating.star_rating)}
                     </div>
                     <p className="text-gray-600 max-w-2xl mx-auto">
                       {result.hsr_result.rating.description}
@@ -578,30 +600,36 @@ export default function HSRCalculate() {
                       {result.food_details.length > 1 ? 'Meal Score Breakdown' : 'Food Score Breakdown'}
                     </h3>
                     
-                    {/* Official HSR Algorithm Notice */}
+                    {/* FIX (HSR audit #9): replaced the "Official HSR
+                        Analysis" / "government-approved" marketing copy with
+                        the literature-accurate HSRAC v9 Implementation Guide
+                        reference. */}
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                       <h4 className="text-sm font-medium text-blue-900 mb-2 flex items-center">
                         <CheckCircleIcon className="w-4 h-4 mr-2" />
-                        Official HSR Analysis
+                        HSRAC v9 Implementation Guide
                       </h4>
                       <div className="text-sm text-blue-800 space-y-1">
-                        <p>• <strong>Category-Specific Thresholds:</strong> Using official HSR thresholds for each food category</p>
-                        <p>• <strong>Standard Methodology:</strong> Following official HSR calculation guidelines</p>
-                        <p>• <strong>Compliant Algorithm:</strong> Matches official Health Star Rating system</p>
-                        <p>• <strong>Validated Results:</strong> Uses government-approved calculation methods</p>
+                        <p>• <strong>Pinned to HSRAC v9:</strong> 10 December 2025 Implementation Guide, Appendix 1 Tables 1-7</p>
+                        <p>• <strong>Category-specific tables:</strong> 6 HSRAC v9 categories (1, 1D, 2, 2D, 3, 3D), each with its own baseline / modifying-point thresholds</p>
+                        <p>• <strong>v5 → v9 equivalence:</strong> per HSRAC v9 Appendix 5, v6 ≡ v7 ≡ v8 ≡ v9 functionally; cumulative v5→v9 differences limited to Cat 1 energy cap (v4) and sweet-corn FVNL eligibility (v8)</p>
+                        <p>• <strong>Threshold arrays verified</strong> cell-by-cell in <code>backend/rust_core/src/hsr/threshold_data.rs</code> against HSRAC v9 Tables 1-7</p>
                       </div>
                     </div>
-                    
-                    {/* Explanation */}
+
+                    {/* FIX (HSR audit #1, #10): corrected the false
+                        "minimum 0" claim and added the HSRAC v9 protein-
+                        eligibility rule. */}
                     <div className="bg-blue-50 rounded-lg p-4 mb-6">
                       <h4 className="text-sm font-medium text-blue-900 mb-2">How HSR Scoring Works</h4>
                       <div className="text-sm text-blue-800 space-y-1">
-                        <p>• <strong>Risk nutrients</strong> (energy, saturated fat, sugar, sodium) add baseline points</p>
-                        <p>• <strong>Beneficial nutrients</strong> (protein, fiber, FVNL) subtract modifying points</p>
-                        <p>• <strong>Final score</strong> = baseline points - modifying points (minimum 0)</p>
-                        <p>• <strong>Star rating</strong> is calculated from final score using category-specific thresholds</p>
+                        <p>• <strong>Baseline points</strong> (V points): energy, saturated fat, sugar, sodium per 100 g/mL — additive, higher = worse</p>
+                        <p>• <strong>Modifying points</strong>: protein (P), fibre (F), FVNL % — additive, subtracted from baseline</p>
+                        <p>• <strong>Final score</strong> = baseline − modifying. <em>Can be negative</em> — lower = better. There is no <code>max(0, …)</code> clamp; reaching 5 stars in Category 2 requires score ≤ −11.</p>
+                        <p>• <strong>Protein-eligibility rule</strong> (HSRAC v9 p. 26): if baseline ≥ 13 and V points &lt; 5, then P points = 0.</p>
+                        <p>• <strong>Star rating</strong> from final score via the category-specific cut-point table (Appendix 1 Table 7).</p>
                         {result.food_details.length > 1 && (
-                          <p>• <strong>Meal categorization:</strong> This {result.food_details.length}-food meal was categorized as <strong>{result.hsr_result.rating.category}</strong> for star rating calculation
+                          <p>• <strong>Meal categorization:</strong> This {result.food_details.length}-food meal was categorized as <strong>{result.hsr_result.rating.category}</strong> for star-rating calculation
                             {result.meal_categorization && (
                               <span className="ml-1">
                                 (confidence: {(result.meal_categorization.category_confidence * 100).toFixed(0)}%)
@@ -609,9 +637,6 @@ export default function HSRCalculate() {
                             )}
                           </p>
                         )}
-                        <p className="mt-2 pt-2 border-t border-blue-200 font-medium">
-                          ⭐ <strong>Official HSR Algorithm:</strong> This calculation uses the official Health Star Rating methodology as approved by government authorities
-                        </p>
                       </div>
                     </div>
                     
@@ -686,23 +711,26 @@ export default function HSRCalculate() {
                       <div className="text-sm text-gray-600 mb-2">
                         Calculation: {result.hsr_result.score_breakdown.baseline_points} baseline points - {result.hsr_result.score_breakdown.modifying_points} modifying points = {result.hsr_result.score_breakdown.final_score}
                       </div>
+                      {/* FIX (HSR audit #2 + #11): the previous interpretation
+                          used invented thresholds (≤5 = "Low/excellent",
+                          ≤15 = "Moderate", >15 = "Higher") that didn't match
+                          any HSRAC v9 category — Beef stew at final = 5 (→ 3
+                          stars / median) read as "excellent balance". The
+                          calibrated interpretation now derives from the
+                          star-band, which IS category-specific. The duplicate
+                          "Score X in Y category = Z stars" line is removed
+                          (already in the Calculation line above). */}
                       <div className="text-sm text-gray-500">
                         <p>💡 <strong>Understanding your score:</strong></p>
-                        {result.hsr_result.score_breakdown.final_score === 0 ? (
-                          <p>• Perfect score - all risk nutrients are offset by beneficial ones</p>
-                        ) : result.hsr_result.score_breakdown.final_score <= 5 ? (
-                          <p>• Low final score - excellent balance of nutrients</p>
-                        ) : result.hsr_result.score_breakdown.final_score <= 15 ? (
-                          <p>• Moderate final score - some risk nutrients present</p>
-                        ) : (
-                          <p>• Higher final score - significant risk nutrients present</p>
-                        )}
-                        <p>• Star rating depends on {result.food_details.length > 1 ? 'meal' : 'food'} category thresholds</p>
-                        <p>• Score {result.hsr_result.score_breakdown.final_score} in {result.hsr_result.rating.category} category = {result.hsr_result.rating.star_rating} stars</p>
+                        <p>
+                          • {hsrBandLabel(result.hsr_result.rating.star_rating)}
+                          {' '}({result.hsr_result.rating.star_rating} of 5 stars
+                          in HSRAC v9 Category {result.hsr_result.rating.category})
+                        </p>
+                        <p>• Lower final score = better; star cut-points are category-specific (Appendix 1 Table 7).</p>
                         {result.food_details.length > 1 && result.meal_categorization && (
                           <p>• {result.food_details.length} foods combined and categorized as {result.meal_categorization.final_category}</p>
                         )}
-                        <p>• ⭐ Using official HSR algorithm for accurate results</p>
                       </div>
                     </div>
                   </div>
@@ -732,11 +760,18 @@ export default function HSRCalculate() {
                           {result.hsr_result.score_breakdown.components.fvnl > 0 && (
                             <li>• Good plant food content (earning {result.hsr_result.score_breakdown.components.fvnl} FVNL points)</li>
                           )}
-                          {result.hsr_result.rating.star_rating >= 4.0 && (
-                            <li>• Excellent nutritional quality ({result.hsr_result.rating.star_rating} stars)</li>
+                          {/* FIX (HSR audit #3): "Above-average" was wrong
+                              for 3.0-3.5 stars — that's the median band in
+                              HSRAC v9, not above-average. Now uses the same
+                              band labels as the ExplanationsPanel. */}
+                          {result.hsr_result.rating.star_rating >= 4.5 && (
+                            <li>• {hsrBandLabel(result.hsr_result.rating.star_rating)} ({result.hsr_result.rating.star_rating} stars)</li>
                           )}
-                          {result.hsr_result.rating.star_rating >= 3.0 && result.hsr_result.rating.star_rating < 4.0 && (
-                            <li>• Above-average nutritional quality ({result.hsr_result.rating.star_rating} stars)</li>
+                          {result.hsr_result.rating.star_rating >= 3.5 && result.hsr_result.rating.star_rating < 4.5 && (
+                            <li>• {hsrBandLabel(result.hsr_result.rating.star_rating)} ({result.hsr_result.rating.star_rating} stars)</li>
+                          )}
+                          {result.hsr_result.rating.star_rating >= 2.5 && result.hsr_result.rating.star_rating < 3.5 && (
+                            <li>• {hsrBandLabel(result.hsr_result.rating.star_rating)} ({result.hsr_result.rating.star_rating} stars — median band)</li>
                           )}
                           {result.hsr_result.score_breakdown.components.energy === 0 && (
                             <li>• Low energy density (0 energy points)</li>
@@ -755,38 +790,39 @@ export default function HSRCalculate() {
                           )}
                         </ul>
                       </div>
+                      {/* FIX (HSR audit #7): the previous interpretation
+                          promoted a 3-star high-sodium canned product as a
+                          "Good choice as part of a balanced diet", overriding
+                          the explanations panel's calibrated language. Now
+                          the star-band → consumption recommendation honours
+                          the within-category-only constraint and uses
+                          HSRAC v9 / Shahid 2020 band terminology. */}
                       <div>
                         <h4 className="text-md font-medium text-blue-600 mb-3">📊 Score Explanation</h4>
                         <div className="text-sm text-gray-600 space-y-1">
                           <p>Your final score of {result.hsr_result.score_breakdown.final_score} indicates:</p>
-                          {result.hsr_result.score_breakdown.final_score === 0 && (
-                            <p>• Perfect balance - beneficial nutrients offset all risk</p>
-                          )}
-                          {result.hsr_result.score_breakdown.final_score > 0 && result.hsr_result.score_breakdown.final_score <= 5 && (
-                            <p>• Low risk with some beneficial nutrients</p>
-                          )}
-                          {result.hsr_result.score_breakdown.final_score > 5 && result.hsr_result.score_breakdown.final_score <= 15 && (
-                            <p>• Moderate risk nutrient levels</p>
-                          )}
-                          {result.hsr_result.score_breakdown.final_score > 15 && (
-                            <p>• Higher risk nutrient levels - consume in moderation</p>
-                          )}
+                          <p>• {hsrBandLabel(result.hsr_result.rating.star_rating)} in Category {result.hsr_result.rating.category}</p>
                           {result.hsr_result.score_breakdown.modifying_points > 0 && (
-                            <p>• {result.hsr_result.score_breakdown.modifying_points} points from beneficial nutrients</p>
+                            <p>• {result.hsr_result.score_breakdown.modifying_points} points from beneficial nutrients (protein, fibre, FVNL)</p>
                           )}
-                          <p>• {result.hsr_result.rating.star_rating} stars = {result.hsr_result.rating.level.replace('_', ' ')} quality</p>
-                          {result.hsr_result.rating.star_rating >= 4.0 && (
-                            <p>• Excellent choice for regular consumption</p>
+                          {result.hsr_result.rating.star_rating >= 4.5 && (
+                            <p>• Strong within-category choice; favour at this star level within Category {result.hsr_result.rating.category}</p>
                           )}
-                          {result.hsr_result.rating.star_rating >= 3.0 && result.hsr_result.rating.star_rating < 4.0 && (
-                            <p>• Good choice as part of a balanced diet</p>
+                          {result.hsr_result.rating.star_rating >= 3.5 && result.hsr_result.rating.star_rating < 4.5 && (
+                            <p>• Better-than-typical within Category {result.hsr_result.rating.category}; favour over lower-star options in the same category</p>
                           )}
-                          {result.hsr_result.rating.star_rating >= 2.0 && result.hsr_result.rating.star_rating < 3.0 && (
-                            <p>• Moderate choice - consider healthier alternatives</p>
+                          {result.hsr_result.rating.star_rating >= 2.5 && result.hsr_result.rating.star_rating < 3.5 && (
+                            <p>• Median band within Category {result.hsr_result.rating.category}; higher-star options exist in this category</p>
                           )}
-                          {result.hsr_result.rating.star_rating < 2.0 && (
-                            <p>• Lower nutritional quality - enjoy in moderation</p>
+                          {result.hsr_result.rating.star_rating >= 1.5 && result.hsr_result.rating.star_rating < 2.5 && (
+                            <p>• Below-typical within Category {result.hsr_result.rating.category}; consider higher-star alternatives in this category</p>
                           )}
+                          {result.hsr_result.rating.star_rating < 1.5 && (
+                            <p>• Low within Category {result.hsr_result.rating.category}; consume sparingly</p>
+                          )}
+                          <p className="pt-1 text-xs italic text-gray-500">
+                            Remember: HSR only compares products within the same category — see the within-category-only caveat above.
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -947,8 +983,19 @@ export default function HSRCalculate() {
                           </div>
                           {food.category_source && (
                             <div className="flex justify-between">
-                              <span>Category Source:</span>
-                              <span className="text-xs text-gray-500">{food.category_source}</span>
+                              {/* FIX (HSR audit #6): the previous label
+                                  "Category Source: auto_assigned" exposed the
+                                  raw kernel field. Now translated to plain
+                                  language. */}
+                              <span>Categorization:</span>
+                              <span className="text-xs text-gray-500">
+                                {{
+                                  auto_assigned: 'Auto-assigned from CNF FoodGroup',
+                                  manual: 'Manually set',
+                                  scientific_categorization: 'Scientific (HSRAC v9 categoriser)',
+                                  unknown: 'Unknown',
+                                }[food.category_source] || food.category_source.replace(/_/g, ' ')}
+                              </span>
                             </div>
                           )}
                         </div>

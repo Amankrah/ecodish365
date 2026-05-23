@@ -164,6 +164,14 @@ def get_explanations(
                     'Score, FCS) — HSR is not designed for cross-category '
                     'comparison.'
                 ),
+                # FIX (HSR audit #12): explicit cross-link to the FCS
+                # calculator already implemented on this platform.
+                'cross_category_tool': (
+                    'For cross-category comparisons on this platform, use '
+                    '/fcs/calculate (FCS-10 per Mozaffarian 2021 / Barrett '
+                    '2025; diet-level i.FCS HR 0.92 all-cause mortality per '
+                    '1 SD, O\'Hearn 2022 Nat Comm 13:7066).'
+                ),
             },
         }
 
@@ -231,6 +239,15 @@ def get_explanations(
                     'targets should align with the modifying-point levers: '
                     'FVNL %, protein, fibre.'
                 ),
+                # FIX (HSR audit #12): cross-link to FCS for population-level
+                # diet quality targets (i.FCS is mortality-validated; HSR is not).
+                'cross_category_tool': (
+                    'For population diet-quality targets and mortality-anchored '
+                    'thresholds, complement HSR with the Food Compass Score '
+                    '(/fcs/calculate). FCS is per-100-kcal density across all '
+                    'food groups; diet-level i.FCS HR 0.92 per 1 SD all-cause '
+                    'mortality (O\'Hearn 2022).'
+                ),
             },
         }
 
@@ -267,6 +284,17 @@ def get_explanations(
                 f'star options. Don\'t use HSR to compare across different '
                 f'product types (e.g. don\'t compare cereal stars to '
                 f'beverage stars — the systems are different).'
+            ),
+            # FIX (HSR audit #12): explicit cross-link to FCS for users who
+            # need a cross-category comparison number — without this, the
+            # within-category-only caveat leaves them with no actionable
+            # alternative.
+            'cross_category_tool': (
+                'Need to compare different product types (e.g. cereal vs '
+                'yogurt)? Use the Food Compass Score (FCS) calculator at '
+                '/fcs/calculate — it scores 1-100 across all food categories '
+                'and is validated against all-cause mortality at the diet '
+                'level (Mozaffarian 2021, O\'Hearn 2022).'
             ),
         },
     }

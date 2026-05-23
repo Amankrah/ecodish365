@@ -589,12 +589,22 @@ def _format_detailed_hsr_result(result) -> Dict:
                 "fiber": result.component_score.fiber_points,
                 "fvnl": result.component_score.fvnl_points
             },
-            # Standard HSR calculation details
+            # FIX (HSR audit #1 2026-05-23): the previous self-description
+            # claimed `final_formula = "max(0, baseline - modifying)"`, which
+            # contradicts both HSRAC v9 and the actual kernel output. The Rust
+            # kernel returns negative final scores (e.g. apple raw at -7),
+            # which is required for foods to reach 5 stars in Category 2
+            # (cut-point ≤ -11). HSRAC v9 explicitly allows negative final
+            # scores; lower = better. Frontend has been updated to match.
             "calculation_method": {
                 "baseline_formula": "energy + saturated_fat + sugar + sodium",
-                "modifying_formula": "protein + fiber + fvnl", 
-                "final_formula": "max(0, baseline - modifying)",
-                "category_specific": True
+                "modifying_formula": "protein + fiber + fvnl",
+                "final_formula": "baseline − modifying (can be negative; lower is better)",
+                "protein_eligibility_rule": (
+                    "HSRAC v9 p. 26: if baseline ≥ 13 and V points < 5, "
+                    "P points = 0."
+                ),
+                "category_specific": True,
             }
         },
         "nutritional_analysis": [
@@ -722,17 +732,27 @@ def _generate_comparison_recommendations(comparisons: List[Dict]) -> List[str]:
 
 
 def _get_food_details_summary(foods: List[HSRFood]) -> List[Dict]:
-    """Get summary of food details for user context"""
-    # Category name mapping
+    """Get summary of food details for user context.
+
+    FIX (HSR audit #5 2026-05-23): the previous per-food category labels
+    ("Beverage", "Food", ...) dropped the HSRAC v9 category code and short-
+    formed the label, so the Analyzed Food card rendered just "Food" instead
+    of the canonical "General foods (Category 2)". The category label is
+    mandatory per HSRAC v9 Introduction (within-category-only comparison rule),
+    so the label must be unambiguous and identify the v9 category.
+    """
+    # HSRAC v9 official 6-category labels — matches _CATEGORY_LABELS in
+    # api/views/hsr_explanations.py and is the canonical source for the
+    # within-category-only caveat anchor.
     category_name_map = {
-        '1': 'Beverage',
-        '1D': 'Dairy Beverage', 
-        '2': 'Food',
-        '2D': 'Dairy Food',
-        '3': 'Oils and Spreads',
-        '3D': 'Cheese'
+        '1':  'Non-dairy beverages (Category 1)',
+        '1D': 'Dairy beverages (Category 1D)',
+        '2':  'General foods (Category 2)',
+        '2D': 'Other dairy foods (Category 2D)',
+        '3':  'Oils and spreads (Category 3)',
+        '3D': 'Cheese (Category 3D)',
     }
-    
+
     return [
         {
             "food_id": food.food_id,
