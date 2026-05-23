@@ -95,11 +95,11 @@
           "processed_meat": 1.72
         },
         "contribs_api_nutrient": {
-          "fiber_other": -1.48,
-          "polyunsaturated_fatty_acids": -1.57,
+          "calcium": -0.18,
           "trans_fat": 0.0,
+          "fiber_other": -1.48,
           "sodium": 14.26,
-          "calcium": -0.18
+          "polyunsaturated_fatty_acids": -1.57
         }
       }
     },
@@ -145,9 +145,9 @@
           "processed_meat": 1.72
         },
         "contribs_api_nutrient": {
-          "calcium": -0.07,
           "polyunsaturated_fatty_acids": -0.33,
           "trans_fat": 0.37,
+          "calcium": -0.07,
           "sodium": 8.23
         }
       }
@@ -198,14 +198,14 @@
           "fiber_fvlw": 3.3
         },
         "contribs_api_food_group": {
-          "processed_meat": 1.72,
           "vegetables": -2.05,
-          "milk": -0.27
+          "milk": -0.27,
+          "processed_meat": 1.72
         },
         "contribs_api_nutrient": {
           "trans_fat": 0.0,
-          "sodium": 12.89,
           "polyunsaturated_fatty_acids": -2.12,
+          "sodium": 12.89,
           "fiber_fvlw": -0.63
         }
       }
@@ -254,10 +254,10 @@
           "fruits": -14.55
         },
         "contribs_api_nutrient": {
-          "polyunsaturated_fatty_acids": -1.98,
-          "sodium": 4.19,
-          "calcium": -0.08,
           "fiber_fvlw": -0.46,
+          "calcium": -0.08,
+          "sodium": 4.19,
+          "polyunsaturated_fatty_acids": -1.98,
           "trans_fat": 0.0
         }
       }
@@ -301,11 +301,11 @@
         },
         "contribs_api_food_group": {},
         "contribs_api_nutrient": {
-          "trans_fat": 0.0,
+          "fiber_other": -0.1,
           "polyunsaturated_fatty_acids": -1.27,
+          "trans_fat": 0.0,
           "calcium": -1.22,
-          "sodium": 5.75,
-          "fiber_other": -0.1
+          "sodium": 5.75
         }
       }
     },
@@ -350,10 +350,10 @@
           "processed_meat": 1.72
         },
         "contribs_api_nutrient": {
-          "trans_fat": 0.0,
           "polyunsaturated_fatty_acids": -0.57,
+          "sodium": 18.7,
           "calcium": -0.09,
-          "sodium": 18.7
+          "trans_fat": 0.0
         }
       }
     },
@@ -396,11 +396,11 @@
         },
         "contribs_api_food_group": {},
         "contribs_api_nutrient": {
-          "fiber_other": -0.98,
           "calcium": -0.12,
           "trans_fat": 0.02,
-          "sodium": 2.14,
-          "polyunsaturated_fatty_acids": -0.24
+          "polyunsaturated_fatty_acids": -0.24,
+          "fiber_other": -0.98,
+          "sodium": 2.14
         }
       }
     },
@@ -448,11 +448,11 @@
           "vegetables": -8.9
         },
         "contribs_api_nutrient": {
-          "trans_fat": 0.0,
-          "fiber_fvlw": -0.44,
           "calcium": -0.26,
+          "polyunsaturated_fatty_acids": -0.03,
+          "fiber_fvlw": -0.44,
           "sodium": 0.33,
-          "polyunsaturated_fatty_acids": -0.03
+          "trans_fat": 0.0
         }
       }
     },
@@ -494,9 +494,9 @@
           "milk": -1.93
         },
         "contribs_api_nutrient": {
-          "polyunsaturated_fatty_acids": -0.29,
           "sodium": 1.49,
-          "trans_fat": 0.0
+          "trans_fat": 0.0,
+          "polyunsaturated_fatty_acids": -0.29
         }
       }
     }

@@ -139,10 +139,10 @@ def get_explanations(
             },
             'citations': {
                 'primary': (
-                    'Health Star Rating Advisory Committee. Health Star '
-                    'Rating System Implementation Guide. Version 9. Canberra: '
-                    'Australian Government Department of Health, Disability '
-                    'and Ageing; 10 December 2025.'
+                    'Health Star Rating Advisory Committee (HSRAC). Health '
+                    'Star Rating System Implementation Guide. Version 9. '
+                    'Canberra: Australian Government Department of Health, '
+                    'Disability and Ageing; 10 December 2025.'
                 ),
                 'algorithm_description': (
                     'Shahid M, Neal B, Jones A. Uptake of Australia\'s Health '
