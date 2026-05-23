@@ -55,11 +55,32 @@ export const RiskFactorBreakdown: React.FC<Props> = ({ results }) => {
         ? (results as HENIAnalysis)
         : null;
 
-  if (!analysis?.risk_factor_analysis?.risk_factors) {
+  // FIX (2026-05-23): switch data source from `risk_factor_analysis.risk_factors`
+  // (which contains gram amounts) to the merged μDALY contributions, so the
+  // panel's μDALY label is dimensionally correct AND signs come from the
+  // kernel rather than an ad-hoc category-name lookup.
+  //
+  // HENI sign convention (post-HENI-CODE-1, see rust_core/src/heni/engine.rs:268):
+  //   positive μDALY  = harmful   (multiplied by MINUTES_PER_UDALY = -0.5256 → negative minutes)
+  //   negative μDALY  = beneficial (negative × -0.5256 → positive minutes gained)
+  if (!analysis?.component_breakdown) {
     return null;
   }
 
-  const riskFactors: Record<string, number> = analysis.risk_factor_analysis.risk_factors;
+  const foodGroupContrib: Record<string, number> =
+    analysis.component_breakdown.food_group_contributions || {};
+  const nutrientContrib: Record<string, number> =
+    analysis.component_breakdown.nutrient_contributions || {};
+  // Merge — names are disjoint between food-group and nutrient buckets in the kernel.
+  const riskFactors: Record<string, number> = { ...foodGroupContrib, ...nutrientContrib };
+  // Drop internal audit / informational keys and exact-zero rows (Trans Fat is
+  // defaulted to 0.0 in heni_calculator_methods.py:222 even when absent — see
+  // audit bug #7).
+  for (const k of Object.keys(riskFactors)) {
+    if (k.startsWith('__') || riskFactors[k] === 0) {
+      delete riskFactors[k];
+    }
+  }
 
   // Risk factor categories and metadata
   type RiskInfo = {
@@ -179,6 +200,30 @@ export const RiskFactorBreakdown: React.FC<Props> = ({ results }) => {
       evidenceLevel: 'High',
       dalysAttribute: '40% cancer, 35% diabetes, 25% cardiovascular'
     },
+    // Post-HENI carve-out keys (heni_calculator_methods.py:151-167): fibre is
+    // split into the FVLW-attributable share (already credited via produce groups)
+    // and the residual `fiber_other` share to avoid double-counting against
+    // Stylianou 2021 SI's fibre DRF.
+    'fiber_fvlw': {
+      category: 'Protective Nutrients',
+      icon: TrendingUp,
+      color: 'green',
+      description: 'Fibre attributed to fruits/vegetables/legumes/whole-grains in this meal (carve-out share)',
+      diseases: ['Colorectal cancer', 'Type 2 diabetes', 'Cardiovascular disease'],
+      mechanism: 'Same as total fibre; this row separates the share already credited via produce-group attribution',
+      evidenceLevel: 'High',
+      dalysAttribute: '40% cancer, 35% diabetes, 25% cardiovascular'
+    },
+    'fiber_other': {
+      category: 'Protective Nutrients',
+      icon: TrendingUp,
+      color: 'green',
+      description: 'Residual fibre not attributable to FVLW groups (e.g. from refined grains)',
+      diseases: ['Colorectal cancer', 'Type 2 diabetes', 'Cardiovascular disease'],
+      mechanism: 'Improved gut microbiome, glucose control, cholesterol reduction',
+      evidenceLevel: 'High',
+      dalysAttribute: '40% cancer, 35% diabetes, 25% cardiovascular'
+    },
     'calcium': {
       category: 'Protective Nutrients',
       icon: TrendingUp,
@@ -221,20 +266,19 @@ export const RiskFactorBreakdown: React.FC<Props> = ({ results }) => {
     }
   };
 
-  // Separate positive and negative factors, then sort by impact magnitude
-  const isRiskFactorName = (factor: string): boolean => {
-    const info = riskFactorInfo[factor as keyof typeof riskFactorInfo];
-    if (!info) return false;
-    return info.category.toLowerCase().startsWith('risk');
-  };
-
+  // Partition by ACTUAL μDALY sign (post-HENI-CODE-1):
+  //   value < 0 → beneficial (negative μDALY × -0.5256 → positive minutes)
+  //   value > 0 → harmful    (positive μDALY × -0.5256 → negative minutes)
+  // The previous implementation forced the sign from a category-name lookup
+  // (`isRiskFactorName(factor)`), which contradicted the kernel for foods
+  // whose actual contribution flipped the table assignment (audit bug #2).
   const allFactors = Object.entries(riskFactors) as Array<[string, number]>;
   const positiveFactors = allFactors
-    .filter(([factor]) => !isRiskFactorName(factor))
-    .sort(([, a], [, b]) => b - a);
+    .filter(([, v]) => v < 0)            // beneficial μDALY rows
+    .sort(([, a], [, b]) => a - b);      // most-beneficial (most-negative) first
   const negativeFactors = allFactors
-    .filter(([factor]) => isRiskFactorName(factor))
-    .sort(([, a], [, b]) => b - a);
+    .filter(([, v]) => v > 0)            // harmful μDALY rows
+    .sort(([, a], [, b]) => b - a);      // most-harmful (most-positive) first
   // const sortedFactors = allFactors.sort(([, a], [, b]) => Math.abs(b) - Math.abs(a));
 
   const getImpactLevel = (value: number) => {
@@ -301,8 +345,11 @@ export const RiskFactorBreakdown: React.FC<Props> = ({ results }) => {
           };
           
           const isExpanded = expandedFactor === factor;
-          const isPositive = !isRiskFactorName(factor);
-           const impactLevel = getImpactLevel(value);
+          // FIX (audit bug #2): isPositive now derives from the actual μDALY
+          // value, not from a category-name lookup. Under HENI sign convention,
+          // value < 0 means beneficial.
+          const isPositive = value < 0;
+          const impactLevel = getImpactLevel(value);
           const HealthIcon = getHealthIcon(factor);
 
           return (
@@ -334,7 +381,7 @@ export const RiskFactorBreakdown: React.FC<Props> = ({ results }) => {
                   <div className="flex items-center gap-3">
                     <div className="text-right">
                       <div className={`text-lg font-bold ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-                        {isPositive ? '+' : '-'}{Math.abs(value).toFixed(1)}
+                        {value > 0 ? '+' : ''}{value.toFixed(1)}
                       </div>
                       <div className="text-xs text-gray-500">μDALY</div>
                     </div>
@@ -364,7 +411,11 @@ export const RiskFactorBreakdown: React.FC<Props> = ({ results }) => {
                              <div className="flex justify-between">
                               <span className="text-sm">Time Equivalent:</span>
                               <span className="text-sm font-medium">
-                                {(Math.abs(value) * 0.5256).toFixed(1)} minutes
+                                {/* 2-dp for the expanded card so small values
+                                    don't collapse to "0.0" minutes when the
+                                    underlying μDALY rounds to e.g. -0.06 →
+                                    0.03 min. Summary badge stays at 1-dp. */}
+                                {(Math.abs(value) * 0.5256).toFixed(2)} minutes
                               </span>
                             </div>
                             <div className="flex justify-between">
@@ -396,7 +447,10 @@ export const RiskFactorBreakdown: React.FC<Props> = ({ results }) => {
                             className={`h-3 ${isPositive ? 'bg-green-100' : 'bg-red-100'}`}
                           />
                           <div className="text-xs text-gray-600 mt-1">
-                            {Math.abs(value).toFixed(1)} μDALY per serving
+                            {/* 2-dp on the expanded card so this matches the
+                                Time Equivalent precision above (issue surfaced
+                                with Calcium = -0.06: badge -0.1 vs detail 0.06). */}
+                            {Math.abs(value).toFixed(2)} μDALY per serving
                           </div>
                         </div>
                       </div>
@@ -478,7 +532,7 @@ export const RiskFactorBreakdown: React.FC<Props> = ({ results }) => {
                             </p>
                             <div className="flex items-center gap-2">
                               <Badge className="bg-red-100 text-red-800">
-                                -{Math.abs(value).toFixed(1)} μDALY
+                                +{value.toFixed(1)} μDALY
                               </Badge>
                               {isExpanded ? (
                                 <ChevronDown className="h-4 w-4 text-gray-400" />
@@ -501,7 +555,9 @@ export const RiskFactorBreakdown: React.FC<Props> = ({ results }) => {
                               {info.description}
                             </p>
                             <div className="text-xs text-gray-500">
-                              {Math.abs(value).toFixed(1)} μDALY per serving
+                              {/* 2-dp on both sides — matches the Benefits
+                                  expanded card after the precision fix. */}
+                              {Math.abs(value).toFixed(2)} μDALY per serving
                               {' '}({Math.abs(value * 0.5256).toFixed(2)} minutes)
                             </div>
                           </div>
@@ -556,7 +612,8 @@ export const RiskFactorBreakdown: React.FC<Props> = ({ results }) => {
                 dalysAttribute: 'Attribution not specified'
               };
               
-              const isPositive = value > 0;
+              // HENI sign convention: value < 0 = beneficial μDALY contribution.
+              const isPositive = value < 0;
               const HealthIcon = getHealthIcon(factor);
 
               return (
@@ -618,13 +675,13 @@ export const RiskFactorBreakdown: React.FC<Props> = ({ results }) => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div>
               <div className="text-lg font-bold text-green-600">
-                {Object.keys(riskFactors).filter(f => !isRiskFactorName(f)).length}
+                {Object.values(riskFactors).filter(v => v < 0).length}
               </div>
               <div className="text-xs text-gray-500">Protective Factors</div>
             </div>
             <div>
               <div className="text-lg font-bold text-red-600">
-                {Object.keys(riskFactors).filter(f => isRiskFactorName(f)).length}
+                {Object.values(riskFactors).filter(v => v > 0).length}
               </div>
               <div className="text-xs text-gray-500">Risk Factors</div>
             </div>

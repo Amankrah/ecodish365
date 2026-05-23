@@ -1062,13 +1062,13 @@ export interface RiskFactorAnalysis {
   confidence_scores: Record<string, number>;
 }
 
+// Actual backend payload shape — see heni_calculator_methods.py:315-324.
+// Keys in `disease_breakdown` are kernel-emitted (cardiovascular_diseases,
+// colorectal_cancer, other_cancers, metabolic_disorders, all_cause_mortality,
+// etc.); values are per-disease μDALY contributions for this meal.
 export interface DiseaseImpactAnalysis {
-  cardiovascular: number;
-  cancer: number;
-  metabolic: number;
-  neurological: number;
-  musculoskeletal: number;
-  other: number;
+  disease_breakdown: Record<string, number>;
+  methodology?: string;
 }
 
 export interface MealComposition {

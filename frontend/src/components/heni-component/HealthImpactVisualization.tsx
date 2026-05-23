@@ -77,16 +77,24 @@ export const HealthImpactVisualization: React.FC<Props> = ({ results }) => {
   const healthStatus = getHealthStatus(healthMinutes);
   const StatusIcon = healthStatus.icon;
 
-  // Get top positive and negative contributors
-  const contributors = component_breakdown?.food_group_contributions || {} as Record<string, number>;
+  // FIX (audit follow-up): merge food_group + nutrient contributions. Many CNF
+  // foods (e.g. Beef stew canned 4964) emit only nutrient_contributions, so a
+  // food-group-only view collapses to nothing. Also flip sign convention to
+  // match the rest of the page: negative μDALY = beneficial, positive = harmful.
+  const contribFG = component_breakdown?.food_group_contributions || {};
+  const contribN  = component_breakdown?.nutrient_contributions || {};
+  const contributors: Record<string, number> = { ...contribFG, ...contribN };
+  for (const k of Object.keys(contributors)) {
+    if (k.startsWith('__') || contributors[k] === 0) delete contributors[k];
+  }
   const positiveContributors = (Object.entries(contributors) as Array<[string, number]>)
-    .filter(([, value]) => value > 0)
-    .sort(([, a], [, b]) => b - a)
+    .filter(([, value]) => value < 0)              // beneficial μDALY
+    .sort(([, a], [, b]) => a - b)                 // most-beneficial first
     .slice(0, 3);
-  
+
   const negativeContributors = (Object.entries(contributors) as Array<[string, number]>)
-    .filter(([, value]) => value < 0)
-    .sort(([, a], [, b]) => a - b)
+    .filter(([, value]) => value > 0)              // harmful μDALY
+    .sort(([, a], [, b]) => b - a)                 // most-harmful first
     .slice(0, 3);
 
   return (
@@ -153,11 +161,11 @@ export const HealthImpactVisualization: React.FC<Props> = ({ results }) => {
                       {factor.replace('_', ' ')}
                     </span>
                     <span className="text-xs text-green-600">
-                      +{value.toFixed(1)} μDALY
+                      {value.toFixed(1)} μDALY
                     </span>
                   </div>
-                  <Progress 
-                    value={Math.min(100, (value / 20) * 100)} 
+                  <Progress
+                    value={Math.min(100, (Math.abs(value) / 20) * 100)}
                     className="h-2 bg-green-100"
                   />
                 </div>
@@ -183,11 +191,11 @@ export const HealthImpactVisualization: React.FC<Props> = ({ results }) => {
                       {factor.replace('_', ' ')}
                     </span>
                     <span className="text-xs text-amber-600">
-                      {value.toFixed(1)} μDALY
+                      +{value.toFixed(1)} μDALY
                     </span>
                   </div>
-                  <Progress 
-                    value={Math.min(100, (Math.abs(value) / 20) * 100)} 
+                  <Progress
+                    value={Math.min(100, (Math.abs(value) / 20) * 100)}
                     className="h-2 bg-amber-100"
                   />
                 </div>
@@ -223,7 +231,12 @@ export const HealthImpactVisualization: React.FC<Props> = ({ results }) => {
           <CardContent className="p-4">
             <Activity className="h-6 w-6 text-purple-500 mx-auto mb-2" />
             <div className="text-lg font-bold text-gray-800">
-              {Object.keys(risk_factor_analysis?.risk_factors || {}).length}
+              {/* Match HENIResultsCard counter: drop zero-valued rows
+                  (heni_calculator_methods.py:222 defaults trans_fat = 0.0)
+                  and internal __audit__ keys, so the two counters agree. */}
+              {Object.entries(risk_factor_analysis?.risk_factors || {})
+                .filter(([k, v]) => !k.startsWith('__') && Number(v) !== 0)
+                .length}
             </div>
             <div className="text-xs text-gray-500">Risk Factors</div>
           </CardContent>
@@ -271,21 +284,27 @@ export const HealthImpactVisualization: React.FC<Props> = ({ results }) => {
               </Badge>
             </div>
 
-            {/* Years */}
+            {/* Years — FIX (audit bug #5): the previous copy asserted
+                definitive "Increased risk of cardiovascular disease, diabetes,
+                certain cancers" outcomes for any negative-minutes meal,
+                including Neutral-classified ones. Stylianou 2021 (Discussion
+                p. 622) is explicit that the HENI marginal framework is NOT
+                applicable to chronic-disease incidence forecasting for a
+                single eating occasion. */}
             <div className="flex items-center gap-4">
               <div className="w-20 text-sm text-gray-500">Years</div>
               <div className="flex-1">
-                <div className="text-sm font-medium">Long-term Health</div>
+                <div className="text-sm font-medium">Marginal Population Effect</div>
                 <div className="text-xs text-gray-600">
-                  {healthMinutes > 0 
-                    ? 'Reduced risk of chronic diseases, increased healthy lifespan' 
-                    : 'Increased risk of cardiovascular disease, diabetes, certain cancers'
+                  {healthMinutes > 0
+                    ? 'Marginal contribution toward beneficial population-level GBD outcomes (Stylianou 2021)'
+                    : 'Marginal contribution toward adverse population-level GBD outcomes — not a personal disease-risk projection (Stylianou 2021 marginality caveat)'
                   }
                 </div>
               </div>
-              <Badge 
-                variant="secondary" 
-                className={`text-xs ${healthMinutes > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
+              <Badge
+                variant="secondary"
+                className={`text-xs ${healthMinutes > 0 ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}
               >
                 {healthMinutes > 0 ? '+' : ''}{healthMinutes.toFixed(2)} min
               </Badge>

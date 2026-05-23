@@ -73,6 +73,54 @@ These were explicitly logged as v1 simplifications during HENI-CODE-1 implementa
 
 ## Done
 
+### 2026-05-23 — Audience-aware API + frontend contract for nutrition indicators (AUDIENCE-CODE-1)
+
+**Why this matters.** A platform that serves both lay end-users (consumer decision support) AND researchers / academic publishers (transparency, citation, reproducibility) cannot use a single result presentation. An end-to-end review found three problem classes on the four nutrition endpoints (HENI / HEFI / HSR / FCS): (a) math leakage — μDALY values, raw HSR baseline/modifying points, FCS pre-rescaling `original_score`, FPED cup-equivalents, NOVA classifier rationale strings all rendered uniformly to lay consumers; (b) copy gaps — HEFI's `hefi_interpretation` was hardcoded prose NOT cited to Brassard 2022, HSR's `rating.description` was hardcoded NOT HSRAC v9, FCS had NO recommendation field at all; (c) missing mandatory caveats — HENI's marginality scope-limit (Stylianou 2021 Discussion p. 622), HEFI's single-day caveat (Brassard 2022b Discussion p. 588), HSR's within-category-only rule (HSRAC v9) were not enforced anywhere. The environmental endpoint already had the audience-aware `user_type` pattern; this round extends it to the four nutrition endpoints with literature-cited explanation packs per audience.
+
+**Files added.**
+
+- `backend/api/views/heni_explanations.py` — literature-cited HENI explanation pack (individual / researcher / policy) with mandatory marginality caveat per Stylianou 2021 Discussion p. 622
+- `backend/api/views/hefi_explanations.py` — HEFI pack with mandatory single-day caveat per Brassard 2022b Discussion p. 588 + Canadian population percentiles
+- `backend/api/views/hsr_explanations.py` — HSR pack pinned to HSRAC v9 Implementation Guide (10 Dec 2025) with mandatory within-category-only comparison rule + 6-category labels
+- `backend/api/views/fcs_explanations.py` — FCS pack with the Mozaffarian 2021 Methods p. 8 cut-offs (encourage ≥70 / moderate 31–69 / limit ≤30) + Monteiro 2019 NOVA canonical descriptions
+- `frontend/src/components/shared/AudienceToggle.tsx` — reusable 3-button audience selector with tooltips + ARIA labels; extracted from the environmental food-comparison component
+- `frontend/src/components/shared/ExplanationsPanel.tsx` — reusable panel rendering the API explanation block; renders mandatory caveat as a callout in all modes; methodology + citations + policy_context as collapsible accordions in researcher/policy modes
+- `backend/_smoke_audience_aware_contract.py` — end-to-end contract validation harness; 52 assertions across 4 endpoints × 3 audiences
+
+**Files modified.**
+
+- `backend/api/views/heni_views.py` — accepts `user_type`; attaches `explanations` block via `get_heni_explanations()`
+- `backend/api/views/hefi_views.py` — same; `hefi_interpretation` kept for backward-compat but DEPRECATED; new `explanations` block is the audience-aware path
+- `backend/api/views/hsr_views_consolidated.py` — same; star + category resolved from existing computed result, passed to `get_hsr_explanations()`
+- `backend/api/views/fcs_views.py` — same; ADDS the previously-missing `recommendation` field via the Mozaffarian band logic
+- `frontend/src/lib/api.ts` — extends `user_type?: 'individual' | 'researcher' | 'policy'` to all 4 nutrition request types (HENI/HEFI/HSR/FCS)
+- `frontend/src/components/heni-component/HENICalculator.tsx` — wires UserType state, AudienceToggle in header, ExplanationsPanel in Analysis tab; conditionally hides μDALY-leaking visualisations in individual mode
+- `frontend/src/app/hefi/calculate/page.tsx` — same pattern; hides component point breakdown + raw inputs in individual mode
+- `frontend/src/app/hsr/calculate/page.tsx` — same pattern; hides baseline/modifying point tiers + per-nutrient breakdown in individual mode
+- `frontend/src/app/fcs/calculate/page.tsx` — same pattern; hides `original_score` block in individual mode
+- `manuscript_call1.md` §3.7 — new section "Audience-aware API + frontend contract for nutrition indicators"; §3.8/3.9/3.10 renumbering of the existing Uncertainty / Country / Reproducibility sections; 5 cross-references updated
+
+**Architecture.** Each of the four endpoints accepts `user_type ∈ {individual, researcher, policy}` (default `individual`); after computing the score, attaches a top-level `explanations` block whose shape varies by audience. Individual mode returns `{score_summary, action_tips}` with mandatory caveat; researcher mode adds `{methodology, citations}`; policy mode adds `{policy_context, citations}`. Numerical computational state stays in the response for all audiences (researchers can still inspect μDALY, raw points, original_score); the frontend decides what to RENDER based on `user_type`. Backward-compatible: existing API consumers see all current fields + the new `explanations` block. The five existing nutrition smoke harnesses remain unchanged (default `user_type=individual` matches their existing assumptions).
+
+**Validation.** End-to-end contract harness at [`backend/_smoke_audience_aware_contract.py`](backend/_smoke_audience_aware_contract.py): 52 assertions across 4 endpoints × 3 user_types covering (a) explanations block present in expected response path; (b) score_summary headline non-empty; (c) mandatory per-audience caveat matches a literature-grounded canonical phrase (`"marginal"` / `"one serving"` for HENI; `"single-day"` / `"one day"` / `"usual adherence"` for HEFI; `"within"` + category for HSR; `"per 100"` / `"cross"` for FCS); (d) **individual mode does not leak any of 11 forbidden math tokens** (μDALY, 0.5256, DRF, baseline/modifying, original_score, cup-eq, etc.); (e) researcher mode carries the required literature citations (Stylianou 2021, Brassard 2022, HSRAC v9 / Shahid 2020, Mozaffarian 2021 / O'Hearn 2022, Monteiro 2019); (f) policy mode carries the `policy_context` block. **52/52 PASS.**
+
+**Verification.**
+
+```
+cd backend
+python _smoke_audience_aware_contract.py        # 52/52 PASS
+python _smoke_heni_literature_panel.py          # unchanged: 10/10 at +-0.1 min
+python _smoke_hefi_canonical_diets.py           # unchanged: 3/3 + rank PASS
+python _smoke_hsr_canonical_panel.py            # unchanged: 9/9
+python _smoke_fcs_canonical_panel.py            # unchanged: 11/11 + rank + golden
+python _smoke_nova_classification.py            # unchanged: 20/20
+
+cd ../frontend
+npx tsc --noEmit                                # clean
+```
+
+Manual UI walk-through: open `/heni/calculate`, `/hefi/calculate`, `/hsr/calculate`, `/fcs/calculate`; toggle Individual / Researcher / Policy via the new AudienceToggle; verify (i) headline + interpretation + mandatory caveat callout appear in all modes; (ii) methodology + citations accordions appear only in researcher/policy modes; (iii) μDALY/baseline-points/original_score detailed sections appear only in researcher/policy modes.
+
 ### 2026-05-23 — NOVA classifier rebuilt as rigorous Monteiro-2019-grounded matcher (NOVA-CODE-1)
 
 **Why this matters.** The FCS smoke audit spot-checked 11 foods and found 3 NOVA misclassifications: (a) frozen-boiled broccoli classified as NOVA 2 because the previous code did substring matching without word boundaries (`'OIL' in 'BOILED'` → True); (b) a fast-food hot dog classified as NOVA 3 — but Monteiro 2019 §4.3 lists "reconstituted meat products" as a literal canonical NOVA 4 example; (c) a frozen pepperoni pizza classified as NOVA 3 — but Monteiro 2019 §4.3 lists "pre-prepared frozen dishes" as another literal canonical NOVA 4 example. The previous keyword-only classifier had no CNF FoodGroup auto-routes and a narrow NOVA-4 lexicon missing Monteiro's "ingredient isolates and additives with no domestic equivalent" criterion (soy/whey protein isolate, maltodextrin, hydrolysed proteins, hydrogenated/interesterified oils, MSG, carrageenan, xanthan, polysorbate, BHA/BHT, artificial flavours/colours/non-sugar sweeteners).

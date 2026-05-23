@@ -17,15 +17,25 @@ import {
   Info
 } from 'lucide-react';
 import { type HENIResult, type HENIFoodProfile } from '../../lib/api';
+import { type UserType } from '../shared/AudienceToggle';
 
 type HENIAnalysis = HENIResult['data'] | HENIFoodProfile['data']['heni_analysis'];
 type Props = {
   results: HENIResult | HENIAnalysis;
   compact?: boolean;
   detailed?: boolean;
+  // AUDIENCE-CODE-1: when 'individual', suppress numeric μDALY exposure
+  // (the compact preview line and per-nutrient badge values). Researcher /
+  // policy modes see the full breakdown.
+  userType?: UserType;
 };
 
-export const HENIResultsCard: React.FC<Props> = ({ results, compact = false, detailed = false }) => {
+export const HENIResultsCard: React.FC<Props> = ({
+  results,
+  compact = false,
+  detailed = false,
+  userType = 'individual',
+}) => {
   if (!results) return null;
 
   // Normalize to analysis block
@@ -80,9 +90,15 @@ export const HENIResultsCard: React.FC<Props> = ({ results, compact = false, det
             </div>
           </div>
           <p className="text-lg text-gray-600">minutes of healthy life</p>
-          <p className="text-sm text-gray-500 mt-1">
-            HENI Score: {heni_scores?.heni_per_100_kcal?.toFixed(1) || '0.0'} μDALY/100kcal
-          </p>
+          {/* AUDIENCE-CODE-1 (audit bug #6): μDALY/100kcal is a researcher-mode
+              metric — Stylianou 2021 framed the burden-density figure for
+              expert audiences. Hidden from individual view to align with the
+              other 3 nutrition endpoints. */}
+          {userType !== 'individual' && (
+            <p className="text-sm text-gray-500 mt-1">
+              HENI Score: {heni_scores?.heni_per_100_kcal?.toFixed(1) || '0.0'} μDALY/100kcal
+            </p>
+          )}
         </div>
 
         {/* Quick Stats */}
@@ -142,7 +158,13 @@ export const HENIResultsCard: React.FC<Props> = ({ results, compact = false, det
             <CardContent className="p-4">
               <Heart className="h-6 w-6 text-red-500 mx-auto mb-2" />
               <div className="text-2xl font-bold text-gray-800">
-                {Object.keys(risk_factor_analysis?.risk_factors || {}).length}
+                {/* FIX (audit bug #7): heni_calculator_methods.py:221-222
+                    defaults trans_fat to 0.0 when absent and other rows can
+                    end up zero after the carve-out; count only non-zero
+                    contributors and exclude internal audit keys. */}
+                {Object.entries(risk_factor_analysis?.risk_factors || {})
+                  .filter(([k, v]) => !k.startsWith('__') && Number(v) !== 0)
+                  .length}
               </div>
               <p className="text-sm text-gray-600">risk factors</p>
             </CardContent>
@@ -166,11 +188,13 @@ export const HENIResultsCard: React.FC<Props> = ({ results, compact = false, det
           </CardContent>
         </Card>
 
-        {/* Component Breakdown */}
+        {/* Component Breakdown — FIX (audit bug #3): sign convention is
+            value < 0 = benefit, value > 0 = harm (post-HENI-CODE-1). The
+            previous filters were inverted. */}
         <div className="grid md:grid-cols-2 gap-6">
-          {/* Positive Contributors */}
-          {Object.keys(component_breakdown?.food_group_contributions || {}).some(key => 
-            component_breakdown.food_group_contributions[key] > 0
+          {/* Beneficial food groups (value < 0 μDALY) */}
+          {Object.keys(component_breakdown?.food_group_contributions || {}).some(key =>
+            component_breakdown.food_group_contributions[key] < 0
           ) && (
             <Card>
               <CardHeader>
@@ -181,8 +205,8 @@ export const HENIResultsCard: React.FC<Props> = ({ results, compact = false, det
               </CardHeader>
               <CardContent className="space-y-3">
                 {(Object.entries(component_breakdown?.food_group_contributions || {}) as Array<[string, number]>)
-                  .filter(([, value]) => value > 0)
-                  .sort(([, a], [, b]) => b - a)
+                  .filter(([k, value]) => !k.startsWith('__') && value < 0)
+                  .sort(([, a], [, b]) => a - b)
                   .map(([factor, value]) => (
                     <div key={factor} className="flex items-center justify-between">
                       <div className="flex-1">
@@ -190,14 +214,14 @@ export const HENIResultsCard: React.FC<Props> = ({ results, compact = false, det
                           {factor.replace('_', ' ')}
                         </p>
                         <div className="w-full bg-green-100 rounded-full h-2 mt-1">
-                          <div 
-                            className="bg-green-500 h-2 rounded-full" 
-                            style={{ width: `${Math.min(100, (value / 20) * 100)}%` }}
+                          <div
+                            className="bg-green-500 h-2 rounded-full"
+                            style={{ width: `${Math.min(100, (Math.abs(value) / 20) * 100)}%` }}
                           />
                         </div>
                       </div>
                       <Badge className="ml-3 bg-green-100 text-green-800">
-                        +{value.toFixed(1)} μDALY
+                        {value.toFixed(1)} μDALY
                       </Badge>
                     </div>
                   ))}
@@ -205,9 +229,9 @@ export const HENIResultsCard: React.FC<Props> = ({ results, compact = false, det
             </Card>
           )}
 
-          {/* Negative Contributors */}
-          {Object.keys(component_breakdown?.food_group_contributions || {}).some(key => 
-            component_breakdown.food_group_contributions[key] < 0
+          {/* Harmful food groups (value > 0 μDALY) */}
+          {Object.keys(component_breakdown?.food_group_contributions || {}).some(key =>
+            component_breakdown.food_group_contributions[key] > 0
           ) && (
             <Card>
               <CardHeader>
@@ -218,8 +242,8 @@ export const HENIResultsCard: React.FC<Props> = ({ results, compact = false, det
               </CardHeader>
               <CardContent className="space-y-3">
                 {(Object.entries(component_breakdown?.food_group_contributions || {}) as Array<[string, number]>)
-                  .filter(([, value]) => value < 0)
-                  .sort(([, a], [, b]) => a - b)
+                  .filter(([k, value]) => !k.startsWith('__') && value > 0)
+                  .sort(([, a], [, b]) => b - a)
                   .map(([factor, value]) => (
                     <div key={factor} className="flex items-center justify-between">
                       <div className="flex-1">
@@ -234,7 +258,7 @@ export const HENIResultsCard: React.FC<Props> = ({ results, compact = false, det
                         </div>
                       </div>
                       <Badge className="ml-3 bg-amber-100 text-amber-800">
-                        {value.toFixed(1)} μDALY
+                        +{value.toFixed(1)} μDALY
                       </Badge>
                     </div>
                   ))}
@@ -254,16 +278,22 @@ export const HENIResultsCard: React.FC<Props> = ({ results, compact = false, det
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 gap-4">
+                {/* FIX (audit bug #3): post-HENI-CODE-1 sign convention is
+                    positive μDALY = HARM (the kernel multiplies by
+                    MINUTES_PER_UDALY = -0.5256, so positive → negative
+                    minutes). Previous logic painted positive μDALY green
+                    (assumed positive = benefit) — inverted. */}
                 {(Object.entries(component_breakdown?.nutrient_contributions || {}) as Array<[string, number]>)
+                  .filter(([k, v]) => !k.startsWith('__') && Number(v) !== 0)
                   .sort(([, a], [, b]) => Math.abs(b) - Math.abs(a))
                   .map(([nutrient, value]) => (
                     <div key={nutrient} className="flex items-center justify-between p-3 bg-gray-50 rounded">
                       <span className="font-medium text-gray-700 capitalize">
                         {nutrient.replace('_', ' ')}
                       </span>
-                      <Badge 
-                        variant={value > 0 ? "default" : "destructive"} 
-                        className={value > 0 ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}
+                      <Badge
+                        variant={value < 0 ? "default" : "destructive"}
+                        className={value < 0 ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}
                       >
                         {value > 0 ? '+' : ''}{value.toFixed(1)} μDALY
                       </Badge>
