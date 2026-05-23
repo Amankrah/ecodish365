@@ -73,6 +73,40 @@ These were explicitly logged as v1 simplifications during HENI-CODE-1 implementa
 
 ## Done
 
+### 2026-05-23 — NOVA classifier rebuilt as rigorous Monteiro-2019-grounded matcher (NOVA-CODE-1)
+
+**Why this matters.** The FCS smoke audit spot-checked 11 foods and found 3 NOVA misclassifications: (a) frozen-boiled broccoli classified as NOVA 2 because the previous code did substring matching without word boundaries (`'OIL' in 'BOILED'` → True); (b) a fast-food hot dog classified as NOVA 3 — but Monteiro 2019 §4.3 lists "reconstituted meat products" as a literal canonical NOVA 4 example; (c) a frozen pepperoni pizza classified as NOVA 3 — but Monteiro 2019 §4.3 lists "pre-prepared frozen dishes" as another literal canonical NOVA 4 example. The previous keyword-only classifier had no CNF FoodGroup auto-routes and a narrow NOVA-4 lexicon missing Monteiro's "ingredient isolates and additives with no domestic equivalent" criterion (soy/whey protein isolate, maltodextrin, hydrolysed proteins, hydrogenated/interesterified oils, MSG, carrageenan, xanthan, polysorbate, BHA/BHT, artificial flavours/colours/non-sugar sweeteners).
+
+**Files added.**
+
+- `backend/fcs_calculator/fcs/utils/nova_classifier.py` — new 400-line rigorous classifier with three deterministic stages + optional LLM augmentation
+- `backend/_smoke_nova_classification.py` — Monteiro-2019-canonical 20-food validation harness
+- `backend/_smoke_nova_classification_results.json` — committed results
+
+**Files modified.**
+
+- `backend/fcs_calculator/fcs/utils/cnf_data_integrator.py:231-420` — removed the inline substring-keyword block (~120 lines); replaced with a call to `nova_classifier.classify()`; preserved all FCS food-ingredient attribute side-effects per NOVA level
+- `backend/_smoke_fcs_canonical_panel.py` — Greek yogurt target revised from `moderate` → `encourage` to reflect the secondary improvement: the previous YOGURT-detection check missed the Canadian "YOGOURT" spelling, so plain fat-free Greek yogurt did not receive the `yogurt` food_ingredients attribute and scored FCS 57.1; with the corrected detection, it scores FCS 84.1 (correct per Mozaffarian 2021 NHANES distribution for top-decile dairy foods)
+- `manuscript_call1.md` §3.2 FCS bullet — full architectural description of the new classifier + 20/20 validation panel result
+
+**Architecture (parallels §3.4 HENI categorizer + §3.5 LCA matcher + §3.6 FPED bridge).**
+
+- **Stage 1**: CNF FoodGroup hard rules with description-pattern exceptions. Examples: Sweets group (19) → NOVA 2 if granulated/brown/icing sugar, → NOVA 3 if honey/maple syrup, → NOVA 4 by default for candy/cookies/dessert; Baked Products (18) → NOVA 3 for plain bread, → NOVA 4 for sweetened/glazed/pastry/cookie; Dairy and Egg Products (1) → NOVA 2 for butter/ghee, → NOVA 3 for cheese, → NOVA 4 for sweetened-flavoured yogurt, → NOVA 1 default for plain milk/yogurt/eggs; meat groups (5, 10, 13, 17) → NOVA 4 for reconstituted/sausage/hot-dog/frankfurter/bologna/salami/pepperoni/deli-meat, → NOVA 3 for cured/smoked/canned/jerky, → NOVA 1 default raw; Fast Foods (21) / Babyfoods (3) / Snacks (25) / Breakfast cereals (8) / Sausages and Luncheon meats (7) → NOVA 4 always.
+- **Stage 2**: Word-boundary regex matching (no more OIL/BOILED bug) across four Monteiro NOVA 4 tiers — isolates (soy/whey protein isolate, casein, maltodextrin, HFCS/glucose-fructose, hydrogenated/interesterified, hydrolysed protein, modified starch) → additives (aspartame, sucralose, MSG, sodium nitrite/nitrate, carrageenan, xanthan/guar gum, lecithin, polysorbate, BHA/BHT/TBHQ, FD&C, enriched, fortified) → industrial processes (extruded, moulded, reconstituted, dehydrated, freeze-dried, pre-fried) → packaged-product archetypes (soft drink/cola, soda, sweetened beverage, candy, granola bar, cracker, chip, cookie, breakfast cereal, ice cream, frozen meal/dinner/entrée, instant noodle/soup, margarine, muffin, donut, pastry). Then NOVA 3 preservation/processing markers. Then NOVA 2 culinary ingredients.
+- **Stage 3-bis (optional)**: LLM augmentation via `ChatJSONClient` (multi-provider — `LLM_PROVIDER` env routes between OpenAI `gpt-4.1-mini` default and Anthropic `claude-haiku-4-5`). Monteiro's 4-group definitions embedded in the system prompt; constrained JSON output `{nova_group: 1|2|3|4, confidence: 0-1, rationale: str}`; gated on heterogeneous CNF groups where rule-based classification leaves residual ambiguity; per-food-id cache (deterministic at T=0).
+- **Stage 3 default**: NOVA 1 (Monteiro's "any food not matching higher-process criteria" baseline).
+
+**Validation.** 20 Monteiro-2019-canonical foods spanning all four groups (6 NOVA 1 + 3 NOVA 2 + 5 NOVA 3 + 6 NOVA 4). Per-group accuracy: **NOVA 1 6/6, NOVA 2 3/3, NOVA 3 5/5, NOVA 4 6/6 = 20/20 PASS** with exact-match gating (no half-band tolerance). The previously-broken cases now pass: broccoli frozen boiled → NOVA 1 ✓; fast-food hot dog → NOVA 4 ✓; pepperoni frozen pizza → NOVA 4 ✓. FCS smoke regression check: 11/11 PASS preserved.
+
+**Verification.**
+
+```
+cd backend
+python _smoke_nova_classification.py               # 20/20 PASS
+python _smoke_fcs_canonical_panel.py               # 11/11 + rank + golden PASS
+python -m pytest heni_calculator/tests/ -q         # 15/15 PASS unchanged
+```
+
 ### 2026-05-23 — Nutrition-score literature-pinned smoke harness (HENI / HEFI / HSR / cross-system)
 
 **Why this matters.** The platform ships three nutrition scoring systems (HENI, HEFI-2019, HSR v9) and the manuscript §3.2 claimed canonical reproduction for each, but the actual empirical reproduction was either non-existent (HEFI, HSR had 0 pytest tests) or unit-test-only (HENI's 15 tests cover the DALY kernel on synthetic inputs but not the live API path). Per the approved plan ([`tranquil-coalescing-acorn.md`](C:\Users\Windows\.claude\plans\tranquil-coalescing-acorn.md)) literature-pinned smoke harnesses now back each manuscript claim.

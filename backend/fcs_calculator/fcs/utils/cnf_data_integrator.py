@@ -252,16 +252,21 @@ class EnhancedCNFDataIntegrator:
             
             # Track processing levels for combined foods (use worst case)
             detected_processing_levels = []
-            
+
             # Enhanced food categorization using CNF food groups and descriptions
             for _, row in food_with_groups.iterrows():
                 food_desc = row.get('FoodDescription', '').upper()
+                food_desc_orig = row.get('FoodDescription', '')
                 group_name = row.get('FoodGroupName', '').upper() if 'FoodGroupName' in row else ''
+                group_name_orig = row.get('FoodGroupName', '') if 'FoodGroupName' in row else ''
                 food_group_id = row.get('FoodGroupID', 0)
-                
+                food_id_int = int(row.get('FoodID', 0))
+
                 logger.debug(f" Categorizing food: '{food_desc}' in group: '{group_name}' (ID: {food_group_id})")
-                
-                # Use CNF food group structure for better categorization
+
+                # Use CNF food group structure for food-ingredient attribute setting
+                # (this is the FCS attribute side; NOVA classification is now via
+                # nova_classifier.classify below)
                 if food_group_id == 9:  # Fruits and Fruit Juices
                     food_item.set_attribute('food_ingredients', 'fruit', 100)
                 elif food_group_id == 11:  # Vegetables and Vegetable Products
@@ -275,123 +280,65 @@ class EnhancedCNFDataIntegrator:
                 elif food_group_id == 4:  # Fats and Oils
                     food_item.set_attribute('food_ingredients', 'plant_oils', 100)
                 elif food_group_id == 1:  # Dairy and Egg Products
-                    if 'YOGURT' in food_desc or 'YOGHURT' in food_desc:
+                    if 'YOGURT' in food_desc or 'YOGHURT' in food_desc or 'YOGOURT' in food_desc:
                         food_item.set_attribute('food_ingredients', 'yogurt', 100)
-                
-                # Enhanced processing level detection with comprehensive keyword matching
-                
-                # NOVA 4 (Ultra-processed) indicators - expanded list
-                ultra_processed_terms = [
-                    # Packaged/processed indicators
-                    'INSTANT', 'MIX', 'POWDER', 'CONCENTRATE', 'SYRUP', 'EXTRACT',
-                    'SWEETENED', 'FLAVORED', 'FLAVOURED', 'ARTIFICIAL', 'IMITATION', 'SUBSTITUTE',
-                    # Manufacturing indicators  
-                    'ENRICHED', 'FORTIFIED', 'MODIFIED', 'RESTRUCTURED', 'REFORMED',
-                    # Specific ultra-processed foods
-                    'BREAKFAST CEREAL', 'READY TO EAT', 'CANDY', 'SODA', 'SOFT DRINK', 'ENERGY DRINK',
-                    'CHIPS', 'CRACKERS', 'COOKIES', 'CAKE', 'PIE', 'PASTRY', 'DONUT', 'MUFFIN',
-                    'ICE CREAM', 'FROZEN DESSERT', 'PUDDING', 'JELLO', 'GELATIN',
-                    # Chemical indicators
-                    'HYDROGENATED', 'HIGH FRUCTOSE', 'CORN SYRUP', 'ASPARTAME', 'SUCRALOSE',
-                    'MONOSODIUM GLUTAMATE', 'MSG', 'SODIUM NITRITE', 'NITRATE',
-                    # Processing methods
-                    'EXTRUDED', 'PUFFED', 'RECONSTITUTED', 'DEHYDRATED'
-                ]
-                
-                # NOVA 3 (Processed foods) indicators - expanded list
-                processed_terms = [
-                    # Preservation methods
-                    'CURED', 'SMOKED', 'SALTED', 'PICKLED', 'FERMENTED', 'AGED',
-                    # Canned products
-                    'CANNED', 'JARRED', 'BOTTLED', 'PRESERVED',
-                    # Processed meats
-                    'HAM', 'BACON', 'SAUSAGE', 'DELI MEAT', 'LUNCH MEAT', 'HOT DOG', 'BRATWURST',
-                    'PEPPERONI', 'SALAMI', 'BOLOGNA', 'PASTRAMI',
-                    # Dairy processing
-                    'CHEESE', 'PROCESSED CHEESE',
-                    # Baked goods
-                    'BREAD', 'BAGUETTE', 'ROLL', 'BAGEL', 'TORTILLA'
-                ]
-                
-                # NOVA 2 (Culinary ingredients) indicators
-                culinary_terms = [
-                    'OIL', 'BUTTER', 'LARD', 'SHORTENING', 'MARGARINE', 'GHEE',
-                    'SALT', 'SUGAR', 'HONEY', 'MAPLE SYRUP', 'MOLASSES',
-                    'VINEGAR', 'FLOUR', 'STARCH', 'CORN STARCH', 'BAKING POWDER', 'YEAST'
-                ]
-                
-                # Determine processing level for this food item
-                current_processing_level = 1  # Default to minimally processed
-                
-                # Check for ultra-processed characteristics
-                if any(term in food_desc for term in ultra_processed_terms):
-                    current_processing_level = 4
-                    detected_processing_levels.append(4)
-                    
-                    # Set food ingredients for ultra-processed
+
+                # NOVA classification — delegate to the rigorous classifier.
+                # See `nova_classifier.py` for the architecture (CNF FoodGroup
+                # hard rules + word-boundary keyword matching + optional LLM
+                # augmentation). 2026-05-23 replaces the inline substring-
+                # keyword block whose bugs were surfaced by the FCS smoke
+                # audit (OIL/BOILED substring false-positives; missing food-
+                # group auto-routes for Fast Foods + Babyfoods + Snacks → NOVA 4).
+                from .nova_classifier import classify as nova_classify
+                nova_result = nova_classify(
+                    food_id=food_id_int,
+                    food_description=food_desc_orig,
+                    food_group_name=group_name_orig,
+                    food_group_id=int(food_group_id),
+                    chat_json_client=getattr(self, 'nova_llm_client', None),
+                    enable_llm=getattr(self, 'enable_nova_llm', False),
+                )
+                current_processing_level = nova_result.level
+                detected_processing_levels.append(current_processing_level)
+                logger.debug(
+                    f" NOVA classifier: food_id={food_id_int} level={nova_result.level} "
+                    f"conf={nova_result.confidence:.2f} reason={nova_result.rationale}"
+                )
+
+                # Side effects per NOVA level (carry-over from the previous block):
+                if current_processing_level == 4:
                     food_item.set_attribute('food_ingredients', 'added_sugar', 100)
-                    
-                    # Enhanced additive detection for ultra-processed foods
                     self._detect_additives_from_description(food_desc, food_item, processing_level=4)
-                    
-                    # Set processing methods
-                    if any(term in food_desc for term in ['FRIED', 'DEEP FRIED']):
+                    if 'FRIED' in food_desc:
                         food_item.set_attribute('processing', 'frying', 100)
                     if 'CANNED' in food_desc:
                         food_item.set_attribute('processing', 'canning', 100)
-                    
-                    logger.debug(f" Detected NOVA 4 (ultra-processed) food: '{food_desc}'")
-                
-                # Check for processed foods
-                elif any(term in food_desc for term in processed_terms):
-                    current_processing_level = 3
-                    detected_processing_levels.append(3)
-                    
-                    # Set appropriate food ingredients
-                    if any(meat_term in food_desc for meat_term in ['HAM', 'BACON', 'SAUSAGE', 'DELI', 'LUNCH', 'HOT DOG', 'CURED']):
+                elif current_processing_level == 3:
+                    if any(t in food_desc for t in ['HAM', 'BACON', 'SAUSAGE', 'DELI', 'LUNCH', 'HOT DOG', 'CURED']):
                         food_item.set_attribute('food_ingredients', 'red_or_processed_meat', 100)
-                    elif 'CHEESE' in food_desc:
-                        # Cheese is processed but not necessarily refined grains
-                        pass
-                    elif any(grain_term in food_desc for grain_term in ['BREAD', 'ROLL', 'BAGEL']):
+                    elif any(t in food_desc for t in ['BREAD', 'ROLL', 'BAGEL']):
                         food_item.set_attribute('food_ingredients', 'refined_grains', 100)
-                    
-                    # Detect additives for processed foods
                     self._detect_additives_from_description(food_desc, food_item, processing_level=3)
-                    
-                    # Set processing methods
-                    if any(term in food_desc for term in ['SMOKED', 'SMOKING']):
+                    if 'SMOKED' in food_desc or 'SMOKING' in food_desc:
                         food_item.set_attribute('processing', 'smoking', 100)
                     if 'CANNED' in food_desc:
                         food_item.set_attribute('processing', 'canning', 100)
-                    if any(term in food_desc for term in ['FERMENTED', 'AGED']):
+                    if 'FERMENTED' in food_desc or 'AGED' in food_desc:
                         food_item.set_attribute('processing', 'fermentation', 100)
-                    
-                    logger.debug(f" Detected NOVA 3 (processed) food: '{food_desc}'")
-                
-                # Check for culinary ingredients
-                elif any(term in food_desc for term in culinary_terms):
-                    current_processing_level = 2
-                    detected_processing_levels.append(2)
-                    
-                    if any(oil_term in food_desc for oil_term in ['OIL', 'BUTTER', 'MARGARINE', 'SHORTENING']):
+                elif current_processing_level == 2:
+                    if any(t in food_desc for t in ['OIL', 'BUTTER', 'MARGARINE', 'SHORTENING']):
                         food_item.set_attribute('food_ingredients', 'plant_oils', 100)
-                    
-                    logger.debug(f" Detected NOVA 2 (culinary ingredient): '{food_desc}'")
-                
-                else:
-                    # Minimally processed
-                    detected_processing_levels.append(1)
+                elif current_processing_level == 1:
                     food_item.set_attribute('processing', 'minimal_processing', 100)
-                    logger.debug(f" Detected NOVA 1 (minimally processed): '{food_desc}'")
-                
-                # Detect whole grains vs refined grains
+
+                # Whole-grain vs refined-grain attribute (unchanged from previous block)
                 if food_group_id == 20:  # Cereals, Grains and Pasta
                     if any(term in food_desc for term in ['WHOLE', 'BROWN', 'BRAN', 'WHEAT GERM']):
                         food_item.set_attribute('food_ingredients', 'whole_grains', 100)
                     else:
                         food_item.set_attribute('food_ingredients', 'refined_grains', 100)
-                
+
                 logger.debug(f" Food '{food_desc}' categorized as NOVA level {current_processing_level}")
             
             # For combined foods, use energy-weighted processing level

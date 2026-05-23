@@ -1,0 +1,187 @@
+{
+  "panel_description": "FCS-10 canonical-food smoke (band gates + directional rank + golden regression)",
+  "gate_policy": {
+    "per_food_band": "actual FCS must fall in expected Mozaffarian 2021 band (encourage >= 70.0; limit <= 30.0; moderate in between)",
+    "directional_rank": "min(FCS of encourage foods) > max(FCS of limit foods)",
+    "golden_regression": "food_id=29 (Cheese, edam) must reproduce FCS=21.61 from FCS-CODE-1 audit"
+  },
+  "summary": {
+    "n_pass_band": 11,
+    "n_total": 11,
+    "rank_pass": true,
+    "golden_pass": true,
+    "overall_pass": true
+  },
+  "notes": [
+    "FCS and FCS-10 literature validate aggregate metrics (Spearman r, RMSE, band accuracy) rather than publishing per-food canonical FCS values, so the smoke uses band-categorical gates (Mozaffarian 2021 Methods p. 8) rather than per-food numerical targets.",
+    "O'Hearn 2022 NHANES distribution: ~33% limit, ~67% moderate, ~0.5% encourage (the encourage band is exclusive in practice). Our smoke panel oversamples the encourage and limit bands for dynamic-range testing.",
+    "The golden regression at food_id=29 reproduces the FCS-CODE-1 (2026-05-21) Mozaffarian rescaling formula audit value (21.61); tighter pinning (+-0.01) lives in pytest at fcs_calculator/tests/test_fcs_rust.py."
+  ],
+  "rows": [
+    {
+      "label": "Apple, raw, with skin",
+      "cnf_food_id": 1696,
+      "expected_band": "encourage",
+      "rationale": "Whole fruit, no processing \u2014 Mozaffarian 2021 Fig 1 fruits have highest mean FCS among 12 NHANES food groups.",
+      "fcs_actual": 81.18,
+      "fcs_actual_band": "encourage",
+      "within_gate": true,
+      "verdict": "PASS",
+      "diagnostics": {
+        "original_score": 19.12,
+        "nova_category": "MINIMALLY_PROCESSED",
+        "name": "Apple, raw, with skin"
+      }
+    },
+    {
+      "label": "Broccoli, frozen, boiled",
+      "cnf_food_id": 2026,
+      "expected_band": "encourage",
+      "rationale": "Whole vegetable, light processing.",
+      "fcs_actual": 100.0,
+      "fcs_actual_band": "encourage",
+      "within_gate": true,
+      "verdict": "PASS",
+      "diagnostics": {
+        "original_score": 43.0,
+        "nova_category": "MINIMALLY_PROCESSED",
+        "name": "Broccoli, frozen, boiled"
+      }
+    },
+    {
+      "label": "Chia seeds, dried",
+      "cnf_food_id": 2511,
+      "expected_band": "encourage",
+      "rationale": "Seeds: high fibre + omega-3 + protein density.",
+      "fcs_actual": 100.0,
+      "fcs_actual_band": "encourage",
+      "within_gate": true,
+      "verdict": "PASS",
+      "diagnostics": {
+        "original_score": 36.27,
+        "nova_category": "MINIMALLY_PROCESSED",
+        "name": "Chia seeds, dried"
+      }
+    },
+    {
+      "label": "Milk, fluid, whole 3.25%",
+      "cnf_food_id": 113,
+      "expected_band": "moderate",
+      "rationale": "Dairy beverage: protein + calcium offset moderate sat fat.",
+      "fcs_actual": 49.11,
+      "fcs_actual_band": "moderate",
+      "within_gate": true,
+      "verdict": "PASS",
+      "diagnostics": {
+        "original_score": 7.24,
+        "nova_category": "MINIMALLY_PROCESSED",
+        "name": "Milk, fluid, whole 3.25%"
+      }
+    },
+    {
+      "label": "Yogurt, Greek style, plain, fat free",
+      "cnf_food_id": 502188,
+      "expected_band": "encourage",
+      "rationale": "Plain fat-free Greek yogurt: high protein, calcium, no added sugar, fermented dairy. REVISED 2026-05-23 (target moderate -> encourage) after the NOVA classifier refactor also fixed a latent YOGURT-detection bug \u2014 the previous \"YOGURT in desc\" check missed the Canadian \"YOGOURT\" spelling, so Greek yogurt did not receive the yogurt food_ingredients attribute. With the attribute correctly set, plain fat-free Greek yogurt lands at FCS 84.1, in the top decile of Mozaffarian 2021's NHANES distribution (only ~0.5%% of foods score >=70).",
+      "fcs_actual": 84.1,
+      "fcs_actual_band": "encourage",
+      "within_gate": true,
+      "verdict": "PASS",
+      "diagnostics": {
+        "original_score": 20.21,
+        "nova_category": "MINIMALLY_PROCESSED",
+        "name": "Yogurt, Greek style, plain, fat free"
+      }
+    },
+    {
+      "label": "Apple juice, canned/bottled",
+      "cnf_food_id": 1495,
+      "expected_band": "moderate",
+      "rationale": "100% juice: no added sugar, some fruit nutrients but no fibre \u2014 Mozaffarian Discussion identifies juices as a borderline-moderate case.",
+      "fcs_actual": 45.97,
+      "fcs_actual_band": "moderate",
+      "within_gate": true,
+      "verdict": "PASS",
+      "diagnostics": {
+        "original_score": 6.07,
+        "nova_category": "PROCESSED_FOODS",
+        "name": "Apple juice, canned/bottled"
+      }
+    },
+    {
+      "label": "Bread, white, commercial",
+      "cnf_food_id": 4066,
+      "expected_band": "limit",
+      "rationale": "Refined grain, high sodium \u2014 Mozaffarian 2021 Fig 1 places refined breads in the limit band.",
+      "fcs_actual": 3.36,
+      "fcs_actual_band": "limit",
+      "within_gate": true,
+      "verdict": "PASS",
+      "diagnostics": {
+        "original_score": -9.72,
+        "nova_category": "PROCESSED_FOODS",
+        "name": "Bread, white, commercial"
+      }
+    },
+    {
+      "label": "Pork, cured, bacon, raw",
+      "cnf_food_id": 1936,
+      "expected_band": "limit",
+      "rationale": "Processed meat: high sodium, sat fat, nitrites.",
+      "fcs_actual": 1.0,
+      "fcs_actual_band": "limit",
+      "within_gate": true,
+      "verdict": "PASS",
+      "diagnostics": {
+        "original_score": -17.22,
+        "nova_category": "PROCESSED_FOODS",
+        "name": "Pork, cured, bacon, raw"
+      }
+    },
+    {
+      "label": "Fast foods, hot dog, plain",
+      "cnf_food_id": 4644,
+      "expected_band": "limit",
+      "rationale": "Processed meat + refined bun: composite limit.",
+      "fcs_actual": 1.0,
+      "fcs_actual_band": "limit",
+      "within_gate": true,
+      "verdict": "PASS",
+      "diagnostics": {
+        "original_score": -12.66,
+        "nova_category": "ULTRA_PROCESSED_FOODS",
+        "name": "Fast foods, hot dog, plain"
+      }
+    },
+    {
+      "label": "Pizza, pepperoni, frozen, cooked",
+      "cnf_food_id": 4962,
+      "expected_band": "limit",
+      "rationale": "Mixed processed dish: refined crust + processed meat + cheese; expect ~20-30 FCS (lower limit band).",
+      "fcs_actual": 1.0,
+      "fcs_actual_band": "limit",
+      "within_gate": true,
+      "verdict": "PASS",
+      "diagnostics": {
+        "original_score": -13.45,
+        "nova_category": "ULTRA_PROCESSED_FOODS",
+        "name": "Pizza, pepperoni, frozen, cooked"
+      }
+    },
+    {
+      "label": "Sweets, sugars, granulated",
+      "cnf_food_id": 4318,
+      "expected_band": "limit",
+      "rationale": "Pure refined sucrose \u2014 should hit limit floor (~1).",
+      "fcs_actual": 1.0,
+      "fcs_actual_band": "limit",
+      "within_gate": true,
+      "verdict": "PASS",
+      "diagnostics": {
+        "original_score": -12.56,
+        "nova_category": "PROCESSED_CULINARY_INGREDIENTS",
+        "name": "Sweets, sugars, granulated"
+      }
+    }
+  ]
+}
