@@ -12,6 +12,8 @@ import {
   SparklesIcon
 } from '@heroicons/react/24/outline';
 import { FCSApiService, CNFApiService, type FCSResult, type SearchResult, type FilterOptions } from '@/lib/api';
+import { AudienceToggle, type UserType, type ExplanationsBlock } from '@/components/shared/AudienceToggle';
+import { ExplanationsPanel } from '@/components/shared/ExplanationsPanel';
 
 interface FoodItem {
   id: string;
@@ -38,6 +40,7 @@ export default function FCSCalculate() {
   });
   const [activeSearch, setActiveSearch] = useState<string>('');
   const [result, setResult] = useState<FCSResult | null>(null);
+  const [userType, setUserType] = useState<UserType>('individual');
   const [isCalculating, setIsCalculating] = useState(false);
   const [filters, setFilters] = useState<FilterOptions | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -142,7 +145,8 @@ export default function FCSCalculate() {
     try {
       const fcsResult = await FCSApiService.calculateFCS({
         food_ids: validFoods.map(food => food.food_id),
-        food_names: validFoods.map(food => food.food_name)
+        food_names: validFoods.map(food => food.food_name),
+        user_type: userType
       });
       
       console.log('FCS API Response:', fcsResult);
@@ -205,6 +209,10 @@ export default function FCSCalculate() {
           <p className="text-lg text-gray-600">
             Calculate Food Compass Scores using the scientifically validated FCS 2.0 algorithm.
           </p>
+          {/* Audience selector (AUDIENCE-CODE-1 2026-05-23) */}
+          <div className="mt-4">
+            <AudienceToggle userType={userType} onChange={setUserType} accent="blue" />
+          </div>
           <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
             <div className="flex items-center">
               <SparklesIcon className="w-5 h-5 text-blue-600 mr-2" />
@@ -381,9 +389,14 @@ export default function FCSCalculate() {
           <div className="lg:col-span-2">
             {result ? (
               <div className="space-y-6">
-                {(() => { console.log('Rendering with result:', result); return null; })()}
+                {/* Audience-aware explanations (AUDIENCE-CODE-1) */}
+                <ExplanationsPanel
+                  explanations={(result as unknown as { explanations?: ExplanationsBlock })?.explanations}
+                  userType={userType}
+                  accent="text-blue-700"
+                />
 
-                {/* Main FCS Result */}
+                {/* Main FCS Result — headline always visible */}
                 <div className="bg-white rounded-lg shadow-sm p-6">
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">
                     Food Compass Score Results
@@ -405,8 +418,10 @@ export default function FCSCalculate() {
                     </p>
                   </div>
 
-                  {/* Score Details */}
+                  {/* Score Details — Original Algorithm Score is researcher/policy only
+                      (pre-rescaling raw value confuses individuals). */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {userType !== 'individual' && (
                     <div className="bg-gray-50 rounded-lg p-4">
                       <h3 className="text-sm font-medium text-gray-700 mb-2">Original Algorithm Score</h3>
                       <div className="text-2xl font-bold text-gray-900">{result.original_score !== undefined ? result.original_score.toFixed(2) : 'N/A'}</div>
@@ -414,6 +429,7 @@ export default function FCSCalculate() {
                         Raw score from 9-domain calculation before transformation to 1-100 scale
                       </p>
                     </div>
+                    )}
                     <div className="bg-gray-50 rounded-lg p-4">
                       <h3 className="text-sm font-medium text-gray-700 mb-2">NOVA Category</h3>
                       <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getNOVAColor(result.nova_category)}`}>

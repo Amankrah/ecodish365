@@ -11,6 +11,7 @@ from heni_calculator.heni.service import (
     resolve_llm_api_key,
 )
 from heni_calculator.heni.models.ingredient import Ingredient
+from .heni_explanations import get_explanations as get_heni_explanations
 from .heni_analysis_helpers import (
     _identify_primary_health_drivers,
     _get_epidemiological_context, 
@@ -39,7 +40,10 @@ def heni_calculate(request):
     """Calculate HENI score for meals with specified ingredients and amounts."""
     try:
         meal_data = request.data.get('meal', [])
-        
+        user_type = str(request.data.get('user_type', 'individual'))
+        if user_type not in ('individual', 'researcher', 'policy'):
+            user_type = 'individual'
+
         if not meal_data:
             return Response({"error": "'meal' array with ingredients is required"}, status=status.HTTP_400_BAD_REQUEST)
         
@@ -79,7 +83,23 @@ def heni_calculate(request):
             llm_api_key=resolve_llm_api_key(),
             cnf_integrator=integrator,
         )
-        
+
+        # Audience-aware explanations (AUDIENCE-CODE-1 SHIPPED 2026-05-23).
+        # The literature-cited interpretive prose lives in heni_explanations.py;
+        # the existing comprehensive_result keys are preserved for backward
+        # compatibility (researchers still see all internal fields).
+        try:
+            health_min = float(
+                comprehensive_result.get('health_impact', {})
+                                     .get('health_impact_minutes', 0.0)
+            )
+        except Exception:
+            health_min = 0.0
+        comprehensive_result['explanations'] = get_heni_explanations(
+            health_impact_minutes=health_min, user_type=user_type,
+        )
+        comprehensive_result['user_type'] = user_type
+
         result = {
             "success": True,
             "data": comprehensive_result,

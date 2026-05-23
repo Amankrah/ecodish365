@@ -12,6 +12,7 @@ from fcs_calculator.fcs.service import (
     get_cnf_integrator,
     per_domain_attribute_breakdown,
 )
+from .fcs_explanations import get_explanations as get_fcs_explanations
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +28,9 @@ def fcs_calculate(request):
     try:
         food_ids = request.data.get('food_ids', [])
         food_names = request.data.get('food_names', [])
+        user_type = str(request.data.get('user_type', 'individual'))
+        if user_type not in ('individual', 'researcher', 'policy'):
+            user_type = 'individual'
 
         if not food_ids:
             return Response({"error": "No food IDs provided"}, status=status.HTTP_400_BAD_REQUEST)
@@ -56,6 +60,20 @@ def fcs_calculate(request):
                 {"error": "An unexpected error occurred while processing food data"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+        # Audience-aware explanations (AUDIENCE-CODE-1 SHIPPED 2026-05-23).
+        # ADDS the previously-missing Mozaffarian 2021 recommendation band
+        # (encourage / moderate / limit) per user_type.
+        try:
+            fcs_val = float(result.get('fcs', 0.0))
+            nova_cat = str(result.get('nova_category', 'MINIMALLY_PROCESSED'))
+        except Exception:
+            fcs_val = 0.0
+            nova_cat = 'MINIMALLY_PROCESSED'
+        result['explanations'] = get_fcs_explanations(
+            fcs=fcs_val, nova_category=nova_cat, user_type=user_type,
+        )
+        result['user_type'] = user_type
 
         return Response({
             "success": True,

@@ -14,6 +14,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { HSRApiService, CNFApiService, type HSRResult, type SearchResult, type FilterOptions } from '@/lib/api';
 import StarRating from '@/components/StarRating';
+import { AudienceToggle, type UserType, type ExplanationsBlock } from '@/components/shared/AudienceToggle';
+import { ExplanationsPanel } from '@/components/shared/ExplanationsPanel';
 
 interface FoodItem {
   id: string;
@@ -42,6 +44,7 @@ export default function HSRCalculate() {
   });
   const [activeSearch, setActiveSearch] = useState<string>('');
   const [result, setResult] = useState<HSRResult | null>(null);
+  const [userType, setUserType] = useState<UserType>('individual');
   const [isCalculating, setIsCalculating] = useState(false);
   const [analysisLevel, setAnalysisLevel] = useState<'simple' | 'detailed'>('detailed');
   const [includeAlternatives, setIncludeAlternatives] = useState(true);
@@ -153,7 +156,8 @@ export default function HSRCalculate() {
         serving_sizes: validFoods.map(food => food.serving_size),
         analysis_level: analysisLevel,
         include_alternatives: includeAlternatives,
-        include_meal_insights: includeMealInsights
+        include_meal_insights: includeMealInsights,
+        user_type: userType,
       });
       
       setResult(hsrResult);
@@ -198,6 +202,10 @@ export default function HSRCalculate() {
           <p className="text-lg text-gray-600">
             Calculate Health Star Ratings for foods and meals with detailed nutritional analysis.
           </p>
+          {/* Audience selector (AUDIENCE-CODE-1 2026-05-23) */}
+          <div className="mt-4">
+            <AudienceToggle userType={userType} onChange={setUserType} accent="amber" />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -421,6 +429,18 @@ export default function HSRCalculate() {
           <div className="lg:col-span-2">
             {result ? (
               <div className="space-y-6">
+                {/* Audience-aware explanations (AUDIENCE-CODE-1) */}
+                <ExplanationsPanel
+                  explanations={(result as unknown as { explanations?: ExplanationsBlock })?.explanations}
+                  userType={userType}
+                  accent="text-amber-700"
+                />
+                {/* Math-leaking detailed breakdown: researcher + policy only.
+                    Baseline / modifying point breakdowns, per-nutrient impact
+                    points, threshold-table references expose HSRAC v9
+                    internal scoring mechanics not intended for lay users. */}
+                {userType !== 'individual' && (
+                <>
                 {/* Main HSR Result */}
                 <div className="bg-white rounded-lg shadow-sm p-6">
                   <div className="flex items-center justify-between mb-6">
@@ -956,6 +976,8 @@ export default function HSRCalculate() {
                     </div>
                   )}
                 </div>
+                </>
+                )}
               </div>
             ) : (
               <div className="bg-white rounded-lg shadow-sm p-12 text-center">

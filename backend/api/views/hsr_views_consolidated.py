@@ -48,6 +48,9 @@ def _log_hsr_timing(view: str, food_ids: List, meta: str = "", **parts_ms: float
 # Single process-wide CNF pipeline — see backend/api/cnf_cache.py.
 from api.cnf_cache import get_dish_cnf_pipeline as get_cnf_pipeline
 
+# Audience-aware explanations (AUDIENCE-CODE-1 SHIPPED 2026-05-23).
+from .hsr_explanations import get_explanations as get_hsr_explanations
+
 
 class HSRAPIError(Exception):
     """Custom exception for HSR API errors"""
@@ -113,6 +116,9 @@ def calculate_hsr(request):
     analysis_level = request.data.get('analysis_level', 'detailed')
     include_alternatives = request.data.get('include_alternatives', False)
     include_meal_insights = request.data.get('include_meal_insights', True)
+    user_type = str(request.data.get('user_type', 'individual'))
+    if user_type not in ('individual', 'researcher', 'policy'):
+        user_type = 'individual'
     
     # Validate inputs
     _validate_hsr_input(food_ids, serving_sizes)
@@ -167,6 +173,20 @@ def calculate_hsr(request):
 
     # Add food details for user context
     result["food_details"] = _get_food_details_summary(foods)
+
+    # Audience-aware explanations (AUDIENCE-CODE-1 SHIPPED 2026-05-23).
+    # Star rating + category come from the existing computed result; the
+    # explanations block replaces the previously-hardcoded rating.description.
+    try:
+        star_rating = float(result.get('hsr_result', {}).get('rating', {}).get('star_rating', 0.0))
+        category_str = str(meal_category.value) if hasattr(meal_category, 'value') else str(meal_category)
+    except Exception:
+        star_rating = 0.0
+        category_str = '2'
+    result["explanations"] = get_hsr_explanations(
+        star_rating=star_rating, category=category_str, user_type=user_type,
+    )
+    result["user_type"] = user_type
     result["meal_categorization"] = _get_basic_meal_categorization_summary(meal)
 
     t3 = time.perf_counter()

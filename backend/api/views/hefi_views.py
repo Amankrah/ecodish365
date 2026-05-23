@@ -12,6 +12,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../hefi_calculator')
 from hefi_calculator.hefi.cnf_integrator import HEFICNFIntegrator
 from hefi_calculator.hefi.models import HEFIInputs
 from hefi_calculator.hefi.algorithm import compute_hefi
+from .hefi_explanations import get_explanations as get_hefi_explanations
 
 # Global integrator instance to avoid initialization overhead
 _hefi_integrator = None
@@ -34,8 +35,15 @@ def _get_food_name(food_id, integrator):
     except:
         return f"Food ID {food_id}"
 
-def _format_hefi_response(result, food_ids=None, food_name=None, integrator=None):
-    """Helper function to format HEFI response consistently"""
+def _format_hefi_response(result, food_ids=None, food_name=None, integrator=None,
+                            user_type: str = 'individual'):
+    """Helper function to format HEFI response consistently.
+
+    `user_type` controls the audience-aware `explanations` block per
+    HEFI-CODE / AUDIENCE-CODE-1 (2026-05-23). Legacy `hefi_interpretation`
+    block is preserved for backward compatibility but is deprecated; new
+    consumers should read `explanations` instead.
+    """
     def _interpret_hefi(total_score: float):
         # Population-based interpretation (no official grading)
         # Benchmarks from population data: mean ~43.1, p1 ~22.1, p99 ~62.9
@@ -116,9 +124,13 @@ def _format_hefi_response(result, food_ids=None, food_name=None, integrator=None
             'free_sugars_g': result.inputs.free_sugars_g,
             'sodium_mg': result.inputs.sodium_mg,
         },
-        'hefi_interpretation': _interpret_hefi(result.total_score),
+        'hefi_interpretation': _interpret_hefi(result.total_score),  # DEPRECATED — kept for backward-compat
+        'explanations': get_hefi_explanations(
+            total_score=float(result.total_score), user_type=user_type,
+        ),
+        'user_type': user_type,
     }
-    
+
     return data
 
 @api_view(['POST'])
@@ -135,7 +147,10 @@ def hefi_calculate(request):
     """
     try:
         foods_data = request.data.get('foods')
-        
+        user_type = str(request.data.get('user_type', 'individual'))
+        if user_type not in ('individual', 'researcher', 'policy'):
+            user_type = 'individual'
+
         if not foods_data:
             return Response({"error": "'foods' array with food_id and amount_g is required"}, status=status.HTTP_400_BAD_REQUEST)
         
@@ -176,7 +191,7 @@ def hefi_calculate(request):
         else:
             food_name = f"Meal with {len(food_ids)} foods ({total_amount}g total)"
 
-        data = _format_hefi_response(result, food_ids, food_name, integrator)
+        data = _format_hefi_response(result, food_ids, food_name, integrator, user_type=user_type)
         
         # Add detailed food breakdown
         food_breakdown = []
@@ -409,7 +424,7 @@ def compare_foods_hefi(request):
                 inputs = HEFIInputs(**agg)
                 result = compute_hefi(inputs)
                 
-                data = _format_hefi_response(result, food_ids, food_name, integrator)
+                data = _format_hefi_response(result, food_ids, food_name, integrator, user_type=user_type)
                 results.append(data)
                 
             except Exception as e:

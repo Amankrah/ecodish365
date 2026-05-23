@@ -364,6 +364,8 @@ export interface HSRCalculationRequest {
   analysis_level?: 'simple' | 'detailed';
   include_alternatives?: boolean;
   include_meal_insights?: boolean;
+  /** Audience selector for the explanations block (AUDIENCE-CODE-1 2026-05-23). */
+  user_type?: 'individual' | 'researcher' | 'policy';
 }
 
 export interface HSRComparisonRequest {
@@ -710,6 +712,8 @@ export class HSRApiService {
 export interface FCSCalculationRequest {
   food_ids: number[];
   food_names?: string[];
+  /** Audience selector for the explanations block (AUDIENCE-CODE-1 2026-05-23). */
+  user_type?: 'individual' | 'researcher' | 'policy';
 }
 
 export interface FCSBatchRequest {
@@ -795,6 +799,8 @@ export interface HEFICalculationRequest {
     food_id: number;
     amount_g: number;
   }>;
+  /** Audience selector for the explanations block (AUDIENCE-CODE-1 2026-05-23). */
+  user_type?: 'individual' | 'researcher' | 'policy';
 }
 
 export interface HEFIComparisonRequest {
@@ -1004,6 +1010,8 @@ export interface HENICalculationRequest {
     amount: number;
     unit?: string;
   }>;
+  /** Audience selector for the explanations block (AUDIENCE-CODE-1 2026-05-23). */
+  user_type?: 'individual' | 'researcher' | 'policy';
 }
 
 export interface HENIFoodProfileRequest {

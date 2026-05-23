@@ -9,6 +9,8 @@ import {
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 import { HEFIApiService, CNFApiService, type HEFIResult, type FilterOptions, type HEFIInterpretation } from '../../../lib/api';
+import { AudienceToggle, type UserType, type ExplanationsBlock } from '../../../components/shared/AudienceToggle';
+import { ExplanationsPanel } from '../../../components/shared/ExplanationsPanel';
 
 interface SelectedFood {
   FoodID: number;
@@ -150,6 +152,7 @@ export default function HEFICalculatePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [searchIsLoading, setSearchIsLoading] = useState(false);
   const [result, setResult] = useState<HEFIResult | null>(null);
+  const [userType, setUserType] = useState<UserType>('individual');
   const [error, setError] = useState<string>('');
   const [filters, setFilters] = useState<FilterOptions | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -250,7 +253,7 @@ export default function HEFICalculatePage() {
       setError('');
       
       const foods = selectedFoods.map(f => ({ food_id: f.FoodID, amount_g: f.amount_g }));
-      const response = await HEFIApiService.calculateHEFI({ foods });
+      const response = await HEFIApiService.calculateHEFI({ foods, user_type: userType });
       
       setResult(response);
     } catch (err: unknown) {
@@ -280,6 +283,10 @@ export default function HEFICalculatePage() {
             Build a meal or day from foods to estimate HEFI-2019 alignment. For scientifically valid use, HEFI-2019 is intended for complete
             daily dietary patterns (24-hour recalls), not single foods.
           </p>
+          {/* Audience selector (AUDIENCE-CODE-1 2026-05-23) */}
+          <div className="mt-4">
+            <AudienceToggle userType={userType} onChange={setUserType} accent="green" />
+          </div>
           <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <div className="flex">
               <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600 mr-2 flex-shrink-0" />
@@ -464,17 +471,42 @@ export default function HEFICalculatePage() {
           {/* Results Panel */}
           <div className="lg:col-span-2 space-y-6">
             {result ? (
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-2xl font-bold text-gray-900">HEFI Results</h2>
-                  <button
-                    onClick={resetCalculation}
-                    className="text-purple-600 hover:text-purple-700 font-medium"
-                  >
-                    Calculate Another
-                  </button>
+              <div className="space-y-6">
+                {/* Audience-aware explanations (AUDIENCE-CODE-1) */}
+                <ExplanationsPanel
+                  explanations={(result.data as unknown as { explanations?: ExplanationsBlock })?.explanations}
+                  userType={userType}
+                  accent="text-purple-700"
+                />
+                {/* Math-leaking detailed breakdown: researcher + policy only.
+                    Component scores, ratios, raw inputs (sodium mg, energy
+                    kcal, etc.) expose internal calculation state. */}
+                {userType !== 'individual' && (
+                <div className="bg-white rounded-lg shadow-sm p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-2xl font-bold text-gray-900">HEFI Component Breakdown</h2>
+                    <button
+                      type="button"
+                      onClick={resetCalculation}
+                      className="text-purple-600 hover:text-purple-700 font-medium"
+                    >
+                      Calculate Another
+                    </button>
+                  </div>
+                  <HEFIScoreDisplay result={result} />
                 </div>
-                <HEFIScoreDisplay result={result} />
+                )}
+                {userType === 'individual' && (
+                  <div className="text-center">
+                    <button
+                      type="button"
+                      onClick={resetCalculation}
+                      className="text-purple-600 hover:text-purple-700 font-medium"
+                    >
+                      Calculate Another
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="bg-white rounded-lg shadow-sm p-12 text-center">
