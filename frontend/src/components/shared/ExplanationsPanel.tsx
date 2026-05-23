@@ -20,7 +20,7 @@
  */
 'use client';
 import { useState } from 'react';
-import { AlertTriangle, BookOpen, Info, ChevronDown, ChevronRight } from 'lucide-react';
+import { AlertTriangle, BookOpen, Info, ChevronDown, ChevronRight, Eye } from 'lucide-react';
 import type { ExplanationsBlock, UserType } from './AudienceToggle';
 
 interface ExplanationsPanelProps {
@@ -30,10 +30,14 @@ interface ExplanationsPanelProps {
   accent?: string;
 }
 
-const AUDIENCE_BANNER: Record<UserType, { label: string; bg: string; text: string }> = {
-  individual: { label: 'Plain-language view', bg: 'bg-green-50',  text: 'text-green-800' },
-  researcher: { label: 'Researcher view — full methodology + citations', bg: 'bg-blue-50',   text: 'text-blue-800' },
-  policy:     { label: 'Policy view — population context',              bg: 'bg-purple-50', text: 'text-purple-800' },
+// FIX (HEFI audit fix #5): the previous pill styling (rounded-md, no icon,
+// solid coloured background) read as a button/tab. Switched to a left-
+// bordered banner with an Eye icon so it visibly reads as a passive label.
+// Also added a "View mode:" prefix so its role is unambiguous.
+const AUDIENCE_BANNER: Record<UserType, { label: string; border: string; text: string; bg: string }> = {
+  individual: { label: 'Plain-language view',                            border: 'border-green-400',  text: 'text-green-900',  bg: 'bg-green-50' },
+  researcher: { label: 'Researcher view — full methodology + citations', border: 'border-blue-400',   text: 'text-blue-900',   bg: 'bg-blue-50' },
+  policy:     { label: 'Policy view — population context',               border: 'border-purple-400', text: 'text-purple-900', bg: 'bg-purple-50' },
 };
 
 export function ExplanationsPanel({
@@ -53,9 +57,11 @@ export function ExplanationsPanel({
 
   return (
     <div className="space-y-4">
-      {/* Audience-mode banner so users always know which view they're in */}
-      <div className={`${banner.bg} ${banner.text} rounded-md px-3 py-2 text-xs font-medium border border-current/10`}>
-        {banner.label}
+      {/* Audience-mode banner — left-bordered passive label, not a button (fix #5) */}
+      <div className={`${banner.bg} ${banner.text} border-l-4 ${banner.border} px-3 py-2 text-xs flex items-center gap-2`}>
+        <Eye className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
+        <span className="font-semibold">View mode:</span>
+        <span>{banner.label}</span>
       </div>
 
       {/* Primary score summary */}
@@ -185,24 +191,25 @@ interface CollapsibleSectionProps {
 
 function CollapsibleSection({ title, icon, open, onToggle, children }: CollapsibleSectionProps) {
   return (
-    <div className="bg-white rounded-lg border shadow-sm">
-      <button
-        type="button"
-        onClick={onToggle}
-        className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
-        aria-expanded={open}
+    <details className="bg-white rounded-lg border shadow-sm" open={open}>
+      <summary
+        className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors cursor-pointer list-none [&::-webkit-details-marker]:hidden"
+        onClick={(e) => {
+          e.preventDefault();
+          onToggle();
+        }}
       >
         <div className="flex items-center gap-2">
           {icon}
           <span className="font-semibold text-gray-700">{title}</span>
         </div>
         {open ? (
-          <ChevronDown className="h-4 w-4 text-gray-500" />
+          <ChevronDown className="h-4 w-4 text-gray-500 shrink-0" aria-hidden="true" />
         ) : (
-          <ChevronRight className="h-4 w-4 text-gray-500" />
+          <ChevronRight className="h-4 w-4 text-gray-500 shrink-0" aria-hidden="true" />
         )}
-      </button>
-      {open && <div className="px-4 pb-4 border-t">{children}</div>}
-    </div>
+      </summary>
+      <div className="px-4 pb-4 border-t">{children}</div>
+    </details>
   );
 }

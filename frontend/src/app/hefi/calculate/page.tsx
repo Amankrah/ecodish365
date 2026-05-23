@@ -26,9 +26,61 @@ interface SearchResult {
   FoodCode?: string;
 }
 
+  // FIX (HEFI audit fix #2): kernel-internal key → human-readable label. Without
+  // this map, the Key Ratios panel rendered "ratio vf", "sodden", "sfa perc"
+  // (lowercase-snake-case) which is researcher-jargon, not researcher-readable.
+  const RATIO_LABELS: Record<string, string> = {
+    RATIO_VF:      'Vegetables & fruits / total foods',
+    RATIO_WGTOT:   'Whole grains / total foods',
+    RATIO_WGGR:    'Whole grains / grain foods',
+    RATIO_PRO:     'Protein foods / total foods',
+    RATIO_PLANT:   'Plant protein / protein foods',
+    RATIO_BEV:     'Recommended beverages / total beverages',
+    RATIO_UNSFAT:  '(MUFA + PUFA) / SFA',
+    SFA_PERC:      'Saturated fat (% energy)',
+    SUG_PERC:      'Free sugars (% energy)',
+    SODDEN:        'Sodium density (mg / kcal)',
+  };
+
+  // Same treatment for Nutritional Inputs. The "_ra" suffix is Brassard's
+  // "reference amount" — jargon without context.
+  const INPUT_LABELS: Record<string, string> = {
+    total_foods_ra:          'Total foods (reference-amount equivalents)',
+    energy_kcal:             'Energy (kcal)',
+    vf_ra:                   'Vegetables & fruits (ref. amts)',
+    whole_grains_ra:         'Whole grains (ref. amts)',
+    total_grains_ra:         'Total grains (ref. amts)',
+    protein_foods_ra:        'Protein foods (ref. amts)',
+    plant_protein_foods_ra:  'Plant protein foods (ref. amts)',
+    total_beverages_g:       'Total beverages (g)',
+    recommended_beverages_g: 'Recommended beverages (g)',
+    sfa_g:                   'Saturated fat (g)',
+    mufa_g:                  'Monounsaturated fat (g)',
+    pufa_g:                  'Polyunsaturated fat (g)',
+    free_sugars_g:           'Free sugars (g)',
+    sodium_mg:               'Sodium (mg)',
+  };
+
+  // FIX (HEFI audit fix #4): per-component scoring-rule microcopy, sourced from
+  // Brassard et al. 2022a Table 2 p. 600. Surfaced as a small caption under
+  // each component bar so a researcher can audit the score in context.
+  const COMPONENT_RULES: Record<string, string> = {
+    C1_VF:         'Adequacy: full 20 pts if ≥ 0.50 ref. amts of V&F per total ref. amts; 0 at 0.',
+    C2_WHOLEGR:    'Adequacy: full 5 pts if whole-grain ref. amts ≥ 0.25 of total foods; 0 at 0.',
+    C3_GRRATIO:    'Adequacy: full 5 pts if whole grains / total grains ≥ 1.0; 0 at 0.',
+    C4_PROFOODS:   'Adequacy: full 5 pts if protein foods / total foods ≥ 0.25; 0 at 0.',
+    C5_PLANTPRO:   'Adequacy: full 5 pts if plant protein / protein foods ≥ 0.50; 0 at 0.',
+    C6_BEVERAGES:  'Adequacy: full 10 pts if recommended beverages / total beverages = 1.0; 0 at 0.',
+    C7_FATTYACID:  'Moderation: full 5 pts if (MUFA+PUFA) / SFA ≥ 2.6; 0 if ≤ 1.1.',
+    C8_SFAT:       'Moderation: full 5 pts if SFA ≤ 10 % of energy; 0 if ≥ 15 %.',
+    C9_FREESUGARS: 'Moderation: full 10 pts if free sugars ≤ 20 % of energy; 0 if ≥ 30 %.',
+    C10_SODIUM:    'Moderation: full 10 pts if sodium density ≤ 0.9 mg/kcal; 0 if ≥ 2.0 mg/kcal.',
+  };
+
   const HEFIScoreDisplay = ({ result }: { result: HEFIResult }) => {
   const { data } = result;
     const interpretation: HEFIInterpretation | undefined = data.hefi_interpretation as HEFIInterpretation | undefined;
+    const numFoods = Array.isArray(data.food_ids) ? data.food_ids.length : 0;
 
     const chipColor = interpretation?.ui_color === 'emerald'
       ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
@@ -77,22 +129,42 @@ interface SearchResult {
         </div>
       </div>
 
-      {/* Components Breakdown */}
+      {/* Components Breakdown — with empty-component annotation (#3) and
+          per-component scoring-rule microcopy (#4). */}
       <div className="card">
         <h3 className="text-xl font-bold text-gray-900 mb-6">Component Scores</h3>
+        {numFoods <= 1 && (
+          <div className="mb-4 text-xs text-gray-600 bg-yellow-50 border border-yellow-200 rounded-md p-3">
+            <strong>Single-food caveat:</strong> HEFI-2019 is a 24-h dietary-pattern index.
+            Components that depend on contributions from other food groups (V&amp;F, grains,
+            beverages, etc.) naturally score 0 when only one food is scored.
+          </div>
+        )}
         <div className="space-y-4">
           {Object.entries(data.components).map(([key, component]) => {
             const percentage = (component.score / component.max_points) * 100;
+            const isEmpty = component.score === 0;
+            const rule = COMPONENT_RULES[key];
             return (
-              <div key={key} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+              <div key={key} className="flex items-start justify-between p-4 bg-gray-50 rounded-lg">
                 <div className="flex-1">
-                  <div className="font-medium text-gray-900">{component.name}</div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-gray-900">{component.name}</span>
+                    {isEmpty && (
+                      <span className="text-[10px] uppercase tracking-wide bg-gray-200 text-gray-600 rounded px-1.5 py-0.5">
+                        N/A for this food
+                      </span>
+                    )}
+                  </div>
                   <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                    <div 
+                    <div
                       className="bg-purple-600 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${Math.min(percentage, 100)}%` }}
                     />
                   </div>
+                  {rule && (
+                    <div className="text-xs text-gray-500 mt-2">{rule}</div>
+                  )}
                 </div>
                 <div className="ml-4 text-right">
                   <div className="text-lg font-semibold text-gray-900">
@@ -108,7 +180,7 @@ interface SearchResult {
         </div>
       </div>
 
-      {/* Ratios */}
+      {/* Ratios — labels from RATIO_LABELS map (fix #2) */}
       <div className="card">
         <h3 className="text-xl font-bold text-gray-900 mb-6">Key Ratios</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -118,14 +190,14 @@ interface SearchResult {
                 {typeof value === 'number' ? value.toFixed(2) : value}
               </div>
               <div className="text-sm text-gray-600 mt-1">
-                {key.replace(/_/g, ' ').toLowerCase()}
+                {RATIO_LABELS[key] || key.replace(/_/g, ' ').toLowerCase()}
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Nutritional Inputs */}
+      {/* Nutritional Inputs — labels from INPUT_LABELS map (fix #2) */}
       <div className="card">
         <h3 className="text-xl font-bold text-gray-900 mb-6">Nutritional Inputs</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -135,7 +207,7 @@ interface SearchResult {
                 {typeof value === 'number' ? value.toFixed(1) : value}
               </div>
               <div className="text-sm text-gray-600">
-                {key.replace(/_/g, ' ').toLowerCase()}
+                {INPUT_LABELS[key] || key.replace(/_/g, ' ').toLowerCase()}
               </div>
             </div>
           ))}
@@ -153,6 +225,9 @@ export default function HEFICalculatePage() {
   const [searchIsLoading, setSearchIsLoading] = useState(false);
   const [result, setResult] = useState<HEFIResult | null>(null);
   const [userType, setUserType] = useState<UserType>('individual');
+  // AUDIENCE-CODE-1 follow-up: track which userType the current `result` was
+  // computed under so we can flag stale explanations when the user toggles.
+  const [lastCalcUserType, setLastCalcUserType] = useState<UserType | null>(null);
   const [error, setError] = useState<string>('');
   const [filters, setFilters] = useState<FilterOptions | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -254,8 +329,9 @@ export default function HEFICalculatePage() {
       
       const foods = selectedFoods.map(f => ({ food_id: f.FoodID, amount_g: f.amount_g }));
       const response = await HEFIApiService.calculateHEFI({ foods, user_type: userType });
-      
+
       setResult(response);
+      setLastCalcUserType(userType);
     } catch (err: unknown) {
       const e = err as { response?: { data?: { message?: string; error?: string } } };
       setError(e?.response?.data?.error || e?.response?.data?.message || 'Failed to calculate HEFI score');
@@ -271,6 +347,7 @@ export default function HEFICalculatePage() {
     setError('');
     setSearchQuery('');
     setSearchResults([]);
+    setLastCalcUserType(null);
   };
 
   return (
@@ -285,7 +362,12 @@ export default function HEFICalculatePage() {
           </p>
           {/* Audience selector (AUDIENCE-CODE-1 2026-05-23) */}
           <div className="mt-4">
-            <AudienceToggle userType={userType} onChange={setUserType} accent="green" />
+            <AudienceToggle
+              userType={userType}
+              onChange={setUserType}
+              accent="green"
+              staleResultHint={result !== null && lastCalcUserType !== null && userType !== lastCalcUserType}
+            />
           </div>
           <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <div className="flex">
@@ -482,31 +564,24 @@ export default function HEFICalculatePage() {
                     Component scores, ratios, raw inputs (sodium mg, energy
                     kcal, etc.) expose internal calculation state. */}
                 {userType !== 'individual' && (
-                <div className="bg-white rounded-lg shadow-sm p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-2xl font-bold text-gray-900">HEFI Component Breakdown</h2>
-                    <button
-                      type="button"
-                      onClick={resetCalculation}
-                      className="text-purple-600 hover:text-purple-700 font-medium"
-                    >
-                      Calculate Another
-                    </button>
+                  <div className="bg-white rounded-lg shadow-sm p-6">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">HEFI Component Breakdown</h2>
+                    <HEFIScoreDisplay result={result} />
                   </div>
-                  <HEFIScoreDisplay result={result} />
+                )}
+                {/* FIX (#6): Calculate Another button moved out of the result-card
+                    header to the bottom of the result panel, consistent across
+                    audience modes — previously it sat inside the title row of
+                    the researcher card which interrupted reading flow. */}
+                <div className="text-center pt-2">
+                  <button
+                    type="button"
+                    onClick={resetCalculation}
+                    className="inline-flex items-center px-4 py-2 border border-purple-200 rounded-md text-purple-700 hover:bg-purple-50 hover:text-purple-800 font-medium text-sm transition-colors"
+                  >
+                    Calculate Another
+                  </button>
                 </div>
-                )}
-                {userType === 'individual' && (
-                  <div className="text-center">
-                    <button
-                      type="button"
-                      onClick={resetCalculation}
-                      className="text-purple-600 hover:text-purple-700 font-medium"
-                    >
-                      Calculate Another
-                    </button>
-                  </div>
-                )}
               </div>
             ) : (
               <div className="bg-white rounded-lg shadow-sm p-12 text-center">

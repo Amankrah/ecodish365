@@ -41,6 +41,9 @@ export default function FCSCalculate() {
   const [activeSearch, setActiveSearch] = useState<string>('');
   const [result, setResult] = useState<FCSResult | null>(null);
   const [userType, setUserType] = useState<UserType>('individual');
+  // AUDIENCE-CODE-1 follow-up: track which userType the current `result` was
+  // computed under so we can flag stale explanations when the user toggles.
+  const [lastCalcUserType, setLastCalcUserType] = useState<UserType | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const [filters, setFilters] = useState<FilterOptions | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -156,6 +159,7 @@ export default function FCSCalculate() {
       const actualResult = (fcsResult.data as { data?: FCSResult }).data || fcsResult.data;
       console.log('Actual FCS result:', actualResult);
       setResult(actualResult);
+      setLastCalcUserType(userType);
     } catch (error) {
       console.error('FCS calculation error:', error);
       alert('Failed to calculate FCS. Please try again.');
@@ -200,29 +204,65 @@ export default function FCSCalculate() {
     return nova.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
 
+  // FIX (FCS audit #4): the single-food NOVA badge previously rendered just
+  // the category name (e.g. "Ultra Processed Foods") with no NOVA level
+  // number, whereas the mixed-dish badge correctly shows "NOVA 4". Map the
+  // category string back to its Monteiro level for consistent labelling.
+  // Returns null for unknown / mixed-processing categories where a single
+  // level number is not meaningful.
+  const novaLevelOf = (nova: string): number | null => {
+    switch ((nova || '').toUpperCase()) {
+      case 'MINIMALLY_PROCESSED': return 1;
+      case 'PROCESSED_CULINARY_INGREDIENTS': return 2;
+      case 'PROCESSED_FOODS': return 3;
+      case 'ULTRA_PROCESSED_FOODS': return 4;
+      default: return null;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">FCS Calculator</h1>
+          {/* FIX (FCS audit #3): the previous subtitle invented an "FCS 2.0
+              algorithm" label that has no anchor in the literature. The
+              implementation is FCS-10 (Barrett 2025), an 18-attribute
+              simplification of the original 54-attribute Food Compass
+              (Mozaffarian 2021). */}
           <p className="text-lg text-gray-600">
-            Calculate Food Compass Scores using the scientifically validated FCS 2.0 algorithm.
+            Calculate Food Compass Scores (FCS-10) per Mozaffarian 2021 / Barrett 2025.
           </p>
           {/* Audience selector (AUDIENCE-CODE-1 2026-05-23) */}
           <div className="mt-4">
-            <AudienceToggle userType={userType} onChange={setUserType} accent="blue" />
+            <AudienceToggle
+              userType={userType}
+              onChange={setUserType}
+              accent="blue"
+              staleResultHint={result !== null && lastCalcUserType !== null && userType !== lastCalcUserType}
+            />
           </div>
-          <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div className="flex items-center">
-              <SparklesIcon className="w-5 h-5 text-blue-600 mr-2" />
-              <span className="text-sm font-medium text-blue-900">Advanced Algorithm</span>
+          {/* FIX (FCS audit #5): Advanced-Algorithm banner enumerates internal
+              domain names — researcher-mode jargon. Hidden in individual mode
+              to keep the consumer surface uncluttered. */}
+          {userType !== 'individual' && (
+            <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-center">
+                <SparklesIcon className="w-5 h-5 text-blue-600 mr-2" />
+                <span className="text-sm font-medium text-blue-900">Algorithm</span>
+              </div>
+              {/* FIX (FCS audit #2): the platform implements FCS-10 (18
+                  attributes, Barrett 2025), not the original 54-attribute
+                  Mozaffarian Food Compass. The previous "54 attributes" copy
+                  contradicted the backend explanations which correctly say 18. */}
+              <p className="text-sm text-blue-800 mt-1">
+                Evaluates 18 attributes across 9 domains (Mozaffarian 2021 / Barrett 2025
+                FCS-10): nutrient ratios, vitamins, minerals, food ingredients,
+                additives, processing, specific lipids, fiber &amp; protein, and phytochemicals.
+              </p>
             </div>
-            <p className="text-sm text-blue-800 mt-1">
-              Evaluates 54 attributes across 9 domains: nutrient ratios, vitamins, minerals, 
-              food ingredients, additives, processing, specific lipids, fiber & protein, and phytochemicals.
-            </p>
-          </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -432,13 +472,21 @@ export default function FCSCalculate() {
                     )}
                     <div className="bg-gray-50 rounded-lg p-4">
                       <h3 className="text-sm font-medium text-gray-700 mb-2">NOVA Category</h3>
+                      {/* FIX (FCS audit #4): prefix "NOVA N — " so the
+                          single-food badge matches the mixed-dish badge format
+                          (which already shows "NOVA 4"). */}
                       <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getNOVAColor(result.nova_category)}`}>
-                        {formatNOVAName(result.nova_category)}
+                        {(() => {
+                          const lvl = novaLevelOf(result.nova_category);
+                          return lvl !== null
+                            ? `NOVA ${lvl} — ${formatNOVAName(result.nova_category)}`
+                            : formatNOVAName(result.nova_category);
+                        })()}
                       </span>
                       <p className="text-xs text-gray-500 mt-1">
-                        {result.nova_category === 'MIXED_PROCESSING_LEVELS' 
-                          ? 'Energy-weighted processing level for combined foods' 
-                          : 'Food processing classification level'}
+                        {result.nova_category === 'MIXED_PROCESSING_LEVELS'
+                          ? 'Energy-weighted processing level for combined foods'
+                          : 'Food processing classification level (Monteiro 2019)'}
                       </p>
                     </div>
                   </div>
@@ -519,77 +567,72 @@ export default function FCSCalculate() {
                   </div>
                 )}
 
-                {/* Algorithm Information */}
-                <div className="bg-white rounded-lg shadow-sm p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    FCS 2.0 Algorithm Details
-                  </h3>
-                  
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                    <h4 className="text-sm font-medium text-blue-900 mb-2 flex items-center">
-                      <CheckCircleIcon className="w-4 h-4 mr-2" />
-                      Scientific Validation
-                    </h4>
-                    <div className="text-sm text-blue-800 space-y-1">
-                      <p>• <strong>9-Domain Structure:</strong> Comprehensive evaluation across all nutritional aspects</p>
-                      <p>• <strong>54 Attributes:</strong> Most detailed nutrient profiling system available</p>
-                      <p>• <strong>Population Validated:</strong> Tested on 47,999 U.S. adults (NHANES 1999-2018)</p>
-                      <p>• <strong>Health Outcomes:</strong> 7% lower mortality risk per standard deviation increase</p>
-                    </div>
-                  </div>
+                {/* Algorithm Information — FIX (FCS audit #1): the previous
+                    block was visible in individual mode and quoted the
+                    "7% lower mortality risk per standard deviation" i.FCS
+                    hazard ratio (O'Hearn 2022 NHANES) as if it applied to a
+                    single food, directly contradicting the explanations
+                    panel's mandatory caveat ("mortality benefit measured at
+                    the DIET level, not from a single food"). Now gated
+                    researcher/policy only.
+                    FIX (FCS audit #2): "54 Attributes" → "18 Attributes" to
+                    match FCS-10 (Barrett 2025) implementation; the original
+                    Mozaffarian 2021 Food Compass had 54.
+                    FIX (FCS audit #3): "FCS 2.0 Algorithm Details" header
+                    renamed since there's no "FCS 2.0" in the literature. */}
+                {userType !== 'individual' && (
+                  <div className="bg-white rounded-lg shadow-sm p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                      Food Compass Score — Algorithm Details (FCS-10)
+                    </h3>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="text-center">
-                      <div className="bg-green-100 rounded-lg p-4 mb-2">
-                        <BeakerIcon className="w-8 h-8 text-green-600 mx-auto" />
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                      <h4 className="text-sm font-medium text-blue-900 mb-2 flex items-center">
+                        <CheckCircleIcon className="w-4 h-4 mr-2" />
+                        Scientific Validation
+                      </h4>
+                      <div className="text-sm text-blue-800 space-y-1">
+                        <p>• <strong>9-Domain Structure:</strong> Mozaffarian 2021 (Nat Food 2:809-818)</p>
+                        <p>• <strong>18 Attributes (FCS-10):</strong> Barrett 2025 (AJCN), simplified label-only variant of the 54-attribute Food Compass</p>
+                        <p>• <strong>Population Validation:</strong> 47,999 U.S. adults (NHANES 1999-2018)</p>
+                        <p>• <strong>Diet-level outcome link:</strong> i.FCS (energy-weighted mean) per 1 SD (10.9 pts) → HR 0.92 (0.88-0.95) all-cause mortality (O&apos;Hearn 2022 Nat Comm 13:7066). NOT applicable to single-food rankings.</p>
                       </div>
-                      <h4 className="text-sm font-medium text-gray-900">Advanced Analysis</h4>
-                      <p className="text-xs text-gray-600 mt-1">
-                        Per 100 kcal normalization for consistent comparison
-                      </p>
                     </div>
-                    <div className="text-center">
-                      <div className="bg-blue-100 rounded-lg p-4 mb-2">
-                        <ChartBarIcon className="w-8 h-8 text-blue-600 mx-auto" />
-                      </div>
-                      <h4 className="text-sm font-medium text-gray-900">Domain Weighting</h4>
-                      <p className="text-xs text-gray-600 mt-1">
-                        Evidence-based weighting with half-weight for emerging domains
-                      </p>
-                    </div>
-                    <div className="text-center">
-                      <div className="bg-purple-100 rounded-lg p-4 mb-2">
-                        <SparklesIcon className="w-8 h-8 text-purple-600 mx-auto" />
-                      </div>
-                      <h4 className="text-sm font-medium text-gray-900">Unique Features</h4>
-                      <p className="text-xs text-gray-600 mt-1">
-                        Only system that evaluates all food types uniformly
-                      </p>
-                    </div>
-                  </div>
-                </div>
 
-                {/* Food Details */}
-                <div className="bg-white rounded-lg shadow-sm p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Analyzed Food</h3>
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="font-medium text-gray-900">{result.name}</h4>
-                    <div className="mt-2 grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-gray-600">FCS Score:</span>
-                        <span className={`ml-2 font-medium ${getFCSColor(result.fcs)}`}>
-                          {result.fcs}/100
-                        </span>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="text-center">
+                        <div className="bg-green-100 rounded-lg p-4 mb-2">
+                          <BeakerIcon className="w-8 h-8 text-green-600 mx-auto" />
+                        </div>
+                        <h4 className="text-sm font-medium text-gray-900">Per-100-kcal Density</h4>
+                        <p className="text-xs text-gray-600 mt-1">
+                          Energy-normalized so foods are compared on nutrient density, not portion size
+                        </p>
                       </div>
-                      <div>
-                        <span className="text-gray-600">Processing Level:</span>
-                        <span className="ml-2 font-medium">
-                          {formatNOVAName(result.nova_category)}
-                        </span>
+                      <div className="text-center">
+                        <div className="bg-blue-100 rounded-lg p-4 mb-2">
+                          <ChartBarIcon className="w-8 h-8 text-blue-600 mx-auto" />
+                        </div>
+                        <h4 className="text-sm font-medium text-gray-900">Domain Weighting</h4>
+                        <p className="text-xs text-gray-600 mt-1">
+                          5 domains full weight; Specific Lipids, Fiber &amp; Protein, Phytochemicals at half weight
+                        </p>
+                      </div>
+                      <div className="text-center">
+                        <div className="bg-purple-100 rounded-lg p-4 mb-2">
+                          <SparklesIcon className="w-8 h-8 text-purple-600 mx-auto" />
+                        </div>
+                        <h4 className="text-sm font-medium text-gray-900">Cross-Group Coverage</h4>
+                        <p className="text-xs text-gray-600 mt-1">
+                          Evaluates all food types uniformly (≠ category-specific schemes like HSR)
+                        </p>
                       </div>
                     </div>
                   </div>
-                </div>
+                )}
+                {/* FIX (FCS audit #6): "Analyzed Food" card removed — it just
+                    restated FCS Score + Processing Level already shown two
+                    cards above (Food Compass Score Results header). */}
               </div>
             ) : (
               <div className="bg-white rounded-lg shadow-sm p-12 text-center">

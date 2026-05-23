@@ -45,6 +45,9 @@ export default function HSRCalculate() {
   const [activeSearch, setActiveSearch] = useState<string>('');
   const [result, setResult] = useState<HSRResult | null>(null);
   const [userType, setUserType] = useState<UserType>('individual');
+  // AUDIENCE-CODE-1 follow-up: track which userType the current `result` was
+  // computed under so we can flag stale explanations when the user toggles.
+  const [lastCalcUserType, setLastCalcUserType] = useState<UserType | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const [analysisLevel, setAnalysisLevel] = useState<'simple' | 'detailed'>('detailed');
   const [includeAlternatives, setIncludeAlternatives] = useState(true);
@@ -161,6 +164,7 @@ export default function HSRCalculate() {
       });
       
       setResult(hsrResult);
+      setLastCalcUserType(userType);
     } catch (error) {
       console.error('HSR calculation error:', error);
       alert('Failed to calculate HSR. Please try again.');
@@ -204,7 +208,12 @@ export default function HSRCalculate() {
           </p>
           {/* Audience selector (AUDIENCE-CODE-1 2026-05-23) */}
           <div className="mt-4">
-            <AudienceToggle userType={userType} onChange={setUserType} accent="amber" />
+            <AudienceToggle
+              userType={userType}
+              onChange={setUserType}
+              accent="amber"
+              staleResultHint={result !== null && lastCalcUserType !== null && userType !== lastCalcUserType}
+            />
           </div>
         </div>
 

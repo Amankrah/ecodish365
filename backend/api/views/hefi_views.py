@@ -12,7 +12,12 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../hefi_calculator')
 from hefi_calculator.hefi.cnf_integrator import HEFICNFIntegrator
 from hefi_calculator.hefi.models import HEFIInputs
 from hefi_calculator.hefi.algorithm import compute_hefi
-from .hefi_explanations import get_explanations as get_hefi_explanations
+from .hefi_explanations import (
+    get_explanations as get_hefi_explanations,
+    _score_band as _hefi_score_band,
+    _band_phrase as _hefi_band_phrase,
+    _POPULATION_BENCHMARKS as _HEFI_POPULATION_BENCHMARKS,
+)
 
 # Global integrator instance to avoid initialization overhead
 _hefi_integrator = None
@@ -45,47 +50,68 @@ def _format_hefi_response(result, food_ids=None, food_name=None, integrator=None
     consumers should read `explanations` instead.
     """
     def _interpret_hefi(total_score: float):
-        # Population-based interpretation (no official grading)
-        # Benchmarks from population data: mean ~43.1, p1 ~22.1, p99 ~62.9
-        if total_score <= 35:
-            category = "Below Average"
-            description = (
-                "Significantly below Canadian population mean; substantial room for improvement across multiple components."
-            )
-            color = "red"
-        elif 36 <= total_score <= 50:
-            category = "Below Average to Average"
-            description = (
-                "Around or slightly below Canadian population mean (~43); many Canadians fall in this range."
-            )
-            color = "yellow"
-        elif 51 <= total_score <= 65:
-            category = "Above Average"
-            description = (
-                "Above Canadian population mean; upper portion of typical Canadian scores."
-            )
-            color = "green"
-        else:
-            category = "Excellent"
-            description = (
-                "Exceptional adherence to Canada's Food Guide; near-optimal dietary pattern."
-            )
-            color = "emerald"
-
+        # FIX (HEFI audit 2026-05-23): the legacy 4-band classifier
+        # ("Below Average", "Below Average to Average", "Above Average",
+        # "Excellent") couldn't distinguish sub-p1 scores from merely below-
+        # average ones — Beef stew canned 4964 at 12.5/80 and a 30/80 score
+        # both rendered as "Below Average", while the AUDIENCE-CODE-1
+        # explanations block correctly labelled them differently. We now
+        # delegate to the 6-band scheme in hefi_explanations._score_band
+        # so the legacy interpretation panel and the explanations panel
+        # agree on the band.
+        band = _hefi_score_band(total_score)
+        category = _hefi_band_phrase(band)
+        descriptions = {
+            'extreme_low':
+                'Below the 1st percentile of the Canadian population '
+                f'(p1 = {_HEFI_POPULATION_BENCHMARKS["p1"]:.1f}); substantial room '
+                'for improvement across multiple components.',
+            'bottom_quartile':
+                'In the bottom quartile of Canadians '
+                f'(p1 {_HEFI_POPULATION_BENCHMARKS["p1"]:.1f}, p25 '
+                f'{_HEFI_POPULATION_BENCHMARKS["p25"]:.1f}); below Canadian population '
+                'mean across several components.',
+            'below_median':
+                'Below the Canadian median '
+                f'(p50 = {_HEFI_POPULATION_BENCHMARKS["p50"]:.1f}); '
+                'in the lower half of typical Canadian scores.',
+            'above_median':
+                'Above the Canadian median '
+                f'(p50 = {_HEFI_POPULATION_BENCHMARKS["p50"]:.1f}); '
+                'upper half of typical Canadian scores.',
+            'top_quartile':
+                'In the top quartile of Canadians '
+                f'(p75 = {_HEFI_POPULATION_BENCHMARKS["p75"]:.1f}); strong overall '
+                'adherence to Canada\'s Food Guide.',
+            'top_1_percent':
+                'In the top 1% of Canadian adults '
+                f'(p99 = {_HEFI_POPULATION_BENCHMARKS["p99"]:.1f}); near-optimal '
+                'dietary pattern.',
+        }
+        # 6 bands → 4 UI colours: red for sub-p1, orange for bottom quartile,
+        # yellow for below median, green for at-or-above median, emerald for top 1%.
+        colors = {
+            'extreme_low':     'red',
+            'bottom_quartile': 'red',
+            'below_median':    'yellow',
+            'above_median':    'green',
+            'top_quartile':    'green',
+            'top_1_percent':   'emerald',
+        }
         return {
             'category': category,
-            'description': description,
+            'description': descriptions[band],
             'score': total_score,
             'population_benchmarks': {
-                'mean': 43.1,
-                'percentile_1': 22.1,
-                'percentile_99': 62.9,
+                'mean':         _HEFI_POPULATION_BENCHMARKS['mean'],
+                'percentile_1': _HEFI_POPULATION_BENCHMARKS['p1'],
+                'percentile_99': _HEFI_POPULATION_BENCHMARKS['p99'],
             },
             'notes': [
                 'No official grading categories; this is a population-based interpretation.',
-                'Interpret the total score alongside component scores for a complete picture.'
+                'Interpret the total score alongside component scores for a complete picture.',
             ],
-            'ui_color': color,
+            'ui_color': colors[band],
         }
     component_details = {
         'C1_VF': {'score': result.component_scores.c1_vf, 'max_points': 20, 'name': 'Vegetables and Fruits'},

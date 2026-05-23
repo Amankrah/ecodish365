@@ -277,9 +277,12 @@ def get_explanations(
         }
 
     # Default: individual audience (consumer-facing)
+    # FIX (FCS audit #7): previously the title repeated the score ("Food Compass
+    # Score: 1/100") which duplicated the big numeric score rendered in the
+    # adjacent results card. Title is now a plain section header.
     return {
         'score_summary': {
-            'title': f'Food Compass Score: {fcs:.0f}/100',
+            'title': 'Food Compass Score',
             'headline': (
                 f'{band_label}. This food scores {fcs:.0f} out of 100 on the '
                 f'Food Compass Score, which combines 18 nutrition and '
