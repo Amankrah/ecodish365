@@ -1,14 +1,14 @@
 /**
  * RecipeDecomposerModal — "Score a homemade dish" workflow (AI-MATCH-1 Phase 9).
  *
- * Modal triggered from each calculate page (HENI / HEFI / HSR / FCS). User
+ * Modal triggered from each calculate page (HENI / HEFI / HSR / FCS / Environmental). User
  * enters a dish name + total mass; the backend's two-stage decomposer
  * (LLM proposes ingredients → CNFMatcher resolves each to a CNF FoodID with
  * confidence) returns a list of ingredients. User can edit masses, remove
  * ingredients, swap one ingredient (via AIEnhancedSearch), and finally
  * "Apply" — which calls the parent's `onApply` with the final list. The
  * parent then pushes those CNF FoodIDs into its own food picker and the
- * downstream HENI/HEFI/HSR/FCS scoring path runs unchanged.
+ * downstream HENI/HEFI/HSR/FCS/Environmental scoring path runs unchanged.
  *
  * Audience-aware: in researcher / policy mode the per-ingredient
  * resolution_confidence + the decomposer's audit trail are visible; in

@@ -105,6 +105,12 @@ class CNFDecomposedRecipe:
     ingredients: List[CNFIngredient] = field(default_factory=list)
     resolved_mass_g: float = 0.0                     # sum of ingredient mass_g
     unresolved_mass_g: float = 0.0                   # explicit residual + dropped-low-confidence
+    # AI-MATCH-1.x (2026-05-23): free-text description of what the
+    # unresolved residual IS. Sourced from the Stage-1 LLM's new
+    # `unresolved_description` field. Prevents the silent-residual problem
+    # (a "5 g unresolved" could be negligible seasoning OR a material
+    # 45-kcal oil residue — the description disambiguates).
+    unresolved_description: str = ''
     decomposition_confidence: float = 0.0
     fallback_reason: Optional[str] = None
     cache_hit: bool = False
@@ -124,6 +130,7 @@ class CNFDecomposedRecipe:
             'ingredients': [i.to_dict() for i in self.ingredients],
             'resolved_mass_g': round(self.resolved_mass_g, 2),
             'unresolved_mass_g': round(self.unresolved_mass_g, 2),
+            'unresolved_description': self.unresolved_description,
             'decomposition_confidence': round(self.decomposition_confidence, 3),
             'fallback_reason': self.fallback_reason,
             'cache_hit': self.cache_hit,
@@ -145,13 +152,27 @@ class CNFRecipeDecomposer:
         "MASS CLOSURE RULE: sum(ingredient.mass_g) + unresolved_mass_g MUST "
         "equal the stated total mass within ±2 %. If your explicit "
         "ingredients leave a residual (water, oil for cooking, minor "
-        "seasonings, etc.), put that residual in `unresolved_mass_g`. "
-        "Do NOT leave the mass unbalanced.\n\n"
-        "ING REDIENT NAMES: prefer specific, generic English names that map "
+        "seasonings, etc.), put that residual in `unresolved_mass_g` AND "
+        "describe what the residual is in `unresolved_description` (e.g. "
+        "\"salt, pepper, and herbs\" or \"cooking water drained off pasta\" "
+        "or \"olive oil residue in the pan\"). Do NOT leave the mass "
+        "unbalanced. If unresolved_mass_g is 0, set unresolved_description "
+        "to an empty string.\n\n"
+        "INGREDIENT NAMES: prefer specific, generic English names that map "
         "well to CNF entries (e.g. \"chicken breast, cooked\" rather than "
         "\"poultry\"; \"olive oil\" rather than \"vegetable fat\"). Avoid "
         "brand names and ultra-specific cuts the CNF won't carry. State "
         "cooked vs raw where it matters.\n\n"
+        "VARIANT SELECTION (cautious-defaults rule, 2026-05-23 AI-MATCH-1.x): "
+        "For ingredients with multiple CNF entries differing in salt content, "
+        "fat content, or processing level (e.g. \"low-sodium\" vs unqualified, "
+        "\"fat-free\" vs regular, \"unsalted\" vs salted, \"unenriched\" vs "
+        "enriched), prefer the GENERIC unqualified entry that reflects what "
+        "most people actually use — UNLESS the dish name explicitly calls "
+        "for the variant (\"low-sodium chicken soup\" → low-sodium broth; "
+        "\"unsalted peanut butter sandwich\" → unsalted peanut butter). "
+        "Don't gratuitously pick the lowest-sodium or fat-free CNF entry "
+        "when the user said \"chicken soup\" or \"peanut butter sandwich\".\n\n"
         "CONFIDENCE CALIBRATION: `decomposition_confidence` = P(a "
         "nutrition curator would call this list LCA-equivalent to the dish). "
         "If you ran this 10 times with different proportions within plausible "
@@ -168,6 +189,7 @@ class CNFRecipeDecomposer:
         "      {\"name\": \"<specific generic name>\", \"mass_g\": <float>, \"rationale\": \"<≤30 words>\"}\n"
         "    ],\n"
         "    \"unresolved_mass_g\": <float>,\n"
+        "    \"unresolved_description\": \"<what the residual is, or empty>\",\n"
         "    \"decomposition_confidence\": <float 0-1>\n"
         "  }"
     )
@@ -274,6 +296,7 @@ class CNFRecipeDecomposer:
 
         raw_ings = parsed['ingredients'][:self.max_ingredients]
         explicit_unresolved = float(parsed.get('unresolved_mass_g', 0.0) or 0.0)
+        unresolved_description = str(parsed.get('unresolved_description', '') or '').strip()[:240]
         confidence = float(parsed.get('decomposition_confidence', 0.0) or 0.0)
 
         # Stage 2: resolve each ingredient → CNF FoodID
@@ -344,6 +367,7 @@ class CNFRecipeDecomposer:
                 total_mass_g=total_mass_g, matched=False,
                 ingredients=resolved, resolved_mass_g=resolved_mass,
                 unresolved_mass_g=unresolved_mass,
+                unresolved_description=unresolved_description,
                 decomposition_confidence=confidence,
                 fallback_reason=f'too_few_ingredients:{len(resolved)}<{DEFAULT_MIN_INGREDIENTS}',
                 unresolved_ingredients_audit=dropped_audit,
@@ -369,6 +393,7 @@ class CNFRecipeDecomposer:
                 total_mass_g=total_mass_g, matched=False,
                 ingredients=resolved, resolved_mass_g=resolved_mass,
                 unresolved_mass_g=unresolved_mass,
+                unresolved_description=unresolved_description,
                 decomposition_confidence=confidence,
                 fallback_reason=(f'mass_imbalance:resolved+unresolved={total:.1f} '
                                  f'vs target={total_mass_g:.1f} (tol={tolerance:.1f})'),
@@ -391,6 +416,7 @@ class CNFRecipeDecomposer:
                     total_mass_g=total_mass_g, matched=True,
                     ingredients=resolved, resolved_mass_g=resolved_mass,
                     unresolved_mass_g=unresolved_mass,
+                unresolved_description=unresolved_description,
                     decomposition_confidence=confidence,
                     fallback_reason=f'partial_resolution:{resolved_frac:.2f}_of_mass_resolved',
                     unresolved_ingredients_audit=dropped_audit,
@@ -404,6 +430,7 @@ class CNFRecipeDecomposer:
                 total_mass_g=total_mass_g, matched=False,
                 ingredients=resolved, resolved_mass_g=resolved_mass,
                 unresolved_mass_g=unresolved_mass,
+                unresolved_description=unresolved_description,
                 decomposition_confidence=confidence,
                 fallback_reason=(f'unresolved_mass_too_large:{unresolved_mass:.1f} '
                                  f'(> {self.max_unresolved_fraction:.0%} of {total_mass_g:.1f})'),
@@ -421,6 +448,7 @@ class CNFRecipeDecomposer:
                 total_mass_g=total_mass_g, matched=False,
                 ingredients=resolved, resolved_mass_g=resolved_mass,
                 unresolved_mass_g=unresolved_mass,
+                unresolved_description=unresolved_description,
                 decomposition_confidence=confidence,
                 fallback_reason=f'low_confidence:{confidence:.2f}<{self.confidence_threshold:.2f}',
                 unresolved_ingredients_audit=dropped_audit,
@@ -436,6 +464,7 @@ class CNFRecipeDecomposer:
             total_mass_g=total_mass_g, matched=True,
             ingredients=resolved, resolved_mass_g=resolved_mass,
             unresolved_mass_g=unresolved_mass,
+            unresolved_description=unresolved_description,
             decomposition_confidence=confidence,
             unresolved_ingredients_audit=dropped_audit,
             raw_llm_response=raw_llm,

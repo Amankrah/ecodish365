@@ -248,6 +248,7 @@ class CNFMatcher:
         max_tokens: int = DEFAULT_MAX_TOKENS,
         temperature: float = DEFAULT_TEMPERATURE,
         cache_size: int = 2000,
+        embedding_cache_size: int = 5000,
     ):
         self.corpus = corpus
         self.chat_json_client = chat_json_client
@@ -258,11 +259,26 @@ class CNFMatcher:
         self.embedding_model = embedding_model
         self.max_tokens = max_tokens
         self.temperature = temperature
-        # LRU cache keyed by normalised query string
+        # LRU cache for full match results, keyed by normalised query string
         self._cache_size = cache_size
         self._cache: 'dict[str, CNFMatchResult]' = {}
         self._cache_order: List[str] = []
         self._cache_lock = Lock()
+        # AI-MATCH-1.x (2026-05-23): separate LRU for query EMBEDDINGS.
+        # The result cache above short-circuits the full pipeline on repeat
+        # queries — but the recipe decomposer routes each Stage-1 ingredient
+        # name through CNFMatcher independently, and those names ("tomato
+        # sauce", "olive oil", "salt") repeat heavily across recipes.
+        # Caching just the embedding (without the LLM rank) lets recipe
+        # decomposition reuse the embedding even when the full match result
+        # isn't cached for the specific (top_k, mode) combination. ~5,000
+        # entries × 1,536 × 4 bytes ≈ 30 MB per process — well within budget.
+        self._emb_cache_size = embedding_cache_size
+        self._emb_cache: 'dict[str, np.ndarray]' = {}
+        self._emb_cache_order: List[str] = []
+        self._emb_cache_lock = Lock()
+        self._emb_cache_hits = 0
+        self._emb_cache_misses = 0
 
     # --- public ----------------------------------------------------------
 
@@ -420,8 +436,20 @@ class CNFMatcher:
 
     # --- internals -------------------------------------------------------
 
-    def _retrieve(self, normalised_query: str, k: int) -> List['tuple[int, float]']:
-        """Embed query, compute cosine vs corpus, return top-k (idx, sim) tuples."""
+    def _embed_query(self, normalised_query: str) -> np.ndarray:
+        """L2-normalised query vector, with LRU cache. AI-MATCH-1.x."""
+        with self._emb_cache_lock:
+            cached = self._emb_cache.get(normalised_query)
+            if cached is not None:
+                # Touch (MRU)
+                try:
+                    self._emb_cache_order.remove(normalised_query)
+                except ValueError:
+                    pass
+                self._emb_cache_order.append(normalised_query)
+                self._emb_cache_hits += 1
+                return cached
+
         if self.openai_client is None:
             from openai import OpenAI
             import os
@@ -431,10 +459,22 @@ class CNFMatcher:
             input=[normalised_query],
         )
         qv = np.array(resp.data[0].embedding, dtype=np.float32)
-        # L2-normalise the query so dot = cosine
         n = np.linalg.norm(qv)
         if n > 0:
             qv = qv / n
+
+        with self._emb_cache_lock:
+            self._emb_cache[normalised_query] = qv
+            self._emb_cache_order.append(normalised_query)
+            while len(self._emb_cache_order) > self._emb_cache_size:
+                evict = self._emb_cache_order.pop(0)
+                self._emb_cache.pop(evict, None)
+            self._emb_cache_misses += 1
+        return qv
+
+    def _retrieve(self, normalised_query: str, k: int) -> List['tuple[int, float]']:
+        """Embed query (cached), compute cosine vs corpus, return top-k (idx, sim) tuples."""
+        qv = self._embed_query(normalised_query)
         sims = self.corpus.embeddings @ qv
         # Top-k via argpartition + argsort within partition
         if k >= len(sims):
@@ -443,6 +483,16 @@ class CNFMatcher:
             top_idx = np.argpartition(-sims, k)[:k]
             top_idx = top_idx[np.argsort(-sims[top_idx])]
         return [(int(i), float(sims[i])) for i in top_idx]
+
+    def embedding_cache_stats(self) -> Dict[str, int]:
+        """Diagnostic — used by smoke harnesses + telemetry."""
+        with self._emb_cache_lock:
+            return {
+                'hits':    self._emb_cache_hits,
+                'misses':  self._emb_cache_misses,
+                'size':    len(self._emb_cache),
+                'max_size': self._emb_cache_size,
+            }
 
     def _llm_rank(
         self,

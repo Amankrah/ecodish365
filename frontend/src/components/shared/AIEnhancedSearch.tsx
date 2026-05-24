@@ -2,8 +2,9 @@
  * AIEnhancedSearch — opt-in LLM ranking layer beside the existing basic search.
  *
  * AI-MATCH-1 (2026-05-23): drops in next to any existing search input on the
- * platform (CNF Explorer, HENI / HEFI / HSR / FCS calculate pages, FCS Compare,
- * FCS Food Profile). The basic fuzzywuzzy search stays unchanged + instant;
+ * platform (CNF Explorer, HENI / HEFI / HSR / FCS / Environmental calculate
+ * flows, FCS Compare, FCS Food Profile). The basic fuzzywuzzy search stays
+ * unchanged + instant;
  * this component adds a "Find with AI" button that calls
  * /api/cnf/search/ai-enhanced/ on click and renders a single ranked result card
  * with the LLM's chosen CNF FoodID + confidence badge + top-3 alternatives.

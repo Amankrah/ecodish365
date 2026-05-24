@@ -2,8 +2,8 @@
   "harness": "CNFMatcher smoke + accuracy (AI-MATCH-1)",
   "corpus_version": "2026-05-24T01:15:02.625627+00:00",
   "totals": {
-    "pass": 36,
-    "fail": 4,
+    "pass": 37,
+    "fail": 3,
     "total": 40,
     "per_panel": {
       "A": {
@@ -19,7 +19,7 @@
         "total": 10
       },
       "D": {
-        "pass": 8,
+        "pass": 9,
         "total": 10
       }
     }
@@ -52,7 +52,7 @@
       ],
       "passed": true,
       "detail": "canonical apple FoodID",
-      "timing_ms": 1894.0
+      "timing_ms": 1824.8
     },
     {
       "panel": "A",
@@ -81,7 +81,7 @@
       ],
       "passed": true,
       "detail": "white bread family",
-      "timing_ms": 1244.3
+      "timing_ms": 1073.2
     },
     {
       "panel": "A",
@@ -110,7 +110,7 @@
       ],
       "passed": true,
       "detail": "canonical canned beef stew (used in HSR audit panel)",
-      "timing_ms": 1087.4
+      "timing_ms": 916.9
     },
     {
       "panel": "A",
@@ -139,7 +139,7 @@
       ],
       "passed": true,
       "detail": "canonical cheddar",
-      "timing_ms": 984.8
+      "timing_ms": 1007.2
     },
     {
       "panel": "A",
@@ -168,7 +168,7 @@
       ],
       "passed": true,
       "detail": "canonical olive oil",
-      "timing_ms": 1315.7
+      "timing_ms": 9486.8
     },
     {
       "panel": "A",
@@ -197,7 +197,7 @@
       ],
       "passed": true,
       "detail": "French CNF spelling (Yogourt) of plain yogurt",
-      "timing_ms": 1040.9
+      "timing_ms": 1165.1
     },
     {
       "panel": "A",
@@ -226,7 +226,7 @@
       ],
       "passed": true,
       "detail": "canonical 2% milk",
-      "timing_ms": 1188.5
+      "timing_ms": 1001.2
     },
     {
       "panel": "A",
@@ -255,7 +255,7 @@
       ],
       "passed": true,
       "detail": "canonical brie",
-      "timing_ms": 1087.1
+      "timing_ms": 1201.9
     },
     {
       "panel": "A",
@@ -284,7 +284,7 @@
       ],
       "passed": true,
       "detail": "canonical apple juice",
-      "timing_ms": 3995.4
+      "timing_ms": 1078.9
     },
     {
       "panel": "A",
@@ -308,12 +308,12 @@
         {
           "food_id": 5466,
           "description": "Salad dressing, peppercorn dressing, commercial, regular",
-          "similarity": 0.697
+          "similarity": 0.698
         }
       ],
       "passed": true,
       "detail": "canonical mayonnaise",
-      "timing_ms": 1188.2
+      "timing_ms": 912.6
     },
     {
       "panel": "B",
@@ -342,7 +342,7 @@
       ],
       "passed": true,
       "detail": "British / French \u2192 eggplant",
-      "timing_ms": 1141.8
+      "timing_ms": 928.8
     },
     {
       "panel": "B",
@@ -371,7 +371,7 @@
       ],
       "passed": true,
       "detail": "British / French \u2192 zucchini",
-      "timing_ms": 1110.2
+      "timing_ms": 1191.2
     },
     {
       "panel": "B",
@@ -400,7 +400,7 @@
       ],
       "passed": true,
       "detail": "French spelling of yogurt (no qualifier)",
-      "timing_ms": 1292.5
+      "timing_ms": 983.8
     },
     {
       "panel": "B",
@@ -429,7 +429,7 @@
       ],
       "passed": true,
       "detail": "British \u2192 arugula",
-      "timing_ms": 1336.8
+      "timing_ms": 1116.6
     },
     {
       "panel": "B",
@@ -438,7 +438,7 @@
       "observed_food_id": 2067,
       "observed_description": "Coriander (cilantro), raw",
       "observed_group": "Vegetables and Vegetable Products",
-      "observed_confidence": 0.85,
+      "observed_confidence": 0.95,
       "observed_alternatives": [
         {
           "food_id": 181,
@@ -448,7 +448,7 @@
         {
           "food_id": 180,
           "description": "Spices, coriander leaf (cilantro), dried",
-          "similarity": 0.498
+          "similarity": 0.497
         },
         {
           "food_id": 2497,
@@ -458,7 +458,7 @@
       ],
       "passed": true,
       "detail": "Spanish/Mexican \u2192 coriander leaves (CNF likely uses coriander)",
-      "timing_ms": 1083.0
+      "timing_ms": 989.2
     },
     {
       "panel": "B",
@@ -487,7 +487,7 @@
       ],
       "passed": true,
       "detail": "descriptor synonym for sweet pepper",
-      "timing_ms": 1306.1
+      "timing_ms": 1146.7
     },
     {
       "panel": "B",
@@ -516,7 +516,7 @@
       ],
       "passed": true,
       "detail": "variety synonym for cos lettuce",
-      "timing_ms": 996.0
+      "timing_ms": 1001.7
     },
     {
       "panel": "B",
@@ -545,7 +545,7 @@
       ],
       "passed": false,
       "detail": "no expected match",
-      "timing_ms": 934.6
+      "timing_ms": 1020.9
     },
     {
       "panel": "B",
@@ -574,7 +574,7 @@
       ],
       "passed": true,
       "detail": "UK spelling of anise seed (spices/herbs)",
-      "timing_ms": 1120.2
+      "timing_ms": 955.5
     },
     {
       "panel": "B",
@@ -588,7 +588,7 @@
         {
           "food_id": 3591,
           "description": "Game meat, opossum, roasted",
-          "similarity": 0.282
+          "similarity": 0.281
         },
         {
           "food_id": 501783,
@@ -603,7 +603,7 @@
       ],
       "passed": false,
       "detail": "conf 0.40 < min 0.5",
-      "timing_ms": 2407.9
+      "timing_ms": 1119.4
     },
     {
       "panel": "C",
@@ -632,7 +632,7 @@
       ],
       "passed": true,
       "detail": "attribute + flavor + commodity",
-      "timing_ms": 1225.0
+      "timing_ms": 1288.4
     },
     {
       "panel": "C",
@@ -661,7 +661,7 @@
       ],
       "passed": true,
       "detail": "attribute + commodity",
-      "timing_ms": 1973.2
+      "timing_ms": 1465.7
     },
     {
       "panel": "C",
@@ -690,7 +690,7 @@
       ],
       "passed": true,
       "detail": "cuts + attribute",
-      "timing_ms": 1237.1
+      "timing_ms": 1019.6
     },
     {
       "panel": "C",
@@ -719,7 +719,7 @@
       ],
       "passed": true,
       "detail": "plant-based beverage",
-      "timing_ms": 970.6
+      "timing_ms": 1095.6
     },
     {
       "panel": "C",
@@ -748,7 +748,7 @@
       ],
       "passed": true,
       "detail": "premium olive oil \u2014 should match canonical (CNF lacks \"extra virgin\" tier)",
-      "timing_ms": 1188.2
+      "timing_ms": 966.3
     },
     {
       "panel": "C",
@@ -777,7 +777,7 @@
       ],
       "passed": true,
       "detail": "Greek / plain / fat-free yogurt family",
-      "timing_ms": 1293.7
+      "timing_ms": 1002.0
     },
     {
       "panel": "C",
@@ -806,7 +806,7 @@
       ],
       "passed": true,
       "detail": "cooking-state + attribute",
-      "timing_ms": 933.6
+      "timing_ms": 1086.2
     },
     {
       "panel": "C",
@@ -835,7 +835,7 @@
       ],
       "passed": true,
       "detail": "ok",
-      "timing_ms": 1033.3
+      "timing_ms": 989.0
     },
     {
       "panel": "C",
@@ -864,7 +864,7 @@
       ],
       "passed": true,
       "detail": "ok",
-      "timing_ms": 1053.5
+      "timing_ms": 1096.8
     },
     {
       "panel": "C",
@@ -893,7 +893,7 @@
       ],
       "passed": true,
       "detail": "nuts + processing + attribute",
-      "timing_ms": 1399.1
+      "timing_ms": 892.7
     },
     {
       "panel": "D",
@@ -922,7 +922,7 @@
       ],
       "passed": true,
       "detail": "plant-based brand-name burger; closest CNF will be a legume product",
-      "timing_ms": 1028.6
+      "timing_ms": 990.7
     },
     {
       "panel": "D",
@@ -951,7 +951,7 @@
       ],
       "passed": true,
       "detail": "ok",
-      "timing_ms": 1199.5
+      "timing_ms": 1023.8
     },
     {
       "panel": "D",
@@ -980,7 +980,7 @@
       ],
       "passed": true,
       "detail": "matches canned beef stew or beef-stew-with-vegetables",
-      "timing_ms": 1171.4
+      "timing_ms": 1057.9
     },
     {
       "panel": "D",
@@ -1009,7 +1009,7 @@
       ],
       "passed": true,
       "detail": "ok",
-      "timing_ms": 1368.6
+      "timing_ms": 1071.2
     },
     {
       "panel": "D",
@@ -1038,17 +1038,22 @@
       ],
       "passed": true,
       "detail": "fusion dish; closest CNF mixed-dish",
-      "timing_ms": 1057.4
+      "timing_ms": 1105.5
     },
     {
       "panel": "D",
       "query": "kale chips",
       "expected": "group~='snack'",
-      "observed_food_id": 2395,
-      "observed_description": "Kale, raw",
-      "observed_group": "Vegetables and Vegetable Products",
+      "observed_food_id": 502033,
+      "observed_description": "Snacks, vegetable chips",
+      "observed_group": "Snacks",
       "observed_confidence": 0.6,
       "observed_alternatives": [
+        {
+          "food_id": 2395,
+          "description": "Kale, raw",
+          "similarity": 0.554
+        },
         {
           "food_id": 2295,
           "description": "Kale, scotch, raw",
@@ -1058,16 +1063,11 @@
           "food_id": 501664,
           "description": "Kale, boiled, drained, with salt",
           "similarity": 0.526
-        },
-        {
-          "food_id": 501666,
-          "description": "Kale, frozen, boiled, drained, with salt",
-          "similarity": 0.515
         }
       ],
-      "passed": false,
-      "detail": "no expected match",
-      "timing_ms": 1223.1
+      "passed": true,
+      "detail": "ok",
+      "timing_ms": 1002.2
     },
     {
       "panel": "D",
@@ -1096,7 +1096,7 @@
       ],
       "passed": true,
       "detail": "ok",
-      "timing_ms": 1143.2
+      "timing_ms": 2050.4
     },
     {
       "panel": "D",
@@ -1125,7 +1125,7 @@
       ],
       "passed": true,
       "detail": "no canonical recipe; closest fit is mixed-dish or vegetable",
-      "timing_ms": 1274.0
+      "timing_ms": 899.3
     },
     {
       "panel": "D",
@@ -1154,7 +1154,7 @@
       ],
       "passed": false,
       "detail": "no expected match",
-      "timing_ms": 1091.1
+      "timing_ms": 1874.8
     },
     {
       "panel": "D",
@@ -1183,7 +1183,7 @@
       ],
       "passed": true,
       "detail": "fruit-based; closest fit likely a berry or smoothie entry",
-      "timing_ms": 1146.5
+      "timing_ms": 1090.3
     }
   ]
 }

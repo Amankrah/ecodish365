@@ -33,6 +33,8 @@ import {
   type FoodComparisonResult,
   type FilterOptions 
 } from '../../lib/api';
+import { AIEnhancedSearch } from '../shared/AIEnhancedSearch';
+import { RecipeDecomposerModal } from '../shared/RecipeDecomposerModal';
 
 interface SelectedFood {
   FoodID: number;
@@ -61,6 +63,7 @@ const EnvironmentalFoodComparison = () => {
   const [filters, setFilters] = useState<FilterOptions | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedMethod, setSelectedMethod] = useState<string>('');
+  const [recipeModalOpen, setRecipeModalOpen] = useState(false);
   const [userType, setUserType] = useState<UserType>('individual');
 
   useEffect(() => {
@@ -321,6 +324,25 @@ const EnvironmentalFoodComparison = () => {
                 {searchIsLoading && searchQuery && (
                   <div className="text-sm text-gray-500">Searching...</div>
                 )}
+
+                <AIEnhancedSearch
+                  query={searchQuery}
+                  userType={userType}
+                  accent="green"
+                  onSelect={(food) =>
+                    addFood({
+                      FoodID: food.food_id,
+                      FoodDescription: food.food_description,
+                    })
+                  }
+                />
+                <button
+                  type="button"
+                  onClick={() => setRecipeModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 text-sm text-green-700 hover:text-green-900 hover:underline"
+                >
+                  🍳 Score a homemade dish (decompose into CNF ingredients)
+                </button>
 
                 {searchResults.length > 0 && (
                   <div className="bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto">
@@ -654,6 +676,25 @@ const EnvironmentalFoodComparison = () => {
           </div>
         </div>
       </div>
+
+      <RecipeDecomposerModal
+        open={recipeModalOpen}
+        onClose={() => setRecipeModalOpen(false)}
+        userType={userType}
+        accent="green"
+        onApply={(ingredients) => {
+          const additions: SelectedFood[] = ingredients
+            .filter((i) => !selectedFoods.some((f) => f.FoodID === i.food_id))
+            .map((i) => ({
+              FoodID: i.food_id,
+              FoodDescription: i.food_description,
+              FoodCode: undefined,
+              amount: i.mass_g,
+              unit: 'g',
+            }));
+          setSelectedFoods([...selectedFoods, ...additions]);
+        }}
+      />
     </div>
   );
 };

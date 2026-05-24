@@ -62,7 +62,7 @@
           "mass_g": 5.0
         }
       ],
-      "timing_ms": 10806.6,
+      "timing_ms": 11490.3,
       "gates": {
         "gate1_min_ingredients": true,
         "gate2_mass_closure": true,
@@ -80,8 +80,8 @@
       "matched": true,
       "fallback_reason": null,
       "ingredient_count": 8,
-      "resolved_mass_g": 330.0,
-      "unresolved_mass_g": 20.0,
+      "resolved_mass_g": 345.0,
+      "unresolved_mass_g": 5.0,
       "decomposition_confidence": 0.75,
       "ingredient_summary": [
         {
@@ -90,23 +90,23 @@
           "mass_g": 150.0
         },
         {
-          "food_id": 2402,
-          "food_description": "Onion, boiled, drained",
-          "mass_g": 50.0
-        },
-        {
           "food_id": 2565,
           "food_description": "Nuts, coconut milk (liquid from grated meat and wa",
+          "mass_g": 60.0
+        },
+        {
+          "food_id": 2401,
+          "food_description": "Onion, raw",
           "mass_g": 50.0
         },
         {
-          "food_id": 2461,
-          "food_description": "Tomato, red, ripe, boiled",
+          "food_id": 2460,
+          "food_description": "Tomato, red, ripe, raw, year round average",
           "mass_g": 40.0
         },
         {
-          "food_id": 452,
-          "food_description": "Vegetable oil, mustard",
+          "food_id": 5622,
+          "food_description": "Vegetable oil, corn, peanut and olive",
           "mass_g": 15.0
         },
         {
@@ -122,10 +122,10 @@
         {
           "food_id": 183,
           "food_description": "Spices, curry powder",
-          "mass_g": 5.0
+          "mass_g": 10.0
         }
       ],
-      "timing_ms": 11581.8,
+      "timing_ms": 11924.1,
       "gates": {
         "gate1_min_ingredients": true,
         "gate2_mass_closure": true,
@@ -143,9 +143,9 @@
       "matched": true,
       "fallback_reason": null,
       "ingredient_count": 7,
-      "resolved_mass_g": 315.0,
-      "unresolved_mass_g": 5.0,
-      "decomposition_confidence": 0.85,
+      "resolved_mass_g": 320.0,
+      "unresolved_mass_g": 0.0,
+      "decomposition_confidence": 0.75,
       "ingredient_summary": [
         {
           "food_id": 4874,
@@ -168,6 +168,11 @@
           "mass_g": 20.0
         },
         {
+          "food_id": 3362,
+          "food_description": "Peanuts, all types, dry roasted",
+          "mass_g": 15.0
+        },
+        {
           "food_id": 502471,
           "food_description": "Sauce, peanut (made from peanut butter, water, soy",
           "mass_g": 15.0
@@ -176,14 +181,9 @@
           "food_id": 2144,
           "food_description": "Onion, spring (green) or scallion (includes tops a",
           "mass_g": 10.0
-        },
-        {
-          "food_id": 3362,
-          "food_description": "Peanuts, all types, dry roasted",
-          "mass_g": 10.0
         }
       ],
-      "timing_ms": 9989.7,
+      "timing_ms": 10868.4,
       "gates": {
         "gate1_min_ingredients": true,
         "gate2_mass_closure": true,
@@ -200,14 +200,14 @@
       "total_mass_g": 300.0,
       "matched": true,
       "fallback_reason": null,
-      "ingredient_count": 6,
-      "resolved_mass_g": 280.0,
-      "unresolved_mass_g": 20.0,
+      "ingredient_count": 5,
+      "resolved_mass_g": 270.0,
+      "unresolved_mass_g": 30.0,
       "decomposition_confidence": 0.75,
       "ingredient_summary": [
         {
-          "food_id": 6145,
-          "food_description": "Beef, loin, top sirloin steak, boneless, lean and ",
+          "food_id": 501996,
+          "food_description": "Stir fry with beef",
           "mass_g": 120.0
         },
         {
@@ -229,14 +229,9 @@
           "food_id": 2402,
           "food_description": "Onion, boiled, drained",
           "mass_g": 20.0
-        },
-        {
-          "food_id": 3329,
-          "food_description": "Soy sauce (made from soy), tamari",
-          "mass_g": 10.0
         }
       ],
-      "timing_ms": 7491.2,
+      "timing_ms": 5687.2,
       "gates": {
         "gate1_min_ingredients": true,
         "gate2_mass_closure": true,
@@ -256,7 +251,7 @@
       "ingredient_count": 5,
       "resolved_mass_g": 245.0,
       "unresolved_mass_g": 5.0,
-      "decomposition_confidence": 0.75,
+      "decomposition_confidence": 0.85,
       "ingredient_summary": [
         {
           "food_id": 2116,
@@ -284,7 +279,7 @@
           "mass_g": 10.0
         }
       ],
-      "timing_ms": 8528.9,
+      "timing_ms": 11310.9,
       "gates": {
         "gate1_min_ingredients": true,
         "gate2_mass_closure": true,
@@ -301,53 +296,48 @@
       "total_mass_g": 350.0,
       "matched": true,
       "fallback_reason": null,
-      "ingredient_count": 8,
+      "ingredient_count": 7,
       "resolved_mass_g": 350.0,
       "unresolved_mass_g": 0.0,
-      "decomposition_confidence": 0.85,
+      "decomposition_confidence": 0.75,
       "ingredient_summary": [
         {
           "food_id": 4475,
           "food_description": "Grains, rice, white, medium-grain, cooked",
-          "mass_g": 140.0
+          "mass_g": 120.0
         },
         {
           "food_id": 3212,
           "food_description": "Crustaceans, shrimp, mixed species, boiled or stea",
-          "mass_g": 70.0
+          "mass_g": 100.0
         },
         {
           "food_id": 1167,
           "food_description": "Sausage, smoked, pork, pre-cooked",
-          "mass_g": 60.0
+          "mass_g": 80.0
+        },
+        {
+          "food_id": 2463,
+          "food_description": "Tomato, red, ripe, canned, stewed",
+          "mass_g": 20.0
         },
         {
           "food_id": 2402,
           "food_description": "Onion, boiled, drained",
-          "mass_g": 25.0
+          "mass_g": 10.0
         },
         {
           "food_id": 2414,
           "food_description": "Pepper, sweet, green, boiled, drained",
-          "mass_g": 20.0
+          "mass_g": 10.0
         },
         {
           "food_id": 2387,
           "food_description": "Celery, boiled, drained",
-          "mass_g": 15.0
-        },
-        {
-          "food_id": 2461,
-          "food_description": "Tomato, red, ripe, boiled",
-          "mass_g": 15.0
-        },
-        {
-          "food_id": 2394,
-          "food_description": "Garlic, raw",
-          "mass_g": 5.0
+          "mass_g": 10.0
         }
       ],
-      "timing_ms": 8006.2,
+      "timing_ms": 9576.2,
       "gates": {
         "gate1_min_ingredients": true,
         "gate2_mass_closure": true,
@@ -364,10 +354,10 @@
       "total_mass_g": 300.0,
       "matched": true,
       "fallback_reason": null,
-      "ingredient_count": 5,
-      "resolved_mass_g": 300.0,
-      "unresolved_mass_g": 0.0,
-      "decomposition_confidence": 0.85,
+      "ingredient_count": 4,
+      "resolved_mass_g": 290.0,
+      "unresolved_mass_g": 10.0,
+      "decomposition_confidence": 0.75,
       "ingredient_summary": [
         {
           "food_id": 2463,
@@ -377,25 +367,20 @@
         {
           "food_id": 125,
           "food_description": "Egg, chicken, whole, fresh or frozen, raw",
-          "mass_g": 90.0
+          "mass_g": 100.0
         },
         {
           "food_id": 2401,
           "food_description": "Onion, raw",
-          "mass_g": 30.0
+          "mass_g": 25.0
         },
         {
           "food_id": 2413,
           "food_description": "Pepper, sweet, green, raw",
-          "mass_g": 20.0
-        },
-        {
-          "food_id": 422,
-          "food_description": "Vegetable oil, olive",
-          "mass_g": 10.0
+          "mass_g": 15.0
         }
       ],
-      "timing_ms": 7616.5,
+      "timing_ms": 14566.2,
       "gates": {
         "gate1_min_ingredients": true,
         "gate2_mass_closure": true,
@@ -413,8 +398,8 @@
       "matched": true,
       "fallback_reason": null,
       "ingredient_count": 2,
-      "resolved_mass_g": 75.0,
-      "unresolved_mass_g": 5.0,
+      "resolved_mass_g": 78.0,
+      "unresolved_mass_g": 2.0,
       "decomposition_confidence": 0.85,
       "ingredient_summary": [
         {
@@ -425,10 +410,10 @@
         {
           "food_id": 3414,
           "food_description": "Peanut butter, smooth type, fat and sugar added",
-          "mass_g": 25.0
+          "mass_g": 28.0
         }
       ],
-      "timing_ms": 3416.2,
+      "timing_ms": 4200.8,
       "gates": {
         "gate1_min_ingredients": true,
         "gate2_mass_closure": true,
@@ -445,10 +430,10 @@
       "total_mass_g": 150.0,
       "matched": true,
       "fallback_reason": null,
-      "ingredient_count": 3,
-      "resolved_mass_g": 145.0,
-      "unresolved_mass_g": 5.0,
-      "decomposition_confidence": 0.75,
+      "ingredient_count": 2,
+      "resolved_mass_g": 140.0,
+      "unresolved_mass_g": 10.0,
+      "decomposition_confidence": 0.85,
       "ingredient_summary": [
         {
           "food_id": 125,
@@ -458,15 +443,10 @@
         {
           "food_id": 3732,
           "food_description": "Bread, white, commercial, toasted",
-          "mass_g": 45.0
-        },
-        {
-          "food_id": 118,
-          "food_description": "Butter, regular",
-          "mass_g": 10.0
+          "mass_g": 50.0
         }
       ],
-      "timing_ms": 3583.5,
+      "timing_ms": 2839.9,
       "gates": {
         "gate1_min_ingredients": true,
         "gate2_mass_closure": true,
@@ -483,33 +463,23 @@
       "total_mass_g": 200.0,
       "matched": true,
       "fallback_reason": null,
-      "ingredient_count": 4,
-      "resolved_mass_g": 200.0,
-      "unresolved_mass_g": 0.0,
-      "decomposition_confidence": 0.75,
+      "ingredient_count": 2,
+      "resolved_mass_g": 195.0,
+      "unresolved_mass_g": 5.0,
+      "decomposition_confidence": 0.85,
       "ingredient_summary": [
         {
           "food_id": 1465,
           "food_description": "Cereal, hot, oats, large flakes, prepared, Quaker",
-          "mass_g": 120.0
+          "mass_g": 150.0
         },
         {
           "food_id": 1705,
           "food_description": "Blueberry, raw",
-          "mass_g": 60.0
-        },
-        {
-          "food_id": 2933,
-          "food_description": "Water, municipal",
-          "mass_g": 15.0
-        },
-        {
-          "food_id": 113,
-          "food_description": "Milk, fluid, whole, pasteurized, homogenized, 3.25",
-          "mass_g": 5.0
+          "mass_g": 45.0
         }
       ],
-      "timing_ms": 6015.1,
+      "timing_ms": 4209.4,
       "gates": {
         "gate1_min_ingredients": true,
         "gate2_mass_closure": true,
@@ -527,14 +497,14 @@
       "matched": true,
       "fallback_reason": null,
       "ingredient_count": 3,
-      "resolved_mass_g": 115.0,
-      "unresolved_mass_g": 5.0,
+      "resolved_mass_g": 110.0,
+      "unresolved_mass_g": 10.0,
       "decomposition_confidence": 0.85,
       "ingredient_summary": [
         {
           "food_id": 4066,
           "food_description": "Bread, white, commercial",
-          "mass_g": 70.0
+          "mass_g": 60.0
         },
         {
           "food_id": 502213,
@@ -544,10 +514,10 @@
         {
           "food_id": 118,
           "food_description": "Butter, regular",
-          "mass_g": 5.0
+          "mass_g": 10.0
         }
       ],
-      "timing_ms": 2862.1,
+      "timing_ms": 4766.0,
       "gates": {
         "gate1_min_ingredients": true,
         "gate2_mass_closure": true,
@@ -572,15 +542,15 @@
         {
           "food_id": 502191,
           "food_description": "Yogourt, Greek style, plain, rich (8-12% M.F.)",
-          "mass_g": 135.0
+          "mass_g": 120.0
         },
         {
           "food_id": 1222,
           "food_description": "Cereal, ready to eat, granola, homemade",
-          "mass_g": 45.0
+          "mass_g": 60.0
         }
       ],
-      "timing_ms": 3306.2,
+      "timing_ms": 4224.7,
       "gates": {
         "gate1_min_ingredients": true,
         "gate2_mass_closure": true,
@@ -597,20 +567,20 @@
       "total_mass_g": 350.0,
       "matched": true,
       "fallback_reason": null,
-      "ingredient_count": 7,
-      "resolved_mass_g": 333.0,
-      "unresolved_mass_g": 17.0,
+      "ingredient_count": 5,
+      "resolved_mass_g": 330.0,
+      "unresolved_mass_g": 20.0,
       "decomposition_confidence": 0.75,
       "ingredient_summary": [
         {
           "food_id": 842,
           "food_description": "Chicken, broiler, breast, meat, roasted",
-          "mass_g": 120.0
+          "mass_g": 100.0
         },
         {
           "food_id": 2933,
           "food_description": "Water, municipal",
-          "mass_g": 80.0
+          "mass_g": 100.0
         },
         {
           "food_id": 2380,
@@ -626,19 +596,9 @@
           "food_id": 2401,
           "food_description": "Onion, raw",
           "mass_g": 40.0
-        },
-        {
-          "food_id": 214,
-          "food_description": "Salt, table",
-          "mass_g": 2.0
-        },
-        {
-          "food_id": 198,
-          "food_description": "Spices, pepper, black",
-          "mass_g": 1.0
         }
       ],
-      "timing_ms": 6507.3,
+      "timing_ms": 13339.2,
       "gates": {
         "gate1_min_ingredients": true,
         "gate2_mass_closure": true,
@@ -656,9 +616,9 @@
       "matched": true,
       "fallback_reason": null,
       "ingredient_count": 7,
-      "resolved_mass_g": 330.0,
-      "unresolved_mass_g": 20.0,
-      "decomposition_confidence": 0.7,
+      "resolved_mass_g": 340.0,
+      "unresolved_mass_g": 10.0,
+      "decomposition_confidence": 0.75,
       "ingredient_summary": [
         {
           "food_id": 5917,
@@ -666,37 +626,37 @@
           "mass_g": 100.0
         },
         {
+          "food_id": 2241,
+          "food_description": "Sweet potato, baked, skin removed after baking",
+          "mass_g": 80.0
+        },
+        {
           "food_id": 3390,
           "food_description": "Chickpeas (garbanzo beans, bengal gram), boiled",
-          "mass_g": 70.0
-        },
-        {
-          "food_id": 1511,
-          "food_description": "Avocado, raw, all commercial varieties",
           "mass_g": 50.0
-        },
-        {
-          "food_id": 2380,
-          "food_description": "Carrot, raw",
-          "mass_g": 40.0
-        },
-        {
-          "food_id": 2363,
-          "food_description": "Cucumber, raw",
-          "mass_g": 30.0
         },
         {
           "food_id": 2213,
           "food_description": "Spinach, raw",
+          "mass_g": 40.0
+        },
+        {
+          "food_id": 1511,
+          "food_description": "Avocado, raw, all commercial varieties",
           "mass_g": 30.0
         },
         {
-          "food_id": 422,
-          "food_description": "Vegetable oil, olive",
-          "mass_g": 10.0
+          "food_id": 2380,
+          "food_description": "Carrot, raw",
+          "mass_g": 20.0
+        },
+        {
+          "food_id": 2363,
+          "food_description": "Cucumber, raw",
+          "mass_g": 20.0
         }
       ],
-      "timing_ms": 8751.8,
+      "timing_ms": 10192.4,
       "gates": {
         "gate1_min_ingredients": true,
         "gate2_mass_closure": true,
@@ -714,8 +674,8 @@
       "matched": true,
       "fallback_reason": null,
       "ingredient_count": 6,
-      "resolved_mass_g": 380.0,
-      "unresolved_mass_g": 20.0,
+      "resolved_mass_g": 370.0,
+      "unresolved_mass_g": 30.0,
       "decomposition_confidence": 0.75,
       "ingredient_summary": [
         {
@@ -746,10 +706,10 @@
         {
           "food_id": 1011,
           "food_description": "Gravy, unspecified, dehydrated",
-          "mass_g": 30.0
+          "mass_g": 20.0
         }
       ],
-      "timing_ms": 9186.7,
+      "timing_ms": 10226.0,
       "gates": {
         "gate1_min_ingredients": true,
         "gate2_mass_closure": true,
