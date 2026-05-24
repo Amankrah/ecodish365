@@ -137,19 +137,24 @@ def calculate_hsr(request):
     t1 = time.perf_counter()
     load_ms = (t1 - t0) * 1000.0
 
-    # Determine HSR category using official methodology
-    primary_food = foods[0] if foods else None
-    if primary_food:
-        meal_category = ThresholdProvider.get_category_from_food(
+    # FIX (HSR-CATEG-2 follow-up 2026-05-23): the previous logic hardcoded
+    # the meal category from the FIRST food in the list, completely bypassing
+    # the MealCategorizer. That meant a 30 g cheese + 60 g bread sandwich
+    # got Category 3D (because cheese was listed first) regardless of which
+    # food was actually dominant by mass / fitness. For single-food calls
+    # we keep the per-food category (no ambiguity); for multi-food meals we
+    # delegate to HSRMeal._determine_category which calls the MealCategorizer
+    # (with the new mass-dominant general-food override). This is the only
+    # path that respects the HSRAC v9 "mixed dish → Cat 2" intuition.
+    meal = HSRMeal(foods=foods)
+    if len(foods) == 1:
+        primary_food = foods[0]
+        meal.category = ThresholdProvider.get_category_from_food(
             primary_food.food_name,
             getattr(primary_food, "food_group_id", 0),
         )
-    else:
-        meal_category = Category.FOOD  # Default
-
-    # Create meal with determined category
-    meal = HSRMeal(foods=foods)
-    meal.category = meal_category
+    # Multi-food meals: HSRMeal.__post_init__ already ran _determine_category,
+    # which invokes the MealCategorizer. No override needed here.
 
     # Use standard HSR configuration
     config = HSRConfig(
@@ -382,18 +387,16 @@ def get_meal_insights(request):
     t1 = time.perf_counter()
     load_ms = (t1 - t0) * 1000.0
 
-    # Use official HSR categorization
-    primary_food = foods[0] if foods else None
-    if primary_food:
-        meal_category = ThresholdProvider.get_category_from_food(
+    # FIX (HSR-CATEG-2 follow-up 2026-05-23): same fix as calculate_hsr above.
+    # Multi-food meals must go through MealCategorizer (via HSRMeal's
+    # __post_init__) so the mass-dominant general-food override fires.
+    meal = HSRMeal(foods=foods)
+    if len(foods) == 1:
+        primary_food = foods[0]
+        meal.category = ThresholdProvider.get_category_from_food(
             primary_food.food_name,
             getattr(primary_food, "food_group_id", 0),
         )
-    else:
-        meal_category = Category.FOOD  # Default
-
-    meal = HSRMeal(foods=foods)
-    meal.category = meal_category
 
     # Use standard HSR configuration
     config = HSRConfig(
@@ -768,20 +771,54 @@ def _get_food_details_summary(foods: List[HSRFood]) -> List[Dict]:
 
 
 def _get_basic_meal_categorization_summary(meal: HSRMeal) -> Dict:
-    """Get basic summary of meal categorization"""
-    # Category name mapping
+    """Summary of meal categorization for the API response.
+
+    FIX (HSR-CATEG-3 2026-05-23): the previous version only returned 3 fields
+    (final_category / category_code / methodology), so the frontend HSR page
+    saw `meal_categorization.category_confidence = 0.0` and missing reasoning /
+    warnings / alternatives — even though `Meal.category_confidence` and
+    `Meal.category_analysis` are correctly populated by `_determine_category`
+    in `hsr_calculator/hsr/models/meal.py:82-92`. Now all the fields the
+    frontend reads ([hsr/calculate/page.tsx:474-516]) are surfaced.
+    """
     category_name_map = {
-        Category.BEVERAGE: 'Category 1 - Beverages',
-        Category.DAIRY_BEVERAGE: 'Category 1D - Dairy Beverages', 
-        Category.FOOD: 'Category 2 - General Foods',
-        Category.CHEESE: 'Category 2D - Dairy Foods',
-        Category.OILS_AND_SPREADS: 'Category 3 - Oils, Spreads, Nuts & Seeds'
+        Category.BEVERAGE:         'Category 1 - Non-dairy beverages',
+        Category.DAIRY_BEVERAGE:   'Category 1D - Dairy beverages',
+        Category.FOOD:             'Category 2 - General foods',
+        Category.DAIRY_FOOD:       'Category 2D - Other dairy foods',
+        Category.OILS_AND_SPREADS: 'Category 3 - Oils and spreads',
+        Category.CHEESE:           'Category 3D - Cheese',
     }
-    
+
+    analysis = getattr(meal, 'category_analysis', {}) or {}
+    confidence = float(getattr(meal, 'category_confidence', 0.0) or 0.0)
+    warnings = list(getattr(meal, 'category_warnings', []) or [])
+
+    # Alternative categories come as a list of (Category, fitness_float, reason_str) tuples
+    alt_raw = analysis.get('alternative_categories', []) or []
+    alternative_categories = []
+    for entry in alt_raw:
+        try:
+            cat, fitness, reason = entry
+            alternative_categories.append({
+                'category':   cat.value if hasattr(cat, 'value') else str(cat),
+                'fitness':    float(fitness),
+                'reason':     str(reason),
+            })
+        except (ValueError, TypeError):
+            # Defensive: if the tuple shape ever changes, skip silently
+            continue
+
     return {
-        "final_category": category_name_map.get(meal.category, "Category 2 - General Foods") if meal.category else "unknown",
+        "final_category": category_name_map.get(meal.category, "Category 2 - General foods") if meal.category else "unknown",
         "category_code": meal.category.value if meal.category else "2",
-        "methodology": "Official HSR categorization based on primary food characteristics"
+        "methodology": "Scientific categorisation per HSRAC v9 (FoodGroupMapper + MealCategorizer)",
+        "category_confidence": confidence,
+        "scientific_method": str(analysis.get('reason', 'scientific_categorization')),
+        "reasoning": str(analysis.get('reasoning', '')),
+        "nutritional_rationale": str(analysis.get('nutritional_rationale', '')),
+        "alternative_categories": alternative_categories,
+        "category_warnings": warnings,
     }
 
 

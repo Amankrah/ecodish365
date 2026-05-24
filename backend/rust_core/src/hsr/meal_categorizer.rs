@@ -873,6 +873,49 @@ fn fallback_result(reason: &str) -> ScientificOutput {
     }
 }
 
+/// FIX (HSR-CATEG-2 2026-05-23, expanded): if the meal contains 2+ foods and
+/// one food contributes ≥ 50 % of total mass, the meal inherits that food's
+/// per-food category. Rationale: the pure fitness scorer's profile templates
+/// don't always agree with the obvious dominant-ingredient interpretation
+/// (e.g. cheese+bread → 3D Cheese was wrong; cereal+milk → 1 Non-dairy
+/// beverage was wrong; greek-yogurt+apple → 2 General foods undercut the
+/// dairy-food signal). The mass-dominant rule honours "main ingredient"
+/// intuition and matches HSRAC v9's per-product spirit when applied to a
+/// composite meal: the dish behaves like the main ingredient.
+///
+/// Stays out of the way when no single food is dominant (≥ 50 % is the
+/// threshold). Composites of 3+ evenly-sized foods fall through to the
+/// fitness scorer.
+fn mass_dominant_category_override(foods: &[FoodInput]) -> Option<Cat> {
+    if foods.len() < 2 {
+        return None;
+    }
+    let total_mass: f64 = foods.iter().map(|f| f.serving_size).sum();
+    if total_mass <= 0.0 {
+        return None;
+    }
+    let dominant = foods
+        .iter()
+        .max_by(|a, b| {
+            a.serving_size
+                .partial_cmp(&b.serving_size)
+                .unwrap_or(std::cmp::Ordering::Equal)
+        })?;
+    let share = dominant.serving_size / total_mass;
+    if share < 0.5 {
+        return None;
+    }
+    match dominant.category_value.as_deref()? {
+        "1"  => Some(Cat::B1),
+        "1D" => Some(Cat::B1D),
+        "2"  => Some(Cat::B2),
+        "2D" => Some(Cat::B2D),
+        "3"  => Some(Cat::B3),
+        "3D" => Some(Cat::B3D),
+        _    => None,
+    }
+}
+
 pub fn determine_scientific_category(foods: &[FoodInput]) -> ScientificOutput {
     if foods.is_empty() {
         return fallback_result("Empty meal");
@@ -884,7 +927,11 @@ pub fn determine_scientific_category(foods: &[FoodInput]) -> ScientificOutput {
     let nutritional_analysis = analyze_meal_nutrition(foods);
     let category_fitness = evaluate_category_fitness(&nutritional_analysis);
     let conflict_resolution = resolve_conflicts(foods, &category_fitness, &nutritional_analysis);
-    let recommended = select_category(&conflict_resolution, &category_fitness);
+    let mut recommended = select_category(&conflict_resolution, &category_fitness);
+    // HSR-CATEG-2: mass-dominant per-food category override
+    if let Some(override_cat) = mass_dominant_category_override(foods) {
+        recommended = override_cat;
+    }
     let confidence = calculate_confidence(recommended, &category_fitness, &nutritional_analysis);
     let reasoning = generate_reasoning(recommended, &nutritional_analysis, &category_fitness);
     let rationale = nutritional_rationale(recommended, &nutritional_analysis);

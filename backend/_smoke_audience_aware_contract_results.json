@@ -204,7 +204,7 @@
       "user_type": "individual",
       "check": "has_score_summary_headline",
       "passed": true,
-      "detail": "Excellent within its category. This is 4.5 out of 5 stars within the \"General fo"
+      "detail": "Poor within its category. This is 0.0 out of 5 stars within the \"General foods\" "
     },
     {
       "endpoint": "hsr",
@@ -232,7 +232,7 @@
       "user_type": "researcher",
       "check": "has_score_summary_headline",
       "passed": true,
-      "detail": "4.5 / 5 stars in HSRAC v9 Category 2 (General foods); band: Excellent within its"
+      "detail": "0.0 / 5 stars in HSRAC v9 Category 2 (General foods); band: Poor within its cate"
     },
     {
       "endpoint": "hsr",
@@ -267,7 +267,7 @@
       "user_type": "policy",
       "check": "has_score_summary_headline",
       "passed": true,
-      "detail": "4.5 / 5 stars in General foods (HSRAC v9)."
+      "detail": "0.0 / 5 stars in General foods (HSRAC v9)."
     },
     {
       "endpoint": "hsr",

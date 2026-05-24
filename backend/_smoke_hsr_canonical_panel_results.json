@@ -52,9 +52,15 @@
           }
         },
         "meal_categorization": {
-          "final_category": "Category 2 - General Foods",
+          "final_category": "Category 2 - General foods",
           "category_code": "2",
-          "methodology": "Official HSR categorization based on primary food characteristics"
+          "methodology": "Scientific categorisation per HSRAC v9 (FoodGroupMapper + MealCategorizer)",
+          "category_confidence": 1.0,
+          "scientific_method": "scientific_categorization",
+          "reasoning": "['Single food item uses pre-assigned category']",
+          "nutritional_rationale": "Individual food categorization maintained",
+          "alternative_categories": [],
+          "category_warnings": []
         }
       }
     },
@@ -93,9 +99,15 @@
           }
         },
         "meal_categorization": {
-          "final_category": "Category 1 - Beverages",
+          "final_category": "Category 1 - Non-dairy beverages",
           "category_code": "1",
-          "methodology": "Official HSR categorization based on primary food characteristics"
+          "methodology": "Scientific categorisation per HSRAC v9 (FoodGroupMapper + MealCategorizer)",
+          "category_confidence": 1.0,
+          "scientific_method": "scientific_categorization",
+          "reasoning": "['Single food item uses pre-assigned category']",
+          "nutritional_rationale": "Individual food categorization maintained",
+          "alternative_categories": [],
+          "category_warnings": []
         }
       }
     },
@@ -134,9 +146,15 @@
           }
         },
         "meal_categorization": {
-          "final_category": "Category 2 - General Foods",
+          "final_category": "Category 2 - General foods",
           "category_code": "2",
-          "methodology": "Official HSR categorization based on primary food characteristics"
+          "methodology": "Scientific categorisation per HSRAC v9 (FoodGroupMapper + MealCategorizer)",
+          "category_confidence": 1.0,
+          "scientific_method": "scientific_categorization",
+          "reasoning": "['Single food item uses pre-assigned category']",
+          "nutritional_rationale": "Individual food categorization maintained",
+          "alternative_categories": [],
+          "category_warnings": []
         }
       }
     },
@@ -175,9 +193,15 @@
           }
         },
         "meal_categorization": {
-          "final_category": "Category 1D - Dairy Beverages",
+          "final_category": "Category 1D - Dairy beverages",
           "category_code": "1D",
-          "methodology": "Official HSR categorization based on primary food characteristics"
+          "methodology": "Scientific categorisation per HSRAC v9 (FoodGroupMapper + MealCategorizer)",
+          "category_confidence": 1.0,
+          "scientific_method": "scientific_categorization",
+          "reasoning": "['Single food item uses pre-assigned category']",
+          "nutritional_rationale": "Individual food categorization maintained",
+          "alternative_categories": [],
+          "category_warnings": []
         }
       }
     },
@@ -216,9 +240,15 @@
           }
         },
         "meal_categorization": {
-          "final_category": "Category 2 - General Foods",
+          "final_category": "Category 2 - General foods",
           "category_code": "2",
-          "methodology": "Official HSR categorization based on primary food characteristics"
+          "methodology": "Scientific categorisation per HSRAC v9 (FoodGroupMapper + MealCategorizer)",
+          "category_confidence": 1.0,
+          "scientific_method": "scientific_categorization",
+          "reasoning": "['Single food item uses pre-assigned category']",
+          "nutritional_rationale": "Individual food categorization maintained",
+          "alternative_categories": [],
+          "category_warnings": []
         }
       }
     },
@@ -257,9 +287,15 @@
           }
         },
         "meal_categorization": {
-          "final_category": "Category 2 - General Foods",
+          "final_category": "Category 2D - Other dairy foods",
           "category_code": "2D",
-          "methodology": "Official HSR categorization based on primary food characteristics"
+          "methodology": "Scientific categorisation per HSRAC v9 (FoodGroupMapper + MealCategorizer)",
+          "category_confidence": 1.0,
+          "scientific_method": "scientific_categorization",
+          "reasoning": "['Single food item uses pre-assigned category']",
+          "nutritional_rationale": "Individual food categorization maintained",
+          "alternative_categories": [],
+          "category_warnings": []
         }
       }
     },
@@ -298,9 +334,15 @@
           }
         },
         "meal_categorization": {
-          "final_category": "Category 1 - Beverages",
+          "final_category": "Category 1 - Non-dairy beverages",
           "category_code": "1",
-          "methodology": "Official HSR categorization based on primary food characteristics"
+          "methodology": "Scientific categorisation per HSRAC v9 (FoodGroupMapper + MealCategorizer)",
+          "category_confidence": 1.0,
+          "scientific_method": "scientific_categorization",
+          "reasoning": "['Single food item uses pre-assigned category']",
+          "nutritional_rationale": "Individual food categorization maintained",
+          "alternative_categories": [],
+          "category_warnings": []
         }
       }
     },
@@ -339,9 +381,15 @@
           }
         },
         "meal_categorization": {
-          "final_category": "Category 2 - General Foods",
+          "final_category": "Category 2 - General foods",
           "category_code": "2",
-          "methodology": "Official HSR categorization based on primary food characteristics"
+          "methodology": "Scientific categorisation per HSRAC v9 (FoodGroupMapper + MealCategorizer)",
+          "category_confidence": 1.0,
+          "scientific_method": "scientific_categorization",
+          "reasoning": "['Single food item uses pre-assigned category']",
+          "nutritional_rationale": "Individual food categorization maintained",
+          "alternative_categories": [],
+          "category_warnings": []
         }
       }
     },
@@ -380,9 +428,15 @@
           }
         },
         "meal_categorization": {
-          "final_category": "Category 2 - General Foods",
+          "final_category": "Category 2 - General foods",
           "category_code": "2",
-          "methodology": "Official HSR categorization based on primary food characteristics"
+          "methodology": "Scientific categorisation per HSRAC v9 (FoodGroupMapper + MealCategorizer)",
+          "category_confidence": 1.0,
+          "scientific_method": "scientific_categorization",
+          "reasoning": "['Single food item uses pre-assigned category']",
+          "nutritional_rationale": "Individual food categorization maintained",
+          "alternative_categories": [],
+          "category_warnings": []
         }
       }
     }
