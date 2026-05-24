@@ -253,6 +253,62 @@ export interface CNFDecomposedRecipe {
   raw_llm_response?: string | null;           // null in individual mode
 }
 
+// AI-MATCH-2 (2026-05-24): aggregated 24-h dietary recall payload from
+// /api/recipes/recall-24h/. Mirrors backend `CNFRecall24hResult.to_dict()`
+// in backend/api/services/cnf_recall_24h.py.
+export type RecallOccasion =
+  | 'breakfast' | 'am_snack' | 'lunch' | 'pm_snack'
+  | 'dinner' | 'evening_snack';
+
+export interface RecallMealInput {
+  occasion: RecallOccasion;
+  dish_name: string;
+  total_mass_g: number;
+}
+
+export interface CNFRecall24hAggregatedIngredient {
+  food_id: number;
+  food_description: string;
+  food_group: string;
+  mass_g: number;
+  /** Per-occasion attribution preserved across the FoodID dedup. */
+  occasions: Partial<Record<RecallOccasion, number>>;
+}
+
+export interface CNFRecall24hMealResult {
+  occasion: RecallOccasion;
+  decomposition: CNFDecomposedRecipe;
+}
+
+export interface CNFRecall24hResult {
+  matched: boolean;
+  meals: CNFRecall24hMealResult[];
+  aggregated_daily_ingredients: CNFRecall24hAggregatedIngredient[];
+  total_resolved_mass_g: number;
+  total_unresolved_mass_g: number;
+  occasions_count: number;
+  estimated_daily_kcal: number;
+  aggregate_warnings: string[];   // free-text codes like 'no_breakfast_logged'
+  fallback_reason: string | null;
+  timing_ms: number;
+  cache_hit: boolean;
+}
+
+export interface CNFRecall24hExplanations {
+  // individual mode
+  plain_summary?: { title: string; message: string };
+  before_you_score?: { title: string; message: string };
+  // researcher / policy mode
+  mandatory_caveat?: { title: string; message: string };
+  methodology?: { title: string; message: string };
+  score_routing?: { title: string; message: Record<string, string> };
+}
+
+export interface CNFRecall24hResponse {
+  result: CNFRecall24hResult;
+  explanations: CNFRecall24hExplanations;
+}
+
 export interface CNFAIMatchResult {
   query: string;                            // original input
   normalised_query: string;                 // cache key (lowercase, collapsed whitespace)
@@ -318,6 +374,86 @@ export class CNFApiService {
       user_type: options.userType || 'individual',
     });
     return response.data.result as CNFDecomposedRecipe;
+  }
+
+  // AI-MATCH-2 (2026-05-24): occasion-by-occasion 24-h dietary recall →
+  // aggregated daily CNF ingredient list. Composes the per-meal decomposer
+  // in parallel server-side. Same 429 (per-IP) / 503 (circuit breaker)
+  // surface as searchFoodsAI + decomposeRecipe. Cost = 5¢/meal capped at 30¢.
+  static async recall24h(
+    meals: RecallMealInput[],
+    options: { userType?: 'individual' | 'researcher' | 'policy' } = {},
+  ): Promise<CNFRecall24hResponse> {
+    const response = await api.post('/recipes/recall-24h/', {
+      meals,
+      user_type: options.userType || 'individual',
+    });
+    return {
+      result: response.data.result as CNFRecall24hResult,
+      explanations: response.data.explanations as CNFRecall24hExplanations,
+    };
+  }
+
+  // AI-MATCH-2 (2026-05-24): per-scoring-endpoint adapters that take an
+  // aggregated 24-h recall ingredient list and shape it to each endpoint's
+  // request schema. Five 1-line adapters keep wizard call-sites identical:
+  //   const req = CNFApiService.recallTo<X>(aggregatedList, userType)
+  //   await CNFApiService.calculate<X>(req)
+  // Centralising the shape adapters here means the wizard never needs to
+  // know the per-endpoint quirks (food_ids vs foods, amount_g vs amount
+  // vs quantity, separate serving_sizes array, etc.).
+  static recallToHEFI(
+    ingredients: CNFRecall24hAggregatedIngredient[],
+    userType: 'individual' | 'researcher' | 'policy' = 'individual',
+  ): HEFICalculationRequest {
+    return {
+      foods: ingredients.map(i => ({ food_id: i.food_id, amount_g: i.mass_g })),
+      user_type: userType,
+    };
+  }
+
+  static recallToHENI(
+    ingredients: CNFRecall24hAggregatedIngredient[],
+    userType: 'individual' | 'researcher' | 'policy' = 'individual',
+  ): HENICalculationRequest {
+    return {
+      meal: ingredients.map(i => ({ food_id: i.food_id, amount: i.mass_g, unit: 'g' })),
+      user_type: userType,
+    };
+  }
+
+  static recallToHSR(
+    ingredients: CNFRecall24hAggregatedIngredient[],
+    userType: 'individual' | 'researcher' | 'policy' = 'individual',
+  ): HSRCalculationRequest {
+    return {
+      food_ids: ingredients.map(i => i.food_id),
+      serving_sizes: ingredients.map(i => i.mass_g),
+      analysis_level: 'detailed',
+      include_meal_insights: true,
+      user_type: userType,
+    };
+  }
+
+  static recallToFCS(
+    ingredients: CNFRecall24hAggregatedIngredient[],
+    userType: 'individual' | 'researcher' | 'policy' = 'individual',
+  ): FCSCalculationRequest {
+    return {
+      food_ids: ingredients.map(i => i.food_id),
+      food_names: ingredients.map(i => i.food_description),
+      user_type: userType,
+    };
+  }
+
+  static recallToEnvironmental(
+    ingredients: CNFRecall24hAggregatedIngredient[],
+    userType: 'individual' | 'researcher' | 'policy' = 'individual',
+  ): EnvironmentalImpactRequest {
+    return {
+      foods: ingredients.map(i => ({ food_id: i.food_id, quantity: i.mass_g })),
+      user_type: userType,
+    };
   }
 
   static async searchFoodsEnhanced(options: EnhancedSearchOptions): Promise<SearchResult> {

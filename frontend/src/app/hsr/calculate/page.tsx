@@ -18,6 +18,7 @@ import { AudienceToggle, type UserType, type ExplanationsBlock } from '@/compone
 import { AIEnhancedSearch } from '@/components/shared/AIEnhancedSearch';
 import { RecipeDecomposerModal } from '@/components/shared/RecipeDecomposerModal';
 import { ExplanationsPanel } from '@/components/shared/ExplanationsPanel';
+import { useRecall24hReceiver } from '@/components/shared/useRecall24hReceiver';
 
 interface FoodItem {
   id: string;
@@ -71,6 +72,23 @@ export default function HSRCalculate() {
     };
     loadFilters();
   }, []);
+
+  // AI-MATCH-2 (2026-05-24): pick up an aggregated 24-h recall payload
+  // handed off from /recall-24h. Daily HSR is INFORMATIONAL ONLY per the
+  // wizard's inline warning — HSRAC v9 is per-product within-category.
+  useRecall24hReceiver({
+    target: 'hsr',
+    onIngredients: (ingredients, meta) => {
+      setUserType(meta.user_type);
+      setFoods(ingredients.map((i, idx) => ({
+        id: String(idx + 1),
+        food_id: i.food_id,
+        food_name: i.food_description,
+        serving_size: i.mass_g,
+        food_group: i.food_group,
+      })));
+    },
+  });
 
   // Debounced search
   useEffect(() => {
@@ -462,6 +480,16 @@ export default function HSRCalculate() {
               >
                 🍳 Score a homemade dish (decompose into CNF ingredients)
               </button>
+              {/* AI-MATCH-2 (2026-05-24): 24-h dietary recall. NOTE: daily
+                  HSR is informational only — HSRAC v9 is a per-product
+                  within-category rating; the wizard surfaces that warning
+                  inline on the HSR score-routing button. */}
+              <a
+                href="/recall-24h?then=hsr"
+                className="w-full mt-1 flex items-center justify-center gap-1.5 text-sm text-amber-700 hover:text-amber-900 hover:underline"
+              >
+                🍽️ Build a 24-h recall instead (six-occasion daily eating)
+              </a>
 
               {/* Calculate Button */}
               <button

@@ -1,0 +1,765 @@
+{
+  "harness": "CNFRecall24h directional smoke (AI-MATCH-2)",
+  "totals": {
+    "hard_pass": 5,
+    "fail": 0,
+    "total": 5
+  },
+  "results": [
+    {
+      "probe_name": "SEDENTARY",
+      "matched": true,
+      "fallback_reason": null,
+      "occasions_count": 3,
+      "aggregated_ingredient_count": 13,
+      "total_resolved_mass_g": 835.0,
+      "total_unresolved_mass_g": 15.0,
+      "estimated_daily_kcal": 1395.0,
+      "food_groups": [
+        "Baked Products",
+        "Beef Products",
+        "Breakfast cereals",
+        "Cereals, Grains and Pasta",
+        "Dairy and Egg Products",
+        "Fats and Oils",
+        "Fruits and fruit juices",
+        "Poultry Products",
+        "Vegetables and Vegetable Products"
+      ],
+      "per_meal_summaries": [
+        {
+          "occasion": "breakfast",
+          "dish_name": "oatmeal with berries",
+          "total_mass_g": 250.0,
+          "matched": true,
+          "ingredients_count": 2,
+          "resolved_mass_g": 250.0,
+          "unresolved_mass_g": 0.0,
+          "fallback_reason": null,
+          "top_ingredients": [
+            {
+              "food_id": 1465,
+              "mass_g": 200.0,
+              "food_description": "Cereal, hot, oats, large flakes, prepared, Quaker"
+            },
+            {
+              "food_id": 1705,
+              "mass_g": 50.0,
+              "food_description": "Blueberry, raw"
+            }
+          ]
+        },
+        {
+          "occasion": "lunch",
+          "dish_name": "turkey sandwich with cheese",
+          "total_mass_g": 280.0,
+          "matched": true,
+          "ingredients_count": 4,
+          "resolved_mass_g": 265.0,
+          "unresolved_mass_g": 15.0,
+          "fallback_reason": null,
+          "top_ingredients": [
+            {
+              "food_id": 4066,
+              "mass_g": 120.0,
+              "food_description": "Bread, white, commercial"
+            },
+            {
+              "food_id": 743,
+              "mass_g": 90.0,
+              "food_description": "Turkey, broiler, breast, meat only, roasted"
+            },
+            {
+              "food_id": 502213,
+              "mass_g": 40.0,
+              "food_description": "Cheese, processed product, cheddar, slices"
+            }
+          ]
+        },
+        {
+          "occasion": "dinner",
+          "dish_name": "spaghetti bolognese",
+          "total_mass_g": 320.0,
+          "matched": true,
+          "ingredients_count": 7,
+          "resolved_mass_g": 320.0,
+          "unresolved_mass_g": 0.0,
+          "fallback_reason": null,
+          "top_ingredients": [
+            {
+              "food_id": 4469,
+              "mass_g": 160.0,
+              "food_description": "Pasta, spaghetti, unenriched, cooked"
+            },
+            {
+              "food_id": 4995,
+              "mass_g": 80.0,
+              "food_description": "Beef, ground, medium, crumbled, pan-fried"
+            },
+            {
+              "food_id": 5557,
+              "mass_g": 50.0,
+              "food_description": "Tomato sauce, unsalted"
+            }
+          ]
+        }
+      ],
+      "aggregate_warnings": [],
+      "timing_ms": 8251.2,
+      "gates": {
+        "g1_all_meals_decomposed": true,
+        "g2_kcal_in_bounds": true,
+        "g3_food_group_diversity": true,
+        "g4_per_meal_mass_closure": true,
+        "g5_no_hallucinated_food_ids": true,
+        "g6_hefi_route_ok": true,
+        "g7_heni_route_ok": true
+      },
+      "hefi_score": 38.899253267238485,
+      "heni_total_impact": 3.7,
+      "overall_pass": true,
+      "gate_detail": "3 mains only, ~1800 kcal target \u2014 typical adult low-activity day"
+    },
+    {
+      "probe_name": "ACTIVE",
+      "matched": true,
+      "fallback_reason": null,
+      "occasions_count": 6,
+      "aggregated_ingredient_count": 20,
+      "total_resolved_mass_g": 1455.0,
+      "total_unresolved_mass_g": 15.0,
+      "estimated_daily_kcal": 2735.5,
+      "food_groups": [
+        "Baked Products",
+        "Cereals, Grains and Pasta",
+        "Dairy and Egg Products",
+        "Fats and Oils",
+        "Fruits and fruit juices",
+        "Legumes and Legume Products",
+        "Mixed Dishes",
+        "Pork Products",
+        "Poultry Products",
+        "Sweets",
+        "Vegetables and Vegetable Products"
+      ],
+      "per_meal_summaries": [
+        {
+          "occasion": "breakfast",
+          "dish_name": "scrambled eggs with toast and bacon",
+          "total_mass_g": 300.0,
+          "matched": true,
+          "ingredients_count": 4,
+          "resolved_mass_g": 295.0,
+          "unresolved_mass_g": 5.0,
+          "fallback_reason": null,
+          "top_ingredients": [
+            {
+              "food_id": 125,
+              "mass_g": 150.0,
+              "food_description": "Egg, chicken, whole, fresh or frozen, raw"
+            },
+            {
+              "food_id": 3732,
+              "mass_g": 90.0,
+              "food_description": "Bread, white, commercial, toasted"
+            },
+            {
+              "food_id": 5407,
+              "mass_g": 45.0,
+              "food_description": "Pork, cured, bacon, cooked, pan-fried"
+            }
+          ]
+        },
+        {
+          "occasion": "am_snack",
+          "dish_name": "banana",
+          "total_mass_g": 120.0,
+          "matched": true,
+          "ingredients_count": 1,
+          "resolved_mass_g": 120.0,
+          "unresolved_mass_g": 0.0,
+          "fallback_reason": "single_food_fallback",
+          "top_ingredients": [
+            {
+              "food_id": 1704,
+              "mass_g": 120.0,
+              "food_description": "Banana, raw"
+            }
+          ]
+        },
+        {
+          "occasion": "lunch",
+          "dish_name": "grilled chicken caesar salad",
+          "total_mass_g": 350.0,
+          "matched": true,
+          "ingredients_count": 5,
+          "resolved_mass_g": 340.0,
+          "unresolved_mass_g": 10.0,
+          "fallback_reason": null,
+          "top_ingredients": [
+            {
+              "food_id": 502555,
+              "mass_g": 120.0,
+              "food_description": "Chicken, broiler, breast, skinless, boneless, meat"
+            },
+            {
+              "food_id": 2116,
+              "mass_g": 120.0,
+              "food_description": "Lettuce, cos or romaine"
+            },
+            {
+              "food_id": 5515,
+              "mass_g": 50.0,
+              "food_description": "Salad dressing, caesar dressing, regular"
+            }
+          ]
+        },
+        {
+          "occasion": "pm_snack",
+          "dish_name": "greek yogurt with honey",
+          "total_mass_g": 170.0,
+          "matched": true,
+          "ingredients_count": 2,
+          "resolved_mass_g": 170.0,
+          "unresolved_mass_g": 0.0,
+          "fallback_reason": null,
+          "top_ingredients": [
+            {
+              "food_id": 502191,
+              "mass_g": 140.0,
+              "food_description": "Yogourt, Greek style, plain, rich (8-12% M.F.)"
+            },
+            {
+              "food_id": 4294,
+              "mass_g": 30.0,
+              "food_description": "Sweets, honey, strained or extracted"
+            }
+          ]
+        },
+        {
+          "occasion": "dinner",
+          "dish_name": "beef stir-fry with rice",
+          "total_mass_g": 400.0,
+          "matched": true,
+          "ingredients_count": 6,
+          "resolved_mass_g": 410.0,
+          "unresolved_mass_g": 0.0,
+          "fallback_reason": null,
+          "top_ingredients": [
+            {
+              "food_id": 4475,
+              "mass_g": 180.0,
+              "food_description": "Grains, rice, white, medium-grain, cooked"
+            },
+            {
+              "food_id": 501996,
+              "mass_g": 150.0,
+              "food_description": "Stir fry with beef"
+            },
+            {
+              "food_id": 2375,
+              "mass_g": 30.0,
+              "food_description": "Broccoli, boiled, drained"
+            }
+          ]
+        },
+        {
+          "occasion": "evening_snack",
+          "dish_name": "apple with peanut butter",
+          "total_mass_g": 120.0,
+          "matched": true,
+          "ingredients_count": 2,
+          "resolved_mass_g": 120.0,
+          "unresolved_mass_g": 0.0,
+          "fallback_reason": null,
+          "top_ingredients": [
+            {
+              "food_id": 1696,
+              "mass_g": 80.0,
+              "food_description": "Apple, raw, with skin"
+            },
+            {
+              "food_id": 3414,
+              "mass_g": 40.0,
+              "food_description": "Peanut butter, smooth type, fat and sugar added"
+            }
+          ]
+        }
+      ],
+      "aggregate_warnings": [],
+      "timing_ms": 7112.2,
+      "gates": {
+        "g1_all_meals_decomposed": true,
+        "g2_kcal_in_bounds": true,
+        "g3_food_group_diversity": true,
+        "g4_per_meal_mass_closure": true,
+        "g5_no_hallucinated_food_ids": true,
+        "g6_hefi_route_ok": true,
+        "g7_heni_route_ok": true
+      },
+      "hefi_score": 34.8225722506725,
+      "heni_total_impact": 20.2,
+      "overall_pass": true,
+      "gate_detail": "6 occasions, ~2500 kcal \u2014 moderately active adult"
+    },
+    {
+      "probe_name": "VEGETARIAN",
+      "matched": true,
+      "fallback_reason": null,
+      "occasions_count": 4,
+      "aggregated_ingredient_count": 19,
+      "total_resolved_mass_g": 1050.0,
+      "total_unresolved_mass_g": 20.0,
+      "estimated_daily_kcal": 1318.8,
+      "food_groups": [
+        "Baked Products",
+        "Cereals, Grains and Pasta",
+        "Dairy and Egg Products",
+        "Fats and Oils",
+        "Fruits and fruit juices",
+        "Legumes and Legume Products",
+        "Soups, Sauces and Gravies",
+        "Vegetables and Vegetable Products"
+      ],
+      "per_meal_summaries": [
+        {
+          "occasion": "breakfast",
+          "dish_name": "avocado toast with eggs",
+          "total_mass_g": 220.0,
+          "matched": true,
+          "ingredients_count": 3,
+          "resolved_mass_g": 220.0,
+          "unresolved_mass_g": 0.0,
+          "fallback_reason": null,
+          "top_ingredients": [
+            {
+              "food_id": 129,
+              "mass_g": 90.0,
+              "food_description": "Egg, chicken, whole, cooked, fried"
+            },
+            {
+              "food_id": 1511,
+              "mass_g": 70.0,
+              "food_description": "Avocado, raw, all commercial varieties"
+            },
+            {
+              "food_id": 3732,
+              "mass_g": 60.0,
+              "food_description": "Bread, white, commercial, toasted"
+            }
+          ]
+        },
+        {
+          "occasion": "lunch",
+          "dish_name": "lentil and vegetable soup",
+          "total_mass_g": 350.0,
+          "matched": true,
+          "ingredients_count": 8,
+          "resolved_mass_g": 335.0,
+          "unresolved_mass_g": 15.0,
+          "fallback_reason": null,
+          "top_ingredients": [
+            {
+              "food_id": 3393,
+              "mass_g": 100.0,
+              "food_description": "Lentils, boiled"
+            },
+            {
+              "food_id": 2381,
+              "mass_g": 50.0,
+              "food_description": "Carrot, boiled, drained"
+            },
+            {
+              "food_id": 502650,
+              "mass_g": 50.0,
+              "food_description": "Soup, broth, vegetable, ready-to-serve"
+            }
+          ]
+        },
+        {
+          "occasion": "pm_snack",
+          "dish_name": "hummus with carrots",
+          "total_mass_g": 120.0,
+          "matched": true,
+          "ingredients_count": 2,
+          "resolved_mass_g": 120.0,
+          "unresolved_mass_g": 0.0,
+          "fallback_reason": null,
+          "top_ingredients": [
+            {
+              "food_id": 4870,
+              "mass_g": 90.0,
+              "food_description": "Hummus, commercial"
+            },
+            {
+              "food_id": 2380,
+              "mass_g": 30.0,
+              "food_description": "Carrot, raw"
+            }
+          ]
+        },
+        {
+          "occasion": "dinner",
+          "dish_name": "vegetable stir-fry with tofu and rice",
+          "total_mass_g": 380.0,
+          "matched": true,
+          "ingredients_count": 7,
+          "resolved_mass_g": 375.0,
+          "unresolved_mass_g": 5.0,
+          "fallback_reason": null,
+          "top_ingredients": [
+            {
+              "food_id": 4475,
+              "mass_g": 150.0,
+              "food_description": "Grains, rice, white, medium-grain, cooked"
+            },
+            {
+              "food_id": 3404,
+              "mass_g": 100.0,
+              "food_description": "Tofu, regular, firm or extra firm, raw (prepared w"
+            },
+            {
+              "food_id": 2375,
+              "mass_g": 40.0,
+              "food_description": "Broccoli, boiled, drained"
+            }
+          ]
+        }
+      ],
+      "aggregate_warnings": [],
+      "timing_ms": 8207.4,
+      "gates": {
+        "g1_all_meals_decomposed": true,
+        "g2_kcal_in_bounds": true,
+        "g3_food_group_diversity": true,
+        "g4_per_meal_mass_closure": true,
+        "g5_no_hallucinated_food_ids": true,
+        "g6_hefi_route_ok": true,
+        "g7_heni_route_ok": true
+      },
+      "hefi_score": 43.80593040047337,
+      "heni_total_impact": 22.6,
+      "overall_pass": true,
+      "gate_detail": "3 mains + snack, no meat / fish anywhere"
+    },
+    {
+      "probe_name": "HIGH_SNACK",
+      "matched": true,
+      "fallback_reason": null,
+      "occasions_count": 6,
+      "aggregated_ingredient_count": 14,
+      "total_resolved_mass_g": 785.0,
+      "total_unresolved_mass_g": 15.0,
+      "estimated_daily_kcal": 1907.6,
+      "food_groups": [
+        "Baked Products",
+        "Breakfast cereals",
+        "Cereals, Grains and Pasta",
+        "Dairy and Egg Products",
+        "Fats and Oils",
+        "Finfish and Shellfish Products",
+        "Nuts and Seeds",
+        "Sweets",
+        "Vegetables and Vegetable Products"
+      ],
+      "per_meal_summaries": [
+        {
+          "occasion": "breakfast",
+          "dish_name": "yogurt parfait with granola",
+          "total_mass_g": 200.0,
+          "matched": true,
+          "ingredients_count": 2,
+          "resolved_mass_g": 200.0,
+          "unresolved_mass_g": 0.0,
+          "fallback_reason": null,
+          "top_ingredients": [
+            {
+              "food_id": 502180,
+              "mass_g": 140.0,
+              "food_description": "Yogourt, plain, Balkan style (4-6% M.F.)"
+            },
+            {
+              "food_id": 1222,
+              "mass_g": 60.0,
+              "food_description": "Cereal, ready to eat, granola, homemade"
+            }
+          ]
+        },
+        {
+          "occasion": "am_snack",
+          "dish_name": "almonds",
+          "total_mass_g": 30.0,
+          "matched": true,
+          "ingredients_count": 1,
+          "resolved_mass_g": 30.0,
+          "unresolved_mass_g": 0.0,
+          "fallback_reason": "single_food_fallback",
+          "top_ingredients": [
+            {
+              "food_id": 2534,
+              "mass_g": 30.0,
+              "food_description": "Nuts, almonds, dried, unblanched, unroasted"
+            }
+          ]
+        },
+        {
+          "occasion": "lunch",
+          "dish_name": "tuna salad on crackers",
+          "total_mass_g": 180.0,
+          "matched": true,
+          "ingredients_count": 5,
+          "resolved_mass_g": 180.0,
+          "unresolved_mass_g": 0.0,
+          "fallback_reason": null,
+          "top_ingredients": [
+            {
+              "food_id": 3131,
+              "mass_g": 90.0,
+              "food_description": "Fish, tuna, light, canned in water, drained, unsal"
+            },
+            {
+              "food_id": 531,
+              "mass_g": 45.0,
+              "food_description": "Salad dressing, mayonnaise, commercial, regular"
+            },
+            {
+              "food_id": 4072,
+              "mass_g": 20.0,
+              "food_description": "Cracker, standard snack-type"
+            }
+          ]
+        },
+        {
+          "occasion": "pm_snack",
+          "dish_name": "cheese and crackers",
+          "total_mass_g": 80.0,
+          "matched": true,
+          "ingredients_count": 2,
+          "resolved_mass_g": 75.0,
+          "unresolved_mass_g": 5.0,
+          "fallback_reason": null,
+          "top_ingredients": [
+            {
+              "food_id": 119,
+              "mass_g": 40.0,
+              "food_description": "Cheese, cheddar"
+            },
+            {
+              "food_id": 4072,
+              "mass_g": 35.0,
+              "food_description": "Cracker, standard snack-type"
+            }
+          ]
+        },
+        {
+          "occasion": "dinner",
+          "dish_name": "grilled salmon with quinoa",
+          "total_mass_g": 280.0,
+          "matched": true,
+          "ingredients_count": 2,
+          "resolved_mass_g": 270.0,
+          "unresolved_mass_g": 10.0,
+          "fallback_reason": null,
+          "top_ingredients": [
+            {
+              "food_id": 3159,
+              "mass_g": 180.0,
+              "food_description": "Fish, salmon, pink (humpback), baked or broiled"
+            },
+            {
+              "food_id": 5917,
+              "mass_g": 90.0,
+              "food_description": "Grains, quinoa, cooked"
+            }
+          ]
+        },
+        {
+          "occasion": "evening_snack",
+          "dish_name": "dark chocolate",
+          "total_mass_g": 30.0,
+          "matched": true,
+          "ingredients_count": 3,
+          "resolved_mass_g": 30.0,
+          "unresolved_mass_g": 0.0,
+          "fallback_reason": null,
+          "top_ingredients": [
+            {
+              "food_id": 4223,
+              "mass_g": 18.0,
+              "food_description": "Sweets, cocoa, powder, unsweetened"
+            },
+            {
+              "food_id": 4318,
+              "mass_g": 10.0,
+              "food_description": "Sweets, sugars, granulated"
+            },
+            {
+              "food_id": 429,
+              "mass_g": 2.0,
+              "food_description": "Vegetable oil, cocoa butter"
+            }
+          ]
+        }
+      ],
+      "aggregate_warnings": [],
+      "timing_ms": 7375.9,
+      "gates": {
+        "g1_all_meals_decomposed": true,
+        "g2_kcal_in_bounds": true,
+        "g3_food_group_diversity": true,
+        "g4_per_meal_mass_closure": true,
+        "g5_no_hallucinated_food_ids": true,
+        "g6_hefi_route_ok": true,
+        "g7_heni_route_ok": true
+      },
+      "hefi_score": 36.202473689569075,
+      "heni_total_impact": 39.7,
+      "overall_pass": true,
+      "gate_detail": "3 small mains + 3 snacks, ~1800 kcal"
+    },
+    {
+      "probe_name": "WEEKEND_BRUNCH",
+      "matched": true,
+      "fallback_reason": null,
+      "occasions_count": 4,
+      "aggregated_ingredient_count": 16,
+      "total_resolved_mass_g": 1063.0,
+      "total_unresolved_mass_g": 27.0,
+      "estimated_daily_kcal": 1754.9,
+      "food_groups": [
+        "Baked Products",
+        "Beverages",
+        "Dairy and Egg Products",
+        "Fats and Oils",
+        "Pork Products",
+        "Poultry Products",
+        "Soups, Sauces and Gravies",
+        "Spices and Herbs",
+        "Sweets",
+        "Vegetables and Vegetable Products"
+      ],
+      "per_meal_summaries": [
+        {
+          "occasion": "lunch",
+          "dish_name": "eggs benedict with bacon and home fries",
+          "total_mass_g": 450.0,
+          "matched": true,
+          "ingredients_count": 5,
+          "resolved_mass_g": 430.0,
+          "unresolved_mass_g": 20.0,
+          "fallback_reason": null,
+          "top_ingredients": [
+            {
+              "food_id": 2168,
+              "mass_g": 150.0,
+              "food_description": "Potato, hashed-brown, homemade"
+            },
+            {
+              "food_id": 132,
+              "mass_g": 100.0,
+              "food_description": "Egg, chicken, whole, cooked, poached"
+            },
+            {
+              "food_id": 3907,
+              "mass_g": 70.0,
+              "food_description": "English muffin, wheat, toasted"
+            }
+          ]
+        },
+        {
+          "occasion": "pm_snack",
+          "dish_name": "iced coffee with milk",
+          "total_mass_g": 240.0,
+          "matched": true,
+          "ingredients_count": 2,
+          "resolved_mass_g": 240.0,
+          "unresolved_mass_g": 0.0,
+          "fallback_reason": null,
+          "top_ingredients": [
+            {
+              "food_id": 2873,
+              "mass_g": 180.0,
+              "food_description": "Coffee, brewed, prepared with tap water"
+            },
+            {
+              "food_id": 113,
+              "mass_g": 60.0,
+              "food_description": "Milk, fluid, whole, pasteurized, homogenized, 3.25"
+            }
+          ]
+        },
+        {
+          "occasion": "dinner",
+          "dish_name": "caesar salad with grilled chicken",
+          "total_mass_g": 300.0,
+          "matched": true,
+          "ingredients_count": 5,
+          "resolved_mass_g": 295.0,
+          "unresolved_mass_g": 5.0,
+          "fallback_reason": null,
+          "top_ingredients": [
+            {
+              "food_id": 2116,
+              "mass_g": 120.0,
+              "food_description": "Lettuce, cos or romaine"
+            },
+            {
+              "food_id": 502555,
+              "mass_g": 100.0,
+              "food_description": "Chicken, broiler, breast, skinless, boneless, meat"
+            },
+            {
+              "food_id": 5515,
+              "mass_g": 40.0,
+              "food_description": "Salad dressing, caesar dressing, regular"
+            }
+          ]
+        },
+        {
+          "occasion": "evening_snack",
+          "dish_name": "vanilla ice cream",
+          "total_mass_g": 100.0,
+          "matched": true,
+          "ingredients_count": 5,
+          "resolved_mass_g": 98.0,
+          "unresolved_mass_g": 2.0,
+          "fallback_reason": null,
+          "top_ingredients": [
+            {
+              "food_id": 113,
+              "mass_g": 60.0,
+              "food_description": "Milk, fluid, whole, pasteurized, homogenized, 3.25"
+            },
+            {
+              "food_id": 138,
+              "mass_g": 20.0,
+              "food_description": "Cream, whipping, 35% M.F."
+            },
+            {
+              "food_id": 4318,
+              "mass_g": 12.0,
+              "food_description": "Sweets, sugars, granulated"
+            }
+          ]
+        }
+      ],
+      "aggregate_warnings": [
+        "no_breakfast_logged"
+      ],
+      "timing_ms": 6431.8,
+      "gates": {
+        "g1_all_meals_decomposed": true,
+        "g2_kcal_in_bounds": true,
+        "g3_food_group_diversity": true,
+        "g4_per_meal_mass_closure": true,
+        "g5_no_hallucinated_food_ids": true,
+        "g6_hefi_route_ok": true,
+        "g7_heni_route_ok": true
+      },
+      "hefi_score": 42.06884443270299,
+      "heni_total_impact": 0.2,
+      "overall_pass": true,
+      "gate_detail": "Adversarial: brunch replaces breakfast + lunch; lighter rest"
+    }
+  ]
+}

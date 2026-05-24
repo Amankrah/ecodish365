@@ -13,6 +13,7 @@ import { AudienceToggle, type UserType, type ExplanationsBlock } from '../../../
 import { ExplanationsPanel } from '../../../components/shared/ExplanationsPanel';
 import { AIEnhancedSearch } from '../../../components/shared/AIEnhancedSearch';
 import { RecipeDecomposerModal } from '../../../components/shared/RecipeDecomposerModal';
+import { useRecall24hReceiver } from '../../../components/shared/useRecall24hReceiver';
 
 interface SelectedFood {
   FoodID: number;
@@ -231,6 +232,13 @@ export default function HEFICalculatePage() {
   // computed under so we can flag stale explanations when the user toggles.
   const [lastCalcUserType, setLastCalcUserType] = useState<UserType | null>(null);
   const [recipeModalOpen, setRecipeModalOpen] = useState(false);
+  // AI-MATCH-2 (2026-05-24): true when the food list was injected from the
+  // /recall-24h wizard. Recasts the pattern-level caveat: HEFI was DESIGNED
+  // for 24-h recall data (Brassard 2022b), so framing the recall as a
+  // "single-food estimate" would actively mislead. The Brassard single-day
+  // caveat (multiple recalls for usual-intake) still applies and surfaces
+  // via the explanations block.
+  const [cameFromRecall, setCameFromRecall] = useState(false);
   const [error, setError] = useState<string>('');
   const [filters, setFilters] = useState<FilterOptions | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -248,6 +256,22 @@ export default function HEFICalculatePage() {
     };
     loadFilters();
   }, []);
+
+  // AI-MATCH-2 (2026-05-24): pick up an aggregated 24-h recall payload
+  // handed off from /recall-24h. Pre-populates the food picker so the user
+  // sees their day's CNF foods ready to score. Fires once per mount.
+  useRecall24hReceiver({
+    target: 'hefi',
+    onIngredients: (ingredients, meta) => {
+      setUserType(meta.user_type);
+      setCameFromRecall(true);
+      setSelectedFoods(ingredients.map(i => ({
+        FoodID: i.food_id,
+        FoodDescription: i.food_description,
+        amount_g: i.mass_g,
+      })));
+    },
+  });
 
   // Debounced search with filters (enhanced -> fallback)
   useEffect(() => {
@@ -372,18 +396,40 @@ export default function HEFICalculatePage() {
               staleResultHint={result !== null && lastCalcUserType !== null && userType !== lastCalcUserType}
             />
           </div>
-          <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <div className="flex">
-              <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600 mr-2 flex-shrink-0" />
-              <div className="text-sm text-yellow-800">
-                <p className="font-semibold">Important: HEFI-2019 is a pattern-level index</p>
-                <ul className="list-disc list-inside mt-1 space-y-1">
-                  <li>Use HEFI with complete meals or 24-hour recalls.</li>
-                  <li>Single-food scores are educational estimates and should be interpreted cautiously.</li>
-                </ul>
+          {cameFromRecall ? (
+            <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
+              <div className="flex">
+                <CheckCircleIcon className="w-5 h-5 text-green-700 mr-2 flex-shrink-0" />
+                <div className="text-sm text-green-900">
+                  <p className="font-semibold">Scoring a 24-h dietary recall — natural fit for HEFI-2019.</p>
+                  <p className="mt-1">
+                    HEFI-2019 was designed against 24-h recall data (Brassard et&nbsp;al. 2022b).
+                    This score reflects one day&rsquo;s eating; for usual-intake claims,
+                    score multiple recall days.
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <div className="flex">
+                <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600 mr-2 flex-shrink-0" />
+                <div className="text-sm text-yellow-800">
+                  <p className="font-semibold">Important: HEFI-2019 is a pattern-level index</p>
+                  <ul className="list-disc list-inside mt-1 space-y-1">
+                    <li>Use HEFI with complete meals or 24-hour recalls.</li>
+                    <li>Single-food scores are educational estimates and should be interpreted cautiously.</li>
+                  </ul>
+                  <p className="mt-2 text-xs">
+                    Building your full day instead?{' '}
+                    <a href="/recall-24h?then=hefi" className="underline font-medium hover:text-yellow-900">
+                      Use the 24-h recall wizard
+                    </a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -474,6 +520,14 @@ export default function HEFICalculatePage() {
                 >
                   🍳 Score a homemade dish (decompose into CNF ingredients)
                 </button>
+                {/* AI-MATCH-2 (2026-05-24): 24-h dietary recall — natural anchor for HEFI
+                    since Brassard 2022b designed HEFI-2019 explicitly for 24-h recall data. */}
+                <a
+                  href="/recall-24h?then=hefi"
+                  className="inline-flex items-center gap-1.5 text-sm text-purple-700 hover:text-purple-900 hover:underline"
+                >
+                  🍽️ Build a 24-h recall instead (six-occasion daily eating)
+                </a>
 
                 {searchResults.length > 0 && (
                   <div className="bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto">

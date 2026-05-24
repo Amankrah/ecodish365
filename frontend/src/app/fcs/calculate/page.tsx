@@ -16,6 +16,7 @@ import { AudienceToggle, type UserType, type ExplanationsBlock } from '@/compone
 import { ExplanationsPanel } from '@/components/shared/ExplanationsPanel';
 import { AIEnhancedSearch } from '@/components/shared/AIEnhancedSearch';
 import { RecipeDecomposerModal } from '@/components/shared/RecipeDecomposerModal';
+import { useRecall24hReceiver } from '@/components/shared/useRecall24hReceiver';
 
 interface FoodItem {
   id: string;
@@ -64,6 +65,22 @@ export default function FCSCalculate() {
     };
     loadFilters();
   }, []);
+
+  // AI-MATCH-2 (2026-05-24): pick up an aggregated 24-h recall payload
+  // handed off from /recall-24h. FCS scores at the food level (no per-food
+  // mass in the request shape), but i.FCS at the diet level uses energy-
+  // weighted mean across daily intake — the food list is the right input.
+  useRecall24hReceiver({
+    target: 'fcs',
+    onIngredients: (ingredients, meta) => {
+      setUserType(meta.user_type);
+      setFoods(ingredients.map((i, idx) => ({
+        id: String(idx + 1),
+        food_id: i.food_id,
+        food_name: i.food_description,
+      })));
+    },
+  });
 
   // Debounced search
   useEffect(() => {
@@ -431,6 +448,16 @@ export default function FCSCalculate() {
               >
                 🍳 Score a homemade dish (decompose into CNF ingredients)
               </button>
+              {/* AI-MATCH-2 (2026-05-24): 24-h dietary recall — i.FCS
+                  (O'Hearn 2022 Nat Comm 13:7066) is the energy-weighted
+                  mean FCS across daily intake, so a full day is the right
+                  unit for diet-level scoring. */}
+              <a
+                href="/recall-24h?then=fcs"
+                className="w-full mt-1 flex items-center justify-center gap-1.5 text-sm text-blue-700 hover:text-blue-900 hover:underline"
+              >
+                🍽️ Build a 24-h recall instead (six-occasion daily eating)
+              </a>
 
               {/* Calculate Button */}
               <button

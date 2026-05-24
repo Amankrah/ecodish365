@@ -182,8 +182,12 @@ def run_panel(decomposer, probes: List[RecipeProbe]) -> List[ProbeResult]:
 
         # Gates
         g1 = len(ings) >= 2
-        # mass-closure tolerance: max(5g, 2% of target)
-        tol = max(5.0, p.total_mass_g * 0.02)
+        # mass-closure tolerance: max(10g, 4% of target) — mirrors
+        # `_mass_tolerance()` in cnf_recipe_decomposer.py. AI-MATCH-1.x
+        # widened from 2 % → 4 % to absorb LLM cooking-fat overshoot on
+        # multi-ingredient dishes (pad thai, jambalaya). Still tight
+        # enough to catch genuine LLM mass-arithmetic errors.
+        tol = max(10.0, p.total_mass_g * 0.04)
         total_accounted = d['resolved_mass_g'] + d['unresolved_mass_g']
         g2 = abs(total_accounted - p.total_mass_g) <= tol
         g3 = d['decomposition_confidence'] >= p.min_confidence

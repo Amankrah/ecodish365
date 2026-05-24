@@ -148,6 +148,15 @@ urlpatterns = [
     path('recipes/decompose/', cnf_ai_search_views.decompose_recipe, name='decompose_recipe'),
 
     # =============================================================================
+    # AI-MATCH-2 (2026-05-24) — 24-hour dietary recall orchestrator
+    # =============================================================================
+    # Free-text occasion-by-occasion daily eating → aggregated CNF ingredient
+    # list, ready to feed any of HEFI / HENI / HSR / FCS / Environmental.
+    # Composes /recipes/decompose/ per meal; same rate-limit + circuit-breaker
+    # machinery, cost = 5¢ per meal capped at 30¢.
+    path('recipes/recall-24h/', cnf_ai_search_views.recall_24h, name='recall_24h'),
+
+    # =============================================================================
     # User Management & Social Features
     # =============================================================================
     path('users/', include('users.urls')),
