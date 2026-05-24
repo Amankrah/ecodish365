@@ -1,12 +1,16 @@
 {
   "model": "text-embedding-3-small",
   "embedding_dim": 1536,
-  "food_count": 5691,
-  "build_date_utc": "2026-05-24T01:15:02.625627+00:00",
+  "food_count": 6719,
+  "cnf_food_count": 5691,
+  "wafct_food_count": 1028,
+  "build_date_utc": "2026-05-24T14:56:32.938016+00:00",
   "source_file": "C:\\Users\\Windows\\Desktop\\Dev_Projects\\ecodish365\\backend\\raw_cnf\\FOOD_NAME.csv",
   "source_file_sha256": "2b9699e92720a4df5f8c3bef19880bcd49321030e2ed27ae971332ea3cbcb88a",
+  "wafct_source_file": "C:\\Users\\Windows\\Desktop\\Dev_Projects\\ecodish365\\backend\\raw_wafct\\WAFCT_2019.xlsx",
+  "wafct_source_sha256": "cdd6861427a1e1734e725d964be6fc690dcdf80257ac6b5309321ec533575695",
   "embed_text_template": "\"<desc_en> | <desc_fr> | group: <food_group>\" (parts dropped if empty / equal)",
   "l2_normalised": true,
   "batch_size": 256,
-  "embedding_runtime_s": 27.2
+  "embedding_runtime_s": 35.5
 }

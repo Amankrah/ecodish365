@@ -79,7 +79,12 @@ def _build_embed_text(desc_en: str, desc_fr: Optional[str], food_group: str) -> 
 
 
 def _load_cnf_corpus() -> List[dict]:
-    """Load CNF FOOD_NAME + FOOD_GROUP, return list of dicts ready to embed."""
+    """Load CNF FOOD_NAME + FOOD_GROUP, return list of dicts ready to embed.
+
+    WAFCT-EXTEND (2026-05-24): this is the CNF half of the corpus build.
+    The WAFCT half is added in `_load_wafct_corpus_via_pipeline()` and the
+    two are concatenated in `build()`.
+    """
     # Lazy Django bootstrap so this module can also be imported by Django
     # views without re-running ``django.setup()``.
     import dish_project.env_bootstrap  # noqa: F401
@@ -110,9 +115,49 @@ def _load_cnf_corpus() -> List[dict]:
             'desc_en': str(r['FoodDescription']),
             'desc_fr': str(r[fr_col]) if fr_col and pd.notna(r[fr_col]) else None,
             'food_group': str(r.get(fg_col, '')) if pd.notna(r.get(fg_col, '')) else '',
+            'source':  'cnf',
         })
     logger.info('Loaded %d CNF foods (raw_cnf/FOOD_NAME.csv joined to FOOD_GROUP)',
                 len(rows))
+    return rows
+
+
+def _load_wafct_corpus_via_pipeline() -> List[dict]:
+    """WAFCT-EXTEND (2026-05-24): load WAFCT food rows via the cached
+    pipeline (which already runs `ingest_wafct` on init). Returns empty if
+    WAFCT workbook isn't present.
+
+    Reading via the pipeline (rather than re-reading the .xlsx here)
+    ensures the embedded FoodIDs are consistent with what the matcher's
+    runtime nutrient lookups will use.
+    """
+    import pandas as pd  # noqa: F401
+    from api.cnf_cache import get_api_cnf_pipeline
+    pipeline = get_api_cnf_pipeline()
+    if 'source' not in pipeline.food_name_df.columns:
+        logger.info('WAFCT-EXTEND: pipeline lacks source column; CNF-only corpus.')
+        return []
+    wafct_df = pipeline.food_name_df[pipeline.food_name_df['source'] == 'wafct']
+    if wafct_df.empty:
+        logger.info('WAFCT-EXTEND: pipeline has no WAFCT rows; CNF-only corpus.')
+        return []
+    fg = pipeline.food_group_df
+    fg_col = 'FoodGroupName' if 'FoodGroupName' in fg.columns else 'FoodGroup'
+    merged = wafct_df.merge(fg[['FoodGroupID', fg_col]], on='FoodGroupID', how='left')
+    fr_col = 'FoodDescriptionF' if 'FoodDescriptionF' in merged.columns else None
+    rows: List[dict] = []
+    import pandas as pd
+    for _, r in merged.iterrows():
+        rows.append({
+            'food_id':   int(r['FoodID']),
+            'desc_en':   str(r['FoodDescription']),
+            'desc_fr':   str(r[fr_col]) if fr_col and pd.notna(r[fr_col]) else None,
+            'food_group': str(r.get(fg_col, '')) if pd.notna(r.get(fg_col, '')) else '',
+            'source':    'wafct',
+        })
+    logger.info('Loaded %d WAFCT foods (via cached pipeline; FoodID range %d-%d)',
+                len(rows),
+                min(r['food_id'] for r in rows), max(r['food_id'] for r in rows))
     return rows
 
 
@@ -128,25 +173,39 @@ def _l2_normalise(v: np.ndarray) -> np.ndarray:
 
 
 def build(force: bool = False) -> None:
-    rows = _load_cnf_corpus()
+    # WAFCT-EXTEND (2026-05-24): concat CNF rows + WAFCT rows; one corpus
+    # serves both food sources. The matcher remains source-agnostic at
+    # embedding-lookup time; per-source filtering happens at query time via
+    # the new `source` parameter (`CNFMatcher.match(query, source=...)`).
+    cnf_rows = _load_cnf_corpus()
+    wafct_rows = _load_wafct_corpus_via_pipeline()
+    rows = cnf_rows + wafct_rows
     food_ids = np.array([r['food_id'] for r in rows], dtype=np.int32)
     texts = [_build_embed_text(r['desc_en'], r['desc_fr'], r['food_group'])
              for r in rows]
+    sources = np.array([r['source'] for r in rows], dtype=object)
+    logger.info('Combined corpus: %d CNF + %d WAFCT = %d foods total',
+                len(cnf_rows), len(wafct_rows), len(rows))
 
-    # Compute the source-file hash for the provenance record (matcher will
-    # check this on init).
+    # Compute the source-file hashes for the provenance record (matcher
+    # will check both on init when WAFCT is present).
     from django.conf import settings
     food_name_csv = Path(settings.CNF_FOLDER) / 'FOOD_NAME.csv'
     source_sha256 = _sha256_of_file(food_name_csv)
+    wafct_path = Path(settings.BASE_DIR) / 'raw_wafct' / 'WAFCT_2019.xlsx'
+    wafct_sha256 = _sha256_of_file(wafct_path) if wafct_path.exists() else None
 
-    # Skip if cache is fresh
+    # Skip if cache is fresh — must match BOTH CNF sha256 + WAFCT sha256 +
+    # combined food_count. If any drifts (CSV refresh, WAFCT replaced, or
+    # WAFCT added to a previously CNF-only build), rebuild.
     if not force and CORPUS_EMBEDDINGS_PATH.exists() and CORPUS_PROVENANCE_PATH.exists():
         with open(CORPUS_PROVENANCE_PATH, encoding='utf-8') as f:
             prov = json.load(f)
-        if prov.get('source_file_sha256') == source_sha256 \
-                and prov.get('food_count') == len(rows):
-            logger.info('Cached corpus is fresh (sha256 + food_count match); skipping. '
-                        'Use --force to rebuild.')
+        if (prov.get('source_file_sha256') == source_sha256
+                and prov.get('wafct_source_sha256') == wafct_sha256
+                and prov.get('food_count') == len(rows)):
+            logger.info('Cached corpus is fresh (CNF+WAFCT sha256 + food_count match); '
+                        'skipping. Use --force to rebuild.')
             return
         logger.info('Cache stale (sha256 / food_count mismatch); rebuilding.')
 
@@ -176,20 +235,27 @@ def build(force: bool = False) -> None:
     elapsed = time.time() - t0
     logger.info('Embedding complete in %.1fs (shape: %s)', elapsed, embeddings.shape)
 
-    # Persist
+    # Persist. WAFCT-EXTEND: bake the per-row `sources` array into the npz
+    # so the matcher can filter candidates by source without re-reading the
+    # pipeline at query time.
     np.savez_compressed(
         CORPUS_EMBEDDINGS_PATH,
         food_ids=food_ids,
         embeddings=embeddings,
         text_used=np.array(texts, dtype=object),
+        sources=sources,
     )
     provenance = {
         'model':                EMBEDDING_MODEL,
         'embedding_dim':        int(embeddings.shape[1]),
         'food_count':           len(rows),
+        'cnf_food_count':       len(cnf_rows),
+        'wafct_food_count':     len(wafct_rows),
         'build_date_utc':       datetime.now(timezone.utc).isoformat(),
         'source_file':          str(food_name_csv),
         'source_file_sha256':   source_sha256,
+        'wafct_source_file':    str(wafct_path) if wafct_sha256 else None,
+        'wafct_source_sha256':  wafct_sha256,
         'embed_text_template':  '"<desc_en> | <desc_fr> | group: <food_group>" '
                                 '(parts dropped if empty / equal)',
         'l2_normalised':        True,

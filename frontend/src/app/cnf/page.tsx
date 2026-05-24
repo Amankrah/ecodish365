@@ -51,18 +51,18 @@ const quickActions = [
 const features = [
   {
     title: 'Advanced Search',
-    description: 'Intelligent search with relevance scoring, pagination, and comprehensive filtering options.',
-    items: ['Text-based search', 'Nutrient filtering', 'Food group filtering', 'Relevance scoring']
+    description: 'Intelligent search with relevance scoring, pagination, and comprehensive filtering options. Includes a source filter to scope to CNF only, WAFCT only, or both.',
+    items: ['Text-based search', 'Source filter (CNF / WAFCT / both)', 'AI-enhanced LLM ranking', 'Nutrient + food-group filtering']
   },
   {
     title: 'Food Comparison',
-    description: 'Compare nutritional profiles of multiple foods side-by-side with detailed analysis.',
-    items: ['Multi-food comparison', 'Nutrient analysis', 'Visual charts', 'Export results']
+    description: 'Compare nutritional profiles of multiple foods side-by-side. Cross-database comparisons (CNF vs WAFCT) surface per-source provenance badges.',
+    items: ['Multi-food comparison', 'Cross-database (CNF + WAFCT)', 'Per-source provenance badges', 'Visual charts']
   },
   {
     title: 'Database Insights',
-    description: 'Comprehensive analytics and statistics about the Canadian Nutrient File database.',
-    items: ['Database statistics', 'Data quality metrics', 'Trend analysis', 'Coverage reports']
+    description: 'Statistics across both food-composition databases — Health Canada CNF (5,691 foods) and FAO/INFOODS WAFCT 2019 (1,028 foods). 14 WAFCT food groups added at FoodGroupID 50-63.',
+    items: ['Combined database stats', 'INFOODS↔CNF nutrient bridge (48 mappings)', 'WAFCT mineral-bias caveats in scoring', '195 canonical WAFCT recipes (sheet 09)']
   },
 ];
 
@@ -93,12 +93,26 @@ export default function CNFDashboard() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            Canadian Nutrient File Explorer
+            Food Composition Database Explorer
           </h1>
           <p className="text-lg text-gray-600 max-w-3xl">
-            Explore comprehensive nutritional data from the Canadian Nutrient File database. 
-            Search, compare, and analyze over 5,000 foods with detailed nutrient information.
+            Explore <strong>two food-composition databases side by side</strong>: Health
+            Canada&rsquo;s Canadian Nutrient File (CNF — 5,691 foods, 150+ nutrients) and
+            FAO/INFOODS&rsquo; West African Food Composition Table 2019 (WAFCT — 1,028
+            foods including fonio, baobab, dawadawa, gari, egusi, and other West African
+            staples). Search, compare, and analyze across either or both sources.
           </p>
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+            <span className="inline-flex items-center px-2 py-1 rounded border bg-gray-100 text-gray-700 border-gray-200 font-semibold">
+              CNF — Health Canada
+            </span>
+            <span className="inline-flex items-center px-2 py-1 rounded border bg-amber-100 text-amber-800 border-amber-200 font-semibold">
+              WAFCT — FAO/INFOODS
+            </span>
+            <span className="text-gray-500">
+              Source filter on every search lets you scope to one database or combine both.
+            </span>
+          </div>
         </div>
 
         {/* Quick Stats */}
@@ -114,6 +128,7 @@ export default function CNFDashboard() {
                     {formatNumber(stats.food_count)}
                   </div>
                   <div className="text-sm text-gray-600">Foods</div>
+                  <div className="text-xs text-gray-500">CNF + WAFCT combined</div>
                 </div>
               </div>
             </div>

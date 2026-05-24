@@ -1,17 +1,19 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Canadian Nutrient File (CNF) Database Explorer",
-  description: "Explore Canada's comprehensive nutrition database with 5000+ foods and 150+ nutrients. Search, compare, and analyze nutritional content with advanced filtering and statistical tools for research and professional use.",
+  title: "Food Composition Database Explorer — CNF + WAFCT",
+  description: "Explore two food-composition databases side by side: Health Canada's CNF (5,691 foods, 150+ nutrients) and FAO/INFOODS' WAFCT 2019 (1,028 West African foods including fonio, baobab, dawadawa). Search, compare, and analyze nutritional content with advanced filtering and per-source provenance.",
   keywords: [
-    "Canadian Nutrient File", "CNF database", "Canada nutrition database", 
-    "food nutrients Canada", "nutritional analysis Canada", "Health Canada food data",
+    "Canadian Nutrient File", "CNF database", "Canada nutrition database",
+    "WAFCT", "West African Food Composition Table", "FAO INFOODS",
+    "fonio nutrition", "baobab nutrition", "African food database",
+    "food nutrients Canada", "nutritional analysis", "Health Canada food data",
     "food composition database", "nutrient search tool", "nutrition research database",
-    "food comparison tool", "dietary analysis", "nutrition facts Canada"
+    "food comparison tool", "dietary analysis", "cross-database nutrition"
   ],
   openGraph: {
-    title: "Canadian Nutrient File Database Explorer - EcoDish365",
-    description: "Access Canada's official nutrition database with 5000+ foods. Advanced search, comparison, and analysis tools for nutrition professionals and researchers.",
+    title: "Food Composition Database Explorer (CNF + WAFCT) — EcoDish365",
+    description: "Access two nutrition databases side by side: Canada's CNF (5,691 foods) and FAO/INFOODS WAFCT 2019 (1,028 West African foods). Advanced search, comparison, and analysis tools.",
     type: "website",
     url: "https://ecodish365.com/cnf",
     images: [
@@ -19,14 +21,14 @@ export const metadata: Metadata = {
         url: "/og-cnf.png",
         width: 1200,
         height: 630,
-        alt: "Canadian Nutrient File Database Explorer",
+        alt: "Food Composition Database Explorer — CNF + WAFCT",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Canadian Nutrient File Database Explorer",
-    description: "Access Canada's comprehensive nutrition database with advanced search and analysis tools for professionals.",
+    title: "Food Composition Database Explorer (CNF + WAFCT)",
+    description: "Health Canada's CNF (5,691 foods) plus FAO/INFOODS WAFCT 2019 (1,028 West African foods) — one search, one comparison surface.",
     images: ["/twitter-cnf.png"],
   },
   alternates: {
@@ -42,27 +44,38 @@ export default function CNFLayout({
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Dataset",
-    "name": "Canadian Nutrient File Database Explorer",
-    "description": "Interactive explorer for Canada's comprehensive nutrition database containing detailed nutritional information for over 5000 foods",
+    "name": "Food Composition Database Explorer (CNF + WAFCT)",
+    "description": "Interactive explorer combining Health Canada's Canadian Nutrient File (5,691 foods) and FAO/INFOODS' West African Food Composition Table 2019 (1,028 foods) into a single search + comparison surface.",
     "url": "https://ecodish365.com/cnf",
     "creator": {
       "@type": "Organization",
       "name": "EcoDish365",
       "url": "https://ecodish365.com"
     },
-    "publisher": {
-      "@type": "Organization",
-      "name": "Health Canada",
-      "url": "https://www.canada.ca/en/health-canada.html"
-    },
-    "includedInDataCatalog": {
-      "@type": "DataCatalog",
-      "name": "Canadian Nutrient File",
-      "publisher": {
+    "publisher": [
+      {
         "@type": "Organization",
-        "name": "Health Canada"
+        "name": "Health Canada",
+        "url": "https://www.canada.ca/en/health-canada.html"
+      },
+      {
+        "@type": "Organization",
+        "name": "FAO / Bioversity / CIRAD (WAFCT 2019)",
+        "url": "https://www.fao.org/infoods/infoods/tables-and-databases/faoinfoods-databases/en/"
       }
-    },
+    ],
+    "includedInDataCatalog": [
+      {
+        "@type": "DataCatalog",
+        "name": "Canadian Nutrient File",
+        "publisher": { "@type": "Organization", "name": "Health Canada" }
+      },
+      {
+        "@type": "DataCatalog",
+        "name": "FAO/INFOODS West African Food Composition Table 2019",
+        "publisher": { "@type": "Organization", "name": "FAO" }
+      }
+    ],
     "mainEntity": {
       "@type": "SoftwareApplication",
       "name": "CNF Database Explorer",

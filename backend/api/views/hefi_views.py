@@ -151,13 +151,28 @@ def _format_hefi_response(result, food_ids=None, food_name=None, integrator=None
             'sodium_mg': result.inputs.sodium_mg,
         },
         'hefi_interpretation': _interpret_hefi(result.total_score),  # DEPRECATED — kept for backward-compat
-        'explanations': get_hefi_explanations(
-            total_score=float(result.total_score), user_type=user_type,
-        ),
+        'explanations': {
+            **get_hefi_explanations(
+                total_score=float(result.total_score), user_type=user_type,
+            ),
+            # WAFCT-EXTEND (2026-05-24): per-source caveat block, only
+            # populated when the meal contains ≥ 1 WAFCT food.
+            **_wafct_caveat_for(food_ids, user_type),
+        },
         'user_type': user_type,
     }
 
     return data
+
+
+def _wafct_caveat_for(food_ids, user_type):
+    """Lazy import + safe call to build the WAFCT caveat block. Returns {}
+    when no WAFCT foods are present."""
+    try:
+        from api.views.wafct_caveat import build_wafct_caveat
+        return build_wafct_caveat(food_ids, indicator='hefi', user_type=user_type)
+    except Exception:  # noqa: BLE001
+        return {}
 
 @api_view(['POST'])
 @permission_classes([AllowAny])

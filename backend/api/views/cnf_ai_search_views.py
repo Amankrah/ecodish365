@@ -175,6 +175,13 @@ def cnf_ai_enhanced_search(request):
     if user_type not in ('individual', 'researcher', 'policy'):
         user_type = 'individual'
 
+    # WAFCT-EXTEND (2026-05-24): optional source filter restricts the
+    # candidate pool to one food database (cnf / wafct / both).
+    source = str(request.data.get('source', 'both')).lower()
+    if source not in ('cnf', 'wafct', 'both'):
+        source = 'both'
+    source_filter = source if source in ('cnf', 'wafct') else None
+
     # Rate limit + circuit breaker
     rate_err = _enforce_rate_limit(request, kind='search')
     if rate_err is not None:
@@ -184,7 +191,7 @@ def cnf_ai_enhanced_search(request):
     try:
         from api.services.cnf_matcher import get_default_matcher
         matcher = get_default_matcher()
-        result = matcher.match(query, top_k=top_k)
+        result = matcher.match(query, top_k=top_k, source=source_filter)
     except FileNotFoundError as exc:
         logger.error('CNF AI search: corpus not built — %s', exc)
         return Response({

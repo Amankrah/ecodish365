@@ -13,6 +13,7 @@ import { AudienceToggle, type UserType, type ExplanationsBlock } from '../../../
 import { ExplanationsPanel } from '../../../components/shared/ExplanationsPanel';
 import { AIEnhancedSearch } from '../../../components/shared/AIEnhancedSearch';
 import { RecipeDecomposerModal } from '../../../components/shared/RecipeDecomposerModal';
+import { SourceFilter, type SourceChoice } from '../../../components/shared/SourceFilter';
 import { useRecall24hReceiver } from '../../../components/shared/useRecall24hReceiver';
 
 interface SelectedFood {
@@ -239,6 +240,8 @@ export default function HEFICalculatePage() {
   // caveat (multiple recalls for usual-intake) still applies and surfaces
   // via the explanations block.
   const [cameFromRecall, setCameFromRecall] = useState(false);
+  // WAFCT-EXTEND (2026-05-24): per-search food-database scope.
+  const [sourceFilter, setSourceFilter] = useState<SourceChoice>('both');
   const [error, setError] = useState<string>('');
   const [filters, setFilters] = useState<FilterOptions | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -295,10 +298,11 @@ export default function HEFICalculatePage() {
             limit: 50,
             category: selectedCategory || undefined,
             method: selectedMethod || undefined,
+            source: sourceFilter,
           });
           setSearchResults(enhanced.results || []);
         } catch {
-          const basic = await CNFApiService.searchFoods(searchQuery, 50);
+          const basic = await CNFApiService.searchFoods(searchQuery, 50, 0, sourceFilter);
           setSearchResults(basic.results || []);
         }
       } catch (err) {
@@ -310,7 +314,7 @@ export default function HEFICalculatePage() {
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [searchQuery, selectedCategory, selectedMethod]);
+  }, [searchQuery, selectedCategory, selectedMethod, sourceFilter]);
 
   const addFood = (food: SearchResult) => {
     const newFood: SelectedFood = {
@@ -488,6 +492,8 @@ export default function HEFICalculatePage() {
 
               {/* Food Search */}
               <div className="space-y-3">
+                {/* WAFCT-EXTEND (2026-05-24): scope the food database */}
+                <SourceFilter source={sourceFilter} onChange={setSourceFilter} accent="purple" />
                 <div className="relative">
                   <input
                     type="text"
@@ -495,7 +501,7 @@ export default function HEFICalculatePage() {
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
                     }}
-                    placeholder="Search for foods (e.g., salmon, bread, apple)..."
+                    placeholder="Search for foods (e.g., salmon, bread, apple, fonio, baobab)..."
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                   />
                 </div>
@@ -507,6 +513,7 @@ export default function HEFICalculatePage() {
                   query={searchQuery}
                   userType={userType}
                   accent="purple"
+                  source={sourceFilter}
                   onSelect={(food) => addFood({
                     FoodID: food.food_id,
                     FoodDescription: food.food_description,

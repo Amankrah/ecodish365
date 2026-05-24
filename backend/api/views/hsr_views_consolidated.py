@@ -196,6 +196,14 @@ def calculate_hsr(request):
     result["explanations"] = get_hsr_explanations(
         star_rating=star_rating, category=category_str, user_type=user_type,
     )
+    # WAFCT-EXTEND (2026-05-24): per-source caveat (sodium method delta).
+    try:
+        from api.views.wafct_caveat import build_wafct_caveat
+        result["explanations"].update(build_wafct_caveat(
+            food_ids, indicator='hsr', user_type=user_type,
+        ))
+    except Exception:  # noqa: BLE001
+        pass
     result["user_type"] = user_type
     result["meal_categorization"] = _get_basic_meal_categorization_summary(meal)
 

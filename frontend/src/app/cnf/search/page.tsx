@@ -19,6 +19,9 @@ import { debounce } from 'lodash';
 // AI-MATCH-1 (2026-05-23): opt-in LLM ranking layer alongside the basic
 // fuzzy search. CNF Explorer is the first surface; others follow in Phase 6.
 import { AIEnhancedSearch } from '@/components/shared/AIEnhancedSearch';
+// WAFCT-EXTEND (2026-05-24): explorer surfaces both CNF + WAFCT now.
+import { SourceFilter, type SourceChoice } from '@/components/shared/SourceFilter';
+import { SourceBadge } from '@/components/shared/SourceBadge';
 
 interface SearchFilters {
   foodGroup: string;
@@ -47,6 +50,9 @@ export default function CNFSearchPage() {
   const [loading, setLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [offset, setOffset] = useState(0);
+  // WAFCT-EXTEND (2026-05-24): food-database scope. Default 'both' so users
+  // see CNF + WAFCT together unless they actively narrow.
+  const [source, setSource] = useState<SourceChoice>('both');
 
   // Load food groups and filter options on mount
   useEffect(() => {
@@ -66,11 +72,14 @@ export default function CNFSearchPage() {
     []
   );
 
-  // Trigger search when query or filters change
+  // Trigger search when query, filters, or source scope change
   useEffect(() => {
     setOffset(0);
     debouncedSearch(query, filters, 0);
-  }, [query, filters, debouncedSearch]);
+    // `source` is read inside `performSearch` via the closure-captured
+    // state — include it in deps so toggling the SourceFilter retriggers.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, filters, source, debouncedSearch]);
 
   const loadFoodGroups = async () => {
     try {
@@ -101,20 +110,21 @@ export default function CNFSearchPage() {
         const options: EnhancedSearchOptions = {
           query: searchQuery,
           limit: searchFilters.limit,
-          offset: searchOffset
+          offset: searchOffset,
+          source,  // WAFCT-EXTEND (2026-05-24)
         };
-        
+
         if (searchFilters.category) {
           options.category = searchFilters.category;
         }
-        
+
         if (searchFilters.method) {
           options.method = searchFilters.method;
         }
-        
+
         searchResults = await CNFApiService.searchFoodsEnhanced(options);
       } else {
-        searchResults = await CNFApiService.searchFoods(searchQuery, searchFilters.limit, searchOffset);
+        searchResults = await CNFApiService.searchFoods(searchQuery, searchFilters.limit, searchOffset, source);
       }
       
       // Apply client-side filtering for food groups and relevance
@@ -194,17 +204,29 @@ export default function CNFSearchPage() {
             Advanced Food Search
           </h1>
           <p className="text-gray-600 mb-2">
-            Search through the Canadian Nutrient File database with advanced filtering options
+            Search across <strong>two food-composition databases</strong>: Canada&rsquo;s CNF
+            (5,691 foods, Health Canada) and FAO&rsquo;s WAFCT 2019 (1,028 West African foods).
+            Use the source filter below to scope a search to one database, or leave on
+            &ldquo;Both&rdquo; to see the combined catalog.
           </p>
           <div className="text-sm text-gray-500">
-            <strong>Search Tips:</strong> Use filters like <code className="bg-gray-100 px-1 rounded">category:cheese</code>, 
-            <code className="bg-gray-100 px-1 rounded">method:cooked</code>, or 
-            <code className="bg-gray-100 px-1 rounded">type:chicken</code> in your search
+            <strong>Search Tips:</strong> Use filters like <code className="bg-gray-100 px-1 rounded">category:cheese</code>,{' '}
+            <code className="bg-gray-100 px-1 rounded">method:cooked</code>, or{' '}
+            <code className="bg-gray-100 px-1 rounded">type:chicken</code> in your search.
+            Try West African staples: <code className="bg-gray-100 px-1 rounded">fonio</code>,{' '}
+            <code className="bg-gray-100 px-1 rounded">baobab leaves</code>,{' '}
+            <code className="bg-gray-100 px-1 rounded">dawadawa</code>.
           </div>
         </div>
 
         {/* Search Interface */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+          {/* WAFCT-EXTEND (2026-05-24): scope picker — applies to BOTH the
+              basic text search and the AI-enhanced ranker below. */}
+          <div className="mb-3">
+            <SourceFilter source={source} onChange={setSource} accent="blue" />
+          </div>
+
           {/* Search Bar */}
           <div className="relative mb-4">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -212,7 +234,7 @@ export default function CNFSearchPage() {
             </div>
             <input
               type="text"
-              placeholder="Search for foods (try: 'chicken breast', 'category:cheese', 'method:raw fish', 'type:soup tomato')..."
+              placeholder="Search for foods (e.g. 'chicken breast', 'fonio', 'baobab', 'category:cheese', 'method:raw')..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
@@ -232,12 +254,14 @@ export default function CNFSearchPage() {
           {/* AI-MATCH-1 (2026-05-23): opt-in AI ranker. Stays out of the way
               until the user clicks "Find with AI". Selecting a result loads
               the food details via the existing flow so downstream UX is
-              unchanged. */}
+              unchanged. WAFCT-EXTEND wires `source` through so the LLM only
+              ranks in-scope candidates. */}
           <div className="mb-4">
             <AIEnhancedSearch
               query={query}
               userType="individual"
               accent="blue"
+              source={source}
               onSelect={(food) => {
                 setQuery(food.food_description);
                 loadFoodDetails(food.food_id);
@@ -474,9 +498,16 @@ export default function CNFSearchPage() {
                           aria-label={`Select ${food.FoodDescription}`}
                         />
                         <div className="flex-1">
-                          <h3 className="text-sm font-medium text-gray-900 mb-1">
-                            {food.FoodDescription}
-                          </h3>
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <h3 className="text-sm font-medium text-gray-900">
+                              {food.FoodDescription}
+                            </h3>
+                            {/* WAFCT-EXTEND (2026-05-24): provenance badge.
+                                Derives source from FoodID (≥700,000 = WAFCT)
+                                so it works for the basic search response
+                                which doesn't carry a `source` field per row. */}
+                            <SourceBadge foodId={food.FoodID} userType="researcher" />
+                          </div>
                           <div className="flex items-center space-x-4 text-xs text-gray-500">
                             <span>Code: {food.FoodCode}</span>
                             <span>Group: {food.FoodGroupID}</span>

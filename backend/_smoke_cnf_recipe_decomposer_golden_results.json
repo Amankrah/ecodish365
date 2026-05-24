@@ -38,7 +38,7 @@
       "overlap": 1.0,
       "observed_count": 3,
       "expected_count": 2,
-      "observed_resolved_mass_g": 147.5,
+      "observed_resolved_mass_g": 150.0,
       "expected_resolved_mass_g": 140.0,
       "observed_food_ids": [
         118,
@@ -65,7 +65,7 @@
       "overlap": 1.0,
       "observed_count": 3,
       "expected_count": 3,
-      "observed_resolved_mass_g": 117.0,
+      "observed_resolved_mass_g": 118.0,
       "expected_resolved_mass_g": 110.0,
       "observed_food_ids": [
         118,

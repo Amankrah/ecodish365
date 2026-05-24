@@ -193,6 +193,8 @@ export interface EnhancedSearchOptions {
   method?: string;
   limit?: number;
   offset?: number;
+  /** WAFCT-EXTEND (2026-05-24): filter results to one food database. */
+  source?: 'cnf' | 'wafct' | 'both';
 }
 
 // Filter Options
@@ -333,12 +335,28 @@ export interface CNFAIMatchResult {
   corpus_version: string | null;            // build_date_utc from corpus provenance
 }
 
+// WAFCT-EXTEND (2026-05-24): food-database provenance. Search-result rows +
+// match results can now come from either CNF (Health Canada Canadian
+// Nutrient File) or WAFCT (FAO/INFOODS West African Food Composition Table
+// 2019). FoodIDs ≥ 700,000 indicate WAFCT-sourced foods; FoodIDs < 700,000
+// are CNF. Backend `food_source(food_id)` is the authoritative resolver.
+// (Distinct from the existing `FoodSource` interface near line 121 which
+// describes a CNF FOOD_SOURCE.csv row — this is provenance, not the row.)
+export type FoodSourceTag = 'cnf' | 'wafct';
+export type SourceFilter  = 'cnf' | 'wafct' | 'both';
+
 // API Service Class
 export class CNFApiService {
-  // Enhanced Search & Exploration
-  static async searchFoods(query: string, limit = 50, offset = 0): Promise<SearchResult> {
+  // Enhanced Search & Exploration. WAFCT-EXTEND (2026-05-24): optional
+  // `source` narrows to one food database (cnf / wafct / both). Default both.
+  static async searchFoods(
+    query: string,
+    limit = 50,
+    offset = 0,
+    source: SourceFilter = 'both',
+  ): Promise<SearchResult> {
     const response = await api.get(`/cnf/search/`, {
-      params: { q: query, limit, offset }
+      params: { q: query, limit, offset, source }
     });
     return response.data.data;
   }
@@ -347,14 +365,21 @@ export class CNFApiService {
   // ranking. Opt-in, additive to the fuzzy `searchFoods` above. Server may
   // return 429 (per-IP rate limit) or 503 (monthly circuit breaker) — surface
   // both with a clean error.
+  // WAFCT-EXTEND (2026-05-24): optional `source` filters candidates to one
+  // food database before LLM ranking.
   static async searchFoodsAI(
     query: string,
-    options: { topK?: number; userType?: 'individual' | 'researcher' | 'policy' } = {},
+    options: {
+      topK?: number;
+      userType?: 'individual' | 'researcher' | 'policy';
+      source?: SourceFilter;
+    } = {},
   ): Promise<CNFAIMatchResult> {
     const response = await api.post('/cnf/search/ai-enhanced/', {
       query,
       top_k: options.topK,
       user_type: options.userType || 'individual',
+      source: options.source || 'both',
     });
     return response.data.result as CNFAIMatchResult;
   }
@@ -470,7 +495,10 @@ export class CNFApiService {
     if (options.method) {
       params.method = options.method;
     }
-    
+    if (options.source && options.source !== 'both') {
+      params.source = options.source;
+    }
+
     const response = await api.get(`/search-food/`, {
       params
     });

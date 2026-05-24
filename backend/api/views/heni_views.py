@@ -96,6 +96,16 @@ def heni_calculate(request):
         comprehensive_result['explanations'] = get_heni_explanations(
             health_impact_minutes=health_min, user_type=user_type,
         )
+        # WAFCT-EXTEND (2026-05-24): per-source caveat — empty dict if no
+        # WAFCT foods in the meal, so this merge is a no-op for CNF-only.
+        try:
+            from api.views.wafct_caveat import build_wafct_caveat
+            comprehensive_result['explanations'].update(build_wafct_caveat(
+                [item.get('food_id') for item in meal_data if item.get('food_id')],
+                indicator='heni', user_type=user_type,
+            ))
+        except Exception:  # noqa: BLE001
+            pass
         comprehensive_result['user_type'] = user_type
 
         result = {

@@ -178,19 +178,34 @@ def manage_cnf_food(request, food_id):
 @permission_classes([AllowAny])
 @handle_exceptions
 def search_cnf_foods(request):
-    """Advanced food search with pagination and relevance scoring."""
+    """Advanced food search with pagination and relevance scoring.
+
+    WAFCT-EXTEND (2026-05-24): optional `source` query param filters the
+    response to one food database:
+      ?source=cnf   — Health Canada CNF only
+      ?source=wafct — FAO/INFOODS WAFCT 2019 only
+      ?source=both  — both (default)
+    """
     query = request.GET.get('q', '').strip()
     limit = min(int(request.GET.get('limit', 50)), 100)  # Max 100 results
     offset = int(request.GET.get('offset', 0))
-    
+    source = request.GET.get('source', 'both').lower()
+    if source not in ('cnf', 'wafct', 'both'):
+        source = 'both'
+
     if not query:
         return Response({
             "error": "Missing search query",
             "details": "Please provide a search query using the 'q' parameter"
         }, status=status.HTTP_400_BAD_REQUEST)
-    
-    results = get_cnf_pipeline().search_foods(query, limit, offset)
-    
+
+    results = get_cnf_pipeline().search_foods(
+        query,
+        limit,
+        offset,
+        source if source in ('cnf', 'wafct') else 'both',
+    )
+
     return Response({
         "success": True,
         "data": results

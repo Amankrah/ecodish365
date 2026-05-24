@@ -16,6 +16,7 @@ import { AudienceToggle, type UserType, type ExplanationsBlock } from '@/compone
 import { ExplanationsPanel } from '@/components/shared/ExplanationsPanel';
 import { AIEnhancedSearch } from '@/components/shared/AIEnhancedSearch';
 import { RecipeDecomposerModal } from '@/components/shared/RecipeDecomposerModal';
+import { SourceFilter, type SourceChoice } from '@/components/shared/SourceFilter';
 import { useRecall24hReceiver } from '@/components/shared/useRecall24hReceiver';
 
 interface FoodItem {
@@ -52,6 +53,8 @@ export default function FCSCalculate() {
   const [filters, setFilters] = useState<FilterOptions | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedMethod, setSelectedMethod] = useState<string>('');
+  // WAFCT-EXTEND (2026-05-24): food-database scope.
+  const [sourceFilter, setSourceFilter] = useState<SourceChoice>('both');
 
   // Load filters on component mount
   useEffect(() => {
@@ -99,12 +102,13 @@ export default function FCSCalculate() {
             query: search.query,
             limit: 50,
             category: selectedCategory || undefined,
-            method: selectedMethod || undefined
+            method: selectedMethod || undefined,
+            source: sourceFilter,
           });
         } catch (enhancedError) {
           console.log('Enhanced search failed, falling back to regular search:', enhancedError);
           try {
-            searchResult = await CNFApiService.searchFoods(search.query, 50);
+            searchResult = await CNFApiService.searchFoods(search.query, 50, 0, sourceFilter);
           } catch (regularError) {
             console.error('Both search methods failed:', { enhancedError, regularError });
             throw regularError;
@@ -123,7 +127,7 @@ export default function FCSCalculate() {
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [search.query, selectedCategory, selectedMethod]);
+  }, [search.query, selectedCategory, selectedMethod, sourceFilter]);
 
   const addFood = () => {
     const newId = (foods.length + 1).toString();
@@ -383,11 +387,14 @@ export default function FCSCalculate() {
 
                       {/* AI-MATCH-1: opt-in LLM ranker for THIS slot */}
                       {activeSearch === food.id && search.query.trim() && (
-                        <div className="mt-2">
+                        <div className="mt-2 space-y-2">
+                          {/* WAFCT-EXTEND (2026-05-24): food-database scope */}
+                          <SourceFilter source={sourceFilter} onChange={setSourceFilter} accent="blue" />
                           <AIEnhancedSearch
                             query={search.query}
                             userType={userType}
                             accent="blue"
+                            source={sourceFilter}
                             onSelect={(picked) => selectFood(food.id, {
                               FoodID: picked.food_id,
                               FoodDescription: picked.food_description,

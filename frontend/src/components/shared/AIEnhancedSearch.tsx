@@ -19,7 +19,7 @@
 
 import { useState } from 'react';
 import { Sparkles, Loader2, Info, AlertCircle, Check } from 'lucide-react';
-import { CNFApiService, type CNFAIMatchResult, type CNFAlternativeMatch } from '@/lib/api';
+import { CNFApiService, type CNFAIMatchResult, type CNFAlternativeMatch, type SourceFilter } from '@/lib/api';
 import type { UserType } from './AudienceToggle';
 
 interface AIEnhancedSearchProps {
@@ -31,6 +31,9 @@ interface AIEnhancedSearchProps {
   userType: UserType;
   /** Optional accent class for the button. Defaults to blue. */
   accent?: 'blue' | 'green' | 'purple' | 'amber';
+  /** WAFCT-EXTEND (2026-05-24): restrict candidates to one food database.
+   *  Default 'both' searches CNF + WAFCT together. */
+  source?: SourceFilter;
 }
 
 const ACCENT: Record<NonNullable<AIEnhancedSearchProps['accent']>, string> = {
@@ -57,6 +60,7 @@ export function AIEnhancedSearch({
   onSelect,
   userType,
   accent = 'blue',
+  source = 'both',
 }: AIEnhancedSearchProps) {
   const [loading, setLoading]     = useState(false);
   const [result, setResult]       = useState<CNFAIMatchResult | null>(null);
@@ -72,7 +76,7 @@ export function AIEnhancedSearch({
     setResult(null);
     setShowAltsExpanded(false);
     try {
-      const r = await CNFApiService.searchFoodsAI(query, { userType });
+      const r = await CNFApiService.searchFoodsAI(query, { userType, source });
       setResult(r);
     } catch (e: unknown) {
       const ax = e as { response?: { status?: number; data?: { message?: string; error?: string } } };

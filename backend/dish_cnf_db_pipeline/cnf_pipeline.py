@@ -104,8 +104,8 @@ class CNFDataPipeline:
     # Search and Exploration Operations
     # =============================================================================
 
-    @lru_cache(maxsize=1000)
-    def search_foods(self, query: str, limit: int = 50, offset: int = 0) -> Dict:
+    @lru_cache(maxsize=1024)
+    def search_foods(self, query: str, limit: int = 50, offset: int = 0, source: str = 'both') -> Dict:
         """
         Advanced food search with pagination and relevance scoring.
         
@@ -113,22 +113,47 @@ class CNFDataPipeline:
             query: Search query string
             limit: Maximum number of results to return
             offset: Number of results to skip (for pagination)
-            
+            source: WAFCT-EXTEND — 'both' | 'cnf' | 'wafct' (subset rows before substring match).
+
         Returns:
             Dict containing search results and metadata
         """
         try:
             if not query or len(query.strip()) < 2:
                 return {"results": [], "total": 0, "query": query}
-            
+
+            src = (source or 'both').lower()
+            if src not in ('cnf', 'wafct', 'both'):
+                src = 'both'
+
             query_lower = query.lower().strip()
-            
+
+            base = self.data_loader.food_name_df
+            work_df = base
+            if src in ('cnf', 'wafct') and 'source' in base.columns:
+                work_df = base[base['source'] == src]
+            elif src in ('cnf', 'wafct'):
+                logger.warning(
+                    '`source` column missing on food_name_df; ignoring source=%r', src,
+                )
+
+            if work_df.empty:
+                return {
+                    "results": [],
+                    "total": 0,
+                    "query": query,
+                    "limit": limit,
+                    "offset": offset,
+                    "has_more": False,
+                    **({"source_filter": src} if src in ('cnf', 'wafct') else {}),
+                }
+
             # Search in food descriptions
-            mask = self.data_loader.food_name_df['search_index'].str.contains(
+            mask = work_df['search_index'].str.contains(
                 query_lower, case=False, na=False
             )
-            
-            results_df = self.data_loader.food_name_df[mask].copy()
+
+            results_df = work_df[mask].copy()
             
             # Add relevance scoring
             results_df['relevance'] = results_df['FoodDescription'].str.lower().apply(
@@ -153,14 +178,18 @@ class CNFDataPipeline:
                     'relevance': float(row['relevance'])
                 })
             
-            return {
+            out = {
                 "results": formatted_results,
                 "total": total_results,
                 "query": query,
                 "limit": limit,
                 "offset": offset,
-                "has_more": offset + limit < total_results
+                "has_more": offset + limit < total_results,
             }
+            if src in ('cnf', 'wafct'):
+                out["source_filter"] = src
+                out["filtered_count"] = total_results
+            return out
             
         except Exception as e:
             logger.error(f"Error searching foods: {str(e)}")

@@ -31,6 +31,13 @@ class CNFDataPipeline:
         self.refuse_name_df = self.refuse_name_df.dropna(subset=['RefuseID']).reset_index(drop=True)
         self.yield_name_df = self.yield_name_df.dropna(subset=['YieldID']).reset_index(drop=True)
 
+        # WAFCT-EXTEND (2026-05-24): provenance column on food_name_df. Every
+        # row loaded from raw_cnf/ is `source='cnf'`; the cache-singleton
+        # WAFCT ingest (`api.cnf_cache._maybe_ingest_wafct`) appends additional
+        # rows with `source='wafct'`. Downstream callers that don't care about
+        # provenance see no behaviour change.
+        self.food_name_df['source'] = 'cnf'
+
         # Build the nutrient index once: `{food_id: {nutrient_name: value_per_100g}}`.
         # Replaces the per-request nested `df[col==x]` filters that HEFI and
         # HENI used to run (O(F*N) pandas ops per meal). All downstream
@@ -77,6 +84,26 @@ class CNFDataPipeline:
         pattern in HEFI/HENI integrators.
         """
         return self.nutrients_by_food.get(int(food_id), {})
+
+    # --- WAFCT-EXTEND (2026-05-24) provenance helpers --------------------
+
+    def food_source(self, food_id: int):
+        """Return 'cnf' or 'wafct' for a FoodID, or None if not found."""
+        if 'source' not in self.food_name_df.columns:
+            return None
+        rows = self.food_name_df[self.food_name_df['FoodID'] == int(food_id)]
+        if rows.empty:
+            return None
+        return str(rows.iloc[0]['source'])
+
+    def filter_by_source(self, source: str):
+        """Return `food_name_df` filtered by `source` ∈ {'cnf', 'wafct', 'both'}.
+
+        `source='both'` (or any other value) returns the full DataFrame.
+        """
+        if source not in ('cnf', 'wafct') or 'source' not in self.food_name_df.columns:
+            return self.food_name_df
+        return self.food_name_df[self.food_name_df['source'] == source]
 
     def _detect_encoding(self, file_path):
         """Legacy shim. Kept so external callers that referenced it don't break;

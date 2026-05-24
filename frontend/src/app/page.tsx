@@ -23,8 +23,8 @@ const features = [
     status: 'Available',
   },
   {
-    name: 'Canadian Nutrient File (CNF) Database',
-    description: 'Access Canada\'s official nutrition database with 5,000+ foods and 150+ nutrients. Powerful search, filtering, comparison, and analysis — tightly integrated with environmental indicators and meal assessment.',
+    name: 'Food Composition Databases (CNF + WAFCT)',
+    description: 'Two food-composition databases in one search: Health Canada\'s Canadian Nutrient File (5,691 foods, 150+ nutrients) plus FAO/INFOODS\' West African Food Composition Table 2019 (1,028 foods including fonio, baobab, dawadawa). Per-source provenance, scope filter, and cross-database comparison — tightly integrated with environmental indicators and meal scoring.',
     icon: ChartBarIcon,
     href: '/cnf',
     status: 'Available',
@@ -156,8 +156,9 @@ export default function HomePage() {
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
               Experience the power of unified nutrition, environmental, and health analytics. Our comprehensive toolkit brings together
-              Canada's CNF database, validated scoring systems (HSR, FCS, HEFI, HENI), and environmental LCA indicators
-              to create the world's first truly integrated environmental nutrition platform.
+              <strong> two food-composition databases</strong> (Canada&rsquo;s CNF + FAO/INFOODS&rsquo; WAFCT 2019 for West African foods),
+              validated scoring systems (HSR, FCS, HEFI, HENI), and environmental LCA indicators
+              to create the world&rsquo;s first truly integrated environmental nutrition platform.
             </p>
           </div>
 

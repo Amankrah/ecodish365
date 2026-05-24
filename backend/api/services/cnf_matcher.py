@@ -117,6 +117,9 @@ class CNFCorpus:
     text_used: List[str]                    # the embed-text per row (for debug)
     food_descriptions: List[str]            # English description per row
     food_groups: List[str]                  # FoodGroupName per row
+    # WAFCT-EXTEND (2026-05-24): per-row source ('cnf' or 'wafct'). Used by
+    # `CNFMatcher.match(..., source=)` to filter candidates pre-LLM-rank.
+    sources: List[str]
     provenance: Dict[str, Any]
     embedding_dim: int
 
@@ -152,6 +155,13 @@ class CNFCorpus:
         food_ids = d['food_ids']
         embeddings = d['embeddings']
         text_used = list(d['text_used'])
+        # WAFCT-EXTEND (2026-05-24): `sources` is present in WAFCT-aware
+        # builds. Legacy CNF-only npz files lack it — synthesise 'cnf' for
+        # every row so we stay backward-compatible until next rebuild.
+        if 'sources' in d.files:
+            sources = [str(s) for s in d['sources'].tolist()]
+        else:
+            sources = ['cnf'] * len(food_ids)
 
         # Hydrate food descriptions + groups from CNF (used for display in
         # API responses). Lazy import so this module loads without Django.
@@ -165,24 +175,26 @@ class CNFCorpus:
             text_used=text_used,
             food_descriptions=food_descriptions,
             food_groups=food_groups,
+            sources=sources,
             provenance=provenance,
             embedding_dim=int(embeddings.shape[1]),
         )
 
     @staticmethod
     def _hydrate_display_fields(food_ids: List[int]) -> 'tuple[List[str], List[str]]':
-        """Re-read FOOD_NAME.csv + FOOD_GROUP.csv to map FoodID → display fields.
+        """Hydrate FoodID → (description, food-group-name) for display.
 
-        Kept out of the .npz on purpose so the corpus stays portable across
-        CNF-version updates (the matcher refuses to load on hash mismatch
-        anyway; rebuilding regenerates both halves consistently).
+        WAFCT-EXTEND (2026-05-24): read from the cached pipeline
+        (`api.cnf_cache.get_api_cnf_pipeline()`) rather than re-reading
+        FOOD_NAME.csv directly. The pipeline already contains both CNF
+        and WAFCT-ingested rows, so WAFCT FoodIDs (700,000+) hydrate
+        correctly without any special-casing here.
         """
         import pandas as pd
-        from django.conf import settings
-
-        cnf_dir = Path(settings.CNF_FOLDER)
-        fn = pd.read_csv(cnf_dir / 'FOOD_NAME.csv', encoding='latin-1', low_memory=False)
-        fg = pd.read_csv(cnf_dir / 'FOOD_GROUP.csv', encoding='latin-1', low_memory=False)
+        from api.cnf_cache import get_api_cnf_pipeline
+        pipeline = get_api_cnf_pipeline()
+        fn = pipeline.food_name_df
+        fg = pipeline.food_group_df
         fg_col = 'FoodGroupName' if 'FoodGroupName' in fg.columns else 'FoodGroup'
         merged = fn.merge(fg[['FoodGroupID', fg_col]], on='FoodGroupID', how='left')
         by_id = {int(r['FoodID']): (str(r['FoodDescription']),
@@ -282,7 +294,19 @@ class CNFMatcher:
 
     # --- public ----------------------------------------------------------
 
-    def match(self, query: str, top_k: Optional[int] = None) -> CNFMatchResult:
+    def match(
+        self,
+        query: str,
+        top_k: Optional[int] = None,
+        source: Optional[str] = None,
+    ) -> CNFMatchResult:
+        """Free-text → CNF / WAFCT FoodID.
+
+        WAFCT-EXTEND (2026-05-24): pass ``source='cnf'`` or ``source='wafct'``
+        to restrict the candidate pool to one food database. Default
+        ``None`` searches both. Filtering happens AFTER embedding retrieval
+        and BEFORE LLM ranking, so the LLM only sees in-scope candidates.
+        """
         t0 = time.perf_counter()
         if not query or not query.strip():
             return CNFMatchResult(
@@ -292,8 +316,12 @@ class CNFMatcher:
                 corpus_version=self.corpus.provenance.get('build_date_utc'),
             )
 
+        # Source-aware cache key — a 'cnf' query and a 'both' query may
+        # return different top matches, so they need independent cache slots.
+        source_norm = source if source in ('cnf', 'wafct') else None
         nq = _normalise_query(query)
-        cached = self._cache_get(nq)
+        cache_key = nq if source_norm is None else f'{nq}|src:{source_norm}'
+        cached = self._cache_get(cache_key)
         if cached is not None:
             # Return a copy with refreshed timing + cache_hit flag so the
             # cached result isn't mutated in place.
@@ -316,8 +344,17 @@ class CNFMatcher:
                 timing_ms=(time.perf_counter() - t0) * 1000,
                 corpus_version=self.corpus.provenance.get('build_date_utc'),
             )
-            self._cache_put(nq, result)
+            self._cache_put(cache_key, result)
             return result
+
+        # WAFCT-EXTEND (2026-05-24): apply source filter to candidates BEFORE
+        # LLM ranking. The corpus's `sources` array is indexed alongside
+        # `food_ids`, so filtering is O(k) and preserves cosine-sim ranking.
+        if source_norm is not None and self.corpus.sources:
+            candidates = [
+                (idx, sim) for idx, sim in candidates
+                if self.corpus.sources[idx] == source_norm
+            ]
 
         if not candidates:
             result = CNFMatchResult(
@@ -326,7 +363,7 @@ class CNFMatcher:
                 timing_ms=(time.perf_counter() - t0) * 1000,
                 corpus_version=self.corpus.provenance.get('build_date_utc'),
             )
-            self._cache_put(nq, result)
+            self._cache_put(cache_key, result)
             return result
 
         # Build the alternatives list (top-3 excluding the chosen match)
@@ -347,7 +384,7 @@ class CNFMatcher:
                 used_ai_ranking=False,
                 t0=t0,
             )
-            self._cache_put(nq, result)
+            self._cache_put(cache_key, result)
             return result
 
         # LLM ranking
@@ -366,7 +403,7 @@ class CNFMatcher:
                 used_ai_ranking=False,
                 t0=t0,
             )
-            self._cache_put(nq, result)
+            self._cache_put(cache_key, result)
             return result
 
         proposed_food_id = parsed.get('food_id')
@@ -400,7 +437,7 @@ class CNFMatcher:
                 used_ai_ranking=True,
                 t0=t0,
             )
-            self._cache_put(nq, result)
+            self._cache_put(cache_key, result)
             return result
 
         chosen_idx = candidate_food_ids[proposed_food_id_int]
@@ -417,7 +454,7 @@ class CNFMatcher:
                 used_ai_ranking=True,
                 t0=t0,
             )
-            self._cache_put(nq, result)
+            self._cache_put(cache_key, result)
             return result
 
         # Matched
@@ -431,7 +468,7 @@ class CNFMatcher:
             used_ai_ranking=True,
             t0=t0,
         )
-        self._cache_put(nq, result)
+        self._cache_put(cache_key, result)
         return result
 
     # --- internals -------------------------------------------------------

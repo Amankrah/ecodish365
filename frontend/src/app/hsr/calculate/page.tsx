@@ -17,6 +17,7 @@ import StarRating from '@/components/StarRating';
 import { AudienceToggle, type UserType, type ExplanationsBlock } from '@/components/shared/AudienceToggle';
 import { AIEnhancedSearch } from '@/components/shared/AIEnhancedSearch';
 import { RecipeDecomposerModal } from '@/components/shared/RecipeDecomposerModal';
+import { SourceFilter, type SourceChoice } from '@/components/shared/SourceFilter';
 import { ExplanationsPanel } from '@/components/shared/ExplanationsPanel';
 import { useRecall24hReceiver } from '@/components/shared/useRecall24hReceiver';
 
@@ -59,6 +60,8 @@ export default function HSRCalculate() {
   const [filters, setFilters] = useState<FilterOptions | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedMethod, setSelectedMethod] = useState<string>('');
+  // WAFCT-EXTEND (2026-05-24): food-database scope.
+  const [sourceFilter, setSourceFilter] = useState<SourceChoice>('both');
 
   // Load filters on component mount
   useEffect(() => {
@@ -107,12 +110,13 @@ export default function HSRCalculate() {
             query: search.query,
             limit: 50,
             category: selectedCategory || undefined,
-            method: selectedMethod || undefined
+            method: selectedMethod || undefined,
+            source: sourceFilter,
           });
         } catch (enhancedError) {
           console.log('Enhanced search failed, falling back to regular search:', enhancedError);
           try {
-            searchResult = await CNFApiService.searchFoods(search.query, 50);
+            searchResult = await CNFApiService.searchFoods(search.query, 50, 0, sourceFilter);
           } catch (regularError) {
             console.error('Both search methods failed:', { enhancedError, regularError });
             throw regularError;
@@ -132,7 +136,7 @@ export default function HSRCalculate() {
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [search.query, selectedCategory, selectedMethod]);
+  }, [search.query, selectedCategory, selectedMethod, sourceFilter]);
 
   const addFood = () => {
     const newId = (foods.length + 1).toString();
@@ -399,11 +403,14 @@ export default function HSRCalculate() {
                           fires when the user is actively typing in this
                           input (activeSearch === food.id). */}
                       {activeSearch === food.id && search.query.trim() && (
-                        <div className="mt-2">
+                        <div className="mt-2 space-y-2">
+                          {/* WAFCT-EXTEND (2026-05-24): food-database scope */}
+                          <SourceFilter source={sourceFilter} onChange={setSourceFilter} accent="amber" />
                           <AIEnhancedSearch
                             query={search.query}
                             userType={userType}
                             accent="amber"
+                            source={sourceFilter}
                             onSelect={(picked) => selectFood(food.id, {
                               FoodID: picked.food_id,
                               FoodDescription: picked.food_description,

@@ -76,6 +76,14 @@ def fcs_calculate(request):
         result['explanations'] = get_fcs_explanations(
             fcs=fcs_val, nova_category=nova_cat, user_type=user_type,
         )
+        # WAFCT-EXTEND (2026-05-24): per-source caveat (mineral bias).
+        try:
+            from api.views.wafct_caveat import build_wafct_caveat
+            result['explanations'].update(build_wafct_caveat(
+                food_ids, indicator='fcs', user_type=user_type,
+            ))
+        except Exception:  # noqa: BLE001
+            pass
         result['user_type'] = user_type
 
         return Response({
