@@ -1,7 +1,11 @@
 # api/urls.py
 
 from django.urls import path, include
-from .views import cnf_views, environmental_views, food_views, translation_views, hsr_views_consolidated, fcs_views, hefi_views, heni_views
+from .views import (
+    cnf_views, environmental_views, food_views, translation_views,
+    hsr_views_consolidated, fcs_views, hefi_views, heni_views,
+    cnf_ai_search_views,                # AI-MATCH-1 (AI-enhanced CNF search + recipe decomposer)
+)
 from .views.cnf_views import (
     # Food Management
     add_food_to_cnf, add_foods_batch, manage_cnf_food,
@@ -65,6 +69,9 @@ urlpatterns = [
     
     # Search and Exploration
     path('cnf/search/', search_cnf_foods, name='search_cnf_foods'),
+    # AI-MATCH-1: free-text → CNF FoodID via embedding + LLM ranking (opt-in,
+    # additive — the basic fuzzy search above is unchanged).
+    path('cnf/search/ai-enhanced/', cnf_ai_search_views.cnf_ai_enhanced_search, name='cnf_ai_enhanced_search'),
     path('cnf/search/by-nutrient/', search_foods_by_nutrient, name='search_foods_by_nutrient'),
     path('cnf/groups/<int:food_group_id>/foods/', get_foods_by_group, name='get_foods_by_group'),
     path('cnf/compare/', compare_foods, name='compare_foods'),

@@ -258,6 +258,14 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 CNF_FOLDER = str(RAW_CNF_DIR)
 
+# AI-MATCH-1 (2026-05-23) — AI-enhanced CNF search + recipe decomposer.
+# Per-IP hourly rate limit + global monthly spend circuit breaker on the
+# /api/cnf/search/ai-enhanced and /api/recipes/decompose endpoints. Tunable
+# via env vars (DJANGO_AI_SEARCH_PER_IP_HOURLY / DJANGO_AI_SEARCH_MONTHLY_BUDGET_CENTS)
+# without redeploy; sane defaults keep the worst-case monthly LLM spend under $50.
+AI_SEARCH_PER_IP_HOURLY = int(os.environ.get('DJANGO_AI_SEARCH_PER_IP_HOURLY', 50))
+AI_SEARCH_MONTHLY_BUDGET_CENTS = int(os.environ.get('DJANGO_AI_SEARCH_MONTHLY_BUDGET_CENTS', 5000))
+
 # Security settings when DJANGO_ENV is not "development"
 #
 # This module stays importable via `manage.py runserver`, which speaks HTTP only.

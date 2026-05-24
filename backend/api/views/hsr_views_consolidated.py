@@ -182,12 +182,17 @@ def calculate_hsr(request):
     # Audience-aware explanations (AUDIENCE-CODE-1 SHIPPED 2026-05-23).
     # Star rating + category come from the existing computed result; the
     # explanations block replaces the previously-hardcoded rating.description.
+    # FIX (2026-05-23): `meal_category` was never defined → NameError here
+    # wiped star_rating in the broad except and showed 0.0 stars for
+    # individual-mode users (their UI surfaces explanations ahead of the
+    # researcher-only score headline).
     try:
         star_rating = float(result.get('hsr_result', {}).get('rating', {}).get('star_rating', 0.0))
-        category_str = str(meal_category.value) if hasattr(meal_category, 'value') else str(meal_category)
-    except Exception:
+    except (TypeError, ValueError):
         star_rating = 0.0
-        category_str = '2'
+    meal_cat = meal.category
+    category_str = str(meal_cat.value) if meal_cat is not None and hasattr(meal_cat, 'value') else '2'
+
     result["explanations"] = get_hsr_explanations(
         star_rating=star_rating, category=category_str, user_type=user_type,
     )

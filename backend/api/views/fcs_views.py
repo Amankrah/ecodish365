@@ -64,12 +64,15 @@ def fcs_calculate(request):
         # Audience-aware explanations (AUDIENCE-CODE-1 SHIPPED 2026-05-23).
         # ADDS the previously-missing Mozaffarian 2021 recommendation band
         # (encourage / moderate / limit) per user_type.
+        # Narrow handlers (parity with HSR calculate_hsr): a broad ``except``
+        # can hide typos like an undefined identifier and silently zero FCS/Nova
+        # for explanations.
         try:
             fcs_val = float(result.get('fcs', 0.0))
-            nova_cat = str(result.get('nova_category', 'MINIMALLY_PROCESSED'))
-        except Exception:
+        except (TypeError, ValueError):
             fcs_val = 0.0
-            nova_cat = 'MINIMALLY_PROCESSED'
+        raw_nova = result.get('nova_category', 'MINIMALLY_PROCESSED')
+        nova_cat = str(raw_nova) if raw_nova is not None else 'MINIMALLY_PROCESSED'
         result['explanations'] = get_fcs_explanations(
             fcs=fcs_val, nova_category=nova_cat, user_type=user_type,
         )

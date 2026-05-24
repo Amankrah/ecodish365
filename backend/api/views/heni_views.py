@@ -88,12 +88,10 @@ def heni_calculate(request):
         # The literature-cited interpretive prose lives in heni_explanations.py;
         # the existing comprehensive_result keys are preserved for backward
         # compatibility (researchers still see all internal fields).
+        hp = comprehensive_result.get('health_impact') or {}
         try:
-            health_min = float(
-                comprehensive_result.get('health_impact', {})
-                                     .get('health_impact_minutes', 0.0)
-            )
-        except Exception:
+            health_min = float(hp.get('health_impact_minutes', 0.0))
+        except (TypeError, ValueError):
             health_min = 0.0
         comprehensive_result['explanations'] = get_heni_explanations(
             health_impact_minutes=health_min, user_type=user_type,
