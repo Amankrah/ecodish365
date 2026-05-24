@@ -140,6 +140,14 @@ urlpatterns = [
     path('heni/analyze-pattern/', heni_views.analyze_dietary_pattern, name='analyze_dietary_pattern'),
 
     # =============================================================================
+    # AI-MATCH-1 (2026-05-23) — Recipe decomposer
+    # =============================================================================
+    # Free-text dish name → CNF ingredient list with masses, ready to feed
+    # the HENI / HEFI / HSR / FCS scoring endpoints. Opt-in; rate-limited +
+    # monthly-budgeted via the same machinery as /cnf/search/ai-enhanced.
+    path('recipes/decompose/', cnf_ai_search_views.decompose_recipe, name='decompose_recipe'),
+
+    # =============================================================================
     # User Management & Social Features
     # =============================================================================
     path('users/', include('users.urls')),

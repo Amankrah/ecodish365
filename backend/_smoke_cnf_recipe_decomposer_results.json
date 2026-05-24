@@ -1,0 +1,764 @@
+{
+  "harness": "CNFRecipeDecomposer smoke (AI-MATCH-1)",
+  "totals": {
+    "pass": 15,
+    "fail": 0,
+    "total": 15,
+    "per_panel": {
+      "CUISINE": {
+        "pass": 7,
+        "total": 7
+      },
+      "SIMPLE": {
+        "pass": 5,
+        "total": 5
+      },
+      "ADVERSARIAL": {
+        "pass": 3,
+        "total": 3
+      }
+    }
+  },
+  "results": [
+    {
+      "panel": "CUISINE",
+      "dish_name": "spaghetti bolognese",
+      "total_mass_g": 300.0,
+      "matched": true,
+      "fallback_reason": null,
+      "ingredient_count": 6,
+      "resolved_mass_g": 300.0,
+      "unresolved_mass_g": 0.0,
+      "decomposition_confidence": 0.85,
+      "ingredient_summary": [
+        {
+          "food_id": 4469,
+          "food_description": "Pasta, spaghetti, unenriched, cooked",
+          "mass_g": 150.0
+        },
+        {
+          "food_id": 4995,
+          "food_description": "Beef, ground, medium, crumbled, pan-fried",
+          "mass_g": 90.0
+        },
+        {
+          "food_id": 5557,
+          "food_description": "Tomato sauce, unsalted",
+          "mass_g": 40.0
+        },
+        {
+          "food_id": 2402,
+          "food_description": "Onion, boiled, drained",
+          "mass_g": 10.0
+        },
+        {
+          "food_id": 2381,
+          "food_description": "Carrot, boiled, drained",
+          "mass_g": 5.0
+        },
+        {
+          "food_id": 2387,
+          "food_description": "Celery, boiled, drained",
+          "mass_g": 5.0
+        }
+      ],
+      "timing_ms": 10806.6,
+      "gates": {
+        "gate1_min_ingredients": true,
+        "gate2_mass_closure": true,
+        "gate3_confidence": true,
+        "gate4_no_hallucinations": true,
+        "gate5_keyword_anchor": true
+      },
+      "overall_pass": true,
+      "gate_detail": "Italian-American canonical"
+    },
+    {
+      "panel": "CUISINE",
+      "dish_name": "chicken curry",
+      "total_mass_g": 350.0,
+      "matched": true,
+      "fallback_reason": null,
+      "ingredient_count": 8,
+      "resolved_mass_g": 330.0,
+      "unresolved_mass_g": 20.0,
+      "decomposition_confidence": 0.75,
+      "ingredient_summary": [
+        {
+          "food_id": 842,
+          "food_description": "Chicken, broiler, breast, meat, roasted",
+          "mass_g": 150.0
+        },
+        {
+          "food_id": 2402,
+          "food_description": "Onion, boiled, drained",
+          "mass_g": 50.0
+        },
+        {
+          "food_id": 2565,
+          "food_description": "Nuts, coconut milk (liquid from grated meat and wa",
+          "mass_g": 50.0
+        },
+        {
+          "food_id": 2461,
+          "food_description": "Tomato, red, ripe, boiled",
+          "mass_g": 40.0
+        },
+        {
+          "food_id": 452,
+          "food_description": "Vegetable oil, mustard",
+          "mass_g": 15.0
+        },
+        {
+          "food_id": 2394,
+          "food_description": "Garlic, raw",
+          "mass_g": 10.0
+        },
+        {
+          "food_id": 2091,
+          "food_description": "Ginger root, raw",
+          "mass_g": 10.0
+        },
+        {
+          "food_id": 183,
+          "food_description": "Spices, curry powder",
+          "mass_g": 5.0
+        }
+      ],
+      "timing_ms": 11581.8,
+      "gates": {
+        "gate1_min_ingredients": true,
+        "gate2_mass_closure": true,
+        "gate3_confidence": true,
+        "gate4_no_hallucinations": true,
+        "gate5_keyword_anchor": true
+      },
+      "overall_pass": true,
+      "gate_detail": "generic curry, expect chicken + spices + tomato or coconut milk"
+    },
+    {
+      "panel": "CUISINE",
+      "dish_name": "pad thai with chicken",
+      "total_mass_g": 320.0,
+      "matched": true,
+      "fallback_reason": null,
+      "ingredient_count": 7,
+      "resolved_mass_g": 315.0,
+      "unresolved_mass_g": 5.0,
+      "decomposition_confidence": 0.85,
+      "ingredient_summary": [
+        {
+          "food_id": 4874,
+          "food_description": "Pasta, rice noodles, cooked",
+          "mass_g": 150.0
+        },
+        {
+          "food_id": 842,
+          "food_description": "Chicken, broiler, breast, meat, roasted",
+          "mass_g": 80.0
+        },
+        {
+          "food_id": 130,
+          "food_description": "Egg, chicken, whole, cooked, boiled in shell, hard",
+          "mass_g": 30.0
+        },
+        {
+          "food_id": 2008,
+          "food_description": "Beans, mung, mature seeds, sprouted, bean sprouts,",
+          "mass_g": 20.0
+        },
+        {
+          "food_id": 502471,
+          "food_description": "Sauce, peanut (made from peanut butter, water, soy",
+          "mass_g": 15.0
+        },
+        {
+          "food_id": 2144,
+          "food_description": "Onion, spring (green) or scallion (includes tops a",
+          "mass_g": 10.0
+        },
+        {
+          "food_id": 3362,
+          "food_description": "Peanuts, all types, dry roasted",
+          "mass_g": 10.0
+        }
+      ],
+      "timing_ms": 9989.7,
+      "gates": {
+        "gate1_min_ingredients": true,
+        "gate2_mass_closure": true,
+        "gate3_confidence": true,
+        "gate4_no_hallucinations": true,
+        "gate5_keyword_anchor": true
+      },
+      "overall_pass": true,
+      "gate_detail": "Thai canonical; expect rice noodles + chicken"
+    },
+    {
+      "panel": "CUISINE",
+      "dish_name": "beef stir-fry with vegetables",
+      "total_mass_g": 300.0,
+      "matched": true,
+      "fallback_reason": null,
+      "ingredient_count": 6,
+      "resolved_mass_g": 280.0,
+      "unresolved_mass_g": 20.0,
+      "decomposition_confidence": 0.75,
+      "ingredient_summary": [
+        {
+          "food_id": 6145,
+          "food_description": "Beef, loin, top sirloin steak, boneless, lean and ",
+          "mass_g": 120.0
+        },
+        {
+          "food_id": 2375,
+          "food_description": "Broccoli, boiled, drained",
+          "mass_g": 60.0
+        },
+        {
+          "food_id": 2381,
+          "food_description": "Carrot, boiled, drained",
+          "mass_g": 40.0
+        },
+        {
+          "food_id": 2485,
+          "food_description": "Pepper, sweet, green, boiled, drained, with salt",
+          "mass_g": 30.0
+        },
+        {
+          "food_id": 2402,
+          "food_description": "Onion, boiled, drained",
+          "mass_g": 20.0
+        },
+        {
+          "food_id": 3329,
+          "food_description": "Soy sauce (made from soy), tamari",
+          "mass_g": 10.0
+        }
+      ],
+      "timing_ms": 7491.2,
+      "gates": {
+        "gate1_min_ingredients": true,
+        "gate2_mass_closure": true,
+        "gate3_confidence": true,
+        "gate4_no_hallucinations": true,
+        "gate5_keyword_anchor": true
+      },
+      "overall_pass": true,
+      "gate_detail": "basic stir-fry"
+    },
+    {
+      "panel": "CUISINE",
+      "dish_name": "Caesar salad with chicken",
+      "total_mass_g": 250.0,
+      "matched": true,
+      "fallback_reason": null,
+      "ingredient_count": 5,
+      "resolved_mass_g": 245.0,
+      "unresolved_mass_g": 5.0,
+      "decomposition_confidence": 0.75,
+      "ingredient_summary": [
+        {
+          "food_id": 2116,
+          "food_description": "Lettuce, cos or romaine",
+          "mass_g": 100.0
+        },
+        {
+          "food_id": 502554,
+          "food_description": "Chicken, broiler, breast, skinless, boneless, meat",
+          "mass_g": 80.0
+        },
+        {
+          "food_id": 5515,
+          "food_description": "Salad dressing, caesar dressing, regular",
+          "mass_g": 40.0
+        },
+        {
+          "food_id": 39,
+          "food_description": "Cheese, parmesan, dry grated",
+          "mass_g": 15.0
+        },
+        {
+          "food_id": 3885,
+          "food_description": "Croutons, plain",
+          "mass_g": 10.0
+        }
+      ],
+      "timing_ms": 8528.9,
+      "gates": {
+        "gate1_min_ingredients": true,
+        "gate2_mass_closure": true,
+        "gate3_confidence": true,
+        "gate4_no_hallucinations": true,
+        "gate5_keyword_anchor": true
+      },
+      "overall_pass": true,
+      "gate_detail": "salad + protein"
+    },
+    {
+      "panel": "CUISINE",
+      "dish_name": "jambalaya with shrimp and sausage",
+      "total_mass_g": 350.0,
+      "matched": true,
+      "fallback_reason": null,
+      "ingredient_count": 8,
+      "resolved_mass_g": 350.0,
+      "unresolved_mass_g": 0.0,
+      "decomposition_confidence": 0.85,
+      "ingredient_summary": [
+        {
+          "food_id": 4475,
+          "food_description": "Grains, rice, white, medium-grain, cooked",
+          "mass_g": 140.0
+        },
+        {
+          "food_id": 3212,
+          "food_description": "Crustaceans, shrimp, mixed species, boiled or stea",
+          "mass_g": 70.0
+        },
+        {
+          "food_id": 1167,
+          "food_description": "Sausage, smoked, pork, pre-cooked",
+          "mass_g": 60.0
+        },
+        {
+          "food_id": 2402,
+          "food_description": "Onion, boiled, drained",
+          "mass_g": 25.0
+        },
+        {
+          "food_id": 2414,
+          "food_description": "Pepper, sweet, green, boiled, drained",
+          "mass_g": 20.0
+        },
+        {
+          "food_id": 2387,
+          "food_description": "Celery, boiled, drained",
+          "mass_g": 15.0
+        },
+        {
+          "food_id": 2461,
+          "food_description": "Tomato, red, ripe, boiled",
+          "mass_g": 15.0
+        },
+        {
+          "food_id": 2394,
+          "food_description": "Garlic, raw",
+          "mass_g": 5.0
+        }
+      ],
+      "timing_ms": 8006.2,
+      "gates": {
+        "gate1_min_ingredients": true,
+        "gate2_mass_closure": true,
+        "gate3_confidence": true,
+        "gate4_no_hallucinations": true,
+        "gate5_keyword_anchor": true
+      },
+      "overall_pass": true,
+      "gate_detail": "Louisiana creole canonical"
+    },
+    {
+      "panel": "CUISINE",
+      "dish_name": "shakshuka",
+      "total_mass_g": 300.0,
+      "matched": true,
+      "fallback_reason": null,
+      "ingredient_count": 5,
+      "resolved_mass_g": 300.0,
+      "unresolved_mass_g": 0.0,
+      "decomposition_confidence": 0.85,
+      "ingredient_summary": [
+        {
+          "food_id": 2463,
+          "food_description": "Tomato, red, ripe, canned, stewed",
+          "mass_g": 150.0
+        },
+        {
+          "food_id": 125,
+          "food_description": "Egg, chicken, whole, fresh or frozen, raw",
+          "mass_g": 90.0
+        },
+        {
+          "food_id": 2401,
+          "food_description": "Onion, raw",
+          "mass_g": 30.0
+        },
+        {
+          "food_id": 2413,
+          "food_description": "Pepper, sweet, green, raw",
+          "mass_g": 20.0
+        },
+        {
+          "food_id": 422,
+          "food_description": "Vegetable oil, olive",
+          "mass_g": 10.0
+        }
+      ],
+      "timing_ms": 7616.5,
+      "gates": {
+        "gate1_min_ingredients": true,
+        "gate2_mass_closure": true,
+        "gate3_confidence": true,
+        "gate4_no_hallucinations": true,
+        "gate5_keyword_anchor": true
+      },
+      "overall_pass": true,
+      "gate_detail": "Middle Eastern egg dish; tolerates many spellings"
+    },
+    {
+      "panel": "SIMPLE",
+      "dish_name": "peanut butter sandwich",
+      "total_mass_g": 80.0,
+      "matched": true,
+      "fallback_reason": null,
+      "ingredient_count": 2,
+      "resolved_mass_g": 75.0,
+      "unresolved_mass_g": 5.0,
+      "decomposition_confidence": 0.85,
+      "ingredient_summary": [
+        {
+          "food_id": 4066,
+          "food_description": "Bread, white, commercial",
+          "mass_g": 50.0
+        },
+        {
+          "food_id": 3414,
+          "food_description": "Peanut butter, smooth type, fat and sugar added",
+          "mass_g": 25.0
+        }
+      ],
+      "timing_ms": 3416.2,
+      "gates": {
+        "gate1_min_ingredients": true,
+        "gate2_mass_closure": true,
+        "gate3_confidence": true,
+        "gate4_no_hallucinations": true,
+        "gate5_keyword_anchor": true
+      },
+      "overall_pass": true,
+      "gate_detail": "2-ingredient simple meal"
+    },
+    {
+      "panel": "SIMPLE",
+      "dish_name": "scrambled eggs with toast",
+      "total_mass_g": 150.0,
+      "matched": true,
+      "fallback_reason": null,
+      "ingredient_count": 3,
+      "resolved_mass_g": 145.0,
+      "unresolved_mass_g": 5.0,
+      "decomposition_confidence": 0.75,
+      "ingredient_summary": [
+        {
+          "food_id": 125,
+          "food_description": "Egg, chicken, whole, fresh or frozen, raw",
+          "mass_g": 90.0
+        },
+        {
+          "food_id": 3732,
+          "food_description": "Bread, white, commercial, toasted",
+          "mass_g": 45.0
+        },
+        {
+          "food_id": 118,
+          "food_description": "Butter, regular",
+          "mass_g": 10.0
+        }
+      ],
+      "timing_ms": 3583.5,
+      "gates": {
+        "gate1_min_ingredients": true,
+        "gate2_mass_closure": true,
+        "gate3_confidence": true,
+        "gate4_no_hallucinations": true,
+        "gate5_keyword_anchor": true
+      },
+      "overall_pass": true,
+      "gate_detail": "breakfast canonical"
+    },
+    {
+      "panel": "SIMPLE",
+      "dish_name": "oatmeal with berries",
+      "total_mass_g": 200.0,
+      "matched": true,
+      "fallback_reason": null,
+      "ingredient_count": 4,
+      "resolved_mass_g": 200.0,
+      "unresolved_mass_g": 0.0,
+      "decomposition_confidence": 0.75,
+      "ingredient_summary": [
+        {
+          "food_id": 1465,
+          "food_description": "Cereal, hot, oats, large flakes, prepared, Quaker",
+          "mass_g": 120.0
+        },
+        {
+          "food_id": 1705,
+          "food_description": "Blueberry, raw",
+          "mass_g": 60.0
+        },
+        {
+          "food_id": 2933,
+          "food_description": "Water, municipal",
+          "mass_g": 15.0
+        },
+        {
+          "food_id": 113,
+          "food_description": "Milk, fluid, whole, pasteurized, homogenized, 3.25",
+          "mass_g": 5.0
+        }
+      ],
+      "timing_ms": 6015.1,
+      "gates": {
+        "gate1_min_ingredients": true,
+        "gate2_mass_closure": true,
+        "gate3_confidence": true,
+        "gate4_no_hallucinations": true,
+        "gate5_keyword_anchor": true
+      },
+      "overall_pass": true,
+      "gate_detail": "oat porridge + fruit"
+    },
+    {
+      "panel": "SIMPLE",
+      "dish_name": "grilled cheese sandwich",
+      "total_mass_g": 120.0,
+      "matched": true,
+      "fallback_reason": null,
+      "ingredient_count": 3,
+      "resolved_mass_g": 115.0,
+      "unresolved_mass_g": 5.0,
+      "decomposition_confidence": 0.85,
+      "ingredient_summary": [
+        {
+          "food_id": 4066,
+          "food_description": "Bread, white, commercial",
+          "mass_g": 70.0
+        },
+        {
+          "food_id": 502213,
+          "food_description": "Cheese, processed product, cheddar, slices",
+          "mass_g": 40.0
+        },
+        {
+          "food_id": 118,
+          "food_description": "Butter, regular",
+          "mass_g": 5.0
+        }
+      ],
+      "timing_ms": 2862.1,
+      "gates": {
+        "gate1_min_ingredients": true,
+        "gate2_mass_closure": true,
+        "gate3_confidence": true,
+        "gate4_no_hallucinations": true,
+        "gate5_keyword_anchor": true
+      },
+      "overall_pass": true,
+      "gate_detail": "cheese sandwich"
+    },
+    {
+      "panel": "SIMPLE",
+      "dish_name": "greek yogurt with granola",
+      "total_mass_g": 180.0,
+      "matched": true,
+      "fallback_reason": null,
+      "ingredient_count": 2,
+      "resolved_mass_g": 180.0,
+      "unresolved_mass_g": 0.0,
+      "decomposition_confidence": 0.85,
+      "ingredient_summary": [
+        {
+          "food_id": 502191,
+          "food_description": "Yogourt, Greek style, plain, rich (8-12% M.F.)",
+          "mass_g": 135.0
+        },
+        {
+          "food_id": 1222,
+          "food_description": "Cereal, ready to eat, granola, homemade",
+          "mass_g": 45.0
+        }
+      ],
+      "timing_ms": 3306.2,
+      "gates": {
+        "gate1_min_ingredients": true,
+        "gate2_mass_closure": true,
+        "gate3_confidence": true,
+        "gate4_no_hallucinations": true,
+        "gate5_keyword_anchor": true
+      },
+      "overall_pass": true,
+      "gate_detail": "yogurt parfait"
+    },
+    {
+      "panel": "ADVERSARIAL",
+      "dish_name": "homemade chicken soup",
+      "total_mass_g": 350.0,
+      "matched": true,
+      "fallback_reason": null,
+      "ingredient_count": 7,
+      "resolved_mass_g": 333.0,
+      "unresolved_mass_g": 17.0,
+      "decomposition_confidence": 0.75,
+      "ingredient_summary": [
+        {
+          "food_id": 842,
+          "food_description": "Chicken, broiler, breast, meat, roasted",
+          "mass_g": 120.0
+        },
+        {
+          "food_id": 2933,
+          "food_description": "Water, municipal",
+          "mass_g": 80.0
+        },
+        {
+          "food_id": 2380,
+          "food_description": "Carrot, raw",
+          "mass_g": 50.0
+        },
+        {
+          "food_id": 2386,
+          "food_description": "Celery, raw",
+          "mass_g": 40.0
+        },
+        {
+          "food_id": 2401,
+          "food_description": "Onion, raw",
+          "mass_g": 40.0
+        },
+        {
+          "food_id": 214,
+          "food_description": "Salt, table",
+          "mass_g": 2.0
+        },
+        {
+          "food_id": 198,
+          "food_description": "Spices, pepper, black",
+          "mass_g": 1.0
+        }
+      ],
+      "timing_ms": 6507.3,
+      "gates": {
+        "gate1_min_ingredients": true,
+        "gate2_mass_closure": true,
+        "gate3_confidence": true,
+        "gate4_no_hallucinations": true,
+        "gate5_keyword_anchor": true
+      },
+      "overall_pass": true,
+      "gate_detail": "ambiguous \u2014 recipe varies by household"
+    },
+    {
+      "panel": "ADVERSARIAL",
+      "dish_name": "Buddha bowl",
+      "total_mass_g": 350.0,
+      "matched": true,
+      "fallback_reason": null,
+      "ingredient_count": 7,
+      "resolved_mass_g": 330.0,
+      "unresolved_mass_g": 20.0,
+      "decomposition_confidence": 0.7,
+      "ingredient_summary": [
+        {
+          "food_id": 5917,
+          "food_description": "Grains, quinoa, cooked",
+          "mass_g": 100.0
+        },
+        {
+          "food_id": 3390,
+          "food_description": "Chickpeas (garbanzo beans, bengal gram), boiled",
+          "mass_g": 70.0
+        },
+        {
+          "food_id": 1511,
+          "food_description": "Avocado, raw, all commercial varieties",
+          "mass_g": 50.0
+        },
+        {
+          "food_id": 2380,
+          "food_description": "Carrot, raw",
+          "mass_g": 40.0
+        },
+        {
+          "food_id": 2363,
+          "food_description": "Cucumber, raw",
+          "mass_g": 30.0
+        },
+        {
+          "food_id": 2213,
+          "food_description": "Spinach, raw",
+          "mass_g": 30.0
+        },
+        {
+          "food_id": 422,
+          "food_description": "Vegetable oil, olive",
+          "mass_g": 10.0
+        }
+      ],
+      "timing_ms": 8751.8,
+      "gates": {
+        "gate1_min_ingredients": true,
+        "gate2_mass_closure": true,
+        "gate3_confidence": true,
+        "gate4_no_hallucinations": true,
+        "gate5_keyword_anchor": true
+      },
+      "overall_pass": true,
+      "gate_detail": "no canonical recipe; many valid decompositions"
+    },
+    {
+      "panel": "ADVERSARIAL",
+      "dish_name": "leftover Thanksgiving plate",
+      "total_mass_g": 400.0,
+      "matched": true,
+      "fallback_reason": null,
+      "ingredient_count": 6,
+      "resolved_mass_g": 380.0,
+      "unresolved_mass_g": 20.0,
+      "decomposition_confidence": 0.75,
+      "ingredient_summary": [
+        {
+          "food_id": 691,
+          "food_description": "Turkey, all classes, meat only, roasted",
+          "mass_g": 120.0
+        },
+        {
+          "food_id": 5278,
+          "food_description": "Potato, mashed, homemade, prepared with 2% M.F. mi",
+          "mass_g": 100.0
+        },
+        {
+          "food_id": 3740,
+          "food_description": "Bread stuffing, dry mix, prepared",
+          "mass_g": 60.0
+        },
+        {
+          "food_id": 1539,
+          "food_description": "Sauce, cranberry, canned, sweetened",
+          "mass_g": 40.0
+        },
+        {
+          "food_id": 2371,
+          "food_description": "Beans, snap (Italian, green or yellow), boiled, dr",
+          "mass_g": 30.0
+        },
+        {
+          "food_id": 1011,
+          "food_description": "Gravy, unspecified, dehydrated",
+          "mass_g": 30.0
+        }
+      ],
+      "timing_ms": 9186.7,
+      "gates": {
+        "gate1_min_ingredients": true,
+        "gate2_mass_closure": true,
+        "gate3_confidence": true,
+        "gate4_no_hallucinations": true,
+        "gate5_keyword_anchor": true
+      },
+      "overall_pass": true,
+      "gate_detail": "composite hard case \u2014 depends on what was leftover"
+    }
+  ]
+}

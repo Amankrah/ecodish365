@@ -73,6 +73,54 @@ These were explicitly logged as v1 simplifications during HENI-CODE-1 implementa
 
 ## Done
 
+### 2026-05-23 — AI-enhanced CNF search + recipe decomposer (AI-MATCH-1) SHIPPED
+
+**Why this matters.** All seven user-facing search surfaces on the platform (CNF Explorer + the four calculate pages + FCS Compare + FCS Food Profile) called the existing `/api/cnf/search/` endpoint, which is pure fuzzywuzzy ([`backend/api/food_id_finder.py:176-242`](backend/api/food_id_finder.py#L176-L242)). Fine for exact CNF names ("apple raw", "white bread"), brittle for synonyms ("aubergine" → eggplant), foreign-language entries (the CNF has French `FoodDescriptionF` columns but fuzzywuzzy doesn't bridge them well), compound descriptors ("low-fat chocolate milk"), and impossible for free-text dish names ("homemade beef stew", "spaghetti bolognese"). The infrastructure to fix this — `LCAMatcher` RAG pattern + `RecipeDecomposer` 7-gate validation + `ChatJSONClient` multi-provider abstraction — already existed inside `environmental_impact_model/src/` for the LCA pipeline but was never exposed to the user-facing CNF endpoints. AI-MATCH-1 surfaces both as opt-in features behind a per-IP rate limit + monthly spend circuit breaker, with audit-grade smoke harnesses, while leaving fuzzywuzzy as the always-on default so basic searches stay instant.
+
+**Files added.**
+
+- `backend/api/services/etl/build_cnf_corpus_embeddings.py` — one-time ETL embedding all 5,691 CNF foods via text-embedding-3-small (~$0.005 one-time, ~30 s runtime). Outputs `backend/api/data/cnf_corpus_embeddings.npz` (27.4 MB) + `_provenance.json` with `source_file_sha256` for staleness detection.
+- `backend/api/services/cnf_matcher.py` — `CNFMatcher` class: free-text query → CNF FoodID + confidence + top-3 alternatives via embedding retrieval + gpt-4.1-mini constrained-JSON ranking. 7 validation gates mirror the LCAMatcher pattern including hallucination rejection (Krahmer 2024 LEAF precedent) and calibrated-confidence prompt anchors. Per-process LRU cache, size 2000.
+- `backend/api/services/cnf_recipe_decomposer.py` — `CNFRecipeDecomposer` class: free-text dish name + total mass → list of CNF ingredients with per-ingredient masses + resolution confidence. Two-stage (LLM proposes ingredient list → CNFMatcher resolves each name → CNF FoodID), with 4 hard gates (min ingredients, mass closure ±max(5 g, 2 %), confidence ≥ 0.30, no hallucinations) + auto-credit short residuals + partial-resolution fallback for failure-cascade resilience.
+- `backend/api/views/cnf_ai_search_views.py` — two endpoints: `POST /api/cnf/search/ai-enhanced/` + `POST /api/recipes/decompose/`. Shared per-IP hourly rate limit (50/hr default) + monthly spend circuit breaker ($50/mo default, configurable via `DJANGO_AI_SEARCH_PER_IP_HOURLY` / `DJANGO_AI_SEARCH_MONTHLY_BUDGET_CENTS`). Audience-aware (individual mode hides LLM justification + per-ingredient confidence + audit trail).
+- `backend/_smoke_cnf_matcher.py` — 4-panel × 10-query smoke harness (canonical sanity, synonyms / foreign-language, compound descriptors, brand / fusion / recipe-style). Panel A is the gating panel (10/10 required); B-D are descriptive.
+- `backend/_smoke_cnf_recipe_decomposer.py` — 3-panel × 15-recipe smoke harness (cuisine canonical, simple meals, adversarial composites). Five per-recipe gates aggregated.
+- `frontend/src/components/shared/AIEnhancedSearch.tsx` — drop-in opt-in component beside any basic search input. Renders "Find with AI" button → ranked result card with confidence badge, "Why this match?" tooltip (researcher / policy only), top-3 alternatives, 429 / 503 error messaging.
+- `frontend/src/components/shared/RecipeDecomposerModal.tsx` — modal for the "Score a homemade dish" workflow. User enters dish name + total mass → loading spinner (5-15 s) → editable ingredient list with per-row mass / swap / remove → "Apply to calculator" populates the page's food picker.
+
+**Files modified.**
+
+- `backend/api/urls.py` — 2 new routes.
+- `backend/dish_project/settings.py` — added `AI_SEARCH_PER_IP_HOURLY` + `AI_SEARCH_MONTHLY_BUDGET_CENTS` config.
+- `frontend/src/lib/api.ts` — `CNFApiService.searchFoodsAI()` + `decomposeRecipe()` + `CNFAIMatchResult` + `CNFDecomposedRecipe` interface types.
+- `frontend/src/app/cnf/search/page.tsx` — Phase 4: first surface, drops `<AIEnhancedSearch>` below the basic input.
+- `frontend/src/components/heni-component/HENICalculator.tsx`, `frontend/src/app/{hefi,hsr,fcs}/calculate/page.tsx`, `frontend/src/app/fcs/{compare,food-profile}/page.tsx` — Phase 6: `<AIEnhancedSearch>` rolled out to remaining 6 surfaces.
+- All 4 calculate pages — Phase 9: `<RecipeDecomposerModal>` + "🍳 Score a homemade dish" trigger button wired up; selecting "Apply" pushes the decomposed ingredients into the existing food picker.
+
+**Verification (2026-05-23).**
+
+- `python -m api.services.etl.build_cnf_corpus_embeddings` — built 5,691 × 1,536 corpus in 27.2 s, 27.4 MB on disk.
+- `_smoke_cnf_matcher.py` — **36/40 PASS** overall. Panel A canonical 10/10 (GATE), Panel B synonyms 8/10, Panel C compound 10/10, Panel D adversarial 8/10. The 4 misses (mangetout, aniseed, "kale chips" → kale raw, "avocado toast" → avocado raw) reflect real CNF coverage limits (CNF has the ingredients, not composite snacks), not matcher bugs.
+- `_smoke_cnf_recipe_decomposer.py` — **15/15 PASS** across all 5 gates (min ingredients, mass closure, confidence, no hallucinations, top-2 keyword anchor) including adversarial cases (Buddha bowl, leftover Thanksgiving plate, homemade chicken soup).
+- All pre-existing smokes remain green: `_smoke_audience_aware_contract.py` 52/52, `_smoke_hsr_categorization.py` 36/36, `_smoke_hsr_categorization_sweep.py` 0 anomalies, `_smoke_hsr_canonical_panel.py` 9/9, `_smoke_fcs_canonical_panel.py` 11/11, `_smoke_hefi_canonical_diets.py` 3/3, `_smoke_heni_literature_panel.py` 10/10.
+- `npx tsc --noEmit` clean.
+
+**Live probes confirm end-to-end behaviour:**
+
+- `/api/cnf/search/ai-enhanced/` with `"aubergine"` → CNF 2088 "Eggplant (aubergine, brinjal), raw" at 0.95 confidence (fuzzywuzzy returned nothing meaningful for this query).
+- `/api/cnf/search/ai-enhanced/` with `"low-fat chocolate milk"` → CNF 4711 "Milk, fluid, chocolate, partly skimmed, 1 % M.F." at 0.85.
+- `/api/recipes/decompose/` with `"spaghetti bolognese"` 300 g → 6 ingredients (150 g pasta + 80 g ground beef + 40 g tomato sauce + 10 g onion + 10 g carrot + 5 g olive oil, 5 g unresolved) at decomposition confidence 0.75.
+
+**Cost / runtime envelope.**
+
+- Per AI search: ~$0.001 (one embedding + one gpt-4.1-mini ranking call), 200-2000 ms wall-clock.
+- Per recipe decompose: ~$0.005 (one decomposition LLM call + N matcher calls), 5-15 s wall-clock. Counted as 5× a basic AI search against the monthly budget.
+- Defaults: 50 AI searches / IP / hour + $50 / month global. Both configurable.
+
+**Out of scope (explicit).** Multi-language UI, recipe scaling/saving/sharing, image-based food recognition, voice-to-text, A/B testing against fuzzywuzzy. fuzzywuzzy basic search remains the always-on default — AI features are explicit opt-in.
+
+---
+
 ### 2026-05-23 — Audience-aware API + frontend contract for nutrition indicators (AUDIENCE-CODE-1)
 
 **Why this matters.** A platform that serves both lay end-users (consumer decision support) AND researchers / academic publishers (transparency, citation, reproducibility) cannot use a single result presentation. An end-to-end review found three problem classes on the four nutrition endpoints (HENI / HEFI / HSR / FCS): (a) math leakage — μDALY values, raw HSR baseline/modifying points, FCS pre-rescaling `original_score`, FPED cup-equivalents, NOVA classifier rationale strings all rendered uniformly to lay consumers; (b) copy gaps — HEFI's `hefi_interpretation` was hardcoded prose NOT cited to Brassard 2022, HSR's `rating.description` was hardcoded NOT HSRAC v9, FCS had NO recommendation field at all; (c) missing mandatory caveats — HENI's marginality scope-limit (Stylianou 2021 Discussion p. 622), HEFI's single-day caveat (Brassard 2022b Discussion p. 588), HSR's within-category-only rule (HSRAC v9) were not enforced anywhere. The environmental endpoint already had the audience-aware `user_type` pattern; this round extends it to the four nutrition endpoints with literature-cited explanation packs per audience.

@@ -190,3 +190,110 @@ def cnf_ai_enhanced_search(request):
 
     payload = _strip_individual_mode_fields(result.to_dict(), user_type)
     return Response({'success': True, 'result': payload}, status=status.HTTP_200_OK)
+
+
+# --- /api/recipes/decompose ---------------------------------------------
+
+def _strip_recipe_individual_mode_fields(payload: Dict[str, Any], user_type: str) -> Dict[str, Any]:
+    """Individual mode: hide per-ingredient resolution_confidence + audit trail
+    + raw LLM response. Researcher / policy mode see everything."""
+    if user_type != 'individual':
+        return payload
+    redacted = dict(payload)
+    # Strip raw LLM response (researcher-only audit trail)
+    redacted['raw_llm_response'] = None
+    # Strip unresolved-ingredients audit
+    redacted['unresolved_ingredients_audit'] = []
+    # Per-ingredient resolution_confidence is researcher-only too
+    redacted['ingredients'] = [
+        {**ing, 'resolution_confidence': None}
+        for ing in payload.get('ingredients', [])
+    ]
+    return redacted
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def decompose_recipe(request):
+    """Decompose a free-text dish name into CNF ingredients with masses.
+
+    Two-stage: LLM proposes ingredient list → CNFMatcher resolves each
+    ingredient name → CNF FoodID. Returns the full ingredient list with
+    masses, ready to feed into HENI / HEFI / HSR / FCS scoring.
+
+    Request body:
+        {
+            "dish_name": "spaghetti bolognese",
+            "total_mass_g": 300.0,
+            "user_type": "individual"            // optional
+        }
+
+    Response (200):
+        {
+            "success": true,
+            "result": { ... CNFDecomposedRecipe.to_dict() ... }
+        }
+
+    Errors: 400 (invalid input), 429 (rate limit), 503 (circuit breaker), 500.
+
+    Cost: counts as 5× a basic AI search against the monthly budget (two-
+    stage LLM + per-ingredient matcher calls).
+    """
+    dish_name = request.data.get('dish_name', '')
+    total_mass_g = request.data.get('total_mass_g')
+    if not dish_name or not isinstance(dish_name, str) or not dish_name.strip():
+        return Response({
+            'success': False,
+            'error': 'invalid_request',
+            'message': 'Field "dish_name" is required (non-empty string).',
+        }, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        total_mass_g_f = float(total_mass_g)
+        if total_mass_g_f <= 0:
+            raise ValueError('total_mass_g must be > 0')
+    except (TypeError, ValueError):
+        return Response({
+            'success': False,
+            'error': 'invalid_request',
+            'message': 'Field "total_mass_g" is required (positive float).',
+        }, status=status.HTTP_400_BAD_REQUEST)
+    # Sanity bound (no one cooks a 10kg single-dish meal at once)
+    if total_mass_g_f > 5000.0:
+        return Response({
+            'success': False,
+            'error': 'invalid_request',
+            'message': 'total_mass_g exceeds 5000g cap.',
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    user_type = str(request.data.get('user_type', 'individual'))
+    if user_type not in ('individual', 'researcher', 'policy'):
+        user_type = 'individual'
+
+    # Rate limit + circuit breaker (5x cost for decompose)
+    rate_err = _enforce_rate_limit(request, kind='decompose')
+    if rate_err is not None:
+        return rate_err
+
+    try:
+        from api.services.cnf_recipe_decomposer import get_default_decomposer
+        decomposer = get_default_decomposer()
+        result = decomposer.decompose(dish_name, total_mass_g_f)
+    except FileNotFoundError as exc:
+        logger.error('Recipe decompose: corpus not built — %s', exc)
+        return Response({
+            'success': False,
+            'error': 'corpus_not_built',
+            'message': ('Recipe decomposition not configured: CNF corpus embeddings missing. '
+                        'Admin: run python -m api.services.etl.build_cnf_corpus_embeddings.'),
+        }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    except Exception as exc:  # noqa: BLE001
+        logger.exception('Recipe decompose failed for dish=%r mass=%s',
+                         dish_name, total_mass_g)
+        return Response({
+            'success': False,
+            'error': 'internal_error',
+            'message': f'Recipe decomposition failed: {exc!r}',
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    payload = _strip_recipe_individual_mode_fields(result.to_dict(), user_type)
+    return Response({'success': True, 'result': payload}, status=status.HTTP_200_OK)

@@ -11,6 +11,8 @@ import {
 import { HEFIApiService, CNFApiService, type HEFIResult, type FilterOptions, type HEFIInterpretation } from '../../../lib/api';
 import { AudienceToggle, type UserType, type ExplanationsBlock } from '../../../components/shared/AudienceToggle';
 import { ExplanationsPanel } from '../../../components/shared/ExplanationsPanel';
+import { AIEnhancedSearch } from '../../../components/shared/AIEnhancedSearch';
+import { RecipeDecomposerModal } from '../../../components/shared/RecipeDecomposerModal';
 
 interface SelectedFood {
   FoodID: number;
@@ -228,6 +230,7 @@ export default function HEFICalculatePage() {
   // AUDIENCE-CODE-1 follow-up: track which userType the current `result` was
   // computed under so we can flag stale explanations when the user toggles.
   const [lastCalcUserType, setLastCalcUserType] = useState<UserType | null>(null);
+  const [recipeModalOpen, setRecipeModalOpen] = useState(false);
   const [error, setError] = useState<string>('');
   const [filters, setFilters] = useState<FilterOptions | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -453,6 +456,24 @@ export default function HEFICalculatePage() {
                 {searchIsLoading && searchQuery && (
                   <div className="text-sm text-gray-500">Searching...</div>
                 )}
+                {/* AI-MATCH-1: opt-in LLM ranker */}
+                <AIEnhancedSearch
+                  query={searchQuery}
+                  userType={userType}
+                  accent="purple"
+                  onSelect={(food) => addFood({
+                    FoodID: food.food_id,
+                    FoodDescription: food.food_description,
+                  })}
+                />
+                {/* AI-MATCH-1: homemade-dish workflow */}
+                <button
+                  type="button"
+                  onClick={() => setRecipeModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 text-sm text-purple-700 hover:text-purple-900 hover:underline"
+                >
+                  🍳 Score a homemade dish (decompose into CNF ingredients)
+                </button>
 
                 {searchResults.length > 0 && (
                   <div className="bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto">
@@ -608,6 +629,24 @@ export default function HEFICalculatePage() {
           </div>
         </div>
       </div>
+
+      {/* AI-MATCH-1: recipe decomposer modal */}
+      <RecipeDecomposerModal
+        open={recipeModalOpen}
+        onClose={() => setRecipeModalOpen(false)}
+        userType={userType}
+        accent="purple"
+        onApply={(ingredients) => {
+          const additions: SelectedFood[] = ingredients
+            .filter(i => !selectedFoods.some(f => f.FoodID === i.food_id))
+            .map(i => ({
+              FoodID: i.food_id,
+              FoodDescription: i.food_description,
+              amount_g: i.mass_g,
+            }));
+          setSelectedFoods([...selectedFoods, ...additions]);
+        }}
+      />
     </div>
   );
 }

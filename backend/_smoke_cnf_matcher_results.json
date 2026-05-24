@@ -1,0 +1,1189 @@
+{
+  "harness": "CNFMatcher smoke + accuracy (AI-MATCH-1)",
+  "corpus_version": "2026-05-24T01:15:02.625627+00:00",
+  "totals": {
+    "pass": 36,
+    "fail": 4,
+    "total": 40,
+    "per_panel": {
+      "A": {
+        "pass": 10,
+        "total": 10
+      },
+      "B": {
+        "pass": 8,
+        "total": 10
+      },
+      "C": {
+        "pass": 10,
+        "total": 10
+      },
+      "D": {
+        "pass": 8,
+        "total": 10
+      }
+    }
+  },
+  "results": [
+    {
+      "panel": "A",
+      "query": "Apple, raw, with skin",
+      "expected": "food_ids=[1696]",
+      "observed_food_id": 1696,
+      "observed_description": "Apple, raw, with skin",
+      "observed_group": "Fruits and fruit juices",
+      "observed_confidence": 0.95,
+      "observed_alternatives": [
+        {
+          "food_id": 1697,
+          "description": "Apple, raw, without skin",
+          "similarity": 0.72
+        },
+        {
+          "food_id": 502433,
+          "description": "Apple, Red Delicious, raw, with skin",
+          "similarity": 0.704
+        },
+        {
+          "food_id": 502436,
+          "description": "Apple, Fuji, raw, with skin",
+          "similarity": 0.699
+        }
+      ],
+      "passed": true,
+      "detail": "canonical apple FoodID",
+      "timing_ms": 1894.0
+    },
+    {
+      "panel": "A",
+      "query": "Bread, white, commercial",
+      "expected": "food_ids=[4066, 4067, 4068, 4069, 4070]",
+      "observed_food_id": 4066,
+      "observed_description": "Bread, white, commercial",
+      "observed_group": "Baked Products",
+      "observed_confidence": 0.85,
+      "observed_alternatives": [
+        {
+          "food_id": 3732,
+          "description": "Bread, white, commercial, toasted",
+          "similarity": 0.786
+        },
+        {
+          "food_id": 3714,
+          "description": "Bread, white with raisins, commercial",
+          "similarity": 0.763
+        },
+        {
+          "food_id": 502532,
+          "description": "Bread, white, commercial, with added fibre, toasted",
+          "similarity": 0.759
+        }
+      ],
+      "passed": true,
+      "detail": "white bread family",
+      "timing_ms": 1244.3
+    },
+    {
+      "panel": "A",
+      "query": "Beef stew, canned",
+      "expected": "food_ids=[4964]",
+      "observed_food_id": 4964,
+      "observed_description": "Beef stew, canned",
+      "observed_group": "Mixed Dishes",
+      "observed_confidence": 0.95,
+      "observed_alternatives": [
+        {
+          "food_id": 964,
+          "description": "Soup, vegetable with beef broth, canned, condensed",
+          "similarity": 0.603
+        },
+        {
+          "food_id": 1119,
+          "description": "Soup, vegetable with beef (and barley), canned, condensed",
+          "similarity": 0.602
+        },
+        {
+          "food_id": 2791,
+          "description": "Beef, cured, corned beef, canned",
+          "similarity": 0.599
+        }
+      ],
+      "passed": true,
+      "detail": "canonical canned beef stew (used in HSR audit panel)",
+      "timing_ms": 1087.4
+    },
+    {
+      "panel": "A",
+      "query": "Cheese, cheddar",
+      "expected": "food_ids=[119]",
+      "observed_food_id": 119,
+      "observed_description": "Cheese, cheddar",
+      "observed_group": "Dairy and Egg Products",
+      "observed_confidence": 0.95,
+      "observed_alternatives": [
+        {
+          "food_id": 5566,
+          "description": "Cheese, cheddar, imitation",
+          "similarity": 0.633
+        },
+        {
+          "food_id": 23,
+          "description": "Cheese, cheshire",
+          "similarity": 0.628
+        },
+        {
+          "food_id": 24,
+          "description": "Cheese, colby",
+          "similarity": 0.596
+        }
+      ],
+      "passed": true,
+      "detail": "canonical cheddar",
+      "timing_ms": 984.8
+    },
+    {
+      "panel": "A",
+      "query": "Vegetable oil, olive",
+      "expected": "food_ids=[422]",
+      "observed_food_id": 422,
+      "observed_description": "Vegetable oil, olive",
+      "observed_group": "Fats and Oils",
+      "observed_confidence": 0.95,
+      "observed_alternatives": [
+        {
+          "food_id": 5622,
+          "description": "Vegetable oil, corn, peanut and olive",
+          "similarity": 0.657
+        },
+        {
+          "food_id": 436,
+          "description": "Vegetable oil, grapeseed",
+          "similarity": 0.637
+        },
+        {
+          "food_id": 439,
+          "description": "Vegetable oil, walnut",
+          "similarity": 0.624
+        }
+      ],
+      "passed": true,
+      "detail": "canonical olive oil",
+      "timing_ms": 1315.7
+    },
+    {
+      "panel": "A",
+      "query": "Yogourt, plain, fat-free",
+      "expected": "food_ids=[502157]",
+      "observed_food_id": 502157,
+      "observed_description": "Yogourt, plain, fat free (0-0.5% MF)",
+      "observed_group": "Dairy and Egg Products",
+      "observed_confidence": 0.95,
+      "observed_alternatives": [
+        {
+          "food_id": 502188,
+          "description": "Yogourt, Greek style, plain, fat free (0-0.5% M.F.)",
+          "similarity": 0.745
+        },
+        {
+          "food_id": 502329,
+          "description": "Yogourt, plain, fat free, with added Vitamin D (0-0.5% MF)",
+          "similarity": 0.723
+        },
+        {
+          "food_id": 502190,
+          "description": "Yogourt, Greek style, vanilla flavoured, fat free (0-0.5% M.F.)",
+          "similarity": 0.714
+        }
+      ],
+      "passed": true,
+      "detail": "French CNF spelling (Yogourt) of plain yogurt",
+      "timing_ms": 1040.9
+    },
+    {
+      "panel": "A",
+      "query": "Milk, fluid, partly skimmed, 2% M.F.",
+      "expected": "food_ids=[61]",
+      "observed_food_id": 61,
+      "observed_description": "Milk, fluid, partly skimmed, 2% M.F.",
+      "observed_group": "Dairy and Egg Products",
+      "observed_confidence": 0.95,
+      "observed_alternatives": [
+        {
+          "food_id": 63,
+          "description": "Milk, fluid, partly skimmed, 1% M.F.",
+          "similarity": 0.799
+        },
+        {
+          "food_id": 70,
+          "description": "Milk, fluid, chocolate, partly skimmed, 2% M.F.",
+          "similarity": 0.782
+        },
+        {
+          "food_id": 4711,
+          "description": "Milk, fluid, chocolate, partly skimmed, 1% M.F.",
+          "similarity": 0.772
+        }
+      ],
+      "passed": true,
+      "detail": "canonical 2% milk",
+      "timing_ms": 1188.5
+    },
+    {
+      "panel": "A",
+      "query": "Cheese, brie",
+      "expected": "food_ids=[20]",
+      "observed_food_id": 20,
+      "observed_description": "Cheese, brie",
+      "observed_group": "Dairy and Egg Products",
+      "observed_confidence": 0.95,
+      "observed_alternatives": [
+        {
+          "food_id": 4059,
+          "description": "Sweet roll, cheese",
+          "similarity": 0.628
+        },
+        {
+          "food_id": 32,
+          "description": "Cheese, gruyere",
+          "similarity": 0.567
+        },
+        {
+          "food_id": 37,
+          "description": "Cheese, muenster",
+          "similarity": 0.567
+        }
+      ],
+      "passed": true,
+      "detail": "canonical brie",
+      "timing_ms": 1087.1
+    },
+    {
+      "panel": "A",
+      "query": "Apple juice, canned or bottled, without added vitamin C",
+      "expected": "food_ids=[1495]",
+      "observed_food_id": 1495,
+      "observed_description": "Apple juice, canned or bottled, without added vitamin C",
+      "observed_group": "Fruits and fruit juices",
+      "observed_confidence": 0.95,
+      "observed_alternatives": [
+        {
+          "food_id": 1752,
+          "description": "Apple juice, canned or bottled, added vitamin C",
+          "similarity": 0.71
+        },
+        {
+          "food_id": 502695,
+          "description": "Apple juice, canned or bottled, unsweetened, calcium and Vitamin C and D added",
+          "similarity": 0.701
+        },
+        {
+          "food_id": 1576,
+          "description": "Grape juice, canned or bottled, without added vitamin C",
+          "similarity": 0.671
+        }
+      ],
+      "passed": true,
+      "detail": "canonical apple juice",
+      "timing_ms": 3995.4
+    },
+    {
+      "panel": "A",
+      "query": "Salad dressing, mayonnaise, commercial, regular",
+      "expected": "food_ids=[531]",
+      "observed_food_id": 531,
+      "observed_description": "Salad dressing, mayonnaise, commercial, regular",
+      "observed_group": "Fats and Oils",
+      "observed_confidence": 0.95,
+      "observed_alternatives": [
+        {
+          "food_id": 527,
+          "description": "Salad dressing, mayonnaise type, commercial, regular",
+          "similarity": 0.756
+        },
+        {
+          "food_id": 5330,
+          "description": "Salad dressing, ranch dressing, commercial, regular",
+          "similarity": 0.721
+        },
+        {
+          "food_id": 5466,
+          "description": "Salad dressing, peppercorn dressing, commercial, regular",
+          "similarity": 0.697
+        }
+      ],
+      "passed": true,
+      "detail": "canonical mayonnaise",
+      "timing_ms": 1188.2
+    },
+    {
+      "panel": "B",
+      "query": "aubergine",
+      "expected": "group~='vegetable'",
+      "observed_food_id": 2088,
+      "observed_description": "Eggplant (aubergine, brinjal), raw",
+      "observed_group": "Vegetables and Vegetable Products",
+      "observed_confidence": 0.95,
+      "observed_alternatives": [
+        {
+          "food_id": 2089,
+          "description": "Eggplant (aubergine, brinjal), boiled, drained",
+          "similarity": 0.457
+        },
+        {
+          "food_id": 501642,
+          "description": "Eggplant (aubergine, brinjal), boiled, drained, with salt",
+          "similarity": 0.427
+        },
+        {
+          "food_id": 5550,
+          "description": "Eggplant, pickled",
+          "similarity": 0.399
+        }
+      ],
+      "passed": true,
+      "detail": "British / French \u2192 eggplant",
+      "timing_ms": 1141.8
+    },
+    {
+      "panel": "B",
+      "query": "courgette",
+      "expected": "group~='vegetable'",
+      "observed_food_id": 2225,
+      "observed_description": "Squash, summer, zucchini, raw",
+      "observed_group": "Vegetables and Vegetable Products",
+      "observed_confidence": 0.85,
+      "observed_alternatives": [
+        {
+          "food_id": 2346,
+          "description": "Squash, summer, zucchini, baby, raw",
+          "similarity": 0.627
+        },
+        {
+          "food_id": 2226,
+          "description": "Squash, summer, zucchini, boiled, drained",
+          "similarity": 0.62
+        },
+        {
+          "food_id": 501772,
+          "description": "Squash, summer, zucchini, boiled, drained, with salt",
+          "similarity": 0.607
+        }
+      ],
+      "passed": true,
+      "detail": "British / French \u2192 zucchini",
+      "timing_ms": 1110.2
+    },
+    {
+      "panel": "B",
+      "query": "yogourt",
+      "expected": "group~='dairy'",
+      "observed_food_id": 502160,
+      "observed_description": "Yogourt, fruit flavoured, artificially sweetened, fat free (0-0.5% M.F.), with added Vitamin D",
+      "observed_group": "Dairy and Egg Products",
+      "observed_confidence": 0.8,
+      "observed_alternatives": [
+        {
+          "food_id": 502206,
+          "description": "Yogourt, with crunchy granola/cereal topping",
+          "similarity": 0.645
+        },
+        {
+          "food_id": 502041,
+          "description": "Yogourt parfait, with fruit and granola, reduced fat yogourt",
+          "similarity": 0.643
+        },
+        {
+          "food_id": 502199,
+          "description": "Yogourt, soy, fruit flavoured, with added fibre",
+          "similarity": 0.632
+        }
+      ],
+      "passed": true,
+      "detail": "French spelling of yogurt (no qualifier)",
+      "timing_ms": 1292.5
+    },
+    {
+      "panel": "B",
+      "query": "rocket leaves",
+      "expected": "group~='vegetable'",
+      "observed_food_id": 2352,
+      "observed_description": "Arugula, raw",
+      "observed_group": "Vegetables and Vegetable Products",
+      "observed_confidence": 0.85,
+      "observed_alternatives": [
+        {
+          "food_id": 5883,
+          "description": "Fireweed, native, young leaves, raw",
+          "similarity": 0.38
+        },
+        {
+          "food_id": 5412,
+          "description": "Lettuce, red leaf",
+          "similarity": 0.363
+        },
+        {
+          "food_id": 2249,
+          "description": "Taro leaves, raw",
+          "similarity": 0.357
+        }
+      ],
+      "passed": true,
+      "detail": "British \u2192 arugula",
+      "timing_ms": 1336.8
+    },
+    {
+      "panel": "B",
+      "query": "cilantro",
+      "expected": "group~='vegetable'",
+      "observed_food_id": 2067,
+      "observed_description": "Coriander (cilantro), raw",
+      "observed_group": "Vegetables and Vegetable Products",
+      "observed_confidence": 0.85,
+      "observed_alternatives": [
+        {
+          "food_id": 181,
+          "description": "Spices, coriander seed (cilantro)",
+          "similarity": 0.527
+        },
+        {
+          "food_id": 180,
+          "description": "Spices, coriander leaf (cilantro), dried",
+          "similarity": 0.498
+        },
+        {
+          "food_id": 2497,
+          "description": "Pickles, cucumber, dill, low sodium",
+          "similarity": 0.436
+        }
+      ],
+      "passed": true,
+      "detail": "Spanish/Mexican \u2192 coriander leaves (CNF likely uses coriander)",
+      "timing_ms": 1083.0
+    },
+    {
+      "panel": "B",
+      "query": "bell pepper red",
+      "expected": "group~='vegetable'",
+      "observed_food_id": 2484,
+      "observed_description": "Pepper, sweet, red, raw",
+      "observed_group": "Vegetables and Vegetable Products",
+      "observed_confidence": 0.85,
+      "observed_alternatives": [
+        {
+          "food_id": 2322,
+          "description": "Pepper, hot chili, red or green, raw",
+          "similarity": 0.599
+        },
+        {
+          "food_id": 2355,
+          "description": "Pepper, hot chili, red, sun-dried",
+          "similarity": 0.576
+        },
+        {
+          "food_id": 2160,
+          "description": "Pepper, hot chili, red or green, canned, solids and liquid",
+          "similarity": 0.559
+        }
+      ],
+      "passed": true,
+      "detail": "descriptor synonym for sweet pepper",
+      "timing_ms": 1306.1
+    },
+    {
+      "panel": "B",
+      "query": "romaine lettuce",
+      "expected": "group~='vegetable'",
+      "observed_food_id": 2116,
+      "observed_description": "Lettuce, cos or romaine",
+      "observed_group": "Vegetables and Vegetable Products",
+      "observed_confidence": 0.95,
+      "observed_alternatives": [
+        {
+          "food_id": 2398,
+          "description": "Lettuce, iceberg",
+          "similarity": 0.546
+        },
+        {
+          "food_id": 2117,
+          "description": "Lettuce, looseleaf",
+          "similarity": 0.544
+        },
+        {
+          "food_id": 2073,
+          "description": "Cornsalad (lamb's lettuce), raw",
+          "similarity": 0.54
+        }
+      ],
+      "passed": true,
+      "detail": "variety synonym for cos lettuce",
+      "timing_ms": 996.0
+    },
+    {
+      "panel": "B",
+      "query": "soya sauce",
+      "expected": "group~='soup'",
+      "observed_food_id": 3329,
+      "observed_description": "Soy sauce (made from soy), tamari",
+      "observed_group": "Legumes and Legume Products",
+      "observed_confidence": 0.95,
+      "observed_alternatives": [
+        {
+          "food_id": 3330,
+          "description": "Soy sauce (made with hydrolyzed vegetable protein)",
+          "similarity": 0.712
+        },
+        {
+          "food_id": 502466,
+          "description": "Soy sauce (made with hydrolyzed vegetable protein), reduced sodium",
+          "similarity": 0.676
+        },
+        {
+          "food_id": 3416,
+          "description": "Soy sauce (made with soy and wheat), shoyu, sodium reduced",
+          "similarity": 0.655
+        }
+      ],
+      "passed": false,
+      "detail": "no expected match",
+      "timing_ms": 934.6
+    },
+    {
+      "panel": "B",
+      "query": "aniseed",
+      "expected": "group~='spices'",
+      "observed_food_id": 170,
+      "observed_description": "Spices, anise seeds",
+      "observed_group": "Spices and Herbs",
+      "observed_confidence": 0.8,
+      "observed_alternatives": [
+        {
+          "food_id": 184,
+          "description": "Spices, dill seed",
+          "similarity": 0.546
+        },
+        {
+          "food_id": 185,
+          "description": "Spices, dill weed, dried",
+          "similarity": 0.5
+        },
+        {
+          "food_id": 213,
+          "description": "Spices, dill weed, fresh",
+          "similarity": 0.492
+        }
+      ],
+      "passed": true,
+      "detail": "UK spelling of anise seed (spices/herbs)",
+      "timing_ms": 1120.2
+    },
+    {
+      "panel": "B",
+      "query": "mangetout",
+      "expected": "group~='vegetable'",
+      "observed_food_id": 2135,
+      "observed_description": "Okra (gumbo), boiled, drained",
+      "observed_group": "Vegetables and Vegetable Products",
+      "observed_confidence": 0.4,
+      "observed_alternatives": [
+        {
+          "food_id": 3591,
+          "description": "Game meat, opossum, roasted",
+          "similarity": 0.282
+        },
+        {
+          "food_id": 501783,
+          "description": "Stew, moose",
+          "similarity": 0.277
+        },
+        {
+          "food_id": 3597,
+          "description": "Game meat, raccoon, roasted",
+          "similarity": 0.264
+        }
+      ],
+      "passed": false,
+      "detail": "conf 0.40 < min 0.5",
+      "timing_ms": 2407.9
+    },
+    {
+      "panel": "C",
+      "query": "low-fat chocolate milk",
+      "expected": "group~='dairy'",
+      "observed_food_id": 4711,
+      "observed_description": "Milk, fluid, chocolate, partly skimmed, 1% M.F.",
+      "observed_group": "Dairy and Egg Products",
+      "observed_confidence": 0.85,
+      "observed_alternatives": [
+        {
+          "food_id": 5426,
+          "description": "Hot chocolate, low calorie, with aspartame, mix, powder, with added calcium and ",
+          "similarity": 0.581
+        },
+        {
+          "food_id": 70,
+          "description": "Milk, fluid, chocolate, partly skimmed, 2% M.F.",
+          "similarity": 0.574
+        },
+        {
+          "food_id": 5589,
+          "description": "Chocolate flavour drink, whey and milk based",
+          "similarity": 0.564
+        }
+      ],
+      "passed": true,
+      "detail": "attribute + flavor + commodity",
+      "timing_ms": 1225.0
+    },
+    {
+      "panel": "C",
+      "query": "whole grain bread",
+      "expected": "group~='baked'",
+      "observed_food_id": 502415,
+      "observed_description": "Bread, whole grain (whole-wheat), commercial",
+      "observed_group": "Baked Products",
+      "observed_confidence": 0.85,
+      "observed_alternatives": [
+        {
+          "food_id": 502537,
+          "description": "Bread, whole grain (whole-wheat), +seeds and bran, commercial, toasted",
+          "similarity": 0.62
+        },
+        {
+          "food_id": 502417,
+          "description": "Bread, whole grain (whole-wheat), +seeds and bran, commercial",
+          "similarity": 0.62
+        },
+        {
+          "food_id": 502536,
+          "description": "Bread, whole grain (whole-wheat) + seeds (flax, sunflower), commercial, toasted",
+          "similarity": 0.61
+        }
+      ],
+      "passed": true,
+      "detail": "attribute + commodity",
+      "timing_ms": 1973.2
+    },
+    {
+      "panel": "C",
+      "query": "boneless skinless chicken breast",
+      "expected": "group~='poultry'",
+      "observed_food_id": 841,
+      "observed_description": "Chicken, broiler, breast, skinless, boneless, meat, raw",
+      "observed_group": "Poultry Products",
+      "observed_confidence": 0.85,
+      "observed_alternatives": [
+        {
+          "food_id": 502554,
+          "description": "Chicken, broiler, breast, skinless, boneless, meat, braised",
+          "similarity": 0.616
+        },
+        {
+          "food_id": 502555,
+          "description": "Chicken, broiler, breast, skinless, boneless, meat, grilled",
+          "similarity": 0.594
+        },
+        {
+          "food_id": 501517,
+          "description": "Chicken breast tenders, breaded, uncooked",
+          "similarity": 0.574
+        }
+      ],
+      "passed": true,
+      "detail": "cuts + attribute",
+      "timing_ms": 1237.1
+    },
+    {
+      "panel": "C",
+      "query": "unsweetened almond milk",
+      "expected": "group~='beverage'",
+      "observed_food_id": 502878,
+      "observed_description": "Plant-based beverage, cashew, enriched, unsweetened",
+      "observed_group": "Beverages",
+      "observed_confidence": 0.75,
+      "observed_alternatives": [
+        {
+          "food_id": 502442,
+          "description": "Plant-based beverage, almond, enriched, sweetened, vanilla flavoured",
+          "similarity": 0.53
+        },
+        {
+          "food_id": 502443,
+          "description": "Plant-based beverage, almond, enriched, sweetened, chocolate flavoured",
+          "similarity": 0.515
+        },
+        {
+          "food_id": 503363,
+          "description": "Plant-based beverage, coconut, unenriched, unsweetened",
+          "similarity": 0.482
+        }
+      ],
+      "passed": true,
+      "detail": "plant-based beverage",
+      "timing_ms": 970.6
+    },
+    {
+      "panel": "C",
+      "query": "extra virgin olive oil",
+      "expected": "food_ids=[422]",
+      "observed_food_id": 422,
+      "observed_description": "Vegetable oil, olive",
+      "observed_group": "Fats and Oils",
+      "observed_confidence": 0.8,
+      "observed_alternatives": [
+        {
+          "food_id": 5622,
+          "description": "Vegetable oil, corn, peanut and olive",
+          "similarity": 0.454
+        },
+        {
+          "food_id": 436,
+          "description": "Vegetable oil, grapeseed",
+          "similarity": 0.445
+        },
+        {
+          "food_id": 5328,
+          "description": "Salad dressing, italian, fat free",
+          "similarity": 0.429
+        }
+      ],
+      "passed": true,
+      "detail": "premium olive oil \u2014 should match canonical (CNF lacks \"extra virgin\" tier)",
+      "timing_ms": 1188.2
+    },
+    {
+      "panel": "C",
+      "query": "fat-free Greek yogurt",
+      "expected": "food_ids=[502157, 502158, 502159, 502187, 502188]",
+      "observed_food_id": 502188,
+      "observed_description": "Yogourt, Greek style, plain, fat free (0-0.5% M.F.)",
+      "observed_group": "Dairy and Egg Products",
+      "observed_confidence": 0.95,
+      "observed_alternatives": [
+        {
+          "food_id": 502189,
+          "description": "Yogourt, Greek style, fruit flavoured, fat free (0-0.5% M.F.)",
+          "similarity": 0.663
+        },
+        {
+          "food_id": 502190,
+          "description": "Yogourt, Greek style, vanilla flavoured, fat free (0-0.5% M.F.)",
+          "similarity": 0.654
+        },
+        {
+          "food_id": 502778,
+          "description": "Yogourt, Greek style, fruit flavoured, 2% M.F.",
+          "similarity": 0.603
+        }
+      ],
+      "passed": true,
+      "detail": "Greek / plain / fat-free yogurt family",
+      "timing_ms": 1293.7
+    },
+    {
+      "panel": "C",
+      "query": "whole wheat pasta cooked",
+      "expected": "group~='cereal'",
+      "observed_food_id": 4517,
+      "observed_description": "Pasta, spaghetti, whole-wheat, cooked",
+      "observed_group": "Cereals, Grains and Pasta",
+      "observed_confidence": 0.85,
+      "observed_alternatives": [
+        {
+          "food_id": 4457,
+          "description": "Pasta, macaroni (elbow), whole wheat, cooked",
+          "similarity": 0.561
+        },
+        {
+          "food_id": 4469,
+          "description": "Pasta, spaghetti, unenriched, cooked",
+          "similarity": 0.56
+        },
+        {
+          "food_id": 4464,
+          "description": "Pasta, spaghetti, enriched, cooked",
+          "similarity": 0.557
+        }
+      ],
+      "passed": true,
+      "detail": "cooking-state + attribute",
+      "timing_ms": 933.6
+    },
+    {
+      "panel": "C",
+      "query": "plain unsweetened coffee",
+      "expected": "group~='beverage'",
+      "observed_food_id": 2874,
+      "observed_description": "Coffee, instant, regular, powder",
+      "observed_group": "Beverages",
+      "observed_confidence": 0.8,
+      "observed_alternatives": [
+        {
+          "food_id": 5602,
+          "description": "Coffee, instant, powder, with whitener and artificial sweetener",
+          "similarity": 0.539
+        },
+        {
+          "food_id": 2930,
+          "description": "Coffee, instant, sweetened, mocha flavour, powder, water added",
+          "similarity": 0.538
+        },
+        {
+          "food_id": 2928,
+          "description": "Coffee, instant, sweetened, cappucino flavour, powder, water added",
+          "similarity": 0.537
+        }
+      ],
+      "passed": true,
+      "detail": "ok",
+      "timing_ms": 1033.3
+    },
+    {
+      "panel": "C",
+      "query": "sparkling water",
+      "expected": "group~='beverage'",
+      "observed_food_id": 2918,
+      "observed_description": "Water, mineral, carbonated, bottled",
+      "observed_group": "Beverages",
+      "observed_confidence": 0.85,
+      "observed_alternatives": [
+        {
+          "food_id": 502453,
+          "description": "Vitamin water, flavours not lemon/orange, sweetened",
+          "similarity": 0.548
+        },
+        {
+          "food_id": 502401,
+          "description": "Vitamin water, all flavours, sweetened",
+          "similarity": 0.548
+        },
+        {
+          "food_id": 502403,
+          "description": "Vitamin water, lemon/orange flavours, sweetened",
+          "similarity": 0.541
+        }
+      ],
+      "passed": true,
+      "detail": "ok",
+      "timing_ms": 1053.5
+    },
+    {
+      "panel": "C",
+      "query": "roasted almonds unsalted",
+      "expected": "group~='nuts'",
+      "observed_food_id": 2536,
+      "observed_description": "Nuts, almonds, dry roasted, unblanched",
+      "observed_group": "Nuts and Seeds",
+      "observed_confidence": 0.85,
+      "observed_alternatives": [
+        {
+          "food_id": 2625,
+          "description": "Nuts, almonds, oil roasted, unblanched, salted",
+          "similarity": 0.611
+        },
+        {
+          "food_id": 502702,
+          "description": "Nuts, almonds, oil roasted, lightly salted",
+          "similarity": 0.61
+        },
+        {
+          "food_id": 2624,
+          "description": "Nuts, almonds, dry roasted, unblanched, salted",
+          "similarity": 0.604
+        }
+      ],
+      "passed": true,
+      "detail": "nuts + processing + attribute",
+      "timing_ms": 1399.1
+    },
+    {
+      "panel": "D",
+      "query": "Beyond Meat burger",
+      "expected": "group~='legume'",
+      "observed_food_id": 5968,
+      "observed_description": "Veggie / soy burger patty, unprepared",
+      "observed_group": "Legumes and Legume Products",
+      "observed_confidence": 0.75,
+      "observed_alternatives": [
+        {
+          "food_id": 5546,
+          "description": "Vegetarian meat loaf or patty, meatless",
+          "similarity": 0.471
+        },
+        {
+          "food_id": 501982,
+          "description": "Sandwich, vegetarian burger (veggie burger) + vegetables + mayonnaise",
+          "similarity": 0.469
+        },
+        {
+          "food_id": 502704,
+          "description": "Quinoa burger patty, frozen",
+          "similarity": 0.436
+        }
+      ],
+      "passed": true,
+      "detail": "plant-based brand-name burger; closest CNF will be a legume product",
+      "timing_ms": 1028.6
+    },
+    {
+      "panel": "D",
+      "query": "rotisserie chicken",
+      "expected": "group~='poultry'",
+      "observed_food_id": 501877,
+      "observed_description": "Chicken, broiler, thigh, meat and skin, cooked, rotisserie, with seasoning",
+      "observed_group": "Poultry Products",
+      "observed_confidence": 0.85,
+      "observed_alternatives": [
+        {
+          "food_id": 501876,
+          "description": "Chicken, broiler, drumstick, meat and skin, cooked, rotisserie, with seasoning",
+          "similarity": 0.596
+        },
+        {
+          "food_id": 501875,
+          "description": "Chicken, broiler, breast, meat and skin, cooked, rotisserie, with seasoning",
+          "similarity": 0.589
+        },
+        {
+          "food_id": 501871,
+          "description": "Chicken, broiler, skin, cooked, rotisserie, with seasoning",
+          "similarity": 0.589
+        }
+      ],
+      "passed": true,
+      "detail": "ok",
+      "timing_ms": 1199.5
+    },
+    {
+      "panel": "D",
+      "query": "homemade beef stew",
+      "expected": "food_ids=[4964, 502002, 502003]",
+      "observed_food_id": 502002,
+      "observed_description": "Beef stew with potatoes and vegetables",
+      "observed_group": "Mixed Dishes",
+      "observed_confidence": 0.8,
+      "observed_alternatives": [
+        {
+          "food_id": 4964,
+          "description": "Beef stew, canned",
+          "similarity": 0.585
+        },
+        {
+          "food_id": 5336,
+          "description": "Soup, stock, beef, homemade",
+          "similarity": 0.539
+        },
+        {
+          "food_id": 501783,
+          "description": "Stew, moose",
+          "similarity": 0.516
+        }
+      ],
+      "passed": true,
+      "detail": "matches canned beef stew or beef-stew-with-vegetables",
+      "timing_ms": 1171.4
+    },
+    {
+      "panel": "D",
+      "query": "spaghetti bolognese",
+      "expected": "group~='mixed'",
+      "observed_food_id": 501994,
+      "observed_description": "Spaghetti with meat sauce",
+      "observed_group": "Mixed Dishes",
+      "observed_confidence": 0.8,
+      "observed_alternatives": [
+        {
+          "food_id": 5867,
+          "description": "Spaghetti, with meatballs in tomato sauce, canned",
+          "similarity": 0.545
+        },
+        {
+          "food_id": 502717,
+          "description": "Spaghetti with pomodoro sauce (tomato sauce)",
+          "similarity": 0.535
+        },
+        {
+          "food_id": 5868,
+          "description": "Spaghetti, without meat, canned",
+          "similarity": 0.513
+        }
+      ],
+      "passed": true,
+      "detail": "ok",
+      "timing_ms": 1368.6
+    },
+    {
+      "panel": "D",
+      "query": "chicken pad thai",
+      "expected": "group~='mixed'",
+      "observed_food_id": 501989,
+      "observed_description": "Pad tha\u00ef with chicken",
+      "observed_group": "Mixed Dishes",
+      "observed_confidence": 0.95,
+      "observed_alternatives": [
+        {
+          "food_id": 501997,
+          "description": "Stir fry with chicken",
+          "similarity": 0.507
+        },
+        {
+          "food_id": 502005,
+          "description": "General Tao (Tso) chicken",
+          "similarity": 0.468
+        },
+        {
+          "food_id": 502003,
+          "description": "Chicken, saut\u00e9ed with almonds (almond guy ding)",
+          "similarity": 0.467
+        }
+      ],
+      "passed": true,
+      "detail": "fusion dish; closest CNF mixed-dish",
+      "timing_ms": 1057.4
+    },
+    {
+      "panel": "D",
+      "query": "kale chips",
+      "expected": "group~='snack'",
+      "observed_food_id": 2395,
+      "observed_description": "Kale, raw",
+      "observed_group": "Vegetables and Vegetable Products",
+      "observed_confidence": 0.6,
+      "observed_alternatives": [
+        {
+          "food_id": 2295,
+          "description": "Kale, scotch, raw",
+          "similarity": 0.539
+        },
+        {
+          "food_id": 501664,
+          "description": "Kale, boiled, drained, with salt",
+          "similarity": 0.526
+        },
+        {
+          "food_id": 501666,
+          "description": "Kale, frozen, boiled, drained, with salt",
+          "similarity": 0.515
+        }
+      ],
+      "passed": false,
+      "detail": "no expected match",
+      "timing_ms": 1223.1
+    },
+    {
+      "panel": "D",
+      "query": "protein shake whey",
+      "expected": "group~='beverage'",
+      "observed_food_id": 502447,
+      "observed_description": "Beverage, protein powder, whey based, powder",
+      "observed_group": "Beverages",
+      "observed_confidence": 0.85,
+      "observed_alternatives": [
+        {
+          "food_id": 502445,
+          "description": "Beverage, whey protein isolate, powder",
+          "similarity": 0.519
+        },
+        {
+          "food_id": 502449,
+          "description": "Beverages, high protein powder",
+          "similarity": 0.485
+        },
+        {
+          "food_id": 5530,
+          "description": "Milk shake, not chocolate, dry mix, unprepared",
+          "similarity": 0.478
+        }
+      ],
+      "passed": true,
+      "detail": "ok",
+      "timing_ms": 1143.2
+    },
+    {
+      "panel": "D",
+      "query": "buddha bowl",
+      "expected": "group~='mixed'",
+      "observed_food_id": 501998,
+      "observed_description": "Stir fry with tofu",
+      "observed_group": "Mixed Dishes",
+      "observed_confidence": 0.6,
+      "observed_alternatives": [
+        {
+          "food_id": 501991,
+          "description": "Sushi with fish and vegetables",
+          "similarity": 0.367
+        },
+        {
+          "food_id": 501990,
+          "description": "Sushi with vegetables, without fish",
+          "similarity": 0.364
+        },
+        {
+          "food_id": 501989,
+          "description": "Pad tha\u00ef with chicken",
+          "similarity": 0.36
+        }
+      ],
+      "passed": true,
+      "detail": "no canonical recipe; closest fit is mixed-dish or vegetable",
+      "timing_ms": 1274.0
+    },
+    {
+      "panel": "D",
+      "query": "avocado toast",
+      "expected": "group~='baked'",
+      "observed_food_id": 1512,
+      "observed_description": "Avocado, raw, california",
+      "observed_group": "Fruits and fruit juices",
+      "observed_confidence": 0.5,
+      "observed_alternatives": [
+        {
+          "food_id": 1513,
+          "description": "Avocado, raw, florida",
+          "similarity": 0.444
+        },
+        {
+          "food_id": 1511,
+          "description": "Avocado, raw, all commercial varieties",
+          "similarity": 0.428
+        },
+        {
+          "food_id": 502132,
+          "description": "Cereal, ready to eat, Toasted Oats, Selection",
+          "similarity": 0.4
+        }
+      ],
+      "passed": false,
+      "detail": "no expected match",
+      "timing_ms": 1091.1
+    },
+    {
+      "panel": "D",
+      "query": "a\u00e7ai bowl",
+      "expected": "group~='fruit'",
+      "observed_food_id": 502063,
+      "observed_description": "Cereal, ready to eat, Acai Plus Granola, Nature's Path",
+      "observed_group": "Breakfast cereals",
+      "observed_confidence": 0.4,
+      "observed_alternatives": [
+        {
+          "food_id": 1485,
+          "description": "Acerola juice, raw",
+          "similarity": 0.426
+        },
+        {
+          "food_id": 1484,
+          "description": "Acerola (West Indian cherry), raw",
+          "similarity": 0.423
+        },
+        {
+          "food_id": 1523,
+          "description": "Carambola (star fruit), raw",
+          "similarity": 0.388
+        }
+      ],
+      "passed": true,
+      "detail": "fruit-based; closest fit likely a berry or smoothie entry",
+      "timing_ms": 1146.5
+    }
+  ]
+}

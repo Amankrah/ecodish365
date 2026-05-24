@@ -201,6 +201,82 @@ export interface FilterOptions {
   methods: string[];
 }
 
+// AI-MATCH-1 (2026-05-23): payload from /api/cnf/search/ai-enhanced/.
+// Mirrors backend `CNFMatchResult.to_dict()` in
+// backend/api/services/cnf_matcher.py.
+export interface CNFAlternativeMatch {
+  food_id: number;
+  food_description: string;
+  food_group: string;
+  similarity: number;
+}
+
+// AI-MATCH-1: payload from /api/recipes/decompose/.
+// Mirrors backend `CNFDecomposedRecipe.to_dict()` in
+// backend/api/services/cnf_recipe_decomposer.py.
+export interface CNFRecipeIngredient {
+  food_id: number;
+  food_description: string;
+  food_group: string;
+  mass_g: number;
+  rationale: string;
+  resolution_confidence: number | null;       // null in individual mode
+}
+
+export interface CNFDecomposedRecipe {
+  dish_name: string;
+  normalised_dish_name: string;
+  total_mass_g: number;
+  matched: boolean;                           // true iff all 4 gates passed
+  ingredients: CNFRecipeIngredient[];
+  resolved_mass_g: number;
+  unresolved_mass_g: number;
+  decomposition_confidence: number;           // 0-1
+  fallback_reason:
+    | null
+    | 'empty_dish_name'
+    | 'non_positive_mass'
+    | 'no_llm_client'
+    | 'no_candidates'
+    | 'missing_ingredients_field'
+    | 'low_confidence_or_internal'            // individual-mode redaction
+    | string;                                 // detailed reasons (mass_imbalance:..., too_few_ingredients:..., etc.)
+  cache_hit: boolean;
+  timing_ms: number;
+  unresolved_ingredients_audit: Array<{       // empty in individual mode
+    name?: string;
+    mass_g?: number;
+    matcher_food_id?: number | null;
+    matcher_confidence?: number;
+    reason?: string;
+  }>;
+  raw_llm_response?: string | null;           // null in individual mode
+}
+
+export interface CNFAIMatchResult {
+  query: string;                            // original input
+  normalised_query: string;                 // cache key (lowercase, collapsed whitespace)
+  matched: boolean;                         // true iff confidence ≥ threshold AND not hallucinated
+  food_id: number | null;
+  food_description: string | null;
+  food_group: string | null;
+  confidence: number;                       // 0-1
+  justification: string;                    // blank in individual mode
+  alternatives: CNFAlternativeMatch[];      // top-3 next-best (excluding the chosen one)
+  fallback_reason:                          // null on success
+    | null
+    | 'low_confidence'
+    | 'low_confidence_or_internal'          // individual-mode redaction
+    | 'hallucinated_id'
+    | 'no_llm_client'
+    | 'no_candidates'
+    | 'exception';
+  used_ai_ranking: boolean;                 // false = degraded retrieval-only top-1
+  cache_hit: boolean;
+  timing_ms: number;
+  corpus_version: string | null;            // build_date_utc from corpus provenance
+}
+
 // API Service Class
 export class CNFApiService {
   // Enhanced Search & Exploration
@@ -209,6 +285,39 @@ export class CNFApiService {
       params: { q: query, limit, offset }
     });
     return response.data.data;
+  }
+
+  // AI-MATCH-1 (2026-05-23): free-text → CNF FoodID via embedding + LLM
+  // ranking. Opt-in, additive to the fuzzy `searchFoods` above. Server may
+  // return 429 (per-IP rate limit) or 503 (monthly circuit breaker) — surface
+  // both with a clean error.
+  static async searchFoodsAI(
+    query: string,
+    options: { topK?: number; userType?: 'individual' | 'researcher' | 'policy' } = {},
+  ): Promise<CNFAIMatchResult> {
+    const response = await api.post('/cnf/search/ai-enhanced/', {
+      query,
+      top_k: options.topK,
+      user_type: options.userType || 'individual',
+    });
+    return response.data.result as CNFAIMatchResult;
+  }
+
+  // AI-MATCH-1 (Phase 8): free-text dish name → CNF ingredient list with
+  // masses. Two-stage server-side (LLM decompose → CNFMatcher resolve). May
+  // take 5-15 s; long-running modal UX recommended. Same 429/503 surface as
+  // searchFoodsAI.
+  static async decomposeRecipe(
+    dishName: string,
+    totalMassG: number,
+    options: { userType?: 'individual' | 'researcher' | 'policy' } = {},
+  ): Promise<CNFDecomposedRecipe> {
+    const response = await api.post('/recipes/decompose/', {
+      dish_name: dishName,
+      total_mass_g: totalMassG,
+      user_type: options.userType || 'individual',
+    });
+    return response.data.result as CNFDecomposedRecipe;
   }
 
   static async searchFoodsEnhanced(options: EnhancedSearchOptions): Promise<SearchResult> {

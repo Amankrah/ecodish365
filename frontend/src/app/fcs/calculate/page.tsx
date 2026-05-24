@@ -14,6 +14,8 @@ import {
 import { FCSApiService, CNFApiService, type FCSResult, type SearchResult, type FilterOptions } from '@/lib/api';
 import { AudienceToggle, type UserType, type ExplanationsBlock } from '@/components/shared/AudienceToggle';
 import { ExplanationsPanel } from '@/components/shared/ExplanationsPanel';
+import { AIEnhancedSearch } from '@/components/shared/AIEnhancedSearch';
+import { RecipeDecomposerModal } from '@/components/shared/RecipeDecomposerModal';
 
 interface FoodItem {
   id: string;
@@ -44,6 +46,7 @@ export default function FCSCalculate() {
   // AUDIENCE-CODE-1 follow-up: track which userType the current `result` was
   // computed under so we can flag stale explanations when the user toggles.
   const [lastCalcUserType, setLastCalcUserType] = useState<UserType | null>(null);
+  const [recipeModalOpen, setRecipeModalOpen] = useState(false);
   const [isCalculating, setIsCalculating] = useState(false);
   const [filters, setFilters] = useState<FilterOptions | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -360,7 +363,23 @@ export default function FCSCalculate() {
                         />
                         <MagnifyingGlassIcon className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
                       </div>
-                      
+
+                      {/* AI-MATCH-1: opt-in LLM ranker for THIS slot */}
+                      {activeSearch === food.id && search.query.trim() && (
+                        <div className="mt-2">
+                          <AIEnhancedSearch
+                            query={search.query}
+                            userType={userType}
+                            accent="blue"
+                            onSelect={(picked) => selectFood(food.id, {
+                              FoodID: picked.food_id,
+                              FoodDescription: picked.food_description,
+                              FoodCode: undefined as unknown as string,
+                            } as SearchResult['results'][0])}
+                          />
+                        </div>
+                      )}
+
                       {/* Search Results */}
                       {activeSearch === food.id && search.showResults && (
                         <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto">
@@ -402,6 +421,15 @@ export default function FCSCalculate() {
               >
                 <PlusIcon className="w-4 h-4 mr-2" />
                 Add Another Food
+              </button>
+
+              {/* AI-MATCH-1: homemade-dish workflow */}
+              <button
+                type="button"
+                onClick={() => setRecipeModalOpen(true)}
+                className="w-full mt-2 flex items-center justify-center gap-1.5 text-sm text-blue-700 hover:text-blue-900 hover:underline"
+              >
+                🍳 Score a homemade dish (decompose into CNF ingredients)
               </button>
 
               {/* Calculate Button */}
@@ -646,6 +674,30 @@ export default function FCSCalculate() {
           </div>
         </div>
       </div>
+
+      {/* AI-MATCH-1: recipe decomposer modal */}
+      <RecipeDecomposerModal
+        open={recipeModalOpen}
+        onClose={() => setRecipeModalOpen(false)}
+        userType={userType}
+        accent="blue"
+        onApply={(ingredients) => {
+          // FCS uses the same slot pattern as HSR. Replace the empty
+          // starter slot if present, else append.
+          const nextId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+          const seed = (foods.length === 1 && foods[0].food_id === 0)
+            ? []
+            : [...foods];
+          const additions = ingredients
+            .filter(i => !seed.some(f => f.food_id === i.food_id))
+            .map(i => ({
+              id: nextId(),
+              food_id: i.food_id,
+              food_name: i.food_description,
+            }));
+          setFoods(seed.length === 0 ? additions : [...seed, ...additions]);
+        }}
+      />
     </div>
   );
 }

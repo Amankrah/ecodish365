@@ -16,6 +16,9 @@ import { CNFApiService, SearchResult, FoodGroup, Food, EnhancedSearchOptions, Fi
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { debounce } from 'lodash';
+// AI-MATCH-1 (2026-05-23): opt-in LLM ranking layer alongside the basic
+// fuzzy search. CNF Explorer is the first surface; others follow in Phase 6.
+import { AIEnhancedSearch } from '@/components/shared/AIEnhancedSearch';
 
 interface SearchFilters {
   foodGroup: string;
@@ -224,6 +227,22 @@ export default function CNFSearchPage() {
                 <XMarkIcon className="h-5 w-5 text-gray-400 hover:text-gray-600" />
               </button>
             )}
+          </div>
+
+          {/* AI-MATCH-1 (2026-05-23): opt-in AI ranker. Stays out of the way
+              until the user clicks "Find with AI". Selecting a result loads
+              the food details via the existing flow so downstream UX is
+              unchanged. */}
+          <div className="mb-4">
+            <AIEnhancedSearch
+              query={query}
+              userType="individual"
+              accent="blue"
+              onSelect={(food) => {
+                setQuery(food.food_description);
+                loadFoodDetails(food.food_id);
+              }}
+            />
           </div>
 
           {/* Filter Toggle */}

@@ -13,6 +13,7 @@ import {
   InformationCircleIcon
 } from '@heroicons/react/24/outline';
 import { FCSApiService, CNFApiService, type FCSComparison, type SearchResult, type FilterOptions } from '@/lib/api';
+import { AIEnhancedSearch } from '@/components/shared/AIEnhancedSearch';
 
 interface FoodItem {
   id: string;
@@ -306,7 +307,23 @@ export default function FCSCompare() {
                         />
                         <MagnifyingGlassIcon className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
                       </div>
-                      
+
+                      {/* AI-MATCH-1: opt-in LLM ranker for THIS slot */}
+                      {activeSearch === food.id && search.query.trim() && (
+                        <div className="mt-2">
+                          <AIEnhancedSearch
+                            query={search.query}
+                            userType="individual"
+                            accent="blue"
+                            onSelect={(picked) => selectFood(food.id, {
+                              FoodID: picked.food_id,
+                              FoodDescription: picked.food_description,
+                              FoodCode: undefined as unknown as string,
+                            } as SearchResult['results'][0])}
+                          />
+                        </div>
+                      )}
+
                       {/* Search Results */}
                       {activeSearch === food.id && search.showResults && (
                         <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto">
