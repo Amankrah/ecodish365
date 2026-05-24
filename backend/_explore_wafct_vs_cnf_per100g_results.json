@@ -1,0 +1,1738 @@
+{
+  "harness": "WAFCT-EXPLORE Phase 3 — per-100g delta (2026-05-24)",
+  "wafct_path": "C:\\Users\\Windows\\Desktop\\Dev_Projects\\ecodish365\\backend\\raw_wafct\\WAFCT_2019.xlsx",
+  "core_nutrients": [
+    {
+      "infoods": "ENERC_kcal",
+      "cnf": "ENERGY (KILOCALORIES)",
+      "unit": "kcal",
+      "label": "Energy"
+    },
+    {
+      "infoods": "WATER",
+      "cnf": "MOISTURE",
+      "unit": "g",
+      "label": "Water"
+    },
+    {
+      "infoods": "PROTCNT",
+      "cnf": "PROTEIN",
+      "unit": "g",
+      "label": "Protein"
+    },
+    {
+      "infoods": "FAT",
+      "cnf": "FAT (TOTAL LIPIDS)",
+      "unit": "g",
+      "label": "Fat"
+    },
+    {
+      "infoods": "CHOAVLDF",
+      "cnf": "CARBOHYDRATE, TOTAL (BY DIFFERENCE)",
+      "unit": "g",
+      "label": "Carbs"
+    },
+    {
+      "infoods": "FIBTG",
+      "cnf": "FIBRE, TOTAL DIETARY",
+      "unit": "g",
+      "label": "Fibre"
+    },
+    {
+      "infoods": "CA",
+      "cnf": "CALCIUM",
+      "unit": "mg",
+      "label": "Ca"
+    },
+    {
+      "infoods": "FE",
+      "cnf": "IRON",
+      "unit": "mg",
+      "label": "Fe"
+    },
+    {
+      "infoods": "MG",
+      "cnf": "MAGNESIUM",
+      "unit": "mg",
+      "label": "Mg"
+    },
+    {
+      "infoods": "K",
+      "cnf": "POTASSIUM",
+      "unit": "mg",
+      "label": "K"
+    }
+  ],
+  "panels": {
+    "A": [
+      {
+        "panel": "A",
+        "wafct_code": "01_037",
+        "wafct_name": "Rice, white, raw",
+        "cnf_food_id": 4471,
+        "cnf_name": "Grains, rice, white, long-grain, regular, dry",
+        "note": "Both raw uncooked white rice",
+        "wafct_resolved": true,
+        "cnf_resolved": true,
+        "nutrients": [
+          {
+            "nutrient": "Energy",
+            "unit": "kcal",
+            "wafct": 344.0,
+            "cnf": 365.0,
+            "abs_delta": -21.0,
+            "pct_delta": -5.9,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Water",
+            "unit": "g",
+            "wafct": 12.1,
+            "cnf": 11.62,
+            "abs_delta": 0.48,
+            "pct_delta": 4.0,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Protein",
+            "unit": "g",
+            "wafct": 7.0,
+            "cnf": 7.13,
+            "abs_delta": -0.13,
+            "pct_delta": -1.8,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fat",
+            "unit": "g",
+            "wafct": 0.6,
+            "cnf": 0.66,
+            "abs_delta": -0.06,
+            "pct_delta": -9.5,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Carbs",
+            "unit": "g",
+            "wafct": 75.9,
+            "cnf": 79.95,
+            "abs_delta": -4.05,
+            "pct_delta": -5.2,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fibre",
+            "unit": "g",
+            "wafct": 3.6,
+            "cnf": 1.0,
+            "abs_delta": 2.6,
+            "pct_delta": 113.0,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "Ca",
+            "unit": "mg",
+            "wafct": 14.0,
+            "cnf": 28.0,
+            "abs_delta": -14.0,
+            "pct_delta": -66.7,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "Fe",
+            "unit": "mg",
+            "wafct": 1.9,
+            "cnf": 0.8,
+            "abs_delta": 1.1,
+            "pct_delta": 81.5,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "Mg",
+            "unit": "mg",
+            "wafct": 46.0,
+            "cnf": 25.0,
+            "abs_delta": 21.0,
+            "pct_delta": 59.2,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "K",
+            "unit": "mg",
+            "wafct": 181.0,
+            "cnf": 115.0,
+            "abs_delta": 66.0,
+            "pct_delta": 44.6,
+            "flagged_large": true
+          }
+        ],
+        "median_abs_pct_delta": 27.1,
+        "notes": "Both raw uncooked white rice"
+      },
+      {
+        "panel": "A",
+        "wafct_code": "01_043",
+        "wafct_name": "Wheat flour, white, unfortified",
+        "cnf_food_id": 4501,
+        "cnf_name": "Grains, wheat flour, white, all purpose, bleached",
+        "note": "WAFCT unfortified vs CNF bleached + flour-treatment-dependent",
+        "wafct_resolved": true,
+        "cnf_resolved": true,
+        "nutrients": [
+          {
+            "nutrient": "Energy",
+            "unit": "kcal",
+            "wafct": 352.0,
+            "cnf": 364.0,
+            "abs_delta": -12.0,
+            "pct_delta": -3.4,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Water",
+            "unit": "g",
+            "wafct": 12.2,
+            "cnf": 13.58,
+            "abs_delta": -1.38,
+            "pct_delta": -10.7,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Protein",
+            "unit": "g",
+            "wafct": 10.4,
+            "cnf": 12.08,
+            "abs_delta": -1.68,
+            "pct_delta": -14.9,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fat",
+            "unit": "g",
+            "wafct": 1.8,
+            "cnf": 2.49,
+            "abs_delta": -0.69,
+            "pct_delta": -32.2,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "Carbs",
+            "unit": "g",
+            "wafct": 72.2,
+            "cnf": 71.42,
+            "abs_delta": 0.78,
+            "pct_delta": 1.1,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fibre",
+            "unit": "g",
+            "wafct": 2.8,
+            "cnf": 2.7,
+            "abs_delta": 0.1,
+            "pct_delta": 3.6,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Ca",
+            "unit": "mg",
+            "wafct": 17.0,
+            "cnf": 14.0,
+            "abs_delta": 3.0,
+            "pct_delta": 19.4,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fe",
+            "unit": "mg",
+            "wafct": 2.0,
+            "cnf": 4.8,
+            "abs_delta": -2.8,
+            "pct_delta": -82.4,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "Mg",
+            "unit": "mg",
+            "wafct": 20.0,
+            "cnf": 29.0,
+            "abs_delta": -9.0,
+            "pct_delta": -36.7,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "K",
+            "unit": "mg",
+            "wafct": 111.0,
+            "cnf": 98.0,
+            "abs_delta": 13.0,
+            "pct_delta": 12.4,
+            "flagged_large": false
+          }
+        ],
+        "median_abs_pct_delta": 13.7,
+        "notes": "WAFCT unfortified vs CNF bleached + flour-treatment-dependent"
+      },
+      {
+        "panel": "A",
+        "wafct_code": "08_001",
+        "wafct_name": "Egg, chicken, raw",
+        "cnf_food_id": 125,
+        "cnf_name": "Egg, chicken, whole, fresh or frozen, raw",
+        "note": "Direct match — universal commodity",
+        "wafct_resolved": true,
+        "cnf_resolved": true,
+        "nutrients": [
+          {
+            "nutrient": "Energy",
+            "unit": "kcal",
+            "wafct": 150.0,
+            "cnf": 145.0,
+            "abs_delta": 5.0,
+            "pct_delta": 3.4,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Water",
+            "unit": "g",
+            "wafct": 74.5,
+            "cnf": 76.25,
+            "abs_delta": -1.75,
+            "pct_delta": -2.3,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Protein",
+            "unit": "g",
+            "wafct": 13.5,
+            "cnf": 11.8,
+            "abs_delta": 1.7,
+            "pct_delta": 13.4,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fat",
+            "unit": "g",
+            "wafct": 10.6,
+            "cnf": 10.01,
+            "abs_delta": 0.59,
+            "pct_delta": 5.7,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Carbs",
+            "unit": "g",
+            "wafct": 0.2,
+            "cnf": 0.98,
+            "abs_delta": -0.78,
+            "pct_delta": -132.2,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "Fibre",
+            "unit": "g",
+            "wafct": 0.0,
+            "cnf": 0.0,
+            "abs_delta": 0.0,
+            "pct_delta": 0.0,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Ca",
+            "unit": "mg",
+            "wafct": 57.0,
+            "cnf": 45.0,
+            "abs_delta": 12.0,
+            "pct_delta": 23.5,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fe",
+            "unit": "mg",
+            "wafct": 2.2,
+            "cnf": 1.39,
+            "abs_delta": 0.81,
+            "pct_delta": 45.1,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "Mg",
+            "unit": "mg",
+            "wafct": 14.0,
+            "cnf": 9.0,
+            "abs_delta": 5.0,
+            "pct_delta": 43.5,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "K",
+            "unit": "mg",
+            "wafct": 150.0,
+            "cnf": 114.0,
+            "abs_delta": 36.0,
+            "pct_delta": 27.3,
+            "flagged_large": true
+          }
+        ],
+        "median_abs_pct_delta": 18.5,
+        "notes": "Direct match — universal commodity"
+      },
+      {
+        "panel": "A",
+        "wafct_code": "10_001",
+        "wafct_name": "Milk, cow, whole, pasteurized 3.5% fat",
+        "cnf_food_id": 113,
+        "cnf_name": "Milk, fluid, whole, pasteurized, homogenized, 3.25% M.F.",
+        "note": "WAFCT 3.5% vs CNF 3.25% — expect fat ~8% higher in WAFCT",
+        "wafct_resolved": true,
+        "cnf_resolved": true,
+        "nutrients": [
+          {
+            "nutrient": "Energy",
+            "unit": "kcal",
+            "wafct": 64.0,
+            "cnf": 61.0,
+            "abs_delta": 3.0,
+            "pct_delta": 4.8,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Water",
+            "unit": "g",
+            "wafct": 87.5,
+            "cnf": 88.13,
+            "abs_delta": -0.63,
+            "pct_delta": -0.7,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Protein",
+            "unit": "g",
+            "wafct": 3.3,
+            "cnf": 3.15,
+            "abs_delta": 0.15,
+            "pct_delta": 4.7,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fat",
+            "unit": "g",
+            "wafct": 3.4,
+            "cnf": 3.25,
+            "abs_delta": 0.15,
+            "pct_delta": 4.5,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Carbs",
+            "unit": "g",
+            "wafct": 5.1,
+            "cnf": 4.8,
+            "abs_delta": 0.3,
+            "pct_delta": 6.1,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fibre",
+            "unit": "g",
+            "wafct": 0.0,
+            "cnf": 0.0,
+            "abs_delta": 0.0,
+            "pct_delta": 0.0,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Ca",
+            "unit": "mg",
+            "wafct": 119.0,
+            "cnf": 113.0,
+            "abs_delta": 6.0,
+            "pct_delta": 5.2,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fe",
+            "unit": "mg",
+            "wafct": 0.1,
+            "cnf": 0.03,
+            "abs_delta": 0.07,
+            "pct_delta": 107.7,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "Mg",
+            "unit": "mg",
+            "wafct": 12.0,
+            "cnf": 10.0,
+            "abs_delta": 2.0,
+            "pct_delta": 18.2,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "K",
+            "unit": "mg",
+            "wafct": 147.0,
+            "cnf": 132.0,
+            "abs_delta": 15.0,
+            "pct_delta": 10.8,
+            "flagged_large": false
+          }
+        ],
+        "median_abs_pct_delta": 5.0,
+        "notes": "WAFCT 3.5% vs CNF 3.25% — expect fat ~8% higher in WAFCT"
+      },
+      {
+        "panel": "A",
+        "wafct_code": "05_028",
+        "wafct_name": "Banana, yellow flesh, ripe, raw",
+        "cnf_food_id": 1704,
+        "cnf_name": "Banana, raw",
+        "note": "Direct match",
+        "wafct_resolved": true,
+        "cnf_resolved": true,
+        "nutrients": [
+          {
+            "nutrient": "Energy",
+            "unit": "kcal",
+            "wafct": 89.0,
+            "cnf": 89.0,
+            "abs_delta": 0.0,
+            "pct_delta": 0.0,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Water",
+            "unit": "g",
+            "wafct": 75.7,
+            "cnf": 74.91,
+            "abs_delta": 0.79,
+            "pct_delta": 1.0,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Protein",
+            "unit": "g",
+            "wafct": 1.3,
+            "cnf": 1.09,
+            "abs_delta": 0.21,
+            "pct_delta": 17.6,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fat",
+            "unit": "g",
+            "wafct": 0.2,
+            "cnf": 0.33,
+            "abs_delta": -0.13,
+            "pct_delta": -49.1,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "Carbs",
+            "unit": "g",
+            "wafct": 19.2,
+            "cnf": 22.84,
+            "abs_delta": -3.64,
+            "pct_delta": -17.3,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fibre",
+            "unit": "g",
+            "wafct": 2.7,
+            "cnf": 1.7,
+            "abs_delta": 1.0,
+            "pct_delta": 45.5,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "Ca",
+            "unit": "mg",
+            "wafct": 9.0,
+            "cnf": 5.0,
+            "abs_delta": 4.0,
+            "pct_delta": 57.1,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "Fe",
+            "unit": "mg",
+            "wafct": 0.3,
+            "cnf": 0.26,
+            "abs_delta": 0.04,
+            "pct_delta": 14.3,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Mg",
+            "unit": "mg",
+            "wafct": 16.0,
+            "cnf": 27.0,
+            "abs_delta": -11.0,
+            "pct_delta": -51.2,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "K",
+            "unit": "mg",
+            "wafct": 293.0,
+            "cnf": 358.0,
+            "abs_delta": -65.0,
+            "pct_delta": -20.0,
+            "flagged_large": false
+          }
+        ],
+        "median_abs_pct_delta": 18.8,
+        "notes": "Direct match"
+      },
+      {
+        "panel": "A",
+        "wafct_code": "01_039",
+        "wafct_name": "Sorghum, whole grains, raw",
+        "cnf_food_id": 4432,
+        "cnf_name": "Grains, sorghum",
+        "note": "Both raw whole-grain sorghum; CNF entry unqualified",
+        "wafct_resolved": true,
+        "cnf_resolved": true,
+        "nutrients": [
+          {
+            "nutrient": "Energy",
+            "unit": "kcal",
+            "wafct": 345.0,
+            "cnf": 329.0,
+            "abs_delta": 16.0,
+            "pct_delta": 4.7,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Water",
+            "unit": "g",
+            "wafct": 10.2,
+            "cnf": 12.4,
+            "abs_delta": -2.2,
+            "pct_delta": -19.5,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Protein",
+            "unit": "g",
+            "wafct": 11.5,
+            "cnf": 10.62,
+            "abs_delta": 0.88,
+            "pct_delta": 8.0,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fat",
+            "unit": "g",
+            "wafct": 3.5,
+            "cnf": 3.46,
+            "abs_delta": 0.04,
+            "pct_delta": 1.1,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Carbs",
+            "unit": "g",
+            "wafct": 61.1,
+            "cnf": 72.09,
+            "abs_delta": -10.99,
+            "pct_delta": -16.5,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fibre",
+            "unit": "g",
+            "wafct": 11.9,
+            "cnf": 6.7,
+            "abs_delta": 5.2,
+            "pct_delta": 55.9,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "Ca",
+            "unit": "mg",
+            "wafct": 26.0,
+            "cnf": 13.0,
+            "abs_delta": 13.0,
+            "pct_delta": 66.7,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "Fe",
+            "unit": "mg",
+            "wafct": 6.8,
+            "cnf": 3.36,
+            "abs_delta": 3.44,
+            "pct_delta": 67.7,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "Mg",
+            "unit": "mg",
+            "wafct": 193.0,
+            "cnf": 165.0,
+            "abs_delta": 28.0,
+            "pct_delta": 15.6,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "K",
+            "unit": "mg",
+            "wafct": 305.0,
+            "cnf": 363.0,
+            "abs_delta": -58.0,
+            "pct_delta": -17.4,
+            "flagged_large": false
+          }
+        ],
+        "median_abs_pct_delta": 16.9,
+        "notes": "Both raw whole-grain sorghum; CNF entry unqualified"
+      },
+      {
+        "panel": "A",
+        "wafct_code": "09_018",
+        "wafct_name": "Catfish, fillet, raw",
+        "cnf_food_id": 5966,
+        "cnf_name": "Fish, tilapia, raw",
+        "note": "DIFFERENT SPECIES — catfish vs tilapia; both warm-water freshwater",
+        "wafct_resolved": true,
+        "cnf_resolved": true,
+        "nutrients": [
+          {
+            "nutrient": "Energy",
+            "unit": "kcal",
+            "wafct": 101.0,
+            "cnf": 96.0,
+            "abs_delta": 5.0,
+            "pct_delta": 5.1,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Water",
+            "unit": "g",
+            "wafct": 78.7,
+            "cnf": 78.08,
+            "abs_delta": 0.62,
+            "pct_delta": 0.8,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Protein",
+            "unit": "g",
+            "wafct": 16.5,
+            "cnf": 20.08,
+            "abs_delta": -3.58,
+            "pct_delta": -19.6,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fat",
+            "unit": "g",
+            "wafct": 3.8,
+            "cnf": 1.7,
+            "abs_delta": 2.1,
+            "pct_delta": 76.4,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "Carbs",
+            "unit": "g",
+            "wafct": 0.0,
+            "cnf": 0.0,
+            "abs_delta": 0.0,
+            "pct_delta": 0.0,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fibre",
+            "unit": "g",
+            "wafct": 0.0,
+            "cnf": 0.0,
+            "abs_delta": 0.0,
+            "pct_delta": 0.0,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Ca",
+            "unit": "mg",
+            "wafct": 78.0,
+            "cnf": 10.0,
+            "abs_delta": 68.0,
+            "pct_delta": 154.5,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "Fe",
+            "unit": "mg",
+            "wafct": 1.6,
+            "cnf": 0.56,
+            "abs_delta": 1.04,
+            "pct_delta": 96.3,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "Mg",
+            "unit": "mg",
+            "wafct": 25.0,
+            "cnf": 27.0,
+            "abs_delta": -2.0,
+            "pct_delta": -7.7,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "K",
+            "unit": "mg",
+            "wafct": 289.0,
+            "cnf": 302.0,
+            "abs_delta": -13.0,
+            "pct_delta": -4.4,
+            "flagged_large": false
+          }
+        ],
+        "median_abs_pct_delta": 6.4,
+        "notes": "DIFFERENT SPECIES — catfish vs tilapia; both warm-water freshwater"
+      }
+    ],
+    "B": [
+      {
+        "panel": "B",
+        "wafct_code": "01_069",
+        "wafct_name": "Rice, white, polished, boiled (no salt), drained",
+        "cnf_food_id": 4475,
+        "cnf_name": "Grains, rice, white, medium-grain, cooked",
+        "note": "WAFCT long-grain vs CNF medium-grain — boiled both",
+        "wafct_resolved": true,
+        "cnf_resolved": true,
+        "nutrients": [
+          {
+            "nutrient": "Energy",
+            "unit": "kcal",
+            "wafct": 118.0,
+            "cnf": 130.0,
+            "abs_delta": -12.0,
+            "pct_delta": -9.7,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Water",
+            "unit": "g",
+            "wafct": 70.3,
+            "cnf": 68.61,
+            "abs_delta": 1.69,
+            "pct_delta": 2.4,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Protein",
+            "unit": "g",
+            "wafct": 2.3,
+            "cnf": 2.38,
+            "abs_delta": -0.08,
+            "pct_delta": -3.4,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fat",
+            "unit": "g",
+            "wafct": 0.2,
+            "cnf": 0.21,
+            "abs_delta": -0.01,
+            "pct_delta": -4.9,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Carbs",
+            "unit": "g",
+            "wafct": 26.4,
+            "cnf": 28.59,
+            "abs_delta": -2.19,
+            "pct_delta": -8.0,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fibre",
+            "unit": "g",
+            "wafct": 0.6,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Ca",
+            "unit": "mg",
+            "wafct": 3.0,
+            "cnf": 3.0,
+            "abs_delta": 0.0,
+            "pct_delta": 0.0,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fe",
+            "unit": "mg",
+            "wafct": 0.3,
+            "cnf": 0.2,
+            "abs_delta": 0.1,
+            "pct_delta": 40.0,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "Mg",
+            "unit": "mg",
+            "wafct": 8.0,
+            "cnf": 13.0,
+            "abs_delta": -5.0,
+            "pct_delta": -47.6,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "K",
+            "unit": "mg",
+            "wafct": 16.0,
+            "cnf": 29.0,
+            "abs_delta": -13.0,
+            "pct_delta": -57.8,
+            "flagged_large": true
+          }
+        ],
+        "median_abs_pct_delta": 8.0,
+        "notes": "WAFCT long-grain vs CNF medium-grain — boiled both"
+      },
+      {
+        "panel": "B",
+        "wafct_code": "09_020",
+        "wafct_name": "Catfish, fillet, grilled (no salt or fat)",
+        "cnf_food_id": 5966,
+        "cnf_name": "Fish, tilapia, raw",
+        "note": "WAFCT cooked vs CNF RAW — expect water Δ + protein concentration",
+        "wafct_resolved": true,
+        "cnf_resolved": true,
+        "nutrients": [
+          {
+            "nutrient": "Energy",
+            "unit": "kcal",
+            "wafct": 145.5,
+            "cnf": 96.0,
+            "abs_delta": 49.5,
+            "pct_delta": 41.0,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "Water",
+            "unit": "g",
+            "wafct": 69.1,
+            "cnf": 78.08,
+            "abs_delta": -8.98,
+            "pct_delta": -12.2,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Protein",
+            "unit": "g",
+            "wafct": 24.0,
+            "cnf": 20.08,
+            "abs_delta": 3.92,
+            "pct_delta": 17.8,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fat",
+            "unit": "g",
+            "wafct": 5.5,
+            "cnf": 1.7,
+            "abs_delta": 3.8,
+            "pct_delta": 105.6,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "Carbs",
+            "unit": "g",
+            "wafct": 0.0,
+            "cnf": 0.0,
+            "abs_delta": 0.0,
+            "pct_delta": 0.0,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fibre",
+            "unit": "g",
+            "wafct": 0.0,
+            "cnf": 0.0,
+            "abs_delta": 0.0,
+            "pct_delta": 0.0,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Ca",
+            "unit": "mg",
+            "wafct": 113.0,
+            "cnf": 10.0,
+            "abs_delta": 103.0,
+            "pct_delta": 167.5,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "Fe",
+            "unit": "mg",
+            "wafct": 1.9,
+            "cnf": 0.56,
+            "abs_delta": 1.34,
+            "pct_delta": 108.9,
+            "flagged_large": true
+          },
+          {
+            "nutrient": "Mg",
+            "unit": "mg",
+            "wafct": 33.0,
+            "cnf": 27.0,
+            "abs_delta": 6.0,
+            "pct_delta": 20.0,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "K",
+            "unit": "mg",
+            "wafct": 356.0,
+            "cnf": 302.0,
+            "abs_delta": 54.0,
+            "pct_delta": 16.4,
+            "flagged_large": false
+          }
+        ],
+        "median_abs_pct_delta": 18.9,
+        "notes": "WAFCT cooked vs CNF RAW — expect water Δ + protein concentration"
+      }
+    ],
+    "C": [
+      {
+        "panel": "C",
+        "wafct_code": "01_002",
+        "wafct_name": "Fonio, black, whole grains, raw",
+        "cnf_food_id": null,
+        "cnf_name": "(no CNF equivalent — West African cereal)",
+        "note": "Fonio is a West African staple cereal absent from CNF",
+        "wafct_resolved": true,
+        "cnf_resolved": false,
+        "nutrients": [
+          {
+            "nutrient": "Energy",
+            "unit": "kcal",
+            "wafct": 332.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Water",
+            "unit": "g",
+            "wafct": 10.3,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Protein",
+            "unit": "g",
+            "wafct": 8.3,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fat",
+            "unit": "g",
+            "wafct": 3.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Carbs",
+            "unit": "g",
+            "wafct": 59.8,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fibre",
+            "unit": "g",
+            "wafct": 16.4,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Ca",
+            "unit": "mg",
+            "wafct": 51.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fe",
+            "unit": "mg",
+            "wafct": 10.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Mg",
+            "unit": "mg",
+            "wafct": 430.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "K",
+            "unit": "mg",
+            "wafct": 340.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          }
+        ],
+        "median_abs_pct_delta": null,
+        "notes": "WAFCT-only (no CNF counterpart)"
+      },
+      {
+        "panel": "C",
+        "wafct_code": "04_002",
+        "wafct_name": "Baobab, leaves, dried",
+        "cnf_food_id": null,
+        "cnf_name": "(no CNF equivalent — West African leaf vegetable)",
+        "note": "Baobab leaves are a calcium-dense dried leafy green",
+        "wafct_resolved": true,
+        "cnf_resolved": false,
+        "nutrients": [
+          {
+            "nutrient": "Energy",
+            "unit": "kcal",
+            "wafct": 241.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Water",
+            "unit": "g",
+            "wafct": 7.5,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Protein",
+            "unit": "g",
+            "wafct": 13.7,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fat",
+            "unit": "g",
+            "wafct": 2.3,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Carbs",
+            "unit": "g",
+            "wafct": 19.8,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fibre",
+            "unit": "g",
+            "wafct": 42.9,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Ca",
+            "unit": "mg",
+            "wafct": 1244.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fe",
+            "unit": "mg",
+            "wafct": 13.7,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Mg",
+            "unit": "mg",
+            "wafct": 206.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "K",
+            "unit": "mg",
+            "wafct": 1490.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          }
+        ],
+        "median_abs_pct_delta": null,
+        "notes": "WAFCT-only (no CNF counterpart)"
+      },
+      {
+        "panel": "C",
+        "wafct_code": "03_042",
+        "wafct_name": "African locust bean, fermented (soumbala/dawadawa)",
+        "cnf_food_id": null,
+        "cnf_name": "(no CNF equivalent — West African fermented seasoning)",
+        "note": "Fermented seasoning — high protein, very high sodium, regional staple",
+        "wafct_resolved": true,
+        "cnf_resolved": false,
+        "nutrients": [
+          {
+            "nutrient": "Energy",
+            "unit": "kcal",
+            "wafct": 375.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Water",
+            "unit": "g",
+            "wafct": 15.1,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Protein",
+            "unit": "g",
+            "wafct": 33.1,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fat",
+            "unit": "g",
+            "wafct": 15.6,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Carbs",
+            "unit": "g",
+            "wafct": 18.4,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fibre",
+            "unit": "g",
+            "wafct": 14.5,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Ca",
+            "unit": "mg",
+            "wafct": 435.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fe",
+            "unit": "mg",
+            "wafct": 15.2,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Mg",
+            "unit": "mg",
+            "wafct": 154.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "K",
+            "unit": "mg",
+            "wafct": 465.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          }
+        ],
+        "median_abs_pct_delta": null,
+        "notes": "WAFCT-only (no CNF counterpart)"
+      },
+      {
+        "panel": "C",
+        "wafct_code": "02_039",
+        "wafct_name": "Cassava, gari (fermented, grated, toasted, white)",
+        "cnf_food_id": null,
+        "cnf_name": "(no CNF equivalent for gari specifically)",
+        "note": "Gari is a fermented + toasted cassava granule, distinct from CNF cassava",
+        "wafct_resolved": true,
+        "cnf_resolved": false,
+        "nutrients": [
+          {
+            "nutrient": "Energy",
+            "unit": "kcal",
+            "wafct": 351.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Water",
+            "unit": "g",
+            "wafct": 8.9,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Protein",
+            "unit": "g",
+            "wafct": 1.2,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fat",
+            "unit": "g",
+            "wafct": 0.5,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Carbs",
+            "unit": "g",
+            "wafct": 82.9,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fibre",
+            "unit": "g",
+            "wafct": 5.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Ca",
+            "unit": "mg",
+            "wafct": 42.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fe",
+            "unit": "mg",
+            "wafct": 1.6,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Mg",
+            "unit": "mg",
+            "wafct": 23.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "K",
+            "unit": "mg",
+            "wafct": 309.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          }
+        ],
+        "median_abs_pct_delta": null,
+        "notes": "WAFCT-only (no CNF counterpart)"
+      },
+      {
+        "panel": "C",
+        "wafct_code": "06_013",
+        "wafct_name": "Melon seed (egusi), kernel only, dried, raw",
+        "cnf_food_id": null,
+        "cnf_name": "(no CNF equivalent — West African oil seed)",
+        "note": "Egusi seed — oilseed staple of West African soups",
+        "wafct_resolved": true,
+        "cnf_resolved": false,
+        "nutrients": [
+          {
+            "nutrient": "Energy",
+            "unit": "kcal",
+            "wafct": 574.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Water",
+            "unit": "g",
+            "wafct": 6.3,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Protein",
+            "unit": "g",
+            "wafct": 27.6,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fat",
+            "unit": "g",
+            "wafct": 45.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Carbs",
+            "unit": "g",
+            "wafct": 11.6,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fibre",
+            "unit": "g",
+            "wafct": 6.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Ca",
+            "unit": "mg",
+            "wafct": 118.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fe",
+            "unit": "mg",
+            "wafct": 6.3,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Mg",
+            "unit": "mg",
+            "wafct": 383.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "K",
+            "unit": "mg",
+            "wafct": 610.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          }
+        ],
+        "median_abs_pct_delta": null,
+        "notes": "WAFCT-only (no CNF counterpart)"
+      },
+      {
+        "panel": "C",
+        "wafct_code": "02_038",
+        "wafct_name": "Cassava, flour, fermented (alibo/elubo/lafun)",
+        "cnf_food_id": null,
+        "cnf_name": "(no CNF equivalent for fermented cassava flour)",
+        "note": "Fermented cassava flour, distinct from CNF cassava flour",
+        "wafct_resolved": true,
+        "cnf_resolved": false,
+        "nutrients": [
+          {
+            "nutrient": "Energy",
+            "unit": "kcal",
+            "wafct": 344.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Water",
+            "unit": "g",
+            "wafct": 11.1,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Protein",
+            "unit": "g",
+            "wafct": 1.5,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fat",
+            "unit": "g",
+            "wafct": 0.6,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Carbs",
+            "unit": "g",
+            "wafct": 81.2,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fibre",
+            "unit": "g",
+            "wafct": 3.9,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Ca",
+            "unit": "mg",
+            "wafct": 68.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fe",
+            "unit": "mg",
+            "wafct": 3.4,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Mg",
+            "unit": "mg",
+            "wafct": 41.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "K",
+            "unit": "mg",
+            "wafct": 488.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          }
+        ],
+        "median_abs_pct_delta": null,
+        "notes": "WAFCT-only (no CNF counterpart)"
+      },
+      {
+        "panel": "C",
+        "wafct_code": "01_018",
+        "wafct_name": "Pearl millet, IKMV 8201 variety, whole grains, raw",
+        "cnf_food_id": null,
+        "cnf_name": "(no CNF equivalent — pearl millet is sparse in CNF)",
+        "note": "Pearl millet is the West African Sahel cereal; CNF lacks varietals",
+        "wafct_resolved": true,
+        "cnf_resolved": false,
+        "nutrients": [
+          {
+            "nutrient": "Energy",
+            "unit": "kcal",
+            "wafct": 375.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Water",
+            "unit": "g",
+            "wafct": 7.5,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Protein",
+            "unit": "g",
+            "wafct": 9.5,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fat",
+            "unit": "g",
+            "wafct": 6.8,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Carbs",
+            "unit": "g",
+            "wafct": 64.8,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fibre",
+            "unit": "g",
+            "wafct": 8.8,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Ca",
+            "unit": "mg",
+            "wafct": 23.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Fe",
+            "unit": "mg",
+            "wafct": 15.2,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "Mg",
+            "unit": "mg",
+            "wafct": 96.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          },
+          {
+            "nutrient": "K",
+            "unit": "mg",
+            "wafct": 332.0,
+            "cnf": null,
+            "abs_delta": null,
+            "pct_delta": null,
+            "flagged_large": false
+          }
+        ],
+        "median_abs_pct_delta": null,
+        "notes": "WAFCT-only (no CNF counterpart)"
+      }
+    ]
+  }
+}

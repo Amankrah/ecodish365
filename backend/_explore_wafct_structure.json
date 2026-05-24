@@ -1,0 +1,3623 @@
+{
+  "harness": "WAFCT-EXPLORE Phase 1+2 (2026-05-24)",
+  "wafct_path": "C:\\Users\\Windows\\Desktop\\Dev_Projects\\ecodish365\\backend\\raw_wafct\\WAFCT_2019.xlsx",
+  "sheet_names": [
+    "01 Introduction",
+    "02 Components",
+    "03 NV_sum_39 (per 100g EP)",
+    "04 NV_stat_39 (per 100g EP)",
+    "05 NV_sum_57 (per 100g EP)",
+    "06 NV_stat_57 (per 100g EP)",
+    "07 Yield factors, sing_ing",
+    "08 Retention factors",
+    "09 Mixed dishes",
+    "10 FoodEx2 codes",
+    "11 2012 vs 2019 names and codes",
+    "12 Data sources with BiblioID"
+  ],
+  "sheet_01_intro": {
+    "lines_sampled": [
+      "FAO/INFOODS Food Composition Table for Western Africa (2019) / Table de composition alimentaire FAO/INFOODS pour l’Afrique de l’Ouest (2019)",
+      "Anna Vincent, Fernanda Grande, Ella Compaoré, George Amponsah Annor, Paulina S. Addy, Lilian Chinelo Aburime, Djoufouna Ahmed, Achu Mercy Bih Loh, Sergio Dahdouh Cabia, Nina Deflache, Fatoumata Mariam Dembélé, Belembaongo Dieudonné, Oboulbiga B. Edwige, Henrietta N. Ene-Obong, Nadia Fanou Fogny, Mor",
+      "The User Guide for WAFCT 2019 is available at: http://www.fao.org/infoods/infoods/tables-and-databases/faoinfoods-databases/en/",
+      "Le Guide d’utilisation de la TCAAO 2019 est disponible à l'adresse : http://www.fao.org/infoods/infoods/tables-et-bases-de-donnees/bases-de-donnees-faoinfoods-sur-la-composition-des-aliments/fr/",
+      "Structure of WAFCT 2019 Excel datasheets / Structure des feuilles de données Excel de la TCAAO 2019:",
+      "Datasheet / Feuille de données",
+      "Description in English",
+      "Description en français",
+      "01 Introduction",
+      "Gives an introduction to the tables, including information on copyright and disclaimer.",
+      "Présentation des tableaux, incluant des informations sur les droits d‘auteur et une clause de non-responsabilité.",
+      "02 Components",
+      "Gives an overview of all components, listing INFOODS tagnames, descriptions, recommended units, maximal decimal places and significant digits, in English and French.",
+      "Offre un aperçu de tous les composants, avec leurs identifiants INFOODS, descriptions, unités recommandées, nombre maximal de décimales et chiffres significatifs.",
+      "03 NV_sum_39 (per 100 g EP)",
+      "Condensed food composition table without statistics: Presents compiled component values per 100 g EP for all foods for 39 components – without statistics or documentation for data taken from outside Africa.",
+      "Présente les valeurs des nutriments compilées pour 100 g de PC pour tous les aliments et pour 39 composants - sans information statistique ni documentation pour les données extra-africaines.",
+      "04 NV_stat_39 (per 100 g EP)",
+      "Condensed food composition table with statistics: Presents compiled component values per 100 g EP for all foods and 39 components – with statistics and documentation for data taken from outside Africa. NOTE: This table is included in both the User Guide and the Excel Datasheets. However, due to spac",
+      "Présente les valeurs des nutriments compilées pour 100 g de PC pour tous les aliments et 39 composants - avec information statistique et documentation pour les données extra-africaines. NOTE: Ce tableau figure à la fois dans le Guide d’utilisation et dans les Feuilles de données Excel. Toutefois, po",
+      "05 NV_sum_57 (per 100 g EP)",
+      "Full food composition table without statistics: Presents compiled component values per 100 g EP for all foods and 57 components – without statistics or documentation for data taken from outside Africa.",
+      "Présente les valeurs des nutriments compilées pour 100 g de PC pour tous les aliments et 57 composants - sans statistiques ni documentation pour les données extra-africaines.",
+      "06 NV_stat_57 (per 100 g EP)",
+      "Full food composition table with statistics: Presents compiled component values per 100 g EP for all foods and 57 components– with statistics and documentation for data taken from outside Africa.",
+      "Présente les valeurs des nutriments compilées pour 100 g de PC, pour tous les aliments et 57 composants - avec statistiques et documentation concernant les données extra-africaines.",
+      "07 Yield factors, sing_ing",
+      "Yield factors used in single ingredient cooked foods, including source(s) for each food.",
+      "Facteurs de rendement utilisés pour les aliments cuits à un seul ingrédient, avec les sources pour chaque aliment.",
+      "08 Retention factors",
+      "Retention factors used in calculating single ingredient cooked foods and mixed dishes in English and French.",
+      "Facteurs de rétention utilisés pour le calcul des aliments cuits à un seul ingrédient et des plats composés, en anglais et en français.",
+      "09 Mixed dishes",
+      "Recipes of mixed dishes, including recipe description and yield factors, in English and French.",
+      "Recettes de plats composés, avec description de la recette et facteurs de rendement, en anglais et en français.",
+      "10 FoodEx2 codes",
+      "List of food names, food codes and the corresponding FoodEx2 code.",
+      "Liste des noms d’aliments, des codes d’aliments et du code FoodEx2 correspondant.",
+      "11 2012 vs 2019 names and codes",
+      "Comparison of names and food codes between the 2012 and 2019 editions of WAFCT.",
+      "Comparaison des noms et des codes d´aliments des éditions 2012 et 2019 de la TCAAO.",
+      "12 Data sources with BiblioID",
+      "List of publications and sources used for all data compiled, ordered by corresponding BiblioID.",
+      "Liste des publications et des sources utilisées pour toutes les données compilées, dans l’ordre de l’identifiant BiblioID correspondant.",
+      "Required citation/ Citer comme suit: Vincent, A., Grande, F., Compaoré, E., Amponsah Annor, G., Addy, P.A., Aburime, L.C., Ahmed, D., Bih Loh, A.M., Dahdouh Cabia, S., Deflache, N., Dembélé, F.M., Dieudonné, B., Edwige, O.B., Ene-Obong, H.N., Fanou Fogny, N., Ferreira, M., Omaghomi Jemide, J., Koueb",
+      "The designations employed and the presentation of material in this information product do not imply the expression of any opinion whatsoever on the part of the Food and Agriculture Organization of the United Nations (FAO) concerning the legal or development status of any country, territory, city or "
+    ],
+    "n_lines_sampled": 46
+  },
+  "sheet_02_components": {
+    "n_components": 58,
+    "tagnames_canonical": [
+      "ALC",
+      "ASH",
+      "CA",
+      "CARTA",
+      "CARTB",
+      "CARTBEQ",
+      "CHOAVLDF",
+      "CHOLE",
+      "CRYPXB",
+      "CU",
+      "EDIBLE1",
+      "EDIBLE2",
+      "ENERC",
+      "F18D2CN6",
+      "F18D3CN3",
+      "FAMS",
+      "FAPU",
+      "FASAT",
+      "FAT",
+      "FE",
+      "FIBTG",
+      "FOL",
+      "FOLAC",
+      "FOLDFE",
+      "FOLFD",
+      "IP3",
+      "IP4",
+      "IP5",
+      "IP6",
+      "K",
+      "MG",
+      "NA",
+      "NIA",
+      "NIAEQ",
+      "P",
+      "PHYTCPP",
+      "PROTCNT",
+      "RETOL",
+      "RIBF",
+      "SOP",
+      "THIA",
+      "TOCPHA",
+      "TOCPHB",
+      "TOCPHD",
+      "TOCPHG",
+      "TRP",
+      "VITA",
+      "VITA_RAE",
+      "VITB12",
+      "VITB6C",
+      "VITC",
+      "VITD",
+      "VITE",
+      "WATER",
+      "XFA",
+      "XN",
+      "ZN"
+    ],
+    "components": [
+      {
+        "tag_raw": "EDIBLE1",
+        "tag_canonical": "EDIBLE1",
+        "name_en": "Edible portion 1",
+        "name_fr": "Portion comestible 1",
+        "unit": "-",
+        "denominator": "-",
+        "sig_figs": "3",
+        "max_decimals": "2",
+        "datasheet": "03-06",
+        "method_en": "Edible portion coefficient (from as purchased to as described)"
+      },
+      {
+        "tag_raw": "EDIBLE2",
+        "tag_canonical": "EDIBLE2",
+        "name_en": "Edible portion 2",
+        "name_fr": "Portion comestible 2",
+        "unit": "-",
+        "denominator": "-",
+        "sig_figs": "3",
+        "max_decimals": "2",
+        "datasheet": "05, 06",
+        "method_en": "Edible portion coefficient (from as described to as eaten)"
+      },
+      {
+        "tag_raw": "SOP",
+        "tag_canonical": "SOP",
+        "name_en": "Sum of proximate components (SOP)",
+        "name_fr": "Somme des macronutriments (SOP)",
+        "unit": "g",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "1",
+        "datasheet": "05, 06",
+        "method_en": "Sum of proximate components (g/100 g EP) = water (g/100 g EP) + total fat (g/100 g EP) + available carbohydrate (g/100 g EP) + total protein (g/100 g EP) + ash (g/100 g EP) + total dietary fibre (g/100 g EP) + alcohol (g/100 g EP)"
+      },
+      {
+        "tag_raw": "ENERC",
+        "tag_canonical": "ENERC",
+        "name_en": "Energy",
+        "name_fr": "Énergie",
+        "unit": "kJ",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "0",
+        "datasheet": "03-06",
+        "method_en": "Energy (kJ/100 g EP) = total protein (g/100 g EP) × 17 + total fat (g/100 g EP) × 37 + available carbohydrate (g/100 g EP) × 17 + total dietary fibre (g/100 g EP) × 8 + alcohol (g/100 g EP) × 29"
+      },
+      {
+        "tag_raw": "ENERC",
+        "tag_canonical": "ENERC",
+        "name_en": "Energy",
+        "name_fr": "Énergie",
+        "unit": "kcal",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "0",
+        "datasheet": "03-06",
+        "method_en": "Energy (kcal/100 g EP) = total protein (g/100 g EP) × 4 + total fat (g/100 g EP) × 9 + available carbohydrate (g/100 g EP) × 4 + total dietary fibre (g/100 g EP) × 2 + alcohol (g/100 g EP) × 7"
+      },
+      {
+        "tag_raw": "WATER",
+        "tag_canonical": "WATER",
+        "name_en": "Water",
+        "name_fr": "Eau",
+        "unit": "g",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "1",
+        "datasheet": "03-06",
+        "method_en": "Drying"
+      },
+      {
+        "tag_raw": "PROTCNT",
+        "tag_canonical": "PROTCNT",
+        "name_en": "Protein, total",
+        "name_fr": "Protéines totales",
+        "unit": "g",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "1",
+        "datasheet": "03-06",
+        "method_en": "Total protein (g/100 g EP) = nitrogen conversion factor (XN) × total nitrogen (g/100 g EP)"
+      },
+      {
+        "tag_raw": "FAT or [FATCE]",
+        "tag_canonical": "FAT",
+        "name_en": "Fat, total or [fat, derived by analysis using continuous extraction]",
+        "name_fr": "Lipides totaux ou [lipides dérivés d’une analyse par extraction continue]",
+        "unit": "g",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "1",
+        "datasheet": "03-06",
+        "method_en": "Mixed solvent extraction or [Soxhlet method with continuous extraction]"
+      },
+      {
+        "tag_raw": "CHOAVLDF",
+        "tag_canonical": "CHOAVLDF",
+        "name_en": "Carbohydrate, available; calculated by difference",
+        "name_fr": "Glucides disponibles; calculés par différence",
+        "unit": "g",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "1",
+        "datasheet": "03-06",
+        "method_en": "Carbohydrate, available; calculated by difference (g/100 g EP) = 100 – (water + total fat + total protein + ash + total dietary fibre + alcohol) (g/100 g EP)"
+      },
+      {
+        "tag_raw": "FIBTG or [FIBC]",
+        "tag_canonical": "FIBTG",
+        "name_en": "Fibre, total dietary or [fibre, crude]",
+        "name_fr": "Fibres alimentaire totales ou [fibres brutes]",
+        "unit": "g",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "1",
+        "datasheet": "03-06",
+        "method_en": "AOAC Prosky method (AOAC 991.43) or [Weende method]"
+      },
+      {
+        "tag_raw": "ALC",
+        "tag_canonical": "ALC",
+        "name_en": "Alcohol",
+        "name_fr": "Alcool",
+        "unit": "g",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "1",
+        "datasheet": "05, 06",
+        "method_en": "GLC or distillation"
+      },
+      {
+        "tag_raw": "ASH",
+        "tag_canonical": "ASH",
+        "name_en": "Ash",
+        "name_fr": "Cendres",
+        "unit": "g",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "1",
+        "datasheet": "03-06",
+        "method_en": "Gravimetric methods"
+      },
+      {
+        "tag_raw": "CA",
+        "tag_canonical": "CA",
+        "name_en": "Calcium",
+        "name_fr": "Calcium",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "0",
+        "datasheet": "03-06",
+        "method_en": "AAS, ICP-MS"
+      },
+      {
+        "tag_raw": "FE",
+        "tag_canonical": "FE",
+        "name_en": "Iron",
+        "name_fr": "Fer",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "1",
+        "datasheet": "03-06",
+        "method_en": "AAS, ICP-MS"
+      },
+      {
+        "tag_raw": "MG",
+        "tag_canonical": "MG",
+        "name_en": "Magnesium",
+        "name_fr": "Magnésium",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "0",
+        "datasheet": "03-06",
+        "method_en": "AAS, ICP-MS"
+      },
+      {
+        "tag_raw": "P",
+        "tag_canonical": "P",
+        "name_en": "Phosphorus",
+        "name_fr": "Phosphore",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "0",
+        "datasheet": "03-06",
+        "method_en": "AAS, ICP-MS"
+      },
+      {
+        "tag_raw": "K",
+        "tag_canonical": "K",
+        "name_en": "Potassium",
+        "name_fr": "Potassium",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "0",
+        "datasheet": "03-06",
+        "method_en": "AAS, ICP-MS"
+      },
+      {
+        "tag_raw": "NA",
+        "tag_canonical": "NA",
+        "name_en": "Sodium",
+        "name_fr": "Sodium",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "0",
+        "datasheet": "03-06",
+        "method_en": "AAS, ICP-MS"
+      },
+      {
+        "tag_raw": "ZN",
+        "tag_canonical": "ZN",
+        "name_en": "Zinc",
+        "name_fr": "Zinc",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "2",
+        "datasheet": "03-06",
+        "method_en": "AAS, ICP-MS"
+      },
+      {
+        "tag_raw": "CU",
+        "tag_canonical": "CU",
+        "name_en": "Copper",
+        "name_fr": "Cuivre",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "2",
+        "datasheet": "03-06",
+        "method_en": "AAS, ICP-MS"
+      },
+      {
+        "tag_raw": "VITA",
+        "tag_canonical": "VITA",
+        "name_en": "Vitamin A (expressed in retinol equivalents)",
+        "name_fr": "Vitamine A (exprimée en équivalent rétinol)",
+        "unit": "mcg",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "0",
+        "datasheet": "03-06",
+        "method_en": "Vitamin A in retinol equivalents (mcg/100 g EP) = retinol (mcg/100 g EP) + beta-carotene equivalents (mcg/100 g EP) / 6"
+      },
+      {
+        "tag_raw": "VITA_RAE",
+        "tag_canonical": "VITA_RAE",
+        "name_en": "Vitamin A (expressed in retinol activity equivalents)",
+        "name_fr": "Vitamine A (exprimée en équivalent activité rétinol)",
+        "unit": "mcg",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "0",
+        "datasheet": "03-06",
+        "method_en": "Vitamin A in retinol activity equivalents (mcg/100 g EP) = retinol (mcg/100 g EP) + beta-carotene equivalents (mcg/100 g EP) / 12"
+      },
+      {
+        "tag_raw": "RETOL",
+        "tag_canonical": "RETOL",
+        "name_en": "Retinol",
+        "name_fr": "Rétinol",
+        "unit": "mcg",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "0",
+        "datasheet": "03-06",
+        "method_en": "HPLC"
+      },
+      {
+        "tag_raw": "CARTBEQ or [CARTB]",
+        "tag_canonical": "CARTBEQ",
+        "name_en": "Beta-carotene equivalents or [beta-carotene]",
+        "name_fr": "Équivalent bêta-carotène ou [bêta-carotène]",
+        "unit": "mcg",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "0",
+        "datasheet": "03-06",
+        "method_en": "Beta-carotene equivalents (mcg/100 g EP) = beta-carotene (mcg/100 g EP) + alpha-carotene (mcg/100 g EP) / 2 + beta-cryptoxanthin (mcg/100 g EP) / 2 or [HPLC]"
+      },
+      {
+        "tag_raw": "CARTA",
+        "tag_canonical": "CARTA",
+        "name_en": "Alpha-carotene",
+        "name_fr": "Alpha-carotène",
+        "unit": "mcg",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "0",
+        "datasheet": "05, 06",
+        "method_en": "HPLC"
+      },
+      {
+        "tag_raw": "CARTB",
+        "tag_canonical": "CARTB",
+        "name_en": "Beta-carotene",
+        "name_fr": "Bêta-carotène",
+        "unit": "mcg",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "0",
+        "datasheet": "05, 06",
+        "method_en": "HPLC"
+      },
+      {
+        "tag_raw": "CRYPXB",
+        "tag_canonical": "CRYPXB",
+        "name_en": "Beta-cryptoxanthin",
+        "name_fr": "Bêta-cryptoxanthine",
+        "unit": "mcg",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "0",
+        "datasheet": "05, 06",
+        "method_en": "HPLC"
+      },
+      {
+        "tag_raw": "VITD",
+        "tag_canonical": "VITD",
+        "name_en": "Vitamin D",
+        "name_fr": "Vitamine D",
+        "unit": "mcg",
+        "denominator": "/100g EP",
+        "sig_figs": "2",
+        "max_decimals": "1",
+        "datasheet": "03-06",
+        "method_en": "Vitamin D = Vitamin D2 + Vitamin D3; analysed by HPLC"
+      },
+      {
+        "tag_raw": "VITE or [TOCPHA]",
+        "tag_canonical": "VITE",
+        "name_en": "Vitamin E (expressed in alpha-tocopherol equivalents) or [alpha-tocopherol]",
+        "name_fr": "Vitamine E (exprimée en équivalent alphatocophérol) ou [alphatocophérol]",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "2",
+        "max_decimals": "2",
+        "datasheet": "03-06",
+        "method_en": "Vitamin E expressed in alpha-tocopherol equivalents (mg/100 g EP) = alpha-tocopherol (mg/100 g EP) + 0.4 × beta-tocopherol (mg/100 g EP) + 0.1 × gamma-tocopherol (mg/100 g EP) + 0.01 × delta-tocotrienol (mg/100 g EP) or [HPLC]"
+      },
+      {
+        "tag_raw": "TOCPHA",
+        "tag_canonical": "TOCPHA",
+        "name_en": "Alpha-tocopherol",
+        "name_fr": "Alpha-tocophérol",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "2",
+        "max_decimals": "2",
+        "datasheet": "05, 06",
+        "method_en": "HPLC"
+      },
+      {
+        "tag_raw": "TOCPHB",
+        "tag_canonical": "TOCPHB",
+        "name_en": "Beta-tocopherol",
+        "name_fr": "Bêta-tocophérol",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "2",
+        "max_decimals": "2",
+        "datasheet": "05, 06",
+        "method_en": "HPLC"
+      },
+      {
+        "tag_raw": "TOCPHG",
+        "tag_canonical": "TOCPHG",
+        "name_en": "Gamma-tocopherol",
+        "name_fr": "Gamma-tocophérol",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "2",
+        "max_decimals": "2",
+        "datasheet": "05, 06",
+        "method_en": "HPLC"
+      },
+      {
+        "tag_raw": "TOCPHD",
+        "tag_canonical": "TOCPHD",
+        "name_en": "Delta-tocopherol",
+        "name_fr": "Delta-tocophérol",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "2",
+        "max_decimals": "2",
+        "datasheet": "05, 06",
+        "method_en": "HPLC"
+      },
+      {
+        "tag_raw": "THIA",
+        "tag_canonical": "THIA",
+        "name_en": "Thiamine (vitamin B1)",
+        "name_fr": "Thiamine (vitamine B1)",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "2",
+        "max_decimals": "2",
+        "datasheet": "03-06",
+        "method_en": "HPLC, microbiological"
+      },
+      {
+        "tag_raw": "RIBF",
+        "tag_canonical": "RIBF",
+        "name_en": "Riboflavin (vitamin B2)",
+        "name_fr": "Riboflavine (vitamine B2)",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "2",
+        "max_decimals": "2",
+        "datasheet": "03-06",
+        "method_en": "HPLC, microbiological"
+      },
+      {
+        "tag_raw": "NIAEQ or [NIA]",
+        "tag_canonical": "NIAEQ",
+        "name_en": "Niacin equivalents or [niacin, preformed] (vitamin B3)",
+        "name_fr": "Équivalent niacine ou [niacine, (préformée)] (vitamine B3)",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "2",
+        "max_decimals": "1",
+        "datasheet": "03-06",
+        "method_en": "Niacin equivalents (mg/100 g EP) = niacin (mg/100 g EP) + tryptophan (mg/100 g EP) / 60 or [HPLC, microbiological]"
+      },
+      {
+        "tag_raw": "NIA",
+        "tag_canonical": "NIA",
+        "name_en": "Niacin, preformed",
+        "name_fr": "Niacine, préformée",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "2",
+        "max_decimals": "1",
+        "datasheet": "03-06",
+        "method_en": "HPLC, microbiological"
+      },
+      {
+        "tag_raw": "TRP",
+        "tag_canonical": "TRP",
+        "name_en": "Tryptophan",
+        "name_fr": "Tryptophane",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "0",
+        "datasheet": "03-06",
+        "method_en": "Ion exchange chromatography"
+      },
+      {
+        "tag_raw": "VITB6C",
+        "tag_canonical": "VITB6C",
+        "name_en": "Vitamin B6",
+        "name_fr": "Vitamine B6",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "2",
+        "max_decimals": "2",
+        "datasheet": "03-06",
+        "method_en": "HPLC, microbiological"
+      },
+      {
+        "tag_raw": "FOLAC",
+        "tag_canonical": "FOLAC",
+        "name_en": "Folic acid (synthetic)",
+        "name_fr": "Acide folique (synthétique)",
+        "unit": "mcg",
+        "denominator": "/100g EP",
+        "sig_figs": "2",
+        "max_decimals": "0",
+        "datasheet": "05, 06",
+        "method_en": "From literature sources"
+      },
+      {
+        "tag_raw": "FOLFD",
+        "tag_canonical": "FOLFD",
+        "name_en": "Folate, naturally occurring (food folate)",
+        "name_fr": "Folate, naturel (folate alimentaire)",
+        "unit": "mcg",
+        "denominator": "/100g EP",
+        "sig_figs": "2",
+        "max_decimals": "0",
+        "datasheet": "05, 06",
+        "method_en": "Microbiological"
+      },
+      {
+        "tag_raw": "FOL or [FOLSUM]",
+        "tag_canonical": "FOL",
+        "name_en": "Folate, total or [folate, sum of vitamers] (vitamin B9)",
+        "name_fr": "Folate, total ou [somme des vitamères] (vitamine B9)",
+        "unit": "mcg",
+        "denominator": "/100g EP",
+        "sig_figs": "2",
+        "max_decimals": "0",
+        "datasheet": "03-06",
+        "method_en": "Microbiological or [HPLC]"
+      },
+      {
+        "tag_raw": "FOLDFE",
+        "tag_canonical": "FOLDFE",
+        "name_en": "Folate, dietary folate equivalents (DFE)",
+        "name_fr": "Folate, équivalent folates alimentaires (DFE)",
+        "unit": "mcg",
+        "denominator": "/100g EP",
+        "sig_figs": "2",
+        "max_decimals": "0",
+        "datasheet": "03-06",
+        "method_en": "Dietary folate equivalents (mcg/100 g EP) = naturally occurring food folates (mcg/100 g EP) + 1.7 × synthetic folic acid (mcg/100 g EP)"
+      },
+      {
+        "tag_raw": "VITB12",
+        "tag_canonical": "VITB12",
+        "name_en": "Vitamin B12",
+        "name_fr": "Vitamine B12",
+        "unit": "mcg",
+        "denominator": "/100g EP",
+        "sig_figs": "2",
+        "max_decimals": "2",
+        "datasheet": "03-06",
+        "method_en": "HPLC, microbiological"
+      },
+      {
+        "tag_raw": "VITC",
+        "tag_canonical": "VITC",
+        "name_en": "Vitamin C",
+        "name_fr": "Vitamine C",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "0",
+        "datasheet": "03-06",
+        "method_en": "Various methods (see User Guide section 5 Components)"
+      },
+      {
+        "tag_raw": "CHOLE",
+        "tag_canonical": "CHOLE",
+        "name_en": "Cholesterol",
+        "name_fr": "Cholestérol",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "0",
+        "datasheet": "03-06",
+        "method_en": "HPLC"
+      },
+      {
+        "tag_raw": "XFA",
+        "tag_canonical": "XFA",
+        "name_en": "Fatty acid conversion factor",
+        "name_fr": "Facteur de conversion de acides gras",
+        "unit": "-",
+        "denominator": "-",
+        "sig_figs": "3",
+        "max_decimals": "3",
+        "datasheet": "05, 06",
+        "method_en": "From literature sources (see User Guide section 5 Components)"
+      },
+      {
+        "tag_raw": "FASAT",
+        "tag_canonical": "FASAT",
+        "name_en": "Fatty acids, total saturated",
+        "name_fr": "Acides gras saturés totaux",
+        "unit": "g",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "2",
+        "datasheet": "03-06",
+        "method_en": "Fatty acids, total saturated (g/100 g EP) = fatty acids, total saturated (% of total FA) × fatty acid conversion factor × fat, total (g/100 g EP) / 100"
+      },
+      {
+        "tag_raw": "FAMS",
+        "tag_canonical": "FAMS",
+        "name_en": "Fatty acids, total monounsaturated",
+        "name_fr": "Acides gras monoinsaturés totaux",
+        "unit": "g",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "2",
+        "datasheet": "03-06",
+        "method_en": "Fatty acids, total monounsaturated (g/100 g EP) = fatty acids, total monounsaturated (% of total FA) × fatty acid conversion factor × fat, total (g/100 g EP) / 100"
+      },
+      {
+        "tag_raw": "FAPU",
+        "tag_canonical": "FAPU",
+        "name_en": "Fatty acids, total polyunsaturated",
+        "name_fr": "Acides gras polyinsaturés totaux",
+        "unit": "g",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "2",
+        "datasheet": "03-06",
+        "method_en": "Fatty acids, total polyunsaturated (g/100 g EP) = fatty acids, total polyunsaturated (% of total FA) × fatty acid conversion factor × fat, total (g/100 g EP) / 100"
+      },
+      {
+        "tag_raw": "F18D2CN6",
+        "tag_canonical": "F18D2CN6",
+        "name_en": "Linoleic acid",
+        "name_fr": "Acide linoléique",
+        "unit": "g",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "2",
+        "datasheet": "03-06",
+        "method_en": "Linoleic acid (g/100 g EP) = linoleic acid (% of polyunsaturated FA) × fatty acids, total polyunsaturated (g/100 g EP) / 100"
+      },
+      {
+        "tag_raw": "F18D3CN3",
+        "tag_canonical": "F18D3CN3",
+        "name_en": "Alpha-linolenic acid",
+        "name_fr": "Acide alpha-linolénique",
+        "unit": "g",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "2",
+        "datasheet": "03-06",
+        "method_en": "Alpha-linolenic acid (g/100 g EP) = alpha-linolenic acid (% of polyunsaturated FA) × fatty acids, total polyunsaturated (g/100 g EP) / 100"
+      },
+      {
+        "tag_raw": "PHYTCPP or [PHYTCPPD] or [PHYTCPPI]",
+        "tag_canonical": "PHYTCPP",
+        "name_en": "Phytate, total or [phytate, determined by direct precipitation] or [phytate, determined by indirect precipitation]",
+        "name_fr": "Phytate, total ou [phytate, déterminé par précipitation directe] ou [phytate, déterminé par précipitation indirecte]",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "0",
+        "datasheet": "03-06",
+        "method_en": "Calculated from phytate phosphorus by anion exchange method (AOAC 986.11) or [determined by direct precipitation] or [determined by indirect precipitation]"
+      },
+      {
+        "tag_raw": "IP3",
+        "tag_canonical": "IP3",
+        "name_en": "Inositol triphosphate (IP3)",
+        "name_fr": "Inositol triphosphate (IP3)",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "0",
+        "datasheet": "05, 06",
+        "method_en": "HPLC"
+      },
+      {
+        "tag_raw": "IP4",
+        "tag_canonical": "IP4",
+        "name_en": "Inositol tetraphosphate (IP4)",
+        "name_fr": "Inositol tétraphosphate (IP4)",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "0",
+        "datasheet": "05, 06",
+        "method_en": "HPLC"
+      },
+      {
+        "tag_raw": "IP5",
+        "tag_canonical": "IP5",
+        "name_en": "Inositol pentaphosphate (IP5)",
+        "name_fr": "Inositol pentaphosphate (IP5)",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "0",
+        "datasheet": "05, 06",
+        "method_en": "HPLC"
+      },
+      {
+        "tag_raw": "IP6",
+        "tag_canonical": "IP6",
+        "name_en": "Inositol hexaphosphate (IP6)",
+        "name_fr": "Inositol hexaphosphate (IP6)",
+        "unit": "mg",
+        "denominator": "/100g EP",
+        "sig_figs": "3",
+        "max_decimals": "0",
+        "datasheet": "05, 06",
+        "method_en": "HPLC"
+      },
+      {
+        "tag_raw": "XN",
+        "tag_canonical": "XN",
+        "name_en": "Conversion factor for calculating total protein from total nitrogen",
+        "name_fr": "Facteur de conversion de l’azote total en protéines totales",
+        "unit": "-",
+        "denominator": "-",
+        "sig_figs": "3",
+        "max_decimals": "2",
+        "datasheet": "05, 06",
+        "method_en": "From literature sources (see User Guide section 5 Components)"
+      }
+    ]
+  },
+  "sheet_03_nv_sum_39": {
+    "n_total_rows": 1058,
+    "n_total_cols": 45,
+    "n_data_rows": 1028,
+    "n_banding_rows": 14,
+    "n_blank_rows": 13,
+    "n_other_rows": 0,
+    "expected_nutrient_count": 39,
+    "nutrient_col_start": 5,
+    "n_nutrient_cols": 40,
+    "nutrient_tags_clean": [
+      "EDIBLE1",
+      "ENERC",
+      "ENERC",
+      "WATER",
+      "PROTCNT",
+      "FAT",
+      "CHOAVLDF",
+      "FIBTG",
+      "ASH",
+      "CA",
+      "FE",
+      "MG",
+      "P",
+      "K",
+      "NA",
+      "ZN",
+      "CU",
+      "VITA",
+      "VITA_RAE",
+      "RETOL",
+      "CARTBEQ",
+      "VITD",
+      "VITE",
+      "THIA",
+      "RIBF",
+      "NIAEQ",
+      "NIA",
+      "TRP",
+      "VITB6C",
+      "FOL",
+      "FOLDFE",
+      "VITB12",
+      "VITC",
+      "CHOLE",
+      "FASAT",
+      "FAMS",
+      "FAPU",
+      "F18D2CN6",
+      "F18D3CN3",
+      "PHYTCPP"
+    ],
+    "group_codes_seen": {
+      "01": 183,
+      "02": 96,
+      "03": 137,
+      "04": 132,
+      "05": 53,
+      "06": 34,
+      "07": 128,
+      "08": 14,
+      "09": 106,
+      "10": 27,
+      "11": 35,
+      "12": 24,
+      "13": 25,
+      "14": 34
+    },
+    "n_groups": 14,
+    "banding_labels": [
+      "Cereals and their products/Céréales et produits dérivés",
+      "Starchy roots, tubers and their products/Racines amylacées, tubercules et produits dérivés",
+      "Legumes and their products/Légumineuses et produits dérivés",
+      "Vegetables and their products/Légumes et produits dérivés",
+      "Fruits and their products/Fruits et produits dérivés",
+      "Nuts, seeds and their products/Noix, graines et produits dérivés",
+      "Meat, poultry and their products/Viande, volaille et produits dérivés",
+      "Eggs and their products/Œufs et produits dérivés",
+      "Fish and its products/Poisson et produits dérivés",
+      "Milk and its products/Lait et produits dérivés",
+      "Fats and oils/Graisses et huiles",
+      "Beverages/Boissons",
+      "Miscellaneous/Divers",
+      "Soups and sauces/Soupes et sauces"
+    ],
+    "mojibake_lines": [],
+    "mojibake_count": 0,
+    "nutrient_coverage": [
+      {
+        "col_idx": 5,
+        "tag_canonical": "EDIBLE1",
+        "name_en": "Edible portion coefficient 1 (from as purchased to as described)",
+        "nonnull": 918,
+        "coverage_pct": 89.3
+      },
+      {
+        "col_idx": 6,
+        "tag_canonical": "ENERC",
+        "name_en": "Energy (kJ)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 7,
+        "tag_canonical": "ENERC",
+        "name_en": "Energy (kcal)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 8,
+        "tag_canonical": "WATER",
+        "name_en": "Water (g)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 9,
+        "tag_canonical": "PROTCNT",
+        "name_en": "Protein, total (g)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 10,
+        "tag_canonical": "FAT",
+        "name_en": "Fat, total or [fat, derived by analysis using continuous extraction] (g)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 11,
+        "tag_canonical": "CHOAVLDF",
+        "name_en": "Carbohydrate, available; calculated by difference (g)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 12,
+        "tag_canonical": "FIBTG",
+        "name_en": "Fibre, total dietary or [fibre, crude] (g)",
+        "nonnull": 1027,
+        "coverage_pct": 99.9
+      },
+      {
+        "col_idx": 13,
+        "tag_canonical": "ASH",
+        "name_en": "Ash (g)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 14,
+        "tag_canonical": "CA",
+        "name_en": "Calcium (mg)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 15,
+        "tag_canonical": "FE",
+        "name_en": "Iron (mg)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 16,
+        "tag_canonical": "MG",
+        "name_en": "Magnesium (mg)",
+        "nonnull": 1026,
+        "coverage_pct": 99.8
+      },
+      {
+        "col_idx": 17,
+        "tag_canonical": "P",
+        "name_en": "Phosphorus (mg)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 18,
+        "tag_canonical": "K",
+        "name_en": "Potassium (mg)",
+        "nonnull": 1025,
+        "coverage_pct": 99.7
+      },
+      {
+        "col_idx": 19,
+        "tag_canonical": "NA",
+        "name_en": "Sodium (mg)",
+        "nonnull": 1024,
+        "coverage_pct": 99.6
+      },
+      {
+        "col_idx": 20,
+        "tag_canonical": "ZN",
+        "name_en": "Zinc (mg)",
+        "nonnull": 1024,
+        "coverage_pct": 99.6
+      },
+      {
+        "col_idx": 21,
+        "tag_canonical": "CU",
+        "name_en": "Copper (mg)",
+        "nonnull": 1019,
+        "coverage_pct": 99.1
+      },
+      {
+        "col_idx": 22,
+        "tag_canonical": "VITA",
+        "name_en": "Vitamin A (expressed in retinol equivalents) (mcg)",
+        "nonnull": 1003,
+        "coverage_pct": 97.6
+      },
+      {
+        "col_idx": 23,
+        "tag_canonical": "VITA_RAE",
+        "name_en": "Vitamin A (expressed in retinol activity equivalents) (mcg)",
+        "nonnull": 1003,
+        "coverage_pct": 97.6
+      },
+      {
+        "col_idx": 24,
+        "tag_canonical": "RETOL",
+        "name_en": "Retinol (mcg)",
+        "nonnull": 1025,
+        "coverage_pct": 99.7
+      },
+      {
+        "col_idx": 25,
+        "tag_canonical": "CARTBEQ",
+        "name_en": "Beta-carotene equivalents or [beta-carotene] (mcg)",
+        "nonnull": 1001,
+        "coverage_pct": 97.4
+      },
+      {
+        "col_idx": 26,
+        "tag_canonical": "VITD",
+        "name_en": "Vitamin D  (mcg)",
+        "nonnull": 1005,
+        "coverage_pct": 97.8
+      },
+      {
+        "col_idx": 27,
+        "tag_canonical": "VITE",
+        "name_en": "Vitamin E (expressed in alpha-tocopherol equivalents) or [alpha-tocopherol] (mg)",
+        "nonnull": 1009,
+        "coverage_pct": 98.2
+      },
+      {
+        "col_idx": 28,
+        "tag_canonical": "THIA",
+        "name_en": "Thiamine (vitamin B1) (mg)",
+        "nonnull": 1024,
+        "coverage_pct": 99.6
+      },
+      {
+        "col_idx": 29,
+        "tag_canonical": "RIBF",
+        "name_en": "Riboflavin (vitamin B2) (mg)",
+        "nonnull": 1026,
+        "coverage_pct": 99.8
+      },
+      {
+        "col_idx": 30,
+        "tag_canonical": "NIAEQ",
+        "name_en": "Niacin equivalents or [niacin, preformed] (vitamin B3) (mg)",
+        "nonnull": 1026,
+        "coverage_pct": 99.8
+      },
+      {
+        "col_idx": 31,
+        "tag_canonical": "NIA",
+        "name_en": "Niacin, preformed (mg)",
+        "nonnull": 1023,
+        "coverage_pct": 99.5
+      },
+      {
+        "col_idx": 32,
+        "tag_canonical": "TRP",
+        "name_en": "Tryptophan (mg)",
+        "nonnull": 1009,
+        "coverage_pct": 98.2
+      },
+      {
+        "col_idx": 33,
+        "tag_canonical": "VITB6C",
+        "name_en": "Vitamin B6 (mg)",
+        "nonnull": 1015,
+        "coverage_pct": 98.7
+      },
+      {
+        "col_idx": 34,
+        "tag_canonical": "FOL",
+        "name_en": "Folate, total or [folate, sum of vitamers] (vitamin B9) (mcg)",
+        "nonnull": 1011,
+        "coverage_pct": 98.3
+      },
+      {
+        "col_idx": 35,
+        "tag_canonical": "FOLDFE",
+        "name_en": "Folate, dietary folate equivalents (mcg)",
+        "nonnull": 1011,
+        "coverage_pct": 98.3
+      },
+      {
+        "col_idx": 36,
+        "tag_canonical": "VITB12",
+        "name_en": "Vitamin B12 (mcg)",
+        "nonnull": 1020,
+        "coverage_pct": 99.2
+      },
+      {
+        "col_idx": 37,
+        "tag_canonical": "VITC",
+        "name_en": "Vitamin C (mg)",
+        "nonnull": 1025,
+        "coverage_pct": 99.7
+      },
+      {
+        "col_idx": 38,
+        "tag_canonical": "CHOLE",
+        "name_en": "Cholesterol (mg)",
+        "nonnull": 1021,
+        "coverage_pct": 99.3
+      },
+      {
+        "col_idx": 39,
+        "tag_canonical": "FASAT",
+        "name_en": "Fatty acids, total saturated (g)",
+        "nonnull": 1007,
+        "coverage_pct": 98.0
+      },
+      {
+        "col_idx": 40,
+        "tag_canonical": "FAMS",
+        "name_en": "Fatty acids, total monounsaturated  (g)",
+        "nonnull": 1007,
+        "coverage_pct": 98.0
+      },
+      {
+        "col_idx": 41,
+        "tag_canonical": "FAPU",
+        "name_en": "Fatty acids, total polyunsaturated (g)",
+        "nonnull": 1007,
+        "coverage_pct": 98.0
+      },
+      {
+        "col_idx": 42,
+        "tag_canonical": "F18D2CN6",
+        "name_en": "Linoleic acid  (g)",
+        "nonnull": 981,
+        "coverage_pct": 95.4
+      },
+      {
+        "col_idx": 43,
+        "tag_canonical": "F18D3CN3",
+        "name_en": "Alpha-linolenic acid (g)",
+        "nonnull": 992,
+        "coverage_pct": 96.5
+      },
+      {
+        "col_idx": 44,
+        "tag_canonical": "PHYTCPP",
+        "name_en": "Phytate, total or [phytate, determined by direct precipitation] or [phytate, det",
+        "nonnull": 792,
+        "coverage_pct": 77.0
+      }
+    ],
+    "sample_data_rows": [
+      {
+        "code": "01_172",
+        "name_en": "Baling béinré (northern Burkina Faso)*: sorghum porridge with monkey bread, tamarind, water, milk and sugar",
+        "name_fr": "Baling béinré (nord du Burkina Faso)*: bouillie de sorgho avec pain de singe, tamarin, eau, lait et sucre",
+        "biblio": "calc. from recipe / de recette",
+        "edible": "",
+        "nutrients_first10": [
+          "",
+          "329",
+          "78",
+          "80.1",
+          "2.5",
+          "[0.2]",
+          "16.1",
+          "[0.6]",
+          "0.5",
+          "61"
+        ]
+      },
+      {
+        "code": "01_173",
+        "name_en": "Baling ni zièm béinré (Burkina Faso)*: porridge of degermed sorghum with potash, water and sugar",
+        "name_fr": "Baling ni zièm béinré (Burkina Faso)*: bouillie de sorgho dégermé avec potasse, eau et sucre",
+        "biblio": "calc. from recipe / de recette",
+        "edible": "",
+        "nutrients_first10": [
+          "",
+          "277",
+          "65",
+          "83.3",
+          "0.9",
+          "[0.2]",
+          "14.8",
+          "0.5",
+          "0.3",
+          "10"
+        ]
+      },
+      {
+        "code": "01_168",
+        "name_en": "Beenkida (Burkina Faso)*: maize porridge with maize granules",
+        "name_fr": "Beenkida (Burkina Faso)*: bouillie de maïs avec grumaux de maïs",
+        "biblio": "calc. from recipe / de recette",
+        "edible": "",
+        "nutrients_first10": [
+          "",
+          "426",
+          "100",
+          "74.6",
+          "2.1",
+          "0.4",
+          "21.7",
+          "1.1",
+          "0.2",
+          "5"
+        ]
+      },
+      {
+        "code": "01_188",
+        "name_en": "Biscuit, sweet, plain, unfortified",
+        "name_fr": "Biscuit, sucré, nature, non enrichi",
+        "biblio": "AU14(02C20287; 02C20364; 02C20286; 02C20314), SA10(3216; 3233; 3296), UK7(11-797; 11-796)",
+        "edible": "1.00",
+        "nutrients_first10": [
+          "1.00",
+          "2010",
+          "479",
+          "4.6",
+          "6.2",
+          "21.2",
+          "64.9",
+          "2.0",
+          "1.1",
+          "67"
+        ]
+      },
+      {
+        "code": "01_177",
+        "name_en": "Boalboal (Burkina Faso)*: millet balls with fried fish and vegetables",
+        "name_fr": "Boalboal (Burkina Faso)*: boulettes de mil avec poisson frit et légumes",
+        "biblio": "calc. from recipe / de recette",
+        "edible": "",
+        "nutrients_first10": [
+          "",
+          "1050",
+          "252",
+          "54.7",
+          "5.4",
+          "17.0",
+          "18.0",
+          "2.8",
+          "1.5",
+          "16"
+        ]
+      }
+    ]
+  },
+  "sheet_04_nv_stat_39": {
+    "n_total_rows": 3812,
+    "n_total_cols": 62,
+    "n_data_rows": 1028,
+    "n_banding_rows": 14,
+    "n_blank_rows": 13,
+    "n_other_rows": 2754,
+    "expected_nutrient_count": 39,
+    "nutrient_col_start": 5,
+    "n_nutrient_cols": 40,
+    "nutrient_tags_clean": [
+      "EDIBLE1",
+      "ENERC",
+      "ENERC",
+      "WATER",
+      "PROTCNT",
+      "FAT",
+      "CHOAVLDF",
+      "FIBTG",
+      "ASH",
+      "CA",
+      "FE",
+      "MG",
+      "P",
+      "K",
+      "NA",
+      "ZN",
+      "CU",
+      "VITA",
+      "VITA_RAE",
+      "RETOL",
+      "CARTBEQ",
+      "VITD",
+      "VITE",
+      "THIA",
+      "RIBF",
+      "NIAEQ",
+      "NIA",
+      "TRP",
+      "VITB6C",
+      "FOL",
+      "FOLDFE",
+      "VITB12",
+      "VITC",
+      "CHOLE",
+      "FASAT",
+      "FAMS",
+      "FAPU",
+      "F18D2CN6",
+      "F18D3CN3",
+      "PHYTCPP"
+    ],
+    "group_codes_seen": {
+      "01": 183,
+      "02": 96,
+      "03": 137,
+      "04": 132,
+      "05": 53,
+      "06": 34,
+      "07": 128,
+      "08": 14,
+      "09": 106,
+      "10": 27,
+      "11": 35,
+      "12": 24,
+      "13": 25,
+      "14": 34
+    },
+    "n_groups": 14,
+    "banding_labels": [
+      "Cereals and their products/Céréales et produits dérivés",
+      "Starchy roots, tubers and their products/Racines amylacées, tubercules et produits dérivés",
+      "Legumes and their products/Légumineuses et produits dérivés",
+      "Vegetables and their products/Légumes et produits dérivés",
+      "Fruits and their products/Fruits et produits dérivés",
+      "Nuts, seeds and their products/Noix, graines et produits dérivés",
+      "Meat, poultry and their products/Viande, volaille et produits dérivés",
+      "Eggs and their products/Œufs et produits dérivés",
+      "Fish and its products/Poisson et produits dérivés",
+      "Milk and its products/Lait et produits dérivés",
+      "Fats and oils/Graisses et huiles",
+      "Beverages/Boissons",
+      "Miscellaneous/Divers",
+      "Soups and sauces/Soupes et sauces"
+    ],
+    "mojibake_lines": [],
+    "mojibake_count": 0,
+    "nutrient_coverage": [
+      {
+        "col_idx": 5,
+        "tag_canonical": "EDIBLE1",
+        "name_en": "Edible portion coefficient 1 (from as purchased to as described)",
+        "nonnull": 918,
+        "coverage_pct": 89.3
+      },
+      {
+        "col_idx": 6,
+        "tag_canonical": "ENERC",
+        "name_en": "Energy (kJ)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 7,
+        "tag_canonical": "ENERC",
+        "name_en": "Energy (kcal)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 8,
+        "tag_canonical": "WATER",
+        "name_en": "Water (g)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 9,
+        "tag_canonical": "PROTCNT",
+        "name_en": "Protein, total (g)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 10,
+        "tag_canonical": "FAT",
+        "name_en": "Fat, total or [fat, derived by analysis using continuous extraction] (g)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 11,
+        "tag_canonical": "CHOAVLDF",
+        "name_en": "Carbohydrate, available; calculated by difference (g)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 12,
+        "tag_canonical": "FIBTG",
+        "name_en": "Fibre, total dietary or [fibre, crude] (g)",
+        "nonnull": 1027,
+        "coverage_pct": 99.9
+      },
+      {
+        "col_idx": 13,
+        "tag_canonical": "ASH",
+        "name_en": "Ash (g)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 14,
+        "tag_canonical": "CA",
+        "name_en": "Calcium (mg)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 15,
+        "tag_canonical": "FE",
+        "name_en": "Iron (mg)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 16,
+        "tag_canonical": "MG",
+        "name_en": "Magnesium (mg)",
+        "nonnull": 1026,
+        "coverage_pct": 99.8
+      },
+      {
+        "col_idx": 17,
+        "tag_canonical": "P",
+        "name_en": "Phosphorus (mg)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 18,
+        "tag_canonical": "K",
+        "name_en": "Potassium (mg)",
+        "nonnull": 1025,
+        "coverage_pct": 99.7
+      },
+      {
+        "col_idx": 19,
+        "tag_canonical": "NA",
+        "name_en": "Sodium (mg)",
+        "nonnull": 1024,
+        "coverage_pct": 99.6
+      },
+      {
+        "col_idx": 20,
+        "tag_canonical": "ZN",
+        "name_en": "Zinc (mg)",
+        "nonnull": 1024,
+        "coverage_pct": 99.6
+      },
+      {
+        "col_idx": 21,
+        "tag_canonical": "CU",
+        "name_en": "Copper (mg)",
+        "nonnull": 1019,
+        "coverage_pct": 99.1
+      },
+      {
+        "col_idx": 22,
+        "tag_canonical": "VITA",
+        "name_en": "Vitamin A (expressed in retinol equivalents) (mcg)",
+        "nonnull": 1003,
+        "coverage_pct": 97.6
+      },
+      {
+        "col_idx": 23,
+        "tag_canonical": "VITA_RAE",
+        "name_en": "Vitamin A (expressed in retinol activity equivalents) (mcg)",
+        "nonnull": 1003,
+        "coverage_pct": 97.6
+      },
+      {
+        "col_idx": 24,
+        "tag_canonical": "RETOL",
+        "name_en": "Retinol (mcg)",
+        "nonnull": 1025,
+        "coverage_pct": 99.7
+      },
+      {
+        "col_idx": 25,
+        "tag_canonical": "CARTBEQ",
+        "name_en": "Beta-carotene equivalents or [beta-carotene] (mcg)",
+        "nonnull": 1001,
+        "coverage_pct": 97.4
+      },
+      {
+        "col_idx": 26,
+        "tag_canonical": "VITD",
+        "name_en": "Vitamin D  (mcg)",
+        "nonnull": 1005,
+        "coverage_pct": 97.8
+      },
+      {
+        "col_idx": 27,
+        "tag_canonical": "VITE",
+        "name_en": "Vitamin E (expressed in alpha-tocopherol equivalents) or [alpha-tocopherol] (mg)",
+        "nonnull": 1009,
+        "coverage_pct": 98.2
+      },
+      {
+        "col_idx": 28,
+        "tag_canonical": "THIA",
+        "name_en": "Thiamine (vitamin B1) (mg)",
+        "nonnull": 1024,
+        "coverage_pct": 99.6
+      },
+      {
+        "col_idx": 29,
+        "tag_canonical": "RIBF",
+        "name_en": "Riboflavin (vitamin B2) (mg)",
+        "nonnull": 1026,
+        "coverage_pct": 99.8
+      },
+      {
+        "col_idx": 30,
+        "tag_canonical": "NIAEQ",
+        "name_en": "Niacin equivalents or [niacin, preformed] (vitamin B3) (mg)",
+        "nonnull": 1026,
+        "coverage_pct": 99.8
+      },
+      {
+        "col_idx": 31,
+        "tag_canonical": "NIA",
+        "name_en": "Niacin, preformed (mg)",
+        "nonnull": 1023,
+        "coverage_pct": 99.5
+      },
+      {
+        "col_idx": 32,
+        "tag_canonical": "TRP",
+        "name_en": "Tryptophan (mg)",
+        "nonnull": 1009,
+        "coverage_pct": 98.2
+      },
+      {
+        "col_idx": 33,
+        "tag_canonical": "VITB6C",
+        "name_en": "Vitamin B6 (mg)",
+        "nonnull": 1016,
+        "coverage_pct": 98.8
+      },
+      {
+        "col_idx": 34,
+        "tag_canonical": "FOL",
+        "name_en": "Folate, total or [folate, sum of vitamers] (vitamin B9) (mcg)",
+        "nonnull": 1011,
+        "coverage_pct": 98.3
+      },
+      {
+        "col_idx": 35,
+        "tag_canonical": "FOLDFE",
+        "name_en": "Folate, dietary folate equivalents (mcg)",
+        "nonnull": 1011,
+        "coverage_pct": 98.3
+      },
+      {
+        "col_idx": 36,
+        "tag_canonical": "VITB12",
+        "name_en": "Vitamin B12 (mcg)",
+        "nonnull": 1020,
+        "coverage_pct": 99.2
+      },
+      {
+        "col_idx": 37,
+        "tag_canonical": "VITC",
+        "name_en": "Vitamin C (mg)",
+        "nonnull": 1025,
+        "coverage_pct": 99.7
+      },
+      {
+        "col_idx": 38,
+        "tag_canonical": "CHOLE",
+        "name_en": "Cholesterol (mg)",
+        "nonnull": 1021,
+        "coverage_pct": 99.3
+      },
+      {
+        "col_idx": 39,
+        "tag_canonical": "FASAT",
+        "name_en": "Fatty acids, total saturated (g)",
+        "nonnull": 1007,
+        "coverage_pct": 98.0
+      },
+      {
+        "col_idx": 40,
+        "tag_canonical": "FAMS",
+        "name_en": "Fatty acids, total monounsaturated  (g)",
+        "nonnull": 1007,
+        "coverage_pct": 98.0
+      },
+      {
+        "col_idx": 41,
+        "tag_canonical": "FAPU",
+        "name_en": "Fatty acids, total polyunsaturated (g)",
+        "nonnull": 1007,
+        "coverage_pct": 98.0
+      },
+      {
+        "col_idx": 42,
+        "tag_canonical": "F18D2CN6",
+        "name_en": "Linoleic acid  (g)",
+        "nonnull": 981,
+        "coverage_pct": 95.4
+      },
+      {
+        "col_idx": 43,
+        "tag_canonical": "F18D3CN3",
+        "name_en": "Alpha-linolenic acid (g)",
+        "nonnull": 992,
+        "coverage_pct": 96.5
+      },
+      {
+        "col_idx": 44,
+        "tag_canonical": "PHYTCPP",
+        "name_en": "Phytate, total or [phytate, determined by direct precipitation] or [phytate, det",
+        "nonnull": 792,
+        "coverage_pct": 77.0
+      },
+      {
+        "col_idx": 45,
+        "tag_canonical": "",
+        "name_en": "",
+        "nonnull": 0,
+        "coverage_pct": 0.0
+      },
+      {
+        "col_idx": 46,
+        "tag_canonical": "",
+        "name_en": "",
+        "nonnull": 0,
+        "coverage_pct": 0.0
+      },
+      {
+        "col_idx": 47,
+        "tag_canonical": "",
+        "name_en": "",
+        "nonnull": 0,
+        "coverage_pct": 0.0
+      },
+      {
+        "col_idx": 48,
+        "tag_canonical": "",
+        "name_en": "",
+        "nonnull": 0,
+        "coverage_pct": 0.0
+      },
+      {
+        "col_idx": 49,
+        "tag_canonical": "",
+        "name_en": "",
+        "nonnull": 0,
+        "coverage_pct": 0.0
+      },
+      {
+        "col_idx": 50,
+        "tag_canonical": "",
+        "name_en": "",
+        "nonnull": 0,
+        "coverage_pct": 0.0
+      },
+      {
+        "col_idx": 51,
+        "tag_canonical": "",
+        "name_en": "",
+        "nonnull": 0,
+        "coverage_pct": 0.0
+      },
+      {
+        "col_idx": 52,
+        "tag_canonical": "",
+        "name_en": "",
+        "nonnull": 0,
+        "coverage_pct": 0.0
+      },
+      {
+        "col_idx": 53,
+        "tag_canonical": "",
+        "name_en": "",
+        "nonnull": 0,
+        "coverage_pct": 0.0
+      },
+      {
+        "col_idx": 54,
+        "tag_canonical": "",
+        "name_en": "",
+        "nonnull": 0,
+        "coverage_pct": 0.0
+      },
+      {
+        "col_idx": 55,
+        "tag_canonical": "",
+        "name_en": "",
+        "nonnull": 0,
+        "coverage_pct": 0.0
+      },
+      {
+        "col_idx": 56,
+        "tag_canonical": "",
+        "name_en": "",
+        "nonnull": 0,
+        "coverage_pct": 0.0
+      },
+      {
+        "col_idx": 57,
+        "tag_canonical": "",
+        "name_en": "",
+        "nonnull": 0,
+        "coverage_pct": 0.0
+      },
+      {
+        "col_idx": 58,
+        "tag_canonical": "",
+        "name_en": "",
+        "nonnull": 0,
+        "coverage_pct": 0.0
+      },
+      {
+        "col_idx": 59,
+        "tag_canonical": "",
+        "name_en": "",
+        "nonnull": 0,
+        "coverage_pct": 0.0
+      },
+      {
+        "col_idx": 60,
+        "tag_canonical": "",
+        "name_en": "",
+        "nonnull": 0,
+        "coverage_pct": 0.0
+      },
+      {
+        "col_idx": 61,
+        "tag_canonical": "",
+        "name_en": "",
+        "nonnull": 0,
+        "coverage_pct": 0.0
+      }
+    ],
+    "sample_data_rows": [
+      {
+        "code": "01_172",
+        "name_en": "Baling béinré (northern Burkina Faso)*: sorghum porridge with monkey bread, tamarind, water, milk and sugar",
+        "name_fr": "Baling béinré (nord du Burkina Faso)*: bouillie de sorgho avec pain de singe, tamarin, eau, lait et sucre",
+        "biblio": "calc. from recipe / de recette",
+        "edible": "",
+        "nutrients_first10": [
+          "",
+          "329",
+          "78",
+          "80.1",
+          "2.5",
+          "[0.2]",
+          "16.1",
+          "[0.6]",
+          "0.5",
+          "61"
+        ]
+      },
+      {
+        "code": "01_173",
+        "name_en": "Baling ni zièm béinré (Burkina Faso)*: porridge of degermed sorghum with potash, water and sugar",
+        "name_fr": "Baling ni zièm béinré (Burkina Faso)*: bouillie de sorgho dégermé avec potasse, eau et sucre",
+        "biblio": "calc. from recipe / de recette",
+        "edible": "",
+        "nutrients_first10": [
+          "",
+          "277",
+          "65",
+          "83.3",
+          "0.9",
+          "[0.2]",
+          "14.8",
+          "0.5",
+          "0.3",
+          "10"
+        ]
+      },
+      {
+        "code": "01_168",
+        "name_en": "Beenkida (Burkina Faso)*: maize porridge with maize granules",
+        "name_fr": "Beenkida (Burkina Faso)*: bouillie de maïs avec grumaux de maïs",
+        "biblio": "calc. from recipe / de recette",
+        "edible": "",
+        "nutrients_first10": [
+          "",
+          "426",
+          "100",
+          "74.6",
+          "2.1",
+          "0.4",
+          "21.7",
+          "1.1",
+          "0.2",
+          "5"
+        ]
+      },
+      {
+        "code": "01_188",
+        "name_en": "Biscuit, sweet, plain, unfortified",
+        "name_fr": "Biscuit, sucré, nature, non enrichi",
+        "biblio": "AU14(02C20287; 02C20364; 02C20286; 02C20314), SA10(3216; 3233; 3296), UK7(11-797; 11-796)",
+        "edible": "1.00",
+        "nutrients_first10": [
+          "1.00",
+          "2010",
+          "479",
+          "4.6",
+          "6.2",
+          "21.2",
+          "64.9",
+          "2.0",
+          "1.1",
+          "67"
+        ]
+      },
+      {
+        "code": "01_177",
+        "name_en": "Boalboal (Burkina Faso)*: millet balls with fried fish and vegetables",
+        "name_fr": "Boalboal (Burkina Faso)*: boulettes de mil avec poisson frit et légumes",
+        "biblio": "calc. from recipe / de recette",
+        "edible": "",
+        "nutrients_first10": [
+          "",
+          "1050",
+          "252",
+          "54.7",
+          "5.4",
+          "17.0",
+          "18.0",
+          "2.8",
+          "1.5",
+          "16"
+        ]
+      }
+    ]
+  },
+  "sheet_05_nv_sum_57": {
+    "n_total_rows": 1058,
+    "n_total_cols": 63,
+    "n_data_rows": 1028,
+    "n_banding_rows": 14,
+    "n_blank_rows": 13,
+    "n_other_rows": 0,
+    "expected_nutrient_count": 57,
+    "nutrient_col_start": 5,
+    "n_nutrient_cols": 58,
+    "nutrient_tags_clean": [
+      "EDIBLE1",
+      "EDIBLE2",
+      "SOP",
+      "ENERC",
+      "ENERC",
+      "WATER",
+      "PROTCNT",
+      "FAT",
+      "CHOAVLDF",
+      "FIBTG",
+      "ALC",
+      "ASH",
+      "CA",
+      "FE",
+      "MG",
+      "P",
+      "K",
+      "NA",
+      "ZN",
+      "CU",
+      "VITA",
+      "VITA_RAE",
+      "RETOL",
+      "CARTBEQ",
+      "CARTA",
+      "CARTB",
+      "CRYPXB",
+      "VITD",
+      "VITE",
+      "TOCPHA",
+      "TOCPHB",
+      "TOCPHG",
+      "TOCPHD",
+      "THIA",
+      "RIBF",
+      "NIAEQ",
+      "NIA",
+      "TRP",
+      "VITB6C",
+      "FOLAC",
+      "FOLFD",
+      "FOL",
+      "FOLDFE",
+      "VITB12",
+      "VITC",
+      "CHOLE",
+      "XFA",
+      "FASAT",
+      "FAMS",
+      "FAPU",
+      "F18D2CN6",
+      "F18D3CN3",
+      "PHYTCPP",
+      "IP3",
+      "IP4",
+      "IP5",
+      "IP6",
+      "XN"
+    ],
+    "group_codes_seen": {
+      "01": 183,
+      "02": 96,
+      "03": 137,
+      "04": 132,
+      "05": 53,
+      "06": 34,
+      "07": 128,
+      "08": 14,
+      "09": 106,
+      "10": 27,
+      "11": 35,
+      "12": 24,
+      "13": 25,
+      "14": 34
+    },
+    "n_groups": 14,
+    "banding_labels": [
+      "Cereals and their products/Céréales et produits dérivés",
+      "Starchy roots, tubers and their products/Racines amylacées, tubercules et produits dérivés",
+      "Legumes and their products/Légumineuses et produits dérivés",
+      "Vegetables and their products/Légumes et produits dérivés",
+      "Fruits and their products/Fruits et produits dérivés",
+      "Nuts, seeds and their products/Noix, graines et produits dérivés",
+      "Meat, poultry and their products/Viande, volaille et produits dérivés",
+      "Eggs and their products/Œufs et produits dérivés",
+      "Fish and its products/Poisson et produits dérivés",
+      "Milk and its products/Lait et produits dérivés",
+      "Fats and oils/Graisses et huiles",
+      "Beverages/Boissons",
+      "Miscellaneous/Divers",
+      "Soups and sauces/Soupes et sauces"
+    ],
+    "mojibake_lines": [],
+    "mojibake_count": 0,
+    "nutrient_coverage": [
+      {
+        "col_idx": 5,
+        "tag_canonical": "EDIBLE1",
+        "name_en": "Edible portion coefficient 1 (from as purchased to as described)",
+        "nonnull": 918,
+        "coverage_pct": 89.3
+      },
+      {
+        "col_idx": 6,
+        "tag_canonical": "EDIBLE2",
+        "name_en": "Edible portion coefficient 2 (from as described to as eaten)",
+        "nonnull": 1022,
+        "coverage_pct": 99.4
+      },
+      {
+        "col_idx": 7,
+        "tag_canonical": "SOP",
+        "name_en": "Sum of proximate components (g)",
+        "nonnull": 1027,
+        "coverage_pct": 99.9
+      },
+      {
+        "col_idx": 8,
+        "tag_canonical": "ENERC",
+        "name_en": "Energy (kJ)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 9,
+        "tag_canonical": "ENERC",
+        "name_en": "Energy (kcal)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 10,
+        "tag_canonical": "WATER",
+        "name_en": "Water (g)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 11,
+        "tag_canonical": "PROTCNT",
+        "name_en": "Protein, total (g)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 12,
+        "tag_canonical": "FAT",
+        "name_en": "Fat, total or [fat, derived by analysis using continuous extraction] (g)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 13,
+        "tag_canonical": "CHOAVLDF",
+        "name_en": "Carbohydrate, available; calculated by difference (g)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 14,
+        "tag_canonical": "FIBTG",
+        "name_en": "Fibre, total dietary or [fibre, crude] (g)",
+        "nonnull": 1027,
+        "coverage_pct": 99.9
+      },
+      {
+        "col_idx": 15,
+        "tag_canonical": "ALC",
+        "name_en": "Alcohol (g)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 16,
+        "tag_canonical": "ASH",
+        "name_en": "Ash (g)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 17,
+        "tag_canonical": "CA",
+        "name_en": "Calcium (mg)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 18,
+        "tag_canonical": "FE",
+        "name_en": "Iron (mg)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 19,
+        "tag_canonical": "MG",
+        "name_en": "Magnesium (mg)",
+        "nonnull": 1026,
+        "coverage_pct": 99.8
+      },
+      {
+        "col_idx": 20,
+        "tag_canonical": "P",
+        "name_en": "Phosphorus (mg)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 21,
+        "tag_canonical": "K",
+        "name_en": "Potassium (mg)",
+        "nonnull": 1025,
+        "coverage_pct": 99.7
+      },
+      {
+        "col_idx": 22,
+        "tag_canonical": "NA",
+        "name_en": "Sodium (mg)",
+        "nonnull": 1024,
+        "coverage_pct": 99.6
+      },
+      {
+        "col_idx": 23,
+        "tag_canonical": "ZN",
+        "name_en": "Zinc (mg)",
+        "nonnull": 1024,
+        "coverage_pct": 99.6
+      },
+      {
+        "col_idx": 24,
+        "tag_canonical": "CU",
+        "name_en": "Copper (mg)",
+        "nonnull": 1019,
+        "coverage_pct": 99.1
+      },
+      {
+        "col_idx": 25,
+        "tag_canonical": "VITA",
+        "name_en": "Vitamin A (expressed in retinol equivalents) (mcg)",
+        "nonnull": 1003,
+        "coverage_pct": 97.6
+      },
+      {
+        "col_idx": 26,
+        "tag_canonical": "VITA_RAE",
+        "name_en": "Vitamin A (expressed in retinol activity equivalents) (mcg)",
+        "nonnull": 1003,
+        "coverage_pct": 97.6
+      },
+      {
+        "col_idx": 27,
+        "tag_canonical": "RETOL",
+        "name_en": "Retinol (mcg)",
+        "nonnull": 1025,
+        "coverage_pct": 99.7
+      },
+      {
+        "col_idx": 28,
+        "tag_canonical": "CARTBEQ",
+        "name_en": "Beta-carotene equivalents or [beta-carotene] (mcg)",
+        "nonnull": 1001,
+        "coverage_pct": 97.4
+      },
+      {
+        "col_idx": 29,
+        "tag_canonical": "CARTA",
+        "name_en": "Alpha-carotene (mcg)",
+        "nonnull": 928,
+        "coverage_pct": 90.3
+      },
+      {
+        "col_idx": 30,
+        "tag_canonical": "CARTB",
+        "name_en": "Beta-carotene (mcg)",
+        "nonnull": 972,
+        "coverage_pct": 94.6
+      },
+      {
+        "col_idx": 31,
+        "tag_canonical": "CRYPXB",
+        "name_en": "Beta-cryptoxanthin (mcg)",
+        "nonnull": 915,
+        "coverage_pct": 89.0
+      },
+      {
+        "col_idx": 32,
+        "tag_canonical": "VITD",
+        "name_en": "Vitamin D  (mcg)",
+        "nonnull": 1005,
+        "coverage_pct": 97.8
+      },
+      {
+        "col_idx": 33,
+        "tag_canonical": "VITE",
+        "name_en": "Vitamin E (expressed in alpha-tocopherol equivalents) or [alpha-tocopherol] (mg)",
+        "nonnull": 1009,
+        "coverage_pct": 98.2
+      },
+      {
+        "col_idx": 34,
+        "tag_canonical": "TOCPHA",
+        "name_en": "Alpha-tocopherol (mg)",
+        "nonnull": 899,
+        "coverage_pct": 87.5
+      },
+      {
+        "col_idx": 35,
+        "tag_canonical": "TOCPHB",
+        "name_en": "Beta-tocopherol (mg)",
+        "nonnull": 816,
+        "coverage_pct": 79.4
+      },
+      {
+        "col_idx": 36,
+        "tag_canonical": "TOCPHG",
+        "name_en": "Gamma-tocopherol (mg)",
+        "nonnull": 823,
+        "coverage_pct": 80.1
+      },
+      {
+        "col_idx": 37,
+        "tag_canonical": "TOCPHD",
+        "name_en": "Delta-tocopherol (mg)",
+        "nonnull": 823,
+        "coverage_pct": 80.1
+      },
+      {
+        "col_idx": 38,
+        "tag_canonical": "THIA",
+        "name_en": "Thiamine (vitamin B1) (mg)",
+        "nonnull": 1024,
+        "coverage_pct": 99.6
+      },
+      {
+        "col_idx": 39,
+        "tag_canonical": "RIBF",
+        "name_en": "Riboflavin (vitamin B2) (mg)",
+        "nonnull": 1026,
+        "coverage_pct": 99.8
+      },
+      {
+        "col_idx": 40,
+        "tag_canonical": "NIAEQ",
+        "name_en": "Niacin equivalents or [niacin, preformed] (vitamin B3) (mg)",
+        "nonnull": 1026,
+        "coverage_pct": 99.8
+      },
+      {
+        "col_idx": 41,
+        "tag_canonical": "NIA",
+        "name_en": "Niacin, preformed (mg)",
+        "nonnull": 1023,
+        "coverage_pct": 99.5
+      },
+      {
+        "col_idx": 42,
+        "tag_canonical": "TRP",
+        "name_en": "Tryptophan (mg)",
+        "nonnull": 1009,
+        "coverage_pct": 98.2
+      },
+      {
+        "col_idx": 43,
+        "tag_canonical": "VITB6C",
+        "name_en": "Vitamin B6 (mg)",
+        "nonnull": 1016,
+        "coverage_pct": 98.8
+      },
+      {
+        "col_idx": 44,
+        "tag_canonical": "FOLAC",
+        "name_en": "Folic acid (synthetic) (mcg)",
+        "nonnull": 1027,
+        "coverage_pct": 99.9
+      },
+      {
+        "col_idx": 45,
+        "tag_canonical": "FOLFD",
+        "name_en": "Folate, naturally occurring (food folate) (mcg)",
+        "nonnull": 1011,
+        "coverage_pct": 98.3
+      },
+      {
+        "col_idx": 46,
+        "tag_canonical": "FOL",
+        "name_en": "Folate, total or [folate, sum of vitamers] (vitamin B9) (mcg)",
+        "nonnull": 1011,
+        "coverage_pct": 98.3
+      },
+      {
+        "col_idx": 47,
+        "tag_canonical": "FOLDFE",
+        "name_en": "Folate, dietary folate equivalents (mcg)",
+        "nonnull": 1011,
+        "coverage_pct": 98.3
+      },
+      {
+        "col_idx": 48,
+        "tag_canonical": "VITB12",
+        "name_en": "Vitamin B12 (mcg)",
+        "nonnull": 1020,
+        "coverage_pct": 99.2
+      },
+      {
+        "col_idx": 49,
+        "tag_canonical": "VITC",
+        "name_en": "Vitamin C (mg)",
+        "nonnull": 1025,
+        "coverage_pct": 99.7
+      },
+      {
+        "col_idx": 50,
+        "tag_canonical": "CHOLE",
+        "name_en": "Cholesterol (mg)",
+        "nonnull": 1021,
+        "coverage_pct": 99.3
+      },
+      {
+        "col_idx": 51,
+        "tag_canonical": "XFA",
+        "name_en": "Fatty acid conversion factor",
+        "nonnull": 887,
+        "coverage_pct": 86.3
+      },
+      {
+        "col_idx": 52,
+        "tag_canonical": "FASAT",
+        "name_en": "Fatty acids, total saturated (g)",
+        "nonnull": 1007,
+        "coverage_pct": 98.0
+      },
+      {
+        "col_idx": 53,
+        "tag_canonical": "FAMS",
+        "name_en": "Fatty acids, total monounsaturated  (g)",
+        "nonnull": 1007,
+        "coverage_pct": 98.0
+      },
+      {
+        "col_idx": 54,
+        "tag_canonical": "FAPU",
+        "name_en": "Fatty acids, total polyunsaturated (g)",
+        "nonnull": 1007,
+        "coverage_pct": 98.0
+      },
+      {
+        "col_idx": 55,
+        "tag_canonical": "F18D2CN6",
+        "name_en": "Linoleic acid  (g)",
+        "nonnull": 981,
+        "coverage_pct": 95.4
+      },
+      {
+        "col_idx": 56,
+        "tag_canonical": "F18D3CN3",
+        "name_en": "Alpha-linolenic acid (g)",
+        "nonnull": 992,
+        "coverage_pct": 96.5
+      },
+      {
+        "col_idx": 57,
+        "tag_canonical": "PHYTCPP",
+        "name_en": "Phytate, total or [phytate, determined by direct precipitation] or [phytate, det",
+        "nonnull": 792,
+        "coverage_pct": 77.0
+      },
+      {
+        "col_idx": 58,
+        "tag_canonical": "IP3",
+        "name_en": "Inositol triphosphate (IP3) (mg)",
+        "nonnull": 13,
+        "coverage_pct": 1.3
+      },
+      {
+        "col_idx": 59,
+        "tag_canonical": "IP4",
+        "name_en": "Inositol tetraphosphate (IP4) (mg)",
+        "nonnull": 13,
+        "coverage_pct": 1.3
+      },
+      {
+        "col_idx": 60,
+        "tag_canonical": "IP5",
+        "name_en": "Inositol pentaphosphate (IP5) (mg)",
+        "nonnull": 19,
+        "coverage_pct": 1.8
+      },
+      {
+        "col_idx": 61,
+        "tag_canonical": "IP6",
+        "name_en": "Inositol hexaphosphate (IP6) (mg)",
+        "nonnull": 114,
+        "coverage_pct": 11.1
+      },
+      {
+        "col_idx": 62,
+        "tag_canonical": "XN",
+        "name_en": "Conversion factor for calculating total protein from total nitrogen",
+        "nonnull": 928,
+        "coverage_pct": 90.3
+      }
+    ],
+    "sample_data_rows": [
+      {
+        "code": "01_172",
+        "name_en": "Baling béinré (northern Burkina Faso)*: sorghum porridge with monkey bread, tamarind, water, milk and sugar",
+        "name_fr": "Baling béinré (nord du Burkina Faso)*: bouillie de sorgho avec pain de singe, tamarin, eau, lait et sucre",
+        "biblio": "calc. from recipe / de recette",
+        "edible": "",
+        "nutrients_first10": [
+          "",
+          "1.00",
+          "99.9",
+          "329",
+          "78",
+          "80.1",
+          "2.5",
+          "[0.2]",
+          "16.1",
+          "[0.6]"
+        ]
+      },
+      {
+        "code": "01_173",
+        "name_en": "Baling ni zièm béinré (Burkina Faso)*: porridge of degermed sorghum with potash, water and sugar",
+        "name_fr": "Baling ni zièm béinré (Burkina Faso)*: bouillie de sorgho dégermé avec potasse, eau et sucre",
+        "biblio": "calc. from recipe / de recette",
+        "edible": "",
+        "nutrients_first10": [
+          "",
+          "1.00",
+          "99.9",
+          "277",
+          "65",
+          "83.3",
+          "0.9",
+          "[0.2]",
+          "14.8",
+          "0.5"
+        ]
+      },
+      {
+        "code": "01_168",
+        "name_en": "Beenkida (Burkina Faso)*: maize porridge with maize granules",
+        "name_fr": "Beenkida (Burkina Faso)*: bouillie de maïs avec grumaux de maïs",
+        "biblio": "calc. from recipe / de recette",
+        "edible": "",
+        "nutrients_first10": [
+          "",
+          "1.00",
+          "100.0",
+          "426",
+          "100",
+          "74.6",
+          "2.1",
+          "0.4",
+          "21.7",
+          "1.1"
+        ]
+      },
+      {
+        "code": "01_188",
+        "name_en": "Biscuit, sweet, plain, unfortified",
+        "name_fr": "Biscuit, sucré, nature, non enrichi",
+        "biblio": "AU14(02C20287; 02C20364; 02C20286; 02C20314), SA10(3216; 3233; 3296), UK7(11-797; 11-796)",
+        "edible": "1.00",
+        "nutrients_first10": [
+          "1.00",
+          "1.00",
+          "100.0",
+          "2010",
+          "479",
+          "4.6",
+          "6.2",
+          "21.2",
+          "64.9",
+          "2.0"
+        ]
+      },
+      {
+        "code": "01_177",
+        "name_en": "Boalboal (Burkina Faso)*: millet balls with fried fish and vegetables",
+        "name_fr": "Boalboal (Burkina Faso)*: boulettes de mil avec poisson frit et légumes",
+        "biblio": "calc. from recipe / de recette",
+        "edible": "",
+        "nutrients_first10": [
+          "",
+          "1.00",
+          "99.4",
+          "1050",
+          "252",
+          "54.7",
+          "5.4",
+          "17.0",
+          "18.0",
+          "2.8"
+        ]
+      }
+    ]
+  },
+  "sheet_06_nv_stat_57": {
+    "n_total_rows": 3812,
+    "n_total_cols": 63,
+    "n_data_rows": 1028,
+    "n_banding_rows": 14,
+    "n_blank_rows": 13,
+    "n_other_rows": 2754,
+    "expected_nutrient_count": 57,
+    "nutrient_col_start": 5,
+    "n_nutrient_cols": 58,
+    "nutrient_tags_clean": [
+      "EDIBLE1",
+      "EDIBLE2",
+      "SOP",
+      "ENERC",
+      "ENERC",
+      "WATER",
+      "PROTCNT",
+      "FAT",
+      "CHOAVLDF",
+      "FIBTG",
+      "ALC",
+      "ASH",
+      "CA",
+      "FE",
+      "MG",
+      "P",
+      "K",
+      "NA",
+      "ZN",
+      "CU",
+      "VITA",
+      "VITA_RAE",
+      "RETOL",
+      "CARTBEQ",
+      "CARTA",
+      "CARTB",
+      "CRYPXB",
+      "VITD",
+      "VITE",
+      "TOCPHA",
+      "TOCPHB",
+      "TOCPHG",
+      "TOCPHD",
+      "THIA",
+      "RIBF",
+      "NIAEQ",
+      "NIA",
+      "TRP",
+      "VITB6C",
+      "FOLAC",
+      "FOLFD",
+      "FOL",
+      "FOLDFE",
+      "VITB12",
+      "VITC",
+      "CHOLE",
+      "XFA",
+      "FASAT",
+      "FAMS",
+      "FAPU",
+      "F18D2CN6",
+      "F18D3CN3",
+      "PHYTCPP",
+      "IP3",
+      "IP4",
+      "IP5",
+      "IP6",
+      "XN"
+    ],
+    "group_codes_seen": {
+      "01": 183,
+      "02": 96,
+      "03": 137,
+      "04": 132,
+      "05": 53,
+      "06": 34,
+      "07": 128,
+      "08": 14,
+      "09": 106,
+      "10": 27,
+      "11": 35,
+      "12": 24,
+      "13": 25,
+      "14": 34
+    },
+    "n_groups": 14,
+    "banding_labels": [
+      "Cereals and their products/Céréales et produits dérivés",
+      "Starchy roots, tubers and their products/Racines amylacées, tubercules et produits dérivés",
+      "Legumes and their products/Légumineuses et produits dérivés",
+      "Vegetables and their products/Légumes et produits dérivés",
+      "Fruits and their products/Fruits et produits dérivés",
+      "Nuts, seeds and their products/Noix, graines et produits dérivés",
+      "Meat, poultry and their products/Viande, volaille et produits dérivés",
+      "Eggs and their products/Œufs et produits dérivés",
+      "Fish and its products/Poisson et produits dérivés",
+      "Milk and its products/Lait et produits dérivés",
+      "Fats and oils/Graisses et huiles",
+      "Beverages/Boissons",
+      "Miscellaneous/Divers",
+      "Soups and sauces/Soupes et sauces"
+    ],
+    "mojibake_lines": [],
+    "mojibake_count": 0,
+    "nutrient_coverage": [
+      {
+        "col_idx": 5,
+        "tag_canonical": "EDIBLE1",
+        "name_en": "Edible portion coefficient 1 (from as purchased to as described)",
+        "nonnull": 918,
+        "coverage_pct": 89.3
+      },
+      {
+        "col_idx": 6,
+        "tag_canonical": "EDIBLE2",
+        "name_en": "Edible portion coefficient 2 (from as described to as eaten)",
+        "nonnull": 1022,
+        "coverage_pct": 99.4
+      },
+      {
+        "col_idx": 7,
+        "tag_canonical": "SOP",
+        "name_en": "Sum of proximate components (g)",
+        "nonnull": 1027,
+        "coverage_pct": 99.9
+      },
+      {
+        "col_idx": 8,
+        "tag_canonical": "ENERC",
+        "name_en": "Energy (kJ)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 9,
+        "tag_canonical": "ENERC",
+        "name_en": "Energy (kcal)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 10,
+        "tag_canonical": "WATER",
+        "name_en": "Water (g)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 11,
+        "tag_canonical": "PROTCNT",
+        "name_en": "Protein, total (g)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 12,
+        "tag_canonical": "FAT",
+        "name_en": "Fat, total or [fat, derived by analysis using continuous extraction] (g)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 13,
+        "tag_canonical": "CHOAVLDF",
+        "name_en": "Carbohydrate, available; calculated by difference (g)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 14,
+        "tag_canonical": "FIBTG",
+        "name_en": "Fibre, total dietary or [fibre, crude] (g)",
+        "nonnull": 1027,
+        "coverage_pct": 99.9
+      },
+      {
+        "col_idx": 15,
+        "tag_canonical": "ALC",
+        "name_en": "Alcohol (g)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 16,
+        "tag_canonical": "ASH",
+        "name_en": "Ash (g)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 17,
+        "tag_canonical": "CA",
+        "name_en": "Calcium (mg)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 18,
+        "tag_canonical": "FE",
+        "name_en": "Iron (mg)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 19,
+        "tag_canonical": "MG",
+        "name_en": "Magnesium (mg)",
+        "nonnull": 1026,
+        "coverage_pct": 99.8
+      },
+      {
+        "col_idx": 20,
+        "tag_canonical": "P",
+        "name_en": "Phosphorus (mg)",
+        "nonnull": 1028,
+        "coverage_pct": 100.0
+      },
+      {
+        "col_idx": 21,
+        "tag_canonical": "K",
+        "name_en": "Potassium (mg)",
+        "nonnull": 1025,
+        "coverage_pct": 99.7
+      },
+      {
+        "col_idx": 22,
+        "tag_canonical": "NA",
+        "name_en": "Sodium (mg)",
+        "nonnull": 1024,
+        "coverage_pct": 99.6
+      },
+      {
+        "col_idx": 23,
+        "tag_canonical": "ZN",
+        "name_en": "Zinc (mg)",
+        "nonnull": 1024,
+        "coverage_pct": 99.6
+      },
+      {
+        "col_idx": 24,
+        "tag_canonical": "CU",
+        "name_en": "Copper (mg)",
+        "nonnull": 1019,
+        "coverage_pct": 99.1
+      },
+      {
+        "col_idx": 25,
+        "tag_canonical": "VITA",
+        "name_en": "Vitamin A (expressed in retinol equivalents) (mcg)",
+        "nonnull": 1003,
+        "coverage_pct": 97.6
+      },
+      {
+        "col_idx": 26,
+        "tag_canonical": "VITA_RAE",
+        "name_en": "Vitamin A (expressed in retinol activity equivalents) (mcg)",
+        "nonnull": 1003,
+        "coverage_pct": 97.6
+      },
+      {
+        "col_idx": 27,
+        "tag_canonical": "RETOL",
+        "name_en": "Retinol (mcg)",
+        "nonnull": 1025,
+        "coverage_pct": 99.7
+      },
+      {
+        "col_idx": 28,
+        "tag_canonical": "CARTBEQ",
+        "name_en": "Beta-carotene equivalents or [beta-carotene] (mcg)",
+        "nonnull": 1001,
+        "coverage_pct": 97.4
+      },
+      {
+        "col_idx": 29,
+        "tag_canonical": "CARTA",
+        "name_en": "Alpha-carotene (mcg)",
+        "nonnull": 928,
+        "coverage_pct": 90.3
+      },
+      {
+        "col_idx": 30,
+        "tag_canonical": "CARTB",
+        "name_en": "Beta-carotene (mcg)",
+        "nonnull": 972,
+        "coverage_pct": 94.6
+      },
+      {
+        "col_idx": 31,
+        "tag_canonical": "CRYPXB",
+        "name_en": "Beta-cryptoxanthin (mcg)",
+        "nonnull": 915,
+        "coverage_pct": 89.0
+      },
+      {
+        "col_idx": 32,
+        "tag_canonical": "VITD",
+        "name_en": "Vitamin D  (mcg)",
+        "nonnull": 1005,
+        "coverage_pct": 97.8
+      },
+      {
+        "col_idx": 33,
+        "tag_canonical": "VITE",
+        "name_en": "Vitamin E (expressed in alpha-tocopherol equivalents) or [alpha-tocopherol] (mg)",
+        "nonnull": 1009,
+        "coverage_pct": 98.2
+      },
+      {
+        "col_idx": 34,
+        "tag_canonical": "TOCPHA",
+        "name_en": "Alpha-tocopherol (mg)",
+        "nonnull": 899,
+        "coverage_pct": 87.5
+      },
+      {
+        "col_idx": 35,
+        "tag_canonical": "TOCPHB",
+        "name_en": "Beta-tocopherol (mg)",
+        "nonnull": 816,
+        "coverage_pct": 79.4
+      },
+      {
+        "col_idx": 36,
+        "tag_canonical": "TOCPHG",
+        "name_en": "Gamma-tocopherol (mg)",
+        "nonnull": 823,
+        "coverage_pct": 80.1
+      },
+      {
+        "col_idx": 37,
+        "tag_canonical": "TOCPHD",
+        "name_en": "Delta-tocopherol (mg)",
+        "nonnull": 823,
+        "coverage_pct": 80.1
+      },
+      {
+        "col_idx": 38,
+        "tag_canonical": "THIA",
+        "name_en": "Thiamine (vitamin B1) (mg)",
+        "nonnull": 1024,
+        "coverage_pct": 99.6
+      },
+      {
+        "col_idx": 39,
+        "tag_canonical": "RIBF",
+        "name_en": "Riboflavin (vitamin B2) (mg)",
+        "nonnull": 1026,
+        "coverage_pct": 99.8
+      },
+      {
+        "col_idx": 40,
+        "tag_canonical": "NIAEQ",
+        "name_en": "Niacin equivalents or [niacin, preformed] (vitamin B3) (mg)",
+        "nonnull": 1026,
+        "coverage_pct": 99.8
+      },
+      {
+        "col_idx": 41,
+        "tag_canonical": "NIA",
+        "name_en": "Niacin, preformed (mg)",
+        "nonnull": 1023,
+        "coverage_pct": 99.5
+      },
+      {
+        "col_idx": 42,
+        "tag_canonical": "TRP",
+        "name_en": "Tryptophan (mg)",
+        "nonnull": 1009,
+        "coverage_pct": 98.2
+      },
+      {
+        "col_idx": 43,
+        "tag_canonical": "VITB6C",
+        "name_en": "Vitamin B6 (mg)",
+        "nonnull": 1016,
+        "coverage_pct": 98.8
+      },
+      {
+        "col_idx": 44,
+        "tag_canonical": "FOLAC",
+        "name_en": "Folic acid (synthetic) (mcg)",
+        "nonnull": 1027,
+        "coverage_pct": 99.9
+      },
+      {
+        "col_idx": 45,
+        "tag_canonical": "FOLFD",
+        "name_en": "Folate, naturally occurring (food folate) (mcg)",
+        "nonnull": 1011,
+        "coverage_pct": 98.3
+      },
+      {
+        "col_idx": 46,
+        "tag_canonical": "FOL",
+        "name_en": "Folate, total or [folate, sum of vitamers] (vitamin B9) (mcg)",
+        "nonnull": 1011,
+        "coverage_pct": 98.3
+      },
+      {
+        "col_idx": 47,
+        "tag_canonical": "FOLDFE",
+        "name_en": "Folate, dietary folate equivalents (mcg)",
+        "nonnull": 1011,
+        "coverage_pct": 98.3
+      },
+      {
+        "col_idx": 48,
+        "tag_canonical": "VITB12",
+        "name_en": "Vitamin B12 (mcg)",
+        "nonnull": 1020,
+        "coverage_pct": 99.2
+      },
+      {
+        "col_idx": 49,
+        "tag_canonical": "VITC",
+        "name_en": "Vitamin C (mg)",
+        "nonnull": 1025,
+        "coverage_pct": 99.7
+      },
+      {
+        "col_idx": 50,
+        "tag_canonical": "CHOLE",
+        "name_en": "Cholesterol (mg)",
+        "nonnull": 1021,
+        "coverage_pct": 99.3
+      },
+      {
+        "col_idx": 51,
+        "tag_canonical": "XFA",
+        "name_en": "Fatty acid conversion factor",
+        "nonnull": 887,
+        "coverage_pct": 86.3
+      },
+      {
+        "col_idx": 52,
+        "tag_canonical": "FASAT",
+        "name_en": "Fatty acids, total saturated (g)",
+        "nonnull": 1007,
+        "coverage_pct": 98.0
+      },
+      {
+        "col_idx": 53,
+        "tag_canonical": "FAMS",
+        "name_en": "Fatty acids, total monounsaturated  (g)",
+        "nonnull": 1007,
+        "coverage_pct": 98.0
+      },
+      {
+        "col_idx": 54,
+        "tag_canonical": "FAPU",
+        "name_en": "Fatty acids, total polyunsaturated (g)",
+        "nonnull": 1007,
+        "coverage_pct": 98.0
+      },
+      {
+        "col_idx": 55,
+        "tag_canonical": "F18D2CN6",
+        "name_en": "Linoleic acid  (g)",
+        "nonnull": 981,
+        "coverage_pct": 95.4
+      },
+      {
+        "col_idx": 56,
+        "tag_canonical": "F18D3CN3",
+        "name_en": "Alpha-linolenic acid (g)",
+        "nonnull": 992,
+        "coverage_pct": 96.5
+      },
+      {
+        "col_idx": 57,
+        "tag_canonical": "PHYTCPP",
+        "name_en": "Phytate, total or [phytate, determined by direct precipitation] or [phytate, det",
+        "nonnull": 792,
+        "coverage_pct": 77.0
+      },
+      {
+        "col_idx": 58,
+        "tag_canonical": "IP3",
+        "name_en": "Inositol triphosphate (IP3) (mg)",
+        "nonnull": 13,
+        "coverage_pct": 1.3
+      },
+      {
+        "col_idx": 59,
+        "tag_canonical": "IP4",
+        "name_en": "Inositol tetraphosphate (IP4) (mg)",
+        "nonnull": 13,
+        "coverage_pct": 1.3
+      },
+      {
+        "col_idx": 60,
+        "tag_canonical": "IP5",
+        "name_en": "Inositol pentaphosphate (IP5) (mg)",
+        "nonnull": 19,
+        "coverage_pct": 1.8
+      },
+      {
+        "col_idx": 61,
+        "tag_canonical": "IP6",
+        "name_en": "Inositol hexaphosphate (IP6) (mg)",
+        "nonnull": 114,
+        "coverage_pct": 11.1
+      },
+      {
+        "col_idx": 62,
+        "tag_canonical": "XN",
+        "name_en": "Conversion factor for calculating total protein from total nitrogen",
+        "nonnull": 928,
+        "coverage_pct": 90.3
+      }
+    ],
+    "sample_data_rows": [
+      {
+        "code": "01_172",
+        "name_en": "Baling béinré (northern Burkina Faso)*: sorghum porridge with monkey bread, tamarind, water, milk and sugar",
+        "name_fr": "Baling béinré (nord du Burkina Faso)*: bouillie de sorgho avec pain de singe, tamarin, eau, lait et sucre",
+        "biblio": "calc. from recipe / de recette",
+        "edible": "",
+        "nutrients_first10": [
+          "",
+          "1.00",
+          "99.9",
+          "329",
+          "78",
+          "80.1",
+          "2.5",
+          "[0.2]",
+          "16.1",
+          "[0.6]"
+        ]
+      },
+      {
+        "code": "01_173",
+        "name_en": "Baling ni zièm béinré (Burkina Faso)*: porridge of degermed sorghum with potash, water and sugar",
+        "name_fr": "Baling ni zièm béinré (Burkina Faso)*: bouillie de sorgho dégermé avec potasse, eau et sucre",
+        "biblio": "calc. from recipe / de recette",
+        "edible": "",
+        "nutrients_first10": [
+          "",
+          "1.00",
+          "99.9",
+          "277",
+          "65",
+          "83.3",
+          "0.9",
+          "[0.2]",
+          "14.8",
+          "0.5"
+        ]
+      },
+      {
+        "code": "01_168",
+        "name_en": "Beenkida (Burkina Faso)*: maize porridge with maize granules",
+        "name_fr": "Beenkida (Burkina Faso)*: bouillie de maïs avec grumaux de maïs",
+        "biblio": "calc. from recipe / de recette",
+        "edible": "",
+        "nutrients_first10": [
+          "",
+          "1.00",
+          "100.0",
+          "426",
+          "100",
+          "74.6",
+          "2.1",
+          "0.4",
+          "21.7",
+          "1.1"
+        ]
+      },
+      {
+        "code": "01_188",
+        "name_en": "Biscuit, sweet, plain, unfortified",
+        "name_fr": "Biscuit, sucré, nature, non enrichi",
+        "biblio": "AU14(02C20287; 02C20364; 02C20286; 02C20314), SA10(3216; 3233; 3296), UK7(11-797; 11-796)",
+        "edible": "1.00",
+        "nutrients_first10": [
+          "1.00",
+          "1.00",
+          "100.0",
+          "2010",
+          "479",
+          "4.6",
+          "6.2",
+          "21.2",
+          "64.9",
+          "2.0"
+        ]
+      },
+      {
+        "code": "01_177",
+        "name_en": "Boalboal (Burkina Faso)*: millet balls with fried fish and vegetables",
+        "name_fr": "Boalboal (Burkina Faso)*: boulettes de mil avec poisson frit et légumes",
+        "biblio": "calc. from recipe / de recette",
+        "edible": "",
+        "nutrients_first10": [
+          "",
+          "1.00",
+          "99.4",
+          "1050",
+          "252",
+          "54.7",
+          "5.4",
+          "17.0",
+          "18.0",
+          "2.8"
+        ]
+      }
+    ]
+  },
+  "sheet_07_yield": {
+    "n_total_rows": 758,
+    "n_data_rows": 440,
+    "n_with_yield": 440,
+    "min_yield": 0.57,
+    "max_yield": 7.3,
+    "mean_yield": 1.76
+  },
+  "sheet_08_retention": {
+    "n_total_rows": 74,
+    "n_data_rows": 61,
+    "retention_nutrients": [
+      "Calcium",
+      "Iron",
+      "Magnesium",
+      "Phosphorus",
+      "Potassium",
+      "Sodium",
+      "Zinc",
+      "Copper",
+      "Vitamin A",
+      "Vitamin D",
+      "Vitamin E",
+      "Thiamine (vitamin B1)",
+      "Riboflavin (vitamin B2)",
+      "Niacin",
+      "Vitamin B6",
+      "Folate",
+      "Vitamin B12",
+      "Vitamin C",
+      "Phytate§",
+      "IP6§"
+    ],
+    "n_retention_nutrients": 20
+  },
+  "sheet_09_mixed": {
+    "n_total_rows": 1714,
+    "n_recipes": 195,
+    "n_ingredients": 1512,
+    "avg_ings_per_recipe": 7.75,
+    "max_ings_per_recipe": 17,
+    "cross_referenced_by_wafct_code": true,
+    "sample_recipes": [
+      {
+        "obs_num": "1",
+        "code": "01_172",
+        "name_en": "Baling béinré (northern Burkina Faso)*: sorghum porridge with monkey bread, tamarind, water, milk and sugar",
+        "yield": "0.6518918918918919",
+        "ingredients": [
+          {
+            "code": "01_072",
+            "name_en": "Sorghum, flour, degermed",
+            "weight": "56"
+          },
+          {
+            "code": "05_021",
+            "name_en": "Tamarind, fruit, ripe, raw",
+            "weight": "24"
+          },
+          {
+            "code": "05_004",
+            "name_en": "Baobab, fruit/monkey bread, raw",
+            "weight": "5"
+          },
+          {
+            "code": "10_017",
+            "name_en": "Milk, cow, powder, skimmed, unfortified",
+            "weight": "30"
+          },
+          {
+            "code": "13_002",
+            "name_en": "Sugar, white",
+            "weight": "35"
+          },
+          {
+            "code": "12_019",
+            "name_en": "Water, tap",
+            "weight": "775"
+          }
+        ]
+      },
+      {
+        "obs_num": "2",
+        "code": "01_172",
+        "name_en": "Baling béinré (northern Burkina Faso)*: sorghum porridge with monkey bread, tamarind, water, milk and sugar",
+        "yield": "0.5533249686323714",
+        "ingredients": [
+          {
+            "code": "01_072",
+            "name_en": "Sorghum, flour, degermed",
+            "weight": "47"
+          },
+          {
+            "code": "05_021",
+            "name_en": "Tamarind, fruit, ripe, raw",
+            "weight": "13"
+          },
+          {
+            "code": "05_004",
+            "name_en": "Baobab, fruit/monkey bread, raw",
+            "weight": "4"
+          },
+          {
+            "code": "10_017",
+            "name_en": "Milk, cow, powder, skimmed, unfortified",
+            "weight": "20"
+          },
+          {
+            "code": "13_002",
+            "name_en": "Sugar, white",
+            "weight": "30"
+          },
+          {
+            "code": "12_019",
+            "name_en": "Water, tap",
+            "weight": "683"
+          }
+        ]
+      },
+      {
+        "obs_num": "1",
+        "code": "01_173",
+        "name_en": "Baling ni zièm béinré (Burkina Faso)*: porridge of degermed sorghum with potash, water and sugar",
+        "yield": "0.5716463414634146",
+        "ingredients": [
+          {
+            "code": "01_072",
+            "name_en": "Sorghum, flour, degermed",
+            "weight": "30"
+          },
+          {
+            "code": "05_021",
+            "name_en": "Tamarind, fruit, ripe, raw",
+            "weight": "10"
+          },
+          {
+            "code": "13_024",
+            "name_en": "Potash, solid",
+            "weight": "1"
+          },
+          {
+            "code": "13_002",
+            "name_en": "Sugar, white",
+            "weight": "35"
+          },
+          {
+            "code": "12_019",
+            "name_en": "Water, tap",
+            "weight": "580"
+          }
+        ]
+      }
+    ]
+  },
+  "sheet_10_foodex2": {
+    "n_total_rows": 1030,
+    "n_data_rows": 1027,
+    "n_with_foodex2_code": 934,
+    "foodex2_coverage_pct": 90.9,
+    "n_exact_match": 633,
+    "exact_match_pct": 61.6
+  },
+  "sheet_11_version_map": {
+    "n_total_rows": 491,
+    "header": [
+      "2012 Code",
+      "2012 Food name in English",
+      "2012 Nom d’aliment en français",
+      "2019 Code",
+      "2019 Food name in English",
+      "2019 Nom d’aliment en français",
+      "",
+      ""
+    ]
+  },
+  "sheet_12_biblio": {
+    "n_total_rows": 468,
+    "n_entries": 467,
+    "sample_first10": [
+      {
+        "biblio_id": "01BR",
+        "reference": "Rodriguez-Amaya, D.B., Kimura, M. & Amaya-Farfan, J. 2008. Fontes Brasileiras de carotenóides: tabela brasileira de composição de carotenóides em alimentos. Brasilia, Ministério do Meio Ambiente. (als"
+      },
+      {
+        "biblio_id": "01CH",
+        "reference": "Li, R., Xia, Q., Tang, M., Zhao, S., Chen, W., Lei, X. & Bai, X. 2012. Chemical composition of Chinese palm fruit and chemical properties of the oil extracts. African Journal of Biotechnology, 11(39):"
+      },
+      {
+        "biblio_id": "01FG",
+        "reference": "Onyekwelu, J.C., Oyewale, O., Stimm, B. & Mosandl, R. 2015. Antioxidant, nutritional and anti-nutritional composition of Garcinia kola and Chrysophyllum albidum from rainforest ecosystem of Ondo State"
+      },
+      {
+        "biblio_id": "1B",
+        "reference": "Favier, J.C., Ireland-Ripert, J., Laussucq, C. & Feinberg, M. 1993. Répertoire général des aliments: 3. Table de composition des fruits exotiques, fruits de cueillette d’Afrique. Paris, Institut Franç"
+      },
+      {
+        "biblio_id": "1E",
+        "reference": "SQR Benin. 2008. Pourquoi manger les produits vivriers de saison? Guide pour l’alimentation et la nutrition durables. Série “Accès au marché local”. ONASA, VECO, Slow Food, CTA."
+      },
+      {
+        "biblio_id": "1G",
+        "reference": "McCrae, J.E. & Paul, A.A. 1996. Foods of Rural Gambia, 2nd edition. Cambridge, UK and Keneba, the Gambia, Medical Research Council Dunn Nutrition Unit."
+      },
+      {
+        "biblio_id": "1GH",
+        "reference": "Nti, C.A. 2009. Effects of bambara groundnut (Vigna subterranea) variety and processing on the quality and consumer appeal for its products. International Journal of Food Science & Technology, 44(11):"
+      },
+      {
+        "biblio_id": "1M",
+        "reference": "Barikmo, I., Ouattara, F. & Oshaug, A. 2004. Food Composition Table for Mali. TACAM, Research Series No. 9. Oslo, Akershus University College."
+      },
+      {
+        "biblio_id": "1N",
+        "reference": "Aletor, V.A. & Aladetimi, O.O. 1989. Compositional evaluation of some cowpea varieties and some under-utilized edible legumes in Nigeria. Die Nahrung, 33(10): 999–1007."
+      },
+      {
+        "biblio_id": "1P",
+        "reference": "University of Ghana. (no date). Nutritional content of some typical African Foods. Nutrition & Food Science Department. Accra."
+      }
+    ]
+  },
+  "infoods_cnf_bridge": {
+    "n_wafct_tags": 57,
+    "n_mapped": 48,
+    "n_unmapped": 10,
+    "coverage_pct": 84.2,
+    "bridge": [
+      {
+        "infoods_tag": "ALC",
+        "cnf_nutrient": "ALCOHOL",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "ASH",
+        "cnf_nutrient": "ASH, TOTAL",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "CA",
+        "cnf_nutrient": "CALCIUM",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "CARTA",
+        "cnf_nutrient": "ALPHA CAROTENE",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "CARTB",
+        "cnf_nutrient": "BETA CAROTENE",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "CARTBEQ",
+        "cnf_nutrient": "BETA CAROTENE",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "CHOAVLDF",
+        "cnf_nutrient": "CARBOHYDRATE, TOTAL (BY DIFFERENCE)",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "CHOLE",
+        "cnf_nutrient": "CHOLESTEROL",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "CRYPXB",
+        "cnf_nutrient": "CRYPTOXANTHIN, BETA",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "CU",
+        "cnf_nutrient": "COPPER",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "EDIBLE1",
+        "cnf_nutrient": null,
+        "status": "wafct_only_known"
+      },
+      {
+        "infoods_tag": "EDIBLE2",
+        "cnf_nutrient": null,
+        "status": "wafct_only_known"
+      },
+      {
+        "infoods_tag": "ENERC (kJ)",
+        "cnf_nutrient": "ENERGY (KILOJOULES)",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "ENERC (kcal)",
+        "cnf_nutrient": "ENERGY (KILOCALORIES)",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "F18D2CN6",
+        "cnf_nutrient": "FATTY ACIDS, n-6 LINOLEIC ACID, 18:2",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "F18D3CN3",
+        "cnf_nutrient": "FATTY ACIDS, n-3 LINOLENIC ACID, 18:3",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "FAMS",
+        "cnf_nutrient": "FATTY ACIDS, MONOUNSATURATED, TOTAL",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "FAPU",
+        "cnf_nutrient": "FATTY ACIDS, POLYUNSATURATED, TOTAL",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "FASAT",
+        "cnf_nutrient": "FATTY ACIDS, SATURATED, TOTAL",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "FAT",
+        "cnf_nutrient": "FAT (TOTAL LIPIDS)",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "FE",
+        "cnf_nutrient": "IRON",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "FIBTG",
+        "cnf_nutrient": "FIBRE, TOTAL DIETARY",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "FOL",
+        "cnf_nutrient": "FOLATE, TOTAL",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "FOLAC",
+        "cnf_nutrient": "FOLIC ACID",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "FOLDFE",
+        "cnf_nutrient": "FOLATE, DFE",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "FOLFD",
+        "cnf_nutrient": "FOLATE, FOOD",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "IP3",
+        "cnf_nutrient": null,
+        "status": "wafct_only_known"
+      },
+      {
+        "infoods_tag": "IP4",
+        "cnf_nutrient": null,
+        "status": "wafct_only_known"
+      },
+      {
+        "infoods_tag": "IP5",
+        "cnf_nutrient": null,
+        "status": "wafct_only_known"
+      },
+      {
+        "infoods_tag": "IP6",
+        "cnf_nutrient": null,
+        "status": "wafct_only_known"
+      },
+      {
+        "infoods_tag": "K",
+        "cnf_nutrient": "POTASSIUM",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "MG",
+        "cnf_nutrient": "MAGNESIUM",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "NA",
+        "cnf_nutrient": "SODIUM",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "NIA",
+        "cnf_nutrient": "NIACIN",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "NIAEQ",
+        "cnf_nutrient": "NIACIN EQUIVALENT (NE)",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "P",
+        "cnf_nutrient": "PHOSPHORUS",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "PHYTCPP",
+        "cnf_nutrient": null,
+        "status": "wafct_only_known"
+      },
+      {
+        "infoods_tag": "PROTCNT",
+        "cnf_nutrient": "PROTEIN",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "RETOL",
+        "cnf_nutrient": "RETINOL",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "RIBF",
+        "cnf_nutrient": "RIBOFLAVIN",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "SOP",
+        "cnf_nutrient": null,
+        "status": "wafct_only_known"
+      },
+      {
+        "infoods_tag": "THIA",
+        "cnf_nutrient": "THIAMIN",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "TOCPHA",
+        "cnf_nutrient": "TOCOPHEROL, ALPHA",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "TOCPHB",
+        "cnf_nutrient": "TOCOPHEROL, BETA",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "TOCPHD",
+        "cnf_nutrient": "TOCOPHEROL, DELTA",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "TOCPHG",
+        "cnf_nutrient": "TOCOPHEROL, GAMMA",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "TRP",
+        "cnf_nutrient": "TRYPTOPHAN",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "VITA",
+        "cnf_nutrient": "VITAMIN A",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "VITA_RAE",
+        "cnf_nutrient": "RETINOL ACTIVITY EQUIVALENTS",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "VITB12",
+        "cnf_nutrient": "VITAMIN B-12",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "VITB6C",
+        "cnf_nutrient": "VITAMIN B-6",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "VITC",
+        "cnf_nutrient": "VITAMIN C",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "VITD",
+        "cnf_nutrient": "VITAMIN D (D2 + D3)",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "VITE",
+        "cnf_nutrient": "VITAMIN E (ALPHA-TOCOPHEROL)",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "WATER",
+        "cnf_nutrient": "MOISTURE",
+        "status": "mapped"
+      },
+      {
+        "infoods_tag": "XFA",
+        "cnf_nutrient": null,
+        "status": "wafct_only_known"
+      },
+      {
+        "infoods_tag": "XN",
+        "cnf_nutrient": null,
+        "status": "wafct_only_known"
+      },
+      {
+        "infoods_tag": "ZN",
+        "cnf_nutrient": "ZINC",
+        "status": "mapped"
+      }
+    ]
+  }
+}
