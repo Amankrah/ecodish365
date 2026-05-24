@@ -289,6 +289,11 @@ def decompose_recipe(request):
     if user_type not in ('individual', 'researcher', 'policy'):
         user_type = 'individual'
 
+    # WAFCT-EXTEND (2026-05-24): optional `source` restricts Stage-2
+    # ingredient resolution to one food database (cnf / wafct / both).
+    source_raw = str(request.data.get('source', 'both')).lower()
+    source = source_raw if source_raw in ('cnf', 'wafct') else None
+
     # Rate limit + circuit breaker (5x cost for decompose)
     rate_err = _enforce_rate_limit(request, kind='decompose')
     if rate_err is not None:
@@ -297,7 +302,7 @@ def decompose_recipe(request):
     try:
         from api.services.cnf_recipe_decomposer import get_default_decomposer
         decomposer = get_default_decomposer()
-        result = decomposer.decompose(dish_name, total_mass_g_f)
+        result = decomposer.decompose(dish_name, total_mass_g_f, source=source)
     except FileNotFoundError as exc:
         logger.error('Recipe decompose: corpus not built — %s', exc)
         return Response({
@@ -519,6 +524,11 @@ def recall_24h(request):
     if user_type not in ('individual', 'researcher', 'policy'):
         user_type = 'individual'
 
+    # WAFCT-EXTEND (2026-05-24): optional `source` restricts every meal's
+    # Stage-2 ingredient resolution to one food database.
+    source_raw = str(request.data.get('source', 'both')).lower()
+    source = source_raw if source_raw in ('cnf', 'wafct') else None
+
     # Rate limit: 5¢ per meal up to 30¢ cap.
     cost = min(
         _COST_RECALL_24H_PER_MEAL_CENTS * len(cleaned),
@@ -533,7 +543,7 @@ def recall_24h(request):
     try:
         from api.services.cnf_recall_24h import get_default_recall_24h
         orchestrator = get_default_recall_24h()
-        result = orchestrator.recall(cleaned, user_type=user_type)
+        result = orchestrator.recall(cleaned, user_type=user_type, source=source)
     except FileNotFoundError as exc:
         logger.error('Recall-24h: corpus not built — %s', exc)
         return Response({

@@ -36,6 +36,8 @@ import {
   type RecallOccasion,
   type RecallMealInput,
 } from '@/lib/api';
+import { SourceFilter, type SourceChoice } from './SourceFilter';
+import { SourceBadge } from './SourceBadge';
 import type { UserType } from './AudienceToggle';
 
 interface Recall24hWizardProps {
@@ -114,6 +116,10 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
   const [error, setError]     = useState<ApiError | null>(null);
   const [result, setResult]   = useState<CNFRecall24hResult | null>(null);
   const [explanations, setExplanations] = useState<CNFRecall24hExplanations | null>(null);
+  // WAFCT-EXTEND (2026-05-24): food-database scope. Forwarded into every
+  // meal's Stage-2 ingredient resolution so a 'wafct' recall stays
+  // entirely within WAFCT FoodIDs.
+  const [source, setSource]   = useState<SourceChoice>('both');
 
   const enabledOccasions = useMemo(
     () => OCCASIONS.filter(o => rows[o.id].enabled),
@@ -143,7 +149,7 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
       total_mass_g: rows[o.id].totalMass,
     }));
     try {
-      const r = await CNFApiService.recall24h(meals, { userType });
+      const r = await CNFApiService.recall24h(meals, { userType, source });
       setResult(r.result);
       setExplanations(r.explanations);
       setStep(3);
@@ -217,6 +223,20 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
           <p className="text-sm text-gray-600">
             Toggle the meals + snacks you had over a full 24-hour day. You can leave snacks off if you skip them — the recall handles any combination.
           </p>
+          {/* WAFCT-EXTEND (2026-05-24): pick the food database upfront. The
+              backend forwards this into every meal's Stage-2 ingredient
+              resolution, so a 'wafct' recall stays entirely WAFCT. */}
+          <div className="flex items-center gap-3 p-3 rounded-md bg-blue-50 border border-blue-100">
+            <span className="text-xs text-gray-700">Food database:</span>
+            <SourceFilter source={source} onChange={setSource} accent="blue" />
+            <span className="text-xs text-gray-500 ml-auto">
+              {source === 'wafct'
+                ? 'WAFCT only — best for West African meals'
+                : source === 'cnf'
+                ? 'CNF only — Health Canada'
+                : 'Searching both databases'}
+            </span>
+          </div>
           <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {OCCASIONS.map(o => {
               const Icon = o.icon;
@@ -444,9 +464,11 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
               <ul className="divide-y text-xs">
                 {result.aggregated_daily_ingredients.map(i => (
                   <li key={i.food_id} className="px-3 py-1.5 flex items-center gap-2">
-                    <span className="flex-1 truncate">
-                      <span className="font-medium text-gray-900">{i.food_description}</span>
-                      <span className="text-gray-500"> · CNF {i.food_id} · {i.food_group}</span>
+                    <span className="flex-1 truncate flex items-center gap-1.5">
+                      <span className="font-medium text-gray-900 truncate">{i.food_description}</span>
+                      {/* WAFCT-EXTEND (2026-05-24): per-row provenance */}
+                      <SourceBadge foodId={i.food_id} userType={userType} />
+                      <span className="text-gray-500 truncate"> · FoodID {i.food_id} · {i.food_group}</span>
                     </span>
                     <span className="text-gray-700 tabular-nums">{i.mass_g.toFixed(0)} g</span>
                   </li>

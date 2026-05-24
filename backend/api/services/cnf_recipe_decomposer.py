@@ -270,7 +270,20 @@ class CNFRecipeDecomposer:
 
     # --- public ----------------------------------------------------------
 
-    def decompose(self, dish_name: str, total_mass_g: float) -> CNFDecomposedRecipe:
+    def decompose(
+        self,
+        dish_name: str,
+        total_mass_g: float,
+        source: Optional[str] = None,
+    ) -> CNFDecomposedRecipe:
+        """Decompose a free-text dish into CNF / WAFCT ingredients.
+
+        WAFCT-EXTEND (2026-05-24): `source` ∈ {None, 'cnf', 'wafct'}
+        restricts Stage-2 ingredient resolution to one food database.
+        None (default) searches both. Source is included in the cache
+        key so a CNF-only query and a both-query for the same dish
+        cache independently.
+        """
         t0 = time.perf_counter()
         if not dish_name or not dish_name.strip():
             return CNFDecomposedRecipe(
@@ -288,7 +301,11 @@ class CNFRecipeDecomposer:
             )
 
         ndn = _normalise_dish_name(dish_name)
-        key = (ndn, round(total_mass_g, 1))
+        # WAFCT-EXTEND (2026-05-24): include source in the cache key so
+        # cnf-only / wafct-only / both queries cache independently for the
+        # same dish + mass.
+        src_key = source if source in ('cnf', 'wafct') else 'both'
+        key = (ndn, round(total_mass_g, 1), src_key)
         cached = self._cache_get(key)
         if cached is not None:
             return CNFDecomposedRecipe(
@@ -358,11 +375,18 @@ class CNFRecipeDecomposer:
         dropped_mass = 0.0
         if raw_ings:
             max_workers = min(8, len(raw_ings))
+            # WAFCT-EXTEND (2026-05-24): forward source to each Stage-2
+            # ingredient resolution so the matcher filters candidates to
+            # the chosen food database (None = both).
+            matcher_source = source if source in ('cnf', 'wafct') else None
             with ThreadPoolExecutor(
                     max_workers=max_workers,
                     thread_name_prefix='cnf-decomp-stage2',
             ) as ex:
-                stage2_results = list(ex.map(self._resolve_one_ingredient, raw_ings))
+                stage2_results = list(ex.map(
+                    lambda raw: self._resolve_one_ingredient(raw, source=matcher_source),
+                    raw_ings,
+                ))
             for ingredient, audit, mass in stage2_results:
                 if ingredient is not None:
                     resolved.append(ingredient)
@@ -507,11 +531,17 @@ class CNFRecipeDecomposer:
     def _resolve_one_ingredient(
         self,
         raw_ing: Dict[str, Any],
+        source: Optional[str] = None,
     ) -> Tuple[Optional[CNFIngredient], Optional[Dict[str, Any]], float]:
-        """Resolve one Stage-1-proposed ingredient name → CNF FoodID via the
-        matcher. Returns a (ingredient, dropped_audit_entry, dropped_mass_g)
-        triple — exactly one of `ingredient` / `dropped_audit_entry` is
-        non-None (or both are None for skipped invalid inputs).
+        """Resolve one Stage-1-proposed ingredient name → CNF / WAFCT FoodID
+        via the matcher. Returns a (ingredient, dropped_audit_entry,
+        dropped_mass_g) triple — exactly one of `ingredient` /
+        `dropped_audit_entry` is non-None (or both are None for skipped
+        invalid inputs).
+
+        WAFCT-EXTEND (2026-05-24): `source` ∈ {None, 'cnf', 'wafct'}
+        forwards to `CNFMatcher.match(source=...)` so the matcher's
+        candidate pool is filtered to one food database before LLM ranking.
 
         Called from ``decompose()``'s ``ThreadPoolExecutor.map(...)`` so all
         ingredients of a recipe resolve concurrently rather than sequentially.
@@ -527,7 +557,7 @@ class CNFRecipeDecomposer:
         if mass_f <= 0 or not name:
             return None, None, 0.0
         try:
-            m = self.cnf_matcher.match(name)
+            m = self.cnf_matcher.match(name, source=source)
         except Exception as exc:  # noqa: BLE001
             return None, {
                 'name': name, 'mass_g': mass_f,

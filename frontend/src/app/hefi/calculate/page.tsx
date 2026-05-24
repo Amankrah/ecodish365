@@ -697,6 +697,7 @@ export default function HEFICalculatePage() {
         onClose={() => setRecipeModalOpen(false)}
         userType={userType}
         accent="purple"
+        initialSource={sourceFilter}
         onApply={(ingredients) => {
           const additions: SelectedFood[] = ingredients
             .filter(i => !selectedFoods.some(f => f.FoodID === i.food_id))

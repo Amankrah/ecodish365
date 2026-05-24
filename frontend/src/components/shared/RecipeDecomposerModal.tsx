@@ -26,6 +26,8 @@ import {
   type CNFRecipeIngredient,
 } from '@/lib/api';
 import { AIEnhancedSearch } from './AIEnhancedSearch';
+import { SourceFilter, type SourceChoice } from './SourceFilter';
+import { SourceBadge } from './SourceBadge';
 import type { UserType } from './AudienceToggle';
 
 interface RecipeDecomposerModalProps {
@@ -37,6 +39,10 @@ interface RecipeDecomposerModalProps {
   /** Default dish-mass shown when the modal opens. */
   defaultMassG?: number;
   accent?: 'blue' | 'green' | 'purple' | 'amber';
+  /** WAFCT-EXTEND (2026-05-24): initial food-database scope passed in by the
+   *  parent calculator (so the modal opens with the same source the parent
+   *  search box is using). User can still narrow inside the modal. */
+  initialSource?: SourceChoice;
 }
 
 const ACCENT: Record<NonNullable<RecipeDecomposerModalProps['accent']>, string> = {
@@ -55,6 +61,7 @@ export function RecipeDecomposerModal({
   userType,
   defaultMassG = 250,
   accent = 'blue',
+  initialSource = 'both',
 }: RecipeDecomposerModalProps) {
   const [dishName, setDishName]   = useState('');
   const [totalMass, setTotalMass] = useState(defaultMassG);
@@ -66,6 +73,9 @@ export function RecipeDecomposerModal({
   // Which ingredient row is in "swap" mode (showing AIEnhancedSearch)
   const [swappingIdx, setSwappingIdx] = useState<number | null>(null);
   const [swapQuery, setSwapQuery]     = useState('');
+  // WAFCT-EXTEND (2026-05-24): food-database scope for the decompose call
+  // AND for the per-row swap matcher.
+  const [source, setSource]       = useState<SourceChoice>(initialSource);
 
   // Reset state when the modal opens fresh
   useEffect(() => {
@@ -77,8 +87,9 @@ export function RecipeDecomposerModal({
       setEditIngs([]);
       setSwappingIdx(null);
       setSwapQuery('');
+      setSource(initialSource);
     }
-  }, [open, defaultMassG]);
+  }, [open, defaultMassG, initialSource]);
 
   async function handleDecompose() {
     if (!dishName.trim() || totalMass <= 0) return;
@@ -88,7 +99,7 @@ export function RecipeDecomposerModal({
     setEditIngs([]);
     setSwappingIdx(null);
     try {
-      const r = await CNFApiService.decomposeRecipe(dishName, totalMass, { userType });
+      const r = await CNFApiService.decomposeRecipe(dishName, totalMass, { userType, source });
       setResult(r);
       setEditIngs(r.ingredients.map(i => ({ ...i })));     // mutable copy
     } catch (e: unknown) {
@@ -156,9 +167,12 @@ export function RecipeDecomposerModal({
         <div className="p-5 space-y-4">
           {/* Inputs */}
           <p className="text-sm text-gray-600">
-            Enter a dish name and total mass. The AI will decompose it into CNF ingredients
-            you can edit before scoring.
+            Enter a dish name and total mass. The AI will decompose it into CNF or WAFCT
+            (West African) ingredients you can edit before scoring.
           </p>
+          {/* WAFCT-EXTEND (2026-05-24): scope the decomposer's ingredient
+              resolution to one food database. */}
+          <SourceFilter source={source} onChange={setSource} accent={accent} />
           <div className="grid grid-cols-1 sm:grid-cols-[1fr,140px] gap-3">
             <div>
               <label htmlFor="dish-name" className="block text-xs font-medium text-gray-700 mb-1">Dish name</label>
@@ -271,6 +285,7 @@ export function RecipeDecomposerModal({
                           query={swapQuery}
                           userType={userType}
                           accent={accent}
+                          source={source}
                           onSelect={picked => swapIng(idx, picked)}
                         />
                         <button
@@ -284,7 +299,11 @@ export function RecipeDecomposerModal({
                     ) : (
                       <div className="flex items-center gap-2">
                         <div className="flex-1 min-w-0">
-                          <div className="font-medium text-gray-900 truncate">{ing.food_description}</div>
+                          <div className="font-medium text-gray-900 truncate flex items-center gap-1.5">
+                            <span className="truncate">{ing.food_description}</span>
+                            {/* WAFCT-EXTEND (2026-05-24): provenance badge */}
+                            <SourceBadge foodId={ing.food_id} userType={userType} />
+                          </div>
                           <div className="text-xs text-gray-500 truncate">
                             CNF {ing.food_id} · {ing.food_group}
                             {userType !== 'individual' && ing.resolution_confidence !== null && (

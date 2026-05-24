@@ -391,12 +391,18 @@ export class CNFApiService {
   static async decomposeRecipe(
     dishName: string,
     totalMassG: number,
-    options: { userType?: 'individual' | 'researcher' | 'policy' } = {},
+    options: {
+      userType?: 'individual' | 'researcher' | 'policy';
+      /** WAFCT-EXTEND (2026-05-24): restrict Stage-2 ingredient resolution
+       *  to one food database. Default 'both'. */
+      source?: SourceFilter;
+    } = {},
   ): Promise<CNFDecomposedRecipe> {
     const response = await api.post('/recipes/decompose/', {
       dish_name: dishName,
       total_mass_g: totalMassG,
       user_type: options.userType || 'individual',
+      source: options.source || 'both',
     });
     return response.data.result as CNFDecomposedRecipe;
   }
@@ -407,11 +413,17 @@ export class CNFApiService {
   // surface as searchFoodsAI + decomposeRecipe. Cost = 5¢/meal capped at 30¢.
   static async recall24h(
     meals: RecallMealInput[],
-    options: { userType?: 'individual' | 'researcher' | 'policy' } = {},
+    options: {
+      userType?: 'individual' | 'researcher' | 'policy';
+      /** WAFCT-EXTEND (2026-05-24): restrict every meal's Stage-2 ingredient
+       *  resolution to one food database. Default 'both'. */
+      source?: SourceFilter;
+    } = {},
   ): Promise<CNFRecall24hResponse> {
     const response = await api.post('/recipes/recall-24h/', {
       meals,
       user_type: options.userType || 'individual',
+      source: options.source || 'both',
     });
     return {
       result: response.data.result as CNFRecall24hResult,

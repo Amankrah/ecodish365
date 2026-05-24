@@ -172,6 +172,7 @@ class CNFRecall24h:
         meals: List[MealEntry],
         user_type: str = 'individual',
         parallel_meals: bool = True,
+        source: Optional[str] = None,
     ) -> CNFRecall24hResult:
         """Decompose each meal, aggregate into a single daily ingredient list.
 
@@ -179,6 +180,11 @@ class CNFRecall24h:
         concurrently via a ThreadPoolExecutor (capped at MAX_PARALLEL_MEALS
         workers). Mirrors the same threading pattern the dish decomposer
         already uses internally for its Stage-2 ingredient resolution.
+
+        WAFCT-EXTEND (2026-05-24): `source` ∈ {None, 'cnf', 'wafct'} is
+        forwarded into every per-meal `decompose()` call, so every
+        ingredient in the daily aggregate comes from the chosen food
+        database. None (default) searches both. Cache key includes source.
         """
         t0 = time.perf_counter()
 
@@ -222,8 +228,10 @@ class CNFRecall24h:
                 )
             cleaned.append(MealEntry(occasion=occ, dish_name=dn, total_mass_g=mass))
 
-        # Cache lookup
-        key = _meals_cache_key(cleaned)
+        # Cache lookup — include source in the key so cnf-only / wafct-only
+        # / both recalls cache independently.
+        src_norm = source if source in ('cnf', 'wafct') else 'both'
+        key = (_meals_cache_key(cleaned), src_norm)
         cached = self._cache_get(key)
         if cached is not None:
             return CNFRecall24hResult(
@@ -243,6 +251,10 @@ class CNFRecall24h:
         #      gracefully; the per-dish decomposer was deliberately built
         #      to reject single-ingredient inputs (it's the matcher's job
         #      for those), so the orchestrator bridges the two.
+        # WAFCT-EXTEND (2026-05-24): forward source to every per-meal
+        # decompose so every aggregated ingredient comes from the chosen
+        # food database. None = both sources.
+        meal_source = source if source in ('cnf', 'wafct') else None
         meal_results: List[Tuple[str, Any]] = []
         if parallel_meals and len(cleaned) > 1:
             max_workers = min(MAX_PARALLEL_MEALS, len(cleaned))
@@ -250,11 +262,14 @@ class CNFRecall24h:
                     max_workers=max_workers,
                     thread_name_prefix='cnf-recall-24h',
             ) as ex:
-                decompositions = list(ex.map(self._decompose_meal, cleaned))
+                decompositions = list(ex.map(
+                    lambda m: self._decompose_meal(m, source=meal_source),
+                    cleaned,
+                ))
             meal_results = list(zip([m.occasion for m in cleaned], decompositions))
         else:
             for m in cleaned:
-                meal_results.append((m.occasion, self._decompose_meal(m)))
+                meal_results.append((m.occasion, self._decompose_meal(m, source=meal_source)))
 
         # --- Aggregate ----------------------------------------------------
         agg = self._aggregate(meal_results)
@@ -264,11 +279,15 @@ class CNFRecall24h:
 
     # --- per-meal decompose + single-food fallback -----------------------
 
-    def _decompose_meal(self, meal: MealEntry):
+    def _decompose_meal(self, meal: MealEntry, source: Optional[str] = None):
         """Decompose one meal, falling back to a single-FoodID match if the
         per-dish decomposer rejects the input as too few ingredients (the
-        common case for snack entries like "banana", "almonds", "apple")."""
-        dec = self.decomposer.decompose(meal.dish_name, meal.total_mass_g)
+        common case for snack entries like "banana", "almonds", "apple").
+
+        WAFCT-EXTEND (2026-05-24): `source` forwards to both the compound
+        decompose path AND the snack-fallback matcher call.
+        """
+        dec = self.decomposer.decompose(meal.dish_name, meal.total_mass_g, source=source)
         # If matched OR failed for any reason OTHER than the single-food gate,
         # return as-is — the orchestrator's aggregation handles partial
         # decompositions cleanly.
@@ -276,11 +295,11 @@ class CNFRecall24h:
         if dec.matched or not fr.startswith('too_few_ingredients'):
             return dec
         # Single-food fallback: route the dish_name through the matcher
-        # directly. If it matches with adequate confidence, synthesise a
-        # 1-ingredient CNFDecomposedRecipe so the aggregation step credits
-        # the snack into the daily list.
+        # directly (filtered to the same source). If it matches with adequate
+        # confidence, synthesise a 1-ingredient CNFDecomposedRecipe so the
+        # aggregation step credits the snack into the daily list.
         try:
-            m = self.decomposer.cnf_matcher.match(meal.dish_name)
+            m = self.decomposer.cnf_matcher.match(meal.dish_name, source=source)
         except Exception as exc:  # noqa: BLE001
             logger.warning('CNFRecall24h snack-fallback matcher failed for %r: %s',
                            meal.dish_name, exc)

@@ -715,6 +715,7 @@ export default function FCSCalculate() {
         onClose={() => setRecipeModalOpen(false)}
         userType={userType}
         accent="blue"
+        initialSource={sourceFilter}
         onApply={(ingredients) => {
           // FCS uses the same slot pattern as HSR. Replace the empty
           // starter slot if present, else append.

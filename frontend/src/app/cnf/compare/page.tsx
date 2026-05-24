@@ -14,6 +14,10 @@ import {
 } from '@heroicons/react/24/outline';
 import { CNFApiService, FoodComparison, Food, SearchResult, NutrientValue } from '@/lib/api';
 import toast from 'react-hot-toast';
+// WAFCT-EXTEND (2026-05-24): dual-source food search inside the compare modal.
+import { SourceFilter, type SourceChoice } from '@/components/shared/SourceFilter';
+import { SourceBadge } from '@/components/shared/SourceBadge';
+import { AIEnhancedSearch } from '@/components/shared/AIEnhancedSearch';
 
 interface ComparisonData {
   foods: Food[];
@@ -40,6 +44,8 @@ function CNFComparePageContent() {
   const [showExportModal, setShowExportModal] = useState(false);
   const [exportFormat, setExportFormat] = useState<'json' | 'csv'>('json');
   const [selectedFoodIds, setSelectedFoodIds] = useState<Set<number>>(new Set());
+  // WAFCT-EXTEND (2026-05-24): food-database scope inside the add-food modal.
+  const [modalSource, setModalSource] = useState<SourceChoice>('both');
 
   useEffect(() => {
     // Load initial foods from URL parameters
@@ -51,6 +57,16 @@ function CNFComparePageContent() {
       }
     }
   }, [searchParams]);
+
+  // WAFCT-EXTEND (2026-05-24): re-run the search when source scope changes
+  // mid-modal so the result list narrows / widens without the user having
+  // to retype.
+  useEffect(() => {
+    if (searchQuery.trim()) {
+      searchFoods(searchQuery);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modalSource]);
 
   const loadFoodsForComparison = async (foodIds: number[]) => {
     try {
@@ -250,7 +266,9 @@ function CNFComparePageContent() {
 
     try {
       setSearchLoading(true);
-      const results = await CNFApiService.searchFoods(query, 20);
+      // WAFCT-EXTEND (2026-05-24): forward source so the search respects
+      // the modal's scope chip.
+      const results = await CNFApiService.searchFoods(query, 20, 0, modalSource);
       setSearchResults(results);
       setSelectedFoodIds(new Set()); // Clear selection when new search results come in
     } catch (error) {
@@ -697,20 +715,39 @@ function CNFComparePageContent() {
               </div>
               
               <div className="px-6 py-4">
+                {/* WAFCT-EXTEND (2026-05-24): scope picker — applies to BOTH
+                    the basic-text search and the AI ranker below. */}
+                <div className="mb-3">
+                  <SourceFilter source={modalSource} onChange={setModalSource} accent="green" />
+                </div>
+
                 {/* Search */}
-                <div className="relative mb-4">
+                <div className="relative mb-3">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
                   </div>
                   <input
                     type="text"
-                    placeholder="Search for foods to add..."
+                    placeholder="Search foods to add (e.g. 'apple', 'salmon', 'fonio', 'baobab')..."
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
                       searchFoods(e.target.value);
                     }}
                     className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* AI-enhanced ranker — same pattern as the main /cnf/search page */}
+                <div className="mb-4">
+                  <AIEnhancedSearch
+                    query={searchQuery}
+                    userType="individual"
+                    accent="green"
+                    source={modalSource}
+                    onSelect={(food) => {
+                      addFoodToComparison(food.food_id);
+                    }}
                   />
                 </div>
 
@@ -785,9 +822,13 @@ function CNFComparePageContent() {
                                 className="mr-3 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                               />
                               <div className="flex-1">
-                                <h4 className="text-sm font-medium text-gray-900">
-                                  {food.FoodDescription}
-                                </h4>
+                                <div className="flex items-center gap-1.5">
+                                  <h4 className="text-sm font-medium text-gray-900">
+                                    {food.FoodDescription}
+                                  </h4>
+                                  {/* WAFCT-EXTEND (2026-05-24): per-row provenance */}
+                                  <SourceBadge foodId={food.FoodID} userType="researcher" />
+                                </div>
                                 <p className="text-xs text-gray-500">
                                   Code: {food.FoodCode} • Group: {food.FoodGroupID}
                                 </p>
@@ -816,8 +857,15 @@ function CNFComparePageContent() {
                 )}
 
                 {!searchQuery && (
-                  <div className="text-center py-8 text-gray-500">
-                    Start typing to search for foods
+                  <div className="text-center py-8 text-gray-500 space-y-1">
+                    <div className="font-medium text-gray-700">Start typing to search for foods</div>
+                    <div className="text-xs">
+                      Searching <strong>{modalSource === 'both' ? 'CNF + WAFCT' : modalSource === 'cnf' ? 'CNF only' : 'WAFCT only'}</strong> —
+                      try <code className="bg-gray-100 px-1 rounded">apple</code>,{' '}
+                      <code className="bg-gray-100 px-1 rounded">salmon</code>,{' '}
+                      <code className="bg-gray-100 px-1 rounded">fonio</code>, or{' '}
+                      <code className="bg-gray-100 px-1 rounded">baobab</code>.
+                    </div>
                   </div>
                 )}
               </div>

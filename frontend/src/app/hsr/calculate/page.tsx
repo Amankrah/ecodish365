@@ -1121,6 +1121,7 @@ export default function HSRCalculate() {
         onClose={() => setRecipeModalOpen(false)}
         userType={userType}
         accent="amber"
+        initialSource={sourceFilter}
         onApply={(ingredients) => {
           // Reset to one slot per ingredient (replaces any empty starter slot).
           // Re-uses the existing slot when it's the unused starter (food_id===0).
