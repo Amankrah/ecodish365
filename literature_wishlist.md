@@ -117,7 +117,7 @@ Once you have a PDF, drop it into a `papers/` directory (or paste the relevant p
 
 35. **Mendoza Beltran, A., et al. (2018).** *When the background matters: using scenarios from integrated assessment models in prospective LCA.* **J Ind Ecol.** 23(1).
 
-36. **Lo Piano, S., Saltelli, A. (2022).** *Two-dimensional Monte Carlo simulations in LCA: an innovative approach to guide the choice for the environmentally preferable option.* **Int J Life Cycle Assess.** doi:10.1007/s11367-022-02041-0
+36. **Michiels, F., Geeraerd, A. (2022).** *(⚠ Previously mis-attributed to Lo Piano & Saltelli — corrected.)* *Two-dimensional Monte Carlo simulations in LCA: an innovative approach to guide the choice for the environmentally preferable option.* **Int J Life Cycle Assess.** 27(4):505–523. doi:10.1007/s11367-022-02041-0 — ✅ *Extracted* — [`literature_extractions.md`](literature_extractions.md) §F36; PDF [`papers/s11367-022-02041-0.pdf`](papers/s11367-022-02041-0.pdf).
 
 37. **Saltelli, A., et al. (2008).** *Global Sensitivity Analysis: The Primer.* Wiley. *(method baseline for Sobol indices)*
 
@@ -147,11 +147,9 @@ Once you have a PDF, drop it into a `papers/` directory (or paste the relevant p
 
 ## H. Monetary valuation / externalities (★★)
 
-47. **Environment and Climate Change Canada (2023).** *Guidance on the social cost of greenhouse gas emissions.* Government of Canada.
-    URL: https://www.canada.ca/en/environment-climate-change/services/climate-change/science-research-data/social-cost-ghg.html
+47. **Environment and Climate Change Canada (2023).** *Social Cost of Greenhouse Gas Estimates – Interim Updated Guidance for the Government of Canada.* Government of Canada. URL: https://www.canada.ca/en/environment-climate-change/services/climate-change/science-research-data/social-cost-ghg.html — ✅ *Extracted* — [`literature_extractions.md`](literature_extractions.md) §H47.
 
-48. **CE Delft (2018, updated 2024).** *Environmental Prices Handbook EU28 version.*
-    *Why:* used as fallback monetary values for non-GHG categories (and we *must* replace the personal-communication references in `monetization.py`).
+48. **de Bruyn S, et al. / CE Delft (2018, VS2020 erratum).** *Environmental Prices Handbook EU28 version.* Publication code: 18.7N54.125. — ✅ *Extracted* — [`literature_extractions.md`](literature_extractions.md) §H48; PDF [`papers/CE_Delft_7N54_Environmental_Prices_Handbook_EU28_version_Def_VS2020.pdf`](papers/CE_Delft_7N54_Environmental_Prices_Handbook_EU28_version_Def_VS2020.pdf).
 
 49. **True Price Foundation (2022, updated 2024).** *Methodology for True Pricing of Food.*
 
@@ -161,8 +159,7 @@ Once you have a PDF, drop it into a `papers/` directory (or paste the relevant p
 
 ## I. Canadian regional context (★★)
 
-51. **ECCC National Inventory Report 1990–2022 (2024).** *Canada's GHG sources and sinks.*
-    *Why:* underpins our Canadian grid intensity factor (current 0.85 multiplier).
+51. **Environment and Climate Change Canada (2024).** *National Inventory Report 1990–2022: Greenhouse Gas Sources and Sinks in Canada.* Cat. No.: En81-4/4E-PDF. — ✅ *Extracted* — [`literature_extractions.md`](literature_extractions.md) §I51; PDF [`papers/En81-4-2022-1-eng.pdf`](papers/En81-4-2022-1-eng.pdf).
 
 52. **Statistics Canada (2024).** *Census of Agriculture and Net Farm Income.*
 

@@ -194,6 +194,31 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
+  // Dietary recall + browser-local history + pattern resemblance
+  // (RECALL-HISTORY-1, 2026-05-24). /recall-history is a per-browser
+  // localStorage surface; included for discoverability so the route is
+  // crawlable + linkable, even though its content is client-side only.
+  const recallPages = [
+    {
+      url: `${baseUrl}/recall-24h`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/recall-history`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly' as const,
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/dietary-pattern`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    },
+  ];
+
   // Meal platform pages
   const mealPages = [
     {
@@ -222,5 +247,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  return [...mainPages, ...cnfPages, ...hsrPages, ...fcsPages, ...hefiPages, ...heniPages, ...environmentalPages, ...mealPages];
+  return [...mainPages, ...cnfPages, ...hsrPages, ...fcsPages, ...hefiPages, ...heniPages, ...environmentalPages, ...recallPages, ...mealPages];
 }

@@ -18,7 +18,7 @@
 
 import { Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { CalendarClock } from 'lucide-react';
+import { CalendarClock, BookOpen } from 'lucide-react';
 import { AudienceToggle, type UserType } from '@/components/shared/AudienceToggle';
 import { Recall24hWizard } from '@/components/shared/Recall24hWizard';
 
@@ -39,12 +39,22 @@ function RecallPageInner() {
               <CalendarClock className="h-8 w-8 text-blue-700" aria-hidden="true" />
             </div>
             <div className="flex-1">
-              <h1 className="text-2xl font-bold text-gray-900">24-hour dietary recall</h1>
+              <div className="flex items-start justify-between gap-3 flex-wrap">
+                <h1 className="text-2xl font-bold text-gray-900">24-hour dietary recall</h1>
+                <a
+                  href="/recall-history"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-sm font-medium rounded-md whitespace-nowrap"
+                >
+                  <BookOpen className="h-4 w-4" aria-hidden="true" />
+                  My recall history
+                </a>
+              </div>
               <p className="text-sm text-gray-600 mt-1">
                 Walk through your day occasion-by-occasion. We&rsquo;ll decompose each meal into Canadian Nutrient File (CNF) ingredients, aggregate your full day, and let you score it against HEFI&nbsp;/&nbsp;HENI&nbsp;/&nbsp;HSR&nbsp;/&nbsp;FCS&nbsp;/&nbsp;Environmental impact.
               </p>
               <p className="text-xs text-gray-500 mt-2">
                 Best for HEFI-2019 (Brassard&nbsp;2022b designed it explicitly for 24-h recall data) and HENI (sums healthy-life-minutes across the day).
+                Save individual days to <a href="/recall-history" className="text-amber-800 underline">recall history</a> to score N-day-average patterns.
               </p>
             </div>
           </div>

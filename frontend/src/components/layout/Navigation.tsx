@@ -5,8 +5,8 @@ import Link from 'next/link';
 import EcoDishLogo from './EcoDishLogo';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { 
-  Bars3Icon, 
+import {
+  Bars3Icon,
   XMarkIcon,
   ChartBarIcon,
   ScaleIcon,
@@ -15,6 +15,7 @@ import {
   UserIcon,
   PlusCircleIcon,
   BookmarkIcon,
+  ClockIcon,
   ArrowRightOnRectangleIcon
 } from '@heroicons/react/24/outline';
 import { clsx } from 'clsx';
@@ -84,17 +85,31 @@ const navigation: NavItem[] = [
       },
     ]
   },
-  { 
-    name: 'Environmental Indicators', 
-    href: '/environmental', 
+  {
+    name: 'Environmental Indicators',
+    href: '/environmental',
     icon: GlobeAltIcon,
     dropdown: [
       { name: 'Calculate Impact', href: '/environmental/calculate' },
       { name: 'Compare Foods', href: '/environmental/compare' },
     ]
   },
-  { 
-    name: 'Meals', 
+  // RECALL-HISTORY-1 (2026-05-24): surface the 24-h recall → history →
+  // dietary-pattern workflow in the top nav so users (especially returning
+  // users with saved days) can find their browser-local history without
+  // having to remember the /recall-history URL.
+  {
+    name: 'Dietary Recall',
+    href: '/recall-24h',
+    icon: ClockIcon,
+    dropdown: [
+      { name: 'Log a 24-h recall', href: '/recall-24h' },
+      { name: 'My recall history', href: '/recall-history' },
+      { name: 'Dietary pattern', href: '/dietary-pattern' },
+    ],
+  },
+  {
+    name: 'Meals',
     href: '/meals', 
     icon: PlusCircleIcon,
     requiresAuth: true,
@@ -177,7 +192,7 @@ export default function Navigation() {
               const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
               const isDropdownOpen = activeDropdown === item.name;
               const showDropdown = Array.isArray(item.dropdown) && (
-                item.name === 'CNF Explorer' || item.name === 'Environmental Indicators' || item.name === 'Nutrition Indicators' || item.name === 'Meals'
+                item.name === 'CNF Explorer' || item.name === 'Environmental Indicators' || item.name === 'Nutrition Indicators' || item.name === 'Meals' || item.name === 'Dietary Recall'
               );
               return (
                 <div key={item.name} className="relative group">
@@ -302,6 +317,14 @@ export default function Navigation() {
                       >
                         <BookmarkIcon className="w-4 h-4 mr-3" />
                         My Meals
+                      </Link>
+                      <Link
+                        href="/recall-history"
+                        className="flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50/80 mx-2 rounded-lg transition-all duration-200"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <ClockIcon className="w-4 h-4 mr-3" />
+                        My recall history
                       </Link>
                       <Link
                         href="/profile"

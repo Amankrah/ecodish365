@@ -3331,7 +3331,129 @@ Kim et al. (2025) provides the state-of-the-art protocol for GSA in high-dimensi
 
 ---
 
-*Pending: papers F35 through F38.*
+*Pending: paper F35 (Mendoza Beltran et al. 2018).*
+
+---
+
+### F36. Michiels & Geeraerd (2022) — Two-dimensional Monte Carlo simulations in LCA [★★]
+
+> **⚠ Wishlist attribution error:** Wishlist entry 36 listed "Lo Piano, S., Saltelli, A." as authors. The paper at doi:10.1007/s11367-022-02041-0 is by **Freya Michiels & Annemie Geeraerd** (KU Leuven, Department of Biosystems). Lo Piano & Saltelli are unrelated authors; their contribution is Sobol/global sensitivity work. Wishlist entry 36 has been corrected accordingly.
+
+**Citation.** Michiels F, Geeraerd A. Two-dimensional Monte Carlo simulations in LCA: an innovative approach to guide the choice for the environmentally preferable option. Int J Life Cycle Assess. 2022;27(4):505–523.
+
+**DOI.** 10.1007/s11367-022-02041-0 (Received 23 March 2021; Accepted 11 March 2022; Published online 4 April 2022.)
+
+**PDF.** [`papers/s11367-022-02041-0.pdf`](papers/s11367-022-02041-0.pdf)
+
+**Open access.** No — exclusive licence to Springer-Verlag GmbH / Springer Nature 2022.
+
+**Affiliations.** Freya Michiels & Annemie Geeraerd: Sustainability in the Agri-Food Chain group, MeBioS Division, Department of Biosystems, KU Leuven, Belgium. **Open-source proof-of-concept model** (Excel/@Risk manual): https://mebios-agri-food.pages.gitlab.kuleuven.be/supplementary/2dmc/
+
+**Type.** Methods article (first application of 2DMC to LCA). Introduces the two-dimensional Monte Carlo (2DMC) framework adapted from quantitative risk assessment into the LCA context; implements it on an existing Belgian post-harvest apple chain attributional LCA comparing bulk vs pre-packed apples (16 ILCD impact categories, ecoinvent 3.5, SimaPro 9).
+
+---
+
+#### Core conceptual framework: uncertainty vs variability (§1, pp. 505–507)
+
+The paper enforces a rigorous epistemic/aleatory split that standard 1DMC conflates:
+
+| Type | Definition | Example | Can be reduced? |
+|---|---|---|---|
+| **Uncertainty** (epistemic) | Imperfect knowledge — inaccurate measurements, missing data | Auction's stated % uncertainty on apple loss at supermarket | Yes — by gathering better data |
+| **Variability** (aleatory) | Inherent heterogeneity of the real world | Different auctions' sorting electricity; consumer food waste depending on behavior | No (per realistic resource constraints) |
+| **Uncertain & variable** | Parameter has both characteristics simultaneously | % apple loss at distribution center: the loss varies each batch *and* there's no system to accurately measure it | Partially |
+| **Deterministic** | Non-influential parameters (<0.10 % output change) | All background ecoinvent parameters below sensitivity threshold | N/A |
+
+One-dimensional MC (1DMC) can propagate uncertainty *or* variability — but not both simultaneously as **separate** sources. 2DMC propagates them together but tracks them independently, enabling diagnosis of which is dominating.
+
+---
+
+#### 2DMC technical structure (§2.1, pp. 507–509, Fig. 1)
+
+The two-loop architecture:
+
+- **Outer loop** (n = 250 simulations): fixes a random draw of all *uncertain* parameters → represents one possible "state of knowledge"
+- **Inner loop** (m = 10,000 iterations per simulation): varies all *variable* parameters within that fixed uncertainty state → represents natural system variability
+
+**Output:** 250 cumulative probability curves per impact category, each curve representing variability under one uncertainty draw. Total: 250 × 10,000 = **2,500,000 possible LCA outcomes**.
+
+**Visual interpretation:**
+- Spread between the 250 curves = uncertainty (how much the answer changes if we had different knowledge)
+- Steepness within each curve = variability (how much the answer changes within the real system)
+
+**Diagnostic ratios** (Fig. 2, p. 508; after Özkaynaka et al. 2009 / Pouillot et al. 2016):
+
+Let A = median[uncertainty] of median[variability]; B = median[U] of 97.5th[V]; C = 97.5th[U] of median[V]; D = 97.5th[U] of 97.5th[V]:
+
+| Ratio | Formula | Interprets |
+|---|---|---|
+| Variability Ratio (VR) | B / A | Spread of variability at median knowledge |
+| Uncertainty Ratio (UR) | C / A | Spread of uncertainty at median variability |
+| Overall Uncertainty Ratio (OR) | D / A | Combined spread |
+
+If VR >> UR → variability dominates; if UR >> VR → uncertainty dominates.
+
+**Computational settings:** @Risk 7.6 (Palisade); Latin Hypercube sampling; Mersenne Twister RNG; fixed seed per simulation for dependent/paired sampling. Runtime: ~50 min per impact category per packaging option ≈ **27 h total** for 16 categories × 2 products on Intel Core i7 / 32 GB RAM laptop.
+
+---
+
+#### Three possible 2DMC outcomes for comparative LCA (§3.1, pp. 516–517, Fig. 4)
+
+| Outcome | Description | Action |
+|---|---|---|
+| **1. No overlap** | 2DMC curves of products A and B are clearly separated | Deterministic/1DMC conclusion robust; proceed with confidence |
+| **2. Overlap, uncertainty dominating** (high UR) | Knowledge imprecision prevents discrimination | Gather more accurate data (measurements, expert consultation, literature) |
+| **3. Overlap, variability dominating** (high VR) | Products are inherently equivalent for that category — true natural difference | Investigate management differences for optimisation; or accept equivalence; or shift decision weight to other categories or cost |
+
+**Recommended workflow (§5, p. 1744):** Deterministic analysis → 1DMC + modified comparison index (Heijungs 2021) to check if curves are well-separated → if not, 2DMC to diagnose which type of overlap drives the uncertainty.
+
+---
+
+#### Case study results — Belgian post-harvest apple chain (§2.2–§3.2, pp. 509–519)
+
+**Input classification:** 47 influential parameters (local sensitivity threshold: ≥0.10% change from ±10% perturbation); categorized as uncertain, variable, or uncertain & variable per survey data, PEF uncertainty ratings, and literature.
+
+**Key results (16 ILCD impact categories):**
+- **12 / 16 categories: Outcome 1** (no overlap) — bulk apples consistently preferred (packaging, transport, food-waste drivers)
+- **4 / 16 categories: Outcome 3** (overlap with variability dominating) — Ionizing Radiation (Human Health), Ionizing Radiation (Ecosystem), Freshwater Ecotoxicity, Ozone Depletion; bulk and pre-packed are **equivalent for these categories** because inherent biological/chain-management variability swamps the deterministic difference
+- **0 / 16 categories: Outcome 2** — uncertainty never dominated the overlap
+- **Uncertainty ratio ≈ 1.04 maximum** across all impact categories; **variability ratio up to ~3** for the 4 overlapping categories
+
+Modified comparison index (from 1DMC, γ₀ = 1.2): Water Resource Depletion superiority probability 100% for bulk; Climate Change 14% for bulk; Ionizing Radiation 0% for both — correctly predicted which categories would show 2DMC overlap before 2DMC was run.
+
+---
+
+#### Author-flagged limitations (§4, pp. 1525–1543)
+
+1. **Uncertainty/variability boundary is not always clear-cut** (§4.1, p. 1539). Natural variation (e.g., biology of apples) could conceptually be reduced with unlimited resources → classification requires pragmatic judgment; "variability is seen as random system behavior when a realistic amount of available resources are considered."
+2. **Correlations not fully implemented** (§2.2.2, p. 1265). Three approaches discussed; actual implementation limited to logic-built model relationships (month of purchase → storage time → loss) because no empirical correlation data were available for other parameter pairs (e.g., transport distance and vehicle type should correlate but data was missing).
+3. **Background system treatment** (§4.1, p. 1563). Shared background processes (electricity, transport infrastructure) add absolute uncertainty equally to both products → their contribution clouds the foreground difference; focus on foreground variability/uncertainty is recommended, not solved.
+4. **Ratio percentile choice is not standardised** (§4.4, pp. 1695–1725). Different published studies use 50th/97.5th, 10th/90th, or 2.5th/97.5th percentiles; for the apple case the differences are small (max ±0.02) but standardisation is absent across the field.
+5. **Computational cost scales poorly** (§2.2.2, p. 1310). 27 h for 16 categories in a relatively simple foreground model; complex multi-country LCA systems (like our full ReCiPe run over thousands of CNF foods) would be prohibitively expensive without vectorisation or variance-based shortcuts.
+6. **Software dependency** (@Risk 7.6 Excel add-in). A free R implementation via `mc2d` package (Pouillot & Delignette-Muller 2010) is the open-source path; the paper's web manual covers this.
+
+---
+
+#### Implications for our manuscript (§§2.3, 3.8, 7.4)
+
+**Conceptual reframing of our σ_g interpretation.** Under the Michiels & Geeraerd framework, the σ_g values we draw from Poore & Nemecek's (2018) deposited archive should be classified as **variability distributions**, not uncertainty distributions. Poore & Nemecek's between-producer σ_g measures inherent heterogeneity across thousands of farms worldwide — exactly the "aleatory variability" category in this framework. Consequently:
+- Our 1DMC with N_run = 10,000 quantifies the **range of environmental outcomes across the producer population** for each food group — a variability characterization.
+- It does **not** quantify epistemic uncertainty about the "true" mean impact factor (which would require Heijungs' recommended N_run ≤ n constraint on differently-sourced parameters).
+- Our §3.8 should be explicit: "Monte Carlo propagation quantifies producer-level variability in life-cycle impact factors (σ_g from Poore & Nemecek 2018), not epistemic uncertainty about characterization factors, which are fixed at the ReCiPe 2016 v1.1 Hierarchist point estimates."
+
+**1DMC sufficiency.** For our 100-meal case study (§5), the 1DMC outputs will likely fall into either Outcome 1 (clear ordinal ranking) or Outcome 3 (variability-dominated indistinction between close-ranking alternatives). Full 2DMC at 27 h+ per impact category is not feasible for a production pipeline over thousands of foods; it remains a validation-mode tool for focused diet-shift comparison pairs in §5.2. We should cite Michiels & Geeraerd as the 2DMC reference and note this as a §7 future direction.
+
+**Modified comparison index.** The Heijungs (2021) modified comparison index (γ₀ threshold superiority score) used in §2.2.3 here is directly applicable to our diet-shift counterfactual results (§5.2) as a formal way to state "beef → legumes shift is environmentally superior with X% probability exceeding a 20% margin" — a more defensible framing than a p-value alone.
+
+---
+
+#### Three-sentence relevance note
+
+Michiels & Geeraerd (2022) introduces the first LCA application of two-dimensional MC simulation, providing the formal framework for separating **producer-level variability** (which our σ_g from Poore & Nemecek captures) from **epistemic uncertainty** (which our fixed ReCiPe characterization factors do not propagate) — a distinction our §3.8 should make explicit to avoid the common conflation of the two. Their three-outcome taxonomy (no overlap / uncertainty-dominated / variability-dominated) and associated diagnostic ratios give us a vocabulary for discussing our diet-shift comparison results in §5.2: for impact categories where 1DMC confidence intervals overlap, we can state whether the indecision reflects insufficient data (→ more collection needed) or genuine producer heterogeneity (→ products are equivalent for that category). Cite at §2.3 as the "2D-MC, 2022" reference already in the manuscript, correct the authorship in the wishlist (Lo Piano & Saltelli is wrong), and add the variability/uncertainty distinction to §3.8 and the 2DMC future-work note to §7.
+
+---
+
+*Pending: papers F37 (Saltelli et al. 2008) and F38 (Igos et al. 2019).*
 
 ## Group G. Sustainability of AI
 
@@ -3339,11 +3461,428 @@ Kim et al. (2025) provides the state-of-the-art protocol for GSA in high-dimensi
 
 ## Group H. Monetary valuation and externalities
 
-*Pending: papers H47 through H50.*
+### H47. ECCC (2023) — Social Cost of Greenhouse Gas Estimates, Interim Updated Guidance [★★]
+
+**Citation.** Environment and Climate Change Canada. *Social Cost of Greenhouse Gas Estimates – Interim Updated Guidance for the Government of Canada.* Government of Canada; 2023. (Effective date for federal departments/agencies: December 12, 2022; page last updated 2023-04-20.)
+
+**URL.** https://www.canada.ca/en/environment-climate-change/services/climate-change/science-research-data/social-cost-ghg.html
+
+**Source file.** Uploaded HTML snapshot `social-cost-ghg-0.html`.
+
+**Open access.** Yes — official Government of Canada web publication (no paywall; Crown copyright).
+
+**Type.** Government guidance document. Provides official SC-GHG values for use by all federal departments and agencies in cost-benefit analyses (CBA) of regulatory proposals. Based on U.S. EPA draft updated SC-GHG guidance (released November 11, 2022), converted to constant Canadian dollars. Explicitly "evergreen" — will be updated as science evolves.
+
+---
+
+#### The three SC-GHG estimates and their meaning (§1, Introduction)
+
+The **social cost of a greenhouse gas** is the monetary value of the *global* incremental damages caused by one additional tonne of that gas emitted in a given year (or conversely, the avoided damages from one tonne of abatement). It is distinct from a carbon price (which is a domestic policy instrument). Three separate estimates are maintained:
+
+| Abbreviation | Gas | 2026 value (C$2021, 2% rate) | Unit |
+|---|---|---|---|
+| **SCC / SC-CO₂** | Carbon dioxide | **$275** | $/t-CO₂ |
+| **SCM / SC-CH₄** | Methane | **$2,687** | $/t-CH₄ |
+| **SCN / SC-N₂O** | Nitrous oxide | **$78,633** | $/t-N₂O |
+
+These are the values applicable to emissions or reductions occurring in **2026** under the primary 2% near-term Ramsey discount rate. Values increase every year (Table 1) because: (a) larger incremental damages as climate stress accumulates, and (b) growing income raises willingness to pay to avoid future harms (§1).
+
+---
+
+#### Full primary schedule — Table 1 (C$2021, 2% Near-term Ramsey discount rate) — selected years
+
+The complete Table 1 runs 2020–2080. Key anchor-years for our case study:
+
+| Year | SCC ($/t-CO₂) | SCM ($/t-CH₄) | SCN ($/t-N₂O) |
+|---|---|---|---|
+| 2020 | $247 | $2,107 | $69,230 |
+| 2021 | $252 | $2,203 | $70,797 |
+| 2022 | $256 | $2,300 | $72,364 |
+| 2023 | $261 | $2,396 | $73,932 |
+| 2024 | $266 | $2,494 | $75,499 |
+| 2025 | $271 | $2,589 | $77,066 |
+| **2026** | **$275** | **$2,687** | **$78,633** |
+| 2030 | $294 | $3,073 | $84,903 |
+| 2035 | $317 | $3,634 | $92,894 |
+| 2040 | $341 | $4,194 | $100,886 |
+| 2050 | $394 | $5,410 | $118,919 |
+| 2080 | $520 | $8,674 | $166,301 |
+
+---
+
+#### Sensitivity analysis schedules (Appendix A.1) — 2026 values at three discount rates
+
+| Discount rate | SCC 2026 | SCM 2026 | SCN 2026 |
+|---|---|---|---|
+| **1.5%** (lower bound) | $467 | $3,610 | $123,778 |
+| **2.0%** (central / recommended) | $275 | $2,687 | $78,633 |
+| **2.5%** (upper bound) | $170 | $2,119 | $52,326 |
+
+The ~1.7× spread between 1.5% and 2.5% rates for SC-CO₂ at 2026 illustrates the sensitivity to discount rate choice — relevant to our §3.8 / §5 monetisation uncertainty analysis.
+
+---
+
+#### Discounting methodology (§2.1)
+
+**Rate:** 2% near-term Ramsey discount rate (reduced from previous 3%), using the EPA's dynamic discounting formula calibrated to: (i) declining certainty-equivalent rates matching Bauer & Rudebusch (2020, 2021) empirical interest-rate uncertainty evidence; (ii) near-term consumption rate of interest over the first decade.
+
+**Application rule:** The same 2% discount rate should be applied to *all* cost and benefit streams in any CBA that also uses SC-GHG values (§2.1). This ensures internal consistency.
+
+**Currency conversion note (§3.2):** U.S. EPA estimates were in US$2020 → converted to US$2021 using U.S. GDP deflator → converted to C$2021 using the 2021 annual exchange rate (which closely approximates PPP).
+
+---
+
+#### IAM methodology (§3.3)
+
+The four-module modular framework (replacing the prior DICE/FUND/PAGE trio):
+
+1. **Socioeconomic module** — projects future emissions pathways
+2. **Climate module** — translates emissions to temperature trajectories
+3. **Damage module** — converts temperature + socioeconomic projections to monetized damages (willingness-to-pay to avoid impacts)
+4. **Discounting module** — brings future damages to present value
+
+Monte Carlo is used within the derivation pipeline to represent parameter uncertainty. The SC-GHG for year *t* is computed as the marginal effect of a pulse emission: run the full model twice (baseline vs. baseline + 1 tonne pulse), discount the damage difference to a present value.
+
+**What is NOT captured** (§1 — conservative caveat): extreme weather events, ocean acidification, national security risks, cross-sector interactions/feedbacks. Estimates are therefore conservative lower bounds.
+
+---
+
+#### Key methodological warnings
+
+**GWP conversion not recommended (§4.2).** Using global warming potentials (e.g., GWP₁₀₀) multiplied by the SCC to proxy SCM or SCN is explicitly warned against, because:
+- GWP ignores nonlinear relationships between radiative forcing and downstream damages
+- GWP's 100-year horizon is shorter than the ~300-year horizon used in SC-GHG estimation
+- GWP treats all impacts equally regardless of timing (inconsistent with discounting)
+- For methane (short-lived), GWP × SCC underestimates SCM at higher discount rates
+- Exception: only use GWP proxy when no dedicated SC-GHG estimate exists for that gas
+
+**Carbon price ≠ SCC (§4.1).** SCC is a global damage metric; Canada's carbon pollution price is a domestic mitigation policy instrument set by other considerations (GHG reduction targets, other policies). They should not be equated.
+
+---
+
+#### Implications for our manuscript (§§5, 7)
+
+**Monetisation in §5.** Our `monetization.py` applies SC-GHG values to the GHG midpoint outputs from the ReCiPe pipeline. The correct values to use, for a 2026 analysis year:
+- **SC-CO₂ = C$275/t-CO₂** (2% rate central estimate)
+- **SC-CH₄ = C$2,687/t-CH₄** (not $275 × GWP₁₀₀, per §4.2 warning)
+- **SC-N₂O = C$78,633/t-N₂O** (not $275 × GWP₁₀₀)
+
+For meals scored per 100 g, the per-kg values become:
+- SC-CO₂ = C$0.275 per kg-CO₂; per 100 g food contributing 1 kg CO₂-eq/kg = $0.0275
+- SC-CH₄ = C$0.269 per kg-CH₄; per 100 g food contributing 1 kg CH₄-eq/kg = $0.0027
+
+**Sensitivity analysis in §5.** Report the 1.5% and 2.5% discount-rate sensitivity results (Tables A.1.1 and A.1.2) alongside the central 2% estimate — this is ECCC's own recommended sensitivity protocol and directly corresponds to our §3.8 MC uncertainty framing.
+
+**Non-GHG monetisation.** ECCC's SC-GHG covers only the three GHGs. For the remaining 15 ReCiPe midpoint categories (land use, water, ionizing radiation, etc.), we still need CE Delft's Environmental Prices Handbook (wishlist H48) or equivalent.
+
+**"Conservative estimates" §7 caveat.** We should note that our monetised GHG externality estimates are conservative lower bounds per ECCC's own §1 qualification — extreme weather events, ocean acidification and sector feedbacks are not reflected.
+
+---
+
+#### Three-sentence relevance note
+
+ECCC (2023) provides the **official Canadian government reference values** for monetising GHG externalities in cost-benefit analysis — SC-CO₂ = C$275/t, SC-CH₄ = C$2,687/t, SC-N₂O = C$78,633/t for 2026 at the primary 2% Ramsey discount rate — and its §4.2 warning against GWP-based conversion from SCC to SC-CH₄/SC-N₂O is directly relevant to our `monetization.py` design, which must apply each gas's own SC-GHG separately rather than collapsing to CO₂-equivalents. The three-rate sensitivity schedule (1.5% / 2.0% / 2.5%) maps naturally onto our §5 uncertainty reporting and gives a 1.7× spread on SC-CO₂ that should be propagated as a monetisation sensitivity analysis alongside our physical-unit MC outputs. Cite at §5 (monetisation methodology), §2.3 (background / related work on externality valuation), and §7 (conservative-estimates caveat).
+
+---
+
+### H48. CE Delft (2018/2020) — Environmental Prices Handbook EU28 version [★★]
+
+**Citation.** de Bruyn S, Bijleveld M, de Graaff L, Schep E, Schroten A, Vergeer R, Ahdour S. *Environmental Prices Handbook EU28 version.* CE Delft; October 2018. Publication code: 18.7N54.125. (VS2020 edition: March 2020 erratum removing conflicting VAT statements.)
+
+**PDF.** [`papers/CE_Delft_7N54_Environmental_Prices_Handbook_EU28_version_Def_VS2020.pdf`](papers/CE_Delft_7N54_Environmental_Prices_Handbook_EU28_version_Def_VS2020.pdf)
+
+**Online webtool.** www.cedelft.eu/en/environmental-prices (covers >2,500 pollutants searchable by name or CAS code).
+
+**Open access.** Yes — CE Delft publishes this openly; no paywall.
+
+**Type.** Reference handbook. Provides monetised environmental prices (€2015/kg emission or €2015/unit impact) for >2,500 atmospheric, water and soil pollutants and for 12 environmental impact themes (midpoints), calibrated for average EU28 emission conditions in 2015. Three levels of pricing: pollutant level, midpoint level, endpoint level. Methodology harmonises ReCiPe characterisation factors (v1.12, April 2016, Individualist perspective for most themes), NEEDS impact pathway approach (updated to 2015 conditions), and economic valuation of human health (VOLY €50–110k), biodiversity (€0.025–0.685/PDF/m²/yr), and abatement costs (for climate change). **VS2020 erratum (March 2020):** carbon prices now consistently reported inclusive of 18% VAT.
+
+---
+
+#### Master price tables
+
+**Table 1 (Summary p. 4) — Key pollutant-level prices, EU28 average, €2015/kg atmospheric emission**
+
+| Substance | Symbol | Lower | Central | Upper |
+|---|---|---|---|---|
+| Carbon dioxide | CO₂ | €0.022 | **€0.057** | €0.094 |
+| Methane | CH₄ | €0.673 | **€1.74** | €2.91 |
+| Ultrafine particulates | PM₂.₅ | €27.7 | **€38.7** | €59.5 |
+| Particulate matter | PM₁₀ | €19 | **€26.6** | €41 |
+| Nitrogen oxides | NOₓ | €9.97 | **€14.8** | €22.1 |
+| Sulphur dioxide | SO₂ | €8.3 | **€11.5** | €17.9 |
+| Ammonia | NH₃ | €10 | **€17.5** | €25.2 |
+| NMVOCs | NMVOC | €0.84 | **€1.15** | €1.84 |
+| Carbon monoxide | CO | €0.038 | **€0.053** | €0.092 |
+| CFC-11 | CFC₁₁ | €130 | **€306** | €504 |
+
+> ⚠ GHG prices (CO₂, CH₄) include 18% VAT and increase at **3.5% per annum** from the 2015 base year; for non-2015 years see §6.3 and Table 28 below.
+
+---
+
+**Table 2 (Summary p. 5) — Midpoint-level environmental prices, €2015/unit**
+
+These are the values directly applicable as **weighting factors in LCA** (single-score monetisation):
+
+| Midpoint theme | Unit | External cost | Weighting factor |
+|---|---|---|---|
+| **Climate change** | €/kg CO₂-eq. | **€0.0566** | **€0.0566** |
+| Ozone depletion | €/kg CFC-11-eq. | €30.4 | €123 |
+| Human toxicity | €/kg 1,4 DB-eq. | €0.0991 | €0.0894 |
+| Photochemical oxidant formation | €/kg NMVOC-eq. | €1.15 | €1.15 |
+| **Particulate matter formation** | €/kg PM₁₀-eq. | **€39.2** | **€39.2** |
+| Ionizing radiation | €/kBq U235-eq. | €0.0461 | €0.0461 |
+| Acidification | €/kg SO₂-eq. | €4.97 | €7.48 |
+| Freshwater eutrophication | €/kg P-eq. | €1.86 | €1.86 |
+| Marine eutrophication | €/kg N | €3.11 | €3.11 |
+| Terrestrial ecotoxicity | €/kg 1,4 DB-eq. | €8.69 | €8.69 |
+| Freshwater ecotoxicity | €/kg 1,4 DB-eq. | €0.0361 | €0.0361 |
+| Marine ecotoxicity | €/kg 1,4 DB-eq. | €0.00739 | €0.00739 |
+| **Land use** | €/m²·yr | €0.0845 | **€0.126** |
+| Noise (>60 dB) | €/dB/person/yr | €52–228 | — |
+
+> **Perspective note:** External cost values use the **individualist** ReCiPe perspective; weighting factors use the **hierarchist** perspective. Our pipeline uses ReCiPe 2016 v1.1 Hierarchist throughout — use the **weighting factor** column for LCA single-score monetisation.
+
+---
+
+**Table 28 (§6.3.7, p. 96) — Climate change environmental prices under three scenarios, €2015/t-CO₂ incl. 18% VAT**
+
+| Scenario | 2015 | 2030 | 2050 |
+|---|---|---|---|
+| Lower (damage cost, Bijgaart et al.) | €22 | €37 | €73 |
+| **Central (current policy, 40% by 2030)** | **€57** | **€95** | **€190** |
+| Upper (2°C path, Kuik et al. meta-analysis) | €94 | €160 | €315 |
+
+At 3.5% annual increase from the 2015 central value of €57/t-CO₂:
+- **2026:** €57 × (1.035)¹¹ = **~€83/t-CO₂** (interpolating between Table 27 / Table 28 values)
+
+> **Critical note for our manuscript:** CE Delft prices apply GWP₁₀₀ characterisation factors for non-CO₂ gases to arrive at CO₂-equivalents (§6.3.4), then multiply by the CO₂ price. This is methodologically distinct from the ECCC SC-GHG approach (H47), which provides separate SC-CH₄ and SC-N₂O values and explicitly warns against GWP-based conversion. For food LCA monetisation, **H47 (SC-GHG) is preferable for GHG categories** because it uses gas-specific damage functions; CE Delft's midpoint prices are more appropriate for the **non-GHG categories** (PM, acidification, eutrophication, toxicity, land use, etc.) where H47 has no values.
+
+---
+
+#### Table 3 (Summary p. 6) — Endpoint-level environmental prices
+
+| Impact | Indicator | Value range |
+|---|---|---|
+| Acute + chronic mortality | VOLY | €50,000–€110,000 (central €70,000) |
+| Morbidity | QALY | €50,000–€100,000 (central €70,000) |
+| Biodiversity loss | PDF/m²/yr | €0.025–€0.685 (central €0.085) |
+| Buildings/materials | Restoration costs | See §5.5 |
+| Resource availability | Environmental prices | Not fully quantified |
+| IQ loss | Lost IQ-point | €17,500 |
+
+---
+
+#### Methodology summary (§§2–4)
+
+**Three-model combination (§4.2, p. 46):**
+1. **Characterisation models** — ReCiPe v1.12 (April 2016) with Individualist perspective (external costs) and Hierarchist perspective (weighting factors); ILCD considered but rejected because endpoint characterisation is underdeveloped (§4.4.3, p. 49).
+2. **Impact pathway models** — NEEDS (ExternE project lineage), updated from 2005/2008 runs to 2015 EU28 conditions: lower background concentrations, actual 2015 population distribution (Eurostat), updated WHO (2013/2014) concentration-response functions (§4.5).
+3. **Valuation** — VOLY/QALY for human health (§5.3); biodiversity (PDF/m²/yr × €/PDF) for ecosystem damage (§5.4); abatement costs for climate (§6.3).
+
+**Climate change — abatement cost method (§6.3.6–6.3.7):** CE Delft explicitly rejects the damage-cost SCC for the central/upper estimates because of the "very high degree of uncertainty" in integrated assessment modelling (Van den Bergh & Botzen 2015 cited at p. 92). Instead, prices are based on the marginal cost of achieving policy targets (current policy: 40% by 2030 / 65% by 2050). Lower bound uses Bijgaart et al. (2016) median SCC = €21.6/t-CO₂ (2015 prices). Central = €57/t-CO₂; Upper = €94/t-CO₂ (incl. VAT).
+
+**Annual CO₂ price growth:** +3.5% per year based on Hotelling's rule applied to the CPB/PBL WLO High scenario discount rate (§6.3.6, p. 94 fn. 66). This is hardcoded as the escalation rule for GHG prices in the handbook.
+
+**Non-GHG categories not monetised:** Water resource depletion (freshwater scarcity) is not included; land use is partially monetised (biodiversity loss only, not water cycle or food supply services). Fossil resource scarcity is treated as a pecuniary rather than technical externality and carries no environmental price. These gaps are relevant to our ReCiPe categories that have no CE Delft counterpart.
+
+---
+
+#### Coverage vs. our ReCiPe 2016 v1.1 midpoint categories
+
+| ReCiPe 2016 Midpoint | CE Delft midpoint price available? | Notes |
+|---|---|---|
+| Climate change (GWP₁₀₀) | ✅ €0.0566/kg CO₂-eq. | But use H47 (SC-GHG) for GHG; CE Delft is backup |
+| Stratospheric ozone depletion | ✅ €30.4/kg CFC-11-eq. (individualist) | Hierarchist: €123 |
+| Ionizing radiation | ✅ €0.0461/kBq U235-eq. | |
+| Ozone formation (human health) | ✅ €1.15/kg NMVOC-eq. | |
+| Fine PM formation | ✅ €39.2/kg PM₁₀-eq. | |
+| Terrestrial acidification | ✅ €7.48/kg SO₂-eq. (hierarchist) | |
+| Freshwater eutrophication | ✅ €1.86/kg P-eq. | |
+| Marine eutrophication | ✅ €3.11/kg N | |
+| Terrestrial ecotoxicity | ✅ €8.69/kg 1,4 DB-eq. | |
+| Freshwater ecotoxicity | ✅ €0.0361/kg 1,4 DB-eq. | |
+| Marine ecotoxicity | ✅ €0.00739/kg 1,4 DB-eq. | |
+| Land use | ✅ €0.126/m²·yr (hierarchist) | Biodiversity loss only |
+| Water consumption | ❌ Not monetised | Major gap for food LCA |
+| Mineral resource scarcity | ❌ No external price assigned | Pecuniary externality only |
+| Fossil resource scarcity | ❌ No external price assigned | Pecuniary externality only |
+
+---
+
+#### Author-flagged limitations (§1.5, pp. 12–14)
+
+1. **EU28 average only** — prices are for an average emission source at an average site in the EU28; not suitable for site-specific studies or highly local dispersion calculations (§1.5).
+2. **Toxic substances require dedicated site-specific studies** — for heavy metals in soil or locally concentrated toxic emissions, the handbook methodology is "too coarse" (§1.5, p. 13 / Summary p. 7).
+3. **Climate change: damage costs are highly uncertain** — the decision to use abatement costs for the central estimate is explicitly motivated by the unreliability of damage-cost methods for long-term global warming (§6.3.5–6.3.6, pp. 91–95).
+4. **Some impact pathways not fully quantified** — water scarcity/freshwater depletion, fossil and mineral resource scarcity, indoor exposure, noise for non-road sources (§6 and Table 2 footnotes).
+5. **Weighting factors based on EU28 emission mix** — the midpoint-level weighting factor is a weighted average across all EU28 pollutants in each category; shifting to a specific product or food commodity may change the relative mix and therefore the weighting factor.
+6. **Currency base 2015€** — values must be converted to current-year prices using an EU/CPI deflator; for C$ conversion, an additional EUR→CAD step is required.
+
+---
+
+#### Implications for our manuscript (§§3.8, 5, 7)
+
+**Non-GHG monetisation in `monetization.py`.** CE Delft's Table 2 hierarchist weighting factors are the **primary reference for monetising the 12 non-GHG ReCiPe midpoint categories**. The three categories without CE Delft coverage (water consumption, mineral resource scarcity, fossil resource scarcity) must either be omitted from the single-score or bridged with other sources; we should flag this explicitly.
+
+**GHG treatment.** For climate change, use **H47 (ECCC SC-GHG)** as the primary value for our Canadian audience, with CE Delft's Table 28 central value (€57/t-CO₂ in 2015€, growing at 3.5%/yr → ~€83/t-CO₂ in 2026€) as the international comparator. Both should be reported in parallel to allow readers to see the Canadian-regulatory vs. EU-policy-cost framing.
+
+**Currency conversion for C$ reporting.** CE Delft values are €2015. For our 2026 analysis: (i) apply 3.5%/yr growth to GHG prices → 2026 values; (ii) apply EU HICP inflation (2015→2026 ≈ +25%) to non-GHG prices; (iii) convert EUR→CAD using appropriate exchange rate or PPP. All conversion factors should be logged and citeable.
+
+**§7 gap disclosure.** Water consumption (freshwater depletion) has no monetised price in CE Delft. For food LCA this is significant — blue-water use in crop irrigation can be a dominant impact for some food groups. We should state this gap explicitly and note it as a reason our single-score monetisation is conservative.
+
+---
+
+#### Three-sentence relevance note
+
+CE Delft (2018/VS2020) provides the standard European reference for monetising the non-GHG environmental externalities from LCA midpoint categories, covering 12 of the 18 ReCiPe 2016 midpoints with harmonised €2015 hierarchist weighting factors directly applicable to our pipeline's midpoint outputs — the three missing categories (water consumption, mineral resource scarcity, fossil resource scarcity) are a disclosed gap. For climate change specifically, CE Delft uses an abatement-cost methodology (€57/t-CO₂ in 2015€, growing at 3.5%/yr) rather than damage costs, making it methodologically distinct from the ECCC SC-GHG approach (H47), so our `monetization.py` should use H47 for GHG categories and CE Delft's Table 2 for the remaining 11 non-GHG midpoints. Cite at §5 (monetisation methodology), §3.8 (single-score derivation), and §7 (water-depletion and resource-scarcity monetisation gap).
+
+---
+
+*Pending: papers H49 (True Price Foundation) and H50 (Drupp et al. 2021 discounting).*
 
 ## Group I. Canadian regional context
 
-*Pending: papers I51 through I54.*
+### I51. ECCC (2024) — National Inventory Report 1990–2022: GHG Sources and Sinks in Canada [★★]
+
+**Citation.** Environment and Climate Change Canada. *National Inventory Report 1990–2022: Greenhouse Gas Sources and Sinks in Canada. Part 1.* Canada's Submission to the UNFCCC. 2024 Edition. Cat. No.: En81-4/4E-PDF; ISSN: 1910-7064. Available: canada.ca/ghg-inventory
+
+**PDF.** [`papers/En81-4-2022-1-eng.pdf`](papers/En81-4-2022-1-eng.pdf)
+
+**Open access.** Yes — Crown copyright, Government of Canada. Freely downloadable.
+
+**Type.** Official government statistical report (annual UNFCCC submission). Provides Canada's complete GHG inventory 1990–2022, disaggregated by IPCC sector, economic sector, gas, and province/territory. Methods follow 2006 IPCC Guidelines for National GHG Inventories; 2024 edition first year under Paris Agreement Article 13 MPGs. Uses IPCC AR5 GWP values (implemented in this edition).
+
+---
+
+#### Key national totals (Executive Summary, pp. 1–15)
+
+**Canada's 2022 GHG emissions: 708 Mt CO₂ eq** (Table ES–1, p. 11)
+
+- vs. 2005 (base year): **−54 Mt (−7.1%)**
+- vs. 2021: +9.3 Mt (+1.3%)
+- vs. 2019 (pre-pandemic): −44 Mt (−5.9%)
+- Canada = **~1.5% of global GHG emissions** (11th largest emitter; Climate Watch 2024 for 2020)
+- Per capita: **18 t CO₂ eq/person** in 2022 (down from 24 t in 2005)
+- Emissions intensity (GHG/GDP): −42% since 1990; −30% since 2005
+
+---
+
+#### Emissions by IPCC sector (Table ES–1, p. 11)
+
+| IPCC Sector | 2005 | 2022 | Change |
+|---|---|---|---|
+| **Energy – Stationary Combustion** | 338 Mt | 306 Mt | −9.5% |
+| — Public Electricity & Heat Production | **124 Mt** | **56 Mt** | **−54.8%** |
+| — Oil and Gas Extraction | 63 Mt | 109 Mt | +73% |
+| — Residential | 43 Mt | 39 Mt | −10% |
+| — Commercial & Institutional | 32 Mt | 35 Mt | +9.4% |
+| **Energy – Transport** | 190 Mt | 196 Mt | +3.2% |
+| **Energy – Fugitive Sources** | 97 Mt | 75 Mt | −22% |
+| **IPPU** | 55 Mt | 51 Mt | −7.4% |
+| **Agriculture** | 56 Mt | 56 Mt | −0.5% |
+| **Waste** | 24 Mt | 23 Mt | −3.7% |
+| **LULUCF (memo)** | 66 Mt | 51 Mt | — |
+| **NATIONAL TOTAL** | **761 Mt** | **708 Mt** | **−7.1%** |
+
+---
+
+#### Electricity economic sector — critical for Canadian grid intensity (Table ES–2, p. 12)
+
+| Year | Electricity sector (Mt CO₂ eq) |
+|---|---|
+| 2005 | **117** |
+| 2017 | 72 |
+| 2018 | 62 |
+| 2019 | 61 |
+| 2020 | 53 |
+| 2021 | 51 |
+| **2022** | **47** |
+
+**Reduction 2005→2022: −70 Mt (−59.8%).** Drivers: coal displacement (Ontario closed last coal plant 2014; -74% coal generation Canada-wide); expansion of low-emitting sources accounting for 59% of the emission reduction; fuel switching accounting for 32%. Within Public Electricity and Heat Production, emissions from coal and refined petroleum products fell 74% and 75% respectively 2005–2022 (ES §4, p. 7).
+
+**Implications for our grid-intensity multiplier (manuscript §5.3):** Canada's electricity grid emits roughly half the CO₂ per MWh compared to its 2005 level, and the trend continues. The NIR provides the authoritative source to justify any Canadian-specific scaling factor applied to Agribalyse/ecoinvent background electricity processes (which are parameterised on European/global averages). The magnitude of the electricity sector reduction (−60%) compared to overall GHG reduction (−7%) illustrates the structural decarbonisation unique to Canada's grid.
+
+---
+
+#### Agriculture sector (Table ES–1 + §ES.4, pp. 9, 11)
+
+| Sub-category | 2005 | 2022 | Notes |
+|---|---|---|---|
+| Enteric fermentation | 35 Mt | **27 Mt** | −23%; livestock herd declined |
+| Manure management | 8.7 Mt | **7.8 Mt** | −10% |
+| Agricultural soils (N₂O) | 12 Mt | **18 Mt** | +50%; inorganic N fertiliser use +79% since 2005 |
+| Field burning of residues | 0.04 Mt | 0.05 Mt | Negligible |
+| Liming, urea application | 1.4 Mt | **2.9 Mt** | +107%; increased lime/fertiliser use |
+| **Agriculture total** | **56 Mt** | **56 Mt** | Effectively stable (−0.5%) |
+
+Agriculture = **7.9% of Canada's 2022 national emissions**; includes **27% of national CH₄** (31 Mt, from enteric fermentation + manure) and **76% of national N₂O** (28 Mt total N₂O nationally, predominantly from agricultural soil management).
+
+The composition shift within agriculture is important for our food LCA framing: while total emissions are stable, the driver has shifted from livestock (enteric fermentation fell 23%) to cropland intensification (agricultural soils +50% due to expanded inorganic nitrogen fertiliser application, especially on Prairie provinces).
+
+---
+
+#### GHG breakdown by gas (ES §ES.3, p. 4)
+
+| Gas | 2022 total | Share |
+|---|---|---|
+| CO₂ | 551 Mt | 78% |
+| CH₄ | 117 Mt | 17% |
+| N₂O | 28 Mt | 4.0% |
+| HFCs, PFCs, SF₆, NF₃ | 12 Mt | 1.6% |
+
+CH₄ breakdown: oil & gas fugitive (56 Mt) + agriculture (31 Mt) + landfills (19 Mt).
+
+---
+
+#### Provincial variation (ES §ES.6, p. 13)
+
+Relevant for spatial sensitivity in our §5.3 Canadian consumer perspective scenario:
+
+- **Ontario:** −46 Mt (−23%) since 2005 — driven almost entirely by electricity (last coal plant closed 2014)
+- **Alberta:** +19 Mt (+7.5%) since 2005 — driven by oil sands expansion
+- **Quebec, BC, Manitoba:** Low electricity emissions due to dominant hydropower
+- **Nova Scotia:** −8.0 Mt (−35%); **New Brunswick:** −7.6 Mt (−38%) — both had meaningful coal-power reductions
+
+The provincial heterogeneity means that "Canada average" electricity emission factors mask enormous within-country variation: Quebec grid ≈ 2 g CO₂/kWh (near 100% hydro); Alberta grid ≈ 500 g CO₂/kWh (gas + coal dominant).
+
+---
+
+#### GWP values used (Table 1–1, referenced in §ES.1)
+
+This 2024 edition adopts **IPCC AR5 GWP values** (implementing the change from AR4 used in prior editions). Key values (100-year horizon):
+- CH₄ (fossil): **29.8** CO₂ eq (AR5, including climate-carbon feedbacks)
+- N₂O: **273** CO₂ eq
+- Note: IPCC AR5 replaces AR4 values (CH₄ = 25; N₂O = 298) across the entire 1990–2022 time series in this edition — this recalculation added approximately 28–29 Mt to prior-year totals.
+
+---
+
+#### Author-flagged limitations
+
+1. **Fugitive methane discrepancy (ES §10–11, pp. 10–11).** "Top-down" atmospheric measurement studies suggest bottom-up inventory methods may underestimate fugitive methane from oil and gas operations due to super-emitters; the gap is acknowledged but not fully resolved. This is the largest known accuracy concern in the NIR.
+2. **LULUCF uncertainty.** Forest carbon fluctuates dramatically with wildfire and harvest cycles (range: 5.6–70 Mt net emissions over recent years); 2022 saw cropland turn from net sink to net source (22 Mt) due to prairie drought — this is flagged as a real event, not a methodology artefact.
+3. **Top-down/bottom-up reconciliation ongoing.** ECCC notes that reconciling atmospheric CH₄ measurements with facility-based bottom-up estimates "remains a monitoring challenge with tens of thousands of facilities, hundreds of thousands of wells and millions of components."
+4. **Annual revision cycle.** The NIR is updated annually and recalculated back to 1990; the 2024 edition incorporated upward revisions of 29 Mt in 2005 and 28 Mt in 2021 relative to the 2023 edition (§ES.1, p. 1).
+
+---
+
+#### Implications for our manuscript (§§3.8, 5.3, 7)
+
+**Canadian electricity grid intensity multiplier (§5.3 / §3.9).** The NIR is the primary citable source for Canada's electricity grid decarbonisation trajectory. The **0.85 multiplier** noted in the wishlist as our current adjustment for the Canadian consumer perspective scenario (§5.3) should be cited to this report. Specifically: Canada's public electricity and heat sector emitted 56 Mt in 2022 vs. 124 Mt in 2005 (−54.8%), and the Electricity economic sector fell from 117 to 47 Mt (−60%). Any Canadian-specific grid intensity correction to Agribalyse/ecoinvent (European-parameterised) LCA background processes should reference this document as the empirical basis.
+
+**Agriculture emission context (§2.3 / §5).** The NIR confirms that Canadian food system agriculture emits 56 Mt/yr (stable since 2005), with a compositional shift toward N₂O from fertiliser-intensive cropping. For our §5 diet-shift counterfactuals (beef→legumes; refined→whole grain), this means enteric fermentation (CH₄, 27 Mt) and agricultural soil N₂O (18 Mt) are the two emission categories most sensitive to dietary change in the Canadian context — consistent with how our ReCiPe pipeline weights CH₄ (via SC-CH₄ = C$2,687/t from H47) and N₂O (via SC-N₂O = C$78,633/t) monetisation.
+
+**GWP values.** The NIR uses IPCC AR5 GWP (CH₄ = 29.8, N₂O = 273). Our pipeline uses ReCiPe 2016 Hierarchist characterisation factors which are based on IPCC AR4/2013 GWPs (CH₄ = 25 or 28 + feedback, depending on version). We should note this AR4/AR5 discrepancy in §7 as it affects the relative weighting of CH₄ vs. CO₂ impacts by ~17%.
+
+---
+
+#### Three-sentence relevance note
+
+The NIR 1990–2022 is Canada's official UNFCCC-mandated GHG inventory and the authoritative citation for any Canadian-specific emission intensity data — in particular the 60% decline in Canada's electricity sector emissions since 2005 (117→47 Mt CO₂ eq) underpinning our Canadian consumer-perspective grid intensity adjustment, and the stable 56 Mt agricultural sector with its shift from livestock CH₄ toward fertiliser-driven N₂O. For our dietary-shift counterfactuals (§5.2), the NIR contextualises the relative magnitudes: enteric fermentation (27 Mt CH₄) and agricultural soils (18 Mt N₂O) are the largest GHG levers within Canadian food production, consistent with our pipeline's diet-change scenarios prioritising beef and refined-grain shifts. Cite at §2.3 (Canadian food system context), §3.9 (Canadian electricity grid intensity justification), §5.3 (S6 consumer-perspective scenario), and §7 (AR4 vs. AR5 GWP discrepancy limitation).
+
+---
+
+*Pending: papers I52 (Statistics Canada Census of Agriculture), I53 (Boulay et al. AWaRe water scarcity), I54 (Pelletier et al. Canadian food system review).*
 
 ## Group J. Data and study cohorts
 
