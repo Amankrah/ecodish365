@@ -99,7 +99,7 @@ Once you have a PDF, drop it into a `papers/` directory (or paste the relevant p
 
 28. **EAT–Lancet Commission 2.0 (2025).** *The EAT–Lancet Commission on healthy, sustainable, and just food systems.* **The Lancet.** doi:10.1016/S0140-6736(25)01201-2
 
-29. **Willett, W., et al. (2019).** *Food in the Anthropocene: the EAT–Lancet Commission on healthy diets from sustainable food systems.* **The Lancet** 393, 447–492.
+29. **Willett, W., et al. (2019).** *Food in the Anthropocene: the EAT–Lancet Commission on healthy diets from sustainable food systems.* **The Lancet** 393, 447–492. ✅ *Extracted* — [`literature_extractions.md`](literature_extractions.md) §E29; PDF [`papers/PIIS0140673618317884.pdf`](papers/PIIS0140673618317884.pdf).
 
 30. **IPCC AR6 Working Group III (2022).** *Chapter 5: Demand, services and social aspects of mitigation.*
 

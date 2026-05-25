@@ -23,7 +23,7 @@
 import { useEffect, useRef } from 'react';
 import type { CNFRecall24hAggregatedIngredient } from '@/lib/api';
 
-type Target = 'hefi' | 'heni' | 'hsr' | 'fcs' | 'environmental';
+type Target = 'hefi' | 'heni' | 'hsr' | 'fcs' | 'environmental' | 'dietary_pattern';
 
 interface RecallStash {
   source: 'recall_24h';

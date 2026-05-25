@@ -1,0 +1,381 @@
+{
+  "harness": "DietaryPatternMatcher smoke (DIET-PATTERN-1, 2026-05-24)",
+  "pass": 6,
+  "total": 6,
+  "gates": [
+    {
+      "gate": "G1 Self-match (individual-mode prototypes, expected in top-1 OR co-leading)",
+      "passed": true,
+      "detail": "20/21 strict top-1, 21/21 top-1-or-co-leading (skipped 2 EAT-Lancet days — researcher-mode only)",
+      "metrics": {
+        "total": 21,
+        "strict_correct": 20,
+        "relaxed_correct": 21,
+        "eat_lancet_skipped": 2,
+        "failures": [
+          "(co-leading) vegetarian::Lacto-ovo balanced day with whole grains + legumes → top=dash (cos 0.945); expected vegetarian at 0.936 (Δ 0.009)"
+        ]
+      }
+    },
+    {
+      "gate": "G2 Cross-distinguishability (individual-mode prototypes)",
+      "passed": true,
+      "detail": "median cross-prototype cosine = 0.827 (≤ 0.92 threshold); max pair vegan vs vegetarian = 0.956",
+      "metrics": {
+        "median_cross_cosine": 0.827,
+        "threshold": 0.92,
+        "max_pair": [
+          "vegan",
+          "vegetarian",
+          0.956
+        ],
+        "all_pairs": [
+          [
+            "vegan",
+            "vegetarian",
+            0.956
+          ],
+          [
+            "mediterranean",
+            "vegan",
+            0.954
+          ],
+          [
+            "cfg_healthy",
+            "vegan",
+            0.952
+          ],
+          [
+            "cfg_healthy",
+            "mediterranean",
+            0.946
+          ],
+          [
+            "mediterranean",
+            "vegetarian",
+            0.946
+          ],
+          [
+            "cfg_healthy",
+            "dash",
+            0.942
+          ],
+          [
+            "dash",
+            "vegetarian",
+            0.937
+          ],
+          [
+            "cfg_healthy",
+            "vegetarian",
+            0.935
+          ],
+          [
+            "dash",
+            "mediterranean",
+            0.913
+          ],
+          [
+            "dash",
+            "vegan",
+            0.886
+          ],
+          [
+            "mediterranean",
+            "west_african_staple",
+            0.827
+          ],
+          [
+            "cfg_healthy",
+            "west_african_staple",
+            0.817
+          ],
+          [
+            "vegetarian",
+            "west_african_staple",
+            0.81
+          ],
+          [
+            "dash",
+            "west_african_staple",
+            0.806
+          ],
+          [
+            "vegan",
+            "west_african_staple",
+            0.805
+          ],
+          [
+            "dash",
+            "western",
+            0.803
+          ],
+          [
+            "vegetarian",
+            "western",
+            0.787
+          ],
+          [
+            "mediterranean",
+            "western",
+            0.783
+          ],
+          [
+            "vegan",
+            "western",
+            0.767
+          ],
+          [
+            "cfg_healthy",
+            "western",
+            0.756
+          ],
+          [
+            "west_african_staple",
+            "western",
+            0.711
+          ]
+        ],
+        "note": "EAT-Lancet excluded (researcher-mode-only composite by design)"
+      }
+    },
+    {
+      "gate": "G3 Known-pattern reference days (top-1 OR co-leading)",
+      "passed": true,
+      "detail": "10/10 expected in top-1 or co-leading (threshold ≥ 8)",
+      "metrics": {
+        "total": 10,
+        "correct": 10,
+        "rows": [
+          {
+            "name": "Greek-village day (olive oil + feta + salmon + kale + lentils)",
+            "expected": "mediterranean",
+            "got": "mediterranean",
+            "cosine": 0.96,
+            "expected_cosine": 0.96,
+            "verdict": "top-1",
+            "pass": true
+          },
+          {
+            "name": "Indian vegetarian thali (rice + dal + paneer + greens)",
+            "expected": "vegetarian",
+            "got": "vegetarian",
+            "cosine": 0.976,
+            "expected_cosine": 0.976,
+            "verdict": "top-1",
+            "pass": true
+          },
+          {
+            "name": "BBQ pulled-pork day (white bread + beef + chips + cola + ice cream)",
+            "expected": "western",
+            "got": "western",
+            "cosine": 0.993,
+            "expected_cosine": 0.993,
+            "verdict": "top-1",
+            "pass": true
+          },
+          {
+            "name": "WAFCT canonical day (fonio + jollof rice + baobab leaf sauce)",
+            "expected": "west_african_staple",
+            "got": "west_african_staple",
+            "cosine": 0.967,
+            "expected_cosine": 0.967,
+            "verdict": "top-1",
+            "pass": true
+          },
+          {
+            "name": "Vegan tofu-stir-fry day (tofu + soy beverage + greens + rice)",
+            "expected": "vegan",
+            "got": "vegan",
+            "cosine": 0.963,
+            "expected_cosine": 0.963,
+            "verdict": "top-1",
+            "pass": true
+          },
+          {
+            "name": "DASH-style day (whole wheat + chicken + low-fat dairy + broccoli + walnuts)",
+            "expected": "dash",
+            "got": "dash",
+            "cosine": 0.979,
+            "expected_cosine": 0.979,
+            "verdict": "top-1",
+            "pass": true
+          },
+          {
+            "name": "CFG-Healthy plate day (half veg, whole grain, plant protein)",
+            "expected": "cfg_healthy",
+            "got": "cfg_healthy",
+            "cosine": 0.958,
+            "expected_cosine": 0.958,
+            "verdict": "top-1",
+            "pass": true
+          },
+          {
+            "name": "EAT-Lancet reference day (whole grains + tofu + legumes + vegetables)",
+            "expected": "eat_lancet",
+            "got": "eat_lancet",
+            "cosine": 0.98,
+            "expected_cosine": 0.98,
+            "verdict": "top-1",
+            "pass": true
+          },
+          {
+            "name": "Italian Mediterranean day (pasta + olive oil + tomato + chickpea)",
+            "expected": "mediterranean",
+            "got": "mediterranean",
+            "cosine": 0.948,
+            "expected_cosine": 0.948,
+            "verdict": "top-1",
+            "pass": true
+          },
+          {
+            "name": "Fast-food Western day (burger + fries + cola)",
+            "expected": "western",
+            "got": "western",
+            "cosine": 0.991,
+            "expected_cosine": 0.991,
+            "verdict": "top-1",
+            "pass": true
+          }
+        ]
+      }
+    },
+    {
+      "gate": "G4 WAFCT-aware sanity",
+      "passed": true,
+      "detail": "WAFCT canonical day → west_african_staple (cosine 0.967)",
+      "metrics": {
+        "top_pattern": "west_african_staple",
+        "top_cosine": 0.967,
+        "all_resemblances": [
+          [
+            "west_african_staple",
+            0.967
+          ],
+          [
+            "mediterranean",
+            0.812
+          ],
+          [
+            "cfg_healthy",
+            0.799
+          ],
+          [
+            "vegan",
+            0.789
+          ],
+          [
+            "vegetarian",
+            0.784
+          ],
+          [
+            "dash",
+            0.764
+          ],
+          [
+            "western",
+            0.666
+          ]
+        ]
+      }
+    },
+    {
+      "gate": "G5 Portion-scale invariance",
+      "passed": true,
+      "detail": "top-3 ranking stable across 0.5x / 2.0x / 5.0x mass scaling",
+      "metrics": {
+        "base_top3": [
+          "mediterranean",
+          "vegetarian",
+          "vegan"
+        ],
+        "scaled_runs": [
+          {
+            "scale": 0.5,
+            "top3": [
+              "mediterranean",
+              "vegetarian",
+              "vegan"
+            ],
+            "matches_base": true,
+            "top_cosine": 0.96
+          },
+          {
+            "scale": 2.0,
+            "top3": [
+              "mediterranean",
+              "vegetarian",
+              "vegan"
+            ],
+            "matches_base": true,
+            "top_cosine": 0.96
+          },
+          {
+            "scale": 5.0,
+            "top3": [
+              "mediterranean",
+              "vegetarian",
+              "vegan"
+            ],
+            "matches_base": true,
+            "top_cosine": 0.96
+          }
+        ]
+      }
+    },
+    {
+      "gate": "G6 Degenerate inputs handled",
+      "passed": true,
+      "detail": "5/5 degenerate input cases handled with no exceptions + correct match flag",
+      "metrics": {
+        "cases": [
+          {
+            "name": "empty_list",
+            "matched": false,
+            "expected_match": false,
+            "fallback": "no_foods_resolved",
+            "n_foods": 0,
+            "n_unresolved": 0,
+            "pass": true
+          },
+          {
+            "name": "single_food",
+            "matched": true,
+            "expected_match": true,
+            "fallback": null,
+            "n_foods": 1,
+            "n_unresolved": 0,
+            "pass": true
+          },
+          {
+            "name": "zero_mass",
+            "matched": false,
+            "expected_match": false,
+            "fallback": "no_foods_resolved",
+            "n_foods": 0,
+            "n_unresolved": 0,
+            "pass": true
+          },
+          {
+            "name": "all_missing_ids",
+            "matched": false,
+            "expected_match": false,
+            "fallback": "no_foods_resolved",
+            "n_foods": 0,
+            "n_unresolved": 2,
+            "pass": true
+          },
+          {
+            "name": "mixed_valid_invalid",
+            "matched": true,
+            "expected_match": true,
+            "fallback": null,
+            "n_foods": 1,
+            "n_unresolved": 1,
+            "pass": true
+          }
+        ]
+      }
+    }
+  ]
+}

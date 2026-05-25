@@ -43,7 +43,7 @@ import type { UserType } from './AudienceToggle';
 interface Recall24hWizardProps {
   userType: UserType;
   /** When set, pre-highlights one score-routing button on step 4. */
-  preselectScore?: 'hefi' | 'heni' | 'hsr' | 'fcs' | 'environmental';
+  preselectScore?: 'hefi' | 'heni' | 'hsr' | 'fcs' | 'environmental' | 'dietary_pattern';
 }
 
 interface OccasionMeta {
@@ -65,17 +65,20 @@ const OCCASIONS: OccasionMeta[] = [
 ];
 
 const SCORE_BUTTONS: Array<{
-  id: 'hefi' | 'heni' | 'hsr' | 'fcs' | 'environmental';
+  id: 'hefi' | 'heni' | 'hsr' | 'fcs' | 'environmental' | 'dietary_pattern';
   emoji: string;
   label: string;
   path: string;
   note?: string;
 }> = [
-  { id: 'hefi',          emoji: '🥗', label: 'Score HEFI-2019',     path: '/hefi/calculate',          note: 'Natural fit (Brassard 2022b)' },
-  { id: 'heni',          emoji: '🧬', label: 'Score HENI',          path: '/heni/calculate',          note: 'Sums healthy-life-minutes across the day' },
-  { id: 'hsr',           emoji: '⭐', label: 'Score HSR',            path: '/hsr/calculate',           note: 'Informational only — HSR is per-product' },
-  { id: 'fcs',           emoji: '🧭', label: 'Score FCS',            path: '/fcs/calculate',           note: 'i.FCS energy-weighted diet score' },
-  { id: 'environmental', emoji: '🌍', label: 'Score Environmental',  path: '/environmental/calculate', note: 'Per-day environmental footprint' },
+  { id: 'hefi',            emoji: '🥗', label: 'Score HEFI-2019',     path: '/hefi/calculate',          note: 'Natural fit (Brassard 2022b)' },
+  { id: 'heni',            emoji: '🧬', label: 'Score HENI',          path: '/heni/calculate',          note: 'Sums healthy-life-minutes across the day' },
+  { id: 'hsr',             emoji: '⭐', label: 'Score HSR',            path: '/hsr/calculate',           note: 'Informational only — HSR is per-product' },
+  { id: 'fcs',             emoji: '🧭', label: 'Score FCS',            path: '/fcs/calculate',           note: 'i.FCS energy-weighted diet score' },
+  { id: 'environmental',   emoji: '🌍', label: 'Score Environmental',  path: '/environmental/calculate', note: 'Per-day environmental footprint' },
+  // DIET-PATTERN-1 (2026-05-24): descriptive resemblance vs canonical
+  // patterns. Complements the 5 scoring lenses with categorical framing.
+  { id: 'dietary_pattern', emoji: '🎯', label: 'Score Dietary Pattern', path: '/dietary-pattern',        note: 'Which canonical pattern (Mediterranean / DASH / etc.) does your day resemble?' },
 ];
 
 interface MealRow {

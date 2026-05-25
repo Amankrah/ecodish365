@@ -2940,7 +2940,159 @@ Furrer et al. 2024 is the closest published task-level prior art to our §3.5 ma
 
 ## Group E. Sustainability assessment frameworks
 
-*Pending: papers E28 through E32.*
+### E28. Rockström, Thilsted, Willett et al. (2025) — The EAT–Lancet Commission on healthy, sustainable, and just food systems (EAT–Lancet 2.0) [★★]
+
+**Citation.** Rockström J, Thilsted SH, Willett WC, Gordon LJ, Herrero M, Hicks CC, Mason-D'Croz D, Rao N, Springmann M, Wright EC, et al. The EAT–Lancet Commission on healthy, sustainable, and just food systems. Lancet. 2025;406(10510):1625–700.
+
+**DOI.** 10.1016/S0140-6736(25)01201-2
+
+**Type.** Lancet Commission — a consensus expert report combining an evidence review (diet–health, planetary boundaries), a novel multimodel scenario ensemble, and a normative justice framework. Direct successor to Willett et al. 2019 (wishlist E29). Of the three wishlist "framework" papers, this is the one that updates both the reference diet and the environmental targets, so it anchors our framing in §1 and §2.1.
+
+---
+
+#### Page-cited results and formulas
+
+**The Planetary Health Diet (PHD) reference values — Table 1, p. 1632.** A flexitarian reference pattern at a population-level intake of ~2400 kcal/day (revised down from 2500 kcal/day in the 2019 Commission; p. 1636). The "name arose from the evidence that adoption would reduce the environmental impacts and nutritional deficiencies of most current diets," but the PHD itself "is based entirely on the direct effects of different diets on human health, not on environmental criteria" (Glossary, p. 1628) — an important framing distinction for us, since our pipeline scores health and environment as *separate* axes rather than collapsing them.
+
+**Health-burden estimates (Panel 1, p. 1629).** Two methods, both pairing relative risks with country-specific diet and mortality data:
+- Comparative risk assessment (CRA): adoption of the PHD would prevent ~10 million deaths/yr among adults (17% of total mortality). ~50% of the reduction is composition-related (more whole grains, fruits, vegetables, legumes, nuts; less red and processed meat); ~50% from reduced under/overweight.
+- PHD-index pattern method (cohort of >200,000 adults, >30 yr follow-up): achieving a PHD score of 120 (140 = perfect) would avert ~15 million deaths/yr (27% of total deaths); a score of 100 would avert ~7 million/yr (13%).
+- Highest-decile PHD adherence = 28% lower overall mortality vs lowest decile (n=206,404; >54,000 deaths; p. 1636).
+
+**Macronutrient profile of the PHD (p. 1637):** ~14% of energy from protein, ~53% from carbohydrate, ~35% from total fat. Added/free sugar capped at 5% of energy; sodium ≤2000 mg/day (5 g salt).
+
+**Food system boundaries — Table 2, p. 1640 (the headline new contribution).** For the first time the Commission quantifies the food system's share of all nine planetary boundaries and proposes science-based food-system targets. Food is "the single largest cause of planetary boundary transgressions, driving the transgression of five of the six breached boundaries" (Executive summary). Food systems = ~30% of GHG emissions (16–17.7 Gt CO₂e/yr; p. 1641).
+
+**Inequality / responsibility (Key messages, p. 1626; Section 3, p. 1661).** The diets of the richest 30% of the global population drive >70% of food-system environmental pressures. Only 1% of the global population lives in a country within the "safe and just space"; 6.9 billion people live in countries that (if their diet were adopted globally) would transgress planetary boundaries, while 3.7 billion fall below social foundations.
+
+**Externalities / economics (p. 1629; Section 6).** The global food system generates ~US$10 trillion/yr in value but ~US$15 trillion/yr in negative externalities (health sector largest). Transformation cost estimated at $200–500 billion/yr; benefits ~$5 trillion/yr. Agricultural subsidies ~$851 billion (2020–22, OECD reporters); ≥1/3 have no public benefit; in the EU 82% favour animal-based agriculture. Fossil-energy subsidies ~$7 trillion (2022).
+
+**Affordability metric (Section 3, p. 1655).** Adopts the FAO Cost of a Healthy Diet (COHD) threshold: a healthy diet is "affordable" when it costs <52% of average household income. In 2022, 2.8 billion people could not afford a healthy diet. Across scenarios the share of income spent on food falls toward 4–5% by 2050.
+
+**Modelling architecture (Section 4, pp. 1661–1670).** A multimodel ensemble of 10 global economic models (AIM, CAPRI, ENVISAGE, FARM, GCAM, GLOBIOM, IMPACT, IMAGE, MAGNET, MAgPIE) plus the static DIA-GIO (Global Input–Output module of the Dietary Impact Assessment model — the updated 2019-Commission input–output model), with FABLE and CiFoS for deep dives. Three core scenarios: BAU (SSP2, RCP 7.0, ~2°C by 2050), EAT–Lancet (PHD adoption + 7–10% productivity gain + halved food loss and waste), and EAT–Lancet Mitigation (ELM, adds ambitious emissions pricing/land-use policy). Results reported as ensemble medians with min–max ranges.
+
+---
+
+#### Tables to reproduce or reference in the manuscript
+
+**Table 1 (p. 1632) — PHD reference diet.** The reference pattern our diet-shift counterfactuals (S5 / §5.2) should benchmark against. Intake in g/day (range), kcal/day at 2400 kcal/day:
+
+| Food group | g/day (range) | kcal/day |
+|---|---|---|
+| Whole grains | 210 (20–50% of energy) | 735 |
+| Tubers and starchy roots | 50 (0–100) | 50 |
+| Vegetables | 300 (200–600) | 95 |
+| Fruits | 200 (100–300) | 145 |
+| Tree nuts and peanuts | 50 (0–75) | 275 |
+| Legumes | 75 (0–150) | 275 |
+| Milk or equivalents | 250 (0–500) | 145 |
+| Chicken and other poultry | 30 (0–60) | 60 |
+| Fish and shellfish | 30 (0–100) | 25 |
+| Eggs | 15 (0–25) | 20 |
+| Beef, pork, or lamb | 15 (0–30) | 45 |
+| Unsaturated plant oils | 40 (20–80) | 355 |
+| Palm and coconut oil | 6 (0–8) | 55 |
+| Lard, tallow, butter | 5 (0–10) | ·· |
+| Sugar (added or free) | 30 (0–30) | 115 |
+| Sodium | <2 g | ·· |
+
+**Table 2 (p. 1640) — food system boundaries (selected control variables).** Use in §1/§2.1 to situate our per-meal indicators within global targets:
+
+| Earth-system process (control variable) | Current food-system contribution | Proposed food-system boundary |
+|---|---|---|
+| Climate (atmospheric CO₂) | 16–17.7 Gt CO₂e/yr (30% of anthropogenic emissions) | 5 Gt CO₂e/yr |
+| Land system change (agricultural area) | 48 M km² (34% of land surface) | <48 M km² (halt conversion of intact nature) |
+| Biosphere integrity (HANPP) | 9.9–11.7 Gt C/yr (72–85% of total HANPP) | 5.5 Gt C/yr |
+| Stratospheric ozone (N₂O) | 3.9–4.2 Tg N₂O-N/yr (54–69% of total) | 1.8 Tg N₂O-N |
+| Ocean acidification | 25% of CO₂ emissions | Zero CO₂ from land-use change + fossil energy in the food chain |
+| Nitrogen surplus | 119 Tg N/yr | <57 Tg N/yr |
+| Phosphorus loss to surface water | 7.2 Tg P/yr (75% of total) | 4.6 Tg P/yr |
+| Blue water (consumptive) | 1200–1800 km³/yr | 2000 km³/yr |
+| Novel entities (pesticides) | 3.3–3.7 Tg PAS/yr (85–90% of use) | 1 Tg PAS/yr (high-risk avoidance); 0.2 Tg PAS/yr (low risk) |
+
+**Table 4 (p. 1655) — social-foundation harms quantified in DALYs.** Directly relevant to our HENI/DALY methodology (cross-link Group C): unsafe water ~42 million DALYs; high temperatures ~14 million DALYs; SSB-heavy/unhealthy diets ~3.6 million DALYs; ~75,725 SSB-linked deaths/yr. These are population-level DALY attributions, not the μDALY/g per-food factors we use, but they demonstrate the same comparative-risk-assessment lineage (GBD) that underpins HENI (C15, C18).
+
+---
+
+#### Author-flagged limitations (useful for §7)
+
+1. **Relative risks drawn primarily from high-income-country cohorts** (Panel 1, p. 1629); LIC/MIC cohort data are scarce — flagged as "an important research gap." Mirrors our own §7.5 cohort-representativeness caveat and the geographic-representativeness gap our §3.7 Canadian layer addresses.
+2. **Sodium effects excluded from the mortality estimates** (measurement difficulty), and the estimates exclude environmentally-mediated indirect diet effects (Panel 1) — a clean precedent for explicitly bounding what a health-impact score does and does not capture.
+3. **Scenarios model only 2050 endpoints, not transition pathways** (p. 1664); ensemble agreement is *low* on whether nitrogen, phosphorus, and water reductions are sufficient to return within boundaries.
+4. **Soil-carbon sequestration estimates taken from global meta-analyses do not account for regional/local saturation limits** (Panel 6) — cite if we discuss uncertainty inheritance.
+5. **Agency / corporate-concentration harms left "Not determined"** in Table 4 because well-established metrics do not exist — an honest data-gap admission worth noting if we discuss multi-indicator coverage.
+6. **The Commission used ChatGPT to draft its Executive Summary** (Acknowledgments, p. 1686), with author review. A concrete, citable data point for our §2.4 / §6.5 sustainability-of-AI and AI-in-food-science discussion: even a flagship sustainability assessment now embeds LLMs in its workflow.
+
+---
+
+#### Three-sentence relevance note
+
+EAT–Lancet 2.0 is the canonical framing reference for §1 and §2.1 and the authoritative source for both the PHD reference diet (Table 1), which anchors our diet-shift counterfactuals in S5/§5.2, and the food system boundaries (Table 2), against which we can situate per-meal environmental scores at the planetary scale. Its DALY-based health-burden accounting (15 million avoidable deaths/yr; Table 4 harm attributions) shares the GBD comparative-risk lineage that underpins our HENI methodology (Group C), and its externality figures ($10 trillion value vs $15 trillion negative externalities) support the monetization framing in §3.3. Two incidental but quotable facts strengthen our AI-for-sustainability narrative: the Commission's reliance on a 10-model economic ensemble plus DIA-GIO illustrates the modelling-uncertainty problem our Monte Carlo work (S3) engages, and its disclosed use of ChatGPT to draft the Executive Summary is a real-world instance of LLM integration into sustainability assessment for §2.4/§6.5.
+
+---
+
+### E29. Willett, Rockström, Loken et al. (2019) — Food in the Anthropocene (EAT–Lancet 1.0) [★★]
+
+**Citation.** Willett W, Rockström J, Loken B, Springmann M, Lang T, Vermeulen S, Garnett T, Tilman D, DeClerck F, Wood A, Jonell M, Clark M, Gordon LJ, Fanzo J, Hawkes C, Zurayk R, Rivera JA, De Vries W, Sibanda LM, Afshin A, Chaudhary A, Herrero M, Agustina R, Branca F, Lartey A, Fan S, Crona B, Fox E, Bignet V, Troell M, Lindahl T, Singh S, Cornell SE, Reddy KS, Narain S, Nishtar S, Murray CJL. Food in the Anthropocene: the EAT–Lancet Commission on healthy diets from sustainable food systems. Lancet. 2019;393:447–492.
+
+**PDF.** [`papers/PIIS0140673618317884.pdf`](papers/PIIS0140673618317884.pdf)
+
+**DOI.** 10.1016/S0140-6736(18)31788-4 (corrected republications documented on the Lancet splash page through Oct 1, 2020).
+
+**Type.** Earlier EAT–Lancet synthesis: expert consensus framing of a **healthy reference diet at 2500 kcal/day**, global **six-process food-production boundaries** anchored in Steffen planetary-boundaries lineage, and scenario modelling tying diet shifts, halved waste (SDG 12.3), and productivity tiers to boundary transgression (IMPACT-derived global food-system model; appendix pp 19–23; scenario core extends Springmann and colleagues (*Nature* 2018, 562:519–525)). Wishlist entry E29; **superseded for numeric PHD/env targets by Rockström et al. 2025 (E28)** — cite E29 only when deliberately anchoring the **2019** reference pattern (prototype `literature_anchor` in `dietary_pattern_prototypes.json`, manuscript researcher-mode text).
+
+---
+
+#### Page-cited results and formulas
+
+**Energy basis for tables (p. 454).** Scenario food amounts are calibrated to **2500 kcal/day** (explicitly defended as aligning with moderate-to-high physical activity for a 70 kg man / 60 kg woman aged ~30 yr; contrasts with WHO 2100-kcal BMI-22 archetypes the authors reject as unrealistic given unresolved obesity reversal).
+
+**Reference diet composition — Table 1 (p. 451).** Key midpoint intakes vs E28 PHD highlights: split **beef+lamb vs pork** (7 g/day each midpoint, interchangeable), **whole grains 232 g/day** (~811 kcal; range allows grain mix up to ~60 % of energy), **fish 28 g/day** (vs revised PHD midpoint values in E28). Red-meat midpoint combined = 14 g/day (matching E28 lexicon). Added sugar cap **31 g/day** (**< 5 %** energy).
+
+**Environmental scientific targets — Table 2 (p. 453).** Six aggregated processes (narrower framing than E28’s expanded nine-boundary food-system accounting): methane+nitrous-oxide-from-food-production **≤ 5 Gt CO₂e/yr (4·7–5·4)**; cropland cap **≤ 13 M km² (11–15)**; freshwater consumptive allocation for food production **≈ 2500 km³/yr (1000–4000)**; nitrogen fertiliser/application boundary **≈ 90 Tg N/yr (65–90; upper extension 90–130 with redistribution)**; phosphorus **≈ 8 Tg P/yr (6–12; upper 8–16 if recycling assumptions met)**; biodiversity loss **≤ 10 E/MSY (1–80)**.
+
+**Avoided premature mortality from global adoption of reference diet — Table 3 (p. 461).** Concordant triangulation:
+- Comparative risk modelling (CRA with agriculture–consumption statistics — Table 3 * and ref 131): ~**19 %** premature mortality reduction, ~**11 100 000** deaths/yr avoided (158 regions; fruits/vegetables/nuts/legumes-dominated swings).
+- GBD-aligned optimal diet (Commission Table 3 † and ref 132): **22·4 %** adult deaths preventable, ~**10 886 000** deaths/yr; sodium + fruits/vegetables/whole grains/nuts dominate.
+- AHEI-2010 empirical scoring (Table 3 ‡; refs 133–134) across 190 countries: **23·6 %** adult deaths preventable, ~**11 600 000** deaths/yr.
+
+**Environmental footprint hierarchy caveat (§3 intro, pp. 470–471).** Authors stress **indicator-unit sensitivity** (“per kcal misleading for vegetables”; prefer **per serving** for heterogeneous energy-density categories) — a methodological caution echoed by our §3 dual-axis indicators (nutrition vs environmental).
+
+**Climate accounting split (§2, pp. 462–463).** Food-related boundary isolates unavoidable **biotic CH₄/N₂O** under Paris-compatible budgets (~**¼** of contemporary all-source GHG share discussed in-text) while assigning **fossil combustion** mitigation to wider energy-sector decarbonisation narratives.
+
+---
+
+#### Tables to reproduce or reference
+
+**Contrasting use vs E28:** For submission-facing diet-shift benchmarking and boundary tables, cite **E28**; retain **Table 1 (2019, p. 451)** verbatim only when reproducibility/traceability to Willett-et-al.-anchored artefacts is required.
+
+| Item | Primary page |
+|---|---|
+| Healthy reference diet (group g/day ranges + kcal) | Table 1, p. 451 |
+| Six production boundaries + uncertainty footnotes | Table 2, p. 453 |
+| Three-method avoided-mortality reconciliation | Table 3, p. 461 |
+
+---
+
+#### Author-flagged limitations (Scope + Results — useful for §7)
+
+1. **Deliberate narrowing to consumption + production endpoints** (Food system glossary, pp. 450–452); distribution, labour, welfare, antimicrobial resistance flagged as under-addressed domains requiring parallel agendas.
+2. **No granular organic-vs-conventional production prescription** — explicitly avoided because “debates … can be overly prescriptive” (§2 prelude, ~p. 453).
+3. **SSP / population pathway ensembles not explored in depth** (main text anchors moderate-growth narrative; p. 453); SRH access noted as requisite for feasibility.
+4. **High uncertainty on boundary numeric values** acknowledged throughout (risk-precaution framing; Table 2 footnotes tie nitrogen/phosphorus upper ranges to redistribution + phosphorus-recycling optimism — pp. 451–453).
+5. **Geographically averaged water boundary masks acute basin-level transgression** (§2 freshwater narrative, pp. 464–465; appendix p 17)—mirrors rationale for §3.7 regional specificity.
+6. **Biodiversity modelling paradox**: reference-diet uplift in low-calorie-intake regions can increase land-use extinction pressure if domestic sourcing naïvely expands nuts/pulses footprints (§3, pp. 473–474; optimisation scenarios in appendix pp 25–26).
+7. **Evidence geography skew**: European/North American dominance for several meat-health associations with Asian pooled exceptions discussed (§1, pp. 456–457).
+
+---
+
+#### Three-sentence relevance note
+
+E29 is the foundational EAT–Lancet planetary-health citation for our **researcher/policy-mode EAT–Lancet prototype** and any historical comparison to PHD-era science, pairing a flexitarian **reference diet (Table 1 @ 2500 kcal/day)** with the original **six global production boundaries** and triangulated comparative-risk mortality benefits **≈11 million deaths/year averted depending on modelling branch (Table 3)**—all articulated before the 2025 Commission’s calorie revision, boundary expansion to nine Earth-system domains, justice layer, and multi-model ensemble. Methodologically it links cleanly to Group C via **explicit GBD-based optimal-diet attribution (Table 3 row)** and reinforces our dual-indicator design by warning that universal functional units distort rankings across energy-dilute produce vs animal-source foods (§3). Practically **E28 should replace E29 wherever normative citation targets reflect current Lancet consensus**, keeping E29 for traceability when JSON prototypes or reproducibility artefacts remain pinned to 2019 group gram midpoints.
+
+---
+
+*Pending: papers E30 through E32.*
 
 ## Group F. Uncertainty quantification in LCA
 

@@ -1,0 +1,356 @@
+{
+  "schema_version": "DIET-PATTERN-1 2026-05-24",
+  "purpose": "Reference prototype patterns for embedding-space dietary-pattern resemblance scoring. Each prototype is anchored to a published literature reference, with 3-5 hand-curated example days that span the variation the source paper documents. The classifier builds a mass-weighted day vector from CNF + WAFCT food embeddings (cnf_corpus_embeddings.npz) for each example_day, averages within a prototype to get the prototype vector, then computes cosine to a user's day vector.",
+  "curation_note": "FoodIDs verified against backend pipeline 2026-05-24. CNF FoodIDs < 700,000; WAFCT FoodIDs >= 700,000. Where a perfect CNF analogue is missing (e.g. fresh fruit not in CNF as raw), a WAFCT entry is substituted with a comment.",
+  "individual_mode_visible": ["mediterranean", "dash", "western", "vegetarian", "vegan", "cfg_healthy", "west_african_staple"],
+  "researcher_mode_visible": ["mediterranean", "dash", "western", "vegetarian", "vegan", "cfg_healthy", "west_african_staple", "eat_lancet"],
+  "prototypes": [
+    {
+      "pattern_id": "mediterranean",
+      "display_name": "Mediterranean",
+      "literature_anchor": "Trichopoulou A, Costacou T, Bamia C, Trichopoulos D. Adherence to a Mediterranean diet and survival in a Greek population. NEJM 2003;348:2599-2608. Estruch R, Ros E, Salas-Salvadó J, et al. Primary Prevention of Cardiovascular Disease with a Mediterranean Diet. NEJM 2013;368:1279-1290 (PREDIMED).",
+      "outcome_evidence_reused": "PREDIMED: composite CVD HR 0.70 (95% CI 0.54-0.92) over 4.8 y; Trichopoulou: 25% lower all-cause mortality top vs bottom quintile of adherence.",
+      "individual_mode_blurb": "Olive oil, vegetables, legumes, fish, whole grains, moderate dairy + wine. Lower red meat than Western.",
+      "example_days": [
+        {
+          "name": "PREDIMED-style Mediterranean day (~2000 kcal)",
+          "source_section": "Estruch 2013 Methods Table 1 + Supplementary Appendix p. 5 (Mediterranean-diet intervention)",
+          "foods": [
+            {"food_id": 4464, "mass_g": 200, "comment": "spaghetti, enriched, cooked"},
+            {"food_id": 419,  "mass_g": 30,  "comment": "olive oil (2 tbsp)"},
+            {"food_id": 3049, "mass_g": 120, "comment": "salmon, Atlantic, wild, raw"},
+            {"food_id": 3393, "mass_g": 80,  "comment": "lentils, boiled (3 servings/wk in PREDIMED)"},
+            {"food_id": 2589, "mass_g": 30,  "comment": "walnuts, black, dried (PREDIMED supplied 30 g/d)"},
+            {"food_id": 1704, "mass_g": 120, "comment": "banana"}
+          ]
+        },
+        {
+          "name": "Greek-traditional day (Trichopoulou 2003 reference)",
+          "source_section": "Trichopoulou 2003 Methods + Table 1 (diet score components)",
+          "foods": [
+            {"food_id": 4464, "mass_g": 150, "comment": "pasta"},
+            {"food_id": 108,  "mass_g": 50,  "comment": "feta cheese (moderate dairy)"},
+            {"food_id": 419,  "mass_g": 30,  "comment": "olive oil"},
+            {"food_id": 2395, "mass_g": 80,  "comment": "kale (leafy greens)"},
+            {"food_id": 3393, "mass_g": 60,  "comment": "lentils"},
+            {"food_id": 2374, "mass_g": 60,  "comment": "broccoli"},
+            {"food_id": 700589, "mass_g": 150, "comment": "orange, raw (WAFCT-sourced — CNF lacks clean raw-orange entry)"}
+          ]
+        },
+        {
+          "name": "Spanish coastal day (PREDIMED variant)",
+          "source_section": "Estruch 2013 Supplementary Appendix p. 5 (regional Mediterranean variant)",
+          "foods": [
+            {"food_id": 4523, "mass_g": 200, "comment": "rice, white, long-grain, cooked"},
+            {"food_id": 419,  "mass_g": 30,  "comment": "olive oil"},
+            {"food_id": 3182, "mass_g": 100, "comment": "salmon, Atlantic, farmed, raw"},
+            {"food_id": 3389, "mass_g": 60,  "comment": "chickpeas, raw (represents cooked)"},
+            {"food_id": 700532, "mass_g": 80, "comment": "tomato, red, ripe, boiled (WAFCT)"},
+            {"food_id": 1511, "mass_g": 70,  "comment": "avocado, raw"},
+            {"food_id": 1486, "mass_g": 100, "comment": "apple, raw (without skin, sliced, cooked)"}
+          ]
+        }
+      ]
+    },
+    {
+      "pattern_id": "dash",
+      "display_name": "DASH (Dietary Approaches to Stop Hypertension)",
+      "literature_anchor": "Sacks FM, Svetkey LP, Vollmer WM, et al. Effects on Blood Pressure of Reduced Dietary Sodium and the DASH Diet. NEJM 2001;344:3-10. Appel LJ, Moore TJ, Obarzanek E, et al. A Clinical Trial of the Effects of Dietary Patterns on Blood Pressure. NEJM 1997;336:1117-1124.",
+      "outcome_evidence_reused": "DASH vs control: systolic BP -5.5 mmHg (-7.4 to -3.7) at low Na (Sacks 2001 Table 3). Hypertensive subgroup: -11.5/-5.7 mmHg.",
+      "individual_mode_blurb": "Vegetables, fruits, low-fat dairy, whole grains, lean poultry/fish/nuts, low sodium + red meat. Designed to lower blood pressure.",
+      "example_days": [
+        {
+          "name": "DASH-classic day (Sacks 2001 reference, ~2100 kcal, 2400 mg Na target)",
+          "source_section": "Sacks 2001 Methods + Appendix Table 1 (DASH menu)",
+          "foods": [
+            {"food_id": 3737, "mass_g": 80, "comment": "bread, whole wheat (whole-grain serving)"},
+            {"food_id": 1704, "mass_g": 120, "comment": "banana"},
+            {"food_id": 114,  "mass_g": 240, "comment": "milk, fluid, skim (low-fat dairy ≥ 2 svg/d)"},
+            {"food_id": 555,  "mass_g": 100, "comment": "chicken, broiler, meat+skin, raw (lean poultry)"},
+            {"food_id": 2374, "mass_g": 90,  "comment": "broccoli (≥ 4-5 vegetable svg/d)"},
+            {"food_id": 2589, "mass_g": 25,  "comment": "walnuts (nuts/seeds/legumes ≥ 4-5/wk)"},
+            {"food_id": 700589, "mass_g": 130, "comment": "orange, raw"}
+          ]
+        },
+        {
+          "name": "DASH meal-prep day with sweet-potato + cottage-cheese",
+          "source_section": "Sacks 2001 Appendix Table 1 (variation menu)",
+          "foods": [
+            {"food_id": 3737, "mass_g": 60,  "comment": "whole-wheat bread"},
+            {"food_id": 25,   "mass_g": 100, "comment": "cottage cheese, creamed (low-fat dairy)"},
+            {"food_id": 555,  "mass_g": 100, "comment": "chicken breast"},
+            {"food_id": 2213, "mass_g": 80,  "comment": "spinach, raw"},
+            {"food_id": 2241, "mass_g": 150, "comment": "sweet potato, baked"},
+            {"food_id": 1511, "mass_g": 70,  "comment": "avocado, raw"}
+          ]
+        },
+        {
+          "name": "DASH whole-grain emphasis day",
+          "source_section": "Appel 1997 Methods (DASH 'Fruits & Vegetables + Combination' arm)",
+          "foods": [
+            {"food_id": 4457, "mass_g": 200, "comment": "macaroni, whole wheat, cooked (whole-grain ≥ 7-8 svg/d)"},
+            {"food_id": 114,  "mass_g": 240, "comment": "skim milk"},
+            {"food_id": 3393, "mass_g": 100, "comment": "lentils, boiled (legumes)"},
+            {"food_id": 2395, "mass_g": 100, "comment": "kale"},
+            {"food_id": 2241, "mass_g": 100, "comment": "sweet potato"},
+            {"food_id": 3414, "mass_g": 20,  "comment": "peanut butter (nut spread)"}
+          ]
+        }
+      ]
+    },
+    {
+      "pattern_id": "western",
+      "display_name": "Western / Standard American",
+      "literature_anchor": "Krebs-Smith SM, Reedy J, Bosire C. Healthfulness of the U.S. food supply: little improvement despite decades of dietary guidance. Am J Prev Med 2010;38(5):472-477. NHANES 2015-2018 mean intake distribution (Brassard 2022b reports a comparable Canadian mean HEFI = 43.1/80, Table A2 p. 591).",
+      "outcome_evidence_reused": "Comparator baseline — NO positive outcome claim. Higher Western adherence associates with higher CVD/T2D incidence in cohort studies (cited e.g. Hu 2002 Curr Opin Lipidol 13:3 for the original PCA-derived Western pattern definition).",
+      "individual_mode_blurb": "Refined grains, red + processed meat, sweets, sugary beverages, ultra-processed snacks. The NHANES population average — comparator baseline, not aspirational.",
+      "example_days": [
+        {
+          "name": "American fast-food day (~2400 kcal, high added sugar + Na)",
+          "source_section": "Krebs-Smith 2010 Table 2 (NHANES food-group intake distribution)",
+          "foods": [
+            {"food_id": 4066, "mass_g": 120, "comment": "bread, white, commercial (refined grain)"},
+            {"food_id": 2683, "mass_g": 150, "comment": "beef, ground, lean, raw (red meat)"},
+            {"food_id": 700206, "mass_g": 100, "comment": "french fries, deep fried (WAFCT-sourced fries)"},
+            {"food_id": 2920, "mass_g": 350, "comment": "cola, fast-food (sugar-sweetened beverage)"},
+            {"food_id": 4163, "mass_g": 100, "comment": "ice cream, vanilla, 11% MF (dessert)"}
+          ]
+        },
+        {
+          "name": "American convenience-food day (frozen + snacks)",
+          "source_section": "Krebs-Smith 2010 Table 2 (typical NHANES intake)",
+          "foods": [
+            {"food_id": 4066, "mass_g": 100, "comment": "white bread"},
+            {"food_id": 4464, "mass_g": 200, "comment": "spaghetti, enriched (refined grain)"},
+            {"food_id": 2683, "mass_g": 130, "comment": "ground beef, lean"},
+            {"food_id": 4117, "mass_g": 40,  "comment": "potato chips, BBQ"},
+            {"food_id": 2920, "mass_g": 350, "comment": "cola"},
+            {"food_id": 4157, "mass_g": 100, "comment": "ice cream, vanilla, rich, 16% MF"}
+          ]
+        },
+        {
+          "name": "American breakfast + diner day",
+          "source_section": "Krebs-Smith 2010 Table 2",
+          "foods": [
+            {"food_id": 4066, "mass_g": 100, "comment": "white bread (toast)"},
+            {"food_id": 125,  "mass_g": 100, "comment": "egg, raw (scrambled with butter)"},
+            {"food_id": 2683, "mass_g": 150, "comment": "ground beef (burger)"},
+            {"food_id": 4117, "mass_g": 30,  "comment": "potato chips"},
+            {"food_id": 2920, "mass_g": 350, "comment": "cola"},
+            {"food_id": 4163, "mass_g": 80,  "comment": "ice cream"}
+          ]
+        }
+      ]
+    },
+    {
+      "pattern_id": "vegetarian",
+      "display_name": "Vegetarian (lacto-ovo)",
+      "literature_anchor": "Orlich MJ, Singh PN, Sabaté J, et al. Vegetarian dietary patterns and mortality in Adventist Health Study 2. JAMA Intern Med 2013;173(13):1230-1238.",
+      "outcome_evidence_reused": "Adventist Health Study 2 (N=73,308): vegetarian vs nonvegetarian all-cause mortality HR 0.88 (95% CI 0.80-0.97); lacto-ovo vegetarian HR 0.91.",
+      "individual_mode_blurb": "Plant foods + dairy + eggs, no meat / poultry / fish. Wide variation in healthfulness depending on processed-food share.",
+      "example_days": [
+        {
+          "name": "Lacto-ovo balanced day with whole grains + legumes",
+          "source_section": "Orlich 2013 Table 1 (lacto-ovo dietary characteristics)",
+          "foods": [
+            {"food_id": 3737, "mass_g": 80,  "comment": "bread, whole wheat"},
+            {"food_id": 125,  "mass_g": 100, "comment": "egg, raw (cooked as omelette)"},
+            {"food_id": 108,  "mass_g": 40,  "comment": "feta cheese"},
+            {"food_id": 114,  "mass_g": 200, "comment": "skim milk"},
+            {"food_id": 3393, "mass_g": 100, "comment": "lentils, boiled"},
+            {"food_id": 2374, "mass_g": 100, "comment": "broccoli"}
+          ]
+        },
+        {
+          "name": "Indian-style vegetarian day (rice + dal + paneer)",
+          "source_section": "Orlich 2013 supplementary characterisation",
+          "foods": [
+            {"food_id": 4523, "mass_g": 200, "comment": "rice, white, long-grain, cooked"},
+            {"food_id": 3393, "mass_g": 120, "comment": "lentils, boiled (dal)"},
+            {"food_id": 3389, "mass_g": 80,  "comment": "chickpeas (channa)"},
+            {"food_id": 2213, "mass_g": 100, "comment": "spinach, raw (saag)"},
+            {"food_id": 25,   "mass_g": 80,  "comment": "cottage cheese (paneer analogue)"}
+          ]
+        },
+        {
+          "name": "Mediterranean-leaning vegetarian day",
+          "source_section": "Orlich 2013 + Mediterranean-vegetarian overlap variant",
+          "foods": [
+            {"food_id": 4464, "mass_g": 200, "comment": "pasta, enriched, cooked"},
+            {"food_id": 419,  "mass_g": 25,  "comment": "olive oil"},
+            {"food_id": 108,  "mass_g": 50,  "comment": "feta"},
+            {"food_id": 3393, "mass_g": 80,  "comment": "lentils"},
+            {"food_id": 2213, "mass_g": 90,  "comment": "spinach"},
+            {"food_id": 2589, "mass_g": 25,  "comment": "walnuts"}
+          ]
+        }
+      ]
+    },
+    {
+      "pattern_id": "vegan",
+      "display_name": "Vegan",
+      "literature_anchor": "Orlich MJ, Singh PN, Sabaté J, et al. Vegetarian dietary patterns and mortality in Adventist Health Study 2. JAMA Intern Med 2013;173(13):1230-1238 (vegan subgroup).",
+      "outcome_evidence_reused": "Adventist Health Study 2 vegan subgroup all-cause mortality HR 0.85 (95% CI 0.73-1.01). Note: Adventist cohort is healthier than general population, so absolute risk reductions may not generalise.",
+      "individual_mode_blurb": "Plant foods only — no animal products. Higher reliance on legumes / tofu / fortified plant beverages for protein and B12/calcium.",
+      "example_days": [
+        {
+          "name": "Whole-food vegan day (~1900 kcal)",
+          "source_section": "Orlich 2013 Table 1 (vegan dietary characteristics)",
+          "foods": [
+            {"food_id": 4523, "mass_g": 200, "comment": "rice, white, long-grain, cooked"},
+            {"food_id": 3404, "mass_g": 120, "comment": "tofu, firm, raw (calcium-sulphate-set)"},
+            {"food_id": 3393, "mass_g": 100, "comment": "lentils, boiled"},
+            {"food_id": 2374, "mass_g": 100, "comment": "broccoli"},
+            {"food_id": 2213, "mass_g": 80,  "comment": "spinach"},
+            {"food_id": 2589, "mass_g": 25,  "comment": "walnuts"}
+          ]
+        },
+        {
+          "name": "Mediterranean-leaning vegan day",
+          "source_section": "Orlich 2013 + Mediterranean-vegan overlap variant",
+          "foods": [
+            {"food_id": 4464, "mass_g": 200, "comment": "pasta, enriched, cooked"},
+            {"food_id": 419,  "mass_g": 30,  "comment": "olive oil"},
+            {"food_id": 3393, "mass_g": 100, "comment": "lentils"},
+            {"food_id": 2395, "mass_g": 80,  "comment": "kale"},
+            {"food_id": 3389, "mass_g": 80,  "comment": "chickpeas"},
+            {"food_id": 1511, "mass_g": 80,  "comment": "avocado, raw"}
+          ]
+        },
+        {
+          "name": "Asian-leaning vegan day (tofu + soy milk + greens)",
+          "source_section": "Orlich 2013 + Asian-vegan variant",
+          "foods": [
+            {"food_id": 4523, "mass_g": 200, "comment": "rice, white, cooked"},
+            {"food_id": 3404, "mass_g": 150, "comment": "tofu, firm"},
+            {"food_id": 5241, "mass_g": 250, "comment": "plant-based beverage, soy, unenriched"},
+            {"food_id": 2395, "mass_g": 100, "comment": "kale"},
+            {"food_id": 3389, "mass_g": 60,  "comment": "chickpeas"}
+          ]
+        }
+      ]
+    },
+    {
+      "pattern_id": "cfg_healthy",
+      "display_name": "Canada's Food Guide 2019 (CFG-Healthy)",
+      "literature_anchor": "Health Canada. Canada's Food Guide 2019. Brassard D, Elvidge Munene LA, St-Pierre S, et al. Development of the Healthy Eating Food Index (HEFI)-2019. Appl Physiol Nutr Metab 2022;47:595-610. Component definitions: B6 Tables 1-2 p. 597-599.",
+      "outcome_evidence_reused": "Not outcome-validated (Brassard 2022b Discussion p. 589 explicitly: 'link between HEFI-2019 and disease endpoints is undetermined'); descriptive comparator anchored to the top quintile of the Canadian population (HEFI ≥ 65/80 per Brassard 2022b Table A2 p. 591).",
+      "individual_mode_blurb": "Half-plate vegetables + fruits, whole-grain protein, plant-protein emphasis, water as the drink of choice. The Health Canada 2019 recommendation.",
+      "example_days": [
+        {
+          "name": "CFG-classic balanced day (half plate veg/fruit)",
+          "source_section": "Canada's Food Guide 2019 plate visual + Brassard 2022a Tables 1-2 (HEFI components)",
+          "foods": [
+            {"food_id": 4457, "mass_g": 200, "comment": "macaroni, whole wheat, cooked (whole grain)"},
+            {"food_id": 2374, "mass_g": 100, "comment": "broccoli"},
+            {"food_id": 2395, "mass_g": 100, "comment": "kale"},
+            {"food_id": 1704, "mass_g": 120, "comment": "banana"},
+            {"food_id": 3049, "mass_g": 90,  "comment": "salmon, Atlantic, wild, raw (protein)"},
+            {"food_id": 3393, "mass_g": 80,  "comment": "lentils (plant protein)"}
+          ]
+        },
+        {
+          "name": "CFG protein-mix day",
+          "source_section": "Brassard 2022a Tables 1-2 (HEFI components C4 + C5)",
+          "foods": [
+            {"food_id": 4523, "mass_g": 180, "comment": "rice, white, cooked (note: CFG prefers whole grain)"},
+            {"food_id": 555,  "mass_g": 100, "comment": "chicken, broiler, raw"},
+            {"food_id": 2374, "mass_g": 100, "comment": "broccoli"},
+            {"food_id": 2241, "mass_g": 120, "comment": "sweet potato, baked"},
+            {"food_id": 3393, "mass_g": 80,  "comment": "lentils (plant protein)"},
+            {"food_id": 3404, "mass_g": 80,  "comment": "tofu (plant protein)"}
+          ]
+        },
+        {
+          "name": "CFG plant-emphasis day",
+          "source_section": "Brassard 2022a Table 2 (C5 plant-protein ≥ 50% of protein foods)",
+          "foods": [
+            {"food_id": 3737, "mass_g": 80,  "comment": "bread, whole wheat"},
+            {"food_id": 3404, "mass_g": 120, "comment": "tofu, firm"},
+            {"food_id": 2395, "mass_g": 100, "comment": "kale"},
+            {"food_id": 2241, "mass_g": 150, "comment": "sweet potato"},
+            {"food_id": 3389, "mass_g": 80,  "comment": "chickpeas"},
+            {"food_id": 2589, "mass_g": 25,  "comment": "walnuts"}
+          ]
+        }
+      ]
+    },
+    {
+      "pattern_id": "west_african_staple",
+      "display_name": "West African Staple",
+      "literature_anchor": "Vincent A, Grande F, Compaoré E, et al. FAO/INFOODS Food Composition Table for Western Africa (WAFCT 2019). Rome: FAO; 2019 — sheet 09 mixed-dish canonical recipes (195 recipes documented across Burkina Faso / Mali / Senegal / Nigeria + regional staples).",
+      "outcome_evidence_reused": "Descriptive only — no outcome claim. Pattern is a regional descriptor for users of West African origin or recently relocated, complementing the WAFCT-EXTEND food-database integration (manuscript §3.8.5).",
+      "individual_mode_blurb": "Fonio / millet / sorghum / cassava staples, dawadawa seasoning, baobab-leaf or melon-seed (egusi) sauces, fish (catfish, tilapia), red palm oil.",
+      "example_days": [
+        {
+          "name": "Burkina Faso traditional day (fonio porridge + sorghum tô + baobab-leaf sauce)",
+          "source_section": "WAFCT 2019 sheet 09 mixed-dish recipes, Burkina Faso entries 01_172, 04_087, 09_108",
+          "foods": [
+            {"food_id": 700023, "mass_g": 200, "comment": "fonio, white, whole grains, boiled (porridge)"},
+            {"food_id": 700421, "mass_g": 100, "comment": "baobab, leaves, fresh, boiled (sauce base)"},
+            {"food_id": 700532, "mass_g": 80,  "comment": "tomato, red, ripe, boiled (sauce)"},
+            {"food_id": 700807, "mass_g": 100, "comment": "catfish, fillet, boiled (protein)"},
+            {"food_id": 700280, "mass_g": 10,  "comment": "African locust bean, fermented (dawadawa/soumbala) — seasoning"}
+          ]
+        },
+        {
+          "name": "Sahel-style millet + jollof-style rice day",
+          "source_section": "WAFCT 2019 sheet 09 + Vincent 2019 §2.3 (regional staples)",
+          "foods": [
+            {"food_id": 700002, "mass_g": 150, "comment": "fonio, black, whole grains, raw (millet-style staple)"},
+            {"food_id": 700153, "mass_g": 200, "comment": "rice, white, polished, boiled (jollof rice base)"},
+            {"food_id": 700532, "mass_g": 100, "comment": "tomato, boiled (jollof sauce)"},
+            {"food_id": 700807, "mass_g": 100, "comment": "catfish"},
+            {"food_id": 700280, "mass_g": 15,  "comment": "dawadawa"}
+          ]
+        },
+        {
+          "name": "Mixed-grain day with milk + recipe-style boalboal",
+          "source_section": "WAFCT 2019 sheet 09 entries 01_177 (Boalboal), 04_002 (baobab dried)",
+          "foods": [
+            {"food_id": 700004, "mass_g": 200, "comment": "boalboal (millet balls with fried fish and vegetables — composite WAFCT recipe)"},
+            {"food_id": 700421, "mass_g": 100, "comment": "baobab leaves, boiled"},
+            {"food_id": 700902, "mass_g": 200, "comment": "milk, cow, whole, pasteurized 3.5% (WAFCT)"},
+            {"food_id": 700532, "mass_g": 80,  "comment": "tomato, boiled"}
+          ]
+        }
+      ]
+    },
+    {
+      "pattern_id": "eat_lancet",
+      "display_name": "EAT-Lancet planetary-health",
+      "literature_anchor": "Willett W, Rockström J, Loken B, et al. Food in the Anthropocene: the EAT-Lancet Commission on healthy diets from sustainable food systems. Lancet 2019;393:447-492. EAT-Lancet Commission 2.0. Lancet 2025 (in press).",
+      "outcome_evidence_reused": "Planetary-health diet projected to avoid ~11 million premature deaths/year globally vs current intake (Willett 2019 §6 + Table 2). Note: targets are aspirational and population-level, NOT personal-risk predictions.",
+      "individual_mode_blurb": "Plant-forward, modest fish, very limited red meat + dairy + added sugar. Half-plate vegetables + fruits, plant-protein emphasis. Designed jointly for human health + planetary boundaries.",
+      "researcher_only": true,
+      "example_days": [
+        {
+          "name": "Willett 2019 reference diet (~2500 kcal, planetary-health targets)",
+          "source_section": "Willett 2019 Table 1 p. 451 (reference daily intake of food groups in g)",
+          "foods": [
+            {"food_id": 4523, "mass_g": 232, "comment": "rice (whole grains 232 g/d target)"},
+            {"food_id": 3404, "mass_g": 75,  "comment": "tofu (legumes 50-100 g/d)"},
+            {"food_id": 3393, "mass_g": 50,  "comment": "lentils (legumes)"},
+            {"food_id": 2374, "mass_g": 100, "comment": "broccoli (vegetables 300 g/d)"},
+            {"food_id": 2395, "mass_g": 100, "comment": "kale (vegetables)"},
+            {"food_id": 2589, "mass_g": 25,  "comment": "walnuts (nuts 50 g/d)"},
+            {"food_id": 1704, "mass_g": 100, "comment": "banana (fruits 200 g/d)"}
+          ]
+        },
+        {
+          "name": "Mediterranean-aligned EAT-Lancet variant",
+          "source_section": "Willett 2019 Table 1 + §4 (regional adaptation guidance)",
+          "foods": [
+            {"food_id": 4457, "mass_g": 200, "comment": "macaroni, whole wheat, cooked"},
+            {"food_id": 419,  "mass_g": 30,  "comment": "olive oil (unsaturated oils 40 g/d)"},
+            {"food_id": 3404, "mass_g": 75,  "comment": "tofu"},
+            {"food_id": 3393, "mass_g": 80,  "comment": "lentils"},
+            {"food_id": 2374, "mass_g": 100, "comment": "broccoli"},
+            {"food_id": 2589, "mass_g": 25,  "comment": "walnuts"},
+            {"food_id": 1511, "mass_g": 70,  "comment": "avocado"}
+          ]
+        }
+      ]
+    }
+  ]
+}

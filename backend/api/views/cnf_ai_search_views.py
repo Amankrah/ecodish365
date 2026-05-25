@@ -28,7 +28,7 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
 
 from django.conf import settings
 from django.core.cache import cache
@@ -44,10 +44,13 @@ logger = logging.getLogger(__name__)
 # Single-query LLM rank: ~1k prompt + 50 output tokens ≈ 0.18 ¢ → round 0.1 ¢.
 # Recipe decompose: 2 LLM calls per ingredient × ~5 ingredients ≈ 0.5 ¢.
 # Recall-24h: up to 6 decomposes per recall → 30 tokens, capped to 30¢.
+# Dietary-pattern: 1¢ baseline (no LLM); +1¢ when include_narrative=true.
 _COST_SEARCH_CENTS = 1                # in 0.1¢ units → 0.1¢
 _COST_DECOMPOSE_CENTS = 5             # 0.5¢
 _COST_RECALL_24H_PER_MEAL_CENTS = 5   # same as decompose; recall composes them
 _COST_RECALL_24H_CAP_CENTS = 30       # hard ceiling regardless of meal count
+_COST_DIETARY_PATTERN_CENTS = 1       # no LLM by default
+_COST_DIETARY_PATTERN_NARRATIVE_CENTS = 2  # +1¢ when include_narrative=true
 
 
 def _client_ip(request) -> str:
@@ -563,6 +566,291 @@ def recall_24h(request):
     result_dict = result.to_dict()
     payload = _strip_recall_individual_mode_fields(result_dict, user_type)
     explanations = _build_recall_explanations(result_dict, user_type)
+    return Response(
+        {'success': True, 'result': payload, 'explanations': explanations},
+        status=status.HTTP_200_OK,
+    )
+
+
+# --- /api/dietary-pattern/classify/ -------------------------------------
+
+_NARRATIVE_SYSTEM_PROMPT = (
+    "You are explaining a dietary-pattern resemblance result to a "
+    "{user_type} user.\n\n"
+    "Input is the top-3 prototype resemblances (cosine values), the user's "
+    "top-5 foods by mass, and the confidence band.\n\n"
+    "Generate 2-3 short sentences total:\n"
+    "- Sentence 1: name the top pattern + cosine (as a percentage) + a "
+    "1-clause reason citing 1-2 user foods that drove the match.\n"
+    "- Sentence 2: name co-leading patterns if any, OR contrast briefly "
+    "with the second-place pattern.\n"
+    "- Sentence 3 (optional): one audience-appropriate observation or a "
+    "concrete swap if they wanted to shift toward a target — NOT a health "
+    "claim, NOT outcome wording.\n\n"
+    "RULES:\n"
+    "- NEVER say \"you eat\" or \"you are eating\" — say "
+    "\"today's food choices resemble\".\n"
+    "- NEVER quote outcome studies, mortality numbers, or risk reductions. "
+    "Those are reserved for the researcher-mode citation block.\n"
+    "- Keep it conversational; don't lecture.\n\n"
+    # NB: the literal JSON braces are doubled so Python's str.format() at
+    # render time substitutes only {user_type} and leaves the example JSON
+    # untouched.
+    "Respond with JSON only: {{\"narrative\": \"...\"}}"
+)
+
+
+def _strip_pattern_individual_mode_fields(
+    payload: Dict[str, Any], user_type: str,
+) -> Dict[str, Any]:
+    """Individual mode strips researcher-only fields per the matcher's
+    JSON `individual_mode_visible` / `researcher_mode_visible` config.
+
+    Already filtered at the matcher (EAT-Lancet prototype excluded for
+    individual mode). This additionally redacts per-prototype researcher-
+    only fields (literature_anchor, outcome_evidence_reused, distinctive
+    user foods) from the response body.
+    """
+    if user_type != 'individual':
+        return payload
+    redacted = dict(payload)
+    redacted_resemblances = []
+    for r in payload.get('resemblances', []):
+        rr = dict(r)
+        rr['literature_anchor'] = ''
+        rr['outcome_evidence_reused'] = ''
+        rr['distinctive_user_foods'] = []
+        redacted_resemblances.append(rr)
+    redacted['resemblances'] = redacted_resemblances
+    return redacted
+
+
+def _build_pattern_explanations(
+    result_dict: Dict[str, Any], user_type: str, narrative: Optional[str],
+) -> Dict[str, Any]:
+    """Audience-aware explanations block. Always carries the mandatory
+    single-day caveat. Researcher / policy adds methodology + the per-
+    prototype literature anchor in the response.
+
+    `narrative` (when include_narrative=true) is shipped here too so the
+    frontend has a single explanations dict to render.
+    """
+    base_caveat_individual = (
+        "Today's day-vector is one snapshot of your eating. For claims "
+        "about your usual eating pattern, log multiple recall days. The "
+        "patterns shown describe the SHAPE of today's food choices — they "
+        "are NOT personal health predictions."
+    )
+    base_caveat_researcher = (
+        "MANDATORY CAVEAT: this resemblance is computed on a single-day "
+        "ingredient list and characterises only the shape of one day's "
+        "food selection. It is NOT a usual-eating-pattern classifier — "
+        "same Brassard 2022b limitation as HEFI-2019 from a single 24-h "
+        "recall (Appl Physiol Nutr Metab 2022;47:611-624 Discussion p. 588). "
+        "Prototype outcome citations refer to populations following each "
+        "pattern long-term in randomised / cohort studies (Trichopoulou "
+        "2003, Estruch 2013 PREDIMED, Sacks 2001 DASH, Orlich 2013 AHS-2), "
+        "NOT to single-day resemblance. Do not interpret a high "
+        "Mediterranean-resemblance cosine as a personal CVD-risk reduction."
+    )
+
+    out: Dict[str, Any] = {}
+    if user_type == 'individual':
+        out['plain_summary'] = {
+            'title': "Today's dietary pattern",
+            'message': (
+                f"Today's food choices most closely resemble "
+                f"{result_dict.get('top_pattern', '?')} pattern "
+                f"(confidence: {result_dict.get('top_pattern_confidence', '?')})."
+            ),
+        }
+        out['mandatory_caveat'] = {
+            'title': 'About this result',
+            'message': base_caveat_individual,
+        }
+    else:
+        out['mandatory_caveat'] = {
+            'title': 'Mandatory caveat (single-day resemblance)',
+            'message': base_caveat_researcher,
+        }
+        out['methodology'] = {
+            'title': 'Method',
+            'message': (
+                "Mass-weighted day vector built from per-food embeddings "
+                "(text-embedding-3-small, 1,536-dim, L2-normalised) of the "
+                "user's aggregated ingredient list, cosine-scored against "
+                "literature-anchored prototype vectors (mean of curated "
+                "example days per pattern). Softmax temperature T=0.1. "
+                "Confidence bands: high if top cosine ≥ 0.75 AND ≥ 0.05 "
+                "gap to runner-up; moderate if ≥ 0.60; low otherwise. "
+                "Co-leading patterns within 0.05 cosine of top reported "
+                "jointly. See DIETARY_PATTERN_JUSTIFICATION.md for the "
+                "full design memo."
+            ),
+        }
+    if narrative:
+        out['narrative'] = {
+            'title': 'Plain-language summary',
+            'message': narrative,
+        }
+    return out
+
+
+def _generate_narrative(
+    result_dict: Dict[str, Any], user_type: str, foods: List[Dict[str, Any]],
+) -> Optional[str]:
+    """Optional LLM narrative via the matcher's existing chat_json_client.
+
+    Returns None on any failure (the resemblance result still ships).
+    """
+    try:
+        from api.services.cnf_matcher import get_default_matcher
+        from api.cnf_cache import get_api_cnf_pipeline
+        client = get_default_matcher().chat_json_client
+        if client is None:
+            return None
+        pipeline = get_api_cnf_pipeline()
+
+        # Build a compact user-side context: top-5 foods by mass, top-3 patterns.
+        top_foods = sorted(foods, key=lambda f: -float(f.get('mass_g', 0)))[:5]
+        fn = pipeline.food_name_df
+        food_names = []
+        for f in top_foods:
+            row = fn[fn['FoodID'] == int(f['food_id'])][:1]
+            name = str(row.iloc[0]['FoodDescription'])[:50] if len(row) else f'FoodID {f["food_id"]}'
+            food_names.append(f'{f["mass_g"]:.0f}g {name}')
+
+        top3 = result_dict.get('resemblances', [])[:3]
+        patterns_summary = '; '.join(
+            f'{r["display_name"]} ({r["cosine"] * 100:.0f}%)' for r in top3
+        )
+        confidence = result_dict.get('top_pattern_confidence', 'moderate')
+        co_leading = result_dict.get('co_leading') or []
+
+        user = (
+            f"User's day (top-5 foods by mass): {' | '.join(food_names)}\n\n"
+            f"Top-3 resemblances: {patterns_summary}\n"
+            f"Confidence band: {confidence}\n"
+            f"Co-leading patterns within 5% cosine of the top: "
+            f"{', '.join(co_leading) if co_leading else 'none'}\n\n"
+            "Generate the 2-3 sentence narrative now."
+        )
+
+        resp = client.chat_completion_json(
+            system=_NARRATIVE_SYSTEM_PROMPT.format(user_type=user_type),
+            user=user,
+            temperature=0.0,
+            max_tokens=200,
+        )
+        if isinstance(resp, dict):
+            return str(resp.get('narrative', ''))[:600] or None
+        if isinstance(resp, str):
+            return resp[:600]
+        return None
+    except Exception as exc:  # noqa: BLE001
+        logger.warning('Dietary-pattern narrative generation failed: %s', exc)
+        return None
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def dietary_pattern_classify(request):
+    """Score a daily ingredient list against the prototype-pattern library.
+
+    Request body:
+        {
+            "foods": [{"food_id": 4471, "mass_g": 100}, ...],
+            "user_type": "individual",
+            "include_narrative": false
+        }
+
+    Response (200):
+        {
+            "success": true,
+            "result": { ... PatternResemblanceResult.to_dict() ... },
+            "explanations": { mandatory_caveat + methodology + narrative? }
+        }
+
+    Errors: 400 (invalid input), 429 (rate limit), 503 (circuit breaker), 500.
+    Cost: 1¢ baseline; 2¢ when include_narrative=true.
+    """
+    foods_raw = request.data.get('foods')
+    if not isinstance(foods_raw, list) or not foods_raw:
+        return Response({
+            'success': False,
+            'error': 'invalid_request',
+            'message': 'Field "foods" is required (non-empty list of {food_id, mass_g}).',
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    cleaned: List[Dict[str, Any]] = []
+    for f in foods_raw:
+        if not isinstance(f, dict):
+            return Response({
+                'success': False, 'error': 'invalid_request',
+                'message': 'Each food must be an object with food_id and mass_g.',
+            }, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            fid = int(f.get('food_id'))
+            mass = float(f.get('mass_g'))
+        except (TypeError, ValueError):
+            continue
+        if fid <= 0 or mass <= 0:
+            continue
+        cleaned.append({'food_id': fid, 'mass_g': mass})
+
+    if not cleaned:
+        return Response({
+            'success': False, 'error': 'invalid_request',
+            'message': 'No foods with positive food_id and mass_g.',
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    user_type = str(request.data.get('user_type', 'individual'))
+    if user_type not in ('individual', 'researcher', 'policy'):
+        user_type = 'individual'
+
+    include_narrative = bool(request.data.get('include_narrative', False))
+
+    cost = (_COST_DIETARY_PATTERN_NARRATIVE_CENTS if include_narrative
+            else _COST_DIETARY_PATTERN_CENTS)
+    rate_err = _enforce_rate_limit(
+        request, kind='dietary_pattern', cost_override_cents=cost,
+    )
+    if rate_err is not None:
+        return rate_err
+
+    try:
+        from api.services.dietary_pattern import get_default_pattern_matcher
+        matcher = get_default_pattern_matcher()
+        visible = matcher.visible_for(user_type)
+        # Individual mode skips per-prototype distinctive-foods computation
+        # — they're researcher-only response fields anyway.
+        result = matcher.classify(
+            cleaned,
+            prototypes_visible=visible,
+            include_distinctive_foods=(user_type != 'individual'),
+        )
+    except FileNotFoundError as exc:
+        logger.error('Dietary-pattern classify: prototypes file missing — %s', exc)
+        return Response({
+            'success': False, 'error': 'prototypes_not_built',
+            'message': ('Dietary-pattern classifier not configured: prototypes JSON '
+                        'is missing at backend/api/data/dietary_pattern_prototypes.json.'),
+        }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    except Exception as exc:  # noqa: BLE001
+        logger.exception('Dietary-pattern classify failed for n_foods=%d', len(cleaned))
+        return Response({
+            'success': False, 'error': 'internal_error',
+            'message': f'Dietary-pattern classification failed: {exc!r}',
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    result_dict = result.to_dict()
+    payload = _strip_pattern_individual_mode_fields(result_dict, user_type)
+
+    narrative: Optional[str] = None
+    if include_narrative and result.matched:
+        narrative = _generate_narrative(result_dict, user_type, cleaned)
+
+    explanations = _build_pattern_explanations(result_dict, user_type, narrative)
     return Response(
         {'success': True, 'result': payload, 'explanations': explanations},
         status=status.HTTP_200_OK,

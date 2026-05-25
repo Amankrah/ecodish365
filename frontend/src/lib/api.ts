@@ -255,6 +255,52 @@ export interface CNFDecomposedRecipe {
   raw_llm_response?: string | null;           // null in individual mode
 }
 
+// DIET-PATTERN-1 (2026-05-24): dietary-pattern resemblance result payload
+// from /api/dietary-pattern/classify/. Mirrors backend
+// `PatternResemblanceResult.to_dict()` in
+// backend/api/services/dietary_pattern.py.
+export interface PatternResemblance {
+  pattern_id: string;
+  display_name: string;
+  cosine: number;                       // raw cosine [0, 1]
+  softmax_share: number;                // softmax-normalised [0, 1]
+  distinctive_user_foods: Array<{       // empty for individual mode
+    food_id: number;
+    mass_g: number;
+    cosine_to_prototype: number;
+    contribution: number;
+  }>;
+  literature_anchor: string;            // empty for individual mode
+  outcome_evidence_reused: string;      // empty for individual mode
+  individual_mode_blurb: string;        // always shown
+}
+
+export interface PatternResemblanceResult {
+  matched: boolean;
+  top_pattern: string | null;
+  top_pattern_confidence: 'high' | 'moderate' | 'low';
+  co_leading: string[];
+  resemblances: PatternResemblance[];
+  n_foods: number;
+  n_foods_unresolved: number;
+  total_mass_g: number;
+  fallback_reason: string | null;
+  timing_ms: number;
+  cache_hit: boolean;
+}
+
+export interface PatternExplanations {
+  plain_summary?: { title: string; message: string };
+  mandatory_caveat?: { title: string; message: string };
+  methodology?: { title: string; message: string };
+  narrative?: { title: string; message: string };
+}
+
+export interface PatternClassifyResponse {
+  result: PatternResemblanceResult;
+  explanations: PatternExplanations;
+}
+
 // AI-MATCH-2 (2026-05-24): aggregated 24-h dietary recall payload from
 // /api/recipes/recall-24h/. Mirrors backend `CNFRecall24hResult.to_dict()`
 // in backend/api/services/cnf_recall_24h.py.
@@ -405,6 +451,30 @@ export class CNFApiService {
       source: options.source || 'both',
     });
     return response.data.result as CNFDecomposedRecipe;
+  }
+
+  // DIET-PATTERN-1 (2026-05-24): score a daily ingredient list against
+  // the prototype-pattern library (Mediterranean / DASH / Western /
+  // Vegetarian / Vegan / CFG-Healthy / West African Staple + optional
+  // EAT-Lancet). Returns top-3 resemblances + confidence band + audience-
+  // aware caveat. Optional LLM narrative when include_narrative=true.
+  // Cost: 1¢ baseline, 2¢ with narrative.
+  static async classifyDietaryPattern(
+    foods: Array<{ food_id: number; mass_g: number }>,
+    options: {
+      userType?: 'individual' | 'researcher' | 'policy';
+      includeNarrative?: boolean;
+    } = {},
+  ): Promise<PatternClassifyResponse> {
+    const response = await api.post('/dietary-pattern/classify/', {
+      foods,
+      user_type: options.userType || 'individual',
+      include_narrative: options.includeNarrative ?? false,
+    });
+    return {
+      result: response.data.result as PatternResemblanceResult,
+      explanations: response.data.explanations as PatternExplanations,
+    };
   }
 
   // AI-MATCH-2 (2026-05-24): occasion-by-occasion 24-h dietary recall →

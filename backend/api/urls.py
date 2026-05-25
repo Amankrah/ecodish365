@@ -157,6 +157,18 @@ urlpatterns = [
     path('recipes/recall-24h/', cnf_ai_search_views.recall_24h, name='recall_24h'),
 
     # =============================================================================
+    # DIET-PATTERN-1 (2026-05-24) — dietary-pattern resemblance classifier
+    # =============================================================================
+    # Daily ingredient list → cosine resemblance vs 7 (+1 optional) literature-
+    # anchored prototype patterns (Mediterranean, DASH, Western, Vegetarian,
+    # Vegan, CFG-Healthy, West African Staple, optional EAT-Lancet). Mass-
+    # weighted day vectors in the same embedding space as the matcher; reuses
+    # cnf_corpus_embeddings.npz. Per DIETARY_PATTERN_JUSTIFICATION.md.
+    path('dietary-pattern/classify/',
+         cnf_ai_search_views.dietary_pattern_classify,
+         name='dietary_pattern_classify'),
+
+    # =============================================================================
     # User Management & Social Features
     # =============================================================================
     path('users/', include('users.urls')),
