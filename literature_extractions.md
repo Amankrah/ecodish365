@@ -3092,11 +3092,246 @@ E29 is the foundational EAT–Lancet planetary-health citation for our **researc
 
 ---
 
-*Pending: papers E30 through E32.*
+### E32. Heller, Keoleian, Willett (2013) — Diet-level LCA + nutritional quality framework (EST critical review) [★★]
 
-## Group F. Uncertainty quantification in LCA
+**Citation.** Heller MC, Keoleian GA, Willett WC. Toward a life cycle-based, diet-level framework for food environmental impact and nutritional quality assessment: a critical review. Environ Sci Technol. 2013;47(22):12632–12647.
 
-*Pending: papers F33 through F38.*
+**PDF.** [`papers/toward-a-life-cycle-based-diet-level-framework-for-food-environmental-impact-and-nutritional-quality-assessment-a.pdf`](papers/toward-a-life-cycle-based-diet-level-framework-for-food-environmental-impact-and-nutritional-quality-assessment-a.pdf)
+
+**DOI.** 10.1021/es4025113 (received June 2013; published online 23 Oct 2013). **Competing interests.** None declared (p. 12644). Acknowledges Olivier Jolliet and Victor Fulgoni III for framework development input.
+
+**Type.** *Environmental Science & Technology* **Critical Review**: synoptically maps how LCA extends from product-level food studies to **consumption-oriented (meal / diet-level)** assessment, inventories the **LCA-based diet and meal literature** (abstract: **32** studies; §3 notes **48** English-language diet-consumption-impact studies of which the LCA subset drives Table 2), and argues explicitly for **nutrition-grounded functional units** and **nutrition–environment co-assessment** rather than mass-only aggregation — the conceptual ancestor of our separate health (HENI/HEFI lane) and environmental (ReCiPe lane) indicators at the meal boundary.
+
+---
+
+#### Page-cited results and constructs
+
+**Consumption share / motivation (§1, pp. 12632–12633).** Cites developed-country estimates that **food consumption contributes ~15–28 %** of national greenhouse-gas emissions (ref. 4 in paper); highlights water withdrawals, N/P cycle disruption, and land-driven biodiversity loss as systemic food-system pressures.
+
+**Functional-unit–scope map — Figure 2 (pp. 12633–12634).** Stratifies **production-oriented** LCAs (hotspots, comparative technology) from **consumption-oriented** work to the right of the conceptual divide; anchors the paper’s thesis that **mass/volume FUs** suffice for intra-system improvement but break down for **cross-food-type** comparisons where **nutritional roles** differ.
+
+**Demonstrator food table — Table 1 (pp. 12634–12635).** For selected minimally processed items, reports **GHGE** on **four FU bases** (per kg as sold, per serving, per 100 g protein, per 1000 kcal food energy) alongside a **weighted nutrient density score (WNDS)** (nutrients per Arsenault/Fulgoni-style profile: protein, fiber, calcium, unsaturated fat, vitamin C, saturated fat, added sugars, sodium — footnote Table 1). Illustrates **rank reversals** across FUs and flags **hothouse veg** and **air-freighted** perishables as outliers to simple plant-vs-animal generalizations.
+
+**Diet / meal LCA literature register — Table 2 (pp. 12635–12639, extends).** Tabulates geographic scope, **process vs hybrid / EIO** LCAs, indicators (dominated by GHG / CED in the reviewed era), aggregation level (**meal vs diet**), stated **equalizing basis** (often none beyond raw intake mass), and study aim. Notes **81 %** Table-2 studies **process-LCA** aggregate per-kg factors into intake lists (§3.1, p. 12637).
+
+**Nutrition integration taxonomy — §5 (pp. 12639–12641).** Two families: (i) **iso-nutrient meal/diet construction** (energy + protein matching, linear programming with macro/micro constraints + “acceptability constraints” after Macdiarmid et al.), and (ii) **nutrient profiling / diet quality indices** as **FU** or **parallel axis** (examples: NDS vs NRF9.3 altering meal contrasts in Kagi et al.; RDV-capping argument in Kernebeek et al.; MAR/MER/ED stratification vs GHGE in Vieux et al.).
+
+**Integrated mental model — Figure 3 (p. 12641).** **Diet definition → life-cycle supply chains → LCA + nutritional quality assessment**, with optional future harmonization of human-health effect metrics with environmental health endpoints.
+
+**Global Burden of Disease cross-link (§4/§5 narrative, pp. 12638–12640).** Describes **GBD 2010** amalgamation of **14 dietary risk factors** (fruits, vegetables, whole grains, nuts/seeds, milk, fish/fiber/calcium/PUFA lows; red meat, processed meat, SSB, trans fat, sodium highs) as a possible **health baseline** to pair with dietary LCA — aligns with our Group C / HENI provenance even though this review predates Stylianou/NaturFood operationalization.
+
+---
+
+#### Author-flagged limitations and research needs (Discussion §6 — useful for §7 / methods)
+
+1. **Environmental indicator narrowness:** most diet-LCAs of the period focus on **GHGE**; authors call for broadening LCIA + **regionalized food/agriculture inventories** (§6.2, pp. 12641–12642).
+2. **Land-use change (direct/indirect):** can be **16–30 %** of diet GHG in Meier & Christen German scenarios; IPCC guidance exists but **methodological disagreement** persists (§6.2.1, p. 12642).
+3. **Food loss and waste:** ~**¼** of produced food lost globally; US-context **10 % retail / 19 % consumer** loss cited; stresses **consistency** between FBS vs survey “consumption” data (§6.2.2 opening, p. 12642).
+4. **Health–environment non-alignment:** Discussion flags **Vieux et al.** — **higher author-defined nutritional-quality class** associated with **slightly higher** GHGE at population scale in French self-selected diets (low-GHGE starches/sugars confound); “sustainable = healthy” not automatic (§6, pp. 12640–12641).
+5. **Trans-disciplinarity gap:** calls for ongoing **LCA ↔ nutrition science** collaboration on **nutrient indices as FU**; positions **LCSA** as umbrella for social/economic deepening (§6.2, p. 12641).
+6. **System boundary completeness:** notes **agricultural production** often dominates but **household refrigeration + wastage** materially shape full-chain results (§6 opening, p. 12640).
+
+---
+
+#### Three-sentence relevance note
+
+Heller et al. 2013 gives our Call-1 narrative a **peer-reviewed, Willett-co-authored** precedent for treating **meals/diets as the natural unit** where **environmental inventories** (today: ReCiPe + Agribalyse/CNF linkage) meet **nutritional or health metrics** (today: HEFI + HENI rather than a single hybrid FU). Its **Figure 2 / Table 1** arm us for §2–§3 exposition on **functional-unit sensitivity and rank reversals**; **Table 2** historicizes the literature our stack extends; **Figure 3** is a schematic cousin of our dual-score architecture. We should cite it as **framework motivation**, not as justification for any specific numeric factor—while flagging its pre-**ReCiPe 2016**, pre-**GBD2017/2019 HENI**, and **GHG-centric** review scope as inherited limitations our implementation explicitly updates.
+
+---
+
+*Group E — extracted for this manuscript: **E28**, **E29**, **E32** (wishlist 28–29, 32). **Not extracted (de-scoped)** per author choice: wishlist **E30** (IPCC AR6 WGIII ch. 5), **E31** (IRP 2019 Global Resources Outlook).*
+
+### F33. Heijungs (2020) — On the number of Monte Carlo runs in comparative probabilistic LCA [★★]
+
+**Citation.** Heijungs R. On the number of Monte Carlo runs in comparative probabilistic life cycle assessment. Int J Life Cycle Assess. 2020;25(2):394–402.
+
+**DOI.** 10.1007/s11367-019-01698-4 (Received 14 May 2019; Accepted 8 October 2019; Published online 22 October 2019.)
+
+**PDF.** [`papers/On_the_number_of_Monte_Carlo_runs_in_comparative_p.pdf`](papers/On_the_number_of_Monte_Carlo_runs_in_comparative_p.pdf)
+
+**Open access.** Yes — Creative Commons Attribution 4.0 International (CC BY 4.0).
+
+**Type.** Methods article. Combines probability theory review (§2) with two numerical simulation experiments (§3) to question the standard practice of running 1,000–100,000 Monte Carlo iterations in LCA, arguing the number of runs should not exceed the sample sizes used to estimate the input distributions.
+
+---
+
+#### Core argument — precision vs accuracy (§§2.7–2.8, pp. 397–398)
+
+Heijungs draws a fundamental distinction between two properties of a Monte Carlo estimate:
+
+- **Precision** — the width of the confidence interval around the Monte Carlo estimate; decreases with √N_run (more runs → narrower CI).
+- **Accuracy** — how close the estimate is to the true population value; governed entirely by the accuracy of the *input parameter estimates* (μ̂_X, σ̂_X), NOT by N_run.
+
+When input parameters are estimated from a small empirical sample of size *n*, the estimated mean x̄ has a standard error σ_X/√n (central limit theorem). Running N_run >> n in the subsequent Monte Carlo simulation does not recover this imprecision; instead it *converts* a visibly imprecise estimate (large SE on x̄) into an *invisibly inaccurate* one (near-zero SE on ȳ, but ȳ converges to the wrong value x̄ rather than the true μ_X). Heijungs' compact summary (p. 400): **"Garbage in, garbage out, but the type of garbage has changed: from imprecise to inaccurate. That is a problem, because imprecision is visible through a large standard error of the mean … while inaccuracy is not visible."**
+
+---
+
+#### Page-cited numerical results
+
+**Example 1 — stand-alone system (p. 399, Fig. 1).**
+Parent distribution X ~ N(10, 1); sample size n = 16; Monte Carlo N_run = 100,000.
+
+| Approach | Estimate | 95 % CI | Contains true μ = 10? |
+|---|---|---|---|
+| Inferential (from n = 16 sample) | x̄ = 10.31 ± 0.25 | [9.819, 10.799] | **Yes** |
+| Monte Carlo (N_run = 100,000) | ȳ = 10.31 ± 0.003 | [10.305, 10.318] | **No** |
+
+The Monte Carlo approach is ~80× more *precise* but the confidence interval has drifted entirely away from the true value because it merely converges to the inaccurate input estimate x̄ = 10.31.
+
+**Example 2 — comparative LCA (p. 400, Fig. 2).**
+Two systems A and B with identical true means μ_XA = μ_XB = 10; n_A = n_B = 16; N_run = 100,000.
+
+| Test | p-value | Conclusion |
+|---|---|---|
+| Two-sample t-test on raw input data | p = 0.67 | Correctly fails to reject equality |
+| Monte Carlo two-sample test (N_run = 100,000) | p ≈ 10⁻¹⁶ | Incorrectly rejects equality with overwhelming significance |
+
+The Monte Carlo analysis manufactures an essentially certain conclusion that product A is better than B, when the underlying input data show no statistically distinguishable difference. "Seemingly precise estimates of the impact of products A and B can lead to the conclusion that A is better than B, while the real situation is that B is better than A." (p. 400)
+
+---
+
+#### Key recommendation (pp. 400–401)
+
+> "Apart from the obvious recommendation to use larger samples for estimating input distributions, we suggest to restrict the number of Monte Carlo runs to a number **not greater than the sample sizes used for the input parameters**."
+
+If input X₁ is estimated from n₁ = 16 data points and X₂ from n₂ = 9, the recommended N_run ≤ min(9, 16) = **9**. This makes the output CI visibly wide — but accurately reflects real uncertainty — rather than deceivingly narrow.
+
+The practical fix is also noted: the solution of capping N_run simultaneously resolves the problem of "overly significant results" documented by Heijungs et al. (2016, *Entropy* 18:361).
+
+---
+
+#### Pedigree approach incompatibility (pp. 400–401)
+
+The **ecoinvent pedigree approach** (Frischknecht et al., 2004; Weidema et al., 2013) assigns default standard deviations from qualitative data-quality indicators (representativeness, age, etc.) rather than from empirical sample estimation. For such inputs, sample size *n* is undefined — meaning there is no principled cap on N_run, and yet "the parameters of the input distribution are not at all accurate." Heijungs' conclusion (p. 401):
+
+> **"Pedigree-based probability distributions are incompatible with large-scale Monte Carlo simulations."**
+
+He explicitly flags this as an unresolved research gap: "This suggests a major area of research in dealing with uncertainty in LCA."
+
+---
+
+#### Author-flagged limitations and research needs (Discussion, pp. 400–401)
+
+1. **Generalisation to multi-input functions:** The argument is demonstrated for Y = f(X) = X but held to carry over to Y = f(X₁, X₂, …) of arbitrary complexity (p. 400); the paper does not provide a formal proof for non-linear functions beyond a narrative assertion.
+2. **No practical algorithm for multi-input cases:** When inputs have different sample sizes (n_X1 ≠ n_X2), the "weakest link" rule (N_run ≤ min n_Xi) is offered as an heuristic but acknowledged as requiring further development (p. 401).
+3. **Non-normal / non-standard distributions not treated fully:** The main analysis uses normal distributions with known σ; lognormal and other distributions common in LCA (Frischknecht et al., 2004) follow the same qualitative logic but add computational complexity (p. 400).
+4. **No guidance on the pedigree problem:** The incompatibility of pedigree-based SDs with MC is identified but no solution is proposed — it is left as an open research area (p. 401).
+
+---
+
+#### Implications for our manuscript (§§2.3, 3.8, 7.4)
+
+Our pipeline uses **N_run = 10,000** (Highlight A4; Abstract). This number is defensible specifically because our σ_g values come from **Poore & Nemecek's (2018) deposited archive**, which is empirically derived from meta-analysed LCI surveys across tens of thousands of farms and processing operations globally — **not** from pedigree scoring. Poore & Nemecek report effective sample sizes per food group ranging from ~dozens (minor processed categories) to several thousand (major commodity groups: dairy ~2,800; beef/lamb ~742; wheat ~2,813). For well-sampled groups, N_run = 10,000 is comfortably within Heijungs' bound; for the sparsest groups (n ≈ 30–80 for some minor categories), N_run = 10,000 technically exceeds the recommended cap.
+
+This creates a minor limitation to flag in §7: for food groups where Poore & Nemecek's survey has fewer than ~1,000 data points, our 10,000-run MC overstates precision and the resulting per-food-group CIs should be treated as indicative rather than definitive. A conservative mitigation is to additionally report sensitivity at N_run = min(n_group, 500) for the five most-sampled and five sparsest groups as a robustness check (SI table). We should cite Heijungs (2020) at both §2.3 ("Monte Carlo propagation remains the dominant approach… with the caveat that N_run should not substantially exceed the sample size of input parameter estimates") and §7 (limitation discussion).
+
+The pedigree incompatibility finding also underpins our choice **not** to propagate ecoinvent background uncertainty via MC (we use fixed background characterisation factors and only vary the σ_g foreground distributions from Poore & Nemecek) — a design choice now citable directly to this paper.
+
+---
+
+#### Three-sentence relevance note
+
+Heijungs (2020) provides the foundational theoretical argument that running 10,000+ Monte Carlo iterations in LCA is only statistically legitimate when the input distributions are themselves estimated from samples of comparable size — otherwise the procedure delivers results that are **precise but inaccurate**, a failure mode invisible to the analyst because the reported CI shrinks to near-zero while converging to the wrong value. For our pipeline, this paper is the citation that justifies two key design choices simultaneously: (i) grounding σ_g in Poore & Nemecek's empirical meta-survey (n >> pedigree) rather than ecoinvent pedigree scoring, and (ii) not propagating background ecoinvent uncertainty through MC at all. We must engage with it in §7 by acknowledging that for the handful of Poore & Nemecek food groups with n < 1,000, our N_run = 10,000 modestly overclaims precision, and propose the N_run = min(n_group, 500) robustness check as the mitigation.
+
+---
+
+### F34. Kim, Mutel & Hellweg (2025) — Global sensitivity analysis of correlated uncertainties in LCA [★★]
+
+**Citation.** Kim A, Mutel C, Hellweg S. Global sensitivity analysis of correlated uncertainties in life cycle assessment. J Ind Ecol. 2025;29(4):1090–1104.
+
+**DOI.** 10.1111/jiec.70036
+
+**PDF.** [`papers/J of Industrial Ecology - 2025 - Kim - Global sensitivity analysis of correlated uncertainties in life cycle assessment.pdf`](papers/J%20of%20Industrial%20Ecology%20-%202025%20-%20Kim%20-%20Global%20sensitivity%20analysis%20of%20correlated%20uncertainties%20in%20life%20cycle%20assessment.pdf)
+
+**Open access.** Yes — Creative Commons Attribution License (CC BY), © 2025 The Author(s).
+
+**Affiliations.** Aleksandra Kim & Christopher Mutel: Paul Scherrer Institute (Laboratory for Energy Systems Analysis), Villigen, Switzerland. Kim & Stefanie Hellweg: ETH Zurich (Dept. of Civil, Environmental and Geomatic Engineering). **Open-source code:** AKULA repository, MIT license (doi:10.5281/zenodo.12599545); runs on Brightway 2.5.
+
+**Type.** Methods article. Extends two prior GSA protocols (Cucurachi et al., 2021; Kim et al., 2022) — which assumed independent inputs — to handle **correlated and causally-linked parameters** in high-dimensional LCA models. Introduces four sampling modules and an updated multi-step GSA pipeline; demonstrates on climate-change footprint of average Swiss household consumption (ecoinvent v3.8 cutoff, ~415,000 uncertain exchanges).
+
+---
+
+#### The core problem: why independent sampling misleads (§1, pp. 1090–1091)
+
+Standard MC simulations in LCA draw each uncertain input independently, even when physical or economic constraints force variables to co-move. The authors illustrate with a food example directly relevant to our pipeline:
+
+**Basmati rice market-share example (Fig. 1, p. 1090–1091).** A global market is modelled as 70 % India (3.4 kg CO₂-eq/kg) + 30 % Rest-of-World (3.0 kg CO₂-eq/kg). If shares are sampled independently as lognormals (S_IN ~ LN(log 0.7, 0.1); S_RoW ~ LN(log 0.3, 0.1)), the two shares need not sum to 1 at each simulation draw. The resulting CF distribution is **significantly wider** than when the constraint S_IN = 1 − S_RoW is enforced. Consequence: **independent sampling overestimates uncertainty**, which in a comparative LCA could mask a real difference between rice types that correlated sampling would correctly identify as significant — the same class of false-negative/false-positive error documented by Heijungs (2020, §F33 above) but now from a different source (correlation neglect rather than N_run inflation).
+
+---
+
+#### Four correlated/dependent sampling modules (§2.2, pp. 1092–1096, Fig. 2)
+
+| Module | Mechanism | Scale in ecoinvent v3.8 |
+|---|---|---|
+| **(a) Parameterized inventories** | Named variable → formula → technosphere/biosphere flow; heavier car → higher brake wear | 565 activities; 857 parameters; 7,509 biosphere + 640 technosphere exchanges |
+| **(b) Carbon balancing in combustion** | Fuel input and CO₂ output linked by stoichiometry; "market for diesel/petrol" → "carbon dioxide, fossil" treated as dependent | 812 activities; 407 biosphere + 1,403 technosphere exchanges |
+| **(c) ENTSO-E electricity time-series** | Annual ecoinvent averages replaced by real 2019–2021 hourly generation data for 32 European countries; correlations between generation types preserved | 821 technosphere exchanges in 87 electricity markets |
+| **(d) Dirichlet for implicit markets** | Shares that must sum to a fixed total (e.g. natural gas offshore+onshore) modelled with multivariate Dirichlet instead of independent lognormals | 61 implicit markets; 517 technosphere exchanges |
+
+For module (d): ecoinvent's *formal* markets already have uncertainty removed (the algorithm detects them). But **implicit markets** — where product names do not exactly match — retain independent lognormal uncertainty, causing their sums to deviate from the physical total at each draw. The Dirichlet distribution enforces the "fixed total" constraint while preserving marginal uncertainty widths (§2.2.4 + Section 3 of SI; validated on Danish electricity data, Fig. 6, p. 1098).
+
+---
+
+#### Multi-step GSA protocol (§2.4, pp. 1096–1097, Fig. 5)
+
+The protocol progressively filters ~415,000 uncertain inputs down to a rankable ~2,000, **without losing influential ones** (each step validated by scatter-plot comparison of Y_all vs Y_subset from 2,000 MC runs):
+
+| Step | Method | Inputs remaining after step | Computation |
+|---|---|---|---|
+| **1. Remove non-influential** | Supply chain traversal (technosphere); matrix-structure zero-contribution pruning (biosphere/CF); formula analysis (parameterized) | 20–30 % of original (cutoff 1×10⁻⁷) | Minutes |
+| **2. Remove lowly influential** | Local one-at-a-time sensitivity (±10× perturbation); discard low-variance contributors | 10,000–30,000 (k_lsa) | Hours |
+| **3. Screen high-dimensional** | XGBoost on N_xgb = k_lsa to 4k_lsa MC samples; feature importance as proxy sensitivity index | 1,000–3,000 (k_xgb) | Hours |
+| **4. Rank** | SHAP / TreeSHAP on the trained XGBoost model; Shapley effects as final sensitivity indices | Top 200 reported | Minutes |
+
+Total runtime: < 24 h on a personal laptop (11th Gen Intel i5, 32 GB RAM) for the full Swiss consumption model. **R² of XGBoost model in Step 3:** 0.79 (independent sampling) / 0.84 (correlated sampling) — adequate for feature-importance ranking even without hyperparameter tuning (§3.3, p. 1100).
+
+SHAP is used because Shapley effects extend naturally to **correlated inputs** (Iooss & Prieur, 2019; Janzing et al., 2020), unlike classical Sobol first/total order indices which assume independent inputs (§2.4, p. 1097).
+
+---
+
+#### Key GSA results (§3.3, pp. 1100–1101, Fig. 8)
+
+For Swiss household carbon footprint (deterministic score: 1,870 kg CO₂-eq/month):
+
+- Independent vs correlated sampling share **81 technosphere + 17 biosphere** inputs in the top 200.
+- Major uncertainty drivers under both: electricity transformation/heat production; passenger car operation + petroleum production; electronics manufacturing; **agricultural processes including milk, cheese and meat** (p. 1101) — the food-LCA-adjacent result.
+- **Critical divergence:** With independent sampling, GSA flags 10 CO₂ biosphere flows from "transport, passenger car" and several characterisation factors and "carbon dioxide from soil/biomass stock" as top-200. With correlated sampling, **these inputs drop entirely out of the top 2,000** — they were false positives generated by uncorrelated pedigree-based ecoinvent uncertainty, not by true physical drivers (§3.3, pp. 1100–1101).
+- With correlated sampling, the true driver is correctly identified as **combustion of petrol/diesel** (20 technosphere inputs from the carbon-balancing module) + **electricity mix uncertainty** (60 technosphere inputs from the ENTSO-E module).
+
+Key quote (p. 1101): *"When correlations are properly accounted for, the overall uncertainty in LCIA scores is more heavily influenced by combustion and electricity inputs, whose contributions overshadow errors in the ecoinvent database. In practical terms, this suggests that addressing uncertainties in these primary sources — combustion and electricity — should take precedence over those in ecoinvent."*
+
+---
+
+#### Author-flagged limitations (§4 Discussion, pp. 1101–1102)
+
+1. **Pedigree–parameterization mismatch (p. 1101, point i).** When the parameterized module was applied, the distribution width obtained by propagating independent named-variable uncertainty "was arbitrarily higher, lower, or well aligned with the predefined [pedigree-based] distribution. We could not track any systematic relation between the two." Likely caused by pedigree scoring rather than empirical fitting — reinforces the Heijungs (2020) critique of pedigree+MC.
+2. **ENTSO-E disaggregation ambiguity (p. 1101, point iii).** ENTSO-E categories don't map 1:1 to ecoinvent; disaggregation choices introduce their own uncertainty. ENTSO-E data quality gaps (Hirth et al., 2018) also limit reliability.
+3. **Dirichlet fails for multimodal marginals (p. 1101, point v).** High-voltage electricity markets with many suppliers exhibit multimodal distributions (intermittent wind effects); Dirichlet cannot capture these. Further disaggregation by season/time-of-day needed.
+4. **Implicit markets Dirichlet — large-n case (p. 1101, point v).** For large numbers of variables the single scaling factor λ cannot fit all marginals simultaneously; needs further development.
+5. **Case study scope (p. 1099, §2.6).** Swiss household consumption only; climate change LCIA only. Other products, regions and impact categories may yield different module importance rankings.
+6. **No coverage of characterization factor correlations across impact categories.** The framework addresses technosphere/biosphere and parameterized flows; cross-category CF correlations (relevant for single-score aggregation under ReCiPe) remain outside the protocol.
+
+---
+
+#### Implications for our manuscript (§§2.3, 3.8, 4.3, 7.4)
+
+Our pipeline implements **Sobol-index sensitivity analysis** (Highlight A4; §3.8) with independent sampling — the same baseline that Kim et al. extend. Three specific implications:
+
+1. **Sobol indices assume independence.** Our §4.3 Sobol analysis over ReCiPe characterisation factors assumes each factor varies independently. This is defensible for a first-pass analysis (most CF categories are assigned to distinct elementary flows with different uncertainty sources), but the basmati rice example (Fig. 1) shows that market-share correlations within a food group inflate estimated uncertainty if not corrected. Our Poore & Nemecek σ_g distributions are group-level aggregates — they implicitly average over the correlated sub-regional variation, which may partially but not fully mitigate this. We should flag independent-sampling as a simplification in §7 and cite Kim et al. (2025) as the reference for the correlated extension.
+
+2. **SHAP vs Sobol for food LCA.** Kim et al.'s finding that SHAP with XGBoost correctly ranks correlated inputs while standard sensitivity methods produce false-positives is directly relevant to the credibility of our factor-importance ranking. For the initial publication, Sobol indices are the simpler and more widely reported choice; SHAP/XGBoost ranking following Kim et al.'s protocol is a natural v2 upgrade to flag in §7 / Future Work.
+
+3. **Pedigree discrepancy corroboration (p. 1101, point i).** Kim et al.'s empirical finding that pedigree-based ecoinvent distributions show no systematic relationship with propagated parameterized uncertainty independently corroborates our design choice to use Poore & Nemecek's empirical σ_g rather than ecoinvent pedigree scoring. This is now citable to both Heijungs (2020) and Kim et al. (2025).
+
+---
+
+#### Three-sentence relevance note
+
+Kim et al. (2025) provides the state-of-the-art protocol for GSA in high-dimensional LCA models when inputs are correlated — the direct methodological successor to the independent-sampling Sobol approaches our §3.8 currently implements, and the food-relevant basmati rice figure (Fig. 1) gives a concrete illustration that independent sampling overestimates food-group market-share uncertainty by a measurable margin. For our manuscript, this paper serves three roles: (i) it is the citation for "correlated Sobol/SHAP extensions" that we explicitly defer to future work in §7, (ii) its empirical finding that pedigree-based ecoinvent distributions are uncorrelated with propagated parameterized distributions corroborates our §3.8 design choice to use Poore & Nemecek σ_g instead of ecoinvent pedigree, and (iii) the SHAP/XGBoost ranking methodology is the upgrade path for a v2 sensitivity analysis once AGRIBALYSE-grounded LCIs are available under TODO-CODE-LCA-2. Cite at §2.3 ("Global sensitivity analysis with correlated inputs has been formalised recently — Kim et al., 2025") and §7 limitation on independent sampling assumption.
+
+---
+
+*Pending: papers F35 through F38.*
 
 ## Group G. Sustainability of AI
 

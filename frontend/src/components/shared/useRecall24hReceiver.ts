@@ -33,6 +33,17 @@ interface RecallStash {
   meals_meta: Array<{ occasion: string; dish_name: string; total_mass_g: number }>;
   aggregated_daily_ingredients: CNFRecall24hAggregatedIngredient[];
   estimated_daily_kcal: number;
+  // RECALL-HISTORY-1 (2026-05-24) — when set, this stash represents a
+  // multi-day average across N saved recalls (mass-weighted concatenation),
+  // not a single day. The receiving page should use this to drive the
+  // softened multi-day caveat + "N-day average" framing.
+  multi_day?: {
+    n_days: number;
+    first_date: string;          // ISO YYYY-MM-DD
+    last_date: string;           // ISO YYYY-MM-DD
+    label: string;               // "5-day average, 2026-05-17 to 2026-05-21"
+    day_ids: string[];           // for traceability
+  };
 }
 
 interface UseRecall24hReceiverOptions {
@@ -43,6 +54,8 @@ interface UseRecall24hReceiverOptions {
     user_type: RecallStash['user_type'];
     estimated_daily_kcal: number;
     meals_meta: RecallStash['meals_meta'];
+    /** Present when the recall-history page routed an N-day average. */
+    multi_day?: RecallStash['multi_day'];
   }) => void;
 }
 
@@ -71,6 +84,7 @@ export function useRecall24hReceiver({ target, onIngredients }: UseRecall24hRece
       user_type: stash.user_type,
       estimated_daily_kcal: stash.estimated_daily_kcal,
       meals_meta: stash.meals_meta,
+      multi_day: stash.multi_day,
     });
     // Clear the stash so a reload doesn't re-inject.
     try { sessionStorage.removeItem('recall_24h_payload'); } catch { /* private mode */ }

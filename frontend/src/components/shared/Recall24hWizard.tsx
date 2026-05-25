@@ -39,6 +39,13 @@ import {
 import { SourceFilter, type SourceChoice } from './SourceFilter';
 import { SourceBadge } from './SourceBadge';
 import type { UserType } from './AudienceToggle';
+// RECALL-HISTORY-1 (2026-05-24): opt-in localStorage save on Step 3.
+import {
+  saveDay,
+  countDays,
+  QuotaExceededError,
+  type SavedRecallDay,
+} from '@/lib/recallHistory';
 
 interface Recall24hWizardProps {
   userType: UserType;
@@ -123,6 +130,16 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
   // meal's Stage-2 ingredient resolution so a 'wafct' recall stays
   // entirely within WAFCT FoodIDs.
   const [source, setSource]   = useState<SourceChoice>('both');
+  // RECALL-HISTORY-1 (2026-05-24): "Save this day" panel on Step 3.
+  // `saveDate` defaults to today on first render; user can edit. `saveLabel`
+  // is optional researcher annotation. `savedDay` flips to the SavedRecallDay
+  // after a successful save so re-saves update in place rather than creating
+  // duplicates. `saveError` surfaces quota-exceeded.
+  const [saveDate, setSaveDate]   = useState<string>(() => new Date().toISOString().slice(0, 10));
+  const [saveLabel, setSaveLabel] = useState<string>('');
+  const [savedDay, setSavedDay]   = useState<SavedRecallDay | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [historyCount, setHistoryCount] = useState<number>(() => countDays());
 
   const enabledOccasions = useMemo(
     () => OCCASIONS.filter(o => rows[o.id].enabled),
@@ -166,6 +183,33 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
       });
     } finally {
       setLoading(false);
+    }
+  }
+
+  function handleSaveToHistory() {
+    if (!result) return;
+    setSaveError(null);
+    try {
+      const day = saveDay({
+        id: savedDay?.id,
+        date: saveDate,
+        label: saveLabel.trim(),
+        user_type: userType,
+        meals: result.meals,
+        aggregated_daily_ingredients: result.aggregated_daily_ingredients,
+        estimated_daily_kcal: result.estimated_daily_kcal,
+        occasions_count: result.occasions_count,
+      });
+      setSavedDay(day);
+      setHistoryCount(countDays());
+    } catch (e) {
+      if (e instanceof QuotaExceededError) {
+        setSaveError(
+          'Recall history is full (4 MB limit). Export your existing history then clear it before saving more days.',
+        );
+      } else {
+        setSaveError(`Failed to save: ${(e as Error).message}`);
+      }
     }
   }
 
@@ -479,6 +523,68 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
               </ul>
             </details>
           )}
+
+          {/* RECALL-HISTORY-1 (2026-05-24): opt-in localStorage save. Lets
+              users build a multi-day history that powers the /recall-history
+              page's N-day average pattern view. Data NEVER leaves the user's
+              browser unless they explicitly export or re-score. */}
+          <details className="border rounded-lg p-4 bg-blue-50">
+            <summary className="cursor-pointer text-sm font-medium text-blue-900">
+              💾 Save this day to your history (browser-local)
+            </summary>
+            <div className="mt-3 space-y-3 text-sm">
+              <p className="text-xs text-gray-600">
+                Saved days appear on the <a href="/recall-history" className="text-blue-700 underline">recall history</a> page,
+                where you can compute an N-day average pattern, export as JSON / CSV
+                for research analysis, or re-score any day individually.
+                Stored only in this browser — never uploaded unless you explicitly score it.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-[140px,1fr] gap-2 items-center">
+                <label htmlFor="recall-save-date" className="text-xs font-medium text-gray-700">
+                  Date this day reflects
+                </label>
+                <input
+                  id="recall-save-date"
+                  type="date"
+                  value={saveDate}
+                  onChange={(e) => setSaveDate(e.target.value)}
+                  className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md"
+                  title="ISO date the day occurred (defaults to today)"
+                />
+                <label htmlFor="recall-save-label" className="text-xs font-medium text-gray-700">
+                  Label (optional)
+                </label>
+                <input
+                  id="recall-save-label"
+                  type="text"
+                  value={saveLabel}
+                  onChange={(e) => setSaveLabel(e.target.value)}
+                  placeholder="e.g. 'Tuesday' or 'Subject 04 / Day 2'"
+                  className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handleSaveToHistory}
+                disabled={!saveDate || !result}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {savedDay ? '✓ Saved — update' : '💾 Save to history'}
+              </button>
+              {savedDay && (
+                <p className="text-xs text-blue-700">
+                  Saved. Your history now contains{' '}
+                  <strong>{historyCount}</strong> day{historyCount === 1 ? '' : 's'}.{' '}
+                  <a href="/recall-history" className="underline">Open recall history →</a>
+                </p>
+              )}
+              {saveError && (
+                <p className="text-xs text-red-700 bg-red-50 border-l-4 border-red-400 px-2 py-1">
+                  {saveError}
+                </p>
+              )}
+            </div>
+          </details>
 
           <div className="flex items-center justify-between pt-3 border-t">
             <button

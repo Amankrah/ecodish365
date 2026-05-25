@@ -625,16 +625,35 @@ def _strip_pattern_individual_mode_fields(
     return redacted
 
 
+def _extract_n_days(meta_label: Optional[str]) -> str:
+    """Extract the leading integer from a meta_label like '5-day average,
+    2026-05-17 to 2026-05-21' → '5'. Returns 'multi' if no integer prefix."""
+    if not meta_label:
+        return 'multi'
+    import re
+    m = re.match(r'\s*(\d+)\s*-\s*day', meta_label)
+    return m.group(1) if m else 'multi'
+
+
 def _build_pattern_explanations(
     result_dict: Dict[str, Any], user_type: str, narrative: Optional[str],
+    meta_label: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Audience-aware explanations block. Always carries the mandatory
-    single-day caveat. Researcher / policy adds methodology + the per-
-    prototype literature anchor in the response.
+    single-day caveat (or its softened multi-day variant when `meta_label`
+    is set). Researcher / policy adds methodology + the per-prototype
+    literature anchor in the response.
 
     `narrative` (when include_narrative=true) is shipped here too so the
     frontend has a single explanations dict to render.
+
+    `meta_label` (RECALL-HISTORY-1, 2026-05-24): when set (e.g.
+    "5-day average, 2026-05-17 to 2026-05-21"), the caveat language
+    swaps from the single-day disclaimer to the softened multi-day
+    variant — honest improvement without overclaiming. The frontend
+    drives this from the `/recall-history` "Score N-day average" path.
     """
+    is_multi_day = bool(meta_label)
     base_caveat_individual = (
         "Today's day-vector is one snapshot of your eating. For claims "
         "about your usual eating pattern, log multiple recall days. The "
@@ -653,25 +672,67 @@ def _build_pattern_explanations(
         "NOT to single-day resemblance. Do not interpret a high "
         "Mediterranean-resemblance cosine as a personal CVD-risk reduction."
     )
+    multi_day_caveat_individual = (
+        f"This is your {meta_label}, which begins to approximate your "
+        "usual eating but is still based on a limited sample. The patterns "
+        "shown describe the SHAPE of your average food choices across these "
+        "days — they are NOT personal health predictions. Day-to-day "
+        "variation is also informative; check the per-day timeline on the "
+        "recall-history page to see how your pattern shifts."
+    )
+    multi_day_caveat_researcher = (
+        f"MULTI-DAY AVERAGE CAVEAT ({meta_label}): the resemblance below is "
+        "computed on a mass-weighted concatenation of {N} saved recall days "
+        "(volume-weighted, NOT per-day-equal-weighted — high-kcal days "
+        "contribute proportionally more). This approximates the directional "
+        "intent of multi-day averaging but is NOT the NCI multivariate "
+        "MCMC usual-intake method (Zhang 2011) which Brassard 2022b "
+        "(Discussion p. 588) recommends for population-level usual-intake "
+        "claims. Prototype outcome citations refer to populations following "
+        "each pattern long-term in randomised / cohort studies "
+        "(Trichopoulou 2003, Estruch 2013 PREDIMED, Sacks 2001 DASH, "
+        "Orlich 2013 AHS-2), NOT to N-day average resemblance. For per-day "
+        "variation in addition to this average, see the timeline view on "
+        "the recall-history page."
+    ).replace('{N}', str(_extract_n_days(meta_label)))
 
     out: Dict[str, Any] = {}
     if user_type == 'individual':
-        out['plain_summary'] = {
-            'title': "Today's dietary pattern",
-            'message': (
-                f"Today's food choices most closely resemble "
-                f"{result_dict.get('top_pattern', '?')} pattern "
-                f"(confidence: {result_dict.get('top_pattern_confidence', '?')})."
-            ),
-        }
-        out['mandatory_caveat'] = {
-            'title': 'About this result',
-            'message': base_caveat_individual,
-        }
+        if is_multi_day:
+            out['plain_summary'] = {
+                'title': f'Your {meta_label}',
+                'message': (
+                    f"Across {meta_label}, your average food choices most "
+                    f"closely resemble {result_dict.get('top_pattern', '?')} "
+                    f"pattern (confidence: "
+                    f"{result_dict.get('top_pattern_confidence', '?')})."
+                ),
+            }
+            out['mandatory_caveat'] = {
+                'title': 'About this multi-day average',
+                'message': multi_day_caveat_individual,
+            }
+        else:
+            out['plain_summary'] = {
+                'title': "Today's dietary pattern",
+                'message': (
+                    f"Today's food choices most closely resemble "
+                    f"{result_dict.get('top_pattern', '?')} pattern "
+                    f"(confidence: {result_dict.get('top_pattern_confidence', '?')})."
+                ),
+            }
+            out['mandatory_caveat'] = {
+                'title': 'About this result',
+                'message': base_caveat_individual,
+            }
     else:
         out['mandatory_caveat'] = {
-            'title': 'Mandatory caveat (single-day resemblance)',
-            'message': base_caveat_researcher,
+            'title': ('Multi-day average caveat'
+                      if is_multi_day
+                      else 'Mandatory caveat (single-day resemblance)'),
+            'message': (multi_day_caveat_researcher
+                        if is_multi_day
+                        else base_caveat_researcher),
         }
         out['methodology'] = {
             'title': 'Method',
@@ -761,7 +822,10 @@ def dietary_pattern_classify(request):
         {
             "foods": [{"food_id": 4471, "mass_g": 100}, ...],
             "user_type": "individual",
-            "include_narrative": false
+            "include_narrative": false,
+            "meta_label": null  // RECALL-HISTORY-1: when set, e.g.
+                                // "5-day average, 2026-05-17 to 2026-05-21",
+                                // swaps caveat to multi-day variant.
         }
 
     Response (200):
@@ -810,6 +874,18 @@ def dietary_pattern_classify(request):
 
     include_narrative = bool(request.data.get('include_narrative', False))
 
+    # RECALL-HISTORY-1 (2026-05-24): optional meta_label swaps the
+    # single-day mandatory caveat to a softened multi-day variant. The
+    # frontend's /recall-history page passes e.g. "5-day average,
+    # 2026-05-17 to 2026-05-21" when routing the N-day-average view.
+    # Bounded length + plain-text scrub to keep it safe to render.
+    meta_label_raw = request.data.get('meta_label')
+    meta_label: Optional[str] = None
+    if isinstance(meta_label_raw, str):
+        ml = meta_label_raw.strip()[:120]
+        if ml:
+            meta_label = ml
+
     cost = (_COST_DIETARY_PATTERN_NARRATIVE_CENTS if include_narrative
             else _COST_DIETARY_PATTERN_CENTS)
     rate_err = _enforce_rate_limit(
@@ -850,7 +926,9 @@ def dietary_pattern_classify(request):
     if include_narrative and result.matched:
         narrative = _generate_narrative(result_dict, user_type, cleaned)
 
-    explanations = _build_pattern_explanations(result_dict, user_type, narrative)
+    explanations = _build_pattern_explanations(
+        result_dict, user_type, narrative, meta_label=meta_label,
+    )
     return Response(
         {'success': True, 'result': payload, 'explanations': explanations},
         status=status.HTTP_200_OK,

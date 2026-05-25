@@ -600,12 +600,12 @@ None declared.
 27. Bulle C, Margni M, Patouillard L, Boulay AM, Bourgault G, De Bruille V, et al. IMPACT World+: a globally regionalized life cycle impact assessment method. *Int J Life Cycle Assess.* 2019;24(9):1653–1674. doi:10.1007/s11367-019-01583-0.
 28. Hong J, Shaked S, Rosenbaum RK, Jolliet O. Analytical uncertainty propagation in life cycle inventory and impact assessment: application to an automobile front panel. *Int J Life Cycle Assess.* 2010;15(5):499–510. doi:10.1007/s11367-010-0175-4.
 29. Fulgoni VL III, Wallace TC, Stylianou KS, Jolliet O. Calculating intake of dietary risk components used in the Global Burden of Disease studies from the What We Eat in America/National Health and Nutrition Examination Surveys. *Nutrients.* 2018;10(10):1441. doi:10.3390/nu10101441.
-
-**Pending retrieval (★ — Groups D / E / F / G / H / I):**
-
-30. ★ Heller MC, Keoleian GA, Willett WC. Toward a life cycle–based, diet-level framework for food environmental impact and nutritional quality assessment. *Environ Sci Technol.* 2013;47(22):12632–12647.
+30. Heller MC, Keoleian GA, Willett WC. Toward a life cycle–based, diet-level framework for food environmental impact and nutritional quality assessment. *Environ Sci Technol.* 2013;47(22):12632–12647. doi:10.1021/es4025113.
 31. EAT–Lancet Commission 2.0 (Rockström J, et al.). The EAT–Lancet Commission on healthy, sustainable, and just food systems. *Lancet.* 2025. doi:10.1016/S0140-6736(25)01201-2.
 31a. EAT–Lancet Commission 1.0 (Willett W, Rockström J, Loken B, et al.). Food in the Anthropocene: the EAT–Lancet Commission on healthy diets from sustainable food systems. *Lancet.* 2019;393:447–492. doi:10.1016/S0140-6736(18)31788-4.
+
+**Pending retrieval (★ — Groups D / F / G / H / I):**
+
 32. ★ Heijungs R. On the number of Monte Carlo runs needed to compare the impacts of alternatives in LCA. *Int J Life Cycle Assess.* 2020;25:394–402.
 33. ★ Kim A. Global sensitivity analysis of correlated uncertainties in life cycle assessment. *J Ind Ecol.* 2025. doi:10.1111/jiec.70036.
 34. ★ Lo Piano S, Saltelli A. Two-dimensional Monte Carlo simulations in LCA. *Int J Life Cycle Assess.* 2022. doi:10.1007/s11367-022-02041-0.
@@ -626,7 +626,7 @@ None declared.
 45. Patterson D, Gonzalez J, Le Q, et al. Carbon Emissions and Large Neural Network Training. arXiv:2104.10350; 2021.
 46. Li P, Yang J, Islam MA, Ren S. Making AI Less "Thirsty". arXiv:2304.03271; 2023.
 
-*Group B wishlist corrections (already applied): B7 pagination is 582–594 not 611–624; the Canadian Food Intake Screener is led by Hutchinson not Lamarche; Food Compass 2.0, FCS-10 and the i.FCS validation paper are led by Barrett, Barrett and O'Hearn respectively, not Mozaffarian. **Group C clarifications:** the count of HENI risk components is 16 (15 GBD dietary risks + a fibre source split), not 14 — see Stylianou et al. 2021 Suppl. Table 3 p. 8 (ref. 22). DANI (Weidema & Stylianou 2020, ref. 26) is the sibling index using 15 GBD risks + saturated fat; we implement HENI, not DANI. References 30–46 will receive page-cited specificity as the remaining PDFs arrive (see `literature_extractions.md`).*
+*Group B wishlist corrections (already applied): B7 pagination is 582–594 not 611–624; the Canadian Food Intake Screener is led by Hutchinson not Lamarche; Food Compass 2.0, FCS-10 and the i.FCS validation paper are led by Barrett, Barrett and O'Hearn respectively, not Mozaffarian. **Group C clarifications:** the count of HENI risk components is 16 (15 GBD dietary risks + a fibre source split), not 14 — see Stylianou et al. 2021 Suppl. Table 3 p. 8 (ref. 22). DANI (Weidema & Stylianou 2020, ref. 26) is the sibling index using 15 GBD risks + saturated fat; we implement HENI, not DANI. References 32–46 (pending block) will receive page-cited specificity as the remaining PDFs arrive (see `literature_extractions.md`). Group **E** Call-1 complete (refs 30–31a ≡ E28, E29, E32); IPCC ch. 5 / IRP 2019 omitted by scope.*
 
 ---
 

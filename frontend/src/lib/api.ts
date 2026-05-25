@@ -464,12 +464,18 @@ export class CNFApiService {
     options: {
       userType?: 'individual' | 'researcher' | 'policy';
       includeNarrative?: boolean;
+      /** RECALL-HISTORY-1 (2026-05-24): set to e.g. "5-day average,
+       *  2026-05-17 to 2026-05-21" to swap the single-day mandatory caveat
+       *  for the softened multi-day variant. The /recall-history page
+       *  passes this when routing the N-day-average view. */
+      metaLabel?: string;
     } = {},
   ): Promise<PatternClassifyResponse> {
     const response = await api.post('/dietary-pattern/classify/', {
       foods,
       user_type: options.userType || 'individual',
       include_narrative: options.includeNarrative ?? false,
+      ...(options.metaLabel ? { meta_label: options.metaLabel } : {}),
     });
     return {
       result: response.data.result as PatternResemblanceResult,

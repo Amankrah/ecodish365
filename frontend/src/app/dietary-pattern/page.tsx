@@ -15,7 +15,7 @@
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
-import { Target, Loader2, Sparkles } from 'lucide-react';
+import { Target, Loader2, Sparkles, CalendarDays } from 'lucide-react';
 import {
   CNFApiService,
   type PatternClassifyResponse,
@@ -27,22 +27,37 @@ import { useRecall24hReceiver } from '@/components/shared/useRecall24hReceiver';
 
 interface ApiError { status: number; message: string }
 
+// RECALL-HISTORY-1 (2026-05-24) — multi-day average metadata passed in
+// from /recall-history via the receiver hook. When set, drives the
+// "N-day average resembles..." headline + softened caveat.
+interface MultiDayMeta {
+  n_days: number;
+  first_date: string;
+  last_date: string;
+  label: string;
+  day_ids: string[];
+}
+
 function DietaryPatternPageInner() {
   const [userType,   setUserType]    = useState<UserType>('individual');
   const [loading,    setLoading]     = useState(false);
   const [data,       setData]        = useState<PatternClassifyResponse | null>(null);
   const [error,      setError]       = useState<ApiError | null>(null);
   const [foodsInput, setFoodsInput]  = useState<CNFRecall24hAggregatedIngredient[]>([]);
+  const [multiDay,   setMultiDay]    = useState<MultiDayMeta | null>(null);
   const [withNarrative, setWithNarrative] = useState(false);
 
   // DIET-PATTERN-1: pick up aggregated daily list handed off from the
   // recall wizard via sessionStorage. Same mechanism as the 5 scoring
   // calculators.
+  // RECALL-HISTORY-1: also receives optional multi_day metadata from
+  // /recall-history's N-day-average action.
   useRecall24hReceiver({
     target: 'dietary_pattern',
     onIngredients: (ingredients, meta) => {
       setUserType(meta.user_type);
       setFoodsInput(ingredients);
+      setMultiDay(meta.multi_day ?? null);
     },
   });
 
@@ -59,6 +74,7 @@ function DietaryPatternPageInner() {
       const r = await CNFApiService.classifyDietaryPattern(payload, {
         userType,
         includeNarrative,
+        ...(multiDay ? { metaLabel: multiDay.label } : {}),
       });
       setData(r);
     } catch (e: unknown) {
@@ -93,14 +109,26 @@ function DietaryPatternPageInner() {
             <div className="flex-1">
               <h1 className="text-2xl font-bold text-gray-900">Dietary pattern resemblance</h1>
               <p className="text-sm text-gray-600 mt-1">
-                Which canonical eating pattern does today&rsquo;s day-vector resemble most?
-                Scored against literature-anchored prototypes (Mediterranean, DASH, Western,
+                {multiDay
+                  ? <>Which canonical eating pattern does your <strong>{multiDay.n_days}-day average</strong> day-vector resemble most?</>
+                  : <>Which canonical eating pattern does today&rsquo;s day-vector resemble most?</>}
+                {' '}Scored against literature-anchored prototypes (Mediterranean, DASH, Western,
                 Vegetarian, Vegan, Canada&rsquo;s Food Guide, West African Staple
                 {userType !== 'individual' && <>, EAT-Lancet</>}).
               </p>
-              <p className="text-xs text-gray-500 mt-2">
-                Single-day snapshot. For usual-eating-pattern claims, log multiple recall days.
-              </p>
+              {multiDay ? (
+                <p className="text-xs text-gray-600 mt-2">
+                  Multi-day average across {multiDay.n_days} saved recall days
+                  ({multiDay.first_date} to {multiDay.last_date}). Begins to
+                  approximate usual eating but is still a limited sample &mdash;
+                  not NCI MCMC usual-intake modelling.
+                </p>
+              ) : (
+                <p className="text-xs text-gray-500 mt-2">
+                  Single-day snapshot. For usual-eating-pattern claims, log multiple recall days
+                  (see <a href="/recall-history" className="text-blue-700 underline">recall history</a>).
+                </p>
+              )}
             </div>
           </div>
           <div className="mt-4 pt-4 border-t flex justify-center">
@@ -153,6 +181,25 @@ function DietaryPatternPageInner() {
         {/* Result */}
         {data && !loading && (
           <>
+            {multiDay && (
+              <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4 shadow-sm flex items-start gap-3">
+                <CalendarDays className="h-5 w-5 text-indigo-700 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                <div className="flex-1 text-sm">
+                  <p className="font-semibold text-indigo-900">
+                    📅 {multiDay.n_days}-day average pattern
+                  </p>
+                  <p className="text-indigo-800 mt-0.5">
+                    {multiDay.label}
+                  </p>
+                  <p className="text-xs text-indigo-700 mt-1">
+                    Mass-weighted concatenation of {multiDay.n_days} saved recall
+                    days &mdash; volume-weighted across days, not equal-per-day.
+                    See the <a href="/recall-history" className="underline">recall history</a>{' '}
+                    for per-day variation.
+                  </p>
+                </div>
+              </div>
+            )}
             <DietaryPatternResult data={data} userType={userType} />
             {/* Narrative opt-in */}
             {!data.explanations.narrative && (

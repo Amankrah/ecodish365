@@ -97,7 +97,7 @@ Once you have a PDF, drop it into a `papers/` directory (or paste the relevant p
 
 ## E. Sustainability assessment frameworks (★★)
 
-28. **EAT–Lancet Commission 2.0 (2025).** *The EAT–Lancet Commission on healthy, sustainable, and just food systems.* **The Lancet.** doi:10.1016/S0140-6736(25)01201-2
+28. **EAT–Lancet Commission 2.0 (2025).** *The EAT–Lancet Commission on healthy, sustainable, and just food systems.* **The Lancet.** doi:10.1016/S0140-6736(25)01201-2 — ✅ *Extracted* — [`literature_extractions.md`](literature_extractions.md) §E28.
 
 29. **Willett, W., et al. (2019).** *Food in the Anthropocene: the EAT–Lancet Commission on healthy diets from sustainable food systems.* **The Lancet** 393, 447–492. ✅ *Extracted* — [`literature_extractions.md`](literature_extractions.md) §E29; PDF [`papers/PIIS0140673618317884.pdf`](papers/PIIS0140673618317884.pdf).
 
@@ -105,15 +105,15 @@ Once you have a PDF, drop it into a `papers/` directory (or paste the relevant p
 
 31. **IRP (2019).** *Global Resources Outlook.* UNEP International Resource Panel.
 
-32. **Heller, M.C., Keoleian, G.A., Willett, W.C. (2013).** *Toward a life cycle–based, diet-level framework for food environmental impact and nutritional quality assessment.* **Environmental Science & Technology** 47, 12632–12647.
+32. **Heller, M.C., Keoleian, G.A., Willett, W.C. (2013).** *Toward a life cycle–based, diet-level framework for food environmental impact and nutritional quality assessment.* **Environmental Science & Technology** 47, 12632–12647. doi:10.1021/es4025113 — ✅ *Extracted* — [`literature_extractions.md`](literature_extractions.md) §E32; PDF [`papers/toward-a-life-cycle-based-diet-level-framework-for-food-environmental-impact-and-nutritional-quality-assessment-a.pdf`](papers/toward-a-life-cycle-based-diet-level-framework-for-food-environmental-impact-and-nutritional-quality-assessment-a.pdf).
 
 ---
 
 ## F. Uncertainty quantification in LCA (★★)
 
-33. **Heijungs, R. (2020).** *On the number of Monte Carlo runs needed to compare the impacts of alternatives…* **Int J Life Cycle Assess.** 25, 394–402.
+33. **Heijungs, R. (2020).** *On the number of Monte Carlo runs needed to compare the impacts of alternatives…* **Int J Life Cycle Assess.** 25, 394–402. doi:10.1007/s11367-019-01698-4 — ✅ *Extracted* — [`literature_extractions.md`](literature_extractions.md) §F33; PDF [`papers/On_the_number_of_Monte_Carlo_runs_in_comparative_p.pdf`](papers/On_the_number_of_Monte_Carlo_runs_in_comparative_p.pdf).
 
-34. **Kim, A. (2025).** *Global sensitivity analysis of correlated uncertainties in life cycle assessment.* **Journal of Industrial Ecology.** doi:10.1111/jiec.70036
+34. **Kim, A., Mutel, C., Hellweg, S. (2025).** *Global sensitivity analysis of correlated uncertainties in life cycle assessment.* **Journal of Industrial Ecology** 29(4):1090–1104. doi:10.1111/jiec.70036 — ✅ *Extracted* — [`literature_extractions.md`](literature_extractions.md) §F34; PDF [`papers/J of Industrial Ecology - 2025 - Kim - Global sensitivity analysis of correlated uncertainties in life cycle assessment.pdf`](papers/).
 
 35. **Mendoza Beltran, A., et al. (2018).** *When the background matters: using scenarios from integrated assessment models in prospective LCA.* **J Ind Ecol.** 23(1).
 
