@@ -205,8 +205,8 @@ class OpenAIMultimodalClient:
 
 class AnthropicMultimodalClient:
     """Wraps `anthropic.Anthropic()`. Vision via message content blocks
-    with type='image'; JSON output via assistant-prefill (same trick as
-    the text-only Anthropic client)."""
+    with type='image'; JSON output via assistant-prefill when supported,
+    otherwise an explicit JSON-only user suffix."""
 
     def __init__(self, api_key: str, model: Optional[str] = None):
         import anthropic  # lazy import
@@ -224,23 +224,52 @@ class AnthropicMultimodalClient:
         max_tokens: Optional[int] = None,
     ) -> dict:
         b64 = base64.b64encode(image_jpeg_bytes).decode("ascii")
-        rsp = self._client.messages.create(
-            model=self.model,
-            max_tokens=max_tokens or 2048,
-            temperature=temperature,
-            system=system,
-            messages=[
-                {"role": "user", "content": [
-                    {"type": "image", "source": {
-                        "type": "base64", "media_type": "image/jpeg", "data": b64,
-                    }},
-                    {"type": "text", "text": user},
-                ]},
-                {"role": "assistant", "content": "{"},
-            ],
+        user_blocks = [
+            {"type": "image", "source": {
+                "type": "base64", "media_type": "image/jpeg", "data": b64,
+            }},
+            {"type": "text", "text": user},
+        ]
+
+        # Newer Anthropic models reject temperature and/or assistant prefill.
+        # Try the legacy path first (Haiku), then fall back gracefully.
+        attempts: tuple[tuple[bool, bool, str], ...] = (
+            (True, True, user),
+            (True, False, user),
+            (False, False, user + "\n\nRespond with ONE JSON object only. "
+             "No markdown fences, no commentary."),
         )
-        text = rsp.content[0].text if rsp.content else ""
-        return _parse_json_permissive("{" + text)
+        last_exc: Optional[Exception] = None
+        for use_prefill, use_temperature, user_text in attempts:
+            blocks = list(user_blocks)
+            blocks[1] = {"type": "text", "text": user_text}
+            messages: list[dict] = [{"role": "user", "content": blocks}]
+            if use_prefill:
+                messages.append({"role": "assistant", "content": "{"})
+            kwargs: dict = {
+                "model": self.model,
+                "max_tokens": max_tokens or 2048,
+                "system": system,
+                "messages": messages,
+            }
+            if use_temperature:
+                kwargs["temperature"] = temperature
+            try:
+                rsp = self._client.messages.create(**kwargs)
+                text = rsp.content[0].text if rsp.content else ""
+                raw = ("{" + text) if use_prefill else text
+                return _parse_json_permissive(raw)
+            except Exception as exc:  # noqa: BLE001 — probe model capabilities
+                last_exc = exc
+                msg = str(exc).lower()
+                if "temperature" in msg and "deprecated" in msg:
+                    continue
+                if "prefill" in msg or "end with a user message" in msg:
+                    continue
+                raise
+        if last_exc is not None:
+            raise last_exc
+        return {}
 
 
 def _parse_json_permissive(raw: str) -> dict:

@@ -47,11 +47,24 @@ from .packaged_food_schema import (
     PackagedFoodExtraction,
     IngredientListExtraction,
     ExtractionMetadata,
+    NutrientBlock,
     SCHEMA_VERSION,
 )
 
 
 logger = logging.getLogger(__name__)
+
+
+# Keys allowed on NFPanelExtraction — strip LLM extras before Pydantic.
+_NF_PANEL_CANONICAL_KEYS = frozenset({
+    'schema_version', 'language_detected', 'panel_format_detected',
+    'product_name_visible', 'brand_visible',
+    'serving_size', 'servings_per_container', 'net_weight',
+    'per_serving', 'per_100g',
+    'hsr_category_hint', 'fopl_on_pack',
+    'extraction_succeeded', 'failure_reason',
+    'extraction_metadata',
+})
 
 
 # =======================================================================
@@ -88,11 +101,13 @@ _FLAT_NUTRIENT_ALIASES: dict[str, str] = {
     'trans_g':               'fat_trans_g',
     'fat_trans_g':           'fat_trans_g',
     # Carbs
-    'total_carbohydrate_g':  'carbohydrate_total_g',
-    'carbohydrate_g':        'carbohydrate_total_g',
-    'carbohydrates_g':       'carbohydrate_total_g',
-    'carbs_g':               'carbohydrate_total_g',
-    'carbohydrate_total_g':  'carbohydrate_total_g',
+    'total_carbohydrate_g':   'carbohydrate_total_g',
+    'total_carbohydrates_g':  'carbohydrate_total_g',
+    'carbohydrate_g':         'carbohydrate_total_g',
+    'carbohydrates_g':        'carbohydrate_total_g',
+    'carbohydrates_total_g':  'carbohydrate_total_g',  # 2026-05-26: LLM emits this plural-s variant on the combined-prompt path
+    'carbs_g':                'carbohydrate_total_g',
+    'carbohydrate_total_g':   'carbohydrate_total_g',
     'dietary_fiber_g':       'fibre_g',
     'fiber_g':               'fibre_g',
     'fibre_g':               'fibre_g',
@@ -109,11 +124,27 @@ _FLAT_NUTRIENT_ALIASES: dict[str, str] = {
     'proteins_g':            'protein_g',
     # Minerals
     'sodium_mg':             'sodium_mg',
+    'sodium':                'sodium_mg',
     'potassium_mg':          'potassium_mg',
+    'potassium':             'potassium_mg',
     'calcium_mg':            'calcium_mg',
+    'calcium':               'calcium_mg',
     'iron_mg':               'iron_mg',
+    'iron':                  'iron_mg',
+    'fer':                   'iron_mg',  # bilingual FR label shorthand
     'cholesterol_mg':        'cholesterol_mg',
 }
+
+# Nested objects the LLM may use for infant-formula vitamin/mineral tables.
+_VITAMIN_MINERAL_TABLE_KEYS = (
+    'vitamin_mineral_table',
+    'vitamins_and_minerals',
+    'vitamins_minerals',
+    'minerals',
+    'micronutrients',
+    'nutrition_information',
+    'nutrition_info',
+)
 
 # Top-level NF panel aliases.
 _FLAT_NF_FIELD_ALIASES: dict[str, str] = {
@@ -127,7 +158,66 @@ _LLM_NOISE_KEYS = {
     'polyunsaturated_fat_g', 'monounsaturated_fat_g',
     'vitamin_d_mcg', 'vitamin_a_mcg', 'vitamin_c_mg',
     'confidence',  # top-level catch-all confidence; we use per-field confidences
+    'overall_confidence',
+    'front_of_pack_label', 'on_pack_hsr_rating', 'on_pack_nutriscore',
+    'front_of_pack',
+    'per_container',
 }
+
+
+def _coerce_hsr_category_hint(raw: object) -> dict:
+    """Map alternate LLM shapes (e.g. Opus/Haiku flat hsr_category_*) to schema."""
+    if isinstance(raw, str):
+        return {'guess': raw, 'confidence': 0.0, 'rationale': '', 'alternatives': []}
+    if not isinstance(raw, dict):
+        return {}
+    if 'guess' in raw:
+        return raw
+    guess = raw.get('guess') or raw.get('category') or raw.get('primary')
+    if guess is None:
+        return {}
+    return {
+        'guess': str(guess),
+        'confidence': float(raw.get('confidence') or 0.0),
+        'rationale': str(raw.get('rationale') or raw.get('reason') or ''),
+        'alternatives': raw.get('alternatives') or [],
+    }
+
+
+def _coerce_fopl_on_pack(raw: object) -> dict:
+    """Map alternate FoPL key names to fopl_on_pack schema."""
+    if not isinstance(raw, dict):
+        return {}
+    stars = (
+        raw.get('hsr_stars_visible') or raw.get('hsr_stars')
+        or raw.get('hsr_stars_on_pack')
+    )
+    nutri = (
+        raw.get('nutri_score_visible') or raw.get('nutri_score')
+        or raw.get('nutri_score_on_pack')
+    )
+    return {
+        'hsr_stars_visible': stars,
+        'nutri_score_visible': nutri,
+    }
+
+
+def _remap_flat_hsr_hint_fields(out: dict) -> dict:
+    """Haiku/Opus sometimes flatten hsr_category_hint into sibling keys."""
+    if 'hsr_category_hint' not in out and 'hsr_category' in out:
+        out['hsr_category_hint'] = _coerce_hsr_category_hint({
+            'guess': out.pop('hsr_category'),
+            'rationale': out.pop('hsr_category_rationale', ''),
+            'alternatives': out.pop('hsr_category_alternatives', []),
+            'confidence': out.pop('hsr_category_confidence', 0.0),
+        })
+    else:
+        for stray in (
+            'hsr_category', 'hsr_category_rationale',
+            'hsr_category_alternatives', 'hsr_category_confidence',
+        ):
+            out.pop(stray, None)
+    return out
 
 
 # Sub-key aliases inside an ExtractedNumeric dict — the LLM sometimes returns
@@ -303,6 +393,62 @@ def _to_extracted_string(raw: object) -> dict:
     return {'value': str(raw), 'confidence': 0.85}
 
 
+def _merge_vitamin_mineral_table(block: dict, table: object) -> dict:
+    """Merge infant-formula vitamin/mineral table values into a nutrient block.
+
+    The LLM sometimes returns a nested {calcium_mg: 44, ...} or flat
+    {calcium: 44, iron: 1, ...} object separate from per_serving. Fill
+    per-field gaps without overwriting values already read from the main NF
+    rows (existing non-null values win).
+    """
+    if not isinstance(table, dict):
+        return block
+    out = dict(block)
+    for k, v in table.items():
+        if not isinstance(k, str):
+            continue
+        key = k.lower()
+        canonical = _FLAT_NUTRIENT_ALIASES.get(key)
+        if canonical is None and key in NutrientBlock.model_fields:
+            canonical = key
+        if canonical is None or canonical not in NutrientBlock.model_fields:
+            continue
+        existing = out.get(canonical) or {}
+        if isinstance(existing, dict) and existing.get('value') is not None:
+            continue
+        unit_hint = (
+            'mg' if canonical.endswith('_mg')
+            else 'g' if canonical.endswith('_g')
+            else 'kcal' if 'kcal' in canonical
+            else 'kJ' if canonical == 'energy_kj'
+            else None
+        )
+        coerced = _to_extracted_numeric(v, default_unit=unit_hint)
+        if coerced.get('value') is not None:
+            out[canonical] = coerced
+    return out
+
+
+def _merge_nested_mineral_sources(nf: dict) -> dict:
+    """Pull micronutrients from infant-formula nested tables into per_serving."""
+    if not isinstance(nf, dict):
+        return nf
+    per_serving = dict(nf.get('per_serving') or {})
+    per_serving = _ensure_nutrient_dicts(per_serving)
+    for key in _VITAMIN_MINERAL_TABLE_KEYS:
+        if key in nf:
+            per_serving = _merge_vitamin_mineral_table(per_serving, nf.pop(key))
+    # Some models nest the table inside per_serving under a non-schema key.
+    for key in list(per_serving.keys()):
+        if key in _VITAMIN_MINERAL_TABLE_KEYS and isinstance(per_serving[key], dict):
+            per_serving = _merge_vitamin_mineral_table(
+                {k: v for k, v in per_serving.items() if k in NutrientBlock.model_fields},
+                per_serving.pop(key),
+            )
+    nf['per_serving'] = _ensure_nutrient_dicts(per_serving)
+    return nf
+
+
 def _normalise_nf_panel(nf: dict) -> dict:
     """If the LLM returned a flat NF panel, coerce to the canonical nested shape.
     Idempotent — passes a correctly-nested panel through unchanged."""
@@ -324,7 +470,7 @@ def _normalise_nf_panel(nf: dict) -> dict:
         nf['per_serving'] = _ensure_nutrient_dicts(nf['per_serving'])
         if isinstance(nf.get('per_100g'), dict):
             nf['per_100g'] = _ensure_nutrient_dicts(nf['per_100g'])
-        return _fix_nf_top_level(nf)
+        return _fix_nf_top_level(_merge_nested_mineral_sources(nf))
 
     # Build the per_serving block from flat keys.
     per_serving: dict = dict(nf.get('per_serving') or {})  # start with whatever was nested
@@ -379,7 +525,7 @@ def _normalise_nf_panel(nf: dict) -> dict:
                 _build_nutrient_block_from_flat(nf['per_100g']))
         else:
             out['per_100g'] = None
-    return _fix_nf_top_level(out)
+    return _fix_nf_top_level(_merge_nested_mineral_sources(out))
 
 
 def _build_nutrient_block_from_flat(block: dict) -> dict:
@@ -464,12 +610,26 @@ def _fix_nf_top_level(nf: dict) -> dict:
         out['per_serving'] = _ensure_nutrient_dicts(out['per_serving'])
     if isinstance(out.get('per_100g'), dict):
         out['per_100g'] = _ensure_nutrient_dicts(out['per_100g'])
-    # Hint defaults
+    out = _remap_flat_hsr_hint_fields(out)
+    # HSR hint — Opus sometimes emits hsr_category_guess instead.
+    if 'hsr_category_guess' in out and 'hsr_category_hint' not in out:
+        out['hsr_category_hint'] = _coerce_hsr_category_hint(out.pop('hsr_category_guess'))
+    elif 'hsr_category_hint' in out:
+        out['hsr_category_hint'] = _coerce_hsr_category_hint(out['hsr_category_hint'])
     if 'hsr_category_hint' not in out or not isinstance(out['hsr_category_hint'], dict):
         out['hsr_category_hint'] = {}
+    if 'fopl' in out and 'fopl_on_pack' not in out:
+        out['fopl_on_pack'] = _coerce_fopl_on_pack(out.pop('fopl'))
+    elif 'front_of_pack' in out and 'fopl_on_pack' not in out:
+        out['fopl_on_pack'] = _coerce_fopl_on_pack(out.pop('front_of_pack'))
+    elif 'fop_label' in out and 'fopl_on_pack' not in out:
+        out['fopl_on_pack'] = _coerce_fopl_on_pack(out.pop('fop_label'))
+    elif 'fopl_on_pack' in out:
+        out['fopl_on_pack'] = _coerce_fopl_on_pack(out['fopl_on_pack'])
     if 'fopl_on_pack' not in out or not isinstance(out['fopl_on_pack'], dict):
         out['fopl_on_pack'] = {}
-    return out
+    out = _merge_nested_mineral_sources(out)
+    return {k: v for k, v in out.items() if k in _NF_PANEL_CANONICAL_KEYS}
 
 
 def _normalise_ingredient_list(il: object) -> object:

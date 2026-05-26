@@ -10,7 +10,25 @@ predominantly dual-language, and the project's user base is Canadian-anchored.
 from __future__ import annotations
 
 
-PROMPT_VERSION: int = 2
+PROMPT_VERSION: int = 5
+# v5 (2026-05-26, PKG-IMG-2.x): infant-formula / "Nutrition Information"
+# tables — Canadian RTF & powder labels use a dense per-100 mL (or per-100 g
+# reconstituted) vitamin/mineral block separate from the standard NF footer.
+# Prompt now maps Calcium / Iron / Potassium / Sodium from that table into
+# per_serving; panel_format_detected gains "canadian_infant_formula". v4 caches
+# invalidated.
+# v4 (2026-05-26, PKG-IMG-2.x bugfix): the v3 critical-fields expansion
+# was applied to `build_user_prompt()` (the NF-only path) but the combined
+# path's `build_combined_user_prompt()` was still emitting the older terse
+# field list that excluded micronutrients + carbohydrate_total_g. The
+# Phase 2 scanner UI calls the combined endpoint, so the v3 expansion
+# was effectively dead for the production scan-product flow. v4 brings
+# the combined prompt to parity with the NF-only one. v3 caches invalidated.
+# v3 (2026-05-26, PKG-IMG-2.x): expanded the user-prompt "critical fields"
+# list to include carbohydrate_total_g + servings_per_container + the
+# micronutrients (potassium/calcium/iron) — earlier benchmark audit found
+# the LLM was skipping the Total Carbohydrate parent row when only Fibre +
+# Sugars children were highlighted as critical. v2 caches invalidated.
 # v2 (2026-05-26, PKG-IMG-1 Phase 2): added combined NF + ingredient-list
 # adaptive extraction prompt. v1 cached extractions are invalidated.
 
@@ -35,6 +53,14 @@ You will see one of three label families:
   3. European (Regulation 1169/2011) — typically a per-100g column \
      primary with optional per-serving secondary, lists kJ AND kcal, \
      salt (NOT sodium directly).
+  4. Canadian infant formula (ready-to-feed or powder) — NOT a standard \
+     "Nutrition Facts / Valeur nutritive" panel. Instead: \
+     "Nutrition Information / Information nutritionnelle" with a stated \
+     reference amount (usually "Per 100 mL / Par 100 mL" for RTF liquids, \
+     or per 100 g reconstituted for powder). A dense two-column table lists \
+     macronutrients (Energy, Protein, Fat, Carbohydrate) AND a long \
+     vitamin/mineral block (Vitamin A, D, E, …, Calcium, Iron, Potassium, \
+     Sodium, …). Set panel_format_detected="canadian_infant_formula".
 
 Rules — these are non-negotiable:
 
@@ -102,6 +128,22 @@ K. Bilingual labels (Canadian): treat both languages as equivalent. The \
    English and French values MUST agree (if they don't, something is \
    wrong — record both in raw_text and flag in extraction_warnings).
 
+K2. Infant-formula nutrition tables (panel_format_detected="canadian_infant_formula"):
+   - Use the label's stated reference amount as serving_size (typically \
+     value=100, unit="ml" for RTF; value=100, unit="g" for reconstituted powder).
+   - Populate per_serving from that reference column — do NOT leave per_serving \
+     empty and put values only in per_100g.
+   - Read macronutrients from the main block: energy (Cal/kcal → energy_kcal; \
+     kJ if shown → energy_kj), protein_g, fat_total_g, carbohydrate_total_g. \
+     Fibre / sugars / trans fat may be absent — leave null when not listed.
+   - Read minerals from the vitamin/mineral section of the SAME table into \
+     per_serving: potassium_mg, calcium_mg, iron_mg. Sodium may appear in the \
+     mineral block (e.g. "Sodium / Sodium 18 mg") rather than a standard NF \
+     sodium row — still map to sodium_mg.
+   - Do NOT skip potassium/calcium/iron just because they sit below vitamins \
+     instead of in a standard Canadian NF footer row.
+   - Energy on formula labels is often written "67 Cal (280 kJ)" — extract both.
+
 L. If no nutrition panel is visible at all (e.g. the image is a cat photo, \
    a fruit, or just the front-of-pack marketing), return \
    extraction_succeeded=false with failure_reason="no_nutrition_panel_detected". \
@@ -121,15 +163,23 @@ def build_user_prompt(*, target: str = "hsr") -> str:
 Extract the Nutrition Facts panel from the attached image and return the \
 strict JSON object described in your system instructions.
 
-Downstream consumer: {target} scorer (Health Star Rating HSRAC v9). The \
-fields HSR critically needs are: serving_size, energy_kj OR energy_kcal, \
-fat_sat_g, sugars_total_g, sodium_mg, protein_g, fibre_g. Other fields \
-are nice-to-have and may be null if absent from the panel.
+Downstream consumer: {target} scorer (Health Star Rating HSRAC v9) plus \
+downstream FCS / HENI / HEFI / dietary-pattern / environmental scorers \
+through the Phase 2 ingredient decomposer. The fields you MUST extract \
+when they appear on the panel (do NOT skip the parent row when child rows \
+are present — e.g. record Total Carbohydrate even when Fibre + Sugars are \
+its line items): serving_size, servings_per_container, energy_kj OR \
+energy_kcal, fat_total_g, fat_sat_g, fat_trans_g, carbohydrate_total_g, \
+fibre_g, sugars_total_g, sugars_added_g, protein_g, sodium_mg, \
+cholesterol_mg. Micronutrients (potassium_mg, calcium_mg, iron_mg) are \
+also required when listed — including on infant-formula "Nutrition Information" \
+tables where they appear in the vitamin/mineral block (see rule K2). Other \
+fields are nice-to-have and may be null if absent from the panel.
 
 Required top-level keys in your response object:
   schema_version (integer, must be 1)
   language_detected (one of: "en", "fr", "en-fr", "es", "other", "unknown")
-  panel_format_detected (one of: "canadian_2016", "us_fda_2016", "eu_1169_2011", "unknown")
+  panel_format_detected (one of: "canadian_2016", "us_fda_2016", "eu_1169_2011", "canadian_infant_formula", "unknown")
   product_name_visible (object with value + confidence)
   brand_visible (object with value + confidence)
   serving_size (object with value, unit, confidence, raw_text)
@@ -276,8 +326,19 @@ Return the JSON described in your system instructions. Set `has_nf_panel` \
 and `has_ingredient_list` booleans to reflect which were populated.
 
 Downstream consumers:
-- nf_panel → Health Star Rating scorer (always); critical fields: serving_size, \
-  energy_kj OR energy_kcal, fat_sat_g, sugars_total_g, sodium_mg, protein_g, fibre_g.
+- nf_panel → Health Star Rating scorer + downstream FCS / HENI / HEFI / \
+  dietary-pattern / environmental scorers through the Phase 2 ingredient \
+  decomposer. The fields you MUST extract when they appear on the panel \
+  (do NOT skip the parent row when child rows are present — e.g. record \
+  Total Carbohydrate even when Fibre + Sugars are its line items): \
+  serving_size, servings_per_container, energy_kj OR energy_kcal, \
+  fat_total_g, fat_sat_g, fat_trans_g, carbohydrate_total_g, fibre_g, \
+  sugars_total_g, sugars_added_g, protein_g, sodium_mg, cholesterol_mg. \
+  Micronutrients (potassium_mg, calcium_mg, iron_mg) are also required \
+  when listed — on standard Canadian (2016) NF panels they appear below \
+  macronutrients; on infant-formula "Nutrition Information" labels they \
+  appear in the vitamin/mineral section of the per-100 mL table (rule K2). \
+  Other fields are nice-to-have and may be null if absent from the panel.
 - ingredient_list → ingredient-to-CNF decomposer → HEFI / HENI / FCS / \
   dietary-pattern / environmental scorers. Critical fields: ingredients_text \
   (always when an ingredient list is visible), ingredients_parsed (best-effort).

@@ -862,7 +862,7 @@ export interface ExtractionMetadata {
 export interface NFPanelExtraction {
   schema_version: number;
   language_detected: 'en' | 'fr' | 'en-fr' | 'es' | 'other' | 'unknown';
-  panel_format_detected: 'canadian_2016' | 'us_fda_2016' | 'eu_1169_2011' | 'unknown';
+  panel_format_detected: 'canadian_2016' | 'us_fda_2016' | 'eu_1169_2011' | 'canadian_infant_formula' | 'unknown';
   product_name_visible: ExtractedString;
   brand_visible: ExtractedString;
   serving_size: ExtractedNumeric;

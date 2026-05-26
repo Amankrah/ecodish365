@@ -193,7 +193,8 @@ class NFPanelExtraction(BaseModel):
     schema_version: int = SCHEMA_VERSION
     language_detected: Literal["en", "fr", "en-fr", "es", "other", "unknown"] = "unknown"
     panel_format_detected: Literal[
-        "canadian_2016", "us_fda_2016", "eu_1169_2011", "unknown",
+        "canadian_2016", "us_fda_2016", "eu_1169_2011",
+        "canadian_infant_formula", "unknown",
     ] = "unknown"
 
     product_name_visible: ExtractedString = Field(default_factory=ExtractedString)

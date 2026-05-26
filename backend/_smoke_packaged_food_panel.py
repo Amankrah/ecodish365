@@ -105,21 +105,29 @@ GROUND_TRUTH: List[GroundTruth] = [
         difficulty="hard",
         language="en",
         expected_category="2",
-        serving_size_value=240,
+        # 2026-05-26 GT audit (PKG-IMG-2.x): re-read clearer crop of the
+        # AVIF pouch panel. Corrected 6 values: serving 240→340 g,
+        # fat_total 1→2 g, sodium 480→470 mg, fibre 1→3 g, sugars 5→4 g,
+        # protein 18→16 g. Also added the visible micronutrient row
+        # (calcium 50 mg, iron 0.8 mg, potassium 320 mg).
+        serving_size_value=340,
         serving_size_unit="g",
         servings_per_container=1,
         per_serving={
             "energy_kcal": 150,
-            "fat_total_g": 1,
+            "fat_total_g": 2,
             "fat_sat_g": 0,
             "fat_trans_g": 0,
             "cholesterol_mg": 25,
-            "sodium_mg": 480,
+            "sodium_mg": 470,
             "carbohydrate_total_g": 15,
-            "fibre_g": 1,
-            "sugars_total_g": 5,
+            "fibre_g": 3,
+            "sugars_total_g": 4,
             "sugars_added_g": 0,
-            "protein_g": 18,
+            "protein_g": 16,
+            "calcium_mg": 50,
+            "iron_mg": 0.8,
+            "potassium_mg": 320,
         },
     ),
     GroundTruth(
@@ -128,6 +136,15 @@ GROUND_TRUTH: List[GroundTruth] = [
         difficulty="hard",
         language="en-fr",
         expected_category="2",
+        # 2026-05-26 GT audit (PKG-IMG-2.x): re-read the bilingual panel
+        # against a high-resolution crop. Corrected 3 values: protein 5→8 g,
+        # sodium 600→510 mg, fibre 5→8 g (third correction found in a
+        # follow-up audit after the user's _debug_extract_one.py showed the
+        # AI reading carb 29 + the higher-res crop showed fibre 8 g with
+        # 29% DV — consistent with 8g/25g DV reference). Added potassium
+        # 600 mg (visible on panel, was missing from GT). The AI's lower
+        # V1 score on this image was therefore artificially low by ~25 pp
+        # cumulative across the four corrections.
         serving_size_value=250,
         serving_size_unit="ml",
         per_serving={
@@ -136,11 +153,12 @@ GROUND_TRUTH: List[GroundTruth] = [
             "fat_sat_g": 0.4,
             "fat_trans_g": 0,
             "carbohydrate_total_g": 27,
-            "fibre_g": 5,
+            "fibre_g": 8,
             "sugars_total_g": 5,
-            "protein_g": 5,
+            "protein_g": 8,
             "cholesterol_mg": 0,
-            "sodium_mg": 600,
+            "sodium_mg": 510,
+            "potassium_mg": 600,
             "calcium_mg": 50,
             "iron_mg": 0.75,
         },
