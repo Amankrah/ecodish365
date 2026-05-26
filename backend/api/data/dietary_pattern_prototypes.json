@@ -319,16 +319,30 @@
     {
       "pattern_id": "eat_lancet",
       "display_name": "EAT-Lancet planetary-health",
-      "literature_anchor": "Willett W, Rockström J, Loken B, et al. Food in the Anthropocene: the EAT-Lancet Commission on healthy diets from sustainable food systems. Lancet 2019;393:447-492. EAT-Lancet Commission 2.0. Lancet 2025 (in press).",
-      "outcome_evidence_reused": "Planetary-health diet projected to avoid ~11 million premature deaths/year globally vs current intake (Willett 2019 §6 + Table 2). Note: targets are aspirational and population-level, NOT personal-risk predictions.",
-      "individual_mode_blurb": "Plant-forward, modest fish, very limited red meat + dairy + added sugar. Half-plate vegetables + fruits, plant-protein emphasis. Designed jointly for human health + planetary boundaries.",
+      "literature_anchor": "Rockström J, Thilsted SH, Willett WC, et al. The EAT-Lancet Commission on healthy, sustainable, and just food systems (EAT-Lancet 2.0). Lancet 2025;406(10510):1625-1700. doi:10.1016/S0140-6736(25)01201-2. Direct successor to: Willett W, Rockström J, Loken B, et al. Food in the Anthropocene (EAT-Lancet 1.0). Lancet 2019;393:447-492.",
+      "literature_anchor_2025_revision_note": "EAT-Lancet 2.0 (Rockström 2025, Table 1 p. 1632) revises the Planetary Health Diet (PHD) reference intake to ~2400 kcal/day (down from 2500 kcal/day in the 2019 Commission, p. 1636). Macronutrient profile: ~14% energy from protein, ~53% from carbohydrate, ~35% from total fat; added/free sugar capped at 5% of energy; sodium <2 g/day (Table 1 p. 1637). Headline composition shifts vs 2019: whole grains widened from 232 g/d to 210 g/d (with 20-50% energy range), legumes widened to 75 g/d (0-150 range), beef/pork/lamb narrowed to 15 g/d (0-30), poultry at 30 g/d (0-60), fish at 30 g/d (0-100). The 2025 update also publishes food-system planetary boundaries (Table 2 p. 1640) for the first time.",
+      "outcome_evidence_reused": "EAT-Lancet 2.0 (Rockström 2025, Panel 1 p. 1629): PHD adoption projected to prevent ~10 million deaths/yr via the comparative risk assessment method (17% of total mortality), or ~15 million deaths/yr (27%) via the PHD-index pattern method on a >200,000-adult cohort with >30-yr follow-up. Highest-decile PHD adherence = 28% lower overall mortality vs lowest decile (n=206,404; >54,000 deaths). NOTE: targets are aspirational and population-level, NOT personal-risk predictions.",
+      "individual_mode_blurb": "Plant-forward, modest fish, very limited red meat + dairy + added sugar. Half-plate vegetables + fruits, plant-protein emphasis. Designed jointly for human health + planetary boundaries (5 of 6 breached Earth-system boundaries are food-system-driven per Rockström 2025 Executive Summary).",
       "researcher_only": true,
       "example_days": [
         {
-          "name": "Willett 2019 reference diet (~2500 kcal, planetary-health targets)",
-          "source_section": "Willett 2019 Table 1 p. 451 (reference daily intake of food groups in g)",
+          "name": "Rockström 2025 PHD reference diet (~2400 kcal, EAT-Lancet 2.0 targets)",
+          "source_section": "Rockström 2025 Table 1 p. 1632 (revised reference daily intake at 2400 kcal/day)",
           "foods": [
-            {"food_id": 4523, "mass_g": 232, "comment": "rice (whole grains 232 g/d target)"},
+            {"food_id": 4523, "mass_g": 210, "comment": "rice (whole grains 210 g/d target, revised from 232 g/d in 2019)"},
+            {"food_id": 3404, "mass_g": 75,  "comment": "tofu (legumes 75 g/d, widened range 0-150)"},
+            {"food_id": 3393, "mass_g": 50,  "comment": "lentils (legumes)"},
+            {"food_id": 2374, "mass_g": 150, "comment": "broccoli (vegetables 300 g/d)"},
+            {"food_id": 2395, "mass_g": 150, "comment": "kale (vegetables)"},
+            {"food_id": 2589, "mass_g": 25,  "comment": "walnuts (nuts 50 g/d)"},
+            {"food_id": 1704, "mass_g": 200, "comment": "banana (fruits 200 g/d)"}
+          ]
+        },
+        {
+          "name": "Willett 2019 reference diet (~2500 kcal, original PHD targets — kept for direct comparability vs literature)",
+          "source_section": "Willett 2019 Table 1 p. 451 (original reference daily intake of food groups in g)",
+          "foods": [
+            {"food_id": 4523, "mass_g": 232, "comment": "rice (whole grains 232 g/d target — 2019 vintage)"},
             {"food_id": 3404, "mass_g": 75,  "comment": "tofu (legumes 50-100 g/d)"},
             {"food_id": 3393, "mass_g": 50,  "comment": "lentils (legumes)"},
             {"food_id": 2374, "mass_g": 100, "comment": "broccoli (vegetables 300 g/d)"},

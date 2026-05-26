@@ -6,12 +6,12 @@
     {
       "gate": "G1 Self-match (individual-mode prototypes, expected in top-1 OR co-leading)",
       "passed": true,
-      "detail": "20/21 strict top-1, 21/21 top-1-or-co-leading (skipped 2 EAT-Lancet days — researcher-mode only)",
+      "detail": "20/21 strict top-1, 21/21 top-1-or-co-leading (skipped 3 EAT-Lancet days — researcher-mode only)",
       "metrics": {
         "total": 21,
         "strict_correct": 20,
         "relaxed_correct": 21,
-        "eat_lancet_skipped": 2,
+        "eat_lancet_skipped": 3,
         "failures": [
           "(co-leading) vegetarian::Lacto-ovo balanced day with whole grains + legumes → top=dash (cos 0.945); expected vegetarian at 0.936 (Δ 0.009)"
         ]
@@ -214,8 +214,8 @@
             "name": "EAT-Lancet reference day (whole grains + tofu + legumes + vegetables)",
             "expected": "eat_lancet",
             "got": "eat_lancet",
-            "cosine": 0.98,
-            "expected_cosine": 0.98,
+            "cosine": 0.985,
+            "expected_cosine": 0.985,
             "verdict": "top-1",
             "pass": true
           },

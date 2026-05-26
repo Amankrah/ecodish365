@@ -11,11 +11,46 @@ from .cnf_integrator import get_cnf_integrator
 # log message is emitted explaining the Canadian calibration of the absolute
 # CAD prices is unchanged. Add entries as authoritative per-country economic
 # valuation studies become available.
+# Per-country regional adjustment factors applied multiplicatively to the
+# Canadian-calibrated absolute prices in `monetary_values`. Exercised when
+# API callers pass `country='CAN'` to /api/environmental/* (see
+# environmental_views.py:896 / 1255 / 1420). Default (no country) does NOT
+# apply these multipliers — the absolute prices stand alone.
+#
+# Sources for the Canadian multipliers below:
+# - 'Global warming' 1.15: Arctic amplification driver — ECCC NIR 2024
+#   (literature_extractions.md §I51 lines 3838-3850) documents that Canada
+#   warms at ~2x the global rate and contributes a disproportionate share of
+#   per-capita food-system emissions; the 1.15 multiplier captures the
+#   marginal Canadian regulatory premium on per-tonne CO2-eq damage relative
+#   to the world-average ECCC SC-CO2 value, NOT a re-derivation of the
+#   damage function. NIR §ES.2 (lines 3790-3804) further documents the
+#   -60% electricity-sector decarbonisation 2005→2022 that REDUCES the
+#   share of food-system emissions attributable to grid electricity, but
+#   the climate-damage premium on the residual emissions is unchanged.
+# - 'Water consumption' 0.7: Canada holds ~7% of global renewable freshwater
+#   for 0.5% of population (per Statistics Canada Census of Environment); the
+#   marginal water-scarcity cost is correspondingly lower than the world avg.
+# - 'Land use' 0.8: Canada's agricultural land base is large relative to
+#   conversion rates (NIR 2024 §ES.4 lines 3808-3821: agriculture stable at
+#   56 Mt CO2-eq since 2005, no LULUCF acceleration outside the 2022 prairie
+#   drought spike).
+# CE Delft Environmental Prices Handbook (literature_extractions.md §H48)
+# publishes its midpoint weighting factors in EUR 2015 per kg. To express in
+# our reporting currency (2021 CAD, matching the ECCC SC-CO2 base year),
+# we apply a two-step chain:
+#   1. EUR 2015 → CAD 2015 via OECD PPP comparative price levels (~1.42)
+#   2. CAD 2015 → CAD 2021 via Statistics Canada CPI All-items
+#      (CANSIM 18-10-0005-01: 2015 = 126.6, 2021 = 141.6 → 1.118×)
+# Combined: 1 EUR 2015 ≈ 1.587 CAD 2021, rounded to 1.59.
+# Re-derive when refreshing to a later base year via Monetization.adjust_for_inflation().
+EUR_2015_TO_CAD_2021: float = 1.42 * 1.118  # ≈ 1.587
+
 _REGIONAL_MONETIZATION_BY_COUNTRY: Dict[str, Dict[str, float]] = {
     "CAN": {
-        'Global warming': 1.15,  # Arctic amplification (Canada warming ~2x global rate)
-        'Water consumption': 0.7,  # Abundant freshwater (~7% global renewable supply)
-        'Land use': 0.8,  # Abundant land resources (minimal conversion rates)
+        'Global warming': 1.15,  # See module-level comment above (NIR 2024 §ES.2)
+        'Water consumption': 0.7,  # See module-level comment (~7% global freshwater)
+        'Land use': 0.8,  # See module-level comment (NIR 2024 §ES.4)
         'Fossil resource scarcity': 1.1,  # Oil sands extraction intensity
     },
 }
@@ -53,42 +88,67 @@ class Monetization:
         # -> identity regional adjustments + informational log message.
         self.country = country or "CAN"
 
-        # Monetary valuation factors (CAD per indicator unit). Values are
-        # unchanged in this revision; per-value source attribution is recorded
-        # in `monetary_value_sources` for traceability. Page-accurate updates
-        # from CE Delft 2024 / True Price 2024 / ECCC 2023 will land in a later
-        # revision once those PDFs are retrieved via institutional access (see
-        # literature_wishlist.md group H).
+        # Monetary valuation factors (CAD per indicator unit).
+        # 2026-05-25 first update: 'Global warming' value updated to the
+        # ECCC 2023 SC-CO2 2026 central (C$275/t-CO2, 2 % Ramsey discount)
+        # per literature_extractions.md §H47.
+        # 2026-05-25 follow-up: nine non-GHG ReCiPe midpoints with clean
+        # 1:1 unit mapping refreshed to CE Delft Environmental Prices
+        # Handbook (literature_extractions.md §H48 Table 2 Hierarchist
+        # weighting factors), converted via EUR_2015_TO_CAD_2021 ≈ 1.59.
+        # Categories left at pre-page-citation v0 placeholders (with explicit
+        # documentation in `monetary_value_sources`): Human cancer/non-cancer
+        # toxicity and Ozone formation Human/Terrestrial — CE Delft publishes
+        # one combined value where ReCiPe publishes two and we have no
+        # principled allocation key; Ionizing radiation — unit mismatch
+        # (CE Delft kBq U-235-eq vs ReCiPe kBq Co-60-eq); Fossil/Mineral
+        # resource scarcity — CE Delft flags as "not fully quantified";
+        # Water consumption — anchored to Canadian municipal tariff median,
+        # different basis from CE Delft EU28.
         self.monetary_values = {
-            # Climate (per tonne CO2-eq)
-            'Global warming': 221.0,
+            # Climate (per tonne CO2-eq).
+            # 2026 central estimate at the 2 % Near-term Ramsey discount rate
+            # from ECCC (2023) "Guidance on the Social Cost of GHG Emissions",
+            # Table 1 (C$2021/t-CO2). Replaces the pre-page-citation 221.0
+            # value that predated the 2023 federal guidance.
+            #
+            # Methodological gotcha (per ECCC §4.2): we MUST NOT apply this
+            # value to CH4 / N2O by re-multiplying through GWP100 — ECCC's
+            # SC-CH4 (C$2,687/t) and SC-N2O (C$78,633/t) are damage-anchored
+            # at the per-gas level and disagree with GWP × SC-CO2 by 1.5–3×.
+            # Our LCA layer collapses CH4 + N2O into 'Global warming' via
+            # AR5 GWPs at the midpoint (see life_cycle_assessment.py:70),
+            # so SC-CH4 / SC-N2O entries would be dead code here. Adding
+            # per-gas monetisation is deferred until the LCA layer surfaces
+            # CH4 / N2O as separate mass flows (architecture change).
+            'Global warming': 275.0,
 
             # Health impacts (per tonne emission unless noted)
-            'Fine particulate matter formation': 52920.0,
-            'Human carcinogenic toxicity': 0.1029,        # per kg 1,4-DCB-eq
-            'Human non-carcinogenic toxicity': 0.000808,  # per kg 1,4-DCB-eq
-            'Ionizing radiation': 0.000056,               # per kBq Co-60-eq
-            'Ozone formation, Human health': 8500.0,
+            'Fine particulate matter formation': 39.2 * EUR_2015_TO_CAD_2021 * 1000,  # CE Delft 2018 Table 2 €39.2/kg PM10-eq
+            'Human carcinogenic toxicity': 0.1029,        # per kg 1,4-DCB-eq — v0 placeholder; see source dict (CE Delft has no cancer/non-cancer split)
+            'Human non-carcinogenic toxicity': 0.000808,  # per kg 1,4-DCB-eq — v0 placeholder; see source dict
+            'Ionizing radiation': 0.000056,               # per kBq Co-60-eq — v0 placeholder; CE Delft uses kBq U-235-eq (unit mismatch)
+            'Ozone formation, Human health': 8500.0,      # v0 placeholder; CE Delft POCP is single category (€1.15/kg NMVOC-eq); see source dict
 
             # Ecosystem impacts
-            'Terrestrial acidification': 1985.0,
-            'Freshwater eutrophication': 38220.0,
-            'Marine eutrophication': 9560.0,
-            'Terrestrial ecotoxicity': 0.00081,           # per kg 1,4-DCB-eq
-            'Freshwater ecotoxicity': 0.00081,            # per kg 1,4-DCB-eq
-            'Marine ecotoxicity': 0.000081,               # per kg 1,4-DCB-eq
-            'Ozone formation, Terrestrial ecosystems': 2100.0,
+            'Terrestrial acidification': 7.48 * EUR_2015_TO_CAD_2021 * 1000,   # CE Delft 2018 Table 2 €7.48/kg SO2-eq Hierarchist
+            'Freshwater eutrophication': 1.86 * EUR_2015_TO_CAD_2021 * 1000,   # CE Delft 2018 Table 2 €1.86/kg P-eq
+            'Marine eutrophication': 3.11 * EUR_2015_TO_CAD_2021 * 1000,       # CE Delft 2018 Table 2 €3.11/kg N
+            'Terrestrial ecotoxicity': 8.69 * EUR_2015_TO_CAD_2021,            # per kg 1,4-DB-eq — CE Delft 2018 Table 2 €8.69/kg
+            'Freshwater ecotoxicity':  0.0361 * EUR_2015_TO_CAD_2021,          # per kg 1,4-DB-eq — CE Delft 2018 Table 2 €0.0361/kg
+            'Marine ecotoxicity':      0.00739 * EUR_2015_TO_CAD_2021,         # per kg 1,4-DB-eq — CE Delft 2018 Table 2 €0.00739/kg
+            'Ozone formation, Terrestrial ecosystems': 2100.0,  # v0 placeholder; see Ozone formation Human health note
 
             # Atmospheric
-            'Stratospheric ozone depletion': 80850.0,
+            'Stratospheric ozone depletion': 123 * EUR_2015_TO_CAD_2021 * 1000,  # CE Delft 2018 Table 2 €123/kg CFC-11-eq Hierarchist
 
-            # Resource depletion (per kg)
+            # Resource depletion (per kg) — v0 placeholders; CE Delft 2018 §Table 3 flags Resource availability as "Not fully quantified" (lines 3669-3672)
             'Fossil resource scarcity': 0.2205,
             'Mineral resource scarcity': 0.0956,
 
             # Water and land
-            'Water consumption': 0.0162,                  # per m3; municipal-tariff median
-            'Land use': 0.00617,                          # per m2.yr crop-eq
+            'Water consumption': 0.0162,                                    # per m3 — Canadian municipal tariff median; NOT CE Delft (different basis)
+            'Land use': 0.126 * EUR_2015_TO_CAD_2021,                       # per m2·yr crop-eq — CE Delft 2018 Table 2 €0.126/m²·yr Hierarchist
         }
 
         # Source attribution for each monetary value (CODE-4).
@@ -98,55 +158,115 @@ class Monetization:
         # updated once literature group H PDFs are retrieved.
         self.monetary_value_sources: Dict[str, Dict[str, str]] = {
             'Global warming': {
-                'source': 'ECCC 2023 SC-GHG Technical Update',
+                'source': 'ECCC 2023, Guidance on the Social Cost of GHG Emissions, Table 1 (2026 central, 2 % Near-term Ramsey discount rate)',
                 'currency_year': '2021 CAD',
-                'status': 'pending_page_citation',
-                'last_verified': '2026-05-20',
+                'status': 'verified',
+                'page_anchor': 'literature_extractions.md §H47 lines 3496-3509',
+                'sensitivity_range_2026': '170 (2.5 % discount) – 275 (2.0 %, central) – 467 (1.5 %)',
+                'methodological_note': 'CO2-eq aggregate only; CH4/N2O folded in via AR5 GWPs per ReCiPe midpoint. Per ECCC §4.2 this is a known underestimate but per-gas separation requires an LCA-layer architecture change.',
+                'last_verified': '2026-05-25',
             },
             'Fine particulate matter formation': {
-                'source': 'True Price Foundation 2022 / CE Delft Environmental Prices Handbook 2024',
-                'currency_year': 'EUR -> CAD via PPP',
-                'status': 'pending_page_citation',
-                'last_verified': '2026-05-20',
+                'source': 'CE Delft 2018, Environmental Prices Handbook EU28 version, Table 2 (Summary p. 5), Hierarchist weighting factor €39.2/kg PM10-eq',
+                'currency_year': '2021 CAD (converted from EUR 2015 via EUR_2015_TO_CAD_2021 ≈ 1.59)',
+                'status': 'verified',
+                'page_anchor': 'literature_extractions.md §H48 line 3633',
+                'last_verified': '2026-05-25',
             },
             'Water consumption': {
                 'source': 'Canadian municipal tariff median; True Price 2024',
                 'currency_year': '2024 CAD',
                 'status': 'pending_page_citation',
                 'override_env': 'WATER_COST_PER_M3',
-                'last_verified': '2026-05-20',
+                'methodological_note': 'NOT refreshed from CE Delft H48 — that handbook does not list water consumption in Table 2; the existing municipal-tariff anchor uses a different basis (Canadian utility tariff median vs scarcity-weighted external cost). Refresh blocked on True Price 2024 PDF retrieval (wishlist H49).',
+                'last_verified': '2026-05-25',
             },
             'Land use': {
-                'source': 'True Price 2024 (Canadian farmland rental basis)',
-                'currency_year': '2024 CAD',
-                'status': 'pending_page_citation',
-                'last_verified': '2026-05-20',
+                'source': 'CE Delft 2018, Environmental Prices Handbook EU28 version, Table 2 (Summary p. 5), Hierarchist weighting factor €0.126/m²·yr',
+                'currency_year': '2021 CAD (converted from EUR 2015 via EUR_2015_TO_CAD_2021 ≈ 1.59)',
+                'status': 'verified',
+                'page_anchor': 'literature_extractions.md §H48 line 3641',
+                'methodological_note': 'Replaces the True Price 2024 Canadian farmland-rental placeholder. ReCiPe land use unit (m²·yr crop-eq) matches CE Delft directly.',
+                'last_verified': '2026-05-25',
             },
-            # Remaining categories — generic European Environmental Prices Handbook fallback
+            # CE Delft Table 2 (H48 §lines 3623-3644) Hierarchist weighting
+            # factors — verified, page-anchored entries for the categories
+            # with clean 1:1 unit mapping to ReCiPe 2016 v1.1 H midpoints.
             **{
-                category: {
-                    'source': 'CE Delft Environmental Prices Handbook 2024 (EU28, PPP-adjusted to CAD)',
-                    'currency_year': 'EUR -> CAD via PPP',
-                    'status': 'pending_page_citation',
-                    'last_verified': '2026-05-20',
+                category_meta['name']: {
+                    'source': f'CE Delft 2018, Environmental Prices Handbook EU28 version, Table 2 (Summary p. 5), Hierarchist weighting factor {category_meta["price"]}',
+                    'currency_year': '2021 CAD (converted from EUR 2015 via EUR_2015_TO_CAD_2021 ≈ 1.59)',
+                    'status': 'verified',
+                    'page_anchor': f'literature_extractions.md §H48 line {category_meta["line"]}',
+                    'last_verified': '2026-05-25',
                 }
-                for category in [
-                    'Human carcinogenic toxicity',
-                    'Human non-carcinogenic toxicity',
-                    'Ionizing radiation',
-                    'Ozone formation, Human health',
-                    'Terrestrial acidification',
-                    'Freshwater eutrophication',
-                    'Marine eutrophication',
-                    'Terrestrial ecotoxicity',
-                    'Freshwater ecotoxicity',
-                    'Marine ecotoxicity',
-                    'Ozone formation, Terrestrial ecosystems',
-                    'Stratospheric ozone depletion',
-                    'Fossil resource scarcity',
-                    'Mineral resource scarcity',
+                for category_meta in [
+                    {'name': 'Terrestrial acidification',         'price': '€7.48/kg SO2-eq',      'line': 3635},
+                    {'name': 'Freshwater eutrophication',         'price': '€1.86/kg P-eq',        'line': 3636},
+                    {'name': 'Marine eutrophication',             'price': '€3.11/kg N',           'line': 3637},
+                    {'name': 'Terrestrial ecotoxicity',           'price': '€8.69/kg 1,4-DB-eq',   'line': 3638},
+                    {'name': 'Freshwater ecotoxicity',            'price': '€0.0361/kg 1,4-DB-eq', 'line': 3639},
+                    {'name': 'Marine ecotoxicity',                'price': '€0.00739/kg 1,4-DB-eq','line': 3640},
+                    {'name': 'Stratospheric ozone depletion',     'price': '€123/kg CFC-11-eq',    'line': 3630},
                 ]
             },
+            # Categories left at v0 placeholder values — CE Delft mapping
+            # is blocked on a real unit/scope mismatch documented in each
+            # entry below. These will be revisited when either a principled
+            # allocation key emerges (toxicity split) or the LCA layer is
+            # extended (Ionizing radiation Co-60 conversion).
+            'Human carcinogenic toxicity': {
+                'source': 'v0 placeholder (no published source)',
+                'currency_year': '2021 CAD (assumed)',
+                'status': 'mapping_blocked',
+                'methodological_note': 'CE Delft H48 publishes ONE combined Human toxicity weighting factor (€0.0894/kg 1,4-DB-eq, line 3631); ReCiPe 2016 splits into cancer + non-cancer with no allocation key in the source documents. Sticking with v0 placeholder until a defensible split is published. CE Delft combined would yield C$0.142/kg if applied to either field — overcounts by 2× if applied to both.',
+                'last_verified': '2026-05-25',
+            },
+            'Human non-carcinogenic toxicity': {
+                'source': 'v0 placeholder (no published source)',
+                'currency_year': '2021 CAD (assumed)',
+                'status': 'mapping_blocked',
+                'methodological_note': 'See Human carcinogenic toxicity entry above — same CE Delft no-split issue.',
+                'last_verified': '2026-05-25',
+            },
+            'Ionizing radiation': {
+                'source': 'v0 placeholder (no published source)',
+                'currency_year': '2021 CAD (assumed)',
+                'status': 'mapping_blocked',
+                'methodological_note': 'Unit mismatch: CE Delft H48 line 3634 publishes €0.0461/kBq U-235-eq; ReCiPe 2016 uses kBq Co-60-eq. The two are not directly substitutable without a radionuclide-specific characterisation-factor remapping (out of v1 scope).',
+                'last_verified': '2026-05-25',
+            },
+            'Ozone formation, Human health': {
+                'source': 'v0 placeholder (no published source)',
+                'currency_year': '2021 CAD (assumed)',
+                'status': 'mapping_blocked',
+                'methodological_note': 'CE Delft H48 line 3632 publishes ONE combined POCP weighting factor (€1.15/kg NMVOC-eq); ReCiPe 2016 splits photochemical ozone formation into Human health and Terrestrial ecosystems endpoints with no allocation key in the source documents. CE Delft combined would yield C$1828/t if 50/50 split — significantly below current placeholder (8500). Refresh deferred until allocation key established.',
+                'last_verified': '2026-05-25',
+            },
+            'Ozone formation, Terrestrial ecosystems': {
+                'source': 'v0 placeholder (no published source)',
+                'currency_year': '2021 CAD (assumed)',
+                'status': 'mapping_blocked',
+                'methodological_note': 'See Ozone formation, Human health entry above — same CE Delft no-split issue.',
+                'last_verified': '2026-05-25',
+            },
+            'Fossil resource scarcity': {
+                'source': 'v0 placeholder (no published source)',
+                'currency_year': '2021 CAD (assumed)',
+                'status': 'not_in_source',
+                'methodological_note': 'CE Delft H48 Table 3 line 3671 explicitly flags Resource availability as "Not fully quantified". No defensible refresh available from this source.',
+                'last_verified': '2026-05-25',
+            },
+            'Mineral resource scarcity': {
+                'source': 'v0 placeholder (no published source)',
+                'currency_year': '2021 CAD (assumed)',
+                'status': 'not_in_source',
+                'methodological_note': 'See Fossil resource scarcity entry above — same CE Delft scope gap.',
+                'last_verified': '2026-05-25',
+            },
+            # Every ReCiPe midpoint category is now explicitly entered above
+            # (verified or mapping_blocked / not_in_source); no comprehension
+            # fallback needed.
         }
         
         # Per-country regional adjustment factors. Selected from the module-level
