@@ -10,7 +10,13 @@ predominantly dual-language, and the project's user base is Canadian-anchored.
 from __future__ import annotations
 
 
-PROMPT_VERSION: int = 7
+PROMPT_VERSION: int = 8
+# v8 (2026-05-26): post-processing change — fat_sat_g=0 is now inferred when
+# fat_total_g=0 (Canadian Supplemented Food Facts panels and most beverages
+# omit the sat-fat sub-row when total fat is zero). Also: alternatives inside
+# hsr_category_hint now spell out the {"category", "reason"} shape so Opus
+# stops mirroring the parent's `guess` field name. Cache key bump invalidates
+# pre-fix failed extractions cached at v7.
 # v7 (2026-05-26, PKG-IMG-2.x): multi-image upload — the combined extractor
 # now accepts 1-3 photos of the SAME packaged product taken from different
 # faces (front / back / side). New rule U at the end of COMBINED_SYSTEM_PROMPT

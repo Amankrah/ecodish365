@@ -744,6 +744,32 @@ _SANITY_RANGES: tuple[tuple[str, float, str, str], ...] = (
 _CRITICAL_FIELDS_FOR_HSR = ("sodium_mg", "fat_sat_g", "sugars_total_g")
 
 
+def _infer_missing_subfields(panel: NFPanelExtraction) -> list[str]:
+    """Fill identity-derivable subfields the label may legitimately omit.
+
+    Canadian "Supplemented Food Facts" panels (and many beverage labels)
+    show only Fat / Lipides 0 g without a Saturated Fat sub-row, because
+    when total fat is zero, saturated fat is mathematically zero — it's a
+    subset. Same logic could extend to total-carbs=0 implying sugars=0,
+    but we only apply the identity that's currently blocking real products.
+    Returns the list of inferences made for the audit trail.
+    """
+    inferences: list[str] = []
+    if panel.per_serving is None:
+        return inferences
+    ft = getattr(panel.per_serving, 'fat_total_g', None)
+    sf = getattr(panel.per_serving, 'fat_sat_g', None)
+    if (ft is not None and sf is not None
+            and ft.value == 0 and ft.confidence > 0
+            and (sf.value is None or sf.confidence == 0)):
+        sf.value = 0.0
+        sf.confidence = ft.confidence
+        inferences.append(
+            f"inferred:fat_sat_g=0 (because fat_total_g=0, confidence={ft.confidence})"
+        )
+    return inferences
+
+
 # --- Public result type -------------------------------------------------
 
 
@@ -936,7 +962,13 @@ def extract_nf_panel(
             cache.set(_cache_key(sha), panel.model_dump(), timeout=CACHE_TTL_SECONDS)
         return ExtractionResult(extraction=panel, cache_hit=False)
 
-    # 6. Sanity guards.
+    # 6. Identity-based inference (e.g. fat_sat_g=0 when fat_total_g=0).
+    # Runs BEFORE sanity guards so a derived value still gets bounded-checked.
+    inferences = _infer_missing_subfields(panel)
+    if inferences:
+        panel.extraction_metadata.extraction_warnings.extend(inferences)
+
+    # 7. Sanity guards.
     panel, sanity_warnings = _apply_sanity_guards(panel)
     panel.extraction_metadata.sanity_guard_rejections.extend(sanity_warnings)
 
@@ -1197,8 +1229,13 @@ def extract_packaged_food(
         return CombinedExtractionResult(extraction=wrapped, cache_hit=False)
 
     # Sanity-guard the NF panel piece (the ingredient list is text-only
-    # and has no numeric thresholds to check).
+    # and has no numeric thresholds to check). Identity inferences (e.g.
+    # fat_sat_g=0 when fat_total_g=0) run first so a derived value gets
+    # bounded-checked too.
     if wrapped.nf_panel is not None:
+        inferences = _infer_missing_subfields(wrapped.nf_panel)
+        if inferences:
+            wrapped.nf_panel.extraction_metadata.extraction_warnings.extend(inferences)
         nf, sanity_warnings = _apply_sanity_guards(wrapped.nf_panel)
         nf.extraction_metadata.sanity_guard_rejections.extend(sanity_warnings)
         wrapped.nf_panel = nf
