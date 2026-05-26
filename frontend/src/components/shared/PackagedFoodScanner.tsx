@@ -1,29 +1,27 @@
 /**
- * PackagedFoodScanner — orchestrates the 3-step packaged-food flow:
+ * PackagedFoodScanner — HSR-only packaged-food flow:
  *   Step 1: image input (mobile camera or file upload)
  *   Step 2: review-and-edit prefilled NF panel form (PackagedFoodPanelForm)
  *   Step 3: HSR result with audience-aware explanation + provenance
  *
- * Step 1 uses <input type="file" accept="image/*" capture="environment"> —
- * on mobile this opens the rear camera directly; on desktop it shows the
- * file picker. We deliberately do NOT use getUserMedia for v1 because the
- * capture-input flow is simpler, works in iOS Safari without permissions
- * gymnastics, and lets users review the photo natively before submitting.
+ * HEFI / HENI / FCS scoring of packaged foods lives in the 24-h recall
+ * wizard (/recall-24h) where a scanned product can be logged per occasion.
  */
 'use client';
 
 import { useState } from 'react';
-import { Camera, Loader2, AlertCircle, Award, RotateCcw, AlertTriangle, Info, TrendingUp, ThumbsUp, FileText, ListChecks } from 'lucide-react';
+import Link from 'next/link';
+import {
+  Camera, Loader2, AlertCircle, Award, RotateCcw, AlertTriangle, Info,
+  TrendingUp, ThumbsUp, CalendarClock,
+} from 'lucide-react';
 import {
   CNFApiService,
   type NFPanelExtraction,
-  type PackagedFoodExtraction,
   type HSRCategoryCode,
   type HsrFromPanelResponse,
-  type DecompositionResult,
 } from '@/lib/api';
 import { PackagedFoodPanelForm } from './PackagedFoodPanelForm';
-import { PackagedFoodCompositionForm } from './PackagedFoodCompositionForm';
 
 type UserType = 'individual' | 'researcher' | 'policy';
 
@@ -31,13 +29,7 @@ interface Props {
   userType: UserType;
 }
 
-type FlowStep =
-  | 'capture'      // user picking an image
-  | 'reviewing'    // editing the extracted NF panel (Phase 1 + 2)
-  | 'decomposing'  // /api/packaged-food/decompose-ingredients/ in flight
-  | 'composing'    // editing the inferred CNF composition (Phase 2)
-  | 'scored'       // HSR result (Phase 1 path)
-  | 'error';
+type FlowStep = 'capture' | 'reviewing' | 'scored' | 'error';
 
 interface ScannerError {
   code: string;
@@ -49,17 +41,10 @@ export function PackagedFoodScanner({ userType }: Props): JSX.Element {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [extracting, setExtracting] = useState(false);
-  // Phase 2: extraction is now the unified wrapper. nf_panel and
-  // ingredient_list may each be null.
-  const [combined, setCombined] = useState<PackagedFoodExtraction | null>(null);
-  // Editable copy of the NF panel (Phase 2: this is initialised from
-  // combined.nf_panel and survives edits the user makes in the form).
   const [editedPanel, setEditedPanel] = useState<NFPanelExtraction | null>(null);
+  const [cacheHit, setCacheHit] = useState(false);
   const [scoring, setScoring] = useState(false);
   const [scoreResult, setScoreResult] = useState<HsrFromPanelResponse | null>(null);
-  // Phase 2: decomposition state for the "full scoring" path.
-  const [decomposing, setDecomposing] = useState(false);
-  const [decomposition, setDecomposition] = useState<DecompositionResult | null>(null);
   const [error, setError] = useState<ScannerError | null>(null);
 
   async function handleImagePicked(file: File): Promise<void> {
@@ -70,19 +55,18 @@ export function PackagedFoodScanner({ userType }: Props): JSX.Element {
     setExtracting(true);
     setStep('capture');
     try {
-      // Phase 2: adaptive extraction. May return NF, ingredients, or both.
-      const rsp = await CNFApiService.extractPackagedFoodCombined(file);
+      const rsp = await CNFApiService.extractPackagedFood(file, { target: 'hsr' });
       if (!rsp.extraction.extraction_succeeded) {
         setError({
           code: 'extraction_failed',
           message: rsp.extraction.failure_reason
-            || 'No nutrition panel or ingredient list detected in this image. Try a clearer photo of the back-of-pack label.',
+            || 'No nutrition panel detected in this image. Try a clearer photo of the Nutrition Facts panel.',
         });
         setStep('error');
         return;
       }
-      setCombined(rsp.extraction);
-      setEditedPanel(rsp.extraction.nf_panel);
+      setEditedPanel(rsp.extraction);
+      setCacheHit(rsp.cache_hit);
       setStep('reviewing');
     } catch (e: unknown) {
       const ax = e as { response?: { status?: number; data?: { error?: string; message?: string } } };
@@ -98,40 +82,6 @@ export function PackagedFoodScanner({ userType }: Props): JSX.Element {
     }
   }
 
-  // Phase 2 path — decompose ingredients with the (possibly edited) panel.
-  async function handleDecompose(): Promise<void> {
-    if (!editedPanel || !combined?.ingredient_list) return;
-    setError(null);
-    setDecomposing(true);
-    setStep('decomposing');
-    try {
-      const rsp = await CNFApiService.decomposePackagedFood(
-        editedPanel, combined.ingredient_list,
-      );
-      if (!rsp.decomposition.decomposition_succeeded) {
-        setError({
-          code: 'decomposition_failed',
-          message: rsp.decomposition.failure_reason
-            || 'Ingredient decomposition failed. Try editing the ingredient list (or NF panel) first.',
-        });
-        setStep('error');
-        return;
-      }
-      setDecomposition(rsp.decomposition);
-      setStep('composing');
-    } catch (e: unknown) {
-      const ax = e as { response?: { status?: number; data?: { error?: string; message?: string } } };
-      setError({
-        code: ax.response?.data?.error || 'decomposition_failed',
-        message: ax.response?.data?.message
-          || 'Could not decompose the ingredient list.',
-      });
-      setStep('error');
-    } finally {
-      setDecomposing(false);
-    }
-  }
-
   async function handleScore(
     edited: NFPanelExtraction,
     category: HSRCategoryCode,
@@ -139,7 +89,7 @@ export function PackagedFoodScanner({ userType }: Props): JSX.Element {
     fvnlPercent: number,
   ): Promise<void> {
     setError(null);
-    setEditedPanel(edited);   // persist edits in case user backtracks to decompose
+    setEditedPanel(edited);
     setScoring(true);
     try {
       const rsp = await CNFApiService.calculateHsrFromPanel(edited, category, {
@@ -163,10 +113,9 @@ export function PackagedFoodScanner({ userType }: Props): JSX.Element {
     if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
     setImageFile(null);
     setImagePreviewUrl(null);
-    setCombined(null);
     setEditedPanel(null);
     setScoreResult(null);
-    setDecomposition(null);
+    setCacheHit(false);
     setError(null);
     setStep('capture');
   }
@@ -177,11 +126,8 @@ export function PackagedFoodScanner({ userType }: Props): JSX.Element {
     }
   }
 
-  // ---------- render ----------
-
   return (
     <div className="space-y-6">
-      {/* Step 1 — capture / upload. Always visible until we have an extraction. */}
       {step === 'capture' && (
         <div className="bg-white rounded-lg border p-6 shadow-sm space-y-4">
           <div className="flex items-start gap-3">
@@ -243,45 +189,18 @@ export function PackagedFoodScanner({ userType }: Props): JSX.Element {
         </div>
       )}
 
-      {/* Step 2 — review-and-edit. Renders the NF panel form when present
-          and an ingredient-list status block (Phase 2). */}
-      {step === 'reviewing' && combined && (
+      {step === 'reviewing' && editedPanel && (
         <div className="space-y-4">
-          {/* Coverage summary: what did we find? */}
           <div className="bg-white rounded-lg border p-4 shadow-sm">
             <div className="flex items-start gap-3">
               <div className="flex-1">
-                <h2 className="text-lg font-semibold text-gray-900">What we extracted</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Review nutrition values</h2>
                 <p className="text-sm text-gray-600 mt-1">
-                  This image contains:
+                  Confirm or correct the values below, then score with HSR. Yellow / red dots
+                  flag fields the AI was less confident about.
                 </p>
-                <ul className="mt-2 space-y-1 text-sm">
-                  <li className="flex items-center gap-2">
-                    <FileText className={`h-4 w-4 ${combined.has_nf_panel ? 'text-emerald-600' : 'text-gray-300'}`} aria-hidden="true" />
-                    <span className={combined.has_nf_panel ? 'text-gray-900' : 'text-gray-400'}>
-                      Nutrition Facts panel{' '}
-                      {combined.has_nf_panel ? '✓ found' : '— not in this image'}
-                    </span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <ListChecks className={`h-4 w-4 ${combined.has_ingredient_list ? 'text-emerald-600' : 'text-gray-300'}`} aria-hidden="true" />
-                    <span className={combined.has_ingredient_list ? 'text-gray-900' : 'text-gray-400'}>
-                      Ingredient list{' '}
-                      {combined.has_ingredient_list ? '✓ found' : '— not in this image'}
-                    </span>
-                  </li>
-                </ul>
-                {(!combined.has_nf_panel || !combined.has_ingredient_list) && (
-                  <p className="mt-2 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded p-2">
-                    Missing piece? Take another photo focusing on the other side of the
-                    package, then come back here.{' '}
-                    <button type="button" onClick={reset} className="underline">
-                      Try another photo
-                    </button>.
-                  </p>
-                )}
               </div>
-              {combined.extraction_metadata.cache_hit && (
+              {cacheHit && (
                 <span className="text-xs px-2 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded">
                   cached
                 </span>
@@ -301,129 +220,38 @@ export function PackagedFoodScanner({ userType }: Props): JSX.Element {
             )}
           </div>
 
-          {/* NF panel form — the HSR scoring path (Phase 1) */}
-          {editedPanel && (
-            <div className="bg-white rounded-lg border p-6 shadow-sm space-y-3">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900">Review nutrition values</h2>
-                <p className="text-sm text-gray-600 mt-1">
-                  Confirm or correct the values below before scoring. Yellow / red dots
-                  flag fields the AI was less confident about. Hover any field name to
-                  see the raw text it read.
-                </p>
-              </div>
-              <PackagedFoodPanelForm
-                initial={editedPanel}
-                busy={scoring}
-                onSubmit={handleScore}
-                onReextract={reextract}
-                onCancel={reset}
-              />
-            </div>
-          )}
-
-          {/* Phase 2 — ingredient list summary + decompose CTA */}
-          {combined.has_ingredient_list && combined.ingredient_list && (
-            <div className="bg-white rounded-lg border p-6 shadow-sm space-y-3">
-              <div className="flex items-start gap-3">
-                <ListChecks className="h-5 w-5 text-blue-700 flex-shrink-0 mt-0.5" aria-hidden="true" />
-                <div className="flex-1">
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Ingredient list also found
-                  </h2>
-                  <p className="text-sm text-gray-600 mt-1">
-                    Decompose into CNF foods to score with HEFI, HENI, FCS, dietary-pattern,
-                    or environmental scorers. Composition will be INFERRED from the ingredient
-                    order + Nutrition Facts macros — labels rarely disclose percentages.
-                  </p>
-                </div>
-              </div>
-              <div className="bg-gray-50 border border-gray-200 rounded p-2 text-xs text-gray-700 max-h-32 overflow-y-auto">
-                <p className="font-medium text-gray-600 mb-1">Raw ingredient text the AI read:</p>
-                <p className="font-mono">{combined.ingredient_list.ingredients_text}</p>
-              </div>
-              {combined.ingredient_list.ingredients_parsed.length > 0 && (
-                <p className="text-xs text-gray-500">
-                  Parsed {combined.ingredient_list.ingredients_parsed.length} ingredient
-                  {combined.ingredient_list.ingredients_parsed.length === 1 ? '' : 's'}
-                  {combined.ingredient_list.explicit_percentages_found
-                    && ' (label discloses explicit %)'}.
-                </p>
-              )}
-              <button
-                type="button"
-                onClick={handleDecompose}
-                disabled={decomposing || !editedPanel}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-medium rounded-md"
-              >
-                {decomposing ? (
-                  <><Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />Decomposing…</>
-                ) : (
-                  <>📊 Decompose for full scoring (HEFI / HENI / FCS / pattern / env)</>
-                )}
-              </button>
-              {!editedPanel && (
-                <p className="text-xs text-red-700">
-                  Decomposition requires the Nutrition Facts panel as a macro-conservation
-                  anchor. Take a photo that includes both.
-                </p>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Step 3a — decomposing (loading) */}
-      {step === 'decomposing' && (
-        <div className="bg-white rounded-lg border p-6 shadow-sm flex items-center gap-3">
-          <Loader2 className="h-5 w-5 animate-spin text-indigo-700" aria-hidden="true" />
-          <div>
-            <p className="text-sm font-semibold text-gray-900">
-              Decomposing ingredient list into CNF composition…
-            </p>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Looking up CNF candidates for each ingredient, then asking the LLM to
-              infer per-ingredient masses constrained by your NF panel macros. ~5 seconds.
-            </p>
+          <div className="bg-white rounded-lg border p-6 shadow-sm space-y-3">
+            <PackagedFoodPanelForm
+              initial={editedPanel}
+              busy={scoring}
+              onSubmit={handleScore}
+              onReextract={reextract}
+              onCancel={reset}
+            />
           </div>
-        </div>
-      )}
 
-      {/* Step 3b — composing (editable composition table + route to scorers) */}
-      {step === 'composing' && decomposition && editedPanel && (
-        <div className="bg-white rounded-lg border p-6 shadow-sm space-y-4">
-          <div className="flex items-start gap-3">
-            <div className="flex-1">
-              <h2 className="text-lg font-semibold text-gray-900">
-                Inferred composition — review before scoring
-              </h2>
-              <p className="text-sm text-gray-600 mt-1">
-                Each label ingredient was mapped to a CNF food + an inferred mass.
-                Edit any obviously-wrong mass below, then route to your chosen scorer.
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
+            <CalendarClock className="h-5 w-5 text-blue-700 flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <div className="text-sm text-blue-900">
+              <p className="font-semibold">Want HEFI, HENI, or FCS instead?</p>
+              <p className="mt-1">
+                Use the{' '}
+                <Link href="/recall-24h" className="underline font-medium">
+                  24-hour dietary recall
+                </Link>
+                {' '}and choose <strong>Scan packaged food</strong> for the occasion
+                (breakfast, snack, etc.). That path decomposes the ingredient list into
+                CNF foods and folds the product into your full day before scoring.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => setStep('reviewing')}
-              className="px-3 py-1.5 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-            >
-              ← Back to NF panel
-            </button>
           </div>
-          <PackagedFoodCompositionForm
-            decomposition={decomposition}
-            panel={editedPanel}
-            userType={userType}
-          />
         </div>
       )}
 
-      {/* Step 4 — HSR result (Phase 1 path). */}
       {step === 'scored' && scoreResult && (
         <PackagedFoodResult result={scoreResult} userType={userType} onAnother={reset} />
       )}
 
-      {/* Error state — graceful retry. */}
       {step === 'error' && error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
           <AlertCircle className="h-5 w-5 text-red-700 flex-shrink-0 mt-0.5" aria-hidden="true" />
@@ -451,8 +279,6 @@ export function PackagedFoodScanner({ userType }: Props): JSX.Element {
 }
 
 
-// ---------- Result rendering ----------
-
 interface ResultProps {
   result: HsrFromPanelResponse;
   userType: UserType;
@@ -465,13 +291,9 @@ function PackagedFoodResult({ result, userType, onAnother }: ResultProps): JSX.E
   const provenance = result.provenance;
   const notes = result.result_notes;
 
-  // Humanise an explanation-section key for use as a fallback heading
-  // when the section dict doesn't carry an explicit "title" string.
   const humaniseKey = (k: string): string =>
     k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
-  // The set of keys we treat as "content paragraphs" inside an explanation
-  // section. `title` is rendered separately as the heading.
   const PARAGRAPH_KEYS = [
     'headline', 'message', 'units', 'interpretation', 'mandatory_caveat',
     'simple_guidance', 'cross_category_tool', 'reporting', 'thresholds',
@@ -482,7 +304,6 @@ function PackagedFoodResult({ result, userType, onAnother }: ResultProps): JSX.E
 
   return (
     <div className="bg-white rounded-lg border p-6 shadow-sm space-y-5">
-      {/* Headline + stars */}
       <div className="flex items-start gap-3">
         <Award className="h-7 w-7 text-blue-700 flex-shrink-0 mt-1" aria-hidden="true" />
         <div className="flex-1">
@@ -520,7 +341,6 @@ function PackagedFoodResult({ result, userType, onAnother }: ResultProps): JSX.E
         <span className="ml-2 text-sm text-gray-600">{stars.toFixed(1)} / 5.0</span>
       </div>
 
-      {/* Score drivers — why this rating */}
       {notes?.drivers?.length > 0 && (
         <div className="border-t pt-4">
           <h3 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-1.5">
@@ -548,7 +368,6 @@ function PackagedFoodResult({ result, userType, onAnother }: ResultProps): JSX.E
         </div>
       )}
 
-      {/* Interpretive caveats specific to this product */}
       {notes?.notes?.length > 0 && (
         <div className="border-t pt-4 space-y-3">
           {notes.notes.map((n, i) => {
@@ -572,7 +391,6 @@ function PackagedFoodResult({ result, userType, onAnother }: ResultProps): JSX.E
         </div>
       )}
 
-      {/* Audience-aware explanation pack (now renders all sub-fields). */}
       {Object.entries(explanations).length > 0 && (
         <div className="border-t pt-4 space-y-3">
           {Object.entries(explanations).map(([sectionKey, section]) => {
@@ -582,8 +400,6 @@ function PackagedFoodResult({ result, userType, onAnother }: ResultProps): JSX.E
             const paragraphs = PARAGRAPH_KEYS
               .filter(k => typeof sec[k] === 'string' && sec[k].trim().length > 0)
               .map(k => ({ key: k, text: sec[k] }));
-            // Also include any other string fields we didn't enumerate
-            // explicitly (forward-compat with future explanation pack keys).
             const knownKeys = new Set(['title', ...PARAGRAPH_KEYS]);
             for (const [k, v] of Object.entries(sec)) {
               if (!knownKeys.has(k) && typeof v === 'string' && v.trim().length > 0) {
@@ -621,7 +437,6 @@ function PackagedFoodResult({ result, userType, onAnother }: ResultProps): JSX.E
         </div>
       )}
 
-      {/* Provenance — visible by default. Researcher mode auto-expands. */}
       <details className="text-xs border-t pt-4" open={userType === 'researcher'}>
         <summary className="cursor-pointer text-gray-600 font-medium">
           ⌖ Source: extracted from image by {provenance.model} at {provenance.extracted_at}
@@ -662,4 +477,3 @@ function PackagedFoodResult({ result, userType, onAnother }: ResultProps): JSX.E
     </div>
   );
 }
-

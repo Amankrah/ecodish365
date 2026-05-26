@@ -1,15 +1,11 @@
 /**
- * /scan-product — Phase 1 of PKG-IMG-1 (2026-05-26).
+ * /scan-product — HSR scoring from a packaged-food Nutrition Facts photo.
  *
- * User uploads a photo of a packaged food's Nutrition Facts panel; a
- * multimodal LLM extracts the panel into a structured JSON; user reviews
- * and confirms the extracted values; we compute Health Star Rating from
- * the (possibly-edited) panel and render an audience-aware result.
+ * User uploads a photo of a Nutrition Facts panel; a multimodal LLM extracts
+ * structured values; the user confirms; we compute Health Star Rating.
  *
- * No CNF FoodID is involved — this path is for products NOT in the
- * Canadian Nutrient File (most branded retail goods). Phase 2 will add
- * ingredient-list extraction to enable HEFI / HENI / dietary-pattern /
- * environmental scoring of the same upload.
+ * HEFI / HENI / FCS use the 24-h recall wizard (/recall-24h) with per-occasion
+ * packaged-food scanning instead.
  */
 'use client';
 
@@ -37,8 +33,9 @@ export default function ScanProductPage() {
                 (bilingual EN/FR), US-FDA, and European (1169/2011) labels.
               </p>
               <p className="text-xs text-gray-500 mt-2">
-                Phase 1: HSR only. HEFI, HENI, dietary pattern, and environmental
-                scoring need an ingredient list (coming in Phase 2).
+                For HEFI, HENI, or FCS, use the{' '}
+                <a href="/recall-24h" className="text-blue-700 underline">24-hour dietary recall</a>
+                {' '}and scan packaged foods per occasion (breakfast, snack, etc.).
               </p>
             </div>
           </div>
