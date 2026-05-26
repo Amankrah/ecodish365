@@ -207,7 +207,7 @@ Required top-level keys in your response object:
   per_serving (object with the per-nutrient sub-fields)
   per_100g (object same shape, OR null if the panel doesn't have that column)
   hsr_category_hint (object with: guess (string code), confidence (0-1), rationale (string),
-    alternatives (array of up to 2 objects, EACH SHAPED EXACTLY {"category": "<code>", "reason": "<string>"}
+    alternatives (array of up to 2 objects, EACH SHAPED EXACTLY {{"category": "<code>", "reason": "<string>"}}
     — note the key is "category" inside each alternative, NOT "guess"))
   fopl_on_pack (object with hsr_stars_visible + nutri_score_visible, both nullable)
   extraction_succeeded (boolean — set false if no panel detected)
