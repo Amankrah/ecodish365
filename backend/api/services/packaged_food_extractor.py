@@ -949,6 +949,20 @@ def extract_nf_panel(
             "and one or more was missing or zero-confidence "
             "(possibly due to sanity-guard rejection)."
         )
+        ps = panel.per_serving
+        critical_snapshot = {}
+        if ps is not None:
+            for fname in ('energy_kj', 'energy_kcal', 'fat_sat_g', 'sugars_total_g', 'sodium_mg'):
+                f = getattr(ps, fname, None)
+                if f is not None:
+                    critical_snapshot[fname] = {'value': f.value, 'confidence': f.confidence}
+        logger.warning(
+            "pkg-food critical_fields_unusable: panel_format=%s, language=%s, "
+            "sanity_rejections=%s, critical_fields=%s",
+            panel.panel_format_detected, panel.language_detected,
+            panel.extraction_metadata.sanity_guard_rejections,
+            critical_snapshot,
+        )
 
     panel.extraction_metadata.latency_ms = int(
         (time.perf_counter() - t_start) * 1000
