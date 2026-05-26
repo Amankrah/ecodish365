@@ -53,6 +53,7 @@ export function PackagedFoodOccasionEntry({
   const [decomposing, setDecomposing] = useState(false);
   const [error, setError] = useState<ScannerError | null>(null);
   const [showPanelEditor, setShowPanelEditor] = useState(false);
+  const [netWeightMissing, setNetWeightMissing] = useState(false);
 
   async function handleImagePicked(file: File): Promise<void> {
     setError(null);
@@ -99,13 +100,28 @@ export function PackagedFoodOccasionEntry({
   async function handleDecompose(panel: NFPanelExtraction): Promise<void> {
     if (!ingredientList) return;
     setError(null);
+    setNetWeightMissing(false);
     setDecomposing(true);
     setStep('decomposing');
     try {
       const rsp = await CNFApiService.decomposePackagedFood(panel, ingredientList);
       if (!rsp.decomposition.decomposition_succeeded) {
+        const reason = rsp.decomposition.failure_reason || '';
+        // Recoverable: panel didn't show net weight AND we couldn't fall back
+        // to servings × serving_size. Stay on the review step, expand the
+        // editor, highlight the field, and let the user supply it and retry.
+        if (reason.startsWith('no_net_weight')) {
+          setEditedPanel(panel);
+          setNetWeightMissing(true);
+          setShowPanelEditor(true);
+          setError({
+            message: 'Net weight not on this panel. Enter it below (check the front or side of pack) and retry.',
+          });
+          setStep('reviewing');
+          return;
+        }
         setError({
-          message: rsp.decomposition.failure_reason
+          message: reason
             || 'Decomposition failed. Edit net weight on the panel or switch to text entry.',
         });
         setStep('error');
@@ -140,6 +156,7 @@ export function PackagedFoodOccasionEntry({
     setIngredientList(null);
     setError(null);
     setShowPanelEditor(false);
+    setNetWeightMissing(false);
     onChange(null);
     setStep('capture');
   }
@@ -245,13 +262,27 @@ export function PackagedFoodOccasionEntry({
               <> · {ingredientList.ingredients_parsed.length} ingredients detected</>
             )}
           </div>
+          {netWeightMissing && (
+            <div role="alert" className="flex items-start gap-2 text-xs text-red-900 bg-red-50 border border-red-300 rounded p-2">
+              <AlertCircle className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" aria-hidden="true" />
+              <span>
+                <strong>Net weight required.</strong> The AI couldn&apos;t find a net weight on this panel,
+                and there&apos;s no servings-per-container fallback. Enter it below (check the front or side
+                of pack — e.g. <em>Net wt 400 g</em>) and click <strong>Confirm &amp; decompose</strong> again.
+              </span>
+            </div>
+          )}
           <button
             type="button"
             onClick={() => setShowPanelEditor(v => !v)}
             className="inline-flex items-center gap-1 text-xs text-blue-700 hover:text-blue-900"
           >
             {showPanelEditor ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
-            {showPanelEditor ? 'Hide panel editor' : 'Edit nutrition panel (optional)'}
+            {showPanelEditor
+              ? 'Hide panel editor'
+              : netWeightMissing
+                ? 'Open panel editor to add net weight'
+                : 'Edit nutrition panel (optional)'}
           </button>
           {showPanelEditor && editedPanel && (
             <div className="bg-white rounded border p-3 space-y-2 text-xs">
@@ -288,29 +319,40 @@ export function PackagedFoodOccasionEntry({
                 />
               </div>
               <div>
-                <label className="block font-medium text-gray-700 mb-1">Net weight (g)</label>
+                <label className={`block font-medium mb-1 ${netWeightMissing ? 'text-red-700' : 'text-gray-700'}`}>
+                  Net weight (g){netWeightMissing && ' — required'}
+                </label>
                 <input
                   type="number"
                   min={1}
                   max={5000}
                   step={1}
                   value={editedPanel.net_weight?.value ?? ''}
-                  onChange={e => updatePanelField({
-                    net_weight: {
-                      ...(editedPanel.net_weight ?? {
-                        unit: 'g', confidence: 0.5, raw_text: null,
-                        from_dv_percent: false, from_kcal_conversion: false,
-                      }),
-                      value: parseFloat(e.target.value) || null,
-                      unit: 'g',
-                    },
-                  })}
+                  onChange={e => {
+                    if (netWeightMissing) setNetWeightMissing(false);
+                    updatePanelField({
+                      net_weight: {
+                        ...(editedPanel.net_weight ?? {
+                          unit: 'g', confidence: 0.5, raw_text: null,
+                          from_dv_percent: false, from_kcal_conversion: false,
+                        }),
+                        value: parseFloat(e.target.value) || null,
+                        unit: 'g',
+                      },
+                    });
+                  }}
                   aria-label="Net weight in grams"
+                  aria-invalid={netWeightMissing ? 'true' : 'false'}
                   title="Net weight in grams"
-                  className="w-full px-2 py-1.5 border border-gray-300 rounded-md"
+                  className={`w-full px-2 py-1.5 border rounded-md ${
+                    netWeightMissing
+                      ? 'border-red-400 bg-red-50 focus:border-red-500 focus:ring-red-200'
+                      : 'border-gray-300'
+                  }`}
                   placeholder="e.g. 400"
+                  autoFocus={netWeightMissing}
                 />
-                <p className="text-[11px] text-gray-500 mt-1">
+                <p className={`text-[11px] mt-1 ${netWeightMissing ? 'text-red-700' : 'text-gray-500'}`}>
                   Required for mass-conservation when decomposing. Check the front or side of pack if missing.
                 </p>
               </div>
@@ -337,7 +379,7 @@ export function PackagedFoodOccasionEntry({
         </div>
       )}
 
-      {error && (
+      {error && !netWeightMissing && (
         <div role="alert" className="flex items-start gap-2 text-xs text-red-800 bg-red-50 border-l-4 border-red-400 px-2 py-1.5 rounded">
           <AlertCircle className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" aria-hidden="true" />
           <span>{error.message}</span>

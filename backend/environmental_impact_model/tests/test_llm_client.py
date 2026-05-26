@@ -168,28 +168,69 @@ class ParseJSONPermissiveTests(unittest.TestCase):
         self.assertEqual(_parse_json_permissive("   "), {})
 
 
-class AnthropicAdapterTests(unittest.TestCase):
-    """Anthropic adapter uses assistant-prefill `"{"` to coerce JSON.
-    Without the anthropic SDK installed (it's an optional dep), we exercise
-    the chat method by injecting a mocked `_client`."""
+class AnthropicUtilsTests(unittest.TestCase):
+    """Shared attempt builder — Opus skips legacy temperature/prefill probes."""
 
-    def test_chat_completion_json_prepends_brace_to_response(self):
-        # Skip if the anthropic SDK isn't importable; otherwise build a real
-        # AnthropicChatJSONClient and swap out its _client for a mock.
+    def test_opus_skips_legacy_attempts(self):
+        from api.services.anthropic_client_utils import (
+            anthropic_error_is_retryable,
+            anthropic_skips_legacy_attempts,
+            build_anthropic_json_attempts,
+        )
+
+        self.assertTrue(anthropic_skips_legacy_attempts("claude-opus-4-7"))
+        self.assertFalse(anthropic_skips_legacy_attempts("claude-haiku-4-5"))
+
+        opus_attempts = build_anthropic_json_attempts("claude-opus-4-7", "hello")
+        self.assertEqual(len(opus_attempts), 1)
+        use_prefill, use_temp, user_text = opus_attempts[0]
+        self.assertFalse(use_prefill)
+        self.assertFalse(use_temp)
+        self.assertIn("JSON object only", user_text)
+
+        haiku_attempts = build_anthropic_json_attempts("claude-haiku-4-5", "hello")
+        self.assertEqual(len(haiku_attempts), 3)
+
+        self.assertTrue(anthropic_error_is_retryable(Exception("temperature is deprecated")))
+        self.assertTrue(anthropic_error_is_retryable(Exception("prefill not allowed")))
+        self.assertFalse(anthropic_error_is_retryable(Exception("rate limit")))
+
+
+class AnthropicAdapterTests(unittest.TestCase):
+    """Anthropic adapter uses assistant-prefill `"{"` to coerce JSON on Haiku.
+    Opus uses a single JSON-only user message (no temperature, no prefill)."""
+
+    def _anthropic_adapter(self, model: str) -> AnthropicChatJSONClient:
         try:
             import anthropic  # noqa: F401
         except ImportError:
             self.skipTest("anthropic SDK not installed")
-        adapter = AnthropicChatJSONClient(api_key="sk-ant-test")
+        adapter = AnthropicChatJSONClient(api_key="sk-ant-test", model=model)
+        adapter._client = MagicMock()
+        return adapter
+
+    def test_haiku_chat_completion_json_prepends_brace_to_response(self):
+        adapter = self._anthropic_adapter("claude-haiku-4-5")
         text_block = MagicMock()
         text_block.text = '"answer": 42, "ok": true}'
-        adapter._client = MagicMock()
         adapter._client.messages.create.return_value = MagicMock(content=[text_block])
         result = adapter.chat_completion_json(system="s", user="u")
         self.assertEqual(result, {"answer": 42, "ok": True})
-        # Verify the prefill turn was passed.
         msgs = adapter._client.messages.create.call_args.kwargs["messages"]
         self.assertEqual(msgs[-1], {"role": "assistant", "content": "{"})
+
+    def test_opus_single_attempt_no_prefill_or_temperature(self):
+        adapter = self._anthropic_adapter("claude-opus-4-7")
+        text_block = MagicMock()
+        text_block.text = '{"answer": 42, "ok": true}'
+        adapter._client.messages.create.return_value = MagicMock(content=[text_block])
+        result = adapter.chat_completion_json(system="s", user="u")
+        self.assertEqual(result, {"answer": 42, "ok": True})
+        adapter._client.messages.create.assert_called_once()
+        kwargs = adapter._client.messages.create.call_args.kwargs
+        self.assertNotIn("temperature", kwargs)
+        self.assertEqual(len(kwargs["messages"]), 1)
+        self.assertEqual(kwargs["messages"][0]["role"], "user")
 
 
 if __name__ == "__main__":

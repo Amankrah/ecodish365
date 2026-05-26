@@ -147,12 +147,11 @@ class AnthropicChatJSONClient:
         temperature: float = 0.0,
         max_tokens: Optional[int] = None,
     ) -> dict:
-        attempts: tuple[tuple[bool, bool, str], ...] = (
-            (True, True, user),
-            (True, False, user),
-            (False, False, user + "\n\nRespond with ONE JSON object only. "
-             "No markdown fences, no commentary."),
+        from api.services.anthropic_client_utils import (
+            anthropic_error_is_retryable,
+            build_anthropic_json_attempts,
         )
+        attempts = build_anthropic_json_attempts(self.model, user)
         last_exc: Optional[Exception] = None
         for use_prefill, use_temperature, user_text in attempts:
             messages: list[dict] = [{"role": "user", "content": user_text}]
@@ -173,10 +172,7 @@ class AnthropicChatJSONClient:
                 return _parse_json_permissive(raw)
             except Exception as exc:  # noqa: BLE001 — probe model capabilities
                 last_exc = exc
-                msg = str(exc).lower()
-                if "temperature" in msg and "deprecated" in msg:
-                    continue
-                if "prefill" in msg or "end with a user message" in msg:
+                if anthropic_error_is_retryable(exc):
                     continue
                 raise
         if last_exc is not None:

@@ -10,7 +10,14 @@ predominantly dual-language, and the project's user base is Canadian-anchored.
 from __future__ import annotations
 
 
-PROMPT_VERSION: int = 5
+PROMPT_VERSION: int = 6
+# v6 (2026-05-26, PKG-IMG-2.x): tighten Rule F so the LLM does NOT infer
+# servings_per_container when the line is not on the panel face it can see.
+# Observed on Opus: SPC was sometimes invented from container size or
+# net_weight ÷ serving_size, which made decomposition flaky — one run
+# would produce a usable fallback net_weight (and decompose), the next
+# would not. Forcing a true null when SPC is absent makes the failure
+# deterministic and lets the frontend prompt the user for net_weight.
 # v5 (2026-05-26, PKG-IMG-2.x): infant-formula / "Nutrition Information"
 # tables — Canadian RTF & powder labels use a dense per-100 mL (or per-100 g
 # reconstituted) vitamin/mineral block separate from the standard NF footer.
@@ -92,7 +99,13 @@ E. Serving size: extract BOTH the numeric value AND the unit (g for \
    serving, capture the full text in raw_text.
 
 F. Servings per container: integer or decimal ("about 2.5", "8 bars"). \
-   When the label says "1 serving per container", record value=1.
+   When the label says "1 serving per container", record value=1. \
+   If the servings-per-container line is NOT clearly visible on the panel \
+   face in this image (it often sits on a different face of the package), \
+   set value=null with confidence=0 — do NOT infer it from container size, \
+   product appearance, net weight ÷ serving size, or any other proxy. The \
+   downstream decomposer needs a true null when the data is absent so it \
+   can fail loudly and ask the user, rather than receive a fabricated SPC.
 
 G. Net weight: total package weight ("Net wt 280 g", "515 mL"). Often \
    appears separately from the NF panel (front of pack, side label). \
