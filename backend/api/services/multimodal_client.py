@@ -5,7 +5,11 @@ to image-in / JSON-out: the packaged-food extractor sends a single image
 (plus a structured-output prompt) and expects a strict JSON object back.
 
 Provider selection follows the same `LLM_PROVIDER` env convention as the
-text-only client. Multimodal model defaults (2026-05-26):
+text-only client. Model overrides are split:
+  - MULTIMODAL_LLM_MODEL — this module (vision extraction)
+  - CHAT_LLM_MODEL       — llm_client.py (decomposition, CNF ranking, …)
+
+Multimodal model defaults (2026-05-26):
   - openai     → "gpt-4o-mini"             (vision-capable, ~$0.15/$0.60 per 1M tok + $0.0036/image at 1024 long-edge)
   - anthropic  → "claude-haiku-4-5"        (vision-capable; image-pricing folded into input-token rate ~$1/$5 per 1M)
 

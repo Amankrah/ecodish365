@@ -659,9 +659,9 @@ def get_default_matcher() -> CNFMatcher:
 
     Loads the embedding corpus from
     ``backend/api/data/cnf_corpus_embeddings.npz`` and wires up the OpenAI +
-    ChatJSONClient instances using ``LLM_PROVIDER`` / ``OPENAI_API_KEY`` /
-    ``ANTHROPIC_API_KEY`` from the environment (same conventions as
-    LCAMatcher's ``build_default_matcher``).
+    ChatJSONClient instances using ``LLM_PROVIDER`` / ``CHAT_LLM_MODEL`` /
+    ``OPENAI_API_KEY`` / ``ANTHROPIC_API_KEY`` from the environment (same
+    conventions as LCAMatcher's ``build_default_matcher``).
     """
     from django.conf import settings  # noqa: F401 (ensures Django settings loaded)
     here = Path(__file__).resolve().parent          # backend/api/services

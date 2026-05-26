@@ -133,8 +133,9 @@ def decompose_packaged_food(
         chat_client = build_chat_json_client()
     if chat_client is None:
         raise RuntimeError(
-            "ChatJSONClient unavailable: set OPENAI_API_KEY or "
-            "ANTHROPIC_API_KEY and ensure LLM_PROVIDER matches."
+            "ChatJSONClient unavailable: set ANTHROPIC_API_KEY (or OPENAI_API_KEY "
+            "when LLM_PROVIDER=openai) and ensure LLM_PROVIDER matches. "
+            "For Opus decomposition set CHAT_LLM_MODEL=claude-opus-4-7."
         )
 
     net_weight_g = _resolve_net_weight(panel)

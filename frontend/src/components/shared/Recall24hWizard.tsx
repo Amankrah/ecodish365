@@ -27,6 +27,7 @@ import { useState, useMemo } from 'react';
 import {
   CalendarClock, Coffee, Sandwich, Soup, Apple, Cookie, Pizza,
   Loader2, AlertCircle, Check, Info, Sparkles, ChevronRight, ChevronLeft,
+  Camera, Type,
   type LucideIcon,
 } from 'lucide-react';
 import {
@@ -38,6 +39,11 @@ import {
 } from '@/lib/api';
 import { SourceFilter, type SourceChoice } from './SourceFilter';
 import { SourceBadge } from './SourceBadge';
+import { PackagedFoodOccasionEntry } from './PackagedFoodOccasionEntry';
+import {
+  buildRecallMealFromPackaged,
+  type PackagedOccasionState,
+} from '@/lib/recallPackagedFood';
 import type { UserType } from './AudienceToggle';
 // RECALL-HISTORY-1 (2026-05-24): opt-in localStorage save on Step 3.
 import {
@@ -90,8 +96,11 @@ const SCORE_BUTTONS: Array<{
 
 interface MealRow {
   enabled: boolean;
+  entryMode: 'text' | 'packaged';
   dishName: string;
   totalMass: number;
+  /** Set when entryMode === 'packaged' and scan+decompose succeeded. */
+  packaged?: PackagedOccasionState | null;
 }
 
 interface ApiError { status: number; message: string }
@@ -106,6 +115,9 @@ function humanWarning(code: string): string {
   if (code === 'single_occasion_day_aggregation_unreliable') return 'Only one meal logged — daily aggregation is unreliable.';
   if (code.includes('_resolved_only_partially')) return code.split('_')[0] + ' meal(s) resolved only partially.';
   if (code.includes('_failed_to_decompose'))     return code.split('_')[0] + ' meal(s) failed to decompose.';
+  if (code.startsWith('packaged_food_inferred_at_')) {
+    return 'One or more occasions used scanned packaged food — composition was inferred from the label, not measured.';
+  }
   return code;
 }
 
@@ -116,8 +128,10 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
     for (const o of OCCASIONS) {
       out[o.id] = {
         enabled: o.defaultEnabled,
+        entryMode: 'text',
         dishName: '',
         totalMass: o.defaultMass,
+        packaged: null,
       };
     }
     return out;
@@ -147,7 +161,18 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
   );
   const canRunRecall = useMemo(
     () => enabledOccasions.length > 0
-       && enabledOccasions.every(o => rows[o.id].dishName.trim() && rows[o.id].totalMass > 0),
+       && enabledOccasions.every(o => {
+         const row = rows[o.id];
+         if (row.entryMode === 'packaged') {
+           return row.packaged != null && row.packaged.decomposition.decomposition_succeeded;
+         }
+         return row.dishName.trim().length > 0 && row.totalMass > 0;
+       }),
+    [enabledOccasions, rows],
+  );
+
+  const hasPackagedOccasions = useMemo(
+    () => enabledOccasions.some(o => rows[o.id].entryMode === 'packaged' && rows[o.id].packaged),
     [enabledOccasions, rows],
   );
 
@@ -163,11 +188,18 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
     setError(null);
     setResult(null);
     setExplanations(null);
-    const meals: RecallMealInput[] = enabledOccasions.map(o => ({
-      occasion:    o.id,
-      dish_name:   rows[o.id].dishName.trim(),
-      total_mass_g: rows[o.id].totalMass,
-    }));
+    const meals: RecallMealInput[] = enabledOccasions.map(o => {
+      const row = rows[o.id];
+      if (row.entryMode === 'packaged' && row.packaged) {
+        return buildRecallMealFromPackaged(o.id, row.packaged);
+      }
+      return {
+        occasion: o.id,
+        dish_name: row.dishName.trim(),
+        total_mass_g: row.totalMass,
+        entry_type: 'text',
+      };
+    });
     try {
       const r = await CNFApiService.recall24h(meals, { userType, source });
       setResult(r.result);
@@ -223,11 +255,33 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
         user_type: userType,
         captured_at: new Date().toISOString(),
         target: target.id,
-        meals_meta: enabledOccasions.map(o => ({
-          occasion: o.id,
-          dish_name: rows[o.id].dishName,
-          total_mass_g: rows[o.id].totalMass,
-        })),
+        meals_meta: enabledOccasions.map(o => {
+          const row = rows[o.id];
+          if (row.entryMode === 'packaged' && row.packaged) {
+            return {
+              occasion: o.id,
+              dish_name: row.packaged.dishName,
+              total_mass_g: row.packaged.totalMass,
+              entry_type: 'packaged' as const,
+            };
+          }
+          return {
+            occasion: o.id,
+            dish_name: row.dishName,
+            total_mass_g: row.totalMass,
+            entry_type: 'text' as const,
+          };
+        }),
+        ...(hasPackagedOccasions ? {
+          packaged_food_occasions: enabledOccasions
+            .filter(o => rows[o.id].entryMode === 'packaged' && rows[o.id].packaged)
+            .map(o => ({
+              occasion: o.id,
+              product_name: rows[o.id].packaged!.panel.product_name_visible.value,
+              brand: rows[o.id].packaged!.panel.brand_visible.value,
+              decomposition_confidence: rows[o.id].packaged!.decomposition.decomposition_confidence,
+            })),
+        } : {}),
         aggregated_daily_ingredients: result.aggregated_daily_ingredients,
         estimated_daily_kcal: result.estimated_daily_kcal,
       };
@@ -331,7 +385,9 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
             <h2 className="text-lg font-semibold text-gray-900">What did you have at each occasion?</h2>
           </div>
           <p className="text-sm text-gray-600">
-            Free-text descriptions are fine — the AI handles brand names, language variation, and casual phrasing. Mass estimates can be rough; the per-meal validator flags anything that drifts more than ~4&nbsp;%.
+            Describe each meal in free text, or <strong>scan a packaged food</strong> if you ate something
+            with a Nutrition Facts label (granola bar, yogurt, soup can, etc.). Mass estimates can be rough
+            for text meals; scanned products use net weight from the label.
           </p>
           <ul className="space-y-3">
             {enabledOccasions.map(o => {
@@ -342,6 +398,36 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
                     <Icon className="h-4 w-4 text-gray-600" aria-hidden={true} />
                     <span className="text-sm font-semibold text-gray-900">{o.label}</span>
                   </div>
+
+                  {/* Entry mode toggle */}
+                  <div className="flex gap-2 mb-3">
+                    <button
+                      type="button"
+                      onClick={() => updateRow(o.id, { entryMode: 'text', packaged: null })}
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md border ${
+                        rows[o.id].entryMode === 'text'
+                          ? 'border-blue-500 bg-blue-50 text-blue-800'
+                          : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      <Type className="h-3.5 w-3.5" aria-hidden="true" />
+                      Describe meal
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateRow(o.id, { entryMode: 'packaged', dishName: '', packaged: null })}
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md border ${
+                        rows[o.id].entryMode === 'packaged'
+                          ? 'border-blue-500 bg-blue-50 text-blue-800'
+                          : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      <Camera className="h-3.5 w-3.5" aria-hidden="true" />
+                      Scan packaged food
+                    </button>
+                  </div>
+
+                  {rows[o.id].entryMode === 'text' ? (
                   <div className="grid grid-cols-1 sm:grid-cols-[1fr,140px] gap-3">
                     <div>
                       <label htmlFor={`recall-dish-${o.id}`} className="block text-xs font-medium text-gray-700 mb-1">
@@ -377,6 +463,18 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
                       />
                     </div>
                   </div>
+                  ) : (
+                    <PackagedFoodOccasionEntry
+                      occasionLabel={o.label}
+                      userType={userType}
+                      value={rows[o.id].packaged ?? null}
+                      onChange={state => updateRow(o.id, {
+                        packaged: state,
+                        dishName: state?.dishName ?? '',
+                        totalMass: state?.totalMass ?? o.defaultMass,
+                      })}
+                    />
+                  )}
                 </li>
               );
             })}
@@ -486,6 +584,11 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
                       <Icon className="h-4 w-4 text-gray-500" aria-hidden={true} />
                       <span className="font-medium text-gray-900">{occ?.label ?? m.occasion}</span>
                       <span className="text-xs text-gray-500">— {m.decomposition.dish_name}</span>
+                      {m.decomposition.fallback_reason === 'packaged_food_inferred' && (
+                        <span className="text-[10px] uppercase font-semibold text-amber-700 bg-amber-100 px-1 py-0.5 rounded">
+                          scanned
+                        </span>
+                      )}
                       {m.decomposition.matched
                         ? <Check className="h-3.5 w-3.5 text-green-600 ml-auto" aria-hidden="true" />
                         : <AlertCircle className="h-3.5 w-3.5 text-amber-600 ml-auto" aria-hidden="true" />}

@@ -521,7 +521,34 @@ def recall_24h(request):
                 'success': False, 'error': 'invalid_request',
                 'message': f'Meal at occasion {occ!r}: total_mass_g must be in (0, 5000].',
             }, status=status.HTTP_400_BAD_REQUEST)
-        cleaned.append(MealEntry(occasion=occ, dish_name=dn, total_mass_g=mass))
+        entry_type = str(m.get('entry_type', 'text')).strip().lower()
+        if entry_type not in ('text', 'packaged'):
+            return Response({
+                'success': False, 'error': 'invalid_request',
+                'message': f'Meal at occasion {occ!r}: entry_type must be "text" or "packaged".',
+            }, status=status.HTTP_400_BAD_REQUEST)
+        pre_decomposed = None
+        if entry_type == 'packaged':
+            pre = m.get('pre_decomposed')
+            if not isinstance(pre, dict):
+                return Response({
+                    'success': False, 'error': 'invalid_request',
+                    'message': f'Packaged meal at {occ!r} requires pre_decomposed object.',
+                }, status=status.HTTP_400_BAD_REQUEST)
+            ings = pre.get('ingredients')
+            if not isinstance(ings, list) or not ings:
+                return Response({
+                    'success': False, 'error': 'invalid_request',
+                    'message': f'Packaged meal at {occ!r}: pre_decomposed.ingredients must be a non-empty list.',
+                }, status=status.HTTP_400_BAD_REQUEST)
+            pre_decomposed = pre
+        cleaned.append(MealEntry(
+            occasion=occ,
+            dish_name=dn,
+            total_mass_g=mass,
+            entry_type=entry_type,
+            pre_decomposed=pre_decomposed,
+        ))
 
     user_type = str(request.data.get('user_type', 'individual'))
     if user_type not in ('individual', 'researcher', 'policy'):
@@ -532,9 +559,13 @@ def recall_24h(request):
     source_raw = str(request.data.get('source', 'both')).lower()
     source = source_raw if source_raw in ('cnf', 'wafct') else None
 
-    # Rate limit: 5¢ per meal up to 30¢ cap.
+    # Rate limit: 5¢ per text meal (LLM decompose) up to 30¢ cap. Packaged
+    # meals arrive pre-decomposed from the scan flow — no per-meal LLM cost.
+    text_meal_count = sum(
+        1 for m in cleaned if (m.entry_type or 'text') != 'packaged'
+    )
     cost = min(
-        _COST_RECALL_24H_PER_MEAL_CENTS * len(cleaned),
+        _COST_RECALL_24H_PER_MEAL_CENTS * text_meal_count,
         _COST_RECALL_24H_CAP_CENTS,
     )
     rate_err = _enforce_rate_limit(

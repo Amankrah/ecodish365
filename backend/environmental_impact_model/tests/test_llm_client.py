@@ -75,6 +75,23 @@ class FactoryEnvDispatchTests(unittest.TestCase):
             if client is not None:
                 self.assertEqual(client.provider, "openai")
 
+    def test_chat_llm_model_env_override(self):
+        with patch.dict(
+            os.environ,
+            {
+                "LLM_PROVIDER": "anthropic",
+                "ANTHROPIC_API_KEY": "sk-ant-test",
+                "CHAT_LLM_MODEL": "claude-opus-4-7",
+            },
+            clear=False,
+        ):
+            try:
+                client = build_chat_json_client()
+            except Exception:  # pragma: no cover
+                client = None
+            if client is not None:
+                self.assertEqual(client.model, "claude-opus-4-7")
+
 
 class CoerceTests(unittest.TestCase):
     """`coerce_chat_json_client` is the back-compat seam: existing matcher

@@ -312,6 +312,26 @@ export interface RecallMealInput {
   occasion: RecallOccasion;
   dish_name: string;
   total_mass_g: number;
+  /** Default 'text'. 'packaged' skips LLM dish decompose — uses pre_decomposed. */
+  entry_type?: 'text' | 'packaged';
+  /** Required when entry_type === 'packaged'. From /packaged-food/decompose-ingredients/. */
+  pre_decomposed?: RecallPackagedPreDecomposed;
+}
+
+/** Pre-decomposed packaged-food payload folded into a 24-h recall meal. */
+export interface RecallPackagedPreDecomposed {
+  ingredients: Array<{
+    food_id: number;
+    food_description: string;
+    food_group: string;
+    mass_g: number;
+    confidence?: number;
+  }>;
+  decomposition_confidence: number;
+  decomposition_warnings?: string[];
+  product_name?: string | null;
+  brand?: string | null;
+  image_sha256?: string;
 }
 
 export interface CNFRecall24hAggregatedIngredient {

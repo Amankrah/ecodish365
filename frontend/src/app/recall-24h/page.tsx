@@ -50,7 +50,10 @@ function RecallPageInner() {
                 </a>
               </div>
               <p className="text-sm text-gray-600 mt-1">
-                Walk through your day occasion-by-occasion. We&rsquo;ll decompose each meal into Canadian Nutrient File (CNF) ingredients, aggregate your full day, and let you score it against HEFI&nbsp;/&nbsp;HENI&nbsp;/&nbsp;HSR&nbsp;/&nbsp;FCS&nbsp;/&nbsp;Environmental impact.
+                Walk through your day occasion-by-occasion. Describe meals in free text or{' '}
+                <strong>photograph packaged foods</strong> (breakfast cereal, snack bar, canned soup).
+                We decompose each occasion into Canadian Nutrient File (CNF) ingredients, aggregate your
+                full day, and let you score it against HEFI&nbsp;/&nbsp;HENI&nbsp;/&nbsp;HSR&nbsp;/&nbsp;FCS&nbsp;/&nbsp;Environmental impact.
               </p>
               <p className="text-xs text-gray-500 mt-2">
                 Best for HEFI-2019 (Brassard&nbsp;2022b designed it explicitly for 24-h recall data) and HENI (sums healthy-life-minutes across the day).

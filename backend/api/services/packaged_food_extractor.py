@@ -848,7 +848,8 @@ def extract_nf_panel(
     if client is None:
         raise RuntimeError(
             "MultimodalJSONClient unavailable: set OPENAI_API_KEY or "
-            "ANTHROPIC_API_KEY and ensure LLM_PROVIDER matches."
+            "ANTHROPIC_API_KEY and ensure LLM_PROVIDER matches. "
+            "For Opus extraction set MULTIMODAL_LLM_MODEL=claude-opus-4-7."
         )
 
     # 4. Call.
@@ -1031,7 +1032,8 @@ def extract_packaged_food(
     if client is None:
         raise RuntimeError(
             "MultimodalJSONClient unavailable: set OPENAI_API_KEY or "
-            "ANTHROPIC_API_KEY and ensure LLM_PROVIDER matches."
+            "ANTHROPIC_API_KEY and ensure LLM_PROVIDER matches. "
+            "For Opus extraction set MULTIMODAL_LLM_MODEL=claude-opus-4-7."
         )
 
     try:

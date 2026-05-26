@@ -87,6 +87,12 @@ class MealEntry:
     occasion: str
     dish_name: str
     total_mass_g: float
+    # PKG-RECALL-1 (2026-05-26): packaged-food rows arrive pre-decomposed
+    # from /packaged-food/decompose-ingredients/ (scan-product flow inlined
+    # into the recall wizard). The orchestrator skips the LLM dish
+    # decomposer for these and folds them straight into aggregation.
+    entry_type: str = 'text'          # 'text' | 'packaged'
+    pre_decomposed: Optional[Dict[str, Any]] = None
 
 
 @dataclass
@@ -140,13 +146,34 @@ def _normalise_dish_name(name: str) -> str:
     return ' '.join((name or '').strip().lower().split())
 
 
-def _meals_cache_key(meals: List[MealEntry]) -> Tuple[Tuple[str, str, float], ...]:
-    """Cache key — tuple of normalised (occasion, dish_name, rounded_mass)
-    triples, sorted by occasion order so user-supplied ordering doesn't
-    miss the cache."""
+def _packaged_ingredient_key(pre: Optional[Dict[str, Any]]) -> Tuple[Tuple[int, float], ...]:
+    """Stable cache fingerprint for a pre-decomposed packaged meal."""
+    if not pre:
+        return ()
+    rows: List[Tuple[int, float]] = []
+    for ing in pre.get('ingredients') or []:
+        if not isinstance(ing, dict):
+            continue
+        try:
+            rows.append((int(ing['food_id']), round(float(ing['mass_g']), 1)))
+        except (KeyError, TypeError, ValueError):
+            continue
+    rows.sort()
+    return tuple(rows)
+
+
+def _meals_cache_key(meals: List[MealEntry]) -> Tuple[Tuple[str, str, float, str, Tuple], ...]:
+    """Cache key — tuple of normalised (occasion, dish_name, rounded_mass,
+    entry_type, packaged-ingredient fingerprint) sorted by occasion order."""
     occasion_rank = {occ: idx for idx, occ in enumerate(OCCASIONS)}
     rows = [
-        (m.occasion, _normalise_dish_name(m.dish_name), round(m.total_mass_g, 1))
+        (
+            m.occasion,
+            _normalise_dish_name(m.dish_name),
+            round(m.total_mass_g, 1),
+            m.entry_type or 'text',
+            _packaged_ingredient_key(m.pre_decomposed),
+        )
         for m in meals
     ]
     rows.sort(key=lambda r: (occasion_rank.get(r[0], 999), r[1]))
@@ -226,7 +253,21 @@ class CNFRecall24h:
                     fallback_reason=f'mass_out_of_bounds:{mass:.1f}',
                     timing_ms=(time.perf_counter() - t0) * 1000,
                 )
-            cleaned.append(MealEntry(occasion=occ, dish_name=dn, total_mass_g=mass))
+            entry_type = getattr(m, 'entry_type', None) or 'text'
+            pre_decomposed = getattr(m, 'pre_decomposed', None)
+            if entry_type == 'packaged' and not pre_decomposed:
+                return CNFRecall24hResult(
+                    matched=False,
+                    fallback_reason=f'packaged_missing_pre_decomposed:{occ}',
+                    timing_ms=(time.perf_counter() - t0) * 1000,
+                )
+            cleaned.append(MealEntry(
+                occasion=occ,
+                dish_name=dn,
+                total_mass_g=mass,
+                entry_type=entry_type,
+                pre_decomposed=pre_decomposed,
+            ))
 
         # Cache lookup — include source in the key so cnf-only / wafct-only
         # / both recalls cache independently.
@@ -256,20 +297,31 @@ class CNFRecall24h:
         # food database. None = both sources.
         meal_source = source if source in ('cnf', 'wafct') else None
         meal_results: List[Tuple[str, Any]] = []
-        if parallel_meals and len(cleaned) > 1:
-            max_workers = min(MAX_PARALLEL_MEALS, len(cleaned))
+        text_meals = [m for m in cleaned if (m.entry_type or 'text') != 'packaged']
+        packaged_meals = [m for m in cleaned if (m.entry_type or 'text') == 'packaged']
+        if parallel_meals and len(text_meals) > 1:
+            max_workers = min(MAX_PARALLEL_MEALS, len(text_meals))
             with ThreadPoolExecutor(
                     max_workers=max_workers,
                     thread_name_prefix='cnf-recall-24h',
             ) as ex:
-                decompositions = list(ex.map(
+                text_decompositions = list(ex.map(
                     lambda m: self._decompose_meal(m, source=meal_source),
-                    cleaned,
+                    text_meals,
                 ))
-            meal_results = list(zip([m.occasion for m in cleaned], decompositions))
+            text_results = list(zip([m.occasion for m in text_meals], text_decompositions))
         else:
-            for m in cleaned:
-                meal_results.append((m.occasion, self._decompose_meal(m, source=meal_source)))
+            text_results = [
+                (m.occasion, self._decompose_meal(m, source=meal_source))
+                for m in text_meals
+            ]
+        packaged_results = [
+            (m.occasion, self._packaged_to_decomposition(m))
+            for m in packaged_meals
+        ]
+        # Preserve user occasion order for downstream attribution.
+        by_occ = {occ: dec for occ, dec in text_results + packaged_results}
+        meal_results = [(m.occasion, by_occ[m.occasion]) for m in cleaned]
 
         # --- Aggregate ----------------------------------------------------
         agg = self._aggregate(meal_results)
@@ -327,6 +379,83 @@ class CNFRecall24h:
             unresolved_description='',
             decomposition_confidence=float(m.confidence),
             fallback_reason='single_food_fallback',
+            unresolved_ingredients_audit=[],
+            raw_llm_response=None,
+            timing_ms=0.0,
+        )
+
+    def _packaged_to_decomposition(self, meal: MealEntry):
+        """Convert a pre-decomposed packaged-food payload into a
+        CNFDecomposedRecipe so aggregation treats it like any other meal."""
+        from .cnf_recipe_decomposer import CNFDecomposedRecipe, CNFIngredient
+
+        pre = meal.pre_decomposed or {}
+        raw_ings = pre.get('ingredients') or []
+        if not raw_ings:
+            return CNFDecomposedRecipe(
+                dish_name=meal.dish_name,
+                normalised_dish_name=_normalise_dish_name(meal.dish_name),
+                total_mass_g=meal.total_mass_g,
+                matched=False,
+                ingredients=[],
+                resolved_mass_g=0.0,
+                unresolved_mass_g=meal.total_mass_g,
+                unresolved_description='',
+                decomposition_confidence=0.0,
+                fallback_reason='packaged_no_ingredients',
+                unresolved_ingredients_audit=[],
+                raw_llm_response=None,
+                timing_ms=0.0,
+            )
+
+        dec_conf = float(pre.get('decomposition_confidence', 0.5) or 0.5)
+        ingredients: List[CNFIngredient] = []
+        for ing in raw_ings:
+            if not isinstance(ing, dict):
+                continue
+            try:
+                ingredients.append(CNFIngredient(
+                    food_id=int(ing['food_id']),
+                    food_description=str(ing.get('food_description') or ''),
+                    food_group=str(ing.get('food_group') or ''),
+                    mass_g=float(ing['mass_g']),
+                    rationale='packaged food label decomposition (inferred)',
+                    resolution_confidence=float(
+                        ing.get('confidence', dec_conf) or dec_conf,
+                    ),
+                ))
+            except (KeyError, TypeError, ValueError):
+                continue
+
+        if not ingredients:
+            return CNFDecomposedRecipe(
+                dish_name=meal.dish_name,
+                normalised_dish_name=_normalise_dish_name(meal.dish_name),
+                total_mass_g=meal.total_mass_g,
+                matched=False,
+                ingredients=[],
+                resolved_mass_g=0.0,
+                unresolved_mass_g=meal.total_mass_g,
+                unresolved_description='',
+                decomposition_confidence=0.0,
+                fallback_reason='packaged_invalid_ingredients',
+                unresolved_ingredients_audit=[],
+                raw_llm_response=None,
+                timing_ms=0.0,
+            )
+
+        resolved = sum(float(i.mass_g) for i in ingredients)
+        return CNFDecomposedRecipe(
+            dish_name=meal.dish_name,
+            normalised_dish_name=_normalise_dish_name(meal.dish_name),
+            total_mass_g=meal.total_mass_g,
+            matched=True,
+            ingredients=ingredients,
+            resolved_mass_g=resolved,
+            unresolved_mass_g=max(0.0, meal.total_mass_g - resolved),
+            unresolved_description='',
+            decomposition_confidence=dec_conf,
+            fallback_reason='packaged_food_inferred',
             unresolved_ingredients_audit=[],
             raw_llm_response=None,
             timing_ms=0.0,
@@ -438,6 +567,16 @@ class CNFRecall24h:
             warnings.append(f'{partial_meals}_meal(s)_resolved_only_partially')
         if failed_meals:
             warnings.append(f'{failed_meals}_meal(s)_failed_to_decompose')
+        # 4e — packaged-food occasions (inferred composition caveat)
+        packaged_occasions = [
+            occ for occ, dec in meal_results
+            if (dec.fallback_reason or '') == 'packaged_food_inferred'
+        ]
+        if packaged_occasions:
+            warnings.append(
+                f'packaged_food_inferred_at_{len(packaged_occasions)}_occasion(s):'
+                + ','.join(packaged_occasions),
+            )
 
         # `matched` = all meals decomposed (none failed) AND kcal in the
         # plausible bound. Partial meals are still a "matched" recall.

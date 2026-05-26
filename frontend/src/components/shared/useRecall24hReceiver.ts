@@ -57,6 +57,13 @@ interface RecallStash {
     decomposition_confidence: number;
     image_sha256: string;
   };
+  /** PKG-RECALL-1: one or more recall occasions entered via label scan. */
+  packaged_food_occasions?: Array<{
+    occasion: string;
+    product_name: string | null;
+    brand: string | null;
+    decomposition_confidence: number;
+  }>;
 }
 
 interface UseRecall24hReceiverOptions {
@@ -71,6 +78,8 @@ interface UseRecall24hReceiverOptions {
     multi_day?: RecallStash['multi_day'];
     /** Present when /scan-product routed an inferred-composition product. */
     packaged_food?: RecallStash['packaged_food'];
+    /** Present when recall included scanned packaged-food occasion(s). */
+    packaged_food_occasions?: RecallStash['packaged_food_occasions'];
   }) => void;
 }
 
@@ -101,6 +110,7 @@ export function useRecall24hReceiver({ target, onIngredients }: UseRecall24hRece
       meals_meta: stash.meals_meta,
       multi_day: stash.multi_day,
       packaged_food: stash.packaged_food,
+      packaged_food_occasions: stash.packaged_food_occasions,
     });
     // Clear the stash so a reload doesn't re-inject.
     try { sessionStorage.removeItem('recall_24h_payload'); } catch { /* private mode */ }

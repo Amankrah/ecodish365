@@ -12,6 +12,18 @@ matcher / decomposer continue to read `OPENAI_API_KEY` for the embedding side
 (Anthropic does not expose an embedding API as of 2026-05); the ranking /
 decomposition side reads whichever key matches the chosen provider.
 
+Model overrides (optional):
+  - CHAT_LLM_MODEL — text JSON clients (CNF ranking, ingredient decomposition,
+    LCA matcher ranking, recipe decomposer). Example: claude-opus-4-7.
+  - MULTIMODAL_LLM_MODEL — vision extraction only (see multimodal_client.py).
+
+Typical packaged-food Opus setup (embeddings stay OpenAI):
+  OPENAI_API_KEY=...           # embeddings (CNF matcher retrieval)
+  ANTHROPIC_API_KEY=...
+  LLM_PROVIDER=anthropic
+  MULTIMODAL_LLM_MODEL=claude-opus-4-7
+  CHAT_LLM_MODEL=claude-opus-4-7
+
 Pattern mirrored from `heni_calculator/heni/categorization/llm_categorizer.py`
 (itself multi-provider) but lifted into a shared factory so all three call
 sites can share the dispatch logic.
@@ -42,6 +54,13 @@ _PROVIDER_DEFAULT_MODELS = {
 
 def _env_provider() -> str:
     return (os.environ.get("LLM_PROVIDER") or "openai").lower()
+
+
+def _env_chat_model(provider: str) -> str:
+    explicit = os.environ.get("CHAT_LLM_MODEL")
+    if explicit:
+        return explicit
+    return _PROVIDER_DEFAULT_MODELS[provider]
 
 
 @runtime_checkable
@@ -110,17 +129,14 @@ class OpenAIChatJSONClient:
 
 
 class AnthropicChatJSONClient:
-    """Wraps `anthropic.Anthropic()` and uses the assistant-prefill trick to
-    coerce JSON output. Anthropic's `messages.create` does not have an
-    OpenAI-style `response_format=json_object` flag, but prefilling the
-    assistant turn with `{` reliably forces the model to continue as a JSON
-    object — the recommended Anthropic pattern (per Anthropic prompting
-    guide on prefilling)."""
+    """Wraps `anthropic.Anthropic()`. JSON output via assistant-prefill when
+    supported; newer models (e.g. claude-opus-4-7) reject temperature and/or
+    prefill — those fall back to an explicit JSON-only user suffix."""
 
     def __init__(self, api_key: str, model: Optional[str] = None):
         import anthropic  # lazy import
         self._client = anthropic.Anthropic(api_key=api_key)
-        self.model = model or _PROVIDER_DEFAULT_MODELS["anthropic"]
+        self.model = model or _env_chat_model("anthropic")
         self.provider = "anthropic"
 
     def chat_completion_json(
@@ -131,20 +147,41 @@ class AnthropicChatJSONClient:
         temperature: float = 0.0,
         max_tokens: Optional[int] = None,
     ) -> dict:
-        rsp = self._client.messages.create(
-            model=self.model,
-            max_tokens=max_tokens or 1024,
-            temperature=temperature,
-            system=system,
-            messages=[
-                {"role": "user", "content": user},
-                {"role": "assistant", "content": "{"},
-            ],
+        attempts: tuple[tuple[bool, bool, str], ...] = (
+            (True, True, user),
+            (True, False, user),
+            (False, False, user + "\n\nRespond with ONE JSON object only. "
+             "No markdown fences, no commentary."),
         )
-        # `rsp.content` is a list of content blocks; the first is the text block
-        # that continues from our "{" prefill. Re-prepend the "{" we forced.
-        text = rsp.content[0].text if rsp.content else ""
-        return _parse_json_permissive("{" + text)
+        last_exc: Optional[Exception] = None
+        for use_prefill, use_temperature, user_text in attempts:
+            messages: list[dict] = [{"role": "user", "content": user_text}]
+            if use_prefill:
+                messages.append({"role": "assistant", "content": "{"})
+            kwargs: dict = {
+                "model": self.model,
+                "max_tokens": max_tokens or 1024,
+                "system": system,
+                "messages": messages,
+            }
+            if use_temperature:
+                kwargs["temperature"] = temperature
+            try:
+                rsp = self._client.messages.create(**kwargs)
+                text = rsp.content[0].text if rsp.content else ""
+                raw = ("{" + text) if use_prefill else text
+                return _parse_json_permissive(raw)
+            except Exception as exc:  # noqa: BLE001 — probe model capabilities
+                last_exc = exc
+                msg = str(exc).lower()
+                if "temperature" in msg and "deprecated" in msg:
+                    continue
+                if "prefill" in msg or "end with a user message" in msg:
+                    continue
+                raise
+        if last_exc is not None:
+            raise last_exc
+        return {}
 
 
 def _parse_json_permissive(raw: str) -> dict:
@@ -216,16 +253,22 @@ def build_chat_json_client(
     Resolution order:
       provider arg  →  LLM_PROVIDER env  →  "openai"
       api_key arg   →  OPENAI_API_KEY or ANTHROPIC_API_KEY env (per provider)
-      model arg     →  _PROVIDER_DEFAULT_MODELS[provider]
+      model arg     →  CHAT_LLM_MODEL env  →  provider default
     """
     provider = (provider or _env_provider()).lower()
+    if provider not in _PROVIDER_DEFAULT_MODELS:
+        raise ValueError(
+            f"Unknown LLM_PROVIDER: {provider!r}. "
+            f"Supported: {sorted(_PROVIDER_DEFAULT_MODELS)}"
+        )
+    resolved_model = model or _env_chat_model(provider)
     if provider == "openai":
         key = api_key or os.environ.get("OPENAI_API_KEY")
         if not key:
             logger.info("OPENAI_API_KEY missing; ChatJSONClient unavailable")
             return None
         try:
-            return OpenAIChatJSONClient(api_key=key, model=model)
+            return OpenAIChatJSONClient(api_key=key, model=resolved_model)
         except ImportError as exc:  # pragma: no cover - openai is in requirements
             logger.warning("openai SDK not importable: %s", exc)
             return None
@@ -235,7 +278,7 @@ def build_chat_json_client(
             logger.info("ANTHROPIC_API_KEY missing; ChatJSONClient unavailable")
             return None
         try:
-            return AnthropicChatJSONClient(api_key=key, model=model)
+            return AnthropicChatJSONClient(api_key=key, model=resolved_model)
         except ImportError as exc:
             logger.warning(
                 "anthropic SDK not installed; install with "
