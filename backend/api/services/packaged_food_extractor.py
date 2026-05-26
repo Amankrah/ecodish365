@@ -165,22 +165,40 @@ _LLM_NOISE_KEYS = {
 }
 
 
+def _coerce_hsr_category_alternative(raw: object) -> Optional[dict]:
+    """Normalise one alternative to {category, reason}. The LLM frequently mirrors
+    the parent's `guess` field name into children, but the schema names it
+    `category` there; without remapping, extra='forbid' rejects the response."""
+    if not isinstance(raw, dict):
+        return None
+    category = raw.get('category') or raw.get('guess') or raw.get('primary')
+    if category is None:
+        return None
+    return {
+        'category': str(category),
+        'reason': str(raw.get('reason') or raw.get('rationale') or ''),
+    }
+
+
 def _coerce_hsr_category_hint(raw: object) -> dict:
     """Map alternate LLM shapes (e.g. Opus/Haiku flat hsr_category_*) to schema."""
     if isinstance(raw, str):
         return {'guess': raw, 'confidence': 0.0, 'rationale': '', 'alternatives': []}
     if not isinstance(raw, dict):
         return {}
-    if 'guess' in raw:
-        return raw
     guess = raw.get('guess') or raw.get('category') or raw.get('primary')
     if guess is None:
         return {}
+    raw_alts = raw.get('alternatives') or []
+    alternatives = [
+        a for a in (_coerce_hsr_category_alternative(x) for x in raw_alts)
+        if a is not None
+    ]
     return {
         'guess': str(guess),
         'confidence': float(raw.get('confidence') or 0.0),
         'rationale': str(raw.get('rationale') or raw.get('reason') or ''),
-        'alternatives': raw.get('alternatives') or [],
+        'alternatives': alternatives,
     }
 
 
