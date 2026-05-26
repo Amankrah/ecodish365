@@ -1,0 +1,361 @@
+{
+  "fixture_id": "disc_81C5Bj40f4L._AC_SL1500_",
+  "source_image": "81C5Bj40f4L._AC_SL1500_.jpg",
+  "net_weight_override_g": null,
+  "nf_panel": {
+    "schema_version": 1,
+    "language_detected": "en-fr",
+    "panel_format_detected": "canadian_2016",
+    "product_name_visible": {
+      "value": null,
+      "confidence": 0.0
+    },
+    "brand_visible": {
+      "value": null,
+      "confidence": 0.0
+    },
+    "serving_size": {
+      "value": 68.0,
+      "unit": "g",
+      "confidence": 0.98,
+      "raw_text": "Per 1 container (68 g) / pour 1 contenant (68 g)",
+      "from_dv_percent": false,
+      "from_kcal_conversion": false
+    },
+    "servings_per_container": {
+      "value": 1.0,
+      "unit": null,
+      "confidence": 0.95,
+      "raw_text": "Per 1 container (68 g)",
+      "from_dv_percent": false,
+      "from_kcal_conversion": false
+    },
+    "net_weight": {
+      "value": 68.0,
+      "unit": "g",
+      "confidence": 0.9,
+      "raw_text": "68 g",
+      "from_dv_percent": false,
+      "from_kcal_conversion": false
+    },
+    "per_serving": {
+      "energy_kj": {
+        "value": 1046.0,
+        "unit": "kJ",
+        "confidence": 0.9,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": true
+      },
+      "energy_kcal": {
+        "value": 250.0,
+        "unit": "kcal",
+        "confidence": 0.98,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_total_g": {
+        "value": 1.0,
+        "unit": "g",
+        "confidence": 0.98,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_sat_g": {
+        "value": 0.3,
+        "unit": "g",
+        "confidence": 0.98,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_trans_g": {
+        "value": 0.0,
+        "unit": "g",
+        "confidence": 0.98,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "carbohydrate_total_g": {
+        "value": 53.0,
+        "unit": "g",
+        "confidence": 0.98,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fibre_g": {
+        "value": 2.0,
+        "unit": "g",
+        "confidence": 0.98,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sugars_total_g": {
+        "value": 1.0,
+        "unit": "g",
+        "confidence": 0.98,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sugars_added_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "protein_g": {
+        "value": 6.0,
+        "unit": "g",
+        "confidence": 0.98,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sodium_mg": {
+        "value": 400.0,
+        "unit": "mg",
+        "confidence": 0.98,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "potassium_mg": {
+        "value": 125.0,
+        "unit": "mg",
+        "confidence": 0.98,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "calcium_mg": {
+        "value": 30.0,
+        "unit": "mg",
+        "confidence": 0.98,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "iron_mg": {
+        "value": 1.0,
+        "unit": "mg",
+        "confidence": 0.98,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "cholesterol_mg": {
+        "value": 0.0,
+        "unit": "mg",
+        "confidence": 0.98,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      }
+    },
+    "per_100g": null,
+    "hsr_category_hint": {
+      "guess": "2",
+      "confidence": 0.95,
+      "rationale": "Solid food (precooked rice cup with dried vegetables and seasoning); not a beverage, not majority dairy, not a fat/oil/nut product.",
+      "alternatives": [
+        {
+          "category": "2D",
+          "reason": "Unlikely \u2014 no dairy ingredients dominate; trace calcium stearate only."
+        }
+      ]
+    },
+    "fopl_on_pack": {
+      "hsr_stars_visible": null,
+      "nutri_score_visible": null
+    },
+    "extraction_metadata": {
+      "model": "claude-opus-4-7",
+      "provider": "anthropic",
+      "prompt_version": 7,
+      "schema_version": 1,
+      "image_sha256": "502adbaaa4c9ac2d89fd5f780ecf3feab34a76174e2099e23253c1aa0877e2f3",
+      "image_bytes": 197375,
+      "image_dimensions": [
+        1500,
+        1083
+      ],
+      "extracted_at": "2026-05-26T21:53:14Z",
+      "extraction_warnings": [],
+      "sanity_guard_rejections": [],
+      "cache_hit": false,
+      "latency_ms": 26057
+    },
+    "extraction_succeeded": true,
+    "failure_reason": null
+  },
+  "ingredient_list": {
+    "ingredients_text": "Precooked long grain white rice, Sugars (maltodextrin, brown sugar, sugar), Tamari soy sauce powder (soybeans, salt), Dried vegetables (green peas, carrots), Soybean oil, Salt, Yeast extract, Garlic powder, Onion powder, Caramel colour, Spices, Potassium chloride, Beef broth, Natural flavour, Calcium stearate, Silicon dioxide, Sunflower lecithin, Mixed tocopherols.",
+    "ingredients_parsed": [
+      {
+        "name": "precooked long grain white rice",
+        "position": 1,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "sugars",
+        "position": 2,
+        "parenthetical": [
+          "maltodextrin",
+          "brown sugar",
+          "sugar"
+        ],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "tamari soy sauce powder",
+        "position": 3,
+        "parenthetical": [
+          "soybeans",
+          "salt"
+        ],
+        "explicit_percentage": null,
+        "allergen_flag": "soy"
+      },
+      {
+        "name": "dried vegetables",
+        "position": 4,
+        "parenthetical": [
+          "green peas",
+          "carrots"
+        ],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "soybean oil",
+        "position": 5,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": "soy"
+      },
+      {
+        "name": "salt",
+        "position": 6,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "yeast extract",
+        "position": 7,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "garlic powder",
+        "position": 8,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "onion powder",
+        "position": 9,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "caramel colour",
+        "position": 10,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "spices",
+        "position": 11,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "potassium chloride",
+        "position": 12,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "beef broth",
+        "position": 13,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "natural flavour",
+        "position": 14,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "calcium stearate",
+        "position": 15,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "silicon dioxide",
+        "position": 16,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "sunflower lecithin",
+        "position": 17,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "mixed tocopherols",
+        "position": 18,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      }
+    ],
+    "explicit_percentages_found": false,
+    "contains_statement": null,
+    "language_detected": "en-fr",
+    "confidence": 0.0
+  },
+  "extraction_metadata": {
+    "model": "claude-opus-4-7",
+    "provider": "anthropic",
+    "prompt_version": 7,
+    "schema_version": 1,
+    "image_sha256": "502adbaaa4c9ac2d89fd5f780ecf3feab34a76174e2099e23253c1aa0877e2f3",
+    "image_bytes": 197375,
+    "image_dimensions": [
+      1500,
+      1083
+    ],
+    "extracted_at": "2026-05-26T21:53:14Z",
+    "extraction_warnings": [],
+    "sanity_guard_rejections": [],
+    "cache_hit": false,
+    "latency_ms": 26057
+  }
+}

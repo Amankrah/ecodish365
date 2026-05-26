@@ -20,6 +20,7 @@ import { RecipeDecomposerModal } from '@/components/shared/RecipeDecomposerModal
 import { SourceFilter, type SourceChoice } from '@/components/shared/SourceFilter';
 import { ExplanationsPanel } from '@/components/shared/ExplanationsPanel';
 import { useRecall24hReceiver } from '@/components/shared/useRecall24hReceiver';
+import { FoodListPanel } from '@/components/shared/FoodListPanel';
 
 interface FoodItem {
   id: string;
@@ -253,6 +254,26 @@ export default function HSRCalculate() {
               staleResultHint={result !== null && lastCalcUserType !== null && userType !== lastCalcUserType}
             />
           </div>
+        </div>
+
+        {/* FOOD-LIST-PANEL (2026-05-26): cross-metric transferable food list. */}
+        <div className="mb-6">
+          <FoodListPanel
+            currentTarget="hsr"
+            onChange={list => {
+              if (!list) {
+                setFoods([]);
+                return;
+              }
+              setFoods(list.ingredients.map((i, idx) => ({
+                id: String(idx + 1),
+                food_id: i.food_id,
+                food_name: i.food_description,
+                serving_size: i.mass_g,
+                food_group: i.food_group,
+              })));
+            }}
+          />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

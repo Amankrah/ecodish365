@@ -1,0 +1,408 @@
+{
+  "fixture_id": "disc_81Mjk8HJqBL._AC_SL1500_",
+  "source_image": "81Mjk8HJqBL._AC_SL1500_.jpg",
+  "net_weight_override_g": null,
+  "nf_panel": {
+    "schema_version": 1,
+    "language_detected": "en-fr",
+    "panel_format_detected": "canadian_2016",
+    "product_name_visible": {
+      "value": null,
+      "confidence": 0.0
+    },
+    "brand_visible": {
+      "value": "McCormick",
+      "confidence": 0.85
+    },
+    "serving_size": {
+      "value": 4.0,
+      "unit": "g",
+      "confidence": 0.95,
+      "raw_text": "Per 1/8 package (4 g) / pour 1/8 du sachet (4 g)",
+      "from_dv_percent": false,
+      "from_kcal_conversion": false
+    },
+    "servings_per_container": {
+      "value": 8.0,
+      "unit": null,
+      "confidence": 0.9,
+      "raw_text": "MAKES 8 SERVINGS / DONNE 8 PORTIONS",
+      "from_dv_percent": false,
+      "from_kcal_conversion": false
+    },
+    "net_weight": {
+      "value": null,
+      "unit": null,
+      "confidence": 0.0,
+      "raw_text": null,
+      "from_dv_percent": false,
+      "from_kcal_conversion": false
+    },
+    "per_serving": {
+      "energy_kj": {
+        "value": 41.84,
+        "unit": "kJ",
+        "confidence": 0.85,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": true
+      },
+      "energy_kcal": {
+        "value": 10.0,
+        "unit": "kcal",
+        "confidence": 0.85,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_total_g": {
+        "value": 0.0,
+        "unit": "g",
+        "confidence": 0.95,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_sat_g": {
+        "value": 0.0,
+        "unit": "g",
+        "confidence": 0.95,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_trans_g": {
+        "value": 0.0,
+        "unit": "g",
+        "confidence": 0.95,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "carbohydrate_total_g": {
+        "value": 2.0,
+        "unit": "g",
+        "confidence": 0.95,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fibre_g": {
+        "value": 0.0,
+        "unit": "g",
+        "confidence": 0.95,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sugars_total_g": {
+        "value": 1.0,
+        "unit": "g",
+        "confidence": 0.95,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sugars_added_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "protein_g": {
+        "value": 0.5,
+        "unit": "g",
+        "confidence": 0.95,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sodium_mg": {
+        "value": 280.0,
+        "unit": "mg",
+        "confidence": 0.95,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "potassium_mg": {
+        "value": 30.0,
+        "unit": "mg",
+        "confidence": 0.95,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "calcium_mg": {
+        "value": 10.0,
+        "unit": "mg",
+        "confidence": 0.95,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "iron_mg": {
+        "value": 0.3,
+        "unit": "mg",
+        "confidence": 0.95,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "cholesterol_mg": {
+        "value": 0.0,
+        "unit": "mg",
+        "confidence": 0.95,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      }
+    },
+    "per_100g": {
+      "energy_kj": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "energy_kcal": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_total_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_sat_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_trans_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "carbohydrate_total_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fibre_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sugars_total_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sugars_added_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "protein_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sodium_mg": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "potassium_mg": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "calcium_mg": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "iron_mg": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "cholesterol_mg": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      }
+    },
+    "hsr_category_hint": {
+      "guess": "2",
+      "confidence": 0.0,
+      "rationale": "Dry marinade seasoning mix powder \u2014 solid spice/seasoning blend, not a beverage, dairy, or fat/oil/nut product; defaults to category 2 (all other foods).",
+      "alternatives": []
+    },
+    "fopl_on_pack": {
+      "hsr_stars_visible": null,
+      "nutri_score_visible": null
+    },
+    "extraction_metadata": {
+      "model": "claude-opus-4-7",
+      "provider": "anthropic",
+      "prompt_version": 7,
+      "schema_version": 1,
+      "image_sha256": "532c770e2b87f272b954cfaa40598141cdcd2abe55dd8f585744eaec72c8fa76",
+      "image_bytes": 289972,
+      "image_dimensions": [
+        1037,
+        1500
+      ],
+      "extracted_at": "2026-05-26T21:54:51Z",
+      "extraction_warnings": [],
+      "sanity_guard_rejections": [],
+      "cache_hit": false,
+      "latency_ms": 19418
+    },
+    "extraction_succeeded": true,
+    "failure_reason": null
+  },
+  "ingredient_list": {
+    "ingredients_text": "Spices and herbs (mustard), Dehydrated onion, Sugars (dextrose), Salt, Dehydrated garlic, Hydrolyzed wheat protein, Natural flavour, Yeast extract, Bromelain.",
+    "ingredients_parsed": [
+      {
+        "name": "spices and herbs",
+        "position": 1,
+        "parenthetical": [
+          "mustard"
+        ],
+        "explicit_percentage": null,
+        "allergen_flag": "mustard"
+      },
+      {
+        "name": "dehydrated onion",
+        "position": 2,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "sugars",
+        "position": 3,
+        "parenthetical": [
+          "dextrose"
+        ],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "salt",
+        "position": 4,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "dehydrated garlic",
+        "position": 5,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "hydrolyzed wheat protein",
+        "position": 6,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": "wheat"
+      },
+      {
+        "name": "natural flavour",
+        "position": 7,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "yeast extract",
+        "position": 8,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "bromelain",
+        "position": 9,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      }
+    ],
+    "explicit_percentages_found": false,
+    "contains_statement": null,
+    "language_detected": "en-fr",
+    "confidence": 0.0
+  },
+  "extraction_metadata": {
+    "model": "claude-opus-4-7",
+    "provider": "anthropic",
+    "prompt_version": 7,
+    "schema_version": 1,
+    "image_sha256": "532c770e2b87f272b954cfaa40598141cdcd2abe55dd8f585744eaec72c8fa76",
+    "image_bytes": 289972,
+    "image_dimensions": [
+      1037,
+      1500
+    ],
+    "extracted_at": "2026-05-26T21:54:51Z",
+    "extraction_warnings": [],
+    "sanity_guard_rejections": [],
+    "cache_hit": false,
+    "latency_ms": 19418
+  }
+}

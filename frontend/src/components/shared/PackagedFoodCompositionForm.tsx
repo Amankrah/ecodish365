@@ -22,6 +22,10 @@ import type {
   DecompositionResult,
   NFPanelExtraction,
 } from '@/lib/api';
+// FOOD-LIST-PANEL (2026-05-26): persist into the cross-page active food
+// list so the user can transfer this same packaged-food composition to
+// other scorers without re-decomposing.
+import { fromRecallAggregated, saveActiveFoodList } from '@/lib/activeFoodList';
 
 type UserType = 'individual' | 'researcher' | 'policy';
 
@@ -95,41 +99,52 @@ export function PackagedFoodCompositionForm({
 
   function routeTo(route: typeof SCORE_ROUTES[number]): void {
     setRouting(route.id);
+    // Build the payload once; reuse for both the sessionStorage handoff
+    // (consumed by the destination's useRecall24hReceiver) and the cross-page
+    // active food list (consumed by FoodListPanel everywhere else).
+    const payload = {
+      source: 'recall_24h' as const,
+      user_type: userType,
+      captured_at: new Date().toISOString(),
+      target: route.id,
+      meals_meta: [{
+        occasion: 'packaged_food',
+        dish_name: panel.product_name_visible.value || 'Packaged food',
+        total_mass_g: totalMass,
+      }],
+      aggregated_daily_ingredients: rows.map(r => ({
+        food_id: r.food_id,
+        food_description: r.food_description,
+        food_group: r.food_group || '',
+        mass_g: r.mass_g,
+        occasions: { packaged_food: r.mass_g },
+      })),
+      // Heuristic energy_per_serving estimate; not load-bearing for scoring,
+      // just informational. The actual per-meal kcal is computed downstream
+      // via CNF lookups on each FoodID.
+      estimated_daily_kcal: 0,
+      packaged_food: {
+        provenance: 'packaged_food_inferred' as const,
+        product_name: panel.product_name_visible.value || null,
+        brand: panel.brand_visible.value || null,
+        net_weight_g: decomposition.net_weight_g_assumed,
+        decomposition_confidence: decomposition.decomposition_confidence,
+        image_sha256: panel.extraction_metadata.image_sha256 || '',
+      },
+    };
     try {
-      const payload = {
-        source: 'recall_24h' as const,
-        user_type: userType,
-        captured_at: new Date().toISOString(),
-        target: route.id,
-        meals_meta: [{
-          occasion: 'packaged_food',
-          dish_name: panel.product_name_visible.value || 'Packaged food',
-          total_mass_g: totalMass,
-        }],
-        aggregated_daily_ingredients: rows.map(r => ({
-          food_id: r.food_id,
-          food_description: r.food_description,
-          food_group: r.food_group || '',
-          mass_g: r.mass_g,
-          occasions: { packaged_food: r.mass_g },
-        })),
-        // Heuristic energy_per_serving estimate; not load-bearing for scoring,
-        // just informational. The actual per-meal kcal is computed downstream
-        // via CNF lookups on each FoodID.
-        estimated_daily_kcal: 0,
-        packaged_food: {
-          provenance: 'packaged_food_inferred' as const,
-          product_name: panel.product_name_visible.value || null,
-          brand: panel.brand_visible.value || null,
-          net_weight_g: decomposition.net_weight_g_assumed,
-          decomposition_confidence: decomposition.decomposition_confidence,
-          image_sha256: panel.extraction_metadata.image_sha256 || '',
-        },
-      };
       sessionStorage.setItem('recall_24h_payload', JSON.stringify(payload));
     } catch {
       // sessionStorage may fail in private mode — target page renders empty
     }
+    try {
+      saveActiveFoodList(fromRecallAggregated(payload.aggregated_daily_ingredients, {
+        user_type: userType,
+        estimated_daily_kcal: payload.estimated_daily_kcal,
+        meals_meta: payload.meals_meta,
+        packaged_food: payload.packaged_food,
+      }));
+    } catch { /* localStorage unavailable — non-fatal */ }
     window.location.href = route.path + '?from=recall24h';
   }
 

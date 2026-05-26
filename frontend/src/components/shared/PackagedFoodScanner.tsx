@@ -14,7 +14,10 @@ import Link from 'next/link';
 import {
   Camera, Loader2, AlertCircle, Award, RotateCcw, AlertTriangle, Info,
   TrendingUp, ThumbsUp, CalendarClock,
+  Image as ImageIcon, X, Check,
 } from 'lucide-react';
+
+const MAX_IMAGES = 3;
 import {
   CNFApiService,
   type NFPanelExtraction,
@@ -38,8 +41,8 @@ interface ScannerError {
 
 export function PackagedFoodScanner({ userType }: Props): JSX.Element {
   const [step, setStep] = useState<FlowStep>('capture');
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [pickedFiles, setPickedFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [extracting, setExtracting] = useState(false);
   const [editedPanel, setEditedPanel] = useState<NFPanelExtraction | null>(null);
   const [cacheHit, setCacheHit] = useState(false);
@@ -47,20 +50,44 @@ export function PackagedFoodScanner({ userType }: Props): JSX.Element {
   const [scoreResult, setScoreResult] = useState<HsrFromPanelResponse | null>(null);
   const [error, setError] = useState<ScannerError | null>(null);
 
-  async function handleImagePicked(file: File): Promise<void> {
+  function appendPickedFiles(incoming: FileList | File[] | null): void {
+    if (!incoming) return;
+    const arr = Array.from(incoming);
+    const room = MAX_IMAGES - pickedFiles.length;
+    if (room <= 0) return;
+    const accepted = arr.slice(0, room);
+    if (accepted.length === 0) return;
+    const newUrls = accepted.map(f => URL.createObjectURL(f));
+    setPickedFiles(prev => [...prev, ...accepted]);
+    setPreviewUrls(prev => [...prev, ...newUrls]);
     setError(null);
-    setImageFile(file);
-    if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
-    setImagePreviewUrl(URL.createObjectURL(file));
+    if (arr.length > room) {
+      setError({
+        code: 'too_many_images',
+        message: `Only the first ${MAX_IMAGES} images are kept per scan.`,
+      });
+    }
+  }
+
+  function removePickedAt(idx: number): void {
+    URL.revokeObjectURL(previewUrls[idx]);
+    setPickedFiles(prev => prev.filter((_, i) => i !== idx));
+    setPreviewUrls(prev => prev.filter((_, i) => i !== idx));
+    setError(null);
+  }
+
+  async function handleExtract(): Promise<void> {
+    if (pickedFiles.length === 0) return;
+    setError(null);
     setExtracting(true);
     setStep('capture');
     try {
-      const rsp = await CNFApiService.extractPackagedFood(file, { target: 'hsr' });
+      const rsp = await CNFApiService.extractPackagedFood(pickedFiles, { target: 'hsr' });
       if (!rsp.extraction.extraction_succeeded) {
         setError({
           code: 'extraction_failed',
           message: rsp.extraction.failure_reason
-            || 'No nutrition panel detected in this image. Try a clearer photo of the Nutrition Facts panel.',
+            || 'No nutrition panel detected. Try clearer photos of the Nutrition Facts panel.',
         });
         setStep('error');
         return;
@@ -110,9 +137,9 @@ export function PackagedFoodScanner({ userType }: Props): JSX.Element {
   }
 
   function reset(): void {
-    if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
-    setImageFile(null);
-    setImagePreviewUrl(null);
+    for (const url of previewUrls) URL.revokeObjectURL(url);
+    setPickedFiles([]);
+    setPreviewUrls([]);
     setEditedPanel(null);
     setScoreResult(null);
     setCacheHit(false);
@@ -121,14 +148,17 @@ export function PackagedFoodScanner({ userType }: Props): JSX.Element {
   }
 
   function reextract(): void {
-    if (imageFile) {
-      void handleImagePicked(imageFile);
+    if (pickedFiles.length > 0) {
+      void handleExtract();
     }
   }
 
   return (
     <div className="space-y-6">
-      {step === 'capture' && (
+      {step === 'capture' && (() => {
+        const canAddMore = pickedFiles.length < MAX_IMAGES;
+        const canExtract = pickedFiles.length > 0 && !extracting;
+        return (
         <div className="bg-white rounded-lg border p-6 shadow-sm space-y-4">
           <div className="flex items-start gap-3">
             <Camera className="h-6 w-6 text-blue-700 flex-shrink-0 mt-1" aria-hidden="true" />
@@ -138,56 +168,124 @@ export function PackagedFoodScanner({ userType }: Props): JSX.Element {
                 On mobile, tap to use the rear camera. On desktop, you can also pick a file.
                 Aim for the panel filling most of the frame, with even lighting and no glare.
               </p>
+              <p className="text-sm text-gray-600 mt-1">
+                You can add up to <strong>{MAX_IMAGES} photos</strong> of the same product
+                — useful when the NF panel, ingredient list, or net weight are on different faces.
+              </p>
             </div>
           </div>
 
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center bg-gray-50">
-            <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md">
-              <Camera className="h-5 w-5" aria-hidden="true" />
-              {imageFile ? 'Pick a different image' : 'Take photo or pick file'}
-              <input
-                type="file"
-                accept="image/*"
-                capture="environment"
-                className="hidden"
-                onChange={e => {
-                  const f = e.target.files?.[0];
-                  if (f) void handleImagePicked(f);
-                }}
-                disabled={extracting}
-              />
-            </label>
-            <p className="text-xs text-gray-500 mt-2">
-              Accepts JPEG, PNG, WebP, HEIC (iOS), AVIF. Max 10 MB.
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50 space-y-3">
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <label
+                className={`cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-md ${
+                  canAddMore && !extracting
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                <Camera className="h-5 w-5" aria-hidden="true" />
+                {pickedFiles.length === 0 ? 'Take photo' : 'Add another photo'}
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  className="hidden"
+                  onChange={e => {
+                    appendPickedFiles(e.target.files);
+                    e.target.value = '';
+                  }}
+                  disabled={!canAddMore || extracting}
+                />
+              </label>
+              <label
+                className={`cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-md border ${
+                  canAddMore && !extracting
+                    ? 'bg-white border-blue-300 text-blue-800 hover:bg-blue-50'
+                    : 'bg-gray-100 border-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                <ImageIcon className="h-5 w-5" aria-hidden="true" />
+                {pickedFiles.length === 0 ? 'Or pick from gallery' : 'Add from gallery'}
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={e => {
+                    appendPickedFiles(e.target.files);
+                    e.target.value = '';
+                  }}
+                  disabled={!canAddMore || extracting}
+                />
+              </label>
+              <button
+                type="button"
+                onClick={() => void handleExtract()}
+                disabled={!canExtract}
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed text-white text-sm font-medium rounded-md"
+              >
+                {extracting
+                  ? <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
+                  : <Check className="h-5 w-5" aria-hidden="true" />}
+                {extracting
+                  ? 'Extracting…'
+                  : pickedFiles.length === 0
+                    ? 'Extract panel'
+                    : `Extract from ${pickedFiles.length} photo${pickedFiles.length > 1 ? 's' : ''}`}
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 text-center">
+              Accepts JPEG, PNG, WebP, HEIC (iOS), AVIF. Max 10 MB per photo.
+              {' · '}{pickedFiles.length}/{MAX_IMAGES} selected.
+              {!canAddMore && ' Maximum reached.'}
             </p>
           </div>
 
-          {imagePreviewUrl && (
+          {previewUrls.length > 0 && (
             <div className="space-y-2">
-              <p className="text-xs text-gray-600">Image preview:</p>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={imagePreviewUrl}
-                alt="Selected packaged food"
-                className="max-h-64 mx-auto rounded-md border border-gray-200"
-              />
+              <p className="text-xs text-gray-600">Selected photos:</p>
+              <div className="flex flex-wrap justify-center gap-3">
+                {previewUrls.map((url, i) => (
+                  <div key={i} className="relative">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={url}
+                      alt={`Selected packaged food face ${i + 1}`}
+                      className="max-h-48 rounded-md border border-gray-200"
+                    />
+                    {!extracting && (
+                      <button
+                        type="button"
+                        onClick={() => removePickedAt(i)}
+                        aria-label={`Remove photo ${i + 1}`}
+                        title={`Remove photo ${i + 1}`}
+                        className="absolute -top-2 -right-2 inline-flex items-center justify-center h-6 w-6 rounded-full bg-white border border-gray-300 text-gray-700 hover:bg-red-50 hover:text-red-700 hover:border-red-300 shadow-sm"
+                      >
+                        <X className="h-3.5 w-3.5" aria-hidden="true" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
           {extracting && (
             <div className="flex items-center gap-2 text-sm text-gray-700 bg-blue-50 border border-blue-200 rounded-md p-3">
               <Loader2 className="h-4 w-4 animate-spin text-blue-700" aria-hidden="true" />
-              Extracting the nutrition panel… this usually takes 2–3 seconds.
+              Extracting the nutrition panel… this usually takes 2–3 seconds per photo.
             </div>
           )}
 
           <p className="text-[11px] text-gray-500 border-t pt-2">
-            <strong>Privacy:</strong> your image is sent to a multimodal AI model for one-time
-            text extraction and is not stored after that. Only the extracted nutrition values
+            <strong>Privacy:</strong> your image{pickedFiles.length === 1 ? '' : 's'} {pickedFiles.length === 1 ? 'is' : 'are'} sent to a multimodal AI model for one-time
+            text extraction and {pickedFiles.length === 1 ? 'is' : 'are'} not stored after that. Only the extracted nutrition values
             (which you will review on the next screen) are saved if you choose to score this product.
           </p>
         </div>
-      )}
+        );
+      })()}
 
       {step === 'reviewing' && editedPanel && (
         <div className="space-y-4">
@@ -207,15 +305,22 @@ export function PackagedFoodScanner({ userType }: Props): JSX.Element {
               )}
             </div>
 
-            {imagePreviewUrl && (
+            {previewUrls.length > 0 && (
               <details className="mt-3 text-sm">
-                <summary className="cursor-pointer text-blue-700">Show image side-by-side</summary>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={imagePreviewUrl}
-                  alt="Source image"
-                  className="mt-2 max-h-48 rounded border border-gray-200"
-                />
+                <summary className="cursor-pointer text-blue-700">
+                  Show {previewUrls.length === 1 ? 'source image' : `${previewUrls.length} source images`} side-by-side
+                </summary>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {previewUrls.map((url, i) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      key={i}
+                      src={url}
+                      alt={`Source image ${i + 1}`}
+                      className="max-h-48 rounded border border-gray-200"
+                    />
+                  ))}
+                </div>
               </details>
             )}
           </div>

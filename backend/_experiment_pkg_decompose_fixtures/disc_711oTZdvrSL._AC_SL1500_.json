@@ -1,0 +1,441 @@
+{
+  "fixture_id": "disc_711oTZdvrSL._AC_SL1500_",
+  "source_image": "711oTZdvrSL._AC_SL1500_.jpg",
+  "net_weight_override_g": null,
+  "nf_panel": {
+    "schema_version": 1,
+    "language_detected": "en-fr",
+    "panel_format_detected": "canadian_2016",
+    "product_name_visible": {
+      "value": "Texan Sriracha Spicy Mix",
+      "confidence": 0.98
+    },
+    "brand_visible": {
+      "value": "Yupik",
+      "confidence": 0.98
+    },
+    "serving_size": {
+      "value": 50.0,
+      "unit": "g",
+      "confidence": 0.97,
+      "raw_text": "Per 1/2 cup (50 g) / Pour 1/2 tasse (50 g)",
+      "from_dv_percent": false,
+      "from_kcal_conversion": false
+    },
+    "servings_per_container": {
+      "value": null,
+      "unit": null,
+      "confidence": 0.0,
+      "raw_text": null,
+      "from_dv_percent": false,
+      "from_kcal_conversion": false
+    },
+    "net_weight": {
+      "value": 1000.0,
+      "unit": "g",
+      "confidence": 0.97,
+      "raw_text": "1 kg / 2.20 lb",
+      "from_dv_percent": false,
+      "from_kcal_conversion": false
+    },
+    "per_serving": {
+      "energy_kj": {
+        "value": 1088.0,
+        "unit": "kJ",
+        "confidence": 0.6,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": true
+      },
+      "energy_kcal": {
+        "value": 260.0,
+        "unit": "kcal",
+        "confidence": 0.97,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_total_g": {
+        "value": 17.0,
+        "unit": "g",
+        "confidence": 0.97,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_sat_g": {
+        "value": 2.5,
+        "unit": "g",
+        "confidence": 0.95,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_trans_g": {
+        "value": 0.1,
+        "unit": "g",
+        "confidence": 0.95,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "carbohydrate_total_g": {
+        "value": 20.0,
+        "unit": "g",
+        "confidence": 0.97,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fibre_g": {
+        "value": 4.0,
+        "unit": "g",
+        "confidence": 0.95,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sugars_total_g": {
+        "value": 3.0,
+        "unit": "g",
+        "confidence": 0.95,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sugars_added_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "protein_g": {
+        "value": 9.0,
+        "unit": "g",
+        "confidence": 0.97,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sodium_mg": {
+        "value": 360.0,
+        "unit": "mg",
+        "confidence": 0.97,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "potassium_mg": {
+        "value": 200.0,
+        "unit": "mg",
+        "confidence": 0.95,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "calcium_mg": {
+        "value": 50.0,
+        "unit": "mg",
+        "confidence": 0.95,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "iron_mg": {
+        "value": 1.75,
+        "unit": "mg",
+        "confidence": 0.95,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "cholesterol_mg": {
+        "value": 0.0,
+        "unit": "mg",
+        "confidence": 0.95,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      }
+    },
+    "per_100g": {
+      "energy_kj": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "energy_kcal": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_total_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_sat_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_trans_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "carbohydrate_total_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fibre_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sugars_total_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sugars_added_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "protein_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sodium_mg": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "potassium_mg": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "calcium_mg": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "iron_mg": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "cholesterol_mg": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      }
+    },
+    "hsr_category_hint": {
+      "guess": "2",
+      "confidence": 0.9,
+      "rationale": "Solid snack mix (peas, nuts, pretzels) \u2014 not a beverage, not majority dairy, not pure fat/oil/nut-butter.",
+      "alternatives": [
+        {
+          "category": "3",
+          "reason": "Contains significant nuts (almonds, peanuts, cashews) and oils, but it is a mixed snack rather than a pure nut/oil product."
+        }
+      ]
+    },
+    "fopl_on_pack": {
+      "hsr_stars_visible": null,
+      "nutri_score_visible": null
+    },
+    "extraction_metadata": {
+      "model": "claude-opus-4-7",
+      "provider": "anthropic",
+      "prompt_version": 7,
+      "schema_version": 1,
+      "image_sha256": "8a57c8c3495a160ece0724be09cc6834238c9aee6958db43ea352fe98799d5f3",
+      "image_bytes": 159507,
+      "image_dimensions": [
+        1033,
+        1500
+      ],
+      "extracted_at": "2026-05-26T21:51:45Z",
+      "extraction_warnings": [],
+      "sanity_guard_rejections": [],
+      "cache_hit": false,
+      "latency_ms": 25624
+    },
+    "extraction_succeeded": true,
+    "failure_reason": null
+  },
+  "ingredient_list": {
+    "ingredients_text": "Ingredients: Green peas [peas, corn starch, sugar, seasoning (sriracha, vegetarian wasabi), palm oil, rice flour, salt, tartrazine (FD&C Yellow No. 5), brilliant blue FCF (FD&C Blue No. 1)], Almonds, Peanuts, Sesame sticks (enriched wheat flour, soybean oil, sesame seeds, bulgur wheat, salt, beet powder, turmeric ), Cashews, Mini pretzels (unbleached enriched wheat flour, salt, malt, soybean oil), Non-hydrogenated canola oil, BBQ seasoning [salt, sugars (dextrose, sugar), torula yeast, monosodium glutamate, spices, farina (wheat), tomato powder, onion powder, citric acid, garlic powder, tricalcium phosphate (anti-caking agent), extractives of paprika, sodium citrate, spice extractives, natural smoke flavour] May contain: other tree nuts, milk, sulphite",
+    "ingredients_parsed": [
+      {
+        "name": "green peas",
+        "position": 1,
+        "parenthetical": [
+          "peas",
+          "corn starch",
+          "sugar",
+          "seasoning (sriracha, vegetarian wasabi)",
+          "palm oil",
+          "rice flour",
+          "salt",
+          "tartrazine (FD&C Yellow No. 5)",
+          "brilliant blue FCF (FD&C Blue No. 1)"
+        ],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "almonds",
+        "position": 2,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": "tree nuts"
+      },
+      {
+        "name": "peanuts",
+        "position": 3,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": "peanuts"
+      },
+      {
+        "name": "sesame sticks",
+        "position": 4,
+        "parenthetical": [
+          "enriched wheat flour",
+          "soybean oil",
+          "sesame seeds",
+          "bulgur wheat",
+          "salt",
+          "beet powder",
+          "turmeric"
+        ],
+        "explicit_percentage": null,
+        "allergen_flag": "wheat/sesame/soy"
+      },
+      {
+        "name": "cashews",
+        "position": 5,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": "tree nuts"
+      },
+      {
+        "name": "mini pretzels",
+        "position": 6,
+        "parenthetical": [
+          "unbleached enriched wheat flour",
+          "salt",
+          "malt",
+          "soybean oil"
+        ],
+        "explicit_percentage": null,
+        "allergen_flag": "wheat/soy"
+      },
+      {
+        "name": "non-hydrogenated canola oil",
+        "position": 7,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "BBQ seasoning",
+        "position": 8,
+        "parenthetical": [
+          "salt",
+          "sugars (dextrose, sugar)",
+          "torula yeast",
+          "monosodium glutamate",
+          "spices",
+          "farina (wheat)",
+          "tomato powder",
+          "onion powder",
+          "citric acid",
+          "garlic powder",
+          "tricalcium phosphate (anti-caking agent)",
+          "extractives of paprika",
+          "sodium citrate",
+          "spice extractives",
+          "natural smoke flavour"
+        ],
+        "explicit_percentage": null,
+        "allergen_flag": "wheat"
+      }
+    ],
+    "explicit_percentages_found": false,
+    "contains_statement": "May contain: other tree nuts, milk, sulphite",
+    "language_detected": "en-fr",
+    "confidence": 0.0
+  },
+  "extraction_metadata": {
+    "model": "claude-opus-4-7",
+    "provider": "anthropic",
+    "prompt_version": 7,
+    "schema_version": 1,
+    "image_sha256": "8a57c8c3495a160ece0724be09cc6834238c9aee6958db43ea352fe98799d5f3",
+    "image_bytes": 159507,
+    "image_dimensions": [
+      1033,
+      1500
+    ],
+    "extracted_at": "2026-05-26T21:51:45Z",
+    "extraction_warnings": [],
+    "sanity_guard_rejections": [],
+    "cache_hit": false,
+    "latency_ms": 25624
+  }
+}

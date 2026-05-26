@@ -148,7 +148,13 @@ def normalize_image_bytes(raw: bytes) -> tuple[bytes, dict]:
 @runtime_checkable
 class MultimodalJSONClient(Protocol):
     """Duck-typed client. `image_jpeg_bytes` is the already-normalised JPEG
-    from `normalize_image_bytes`. Returns parsed JSON object."""
+    from `normalize_image_bytes`. Returns parsed JSON object.
+
+    `extract_with_images` is the plural form for multi-face uploads — 1-3
+    photos of the same product from different angles. Implementations
+    should send them as separate content blocks in one LLM call (cheaper
+    + lets the model reconcile across faces in-context) rather than calling
+    the API once per image."""
 
     model: str
     provider: str
@@ -159,6 +165,16 @@ class MultimodalJSONClient(Protocol):
         system: str,
         user: str,
         image_jpeg_bytes: bytes,
+        temperature: float = 0.0,
+        max_tokens: Optional[int] = None,
+    ) -> dict: ...
+
+    def extract_with_images(
+        self,
+        *,
+        system: str,
+        user: str,
+        images_jpeg_bytes: list[bytes],
         temperature: float = 0.0,
         max_tokens: Optional[int] = None,
     ) -> dict: ...
@@ -184,18 +200,35 @@ class OpenAIMultimodalClient:
         temperature: float = 0.0,
         max_tokens: Optional[int] = None,
     ) -> dict:
-        b64 = base64.b64encode(image_jpeg_bytes).decode("ascii")
+        return self.extract_with_images(
+            system=system, user=user,
+            images_jpeg_bytes=[image_jpeg_bytes],
+            temperature=temperature, max_tokens=max_tokens,
+        )
+
+    def extract_with_images(
+        self,
+        *,
+        system: str,
+        user: str,
+        images_jpeg_bytes: list[bytes],
+        temperature: float = 0.0,
+        max_tokens: Optional[int] = None,
+    ) -> dict:
+        if not images_jpeg_bytes:
+            raise ValueError("images_jpeg_bytes must contain at least one image")
+        content: list[dict] = [{"type": "text", "text": user}]
+        for jpeg in images_jpeg_bytes:
+            b64 = base64.b64encode(jpeg).decode("ascii")
+            content.append({"type": "image_url", "image_url": {
+                "url": f"data:image/jpeg;base64,{b64}",
+                "detail": "high",  # higher cost but needed for small NF text
+            }})
         kwargs: dict = {
             "model": self.model,
             "messages": [
                 {"role": "system", "content": system},
-                {"role": "user", "content": [
-                    {"type": "text", "text": user},
-                    {"type": "image_url", "image_url": {
-                        "url": f"data:image/jpeg;base64,{b64}",
-                        "detail": "high",  # higher cost but needed for small NF text
-                    }},
-                ]},
+                {"role": "user", "content": content},
             ],
             "temperature": temperature,
             "response_format": {"type": "json_object"},
@@ -203,8 +236,8 @@ class OpenAIMultimodalClient:
         if max_tokens is not None:
             kwargs["max_tokens"] = max_tokens
         rsp = self._client.chat.completions.create(**kwargs)
-        content = rsp.choices[0].message.content or "{}"
-        return _parse_json_permissive(content)
+        content_out = rsp.choices[0].message.content or "{}"
+        return _parse_json_permissive(content_out)
 
 
 class AnthropicMultimodalClient:
@@ -227,23 +260,41 @@ class AnthropicMultimodalClient:
         temperature: float = 0.0,
         max_tokens: Optional[int] = None,
     ) -> dict:
-        b64 = base64.b64encode(image_jpeg_bytes).decode("ascii")
-        user_blocks = [
-            {"type": "image", "source": {
+        return self.extract_with_images(
+            system=system, user=user,
+            images_jpeg_bytes=[image_jpeg_bytes],
+            temperature=temperature, max_tokens=max_tokens,
+        )
+
+    def extract_with_images(
+        self,
+        *,
+        system: str,
+        user: str,
+        images_jpeg_bytes: list[bytes],
+        temperature: float = 0.0,
+        max_tokens: Optional[int] = None,
+    ) -> dict:
+        if not images_jpeg_bytes:
+            raise ValueError("images_jpeg_bytes must contain at least one image")
+        user_blocks: list[dict] = []
+        for jpeg in images_jpeg_bytes:
+            b64 = base64.b64encode(jpeg).decode("ascii")
+            user_blocks.append({"type": "image", "source": {
                 "type": "base64", "media_type": "image/jpeg", "data": b64,
-            }},
-            {"type": "text", "text": user},
-        ]
+            }})
+        user_blocks.append({"type": "text", "text": user})
 
         from api.services.anthropic_client_utils import (
             anthropic_error_is_retryable,
             build_anthropic_json_attempts,
         )
         attempts = build_anthropic_json_attempts(self.model, user)
+        text_block_idx = len(user_blocks) - 1  # the text block we just appended
         last_exc: Optional[Exception] = None
         for use_prefill, use_temperature, user_text in attempts:
             blocks = list(user_blocks)
-            blocks[1] = {"type": "text", "text": user_text}
+            blocks[text_block_idx] = {"type": "text", "text": user_text}
             messages: list[dict] = [{"role": "user", "content": blocks}]
             if use_prefill:
                 messages.append({"role": "assistant", "content": "{"})

@@ -752,11 +752,20 @@ export class CNFApiService {
    *  Cost: 1¢ per fresh extraction; cache hits (same image SHA-256 within
    *  7 days) are free. Throws on 4xx/5xx; caller renders error state. */
   static async extractPackagedFood(
-    image: File | Blob,
+    images: File | Blob | Array<File | Blob>,
     opts: { target?: 'hsr' } = {},
   ): Promise<PackagedFoodExtractResponse> {
+    const list = Array.isArray(images) ? images : [images];
+    if (list.length === 0) {
+      throw new Error('extractPackagedFood: at least one image is required');
+    }
+    if (list.length > 3) {
+      throw new Error('extractPackagedFood: at most 3 images per scan');
+    }
     const form = new FormData();
-    form.append('image', image);
+    for (const img of list) {
+      form.append('images', img);
+    }
     if (opts.target) form.append('target', opts.target);
     const response = await api.post('/packaged-food/extract/', form, {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -791,10 +800,19 @@ export class CNFApiService {
    *  Single multimodal LLM call (1¢). Frontend uses has_nf_panel /
    *  has_ingredient_list to decide what to do next. */
   static async extractPackagedFoodCombined(
-    image: File | Blob,
+    images: File | Blob | Array<File | Blob>,
   ): Promise<PackagedFoodExtractCombinedResponse> {
+    const list = Array.isArray(images) ? images : [images];
+    if (list.length === 0) {
+      throw new Error('extractPackagedFoodCombined: at least one image is required');
+    }
+    if (list.length > 3) {
+      throw new Error('extractPackagedFoodCombined: at most 3 images per scan');
+    }
     const form = new FormData();
-    form.append('image', image);
+    for (const img of list) {
+      form.append('images', img);
+    }
     const response = await api.post('/packaged-food/extract-combined/', form, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
@@ -962,6 +980,7 @@ export interface PackagedFoodExtractCombinedResponse {
   extraction: PackagedFoodExtraction;
   cache_hit: boolean;
   cache_ttl_seconds: number;
+  image_count?: number;
 }
 
 export interface PackagedFoodDecomposeResponse {

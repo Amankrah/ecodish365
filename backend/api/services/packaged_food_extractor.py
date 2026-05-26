@@ -800,16 +800,19 @@ def _critical_fields_usable(panel: NFPanelExtraction) -> bool:
 
 
 def extract_nf_panel(
-    image_bytes: bytes,
+    image_bytes,
     *,
     target: str = "hsr",
     client: Optional[MultimodalJSONClient] = None,
     use_cache: bool = True,
 ) -> ExtractionResult:
-    """Extract a packaged-food NF panel from a single image.
+    """Extract a packaged-food NF panel from one or more images.
 
     Args:
-      image_bytes: raw bytes as uploaded (any format Pillow + plugins read).
+      image_bytes: EITHER a single `bytes` (one photo — backward-compatible),
+        OR a `list[bytes]` of 1-`MAX_IMAGES_PER_EXTRACTION` photos of the
+        SAME product from different faces. Multi-image flows merge per
+        Rule U so the NF face + net-weight face can be supplied separately.
       target: downstream consumer hint, currently 'hsr' only.
       client: optional pre-built MultimodalJSONClient (for tests).
       use_cache: set False in smoke tests to force fresh extraction.
@@ -823,9 +826,26 @@ def extract_nf_panel(
     """
     t_start = time.perf_counter()
 
-    # 1. Normalise image. ImageDecodeError propagates — view turns it into 400.
-    jpeg_bytes, img_meta = normalize_image_bytes(image_bytes)
-    sha = img_meta["sha256"]
+    # 1. Normalise image(s). Same polymorphic shape as `extract_packaged_food`.
+    raw_list: list[bytes] = (
+        [image_bytes] if isinstance(image_bytes, (bytes, bytearray))
+        else list(image_bytes)
+    )
+    if not raw_list:
+        raise ValueError("extract_nf_panel: no image bytes provided")
+    if len(raw_list) > MAX_IMAGES_PER_EXTRACTION:
+        raise ValueError(
+            f"extract_nf_panel: at most {MAX_IMAGES_PER_EXTRACTION} images "
+            f"per call (got {len(raw_list)})"
+        )
+    normalised: list[tuple[bytes, dict]] = [normalize_image_bytes(b) for b in raw_list]
+    jpeg_list = [n[0] for n in normalised]
+    per_image_meta = [n[1] for n in normalised]
+    img_meta = dict(per_image_meta[0])
+    img_meta["images"] = per_image_meta
+    img_meta["image_count"] = len(per_image_meta)
+    sha = _combined_sha_for_images([m["sha256"] for m in per_image_meta])
+    img_meta["sha256"] = sha
 
     # 2. Cache check.
     if use_cache:
@@ -852,12 +872,12 @@ def extract_nf_panel(
             "For Opus extraction set MULTIMODAL_LLM_MODEL=claude-opus-4-7."
         )
 
-    # 4. Call.
+    # 4. Call (single multimodal call, 1-3 image blocks).
     try:
-        raw = client.extract_with_image(
+        raw = client.extract_with_images(
             system=NF_PANEL_SYSTEM_PROMPT,
             user=build_user_prompt(target=target),
-            image_jpeg_bytes=jpeg_bytes,
+            images_jpeg_bytes=jpeg_list,
             temperature=0.0,
             max_tokens=2048,
         )
@@ -986,19 +1006,45 @@ class CombinedExtractionResult:
     cache_hit: bool
 
 
+MAX_IMAGES_PER_EXTRACTION = 3
+"""Hard cap on photos per combined extraction. Three covers
+front + back + side, which is typically enough to surface the NF panel,
+ingredient list, AND net weight (often on different faces). Higher
+counts push token costs disproportionately without raising accuracy."""
+
+
 def _combined_cache_key(sha256_hex: str) -> str:
     """Distinct from Phase 1's NF-only key so Phase 1 and Phase 2 caches
-    don't collide on the same image."""
+    don't collide on the same image. For multi-image uploads, pass the
+    concatenated-and-rehashed SHA from `_combined_sha_for_images`."""
     return f"pkg_food_combined:v{SCHEMA_VERSION}.{PROMPT_VERSION}:{sha256_hex}"
 
 
+def _combined_sha_for_images(per_image_sha: list[str]) -> str:
+    """Stable cache key for a multi-image upload. Order matters (different
+    face-order = different LLM input = different result), so we don't sort.
+    Single-image case returns the original SHA unchanged so existing
+    cache entries continue to hit."""
+    import hashlib
+    if len(per_image_sha) == 1:
+        return per_image_sha[0]
+    return hashlib.sha256("|".join(per_image_sha).encode("ascii")).hexdigest()
+
+
 def extract_packaged_food(
-    image_bytes: bytes,
+    image_bytes,
     *,
     client: Optional[MultimodalJSONClient] = None,
     use_cache: bool = True,
 ) -> CombinedExtractionResult:
     """Adaptive extractor — returns NF panel + ingredient list, either or both.
+
+    `image_bytes` is either:
+      - a single `bytes` (one photo — backward-compatible), OR
+      - a `list[bytes]` of 1-`MAX_IMAGES_PER_EXTRACTION` photos of the SAME
+        product taken from different faces. The LLM is instructed (Rule U)
+        to merge across faces so net weight from the front face can complete
+        an NF panel read from the back face.
 
     Single multimodal call using COMBINED_SYSTEM_PROMPT. The LLM is told to
     populate whichever pieces are visible and to set has_nf_panel /
@@ -1011,8 +1057,26 @@ def extract_packaged_food(
     """
     t_start = time.perf_counter()
 
-    jpeg_bytes, img_meta = normalize_image_bytes(image_bytes)
-    sha = img_meta["sha256"]
+    raw_list: list[bytes] = [image_bytes] if isinstance(image_bytes, (bytes, bytearray)) else list(image_bytes)
+    if not raw_list:
+        raise ValueError("extract_packaged_food: no image bytes provided")
+    if len(raw_list) > MAX_IMAGES_PER_EXTRACTION:
+        raise ValueError(
+            f"extract_packaged_food: at most {MAX_IMAGES_PER_EXTRACTION} images "
+            f"per call (got {len(raw_list)})"
+        )
+
+    normalised: list[tuple[bytes, dict]] = [normalize_image_bytes(b) for b in raw_list]
+    jpeg_list = [n[0] for n in normalised]
+    per_image_meta = [n[1] for n in normalised]
+    # Compose a single image-metadata dict for the wrapper. The first image
+    # is the "primary" for source_format / dimensions reporting; we keep
+    # an `images` array with per-image metadata so callers can audit.
+    img_meta = dict(per_image_meta[0])
+    img_meta["images"] = per_image_meta
+    img_meta["image_count"] = len(per_image_meta)
+    sha = _combined_sha_for_images([m["sha256"] for m in per_image_meta])
+    img_meta["sha256"] = sha
 
     if use_cache:
         cached = cache.get(_combined_cache_key(sha))
@@ -1037,10 +1101,10 @@ def extract_packaged_food(
         )
 
     try:
-        raw = client.extract_with_image(
+        raw = client.extract_with_images(
             system=COMBINED_SYSTEM_PROMPT,
             user=build_combined_user_prompt(),
-            image_jpeg_bytes=jpeg_bytes,
+            images_jpeg_bytes=jpeg_list,
             temperature=0.0,
             max_tokens=3500,  # combined NF + ingredients can be larger
         )

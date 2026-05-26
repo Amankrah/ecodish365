@@ -1,0 +1,478 @@
+{
+  "fixture_id": "disc_810+iTFUYKL._AC_SL1500_",
+  "source_image": "810+iTFUYKL._AC_SL1500_.jpg",
+  "net_weight_override_g": null,
+  "nf_panel": {
+    "schema_version": 1,
+    "language_detected": "en-fr",
+    "panel_format_detected": "canadian_2016",
+    "product_name_visible": {
+      "value": "Monster Energy",
+      "confidence": 0.85
+    },
+    "brand_visible": {
+      "value": "Monster",
+      "confidence": 0.85
+    },
+    "serving_size": {
+      "value": 473.0,
+      "unit": "ml",
+      "confidence": 0.98,
+      "raw_text": "Per 1 can (473 mL) / pour 1 canette (473 mL)",
+      "from_dv_percent": false,
+      "from_kcal_conversion": false
+    },
+    "servings_per_container": {
+      "value": 1.0,
+      "unit": null,
+      "confidence": 0.9,
+      "raw_text": "Per 1 can (473 mL)",
+      "from_dv_percent": false,
+      "from_kcal_conversion": false
+    },
+    "net_weight": {
+      "value": 473.0,
+      "unit": "ml",
+      "confidence": 0.9,
+      "raw_text": "473 mL",
+      "from_dv_percent": false,
+      "from_kcal_conversion": false
+    },
+    "per_serving": {
+      "energy_kj": {
+        "value": 920.48,
+        "unit": "kJ",
+        "confidence": 0.9,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": true
+      },
+      "energy_kcal": {
+        "value": 220.0,
+        "unit": "kcal",
+        "confidence": 0.98,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_total_g": {
+        "value": 0.0,
+        "unit": "g",
+        "confidence": 0.98,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_sat_g": {
+        "value": null,
+        "unit": "g",
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_trans_g": {
+        "value": null,
+        "unit": "g",
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "carbohydrate_total_g": {
+        "value": 57.0,
+        "unit": "g",
+        "confidence": 0.98,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fibre_g": {
+        "value": null,
+        "unit": "g",
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sugars_total_g": {
+        "value": 54.0,
+        "unit": "g",
+        "confidence": 0.98,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sugars_added_g": {
+        "value": null,
+        "unit": "g",
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "protein_g": {
+        "value": 0.0,
+        "unit": "g",
+        "confidence": 0.98,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sodium_mg": {
+        "value": 370.0,
+        "unit": "mg",
+        "confidence": 0.98,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "potassium_mg": {
+        "value": null,
+        "unit": "mg",
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "calcium_mg": {
+        "value": null,
+        "unit": "mg",
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "iron_mg": {
+        "value": null,
+        "unit": "mg",
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "cholesterol_mg": {
+        "value": null,
+        "unit": "mg",
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      }
+    },
+    "per_100g": {
+      "energy_kj": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "energy_kcal": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_total_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_sat_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_trans_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "carbohydrate_total_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fibre_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sugars_total_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sugars_added_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "protein_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sodium_mg": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "potassium_mg": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "calcium_mg": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "iron_mg": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "cholesterol_mg": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      }
+    },
+    "hsr_category_hint": {
+      "guess": "1",
+      "confidence": 0.9,
+      "rationale": "Carbonated supplemented energy drink in a 473 mL can \u2014 non-dairy beverage.",
+      "alternatives": [
+        {
+          "category": "2",
+          "reason": "Could be argued as 'all other foods' since it's a supplemented food, but it is consumed as a beverage."
+        }
+      ]
+    },
+    "fopl_on_pack": {
+      "hsr_stars_visible": null,
+      "nutri_score_visible": null
+    },
+    "extraction_metadata": {
+      "model": "claude-opus-4-7",
+      "provider": "anthropic",
+      "prompt_version": 7,
+      "schema_version": 1,
+      "image_sha256": "6e45e077a4e54a3db44abb12e88bf5590d21847c1297a715a482a7f185454443",
+      "image_bytes": 198287,
+      "image_dimensions": [
+        593,
+        1500
+      ],
+      "extracted_at": "2026-05-26T21:52:28Z",
+      "extraction_warnings": [],
+      "sanity_guard_rejections": [],
+      "cache_hit": false,
+      "latency_ms": 26241
+    },
+    "extraction_succeeded": true,
+    "failure_reason": null
+  },
+  "ingredient_list": {
+    "ingredients_text": "Carbonated water, Sugars (sugar, glucose, maltodextrin), Citric acid, Natural flavours, Taurine, Sodium citrate, Grape skin extract (colour), Panax ginseng flavour, Caffeine, Sorbic acid, Benzoic acid, Niacinamide, Sucralose, Guarana seed extract, Inositol, Pyridoxine hydrochloride, Riboflavin, Cyanocobalamin.",
+    "ingredients_parsed": [
+      {
+        "name": "carbonated water",
+        "position": 1,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "sugars",
+        "position": 2,
+        "parenthetical": [
+          "sugar",
+          "glucose",
+          "maltodextrin"
+        ],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "citric acid",
+        "position": 3,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "natural flavours",
+        "position": 4,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "taurine",
+        "position": 5,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "sodium citrate",
+        "position": 6,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "grape skin extract",
+        "position": 7,
+        "parenthetical": [
+          "colour"
+        ],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "panax ginseng flavour",
+        "position": 8,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "caffeine",
+        "position": 9,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "sorbic acid",
+        "position": 10,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "benzoic acid",
+        "position": 11,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "niacinamide",
+        "position": 12,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "sucralose",
+        "position": 13,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "guarana seed extract",
+        "position": 14,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "inositol",
+        "position": 15,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "pyridoxine hydrochloride",
+        "position": 16,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "riboflavin",
+        "position": 17,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "cyanocobalamin",
+        "position": 18,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      }
+    ],
+    "explicit_percentages_found": false,
+    "contains_statement": null,
+    "language_detected": "en-fr",
+    "confidence": 0.0
+  },
+  "extraction_metadata": {
+    "model": "claude-opus-4-7",
+    "provider": "anthropic",
+    "prompt_version": 7,
+    "schema_version": 1,
+    "image_sha256": "6e45e077a4e54a3db44abb12e88bf5590d21847c1297a715a482a7f185454443",
+    "image_bytes": 198287,
+    "image_dimensions": [
+      593,
+      1500
+    ],
+    "extracted_at": "2026-05-26T21:52:28Z",
+    "extraction_warnings": [],
+    "sanity_guard_rejections": [],
+    "cache_hit": false,
+    "latency_ms": 26244
+  }
+}

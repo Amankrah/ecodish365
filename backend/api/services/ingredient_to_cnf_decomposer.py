@@ -159,28 +159,30 @@ def decompose_packaged_food(
         # match() returns a single best result + the candidate pool it
         # considered. Use the alternatives list to expand to top-K.
         food_ids_for_this_ingredient: List[int] = []
-        if match_result.matched and match_result.food_id is not None:
-            food_ids_for_this_ingredient.append(int(match_result.food_id))
-            candidate_pool[int(match_result.food_id)] = {
-                "food_id": int(match_result.food_id),
-                "food_description": match_result.food_description,
-                "food_group": match_result.food_group,
-                "macros": _lookup_macros_per_100g(int(match_result.food_id)),
-            }
-        # Pull additional alternatives if exposed
-        alt_ids = getattr(match_result, "alternative_ids", None) or []
-        for aid in alt_ids[:candidates_per_ingredient - 1]:
-            if aid and aid not in [c["food_id"] for c in candidate_pool.values()]:
-                # We don't have descriptions for raw alternatives; look them up.
-                desc = _lookup_food_description(aid)
-                if desc:
-                    food_ids_for_this_ingredient.append(int(aid))
-                    candidate_pool[int(aid)] = {
-                        "food_id": int(aid),
-                        "food_description": desc,
-                        "food_group": None,
-                        "macros": _lookup_macros_per_100g(int(aid)),
-                    }
+        if match_result.food_id is not None:
+            fid = int(match_result.food_id)
+            if fid not in food_ids_for_this_ingredient:
+                food_ids_for_this_ingredient.append(fid)
+            if fid not in candidate_pool:
+                candidate_pool[fid] = {
+                    "food_id": fid,
+                    "food_description": match_result.food_description or "",
+                    "food_group": match_result.food_group,
+                    "macros": _lookup_macros_per_100g(fid),
+                }
+        # Pull embedding-retrieval alternatives (up to top-K − 1).
+        for alt in match_result.alternatives[: candidates_per_ingredient - 1]:
+            aid = int(alt.food_id)
+            if aid in food_ids_for_this_ingredient:
+                continue
+            food_ids_for_this_ingredient.append(aid)
+            if aid not in candidate_pool:
+                candidate_pool[aid] = {
+                    "food_id": aid,
+                    "food_description": alt.food_description,
+                    "food_group": alt.food_group,
+                    "macros": _lookup_macros_per_100g(aid),
+                }
         per_ingredient_candidates.append(food_ids_for_this_ingredient)
 
     # If no candidates at all, fail gracefully.

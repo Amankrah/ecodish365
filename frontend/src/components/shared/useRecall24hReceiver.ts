@@ -22,6 +22,7 @@
 
 import { useEffect, useRef } from 'react';
 import type { CNFRecall24hAggregatedIngredient } from '@/lib/api';
+import { fromRecallAggregated, saveActiveFoodList } from '@/lib/activeFoodList';
 
 type Target = 'hefi' | 'heni' | 'hsr' | 'fcs' | 'environmental' | 'dietary_pattern';
 
@@ -104,6 +105,19 @@ export function useRecall24hReceiver({ target, onIngredients }: UseRecall24hRece
     if (!Array.isArray(stash.aggregated_daily_ingredients)
         || stash.aggregated_daily_ingredients.length === 0) return;
     firedRef.current = true;
+    // Mirror the received list to the cross-page active food list
+    // (localStorage) so the FoodListPanel can later transfer it to another
+    // scorer without re-running the recall.
+    try {
+      saveActiveFoodList(fromRecallAggregated(stash.aggregated_daily_ingredients, {
+        user_type: stash.user_type,
+        estimated_daily_kcal: stash.estimated_daily_kcal,
+        meals_meta: stash.meals_meta,
+        packaged_food: stash.packaged_food,
+        packaged_food_occasions: stash.packaged_food_occasions,
+        multi_day: stash.multi_day,
+      }));
+    } catch { /* localStorage unavailable — non-fatal */ }
     onIngredients(stash.aggregated_daily_ingredients, {
       user_type: stash.user_type,
       estimated_daily_kcal: stash.estimated_daily_kcal,

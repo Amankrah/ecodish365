@@ -15,6 +15,7 @@ import { AIEnhancedSearch } from '../../../components/shared/AIEnhancedSearch';
 import { RecipeDecomposerModal } from '../../../components/shared/RecipeDecomposerModal';
 import { SourceFilter, type SourceChoice } from '../../../components/shared/SourceFilter';
 import { useRecall24hReceiver } from '../../../components/shared/useRecall24hReceiver';
+import { FoodListPanel } from '../../../components/shared/FoodListPanel';
 
 interface SelectedFood {
   FoodID: number;
@@ -434,6 +435,24 @@ export default function HEFICalculatePage() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* FOOD-LIST-PANEL (2026-05-26): cross-metric transferable food list. */}
+        <div className="mb-6">
+          <FoodListPanel
+            currentTarget="hefi"
+            onChange={list => {
+              if (!list) {
+                setSelectedFoods([]);
+                return;
+              }
+              setSelectedFoods(list.ingredients.map(i => ({
+                FoodID: i.food_id,
+                FoodDescription: i.food_description,
+                amount_g: i.mass_g,
+              })));
+            }}
+          />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

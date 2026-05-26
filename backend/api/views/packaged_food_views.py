@@ -30,6 +30,7 @@ from api.services.packaged_food_extractor import (
     extract_nf_panel,
     extract_packaged_food,
     CACHE_TTL_SECONDS,
+    MAX_IMAGES_PER_EXTRACTION,
 )
 from api.services.multimodal_client import ImageDecodeError, MAX_UPLOAD_BYTES
 from api.services.packaged_food_schema import (
@@ -57,7 +58,9 @@ def packaged_food_extract(request):
     """Multipart image upload → strict NFPanelExtraction.
 
     Request:
-      multipart/form-data with field 'image' = binary file
+      multipart/form-data with EITHER:
+        - 'images' (repeated, 1-3 files) for multi-face uploads, OR
+        - 'image' (single file) for the legacy single-image path
       (optional) form field 'target' = 'hsr' (default; only 'hsr' supported in v1)
 
     Response 200:
@@ -68,62 +71,69 @@ def packaged_food_extract(request):
     Errors:
       400 invalid_image  — bytes failed to decode (corrupt / unsupported)
       400 image_too_large — over MAX_UPLOAD_BYTES
-      400 missing_image  — no 'image' field
+      400 too_many_images — over MAX_IMAGES_PER_EXTRACTION
+      400 missing_image  — no 'images'/'image' field
       429 rate_limit     — per-IP hourly limit reached
       503 circuit_breaker — monthly LLM budget exhausted
       503 llm_unavailable — no API key configured
     """
-    image_file = request.FILES.get('image')
-    if image_file is None:
+    files = request.FILES.getlist('images') or (
+        [request.FILES['image']] if 'image' in request.FILES else []
+    )
+    if not files:
         return Response({
             'success': False,
             'error': 'missing_image',
-            'message': 'Field "image" (multipart/form-data) is required.',
+            'message': 'Field "images" (multipart/form-data, up to 3) or legacy "image" is required.',
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    if len(files) > MAX_IMAGES_PER_EXTRACTION:
+        return Response({
+            'success': False, 'error': 'too_many_images',
+            'message': f'At most {MAX_IMAGES_PER_EXTRACTION} images per scan '
+                       f'(received {len(files)}).',
         }, status=status.HTTP_400_BAD_REQUEST)
 
     target = str(request.data.get('target', 'hsr')).lower()
     if target not in ('hsr',):
         target = 'hsr'  # v1: silently coerce, Phase 2 will add 'ingredients'
 
-    # Read into memory once (DRF chunks for us up to MAX_UPLOAD_BYTES).
-    try:
-        image_bytes = image_file.read()
-    except Exception as exc:  # noqa: BLE001
-        logger.exception("pkg-food: failed to read upload")
-        return Response({
-            'success': False,
-            'error': 'upload_read_failed',
-            'message': f'Could not read uploaded file: {exc}',
-        }, status=status.HTTP_400_BAD_REQUEST)
-
-    if len(image_bytes) == 0:
-        return Response({
-            'success': False,
-            'error': 'empty_upload',
-            'message': 'Uploaded file is empty.',
-        }, status=status.HTTP_400_BAD_REQUEST)
-
-    if len(image_bytes) > MAX_UPLOAD_BYTES:
-        return Response({
-            'success': False,
-            'error': 'image_too_large',
-            'message': f'Image exceeds {MAX_UPLOAD_BYTES // (1024*1024)} MB.',
-        }, status=status.HTTP_400_BAD_REQUEST)
+    image_bytes_list: list[bytes] = []
+    for idx, image_file in enumerate(files):
+        try:
+            data = image_file.read()
+        except Exception as exc:  # noqa: BLE001
+            logger.exception("pkg-food: failed to read upload %d", idx)
+            return Response({
+                'success': False, 'error': 'upload_read_failed',
+                'message': f'Could not read uploaded file #{idx + 1}: {exc}',
+            }, status=status.HTTP_400_BAD_REQUEST)
+        if not data:
+            return Response({
+                'success': False, 'error': 'empty_upload',
+                'message': f'Uploaded file #{idx + 1} is empty.',
+            }, status=status.HTTP_400_BAD_REQUEST)
+        if len(data) > MAX_UPLOAD_BYTES:
+            return Response({
+                'success': False, 'error': 'image_too_large',
+                'message': f'Image #{idx + 1} exceeds {MAX_UPLOAD_BYTES // (1024*1024)} MB.',
+            }, status=status.HTTP_400_BAD_REQUEST)
+        image_bytes_list.append(data)
 
     # Rate limit (cache-hit-aware: we don't know yet whether this will hit
     # cache, so we charge optimistically — refunding cache hits would
     # require splitting the rate limiter into reserve + commit, which is
-    # over-engineered for v1).
+    # over-engineered for v1). Bill linearly with image count.
     rate_err = _enforce_rate_limit(
         request, kind='search',
-        cost_override_cents=_PKG_FOOD_EXTRACT_COST_CENTS,
+        cost_override_cents=_PKG_FOOD_EXTRACT_COST_CENTS * len(image_bytes_list),
     )
     if rate_err is not None:
         return rate_err
 
     # Run extraction.
     try:
-        result = extract_nf_panel(image_bytes, target=target)
+        result = extract_nf_panel(image_bytes_list, target=target)
     except ImageDecodeError as exc:
         return Response({
             'success': False,
@@ -150,6 +160,7 @@ def packaged_food_extract(request):
         'extraction': result.extraction.model_dump(),
         'cache_hit': result.cache_hit,
         'cache_ttl_seconds': CACHE_TTL_SECONDS,
+        'image_count': len(image_bytes_list),
     })
 
 
@@ -619,8 +630,13 @@ _PKG_FOOD_DECOMPOSE_COST_CENTS = 2          # text-only LLM, larger reasoning lo
 def packaged_food_extract_combined(request):
     """Adaptive multipart image upload → NF panel + ingredient list extraction.
 
-    Same multipart contract as `/api/packaged-food/extract/` (Phase 1) but
-    returns the unified `PackagedFoodExtraction` wrapper with either or
+    Accepts EITHER a single image (legacy `image` field) OR up to 3 images
+    of the SAME packaged product from different faces (`images` field
+    repeated). Multi-image is the recommended path when one face doesn't
+    show everything — e.g. NF panel + ingredients on the back, net weight
+    on the front. The LLM merges across faces per Rule U.
+
+    Returns the unified `PackagedFoodExtraction` wrapper with either or
     both pieces populated. Frontend reads `has_nf_panel` and
     `has_ingredient_list` to route the user appropriately.
 
@@ -632,43 +648,56 @@ def packaged_food_extract_combined(request):
         "cache_ttl_seconds": int
       }
     """
-    image_file = request.FILES.get('image')
-    if image_file is None:
+    files = request.FILES.getlist('images') or (
+        [request.FILES['image']] if 'image' in request.FILES else []
+    )
+    if not files:
         return Response({
             'success': False, 'error': 'missing_image',
-            'message': 'Field "image" (multipart/form-data) is required.',
+            'message': 'Field "images" (multipart/form-data, up to 3) or '
+                       'legacy "image" is required.',
         }, status=status.HTTP_400_BAD_REQUEST)
 
-    try:
-        image_bytes = image_file.read()
-    except Exception as exc:  # noqa: BLE001
-        logger.exception("pkg-food combined: failed to read upload")
+    if len(files) > MAX_IMAGES_PER_EXTRACTION:
         return Response({
-            'success': False, 'error': 'upload_read_failed',
-            'message': f'Could not read uploaded file: {exc}',
+            'success': False, 'error': 'too_many_images',
+            'message': f'At most {MAX_IMAGES_PER_EXTRACTION} images per scan '
+                       f'(received {len(files)}).',
         }, status=status.HTTP_400_BAD_REQUEST)
 
-    if len(image_bytes) == 0:
-        return Response({
-            'success': False, 'error': 'empty_upload',
-            'message': 'Uploaded file is empty.',
-        }, status=status.HTTP_400_BAD_REQUEST)
+    image_bytes_list: list[bytes] = []
+    for idx, image_file in enumerate(files):
+        try:
+            data = image_file.read()
+        except Exception as exc:  # noqa: BLE001
+            logger.exception("pkg-food combined: failed to read upload %d", idx)
+            return Response({
+                'success': False, 'error': 'upload_read_failed',
+                'message': f'Could not read uploaded file #{idx + 1}: {exc}',
+            }, status=status.HTTP_400_BAD_REQUEST)
+        if not data:
+            return Response({
+                'success': False, 'error': 'empty_upload',
+                'message': f'Uploaded file #{idx + 1} is empty.',
+            }, status=status.HTTP_400_BAD_REQUEST)
+        if len(data) > MAX_UPLOAD_BYTES:
+            return Response({
+                'success': False, 'error': 'image_too_large',
+                'message': f'Image #{idx + 1} exceeds {MAX_UPLOAD_BYTES // (1024*1024)} MB.',
+            }, status=status.HTTP_400_BAD_REQUEST)
+        image_bytes_list.append(data)
 
-    if len(image_bytes) > MAX_UPLOAD_BYTES:
-        return Response({
-            'success': False, 'error': 'image_too_large',
-            'message': f'Image exceeds {MAX_UPLOAD_BYTES // (1024*1024)} MB.',
-        }, status=status.HTTP_400_BAD_REQUEST)
-
+    # Bill linearly with image count — each image adds ~765 tokens to the
+    # LLM call. 1¢ per image is conservative.
     rate_err = _enforce_rate_limit(
         request, kind='search',
-        cost_override_cents=_PKG_FOOD_EXTRACT_COMBINED_COST_CENTS,
+        cost_override_cents=_PKG_FOOD_EXTRACT_COMBINED_COST_CENTS * len(image_bytes_list),
     )
     if rate_err is not None:
         return rate_err
 
     try:
-        result = extract_packaged_food(image_bytes)
+        result = extract_packaged_food(image_bytes_list)
     except ImageDecodeError as exc:
         return Response({
             'success': False, 'error': 'invalid_image', 'message': str(exc),
@@ -690,6 +719,7 @@ def packaged_food_extract_combined(request):
         'extraction': result.extraction.model_dump(),
         'cache_hit': result.cache_hit,
         'cache_ttl_seconds': CACHE_TTL_SECONDS,
+        'image_count': len(image_bytes_list),
     })
 
 

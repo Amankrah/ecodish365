@@ -24,6 +24,7 @@ import {
 import { AudienceToggle, type UserType } from '@/components/shared/AudienceToggle';
 import { DietaryPatternResult } from '@/components/shared/DietaryPatternResult';
 import { useRecall24hReceiver } from '@/components/shared/useRecall24hReceiver';
+import { FoodListPanel } from '@/components/shared/FoodListPanel';
 
 interface ApiError { status: number; message: string }
 
@@ -161,6 +162,24 @@ function DietaryPatternPageInner() {
             <AudienceToggle userType={userType} onChange={setUserType} accent="blue" />
           </div>
         </header>
+
+        {/* FOOD-LIST-PANEL (2026-05-26): cross-metric transferable food list. */}
+        <FoodListPanel
+          currentTarget="dietary_pattern"
+          onChange={list => {
+            if (!list) {
+              setFoodsInput([]);
+              return;
+            }
+            setFoodsInput(list.ingredients.map(i => ({
+              food_id: i.food_id,
+              food_description: i.food_description,
+              food_group: i.food_group ?? '',
+              mass_g: i.mass_g,
+              occasions: {},
+            })));
+          }}
+        />
 
         {/* No data yet — explain how to get here */}
         {foodsInput.length === 0 && !loading && (

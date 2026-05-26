@@ -383,6 +383,7 @@ class CNFMatcher:
                 candidates=candidates,
                 used_ai_ranking=False,
                 t0=t0,
+                max_alternatives=max(0, k - 1),
             )
             self._cache_put(cache_key, result)
             return result
@@ -402,6 +403,7 @@ class CNFMatcher:
                 candidates=candidates,
                 used_ai_ranking=False,
                 t0=t0,
+                max_alternatives=max(0, k - 1),
             )
             self._cache_put(cache_key, result)
             return result
@@ -436,6 +438,7 @@ class CNFMatcher:
                 candidates=candidates,
                 used_ai_ranking=True,
                 t0=t0,
+                max_alternatives=max(0, k - 1),
             )
             self._cache_put(cache_key, result)
             return result
@@ -453,6 +456,7 @@ class CNFMatcher:
                 candidates=candidates,
                 used_ai_ranking=True,
                 t0=t0,
+                max_alternatives=max(0, k - 1),
             )
             self._cache_put(cache_key, result)
             return result
@@ -467,6 +471,7 @@ class CNFMatcher:
             candidates=candidates,
             used_ai_ranking=True,
             t0=t0,
+            max_alternatives=max(0, k - 1),
         )
         self._cache_put(cache_key, result)
         return result
@@ -586,13 +591,15 @@ class CNFMatcher:
         candidates: List['tuple[int, float]'],
         used_ai_ranking: bool,
         t0: float,
+        max_alternatives: int = 3,
     ) -> CNFMatchResult:
         food_id = int(self.corpus.food_ids[food_idx])
         food_description = self.corpus.food_descriptions[food_idx]
         food_group = self.corpus.food_groups[food_idx]
 
-        # Build top-3 alternatives (excluding the chosen one)
+        # Build alternatives from the retrieval set (excluding the chosen match).
         alts: List[AlternativeMatch] = []
+        max_alts = max(0, max_alternatives)
         for idx, sim in candidates:
             if int(self.corpus.food_ids[idx]) == food_id:
                 continue
@@ -602,7 +609,7 @@ class CNFMatcher:
                 food_group=self.corpus.food_groups[idx],
                 similarity=float(sim),
             ))
-            if len(alts) >= 3:
+            if len(alts) >= max_alts:
                 break
 
         return CNFMatchResult(

@@ -11,6 +11,7 @@
 import { useState } from 'react';
 import {
   Camera, Loader2, AlertCircle, Check, RotateCcw, ChevronDown, ChevronUp,
+  X, Image as ImageIcon,
 } from 'lucide-react';
 import {
   CNFApiService,
@@ -22,6 +23,8 @@ import {
   resolvePackagedMass,
   type PackagedOccasionState,
 } from '@/lib/recallPackagedFood';
+
+const MAX_IMAGES = 3;
 
 type UserType = 'individual' | 'researcher' | 'policy';
 
@@ -42,8 +45,9 @@ export function PackagedFoodOccasionEntry({
   occasionLabel, value, onChange,
 }: Props): JSX.Element {
   const [step, setStep] = useState<Step>(value ? 'ready' : 'capture');
-  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(
-    value?.imagePreviewUrl ?? null,
+  const [pickedFiles, setPickedFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>(
+    value?.imagePreviewUrl ? [value.imagePreviewUrl] : [],
   );
   const [editedPanel, setEditedPanel] = useState<NFPanelExtraction | null>(
     value?.panel ?? null,
@@ -55,27 +59,48 @@ export function PackagedFoodOccasionEntry({
   const [showPanelEditor, setShowPanelEditor] = useState(false);
   const [netWeightMissing, setNetWeightMissing] = useState(false);
 
-  async function handleImagePicked(file: File): Promise<void> {
+  function appendPickedFiles(incoming: FileList | File[] | null): void {
+    if (!incoming) return;
+    const arr = Array.from(incoming);
+    const room = MAX_IMAGES - pickedFiles.length;
+    if (room <= 0) return;
+    const accepted = arr.slice(0, room);
+    if (accepted.length === 0) return;
+    const newUrls = accepted.map(f => URL.createObjectURL(f));
+    setPickedFiles(prev => [...prev, ...accepted]);
+    setPreviewUrls(prev => [...prev, ...newUrls]);
+    setError(null);
+    if (arr.length > room) {
+      setError({ message: `Only the first ${MAX_IMAGES} images are kept per scan.` });
+    }
+  }
+
+  function removePickedAt(idx: number): void {
+    URL.revokeObjectURL(previewUrls[idx]);
+    setPickedFiles(prev => prev.filter((_, i) => i !== idx));
+    setPreviewUrls(prev => prev.filter((_, i) => i !== idx));
+    setError(null);
+  }
+
+  async function handleExtract(): Promise<void> {
+    if (pickedFiles.length === 0) return;
     setError(null);
     onChange(null);
-    if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
-    const preview = URL.createObjectURL(file);
-    setImagePreviewUrl(preview);
     setExtracting(true);
     setStep('capture');
     try {
-      const rsp = await CNFApiService.extractPackagedFoodCombined(file);
+      const rsp = await CNFApiService.extractPackagedFoodCombined(pickedFiles);
       if (!rsp.extraction.extraction_succeeded) {
         setError({
           message: rsp.extraction.failure_reason
-            || 'No nutrition panel or ingredient list detected. Try a clearer photo of the back-of-pack label.',
+            || 'No nutrition panel or ingredient list detected. Try clearer photos of the back-of-pack label.',
         });
         setStep('error');
         return;
       }
       if (!rsp.extraction.ingredient_list?.ingredients_parsed?.length) {
         setError({
-          message: 'Ingredient list not found on this label. For recall scoring we need the ingredient list — try a photo that includes it, or describe the meal as text instead.',
+          message: 'Ingredient list not found on these photos. For recall scoring we need the ingredient list — try a photo that includes it, or describe the meal as text instead.',
         });
         setStep('error');
         return;
@@ -134,7 +159,7 @@ export function PackagedFoodOccasionEntry({
         totalMass,
         panel,
         decomposition: rsp.decomposition,
-        imagePreviewUrl: imagePreviewUrl ?? undefined,
+        imagePreviewUrl: previewUrls[0] ?? undefined,
       };
       onChange(state);
       setStep('ready');
@@ -150,8 +175,9 @@ export function PackagedFoodOccasionEntry({
   }
 
   function reset(): void {
-    if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
-    setImagePreviewUrl(null);
+    for (const url of previewUrls) URL.revokeObjectURL(url);
+    setPickedFiles([]);
+    setPreviewUrls([]);
     setEditedPanel(null);
     setIngredientList(null);
     setError(null);
@@ -197,58 +223,131 @@ export function PackagedFoodOccasionEntry({
             Retake
           </button>
         </div>
-        {imagePreviewUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={imagePreviewUrl}
-            alt="Scanned packaged food label"
-            className="max-h-24 rounded border border-emerald-200"
-          />
+        {previewUrls.length > 0 && (
+          <div className="flex gap-1.5">
+            {previewUrls.map((url, i) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={i}
+                src={url}
+                alt={`Scanned packaged food label face ${i + 1}`}
+                className="max-h-24 rounded border border-emerald-200"
+              />
+            ))}
+          </div>
         )}
       </div>
     );
   }
 
+  const canAddMore = pickedFiles.length < MAX_IMAGES;
+  const canExtract = pickedFiles.length > 0 && !extracting;
+
   return (
     <div className="space-y-3 rounded-md border border-dashed border-blue-300 bg-blue-50/50 p-3">
-      <p className="text-xs text-gray-700">
-        Photograph the <strong>Nutrition Facts</strong> and <strong>ingredient list</strong> on the package.
-        We&apos;ll infer CNF ingredients for this {occasionLabel.toLowerCase()} occasion.
-      </p>
+      <div className="text-xs text-gray-700">
+        <p>
+          Photograph the <strong>Nutrition Facts</strong> and <strong>ingredient list</strong> on the package.
+          We&apos;ll infer CNF ingredients for this {occasionLabel.toLowerCase()} occasion.
+        </p>
+        <p className="mt-1 text-gray-600">
+          You can upload up to <strong>{MAX_IMAGES} photos</strong> of the same product — useful when the NF panel,
+          ingredient list, and net weight are on different faces.
+        </p>
+      </div>
 
       {(step === 'capture' || step === 'error') && (
-        <div className="flex flex-wrap items-center gap-2">
-          <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-md">
-            <Camera className="h-4 w-4" aria-hidden="true" />
-            {imagePreviewUrl ? 'Pick different photo' : 'Take photo or pick file'}
-            <input
-              type="file"
-              accept="image/*"
-              capture="environment"
-              className="hidden"
-              onChange={e => {
-                const f = e.target.files?.[0];
-                if (f) void handleImagePicked(f);
-              }}
-              disabled={extracting}
-            />
-          </label>
-          {extracting && (
-            <span className="inline-flex items-center gap-1 text-xs text-gray-600">
-              <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-              Extracting label…
-            </span>
-          )}
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <label
+              className={`cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md ${
+                canAddMore && !extracting
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              <Camera className="h-4 w-4" aria-hidden="true" />
+              {pickedFiles.length === 0 ? 'Take photo' : 'Add another photo'}
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={e => {
+                  appendPickedFiles(e.target.files);
+                  e.target.value = '';
+                }}
+                disabled={!canAddMore || extracting}
+              />
+            </label>
+            <label
+              className={`cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border ${
+                canAddMore && !extracting
+                  ? 'bg-white border-blue-300 text-blue-800 hover:bg-blue-50'
+                  : 'bg-gray-100 border-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              <ImageIcon className="h-4 w-4" aria-hidden="true" />
+              {pickedFiles.length === 0 ? 'Or pick from gallery' : 'Add from gallery'}
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={e => {
+                  appendPickedFiles(e.target.files);
+                  e.target.value = '';
+                }}
+                disabled={!canAddMore || extracting}
+              />
+            </label>
+            <button
+              type="button"
+              onClick={() => void handleExtract()}
+              disabled={!canExtract}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed text-white text-xs font-medium rounded-md"
+            >
+              {extracting
+                ? <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                : <Check className="h-3.5 w-3.5" aria-hidden="true" />}
+              {extracting
+                ? 'Extracting…'
+                : pickedFiles.length === 0
+                  ? 'Extract label'
+                  : `Extract from ${pickedFiles.length} photo${pickedFiles.length > 1 ? 's' : ''}`}
+            </button>
+          </div>
+          <p className="text-[11px] text-gray-500">
+            {pickedFiles.length}/{MAX_IMAGES} photos selected.
+            {!canAddMore && ' Maximum reached.'}
+          </p>
         </div>
       )}
 
-      {imagePreviewUrl && step !== 'ready' && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={imagePreviewUrl}
-          alt="Selected label"
-          className="max-h-32 rounded border border-gray-200"
-        />
+      {previewUrls.length > 0 && step !== 'ready' && (
+        <div className="flex flex-wrap gap-2">
+          {previewUrls.map((url, i) => (
+            <div key={i} className="relative">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={url}
+                alt={`Selected label face ${i + 1}`}
+                className="max-h-32 rounded border border-gray-200"
+              />
+              {(step === 'capture' || step === 'error') && !extracting && (
+                <button
+                  type="button"
+                  onClick={() => removePickedAt(i)}
+                  aria-label={`Remove photo ${i + 1}`}
+                  title={`Remove photo ${i + 1}`}
+                  className="absolute -top-1.5 -right-1.5 inline-flex items-center justify-center h-5 w-5 rounded-full bg-white border border-gray-300 text-gray-700 hover:bg-red-50 hover:text-red-700 hover:border-red-300 shadow-sm"
+                >
+                  <X className="h-3 w-3" aria-hidden="true" />
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
       )}
 
       {step === 'reviewing' && editedPanel && (
@@ -342,7 +441,7 @@ export function PackagedFoodOccasionEntry({
                     });
                   }}
                   aria-label="Net weight in grams"
-                  aria-invalid={netWeightMissing ? 'true' : 'false'}
+                  {...(netWeightMissing ? { 'aria-invalid': 'true' as const } : {})}
                   title="Net weight in grams"
                   className={`w-full px-2 py-1.5 border rounded-md ${
                     netWeightMissing

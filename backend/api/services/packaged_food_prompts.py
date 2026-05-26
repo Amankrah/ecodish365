@@ -10,7 +10,13 @@ predominantly dual-language, and the project's user base is Canadian-anchored.
 from __future__ import annotations
 
 
-PROMPT_VERSION: int = 6
+PROMPT_VERSION: int = 7
+# v7 (2026-05-26, PKG-IMG-2.x): multi-image upload — the combined extractor
+# now accepts 1-3 photos of the SAME packaged product taken from different
+# faces (front / back / side). New rule U at the end of COMBINED_SYSTEM_PROMPT
+# tells the LLM how to merge: panel from whichever face shows the NF panel,
+# ingredient list from whichever face shows it, net_weight from whichever
+# face stamps it. Single-image uploads are unchanged in behaviour.
 # v6 (2026-05-26, PKG-IMG-2.x): tighten Rule F so the LLM does NOT infer
 # servings_per_container when the line is not on the panel face it can see.
 # Observed on Opus: SPC was sometimes invented from container size or
@@ -322,14 +328,39 @@ Set extraction_succeeded=true when AT LEAST ONE of nf_panel or ingredient_list \
 is populated. Set extraction_succeeded=false ONLY when both are null (e.g. \
 the image is a cat photo or front-of-pack marketing with no label info).
 
+U. MULTI-IMAGE UPLOADS. You may receive 1, 2, or 3 photos in one message. \
+   When more than one is provided, they are DIFFERENT FACES of the SAME \
+   packaged product — front, back, side, top — not different products. \
+   Merge them into ONE extraction:
+     - Read nf_panel from whichever face shows the Nutrition Facts panel \
+       (usually back or side).
+     - Read ingredient_list from whichever face shows the ingredient list \
+       (usually back or side, often adjacent to the NF panel).
+     - Read net_weight from whichever face stamps it (often the front, \
+       sometimes the side or bottom — frequently NOT on the NF face itself).
+     - Read product_name_visible / brand_visible from the cleanest face \
+       (usually the front).
+   When a value appears on multiple photos, prefer the clearest direct \
+   read and record ONE merged value — do NOT return arrays or lists of \
+   alternatives. If the photos disagree, record the most legible reading \
+   in `value` and the conflict in `extraction_warnings`.
+
+   If only one photo is provided, treat it as the single source — same \
+   behaviour as before.
+
 Do NOT include extraction_metadata in your response — the server adds it.
 """
 
 
 def build_combined_user_prompt() -> str:
-    """User message for the Phase 2 adaptive extractor."""
+    """User message for the Phase 2 adaptive extractor.
+
+    Works for single OR multi-image uploads (1-3 faces of the same product).
+    Rule U in COMBINED_SYSTEM_PROMPT governs the merge semantics."""
     return """\
-Look at the attached image. Extract WHATEVER is visible:
+Look at the attached image(s). When more than one is provided, they are \
+different faces of the SAME packaged product — merge per Rule U. Extract \
+WHATEVER is visible across all faces:
 - the Nutrition Facts panel (populate `nf_panel`)
 - the ingredient list (populate `ingredient_list`)
 - both (populate both)

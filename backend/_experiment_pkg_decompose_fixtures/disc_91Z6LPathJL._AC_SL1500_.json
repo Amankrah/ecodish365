@@ -1,0 +1,452 @@
+{
+  "fixture_id": "disc_91Z6LPathJL._AC_SL1500_",
+  "source_image": "91Z6LPathJL._AC_SL1500_.jpg",
+  "net_weight_override_g": null,
+  "nf_panel": {
+    "schema_version": 1,
+    "language_detected": "en-fr",
+    "panel_format_detected": "canadian_2016",
+    "product_name_visible": {
+      "value": null,
+      "confidence": 0.0
+    },
+    "brand_visible": {
+      "value": "McCormick Canada",
+      "confidence": 0.85
+    },
+    "serving_size": {
+      "value": 3.1,
+      "unit": "g",
+      "confidence": 0.95,
+      "raw_text": "Per 1/13 package (3.1 g) / pour 1/13 du sachet (3,1 g)",
+      "from_dv_percent": false,
+      "from_kcal_conversion": false
+    },
+    "servings_per_container": {
+      "value": 13.0,
+      "unit": null,
+      "confidence": 0.9,
+      "raw_text": "Per 1/13 package",
+      "from_dv_percent": false,
+      "from_kcal_conversion": false
+    },
+    "net_weight": {
+      "value": null,
+      "unit": null,
+      "confidence": 0.0,
+      "raw_text": null,
+      "from_dv_percent": false,
+      "from_kcal_conversion": false
+    },
+    "per_serving": {
+      "energy_kj": {
+        "value": 41.84,
+        "unit": "kJ",
+        "confidence": 0.9,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": true
+      },
+      "energy_kcal": {
+        "value": 10.0,
+        "unit": "kcal",
+        "confidence": 0.97,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_total_g": {
+        "value": 0.0,
+        "unit": "g",
+        "confidence": 0.97,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_sat_g": {
+        "value": 0.0,
+        "unit": "g",
+        "confidence": 0.97,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_trans_g": {
+        "value": 0.0,
+        "unit": "g",
+        "confidence": 0.97,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "carbohydrate_total_g": {
+        "value": 2.0,
+        "unit": "g",
+        "confidence": 0.97,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fibre_g": {
+        "value": 0.0,
+        "unit": "g",
+        "confidence": 0.97,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sugars_total_g": {
+        "value": 1.0,
+        "unit": "g",
+        "confidence": 0.97,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sugars_added_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "protein_g": {
+        "value": 0.5,
+        "unit": "g",
+        "confidence": 0.97,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sodium_mg": {
+        "value": 90.0,
+        "unit": "mg",
+        "confidence": 0.97,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "potassium_mg": {
+        "value": 20.0,
+        "unit": "mg",
+        "confidence": 0.97,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "calcium_mg": {
+        "value": 10.0,
+        "unit": "mg",
+        "confidence": 0.97,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "iron_mg": {
+        "value": 0.0,
+        "unit": "mg",
+        "confidence": 0.97,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "cholesterol_mg": {
+        "value": 0.0,
+        "unit": "mg",
+        "confidence": 0.97,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      }
+    },
+    "per_100g": {
+      "energy_kj": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "energy_kcal": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_total_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_sat_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fat_trans_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "carbohydrate_total_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "fibre_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sugars_total_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sugars_added_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "protein_g": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "sodium_mg": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "potassium_mg": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "calcium_mg": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "iron_mg": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      },
+      "cholesterol_mg": {
+        "value": null,
+        "unit": null,
+        "confidence": 0.0,
+        "raw_text": null,
+        "from_dv_percent": false,
+        "from_kcal_conversion": false
+      }
+    },
+    "hsr_category_hint": {
+      "guess": "2",
+      "confidence": 0.75,
+      "rationale": "Dry sauce mix sachet (McCormick) \u2014 a dry powdered seasoning/sauce base that becomes a sauce when reconstituted; classified as a general food, not a beverage or dairy product.",
+      "alternatives": [
+        {
+          "category": "2D",
+          "reason": "First ingredient is modified milk ingredients, but the product as sold is a dry mix, not a dairy food."
+        },
+        {
+          "category": "3",
+          "reason": "Unlikely \u2014 fat content is 0 g and product is not an oil/nut/seed butter."
+        }
+      ]
+    },
+    "fopl_on_pack": {
+      "hsr_stars_visible": null,
+      "nutri_score_visible": null
+    },
+    "extraction_metadata": {
+      "model": "claude-opus-4-7",
+      "provider": "anthropic",
+      "prompt_version": 7,
+      "schema_version": 1,
+      "image_sha256": "977bbd4f9dc497b5184bbfec341645f2c0c02426b333c9e0ab74122a2f7a62da",
+      "image_bytes": 310258,
+      "image_dimensions": [
+        1157,
+        1500
+      ],
+      "extracted_at": "2026-05-26T21:55:33Z",
+      "extraction_warnings": [],
+      "sanity_guard_rejections": [],
+      "cache_hit": false,
+      "latency_ms": 22826
+    },
+    "extraction_succeeded": true,
+    "failure_reason": null
+  },
+  "ingredient_list": {
+    "ingredients_text": "Modified milk ingredients, Modified corn starch, Sugar, Salt, Natural flavour (including lemon extractives), Dehydrated onion, Yeast extract, Spices and herbs (including dill weed), Soy lecithin, Xanthan gum, Inactive yeast, Citric acid, High oleic sunflower oil, Corn starch.",
+    "ingredients_parsed": [
+      {
+        "name": "modified milk ingredients",
+        "position": 1,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": "milk"
+      },
+      {
+        "name": "modified corn starch",
+        "position": 2,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "sugar",
+        "position": 3,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "salt",
+        "position": 4,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "natural flavour",
+        "position": 5,
+        "parenthetical": [
+          "lemon extractives"
+        ],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "dehydrated onion",
+        "position": 6,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "yeast extract",
+        "position": 7,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "spices and herbs",
+        "position": 8,
+        "parenthetical": [
+          "dill weed"
+        ],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "soy lecithin",
+        "position": 9,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": "soy"
+      },
+      {
+        "name": "xanthan gum",
+        "position": 10,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "inactive yeast",
+        "position": 11,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "citric acid",
+        "position": 12,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "high oleic sunflower oil",
+        "position": 13,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      },
+      {
+        "name": "corn starch",
+        "position": 14,
+        "parenthetical": [],
+        "explicit_percentage": null,
+        "allergen_flag": null
+      }
+    ],
+    "explicit_percentages_found": false,
+    "contains_statement": null,
+    "language_detected": "en-fr",
+    "confidence": 0.0
+  },
+  "extraction_metadata": {
+    "model": "claude-opus-4-7",
+    "provider": "anthropic",
+    "prompt_version": 7,
+    "schema_version": 1,
+    "image_sha256": "977bbd4f9dc497b5184bbfec341645f2c0c02426b333c9e0ab74122a2f7a62da",
+    "image_bytes": 310258,
+    "image_dimensions": [
+      1157,
+      1500
+    ],
+    "extracted_at": "2026-05-26T21:55:33Z",
+    "extraction_warnings": [],
+    "sanity_guard_rejections": [],
+    "cache_hit": false,
+    "latency_ms": 22826
+  }
+}

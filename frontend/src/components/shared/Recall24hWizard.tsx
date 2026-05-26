@@ -52,6 +52,10 @@ import {
   QuotaExceededError,
   type SavedRecallDay,
 } from '@/lib/recallHistory';
+// FOOD-LIST-PANEL (2026-05-26): mirror the aggregated list into the
+// cross-page active food list so the user can score with multiple
+// metrics without re-running the wizard.
+import { fromRecallAggregated, saveActiveFoodList } from '@/lib/activeFoodList';
 
 interface Recall24hWizardProps {
   userType: UserType;
@@ -247,49 +251,59 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
 
   function handleRoute(target: typeof SCORE_BUTTONS[number]) {
     if (!result) return;
-    // Stash the aggregated list in sessionStorage and navigate. The target
-    // page reads `recall_24h_payload` on mount and pre-populates its picker.
-    try {
-      const payload = {
-        source: 'recall_24h',
-        user_type: userType,
-        captured_at: new Date().toISOString(),
-        target: target.id,
-        meals_meta: enabledOccasions.map(o => {
-          const row = rows[o.id];
-          if (row.entryMode === 'packaged' && row.packaged) {
-            return {
-              occasion: o.id,
-              dish_name: row.packaged.dishName,
-              total_mass_g: row.packaged.totalMass,
-              entry_type: 'packaged' as const,
-            };
-          }
+    // Build the payload once, then use it for both the sessionStorage handoff
+    // (consumed by the target page's useRecall24hReceiver) and the cross-page
+    // active food list (consumed by FoodListPanel on every scorer page).
+    const payload = {
+      source: 'recall_24h',
+      user_type: userType,
+      captured_at: new Date().toISOString(),
+      target: target.id,
+      meals_meta: enabledOccasions.map(o => {
+        const row = rows[o.id];
+        if (row.entryMode === 'packaged' && row.packaged) {
           return {
             occasion: o.id,
-            dish_name: row.dishName,
-            total_mass_g: row.totalMass,
-            entry_type: 'text' as const,
+            dish_name: row.packaged.dishName,
+            total_mass_g: row.packaged.totalMass,
+            entry_type: 'packaged' as const,
           };
-        }),
-        ...(hasPackagedOccasions ? {
-          packaged_food_occasions: enabledOccasions
-            .filter(o => rows[o.id].entryMode === 'packaged' && rows[o.id].packaged)
-            .map(o => ({
-              occasion: o.id,
-              product_name: rows[o.id].packaged!.panel.product_name_visible.value,
-              brand: rows[o.id].packaged!.panel.brand_visible.value,
-              decomposition_confidence: rows[o.id].packaged!.decomposition.decomposition_confidence,
-            })),
-        } : {}),
-        aggregated_daily_ingredients: result.aggregated_daily_ingredients,
-        estimated_daily_kcal: result.estimated_daily_kcal,
-      };
+        }
+        return {
+          occasion: o.id,
+          dish_name: row.dishName,
+          total_mass_g: row.totalMass,
+          entry_type: 'text' as const,
+        };
+      }),
+      ...(hasPackagedOccasions ? {
+        packaged_food_occasions: enabledOccasions
+          .filter(o => rows[o.id].entryMode === 'packaged' && rows[o.id].packaged)
+          .map(o => ({
+            occasion: o.id,
+            product_name: rows[o.id].packaged!.panel.product_name_visible.value,
+            brand: rows[o.id].packaged!.panel.brand_visible.value,
+            decomposition_confidence: rows[o.id].packaged!.decomposition.decomposition_confidence,
+          })),
+      } : {}),
+      aggregated_daily_ingredients: result.aggregated_daily_ingredients,
+      estimated_daily_kcal: result.estimated_daily_kcal,
+    };
+    try {
       sessionStorage.setItem('recall_24h_payload', JSON.stringify(payload));
     } catch {
       // sessionStorage may fail in private mode; harmless — the score
       // pages still work standalone.
     }
+    try {
+      saveActiveFoodList(fromRecallAggregated(result.aggregated_daily_ingredients, {
+        user_type: userType,
+        estimated_daily_kcal: result.estimated_daily_kcal,
+        meals_meta: payload.meals_meta,
+        packaged_food_occasions: hasPackagedOccasions
+          ? payload.packaged_food_occasions : undefined,
+      }));
+    } catch { /* localStorage unavailable — non-fatal */ }
     window.location.href = target.path + '?from=recall24h';
   }
 
