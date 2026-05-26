@@ -106,6 +106,10 @@ const navigation: NavItem[] = [
       { name: 'Log a 24-h recall', href: '/recall-24h' },
       { name: 'My recall history', href: '/recall-history' },
       { name: 'Dietary pattern', href: '/dietary-pattern' },
+      // PKG-IMG-1 Phase 1 (2026-05-26): camera-based input for users
+      // who want to score a single packaged product without going
+      // through the full recall wizard.
+      { name: 'Scan packaged food', href: '/scan-product' },
     ],
   },
   {

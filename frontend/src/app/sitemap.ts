@@ -217,6 +217,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
+    // PKG-IMG-1 Phase 1 (2026-05-26): packaged-food image scanner.
+    {
+      url: `${baseUrl}/scan-product`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    },
   ];
 
   // Meal platform pages

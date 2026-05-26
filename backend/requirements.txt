@@ -33,6 +33,13 @@ packaging==24.2
 pandas==2.3.2; python_version >= "3.11"
 pandas==2.2.3; python_version < "3.11"
 pillow==11.3.0
+# PKG-IMG-1 (2026-05-26): packaged-food image upload accepts user-supplied
+# product photos. iOS-default HEIC and modern AVIF (web-optimised) aren't
+# in Pillow's stdlib reader set; both plugins register loaders so
+# multimodal_client.py can normalise any input to JPEG/PNG before sending
+# to OpenAI / Anthropic vision endpoints (which accept JPEG/PNG/WebP only).
+pillow-heif>=0.18.0
+pillow-avif-plugin>=1.4.6
 # openpyxl is needed only by the offline ETL
 # (environmental_impact_model/etl/build_agribalyse_v32_catalog.py) to read
 # the ADEME Tableur .xlsx. The runtime matcher consumes the generated JSON

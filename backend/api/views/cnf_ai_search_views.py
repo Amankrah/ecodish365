@@ -638,9 +638,11 @@ def _extract_n_days(meta_label: Optional[str]) -> str:
 def _build_pattern_explanations(
     result_dict: Dict[str, Any], user_type: str, narrative: Optional[str],
     meta_label: Optional[str] = None,
+    decomposition_provenance: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Audience-aware explanations block. Always carries the mandatory
     single-day caveat (or its softened multi-day variant when `meta_label`
+    is set, or the packaged-food-inferred variant when `decomposition_provenance`
     is set). Researcher / policy adds methodology + the per-prototype
     literature anchor in the response.
 
@@ -652,8 +654,15 @@ def _build_pattern_explanations(
     swaps from the single-day disclaimer to the softened multi-day
     variant — honest improvement without overclaiming. The frontend
     drives this from the `/recall-history` "Score N-day average" path.
+
+    `decomposition_provenance` (PKG-IMG-1 Phase 2, 2026-05-26): when set
+    to "packaged_food_inferred", the caveat language additionally notes
+    that the ingredient composition was INFERRED from a label ingredient
+    list (positions + NF panel macros), not measured. The frontend drives
+    this from the `/scan-product` packaged-food decomposition path.
     """
     is_multi_day = bool(meta_label)
+    is_inferred_composition = decomposition_provenance == 'packaged_food_inferred'
     base_caveat_individual = (
         "Today's day-vector is one snapshot of your eating. For claims "
         "about your usual eating pattern, log multiple recall days. The "
@@ -696,9 +705,49 @@ def _build_pattern_explanations(
         "the recall-history page."
     ).replace('{N}', str(_extract_n_days(meta_label)))
 
+    # PKG-IMG-1 Phase 2 caveat — fires when the ingredient list came from
+    # a packaged-food label decomposition (not a recall or measured intake).
+    # Regulation only requires descending-mass-order on labels; the per-
+    # ingredient masses are LLM-inferred from positions + NF panel macros.
+    inferred_composition_caveat_individual = (
+        "This pattern resemblance was computed from an ingredient list AI-"
+        "extracted from a packaged food label. The per-ingredient masses "
+        "are an INFORMED ESTIMATE based on the ingredient ordering and the "
+        "Nutrition Facts panel macros — labels rarely disclose actual "
+        "percentages. Treat the resemblance as DIRECTIONAL only, and "
+        "remember that a single packaged product is not a full day's eating."
+    )
+    inferred_composition_caveat_researcher = (
+        "INFERRED-COMPOSITION CAVEAT (PKG-IMG-1 Phase 2): the ingredient "
+        "list was extracted from a single packaged-food label image; per-"
+        "ingredient masses are LLM-inferred constrained by (a) regulatory "
+        "descending-mass-order, (b) any label-disclosed percentages "
+        "(Regulation 1169/2011 QUID-style; rare in North America), and "
+        "(c) mass-conservation against the NF panel macros (target ± 10 %). "
+        "Composition is structurally INFERRED, not measured. The pattern "
+        "cosine is therefore a directional signal about the product, NOT a "
+        "validated measurement of dietary pattern intake. For inference at "
+        "the dietary-level, route through /recall-24h instead."
+    )
+
     out: Dict[str, Any] = {}
     if user_type == 'individual':
-        if is_multi_day:
+        if is_inferred_composition:
+            out['plain_summary'] = {
+                'title': 'Packaged food — pattern resemblance',
+                'message': (
+                    f"This packaged product's ingredient composition most "
+                    f"closely resembles the {result_dict.get('top_pattern', '?')} "
+                    f"pattern (confidence: "
+                    f"{result_dict.get('top_pattern_confidence', '?')}). "
+                    f"Read this as a property of the product, not your diet."
+                ),
+            }
+            out['mandatory_caveat'] = {
+                'title': 'About this result (packaged-food inferred composition)',
+                'message': inferred_composition_caveat_individual,
+            }
+        elif is_multi_day:
             out['plain_summary'] = {
                 'title': f'Your {meta_label}',
                 'message': (
@@ -726,14 +775,21 @@ def _build_pattern_explanations(
                 'message': base_caveat_individual,
             }
     else:
-        out['mandatory_caveat'] = {
-            'title': ('Multi-day average caveat'
-                      if is_multi_day
-                      else 'Mandatory caveat (single-day resemblance)'),
-            'message': (multi_day_caveat_researcher
-                        if is_multi_day
-                        else base_caveat_researcher),
-        }
+        if is_inferred_composition:
+            out['mandatory_caveat'] = {
+                'title': 'Inferred-composition caveat (packaged food)',
+                'message': inferred_composition_caveat_researcher,
+            }
+        elif is_multi_day:
+            out['mandatory_caveat'] = {
+                'title': 'Multi-day average caveat',
+                'message': multi_day_caveat_researcher,
+            }
+        else:
+            out['mandatory_caveat'] = {
+                'title': 'Mandatory caveat (single-day resemblance)',
+                'message': base_caveat_researcher,
+            }
         out['methodology'] = {
             'title': 'Method',
             'message': (
@@ -886,6 +942,17 @@ def dietary_pattern_classify(request):
         if ml:
             meta_label = ml
 
+    # PKG-IMG-1 Phase 2 (2026-05-26): optional decomposition_provenance
+    # swaps the single-day caveat to a "packaged food, inferred composition"
+    # variant. The frontend's /scan-product page passes
+    # 'packaged_food_inferred' after running the ingredient-list decomposer.
+    decomp_provenance_raw = request.data.get('decomposition_provenance')
+    decomposition_provenance: Optional[str] = None
+    if isinstance(decomp_provenance_raw, str):
+        dp = decomp_provenance_raw.strip()
+        if dp in ('packaged_food_inferred',):
+            decomposition_provenance = dp
+
     cost = (_COST_DIETARY_PATTERN_NARRATIVE_CENTS if include_narrative
             else _COST_DIETARY_PATTERN_CENTS)
     rate_err = _enforce_rate_limit(
@@ -927,7 +994,9 @@ def dietary_pattern_classify(request):
         narrative = _generate_narrative(result_dict, user_type, cleaned)
 
     explanations = _build_pattern_explanations(
-        result_dict, user_type, narrative, meta_label=meta_label,
+        result_dict, user_type, narrative,
+        meta_label=meta_label,
+        decomposition_provenance=decomposition_provenance,
     )
     return Response(
         {'success': True, 'result': payload, 'explanations': explanations},

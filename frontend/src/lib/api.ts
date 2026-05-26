@@ -469,6 +469,11 @@ export class CNFApiService {
        *  for the softened multi-day variant. The /recall-history page
        *  passes this when routing the N-day-average view. */
       metaLabel?: string;
+      /** PKG-IMG-1 Phase 2 (2026-05-26): when set to 'packaged_food_inferred',
+       *  swaps the caveat language to flag that the food list came from an
+       *  LLM-decomposed packaged-food label (not a measured recall). The
+       *  /scan-product page passes this when routing a decomposed product. */
+      decompositionProvenance?: 'packaged_food_inferred';
     } = {},
   ): Promise<PatternClassifyResponse> {
     const response = await api.post('/dietary-pattern/classify/', {
@@ -476,6 +481,8 @@ export class CNFApiService {
       user_type: options.userType || 'individual',
       include_narrative: options.includeNarrative ?? false,
       ...(options.metaLabel ? { meta_label: options.metaLabel } : {}),
+      ...(options.decompositionProvenance
+          ? { decomposition_provenance: options.decompositionProvenance } : {}),
     });
     return {
       result: response.data.result as PatternResemblanceResult,
@@ -716,6 +723,294 @@ export class CNFApiService {
     });
     return response.data.data;
   }
+
+  // ====================================================================
+  // PKG-IMG-1 Phase 1 (2026-05-26) — packaged-food image → NF panel → HSR
+  // ====================================================================
+
+  /** Multipart image upload → server-extracted NF panel JSON.
+   *  Cost: 1¢ per fresh extraction; cache hits (same image SHA-256 within
+   *  7 days) are free. Throws on 4xx/5xx; caller renders error state. */
+  static async extractPackagedFood(
+    image: File | Blob,
+    opts: { target?: 'hsr' } = {},
+  ): Promise<PackagedFoodExtractResponse> {
+    const form = new FormData();
+    form.append('image', image);
+    if (opts.target) form.append('target', opts.target);
+    const response = await api.post('/packaged-food/extract/', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data as PackagedFoodExtractResponse;
+  }
+
+  /** User-confirmed NF panel + HSR category → HSR star rating with
+   *  audience-aware explanation + provenance. No LLM call (0¢). */
+  static async calculateHsrFromPanel(
+    panel: NFPanelExtraction,
+    category: HSRCategoryCode,
+    opts: {
+      userType?: 'individual' | 'researcher' | 'policy';
+      consumedPortionGrams?: number | null;
+      fvnlPercent?: number | null;
+    } = {},
+  ): Promise<HsrFromPanelResponse> {
+    const response = await api.post('/hsr/calculate-from-panel/', {
+      panel,
+      category,
+      consumed_portion_grams: opts.consumedPortionGrams ?? null,
+      fvnl_percent: opts.fvnlPercent ?? null,
+      user_type: opts.userType ?? 'individual',
+    });
+    return response.data as HsrFromPanelResponse;
+  }
+
+  // PKG-IMG-1 Phase 2 (2026-05-26) — adaptive extraction + decomposition
+
+  /** Multipart image upload → adaptive NF panel + ingredient list extraction.
+   *  Single multimodal LLM call (1¢). Frontend uses has_nf_panel /
+   *  has_ingredient_list to decide what to do next. */
+  static async extractPackagedFoodCombined(
+    image: File | Blob,
+  ): Promise<PackagedFoodExtractCombinedResponse> {
+    const form = new FormData();
+    form.append('image', image);
+    const response = await api.post('/packaged-food/extract-combined/', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data as PackagedFoodExtractCombinedResponse;
+  }
+
+  /** Confirmed NF panel + ingredient list → CNF-mapped composition.
+   *  Text-only LLM call (2¢) constrained by descending-mass-order,
+   *  optional explicit percentages, and macro-reconciliation against
+   *  the NF panel. Composition is INFERRED, not measured. */
+  static async decomposePackagedFood(
+    panel: NFPanelExtraction,
+    ingredient_list: IngredientListExtraction,
+  ): Promise<PackagedFoodDecomposeResponse> {
+    const response = await api.post('/packaged-food/decompose-ingredients/', {
+      nf_panel: panel, ingredient_list,
+    });
+    return response.data as PackagedFoodDecomposeResponse;
+  }
+}
+
+// --- PKG-IMG-1 Phase 1 types (mirror backend Pydantic schema) ----------
+
+export type HSRCategoryCode = '1' | '1D' | '2' | '2D' | '3' | '3D';
+
+export interface ExtractedNumeric {
+  value: number | null;
+  unit: string | null;
+  confidence: number;
+  raw_text: string | null;
+  from_dv_percent: boolean;
+  from_kcal_conversion: boolean;
+}
+
+export interface ExtractedString {
+  value: string | null;
+  confidence: number;
+}
+
+export interface NutrientBlock {
+  energy_kj: ExtractedNumeric;
+  energy_kcal: ExtractedNumeric;
+  fat_total_g: ExtractedNumeric;
+  fat_sat_g: ExtractedNumeric;
+  fat_trans_g: ExtractedNumeric;
+  carbohydrate_total_g: ExtractedNumeric;
+  fibre_g: ExtractedNumeric;
+  sugars_total_g: ExtractedNumeric;
+  sugars_added_g: ExtractedNumeric;
+  protein_g: ExtractedNumeric;
+  sodium_mg: ExtractedNumeric;
+  potassium_mg: ExtractedNumeric;
+  calcium_mg: ExtractedNumeric;
+  iron_mg: ExtractedNumeric;
+  cholesterol_mg: ExtractedNumeric;
+}
+
+export interface HSRCategoryHint {
+  guess: HSRCategoryCode;
+  confidence: number;
+  rationale: string;
+  alternatives: Array<{ category: HSRCategoryCode; reason: string }>;
+}
+
+export interface FoplOnPack {
+  hsr_stars_visible: number | null;
+  nutri_score_visible: string | null;
+}
+
+export interface ExtractionMetadata {
+  model: string;
+  provider: string;
+  prompt_version: number;
+  schema_version: number;
+  image_sha256: string;
+  image_bytes: number;
+  image_dimensions: number[];
+  extracted_at: string;
+  extraction_warnings: string[];
+  sanity_guard_rejections: string[];
+  cache_hit: boolean;
+  latency_ms: number | null;
+}
+
+export interface NFPanelExtraction {
+  schema_version: number;
+  language_detected: 'en' | 'fr' | 'en-fr' | 'es' | 'other' | 'unknown';
+  panel_format_detected: 'canadian_2016' | 'us_fda_2016' | 'eu_1169_2011' | 'unknown';
+  product_name_visible: ExtractedString;
+  brand_visible: ExtractedString;
+  serving_size: ExtractedNumeric;
+  servings_per_container: ExtractedNumeric;
+  net_weight: ExtractedNumeric;
+  per_serving: NutrientBlock;
+  per_100g: NutrientBlock | null;
+  hsr_category_hint: HSRCategoryHint;
+  fopl_on_pack: FoplOnPack;
+  extraction_metadata: ExtractionMetadata;
+  extraction_succeeded: boolean;
+  failure_reason: string | null;
+}
+
+// --- PKG-IMG-1 Phase 2 (2026-05-26) types ------------------------------
+
+export interface IngredientEntry {
+  name: string;
+  position: number;
+  parenthetical: string[];
+  explicit_percentage: number | null;
+  allergen_flag: string | null;
+}
+
+export interface IngredientListExtraction {
+  ingredients_text: string;
+  ingredients_parsed: IngredientEntry[];
+  explicit_percentages_found: boolean;
+  contains_statement: string | null;
+  language_detected: NFPanelExtraction['language_detected'];
+  confidence: number;
+}
+
+export interface PackagedFoodExtraction {
+  schema_version: number;
+  nf_panel: NFPanelExtraction | null;
+  ingredient_list: IngredientListExtraction | null;
+  has_nf_panel: boolean;
+  has_ingredient_list: boolean;
+  extraction_metadata: ExtractionMetadata;
+  extraction_succeeded: boolean;
+  failure_reason: string | null;
+}
+
+export interface DecomposedIngredient {
+  label_name: string;
+  position: number;
+  food_id: number;
+  food_description: string;
+  food_group: string | null;
+  mass_g: number;
+  confidence: number;
+  mass_source: 'explicit_percentage' | 'macro_constrained' | 'position_inferred';
+}
+
+export interface DecompositionResult {
+  schema_version: number;
+  ingredients: DecomposedIngredient[];
+  net_weight_g_assumed: number;
+  mass_conservation_residual_g: number;
+  macro_reconciliation: Record<string, {
+    panel_per_100g: number;
+    inferred_per_100g: number;
+    diff: number;
+    rel_diff_pct: number;
+    within_tolerance: boolean;
+  }>;
+  decomposition_confidence: number;
+  decomposition_warnings: string[];
+  extraction_metadata: ExtractionMetadata;
+  decomposition_succeeded: boolean;
+  failure_reason: string | null;
+}
+
+export interface PackagedFoodExtractCombinedResponse {
+  success: boolean;
+  extraction: PackagedFoodExtraction;
+  cache_hit: boolean;
+  cache_ttl_seconds: number;
+}
+
+export interface PackagedFoodDecomposeResponse {
+  success: boolean;
+  decomposition: DecompositionResult;
+}
+
+export interface PackagedFoodExtractResponse {
+  success: boolean;
+  extraction: NFPanelExtraction;
+  cache_hit: boolean;
+  cache_ttl_seconds: number;
+}
+
+export interface HSRScoreDriver {
+  kind: 'baseline_high' | 'baseline_low' | 'modifying_good';
+  nutrient: string;
+  value: number;
+  unit: string;
+  value_per_100: number;
+  unit_per_100: string;
+  threshold_phrase: string;
+  severity: 'high' | 'moderate' | 'good' | string;
+}
+
+export interface HSRInterpretiveNote {
+  kind: 'condensed_product' | 'fvnl_hint' | 'ml_to_g' | string;
+  severity: 'info' | 'warn' | string;
+  title: string;
+  message: string;
+  suggestion?: string;
+}
+
+export interface HSRResultNotes {
+  drivers: HSRScoreDriver[];
+  notes: HSRInterpretiveNote[];
+}
+
+export interface HsrFromPanelResponse {
+  success: boolean;
+  hsr_result: {
+    star_rating: number;
+    category: HSRCategoryCode;
+    baseline_points: number;
+    modifying_points: number;
+    final_score: number;
+    level: string | null;
+  };
+  explanations: Record<string, Record<string, string> | unknown>;
+  result_notes: HSRResultNotes;
+  provenance: {
+    extraction_source: 'llm_vision' | 'manual';
+    model: string;
+    provider: string;
+    prompt_version: number;
+    schema_version: number;
+    image_sha256: string;
+    extracted_at: string;
+    confirmed_at: string;
+    user_type: string;
+    category_source: string;
+    ml_to_g_assumption: boolean;
+    serving_size_grams: number;
+    consumed_portion_grams: number;
+    fvnl_percent_supplied_by_user: boolean;
+    extraction_warnings: string[];
+    sanity_guard_rejections: string[];
+  };
+  user_type: string;
 }
 
 // HSR Types

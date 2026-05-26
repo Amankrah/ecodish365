@@ -15,7 +15,7 @@
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
-import { Target, Loader2, Sparkles, CalendarDays } from 'lucide-react';
+import { Target, Loader2, Sparkles, CalendarDays, Package } from 'lucide-react';
 import {
   CNFApiService,
   type PatternClassifyResponse,
@@ -38,6 +38,18 @@ interface MultiDayMeta {
   day_ids: string[];
 }
 
+// PKG-IMG-1 Phase 2 (2026-05-26) — packaged-food provenance passed in
+// from /scan-product via the receiver hook. When set, drives the
+// "packaged product — inferred composition" framing + caveat swap.
+interface PackagedFoodMeta {
+  provenance: 'packaged_food_inferred';
+  product_name: string | null;
+  brand: string | null;
+  net_weight_g: number;
+  decomposition_confidence: number;
+  image_sha256: string;
+}
+
 function DietaryPatternPageInner() {
   const [userType,   setUserType]    = useState<UserType>('individual');
   const [loading,    setLoading]     = useState(false);
@@ -45,6 +57,7 @@ function DietaryPatternPageInner() {
   const [error,      setError]       = useState<ApiError | null>(null);
   const [foodsInput, setFoodsInput]  = useState<CNFRecall24hAggregatedIngredient[]>([]);
   const [multiDay,   setMultiDay]    = useState<MultiDayMeta | null>(null);
+  const [packagedFood, setPackagedFood] = useState<PackagedFoodMeta | null>(null);
   const [withNarrative, setWithNarrative] = useState(false);
 
   // DIET-PATTERN-1: pick up aggregated daily list handed off from the
@@ -52,12 +65,15 @@ function DietaryPatternPageInner() {
   // calculators.
   // RECALL-HISTORY-1: also receives optional multi_day metadata from
   // /recall-history's N-day-average action.
+  // PKG-IMG-1 Phase 2: also receives optional packaged_food metadata from
+  // /scan-product's "score with dietary pattern" action.
   useRecall24hReceiver({
     target: 'dietary_pattern',
     onIngredients: (ingredients, meta) => {
       setUserType(meta.user_type);
       setFoodsInput(ingredients);
       setMultiDay(meta.multi_day ?? null);
+      setPackagedFood(meta.packaged_food ?? null);
     },
   });
 
@@ -75,6 +91,7 @@ function DietaryPatternPageInner() {
         userType,
         includeNarrative,
         ...(multiDay ? { metaLabel: multiDay.label } : {}),
+        ...(packagedFood ? { decompositionProvenance: packagedFood.provenance } : {}),
       });
       setData(r);
     } catch (e: unknown) {
@@ -109,14 +126,23 @@ function DietaryPatternPageInner() {
             <div className="flex-1">
               <h1 className="text-2xl font-bold text-gray-900">Dietary pattern resemblance</h1>
               <p className="text-sm text-gray-600 mt-1">
-                {multiDay
+                {packagedFood
+                  ? <>Which canonical eating pattern does this <strong>packaged product</strong> resemble most?</>
+                  : multiDay
                   ? <>Which canonical eating pattern does your <strong>{multiDay.n_days}-day average</strong> day-vector resemble most?</>
                   : <>Which canonical eating pattern does today&rsquo;s day-vector resemble most?</>}
                 {' '}Scored against literature-anchored prototypes (Mediterranean, DASH, Western,
                 Vegetarian, Vegan, Canada&rsquo;s Food Guide, West African Staple
                 {userType !== 'individual' && <>, EAT-Lancet</>}).
               </p>
-              {multiDay ? (
+              {packagedFood ? (
+                <p className="text-xs text-gray-600 mt-2">
+                  Packaged-food inferred composition. The ingredient list was
+                  AI-extracted from a product label; per-ingredient masses are
+                  inferred from regulatory descending-mass-order + NF panel
+                  macros (not measured). Interpret as a property of the product.
+                </p>
+              ) : multiDay ? (
                 <p className="text-xs text-gray-600 mt-2">
                   Multi-day average across {multiDay.n_days} saved recall days
                   ({multiDay.first_date} to {multiDay.last_date}). Begins to
@@ -181,6 +207,30 @@ function DietaryPatternPageInner() {
         {/* Result */}
         {data && !loading && (
           <>
+            {packagedFood && (
+              <div className="bg-amber-50 border border-amber-300 rounded-lg p-4 shadow-sm flex items-start gap-3">
+                <Package className="h-5 w-5 text-amber-700 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                <div className="flex-1 text-sm">
+                  <p className="font-semibold text-amber-900">
+                    📦 Packaged product — inferred composition
+                  </p>
+                  <p className="text-amber-800 mt-0.5">
+                    {packagedFood.product_name || 'Unknown product'}
+                    {packagedFood.brand ? ` · ${packagedFood.brand}` : ''}
+                    {' · '}{packagedFood.net_weight_g.toFixed(0)} g
+                  </p>
+                  <p className="text-xs text-amber-700 mt-1">
+                    Decomposition confidence:{' '}
+                    <strong>{(packagedFood.decomposition_confidence * 100).toFixed(0)}%</strong>.
+                    Composition was inferred from the ingredient list + NF panel macros —
+                    label percentages were not disclosed. The resemblance describes the
+                    PRODUCT, not a day&rsquo;s eating. Re-route via{' '}
+                    <a href="/scan-product" className="underline">/scan-product</a>{' '}
+                    if you want to edit masses.
+                  </p>
+                </div>
+              </div>
+            )}
             {multiDay && (
               <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4 shadow-sm flex items-start gap-3">
                 <CalendarDays className="h-5 w-5 text-indigo-700 flex-shrink-0 mt-0.5" aria-hidden="true" />

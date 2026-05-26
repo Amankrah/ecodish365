@@ -61,6 +61,9 @@ backend/deploy.sh
 # Claude AI local config
 .claude/
 
+# Reference papers (large PDFs — keep locally only)
+papers/
+
 # Ignore Django migration files in apps (keep package file)
 **/migrations/*
 !**/migrations/__init__.py

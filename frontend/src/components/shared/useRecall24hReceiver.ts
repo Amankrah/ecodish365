@@ -44,6 +44,19 @@ interface RecallStash {
     label: string;               // "5-day average, 2026-05-17 to 2026-05-21"
     day_ids: string[];           // for traceability
   };
+  // PKG-IMG-1 Phase 2 (2026-05-26) — when set, the aggregated_daily_ingredients
+  // came from a packaged-food label decomposition (NF panel + ingredient
+  // list → CNF composition), NOT from a recall. Receiving pages forward this
+  // to the backend (e.g. as `decomposition_provenance: 'packaged_food_inferred'`)
+  // so the caveat language can swap to the inferred-composition variant.
+  packaged_food?: {
+    provenance: 'packaged_food_inferred';
+    product_name: string | null;
+    brand: string | null;
+    net_weight_g: number;
+    decomposition_confidence: number;
+    image_sha256: string;
+  };
 }
 
 interface UseRecall24hReceiverOptions {
@@ -56,6 +69,8 @@ interface UseRecall24hReceiverOptions {
     meals_meta: RecallStash['meals_meta'];
     /** Present when the recall-history page routed an N-day average. */
     multi_day?: RecallStash['multi_day'];
+    /** Present when /scan-product routed an inferred-composition product. */
+    packaged_food?: RecallStash['packaged_food'];
   }) => void;
 }
 
@@ -85,6 +100,7 @@ export function useRecall24hReceiver({ target, onIngredients }: UseRecall24hRece
       estimated_daily_kcal: stash.estimated_daily_kcal,
       meals_meta: stash.meals_meta,
       multi_day: stash.multi_day,
+      packaged_food: stash.packaged_food,
     });
     // Clear the stash so a reload doesn't re-inject.
     try { sessionStorage.removeItem('recall_24h_payload'); } catch { /* private mode */ }

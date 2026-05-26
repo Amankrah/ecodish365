@@ -5,6 +5,7 @@ from .views import (
     cnf_views, environmental_views, food_views, translation_views,
     hsr_views_consolidated, fcs_views, hefi_views, heni_views,
     cnf_ai_search_views,                # AI-MATCH-1 (AI-enhanced CNF search + recipe decomposer)
+    packaged_food_views,                # PKG-IMG-1 Phase 1 (image → NF panel → HSR)
 )
 from .views.cnf_views import (
     # Food Management
@@ -167,6 +168,29 @@ urlpatterns = [
     path('dietary-pattern/classify/',
          cnf_ai_search_views.dietary_pattern_classify,
          name='dietary_pattern_classify'),
+
+    # =============================================================================
+    # PKG-IMG-1 (2026-05-26) Phase 1 — packaged-food image → HSR
+    # =============================================================================
+    # Multimodal LLM extracts the Nutrition Facts panel from a user-uploaded
+    # product photo; the user reviews + confirms the extracted values in an
+    # editable form; HSR is then computed from the (possibly-edited) panel
+    # without touching the existing CNF-FoodID path. Phase 2 will add an
+    # ingredient-list path that feeds HEFI/HENI/dietary-pattern/environmental.
+    path('packaged-food/extract/',
+         packaged_food_views.packaged_food_extract,
+         name='packaged_food_extract'),
+    path('hsr/calculate-from-panel/',
+         packaged_food_views.hsr_calculate_from_panel,
+         name='hsr_calculate_from_panel'),
+    # PKG-IMG-1 Phase 2 (2026-05-26) — adaptive NF + ingredient extraction
+    # and CNF-decomposition for the 5 ingredient-list-dependent scorers.
+    path('packaged-food/extract-combined/',
+         packaged_food_views.packaged_food_extract_combined,
+         name='packaged_food_extract_combined'),
+    path('packaged-food/decompose-ingredients/',
+         packaged_food_views.packaged_food_decompose_ingredients,
+         name='packaged_food_decompose_ingredients'),
 
     # =============================================================================
     # User Management & Social Features
