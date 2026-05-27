@@ -19,6 +19,7 @@ import { RecipeDecomposerModal } from '@/components/shared/RecipeDecomposerModal
 import { SourceFilter, type SourceChoice } from '@/components/shared/SourceFilter';
 import { useRecall24hReceiver } from '@/components/shared/useRecall24hReceiver';
 import { FoodListPanel } from '@/components/shared/FoodListPanel';
+import { CollapsibleSection } from '@/components/shared/CollapsibleSection';
 
 interface FoodItem {
   id: string;
@@ -309,10 +310,24 @@ export default function FCSCalculate() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Input Panel */}
+          {/* Input Panel — collapsible so the FoodListPanel above can dominate
+              once a list is loaded. */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Add Foods</h2>
+            <CollapsibleSection
+              title="Add Foods"
+              icon={<PlusIcon className="h-5 w-5 text-gray-700" />}
+              badge={foods.length > 0 ? `${foods.length} selected` : undefined}
+              persistKey="fcs-add-foods"
+              defaultCollapsed
+              className="bg-white rounded-lg shadow-sm"
+              headerClassName="p-6"
+              whenCollapsedHint={
+                <p className="px-6 pb-4 text-xs text-gray-600">
+                  Click above to search the CNF database and add or change foods.
+                </p>
+              }
+            >
+              <div className="p-6 pt-0">
               
               {/* Search Filters */}
               {filters && (
@@ -485,25 +500,30 @@ export default function FCSCalculate() {
                 🍽️ Build a 24-h recall instead (six-occasion daily eating)
               </a>
 
-              {/* Calculate Button */}
-              <button
-                onClick={calculateFCS}
-                disabled={isCalculating || foods.every(food => food.food_id === 0)}
-                className="w-full mt-6 bg-blue-600 text-white px-4 py-3 rounded-md font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center"
-              >
-                {isCalculating ? (
-                  <>
-                    <ArrowPathIcon className="w-4 h-4 mr-2 animate-spin" />
-                    Calculating...
-                  </>
-                ) : (
-                  <>
-                    <BeakerIcon className="w-4 h-4 mr-2" />
-                    Calculate FCS
-                  </>
-                )}
-              </button>
-            </div>
+              </div>
+            </CollapsibleSection>
+
+            {/* Calculate button — outside the collapsible so the user can score
+                without re-expanding the Add Foods panel after editing the list
+                via the FoodListPanel above. */}
+            <button
+              type="button"
+              onClick={calculateFCS}
+              disabled={isCalculating || foods.every(food => food.food_id === 0)}
+              className="w-full mt-4 bg-blue-600 text-white px-4 py-3 rounded-md font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center"
+            >
+              {isCalculating ? (
+                <>
+                  <ArrowPathIcon className="w-4 h-4 mr-2 animate-spin" />
+                  Calculating...
+                </>
+              ) : (
+                <>
+                  <BeakerIcon className="w-4 h-4 mr-2" />
+                  Calculate FCS
+                </>
+              )}
+            </button>
           </div>
 
           {/* Results Panel */}

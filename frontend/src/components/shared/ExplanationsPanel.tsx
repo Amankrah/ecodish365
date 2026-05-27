@@ -94,6 +94,27 @@ export function ExplanationsPanel({
         </div>
       )}
 
+      {/* 24-h recall caveat (HSR daily aggregation) */}
+      {explanations.recall_context && (
+        <div className="bg-amber-50 rounded-lg border border-amber-200 p-4">
+          <div className="flex gap-2 items-start">
+            <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+            <div>
+              {explanations.recall_context.title && (
+                <h3 className="text-sm font-semibold text-amber-900 mb-1">
+                  {explanations.recall_context.title}
+                </h3>
+              )}
+              {explanations.recall_context.message && (
+                <p className="text-sm text-amber-900 leading-relaxed">
+                  {explanations.recall_context.message}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* FCS-specific NOVA explainer (individual mode) */}
       {explanations.nova_explainer && (
         <div className="bg-white rounded-lg border shadow-sm p-5">

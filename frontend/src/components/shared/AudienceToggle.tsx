@@ -115,6 +115,7 @@ export interface ExplanationSection {
   interpretation?: string;
   mandatory_caveat?: string;
   description?: string;
+  message?: string;
 }
 
 export interface ExplanationsBlock {
@@ -123,5 +124,7 @@ export interface ExplanationsBlock {
   citations?: Record<string, string>;
   policy_context?: Record<string, string>;
   nova_explainer?: ExplanationSection;
+  /** 24-h recall handoff caveat (HSR calculate when from_recall24h). */
+  recall_context?: ExplanationSection;
   action_tips?: Record<string, string>;
 }

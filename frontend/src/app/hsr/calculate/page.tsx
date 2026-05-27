@@ -21,6 +21,7 @@ import { SourceFilter, type SourceChoice } from '@/components/shared/SourceFilte
 import { ExplanationsPanel } from '@/components/shared/ExplanationsPanel';
 import { useRecall24hReceiver } from '@/components/shared/useRecall24hReceiver';
 import { FoodListPanel } from '@/components/shared/FoodListPanel';
+import { CollapsibleSection } from '@/components/shared/CollapsibleSection';
 
 interface FoodItem {
   id: string;
@@ -29,6 +30,9 @@ interface FoodItem {
   serving_size: number;
   food_group?: string;
 }
+
+/** Must match backend ``HSR_CALCULATE_MAX_FOODS`` in hsr_views_consolidated.py */
+const HSR_CALCULATE_MAX_FOODS = 100;
 
 interface SearchState {
   query: string;
@@ -58,6 +62,9 @@ export default function HSRCalculate() {
   const [analysisLevel, setAnalysisLevel] = useState<'simple' | 'detailed'>('detailed');
   const [includeAlternatives, setIncludeAlternatives] = useState(true);
   const [includeMealInsights, setIncludeMealInsights] = useState(true);
+  // AI-MATCH-2: true when foods were injected from /recall-24h (or an active
+  // list transferred from recall). Daily HSR is informational only.
+  const [cameFromRecall, setCameFromRecall] = useState(false);
   const [filters, setFilters] = useState<FilterOptions | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedMethod, setSelectedMethod] = useState<string>('');
@@ -84,6 +91,8 @@ export default function HSRCalculate() {
     target: 'hsr',
     onIngredients: (ingredients, meta) => {
       setUserType(meta.user_type);
+      setCameFromRecall(true);
+      setIncludeAlternatives(false);
       setFoods(ingredients.map((i, idx) => ({
         id: String(idx + 1),
         food_id: i.food_id,
@@ -178,14 +187,23 @@ export default function HSRCalculate() {
       return;
     }
 
+    if (validFoods.length > HSR_CALCULATE_MAX_FOODS) {
+      alert(
+        `This list has ${validFoods.length} foods. HSR calculate supports up to `
+        + `${HSR_CALCULATE_MAX_FOODS} at once. Remove some foods or score HEFI/FCS instead.`
+      );
+      return;
+    }
+
     setIsCalculating(true);
     try {
       const hsrResult = await HSRApiService.calculateHSR({
         food_ids: validFoods.map(food => food.food_id),
         serving_sizes: validFoods.map(food => food.serving_size),
         analysis_level: analysisLevel,
-        include_alternatives: includeAlternatives,
+        include_alternatives: cameFromRecall ? false : includeAlternatives,
         include_meal_insights: includeMealInsights,
+        from_recall24h: cameFromRecall,
         user_type: userType,
       });
       
@@ -254,6 +272,46 @@ export default function HSRCalculate() {
               staleResultHint={result !== null && lastCalcUserType !== null && userType !== lastCalcUserType}
             />
           </div>
+          {cameFromRecall ? (
+            <div className="mt-4 bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <div className="flex">
+                <ExclamationTriangleIcon className="w-5 h-5 text-amber-700 mr-2 flex-shrink-0" />
+                <div className="text-sm text-amber-900">
+                  <p className="font-semibold">Scoring a 24-h dietary recall — informational only.</p>
+                  <p className="mt-1">
+                    HSRAC v9 rates individual packaged products within their category, not whole
+                    days of eating. This combined star rating is a rough snapshot; for daily diet
+                    quality use{' '}
+                    <a href="/hefi/calculate" className="underline font-medium hover:text-amber-950">
+                      HEFI
+                    </a>{' '}
+                    or{' '}
+                    <a href="/fcs/calculate" className="underline font-medium hover:text-amber-950">
+                      FCS
+                    </a>
+                    . Healthier-alternatives lookup is off for recall loads (up to{' '}
+                    {HSR_CALCULATE_MAX_FOODS} foods).
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex">
+                <InformationCircleIcon className="w-5 h-5 text-blue-700 mr-2 flex-shrink-0" />
+                <div className="text-sm text-blue-900">
+                  <p>
+                    HSR compares products <strong>within the same food category</strong>. For a full
+                    day&apos;s eating,{' '}
+                    <a href="/recall-24h?then=hsr" className="underline font-medium hover:text-blue-950">
+                      build a 24-h recall
+                    </a>{' '}
+                    — daily HSR is informational; HEFI and FCS are better daily metrics.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* FOOD-LIST-PANEL (2026-05-26): cross-metric transferable food list. */}
@@ -263,7 +321,12 @@ export default function HSRCalculate() {
             onChange={list => {
               if (!list) {
                 setFoods([]);
+                setCameFromRecall(false);
                 return;
+              }
+              setCameFromRecall(list.source === 'recall_24h');
+              if (list.source === 'recall_24h') {
+                setIncludeAlternatives(false);
               }
               setFoods(list.ingredients.map((i, idx) => ({
                 id: String(idx + 1),
@@ -277,10 +340,24 @@ export default function HSRCalculate() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Input Panel */}
+          {/* Input Panel — collapsible so the FoodListPanel above can dominate
+              once a list is loaded. */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Add Foods</h2>
+            <CollapsibleSection
+              title="Add Foods"
+              icon={<PlusIcon className="h-5 w-5 text-gray-700" />}
+              badge={foods.length > 0 ? `${foods.length} selected` : undefined}
+              persistKey="hsr-add-foods"
+              defaultCollapsed
+              className="bg-white rounded-lg shadow-sm"
+              headerClassName="p-6"
+              whenCollapsedHint={
+                <p className="px-6 pb-4 text-xs text-gray-600">
+                  Click above to search the CNF database and add or change foods.
+                </p>
+              }
+            >
+              <div className="p-6 pt-0">
               
               {/* FIX (HSR audit #8): Analysis Level + alternatives + meal-
                   insights options were visible in Individual mode despite
@@ -312,9 +389,15 @@ export default function HSRCalculate() {
                         type="checkbox"
                         checked={includeAlternatives}
                         onChange={(e) => setIncludeAlternatives(e.target.checked)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        disabled={cameFromRecall}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:opacity-50"
                       />
-                      <span className="ml-2 text-sm text-gray-700">Include healthier alternatives</span>
+                      <span className="ml-2 text-sm text-gray-700">
+                        Include healthier alternatives
+                        {cameFromRecall && (
+                          <span className="text-gray-500"> (off for 24-h recall loads)</span>
+                        )}
+                      </span>
                     </label>
 
                     <label className="flex items-center">
@@ -519,26 +602,30 @@ export default function HSRCalculate() {
                 🍽️ Build a 24-h recall instead (six-occasion daily eating)
               </a>
 
-              {/* Calculate Button */}
-              <button
-                onClick={calculateHSR}
-                disabled={isCalculating || foods.every(food => food.food_id === 0)}
-                className="w-full mt-6 bg-blue-600 text-white px-4 py-3 rounded-md font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center"
-              >
-                {isCalculating ? (
-                  <>
-                    <ArrowPathIcon className="w-4 h-4 mr-2 animate-spin" />
-                    Calculating...
-                  </>
-                ) : (
-                  <>
-                    <ChartBarIcon className="w-4 h-4 mr-2" />
-                    Calculate HSR
-                  </>
-                )}
-              </button>
+              </div>
+            </CollapsibleSection>
 
-            </div>
+            {/* Calculate button — outside the collapsible so the user can score
+                without re-expanding the Add Foods panel after editing the list
+                via the FoodListPanel above. */}
+            <button
+              type="button"
+              onClick={calculateHSR}
+              disabled={isCalculating || foods.every(food => food.food_id === 0)}
+              className="w-full mt-4 bg-blue-600 text-white px-4 py-3 rounded-md font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center"
+            >
+              {isCalculating ? (
+                <>
+                  <ArrowPathIcon className="w-4 h-4 mr-2 animate-spin" />
+                  Calculating...
+                </>
+              ) : (
+                <>
+                  <ChartBarIcon className="w-4 h-4 mr-2" />
+                  Calculate HSR
+                </>
+              )}
+            </button>
           </div>
 
           {/* Results Panel */}

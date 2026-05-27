@@ -298,3 +298,65 @@ def get_explanations(
             ),
         },
     }
+
+
+def build_recall24h_caveat(
+    user_type: str = 'individual',
+    n_foods: int = 0,
+) -> Dict[str, Dict[str, str]]:
+    """Audience-aware caveat when HSR is fed a 24-h recall ingredient list.
+
+    Merged into the calculate response when ``from_recall24h=true``. HSRAC v9
+    is per-product within-category; a daily pseudo-meal star rating is
+    informational only — parallel to the recall wizard routing guidance.
+    """
+    food_note = (
+        f' ({n_foods} deduped CNF foods in this request)'
+        if n_foods > 0 else ''
+    )
+    if user_type == 'researcher':
+        return {
+            'recall_context': {
+                'title': '24-h recall → daily HSR (informational only)',
+                'message': (
+                    'This request was routed from a 24-h dietary recall'
+                    f'{food_note}. HSR daily aggregation is INFORMATIONAL '
+                    'ONLY — HSRAC v9 is a per-product within-category rating '
+                    '(Shahid et al. 2020). Combining decomposed ingredients '
+                    'into one meal category and one star band is mathematically '
+                    'computable but methodologically suspect for diet-level '
+                    'claims. For Brassard 2022b-aligned daily scoring use '
+                    'HEFI; for mortality-anchored diet quality use FCS '
+                    '(i.FCS). Healthier-alternatives lookup is disabled for '
+                    'recall loads to keep latency manageable.'
+                ),
+            },
+        }
+    if user_type == 'policy':
+        return {
+            'recall_context': {
+                'title': 'Recall-sourced daily HSR — not for policy thresholds',
+                'message': (
+                    'This score aggregates a full recall day into one HSR '
+                    f'band{food_note}. HSR is designed for front-of-pack '
+                    'labelling of individual products within an HSRAC '
+                    'category — not population diet surveillance. Do not set '
+                    'procurement or labelling thresholds from recall-aggregated '
+                    'daily HSR. Use HEFI or diet-level FCS for policy-facing '
+                    'daily metrics.'
+                ),
+            },
+        }
+    return {
+        'recall_context': {
+            'title': 'Scoring a full day — informational only',
+            'message': (
+                'These foods came from your 24-hour recall'
+                f'{food_note}. Health Star Ratings compare packaged products '
+                'within the same category — not whole days of eating. Treat '
+                'this combined star rating as a rough snapshot, not a '
+                'definitive measure of how healthy your day was. For daily '
+                'diet quality, try HEFI or Food Compass (FCS) instead.'
+            ),
+        },
+    }

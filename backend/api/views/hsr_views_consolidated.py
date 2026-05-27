@@ -49,7 +49,13 @@ def _log_hsr_timing(view: str, food_ids: List, meta: str = "", **parts_ms: float
 from api.cnf_cache import get_dish_cnf_pipeline as get_cnf_pipeline
 
 # Audience-aware explanations (AUDIENCE-CODE-1 SHIPPED 2026-05-23).
-from .hsr_explanations import get_explanations as get_hsr_explanations
+from .hsr_explanations import (
+    get_explanations as get_hsr_explanations,
+    build_recall24h_caveat,
+)
+
+# Manual meal builder + 24-h recall handoff (compare endpoint stays at 20).
+HSR_CALCULATE_MAX_FOODS = 100
 
 
 class HSRAPIError(Exception):
@@ -107,14 +113,18 @@ def calculate_hsr(request):
         "serving_sizes": [150, 100],
         "analysis_level": "detailed",  // "simple" or "detailed"
         "include_alternatives": true,
-        "include_meal_insights": true
+        "include_meal_insights": true,
+        "from_recall24h": false
     }
     """
     # Extract and validate request data
     food_ids = request.data.get('food_ids', [])
     serving_sizes = request.data.get('serving_sizes', [])
     analysis_level = request.data.get('analysis_level', 'detailed')
+    from_recall24h = _parse_bool_flag(request.data.get('from_recall24h', False))
     include_alternatives = request.data.get('include_alternatives', False)
+    if from_recall24h:
+        include_alternatives = False
     include_meal_insights = request.data.get('include_meal_insights', True)
     user_type = str(request.data.get('user_type', 'individual'))
     if user_type not in ('individual', 'researcher', 'policy'):
@@ -196,6 +206,10 @@ def calculate_hsr(request):
     result["explanations"] = get_hsr_explanations(
         star_rating=star_rating, category=category_str, user_type=user_type,
     )
+    if from_recall24h:
+        result["explanations"].update(
+            build_recall24h_caveat(user_type=user_type, n_foods=len(food_ids)),
+        )
     # WAFCT-EXTEND (2026-05-24): per-source caveat (sodium method delta).
     try:
         from api.views.wafct_caveat import build_wafct_caveat
@@ -205,6 +219,7 @@ def calculate_hsr(request):
     except Exception:  # noqa: BLE001
         pass
     result["user_type"] = user_type
+    result["from_recall24h"] = from_recall24h
     result["meal_categorization"] = _get_basic_meal_categorization_summary(meal)
 
     t3 = time.perf_counter()
@@ -466,6 +481,15 @@ def get_meal_insights(request):
 
 
 # Helper functions
+def _parse_bool_flag(value: object) -> bool:
+    """Coerce JSON booleans and common string forms."""
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() in ('1', 'true', 'yes', 'on')
+    return bool(value)
+
+
 def _validate_hsr_input(food_ids: List[int], serving_sizes: List[float]):
     """Validate HSR calculation input"""
     if not food_ids or not serving_sizes:
@@ -474,8 +498,10 @@ def _validate_hsr_input(food_ids: List[int], serving_sizes: List[float]):
     if len(food_ids) != len(serving_sizes):
         raise HSRAPIError("Number of food IDs must match number of serving sizes")
     
-    if len(food_ids) > 20:
-        raise HSRAPIError("Maximum 20 foods can be analyzed at once")
+    if len(food_ids) > HSR_CALCULATE_MAX_FOODS:
+        raise HSRAPIError(
+            f"Maximum {HSR_CALCULATE_MAX_FOODS} foods can be analyzed at once"
+        )
     
     for i, serving_size in enumerate(serving_sizes):
         if not isinstance(serving_size, (int, float)) or serving_size <= 0:

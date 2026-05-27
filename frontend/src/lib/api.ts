@@ -1059,6 +1059,8 @@ export interface HSRCalculationRequest {
   analysis_level?: 'simple' | 'detailed';
   include_alternatives?: boolean;
   include_meal_insights?: boolean;
+  /** When true, server disables alternatives and adds recall caveat (PKG-RECALL-1). */
+  from_recall24h?: boolean;
   /** Audience selector for the explanations block (AUDIENCE-CODE-1 2026-05-23). */
   user_type?: 'individual' | 'researcher' | 'policy';
 }

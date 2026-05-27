@@ -16,6 +16,8 @@ import { RecipeDecomposerModal } from '../../../components/shared/RecipeDecompos
 import { SourceFilter, type SourceChoice } from '../../../components/shared/SourceFilter';
 import { useRecall24hReceiver } from '../../../components/shared/useRecall24hReceiver';
 import { FoodListPanel } from '../../../components/shared/FoodListPanel';
+import { CollapsibleSection } from '../../../components/shared/CollapsibleSection';
+import { Plus } from 'lucide-react';
 
 interface SelectedFood {
   FoodID: number;
@@ -456,11 +458,25 @@ export default function HEFICalculatePage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Input Panel */}
+          {/* Input Panel — collapsible so the cross-page FoodListPanel above
+              can be the primary surface once a list is loaded. */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm p-6 space-y-6">
+            <CollapsibleSection
+              title="Add Foods"
+              icon={<Plus className="h-5 w-5 text-gray-700" />}
+              badge={selectedFoods.length > 0 ? `${selectedFoods.length} selected` : undefined}
+              persistKey="hefi-add-foods"
+              defaultCollapsed
+              className="bg-white rounded-lg shadow-sm"
+              headerClassName="p-6"
+              whenCollapsedHint={
+                <p className="px-6 pb-4 text-xs text-gray-600">
+                  Click above to search the CNF database and add or change foods.
+                </p>
+              }
+            >
+              <div className="p-6 pt-0 space-y-6">
               <div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-1">Add Foods</h2>
                 <p className="text-sm text-gray-600">Search and select foods to include in the HEFI calculation.</p>
               </div>
 
@@ -629,16 +645,6 @@ export default function HEFICalculatePage() {
                 )}
               </div>
 
-              {/* Calculate Button */}
-              <button
-                onClick={calculateHEFI}
-                disabled={isLoading || selectedFoods.length === 0}
-                className="w-full mt-2 inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
-              >
-                <CalculatorIcon className="mr-2 w-5 h-5" />
-                {isLoading ? 'Calculating...' : 'Calculate HEFI Score'}
-              </button>
-
               {/* Error */}
               {error && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3">
@@ -648,7 +654,21 @@ export default function HEFICalculatePage() {
                   </div>
                 </div>
               )}
-            </div>
+              </div>
+            </CollapsibleSection>
+
+            {/* Calculate button — outside the collapsible so the user can score
+                without re-expanding the Add Foods panel after editing the list
+                via the FoodListPanel above. */}
+            <button
+              type="button"
+              onClick={calculateHEFI}
+              disabled={isLoading || selectedFoods.length === 0}
+              className="w-full mt-4 inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
+              <CalculatorIcon className="mr-2 w-5 h-5" />
+              {isLoading ? 'Calculating...' : 'Calculate HEFI Score'}
+            </button>
           </div>
 
           {/* Results Panel */}
