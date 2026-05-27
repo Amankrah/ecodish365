@@ -8,7 +8,7 @@
   "per_capita_derivation": {
     "world_population": 8000000000,
     "days_per_year": 365,
-    "rationale": "Simple proportional cut by world population (~8 B). NOT a modelled equity allocation; the manuscript already documents (E28 Section 3, p. 1661) that the richest 30 % of the global population drives >70 % of food-system environmental pressures. The per-capita-per-day figure is an interpretive scaffold for 'is this meal a lot?', not a normative entitlement."
+    "rationale": "We divide the global limit evenly across roughly 8 billion people. This is a simple way to ask \"is this meal a lot?\"; it isn't a fair-share rule. In real life the wealthiest third of the world drives most food-system pressures."
   },
   "boundaries": [
     {
@@ -20,9 +20,9 @@
       "unit": "kg CO₂e",
       "global_boundary_per_year": 5e12,
       "global_boundary_unit": "kg CO₂e/yr",
-      "global_boundary_source": "E28 Table 2 row 1: 5 Gt CO₂e/yr",
-      "current_food_system_contribution": "16-17.7 Gt CO₂e/yr (~30 % of anthropogenic emissions; E28 p. 1641)",
-      "method_note": "GWP100 (IPCC AR5) production-stage CO₂-eq aggregated from AGRIBALYSE 3.2 / Poore & Nemecek 2018."
+      "global_boundary_source": "5 Gt CO₂e/yr",
+      "current_food_system_contribution": "16–17.7 Gt CO₂e/yr (about 30 % of all human emissions)",
+      "method_note": "Production-stage CO₂-equivalent emissions, weighted across CO₂, methane, and N₂O over 100 years."
     },
     {
       "key": "land_use",
@@ -33,9 +33,9 @@
       "unit": "m²·yr",
       "global_boundary_per_year": 48e12,
       "global_boundary_unit": "m² (stock, treated as m²·yr/yr proportional cut)",
-      "global_boundary_source": "E28 Table 2 row 2: <48 M km² agricultural area; treated as 48×10¹² m²·yr held per year.",
-      "current_food_system_contribution": "48 M km² = 34 % of land surface (E28 Table 2)",
-      "method_note": "E28 land-use boundary is a STOCK (total agricultural area). ReCiPe Land use is a FLUX (m²·yr/serving). We treat the per-capita-allocated share as a comparable flux — standard LCA-vs-planetary-boundary reconciliation. The boundary asks: halt conversion of intact nature, not absolute reduction; our share is therefore an attribution proxy."
+      "global_boundary_source": "Hold today's agricultural land area; halt conversion of remaining intact nature",
+      "current_food_system_contribution": "48 million km² (about 34 % of Earth's land)",
+      "method_note": "The published target is an absolute area to hold, not a per-meal flux. We compare each meal's land-use footprint (m²·yr per serving) to one person's daily share of the world's agricultural land. The target asks not to expand, so this share is best read as an attribution rather than a strict limit."
     },
     {
       "key": "water_consumption",
@@ -46,9 +46,9 @@
       "unit": "m³",
       "global_boundary_per_year": 2e12,
       "global_boundary_unit": "m³/yr",
-      "global_boundary_source": "E28 Table 2 row 8: 2000 km³/yr",
-      "current_food_system_contribution": "1200-1800 km³/yr (E28 Table 2)",
-      "method_note": "ReCiPe blue-water consumption weighted by local water-scarcity factor. The E28 boundary is an absolute global volume; we apply it as a flat per-capita allocation."
+      "global_boundary_source": "2000 km³/yr of fresh water",
+      "current_food_system_contribution": "1200–1800 km³/yr",
+      "method_note": "Blue (irrigation) water use, weighted by how scarce water is in the producing region. The recommended limit is a single global number; we divide it equally across people for comparison."
     },
     {
       "key": "biosphere_integrity_hanpp",
@@ -59,9 +59,9 @@
       "unit": "Gt C/yr",
       "global_boundary_per_year": 5.5e9,
       "global_boundary_unit": "kg C/yr (stock-equivalent: 5.5 Gt C/yr)",
-      "global_boundary_source": "E28 Table 2 row 3: 5.5 Gt C/yr",
-      "current_food_system_contribution": "9.9-11.7 Gt C/yr (72-85 % of total HANPP)",
-      "reason_unavailable": "ReCiPe Land use is a local impact metric, not a global HANPP attribution. Per-food HANPP factors require Spartina-level biodiversity modelling not available in AGRIBALYSE 3.2 or Poore & Nemecek 2018."
+      "global_boundary_source": "5.5 Gt of carbon per year",
+      "current_food_system_contribution": "9.9–11.7 Gt of carbon per year (about three-quarters of the global total)",
+      "reason_unavailable": "We don't yet have per-food data for global biodiversity loss. Available life-cycle datasets capture local land use, not the global biosphere impact this target measures."
     },
     {
       "key": "stratospheric_ozone_n2o",
@@ -72,9 +72,9 @@
       "unit": "Tg N₂O-N",
       "global_boundary_per_year": 1.8e9,
       "global_boundary_unit": "kg N₂O-N/yr (1.8 Tg)",
-      "global_boundary_source": "E28 Table 2 row 4: 1.8 Tg N₂O-N",
-      "current_food_system_contribution": "3.9-4.2 Tg N₂O-N/yr (54-69 % of total)",
-      "reason_unavailable": "ReCiPe stratospheric ozone depletion is in the v1.1 method but not consumed by the platform v1 (per code_action_items.md TODO-CODE-LCA-2). AGRIBALYSE carries per-food N₂O figures — wiring this through is in scope for v2."
+      "global_boundary_source": "1.8 Tg of nitrous-oxide nitrogen per year",
+      "current_food_system_contribution": "3.9–4.2 Tg per year (roughly two-thirds of the global total)",
+      "reason_unavailable": "Per-food nitrous-oxide data exists in the source life-cycle catalogue but isn't yet wired into our pipeline. Planned for a later release."
     },
     {
       "key": "ocean_acidification",
@@ -85,9 +85,9 @@
       "unit": "% of food-chain CO₂",
       "global_boundary_per_year": 0,
       "global_boundary_unit": "kg CO₂/yr (zero LUC + fossil)",
-      "global_boundary_source": "E28 Table 2 row 5: zero CO₂ from land-use change + fossil energy in the food chain",
-      "current_food_system_contribution": "25 % of CO₂ emissions",
-      "reason_unavailable": "ReCiPe 2016 v1.1 does not include an ocean-acidification midpoint. E28 reports it as a CO₂ sub-allocation; quantifying the food-chain-attributable share requires LUC + fossil-energy disaggregation not surfaced by AGRIBALYSE."
+      "global_boundary_source": "Zero food-chain CO₂ from clearing land and burning fossil fuels",
+      "current_food_system_contribution": "About 25 % of global CO₂ emissions",
+      "reason_unavailable": "Our environmental method doesn't include a separate ocean-acidification measure. The recommended limit also distinguishes between fuel-burning and land-clearing emissions, which our per-food data doesn't currently separate."
     },
     {
       "key": "nitrogen_surplus",
@@ -98,9 +98,9 @@
       "unit": "Tg N/yr",
       "global_boundary_per_year": 57e9,
       "global_boundary_unit": "kg N/yr (57 Tg)",
-      "global_boundary_source": "E28 Table 2 row 6: <57 Tg N/yr",
-      "current_food_system_contribution": "119 Tg N/yr",
-      "reason_unavailable": "Not a ReCiPe midpoint and not in AGRIBALYSE per-food columns. Closest proxy is Freshwater / Marine eutrophication, but these are local impact metrics, not nitrogen surplus."
+      "global_boundary_source": "57 Tg of nitrogen per year (less than half today's rate)",
+      "current_food_system_contribution": "119 Tg of nitrogen per year",
+      "reason_unavailable": "Nitrogen surplus isn't yet available as a per-food number in our data. Eutrophication numbers come close but measure local water pollution, not the global nitrogen surplus this target tracks."
     },
     {
       "key": "phosphorus_loss",
@@ -111,9 +111,9 @@
       "unit": "Tg P/yr",
       "global_boundary_per_year": 4.6e9,
       "global_boundary_unit": "kg P/yr (4.6 Tg)",
-      "global_boundary_source": "E28 Table 2 row 7: 4.6 Tg P/yr",
-      "current_food_system_contribution": "7.2 Tg P/yr (75 % of total P loss)",
-      "reason_unavailable": "ReCiPe Freshwater eutrophication exists but is not in the v1 consumed midpoint vector (per code_action_items.md). Per-food P-loss factors are available in AGRIBALYSE and EF 3.1; wiring through is in scope for v2."
+      "global_boundary_source": "4.6 Tg of phosphorus reaching surface water per year",
+      "current_food_system_contribution": "7.2 Tg per year (about three-quarters of the global total)",
+      "reason_unavailable": "Per-food phosphorus-loss numbers are available in the source life-cycle data but not yet active in our pipeline. Planned for a later release."
     },
     {
       "key": "novel_entities_pesticides",
@@ -124,9 +124,9 @@
       "unit": "Tg PAS/yr",
       "global_boundary_per_year": 1e9,
       "global_boundary_unit": "kg PAS/yr (1 Tg high-risk avoidance; 0.2 Tg low risk)",
-      "global_boundary_source": "E28 Table 2 row 9: 1 Tg PAS/yr (high-risk avoidance); 0.2 Tg PAS/yr (low risk)",
-      "current_food_system_contribution": "3.3-3.7 Tg PAS/yr (85-90 % of use)",
-      "reason_unavailable": "AGRIBALYSE does not track pesticide residues / application rates. ReCiPe characterises environmental release, not ingestion. Outside the platform's v1 LCA scope by design."
+      "global_boundary_source": "Cut total pesticide use to 1 Tg per year (or 0.2 Tg for the most harmful)",
+      "current_food_system_contribution": "3.3–3.7 Tg per year (most of global pesticide use)",
+      "reason_unavailable": "Our life-cycle data doesn't track pesticide use by product. This category would need a different data source."
     }
   ]
 }

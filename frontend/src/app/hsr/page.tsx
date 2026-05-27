@@ -12,74 +12,131 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon,
   InformationCircleIcon,
+  CameraIcon,
 } from '@heroicons/react/24/outline';
 import StarRating from '@/components/StarRating';
 
 const hsrFeatures = [
   {
-    name: '📷 Scan a packaged product',
-    description: 'Take 1–3 photos of the Nutrition Facts panel + ingredients + net weight. Multimodal AI extracts the panel; you confirm; HSR scores the product in its own category. The canonical single-product HSR flow.',
-    icon: CalculatorIcon,
+    name: 'Scan a packaged product',
+    description:
+      'Take one to three photos of a label: the Nutrition Facts panel, the ingredient list, and the net weight. The app reads the panel, you confirm what it found, and the product is scored in its own category. This is the simplest way to score something straight off the shelf.',
+    icon: CameraIcon,
     href: '/scan-product',
     color: 'primary',
-    features: ['Photo → NF panel → HSR', 'Multi-image upload (front/back/side)', 'You confirm before scoring', 'Best for single-product HSR'],
+    features: [
+      'From photo to star rating',
+      'Upload front, back, and side',
+      'You confirm before anything is scored',
+      'Best for a single packaged product',
+    ],
   },
   {
     name: 'Calculate HSR',
-    description: 'Pick foods from the integrated catalog (CNF or WAFCT) + serving sizes. Single food = standard HSR; multi-food list = per-product summary with energy-weighted average and per-item stars.',
+    description:
+      'Pick foods and serving sizes from our catalogue. Score one food on its own, or build a list and get an overall rating alongside a star rating for each item.',
     icon: CalculatorIcon,
     href: '/hsr/calculate',
     color: 'primary',
-    features: ['Detailed score breakdown', 'Per-component nutritional analysis', 'Per-item ratings on multi-food lists', 'Researcher / policy modes'],
+    features: [
+      'Full score breakdown',
+      'Nutrient-by-nutrient analysis',
+      'A rating for each item in a list',
+      'Researcher and policy views',
+    ],
   },
   {
-    name: 'Compare Foods',
-    description: 'Side-by-side HSR ranking for similar products — what HSR is best at. Use this for "which yogurt?" or "which cereal?" comparisons.',
+    name: 'Compare products',
+    description:
+      'Line up similar products side by side and rank them by stars. This is what HSR does best: which yogurt, which cereal, which loaf of bread.',
     icon: ScaleIcon,
     href: '/hsr/compare',
     color: 'accent',
-    features: ['Within-category compare', 'Ranking by star rating', 'Key nutrients table', 'Strongest/weakest highlights'],
+    features: [
+      'Compare within a category',
+      'Ranked by star rating',
+      'Key nutrients side by side',
+      "Each product's strengths and weaknesses",
+    ],
   },
   {
-    name: '✨ Scorecard (all metrics)',
-    description: 'See HSR alongside FCS, HEFI, HENI, environmental impact, and dietary pattern for the same food list in one consumer-friendly summary.',
+    name: 'Scorecard (all metrics)',
+    description:
+      'See the star rating next to all five other lenses for the same foods: FCS, HEFI, HENI, environmental impact, and dietary pattern, in one clear summary.',
     icon: ChartBarIcon,
     href: '/scorecard',
     color: 'primary',
-    features: ['All six metrics at once', 'Consumer-friendly summary', 'Cross-metric transfer', 'Deep links to each calculator'],
+    features: [
+      'All six lenses at once',
+      'A plain-language summary',
+      'Jump straight to any calculator',
+    ],
   },
 ];
 
 const hsrBenefits = [
   {
     title: 'HSRAC v9 algorithm',
-    description: 'Implements the current Australian / New Zealand Health Star Rating algorithm (HSRAC Implementation Guide v9, Dec 2025). Functionally equivalent to v6–v8; differs from pre-2020 versions.',
+    description:
+      'Runs the current Australian and New Zealand Health Star Rating algorithm (Implementation Guide v9, December 2025). It matches versions 6 through 8 and differs from the pre-2020 versions.',
     icon: CheckCircleIcon,
   },
   {
     title: 'Within-category comparison',
-    description: 'Foods are scored against thresholds for their HSR category (Cat 1/1D beverages, Cat 2/2D foods, Cat 3/3D fats & oils). Compare yogurts to yogurts — not yogurts to oils.',
+    description:
+      'Every food is scored against the thresholds for its own group. HSRAC v9 has six: non-dairy beverages, dairy beverages, foods, dairy foods, fats and oils, and cheese. You compare yogurts to yogurts, not yogurts to oils.',
     icon: ChartBarIcon,
   },
   {
     title: 'Per-product, not per-day',
-    description: 'A 5-star product is not a healthy diet. For full-day diet quality use HEFI-2019 or FCS; for population-level health impact use HENI.',
+    description:
+      'A 5-star product is not a healthy diet. For full-day diet quality, use HEFI-2019 or FCS. For population-level health impact, use HENI.',
     icon: LightBulbIcon,
   },
   {
-    title: 'Multi-database catalog',
-    description: 'Canadian Nutrient File (5,691 foods) + FAO/INFOODS WAFCT 2019 (1,028 West African foods) = 6,719 today, surfaced under a single source-tagged catalog. Per-source caveats flag analytical-method differences; further composition databases follow the same extension pattern.',
+    title: 'Multi-database catalogue',
+    description:
+      'The catalogue holds 6,719 foods today: 5,691 from the Canadian Nutrient File and 1,028 West African foods from FAO/INFOODS WAFCT 2019. Each source keeps its own notes, so differences in how foods were measured stay visible, and new databases can be added the same way.',
     icon: InformationCircleIcon,
   },
 ];
 
 const hsrLevels = [
-  { level: 'Excellent', stars: 5, range: '4.5-5.0', color: 'bg-green-500', description: 'Ideal for daily consumption' },
-  { level: 'Very Good', stars: 4.5, range: '4.0-4.5', color: 'bg-green-400', description: 'Very good choice for regular eating' },
-  { level: 'Good', stars: 4, range: '3.5-4.0', color: 'bg-green-400', description: 'Great choice for regular eating' },
-  { level: 'Average', stars: 3, range: '2.5-3.0', color: 'bg-yellow-400', description: 'Good as part of balanced diet' },
-  { level: 'Below Average', stars: 2, range: '1.5-2.0', color: 'bg-orange-400', description: 'Consume in moderation' },
-  { level: 'Poor', stars: 0.5, range: '0.5-1.0', color: 'bg-red-400', description: 'Limit consumption' },
+  {
+    stars: 4.75,
+    range: '4.5–5.0',
+    level: 'Excellent',
+    color: 'bg-green-500',
+    description: 'Among the best in its category.',
+  },
+  {
+    stars: 3.75,
+    range: '3.5–4.0',
+    level: 'Good',
+    color: 'bg-lime-400',
+    description: 'A strong choice in its category.',
+  },
+  {
+    stars: 2.75,
+    range: '2.5–3.0',
+    level: 'Average',
+    color: 'bg-yellow-400',
+    description: 'Middle of the pack for its category.',
+  },
+  {
+    stars: 1.75,
+    range: '1.5–2.0',
+    level: 'Below average',
+    color: 'bg-orange-400',
+    description: 'Weaker than most in its category.',
+  },
+  {
+    stars: 0.75,
+    range: '0.5–1.0',
+    level: 'Poor',
+    color: 'bg-red-400',
+    description: 'Among the lowest in its category.',
+  },
 ];
 
 export default function HSRDashboard() {
@@ -98,21 +155,22 @@ export default function HSRDashboard() {
               Health Star Rating <span className="text-blue-600">(HSRAC v9)</span>
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed">
-              Rate a packaged product 0.5–5 stars within its own HSR category — the Australian /
-              New Zealand front-of-pack rule for nutrient profiling, applied across our
-              integrated food composition catalog (Canadian Nutrient File + FAO/INFOODS WAFCT
-              today, with additional databases planned). HSR is per-product, designed to help
-              shoppers pick between similar items (yogurt vs yogurt, cereal vs cereal).
+              Rate a packaged product from 0.5 to 5 stars against others in its own category.
+              The Health Star Rating is the front-of-pack system used across Australia and New
+              Zealand, and here it runs on our full food catalogue: the Canadian Nutrient File
+              and the West African Food Composition Table, with more to come. It scores one
+              product at a time, which is what makes it useful at the shelf. This yogurt or
+              that one. This cereal or that one.
             </p>
-            <div className="inline-flex items-start gap-2 max-w-2xl mx-auto bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 mb-8 text-sm text-amber-900">
+            <div className="inline-flex items-start gap-2 max-w-2xl mx-auto bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 mb-8 text-sm text-amber-900 text-left">
               <ExclamationTriangleIcon className="w-4 h-4 flex-shrink-0 mt-0.5" />
               <span>
                 <strong>Per-product, not per-day.</strong> A 5-star product is not a healthy diet.
                 For full-day diet quality see{' '}
                 <Link href="/hefi" className="underline">HEFI-2019</Link> or{' '}
-                <Link href="/fcs" className="underline">FCS</Link>;
-                for all metrics at once use the{' '}
-                <Link href="/scorecard" className="underline font-medium">✨ Scorecard</Link>.
+                <Link href="/fcs" className="underline">FCS</Link>.
+                For all metrics at once, use the{' '}
+                <Link href="/scorecard" className="underline font-medium">Scorecard</Link>.
               </span>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -140,21 +198,21 @@ export default function HSRDashboard() {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Understanding Health Star Ratings</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              The Health Star Rating system rates foods from 0.5 to 5 stars based on their nutritional profile.
+              The Health Star Rating runs from 0.5 to 5 stars and reflects a product&apos;s
+              nutritional profile compared with others in the same category.
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {hsrLevels.map((level) => (
-              <div key={level.level} className="text-center">
+              <div key={level.range} className="text-center">
                 <div className={`w-16 h-16 ${level.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
-                  <span className="text-white font-bold text-lg">{level.stars}</span>
+                  <span className="text-white font-bold text-sm">{level.range}</span>
                 </div>
                 <div className="flex justify-center mb-2">
                   <StarRating rating={level.stars} size="sm" />
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-1">{level.level}</h3>
-                <p className="text-sm text-gray-500 mb-2">{level.range} stars</p>
                 <p className="text-xs text-gray-600">{level.description}</p>
               </div>
             ))}
@@ -167,10 +225,11 @@ export default function HSRDashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Comprehensive HSR Analysis Tools
+              Four ways to score a product
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Choose from our suite of tools to analyze food nutritional quality and make healthier choices.
+              Pick the tool that fits what you have in front of you: a packaged label, a food
+              from our catalogue, two products to compare, or the full picture across every lens.
             </p>
           </div>
 
@@ -188,9 +247,9 @@ export default function HSRDashboard() {
                     </div>
                     <h3 className="text-xl font-semibold text-gray-900 ml-4">{feature.name}</h3>
                   </div>
-                  
+
                   <p className="text-gray-600 mb-6 leading-relaxed">{feature.description}</p>
-                  
+
                   <ul className="space-y-2 mb-6">
                     {feature.features.map((item) => (
                       <li key={item} className="flex items-center text-sm text-gray-600">
@@ -199,7 +258,7 @@ export default function HSRDashboard() {
                       </li>
                     ))}
                   </ul>
-                  
+
                   <Link
                     href={feature.href}
                     className={`inline-flex items-center justify-center w-full px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r ${
@@ -208,7 +267,7 @@ export default function HSRDashboard() {
                       'from-green-600 to-green-700 hover:from-green-700 hover:to-green-800'
                     } transition-all duration-200`}
                   >
-                    Launch Tool
+                    Launch tool
                     <ArrowRightIcon className="ml-2 w-5 h-5" />
                   </Link>
                 </div>
@@ -223,10 +282,11 @@ export default function HSRDashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Why Use Health Star Ratings?
+              Why use Health Star Ratings?
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Our HSR system provides evidence-based nutritional assessment to help you make informed food choices.
+              HSR is built for one job and does it well: comparing similar packaged products on
+              the same evidence base.
             </p>
           </div>
 
@@ -249,11 +309,11 @@ export default function HSRDashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              How Health Star Rating Works
+              How Health Star Rating works
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              The HSR system evaluates foods based on key nutrients that impact health, 
-              providing a simple star rating from 0.5 to 5 stars.
+              HSR weighs the nutrients that affect health and turns them into a single star
+              rating from 0.5 to 5.
             </p>
           </div>
 
@@ -264,8 +324,11 @@ export default function HSRDashboard() {
                   <ExclamationTriangleIcon className="w-5 h-5 text-red-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Risk Nutrients (Negative Points)</h3>
-                  <p className="text-gray-600">Energy, saturated fat, sugar, and sodium content contribute to baseline points that lower the rating.</p>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Risk nutrients</h3>
+                  <p className="text-gray-600">
+                    Energy, saturated fat, sugar, and sodium add risk points. The more a product
+                    has, the more risk points it carries.
+                  </p>
                 </div>
               </div>
 
@@ -274,8 +337,11 @@ export default function HSRDashboard() {
                   <CheckCircleIcon className="w-5 h-5 text-green-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Beneficial Nutrients (Positive Points)</h3>
-                  <p className="text-gray-600">Protein, fiber, and fruits/vegetables/nuts/legumes content provide modifying points that improve the rating.</p>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Beneficial nutrients</h3>
+                  <p className="text-gray-600">
+                    Protein, fibre, and fruit, vegetable, nut, and legume content add beneficial
+                    points that work in the product&apos;s favour.
+                  </p>
                 </div>
               </div>
 
@@ -284,66 +350,77 @@ export default function HSRDashboard() {
                   <CalculatorIcon className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Final Calculation</h3>
-                  <p className="text-gray-600">The final score subtracts modifying points from baseline points, then converts to a 0.5-5 star rating.</p>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Final calculation</h3>
+                  <p className="text-gray-600">
+                    The final score is the risk points minus the beneficial points. A lower final
+                    score means a healthier profile, which earns more stars. Each food category has
+                    its own table that converts the final score into a star rating.
+                  </p>
                 </div>
               </div>
             </div>
 
             <div className="bg-white rounded-xl shadow-lg p-8">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6 text-center">Sample HSR Calculation</h3>
-              
+              <h3 className="text-xl font-semibold text-gray-900 mb-6 text-center">
+                Sample calculation &mdash; general foods
+              </h3>
+
               <div className="space-y-4">
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-gray-600">Baseline Points (Risk)</span>
-                  <span className="font-semibold text-red-600">+8</span>
+                  <span className="text-gray-600">Risk points (energy, saturated fat, sugar, sodium)</span>
+                  <span className="font-semibold text-red-600">7</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-gray-600">Modifying Points (Beneficial)</span>
-                  <span className="font-semibold text-green-600">-3</span>
+                  <span className="text-gray-600">Beneficial points (protein, fibre, fruit, veg, nuts, legumes)</span>
+                  <span className="font-semibold text-green-600">6</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b-2 border-gray-200">
-                  <span className="text-gray-600">Final Score</span>
-                  <span className="font-semibold">5</span>
+                  <span className="text-gray-600">Final score (7 minus 6)</span>
+                  <span className="font-semibold">1</span>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-lg font-semibold text-gray-900">HSR Rating</span>
+                  <span className="text-lg font-semibold text-gray-900">Stars for this category</span>
                   <div className="flex items-center">
                     <span className="text-lg font-bold text-blue-600 mr-2">3.5</span>
-                                          <StarRating rating={3.5} size="md" />
+                    <StarRating rating={3.5} size="md" />
                   </div>
                 </div>
+                <p className="text-xs text-gray-500 pt-2">
+                  Each category has its own conversion table. The same final score yields different
+                  stars for beverages, foods, dairy products, fats and oils, and cheese.
+                </p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Citations + audience modes */}
+      {/* Audience modes */}
+      <section className="py-16 bg-white border-t border-gray-100">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Three ways to read every result</h2>
+          <p className="text-gray-700 leading-relaxed">
+            Every result can be read three ways. The numbers never change; the explanation does.
+            Individuals get a plain-language read with no jargon. Researchers get the full HSRAC v9
+            methodology, including the category-determination trail and notes on how fruit,
+            vegetable, nut, and legume content was estimated. Policy makers get population-level
+            framing for procurement and labelling.
+          </p>
+        </div>
+      </section>
+
+      {/* Primary references */}
       <section className="py-12 bg-white border-t border-gray-100">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-8 text-sm text-gray-700">
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-2">Audience modes</h3>
-            <p>
-              Every HSR calculation toggles between three explanation packs (AUDIENCE-CODE-1):
-              <strong> Individual</strong> (plain-language interpretation, no jargon),
-              <strong> Researcher</strong> (full HSRAC v9 methodology, category-determination
-              audit trail, FVNL imputation notes), and
-              <strong> Policy</strong> (population framing for procurement and labeling regulation).
-            </p>
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-2">Primary references</h3>
-            <ul className="space-y-1 list-disc list-inside text-gray-600">
-              <li>HSRAC, <em>Health Star Rating System Implementation Guide v9</em> (Dec 2025).</li>
-              <li>
-                Shahid M. et al. (2020). The Australian Health Star Rating System
-                — applicability for nutrient profiling.{' '}
-                <em>Nutrients</em> 12, 1791.
-              </li>
-              <li>HSR v9 is functionally equivalent to v6–v8 and differs from pre-2020 versions.</li>
-            </ul>
-          </div>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h3 className="font-semibold text-gray-900 mb-2">Primary references</h3>
+          <ul className="space-y-1 list-disc list-inside text-gray-600 text-sm">
+            <li>HSRAC, <em>Health Star Rating System Implementation Guide v9</em> (Dec 2025).</li>
+            <li>
+              Shahid M. et al. (2020). The Australian Health Star Rating System: applicability
+              for nutrient profiling. <em>Nutrients</em> 12, 1791.
+            </li>
+            <li>HSR v9 is functionally equivalent to versions 6 through 8 and differs from pre-2020 versions.</li>
+          </ul>
         </div>
       </section>
 
@@ -351,10 +428,10 @@ export default function HSRDashboard() {
       <section className="py-20 bg-gradient-to-r from-blue-600 to-green-600">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
-            Ready to Analyze Your Food Choices?
+            Ready to rate a product?
           </h2>
           <p className="text-xl text-blue-100 mb-8 leading-relaxed">
-            Start using our comprehensive HSR tools to make healthier, more informed food decisions today.
+            Score what&apos;s in your hand, or compare two products side by side.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -362,17 +439,17 @@ export default function HSRDashboard() {
               className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-lg text-blue-600 bg-white hover:bg-gray-50 transition-colors duration-200 shadow-lg"
             >
               <CalculatorIcon className="mr-2 w-5 h-5" />
-              Calculate HSR Now
+              Calculate HSR
             </Link>
             <Link
               href="/hsr/compare"
               className="inline-flex items-center justify-center px-8 py-3 border border-white text-base font-medium rounded-lg text-white hover:bg-white hover:bg-opacity-10 transition-colors duration-200"
             >
-              Compare Foods
+              Compare products
             </Link>
           </div>
         </div>
       </section>
     </div>
   );
-} 
+}

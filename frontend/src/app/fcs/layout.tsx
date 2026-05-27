@@ -1,36 +1,45 @@
 import type { Metadata } from 'next';
 
+const SITE_URL = 'https://ecodish365.com';
+
 export const metadata: Metadata = {
-  title: "Food Compass Score (FCS) Calculator",
-  description: "Calculate Food Compass Scores using the scientifically validated FCS 2.0 algorithm with 54 nutritional attributes across 9 domains. Professional-grade food quality assessment tool for researchers and nutrition professionals.",
+  title: 'Food Compass Calculator',
+  description:
+    'Score how closely a food, a meal, or a whole day of eating resembles the patterns linked to longer, healthier lives. Food Compass scores every food on a single 1 to 100 scale, calculated from label information across a 6,719-food catalogue.',
   keywords: [
-    "Food Compass Score", "FCS calculator", "food quality score", "nutritional profiling",
-    "food compass algorithm", "nutrition scoring system", "food assessment tool",
-    "dietary quality evaluation", "food ranking system", "nutritional analysis",
-    "food science research", "evidence-based nutrition", "food quality metrics"
+    'Food Compass',
+    'Food Compass Score',
+    'food quality score',
+    'nutritional profiling',
+    'diet quality',
+    'NOVA processing',
+    'food comparison',
+    'nutrition calculator',
   ],
   openGraph: {
-    title: "Food Compass Score Calculator - EcoDish365",
-    description: "Calculate Food Compass Scores with 54 nutritional attributes. Professional food quality assessment using scientifically validated algorithms.",
-    type: "website",
-    url: "https://ecodish365.com/fcs",
+    title: 'Food Compass Calculator | EcoDish365',
+    description:
+      'Score how closely a food, a meal, or a whole day of eating resembles the patterns linked to longer, healthier lives. A single 1 to 100 scale, the same for one food or a full day.',
+    type: 'website',
+    url: `${SITE_URL}/fcs`,
     images: [
       {
-        url: "/og-fcs.png",
+        url: `${SITE_URL}/og-fcs.png`,
         width: 1200,
         height: 630,
-        alt: "Food Compass Score Calculator",
+        alt: 'Food Compass Calculator',
       },
     ],
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Food Compass Score Calculator", 
-    description: "Professional food quality assessment with 54 nutritional attributes using scientifically validated FCS algorithm.",
-    images: ["/twitter-fcs.png"],
+    card: 'summary_large_image',
+    title: 'Food Compass Calculator | EcoDish365',
+    description:
+      'Score how closely a food, a meal, or a whole day of eating resembles the patterns linked to longer, healthier lives.',
+    images: [`${SITE_URL}/twitter-fcs.png`],
   },
   alternates: {
-    canonical: "https://ecodish365.com/fcs",
+    canonical: `${SITE_URL}/fcs`,
   },
 };
 
@@ -40,45 +49,30 @@ export default function FCSLayout({
   children: React.ReactNode;
 }) {
   const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "Food Compass Score Calculator",
-    "description": "Advanced food quality assessment tool using the scientifically validated Food Compass Score algorithm with 54 nutritional attributes",
-    "url": "https://ecodish365.com/fcs",
-    "applicationCategory": "HealthApplication",
-    "operatingSystem": "Web Browser",
-    "creator": {
-      "@type": "Organization",
-      "name": "EcoDish365", 
-      "url": "https://ecodish365.com"
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Food Compass Calculator',
+    description:
+      'Score how closely a food, a meal, or a whole day of eating resembles the patterns linked to longer, healthier lives using the Food Compass nutrient profiling system.',
+    url: `${SITE_URL}/fcs`,
+    applicationCategory: 'HealthApplication',
+    operatingSystem: 'Web Browser',
+    creator: {
+      '@type': 'Organization',
+      name: 'EcoDish365',
+      url: SITE_URL,
     },
-    "featureList": [
-      "54 nutritional attributes analysis",
-      "9 domain comprehensive scoring",
-      "Evidence-based algorithms",
-      "Food comparison capabilities",
-      "Professional reporting",
-      "Research-grade accuracy",
-      "Batch processing support"
+    featureList: [
+      'Single 1 to 100 scale for foods, meals, and whole days',
+      'Packaged product label scan',
+      'Compare foods across types',
+      'Nine-domain nutrition breakdown',
     ],
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
     },
-    "review": {
-      "@type": "Review",
-      "author": {
-        "@type": "Organization",
-        "name": "Nutrition Research Community"
-      },
-      "reviewRating": {
-        "@type": "Rating",
-        "ratingValue": "4.9",
-        "bestRating": "5"
-      },
-      "reviewBody": "Highly accurate implementation of the Food Compass Score algorithm with professional-grade features."
-    }
   };
 
   return (

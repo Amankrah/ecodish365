@@ -8,9 +8,8 @@
  */
 'use client';
 
-import { useState } from 'react';
 import {
-  Leaf, Info, ChevronDown, ChevronUp, AlertTriangle,
+  Leaf, Info, ChevronDown, AlertTriangle,
 } from 'lucide-react';
 import type {
   PlanetaryBoundaryShares,
@@ -108,12 +107,12 @@ function UnavailableRow({ row }: { row: PlanetaryBoundaryShareRow }): JSX.Elemen
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-gray-700">{row.label}</p>
           <p className="text-[11px] text-gray-500 mt-0.5">
-            EAT-Lancet 2.0 boundary: <strong>{row.global_boundary_source}</strong>
+            Recommended limit: <strong>{row.global_boundary_source}</strong>
           </p>
           <p className="text-[11px] text-gray-600 mt-1 italic">{row.reason}</p>
         </div>
         <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-gray-200 text-gray-600 flex-shrink-0">
-          v2 follow-up
+          Coming later
         </span>
       </div>
     </li>
@@ -123,8 +122,6 @@ function UnavailableRow({ row }: { row: PlanetaryBoundaryShareRow }): JSX.Elemen
 export function PlanetaryBoundaryCard({
   shares, explanations, startCollapsed = false,
 }: Props): JSX.Element {
-  const [showMethodology, setShowMethodology] = useState(!startCollapsed);
-
   const covered = shares.shares.filter(r => r.available);
   const uncovered = shares.shares.filter(r => !r.available);
 
@@ -138,10 +135,10 @@ export function PlanetaryBoundaryCard({
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="text-base font-bold text-gray-900">
-              Planetary food-system boundary share
+              Your share of the daily planet budget
             </h3>
             <p className="text-xs text-gray-600 mt-0.5">
-              EAT-Lancet 2.0 Table 2 · {shares.n_covered} of {shares.n_total} boundaries scored in v1
+              {shares.n_covered} of {shares.n_total} categories shown · others coming later
             </p>
           </div>
         </div>
@@ -158,7 +155,7 @@ export function PlanetaryBoundaryCard({
       {/* Covered rows */}
       <div className="p-5">
         <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wide mb-2">
-          Scored in v1 ({covered.length})
+          Shown ({covered.length})
         </p>
         <ul className="space-y-2">
           {covered.map(row => <AvailableRow key={row.key} row={row} />)}
@@ -174,51 +171,50 @@ export function PlanetaryBoundaryCard({
           </div>
         )}
 
-        {/* Uncovered rows + methodology disclosure */}
-        <button
-          type="button"
-          onClick={() => setShowMethodology(v => !v)}
-          aria-expanded={showMethodology ? 'true' : 'false'}
-          className="w-full flex items-center justify-between mt-4 px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-md text-xs font-medium text-gray-700"
-        >
-          <span className="flex items-center gap-1.5">
-            <Info className="h-3.5 w-3.5" aria-hidden="true" />
-            Show the 6 boundaries we don&apos;t yet score + methodology
-          </span>
-          {showMethodology
-            ? <ChevronUp className="h-3.5 w-3.5" aria-hidden="true" />
-            : <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />}
-        </button>
+        {/* Uncovered rows + methodology — native <details> disclosure (no
+            aria-expanded gymnastics; the browser handles state + ARIA). */}
+        <details className="mt-4 group" open={!startCollapsed}>
+          <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden flex items-center justify-between px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-md text-xs font-medium text-gray-700">
+            <span className="flex items-center gap-1.5">
+              <Info className="h-3.5 w-3.5" aria-hidden="true" />
+              Show how this is calculated and what we don&apos;t yet measure
+            </span>
+            <ChevronDown
+              className="h-3.5 w-3.5 transition-transform group-open:rotate-180"
+              aria-hidden="true"
+            />
+          </summary>
 
-        {showMethodology && (
           <div className="mt-3 space-y-3">
             <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wide">
-              Not scored in v1 ({uncovered.length})
+              Not yet measured ({uncovered.length})
             </p>
             <ul className="space-y-2">
               {uncovered.map(row => <UnavailableRow key={row.key} row={row} />)}
             </ul>
 
             <div className="text-[11px] text-gray-600 bg-gray-50 border border-gray-200 rounded-md p-3 leading-relaxed">
-              <p className="font-semibold text-gray-800 mb-1">Method</p>
+              <p className="font-semibold text-gray-800 mb-1">How this is calculated</p>
               <p>{shares.method_note}</p>
               <p className="mt-2">
-                Per-capita-per-day = global food-system boundary ÷ world population
-                ({shares.population_assumption.toLocaleString()}) ÷ {shares.days_per_year} days.
+                For each category, the recommended global limit is divided across
+                roughly {shares.population_assumption.toLocaleString()} people and {shares.days_per_year} days
+                to get one person&apos;s daily share, then compared to your meal or day.
               </p>
             </div>
 
             <div className="text-[11px] text-gray-600 bg-blue-50 border border-blue-200 rounded-md p-3 leading-relaxed">
-              <p className="font-semibold text-blue-900 mb-1">Citation</p>
-              <p>{shares.citation.citation}</p>
-              <p className="mt-1 text-blue-800">
-                <span className="font-medium">Table:</span> {shares.citation.table}
-                <span className="mx-1">·</span>
-                <span className="font-medium">DOI:</span> {shares.citation.doi}
+              <p className="font-semibold text-blue-900 mb-1">Source</p>
+              <p>
+                Limits are drawn from a 2025 study in <em>The Lancet</em> by the
+                EAT–Lancet Commission on healthy, sustainable, and just food systems.
+              </p>
+              <p className="mt-1 text-blue-800 font-mono text-[10px] break-all">
+                doi:{shares.citation.doi}
               </p>
             </div>
           </div>
-        )}
+        </details>
       </div>
     </div>
   );

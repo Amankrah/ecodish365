@@ -221,25 +221,24 @@ def build_planetary_explanations(
 
     if user_type == "individual":
         return {
-            "title": "Your share of the safe food-system budget",
+            "title": "Your share of the daily planet budget",
             "headline": (
                 f"Climate {_format_pct(climate_pct)} · "
                 f"Land {_format_pct(land_pct)} · "
                 f"Water {_format_pct(water_pct)} "
-                "of one person's daily food-system budget."
+                "of one person's daily share."
             ),
             "message": (
-                "These percentages compare your meal or day against the per-capita-per-day "
-                "share of the planetary food-system boundaries published by the 2025 EAT-Lancet "
-                "Commission. Lower is generally better; numbers above 100 % indicate a meal that, "
-                "if everyone ate this way, would push the food system past safe limits."
+                "These percentages compare your meal or day against the share each "
+                "person would get if global food-system limits were divided equally. "
+                "Lower is better. A number above 100 % means a meal that, if everyone "
+                "ate this way, would push the planet past safe limits."
             ),
             "mandatory_caveat": (
-                "This is a simple proportional cut by world population — not a personal "
-                "entitlement. The richest 30 % of the global population drives over 70 % "
-                "of food-system environmental pressures (EAT-Lancet 2.0, Section 3). "
-                "Only 3 of 9 planetary boundaries are currently scored; the other 6 are "
-                "documented but require future work."
+                "Dividing global limits equally across people is a way to compare, not a "
+                "fair-share rule. In real life the wealthiest third of the world drives "
+                "most of the pressure. We currently show 3 of the 9 categories the source "
+                "report tracks; the others need data we don't yet have for individual foods."
             ),
         }
 

@@ -34,7 +34,10 @@ interface RecipeDecomposerModalProps {
   open: boolean;
   onClose: () => void;
   /** Called with the final ingredient list when the user clicks "Apply". */
-  onApply: (ingredients: Array<{ food_id: number; food_description: string; mass_g: number }>) => void;
+  onApply: (
+    ingredients: Array<{ food_id: number; food_description: string; mass_g: number }>,
+    dishName?: string,
+  ) => void;
   userType: UserType;
   /** Default dish-mass shown when the modal opens. */
   defaultMassG?: number;
@@ -141,7 +144,7 @@ export function RecipeDecomposerModal({
       food_id:          i.food_id,
       food_description: i.food_description,
       mass_g:           i.mass_g,
-    })));
+    })), dishName.trim() || undefined);
     onClose();
   }
 

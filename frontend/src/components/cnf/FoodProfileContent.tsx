@@ -29,7 +29,7 @@ const SCORER_LINKS: { label: string; href: string; lens: LensPanelKey }[] = [
   { label: 'HEFI-2019', href: '/hefi/calculate', lens: 'hefi' },
   { label: 'HENI', href: '/heni/calculate', lens: 'heni' },
   { label: 'HSR', href: '/hsr/calculate', lens: 'hsr' },
-  { label: 'FCS-10', href: '/fcs/calculate', lens: 'fcs' },
+  { label: 'Food Compass', href: '/fcs/calculate', lens: 'fcs' },
 ];
 
 export interface FoodProfileContentProps {

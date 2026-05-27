@@ -109,6 +109,8 @@ const navigation: NavItem[] = [
       // who want to score a single packaged product without going
       // through the full recall wizard.
       { name: 'Scan packaged food', href: '/scan-product' },
+      // SUBST-1 Phase 1 (2026-05-26): ingredient substitution suggestions.
+      { name: 'Improve product / meal', href: '/improve-product' },
     ],
   },
   {

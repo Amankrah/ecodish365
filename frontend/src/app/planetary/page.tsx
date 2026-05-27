@@ -116,16 +116,13 @@ export default function PlanetaryBoundaryPage(): JSX.Element {
             </div>
             <div className="flex-1">
               <h1 className="text-2xl font-bold text-gray-900">
-                Planetary food-system boundary share
+                Your share of the daily planet budget
               </h1>
               <p className="text-sm text-gray-600 mt-1">
-                What share of <strong>one person&apos;s daily food-system budget</strong> does
-                this meal or day use? Anchored to the 2025 EAT-Lancet Commission&apos;s
-                Table 2 boundaries (climate, land, water) at a simple per-capita-per-day cut.
-              </p>
-              <p className="text-[11px] text-gray-500 mt-2 italic">
-                Rockström, Thilsted, Willett et al. (2025). EAT-Lancet 2.0. <em>Lancet</em>
-                {' '}406:1625-1700. doi:10.1016/S0140-6736(25)01201-2 · Table 2, p. 1640.
+                What share of <strong>one person&apos;s daily share</strong> of the world&apos;s
+                food-system budget does this meal or day use? We compare your food against
+                limits scientists have set for climate, land, and water — divided evenly
+                across the world to give a per-person reference point.
               </p>
             </div>
           </div>

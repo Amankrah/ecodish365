@@ -198,7 +198,7 @@ export default function ScorecardPage(): JSX.Element {
       hefi:            toHefiCard(results.hefi, userType),
       heni:            toHeniCard(results.heni, userType),
       hsr:             toHsrCard(results.hsr, userType, nFoods),
-      fcs:             toFcsCard(results.fcs, userType, nFoods),
+      fcs:             toFcsCard(results.fcs, userType),
       environmental:   toEnvironmentalCard(results.environmental, userType),
       dietary_pattern: toDietaryPatternCard(results.dietary_pattern, userType, nFoods),
     };

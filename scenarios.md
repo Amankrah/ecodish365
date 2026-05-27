@@ -165,9 +165,10 @@ For each substitution and each S4 meal that contains the swapped item:
 ### Outputs
 - `results/S5/delta_table.csv` → Table 4.
 - `results/S5/fig_radar_substitutions.pdf` → Figure 8.
+- **SUBST-1 interim (2026-05-26):** single-ingredient gold panel at [`results/S5-subst/`](results/S5-subst/) via [`backend/_smoke_substitution_s5_panel.py`](backend/_smoke_substitution_s5_panel.py); S4-lite day overlay via [`backend/_smoke_substitution_s4_overlay.py`](backend/_smoke_substitution_s4_overlay.py); research protocol in [`docs/substitution_manuscript_research.md`](docs/substitution_manuscript_research.md).
 
 ### Effort
-~1 week (after S4).
+~1 week (after S4). SUBST-1 gold cases runnable now without S4 meal overlay.
 
 ### Success criterion
 All deltas reproducible; substitution 1 (beef→legumes) and 3 (SSB→water) should yield positive HENI and negative LCA single-score (i.e. win-win).

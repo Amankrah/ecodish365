@@ -837,6 +837,40 @@ export class CNFApiService {
   }
 }
 
+/** SUBST-1 Phase 1–3 — ingredient substitution analyzer. */
+export class SubstitutionApiService {
+  static async analyze(request: {
+    composition: SubstitutionCompositionItem[];
+    purpose?: SubstitutionPurpose;
+    max_suggestions?: number;
+    include_scorecard?: boolean;
+    dish_name?: string;
+    reformulation_mode?: SubstitutionReformulationMode;
+    constraints?: SubstitutionConstraints;
+  }): Promise<SubstitutionAnalyzeResponse> {
+    const response = await api.post('/substitution/analyze/', request);
+    return response.data as SubstitutionAnalyzeResponse;
+  }
+
+  static async apply(request: {
+    modified_composition: SubstitutionCompositionItem[];
+  }): Promise<SubstitutionApplyResponse> {
+    const response = await api.post('/substitution/apply/', request);
+    return response.data as SubstitutionApplyResponse;
+  }
+
+  static async batch(request: {
+    items: SubstitutionBatchItem[];
+    purpose?: SubstitutionPurpose;
+    max_suggestions?: number;
+    include_scorecard?: boolean;
+    constraints?: SubstitutionConstraints;
+  }): Promise<SubstitutionBatchResponse> {
+    const response = await api.post('/substitution/batch/', request);
+    return response.data as SubstitutionBatchResponse;
+  }
+}
+
 // --- PKG-IMG-1 Phase 1 types (mirror backend Pydantic schema) ----------
 
 export type HSRCategoryCode = '1' | '1D' | '2' | '2D' | '3' | '3D';
@@ -976,6 +1010,197 @@ export interface DecompositionResult {
   extraction_metadata: ExtractionMetadata;
   decomposition_succeeded: boolean;
   failure_reason: string | null;
+}
+
+// --- SUBST-1 Phase 1–3: ingredient substitution -----------------------
+
+export type SubstitutionPurpose =
+  | 'general_health'
+  | 'lower_sodium'
+  | 'higher_fibre'
+  | 'higher_protein'
+  | 'lower_sat_fat'
+  | 'diabetes_friendly'
+  | 'sustainability';
+
+export type SubstitutionSourceFilter = 'both' | 'cnf' | 'wafct';
+
+export type SubstitutionCulturalContext = 'auto' | 'west_africa' | 'north_america' | 'any';
+
+export type SubstitutionReformulationMode = 'singles' | 'greedy';
+
+export type SubstitutionAllergen =
+  | 'milk'
+  | 'egg'
+  | 'peanut'
+  | 'tree_nut'
+  | 'wheat'
+  | 'soy'
+  | 'fish'
+  | 'shellfish'
+  | 'sesame';
+
+export interface SubstitutionConstraints {
+  exclude_food_ids?: number[];
+  source_filter?: SubstitutionSourceFilter;
+  max_swaps?: 1 | 2 | 3 | 4;
+  vegetarian?: boolean;
+  same_functional_role?: boolean;
+  exclude_allergens?: SubstitutionAllergen[];
+  cultural_context?: SubstitutionCulturalContext;
+}
+
+export interface SubstitutionCompositionItem {
+  food_id: number;
+  mass_g: number;
+  food_description?: string;
+  food_group?: string;
+  label_name?: string;
+  position?: number;
+}
+
+export interface SubstitutionNutrientDelta {
+  before: number;
+  after: number;
+  diff: number;
+  pct: number;
+}
+
+export interface SubstitutionScorecardMetric {
+  value: number | null;
+  unit?: string;
+  max?: number;
+  invert?: boolean;
+  available?: boolean;
+  proxy?: boolean;
+  error?: string;
+  top_pattern_id?: string | null;
+  top_pattern_label?: string | null;
+}
+
+export interface SubstitutionScorecardDeltaEntry {
+  before: number | null;
+  after: number | null;
+  delta: number | null;
+  improved: boolean | null;
+}
+
+export type SubstitutionScorecardDeltaMap = Record<string, SubstitutionScorecardDeltaEntry>;
+
+export interface SubstitutionScorecard {
+  baseline: Record<string, SubstitutionScorecardMetric>;
+  modified: Record<string, SubstitutionScorecardMetric>;
+  deltas: SubstitutionScorecardDeltaMap;
+}
+
+export interface SubstitutionParetoInfo {
+  on_frontier: boolean;
+  wins_on: string[];
+}
+
+export interface SubstitutionSuggestion {
+  id?: string;
+  rule_id: string;
+  suggestion_type?: 'single_swap' | 'multi_swap' | 'reformulation_plan';
+  candidate_source?: 'curated_rule' | 'nutrient_discovery' | 'matcher_alternative' | 'combined' | 'wafct_recipe' | 'reformulation';
+  label: string;
+  rationale: string;
+  ingredient_index: number;
+  ingredient_indices?: number[];
+  reformulation_steps?: number;
+  swaps?: Array<{
+    original: SubstitutionSuggestion['original'];
+    replacement: SubstitutionSuggestion['replacement'];
+  }>;
+  original: {
+    food_id: number;
+    food_description: string;
+    food_group: string;
+    mass_g: number;
+    label_name?: string;
+  };
+  replacement: {
+    food_id: number;
+    food_description: string;
+    mass_g: number;
+  };
+  modified_composition: SubstitutionCompositionItem[];
+  hefi: { before: number; after: number; delta: number };
+  fcs?: { before: number; after: number; delta: number };
+  sustainability_proxy?: { before: number; after: number; delta: number; note?: string };
+  nutrients: Record<string, SubstitutionNutrientDelta>;
+  rank_score: number;
+  scorecard?: SubstitutionScorecard;
+  pareto?: SubstitutionParetoInfo;
+}
+
+export interface SubstitutionAnalyzeResponse {
+  success: boolean;
+  purpose: SubstitutionPurpose;
+  purpose_label: string;
+  dish_name?: string | null;
+  baseline: {
+    composition: SubstitutionCompositionItem[];
+    total_mass_g: number;
+    hefi: { total_score: number; max_score: number; components: Record<string, number> };
+    fcs?: { total_score: number; max_score: number; nova_category?: string };
+    nutrients: Record<string, number>;
+    sustainability_proxy?: number;
+    scorecard?: Record<string, SubstitutionScorecardMetric> | null;
+  };
+  suggestions: SubstitutionSuggestion[];
+  pareto_frontier?: SubstitutionSuggestion[];
+  metadata: {
+    phase: number;
+    rules_evaluated: number;
+    candidates_found: number;
+    single_suggestions?: number;
+    multi_suggestions?: number;
+    reformulation_plans?: number;
+    reformulation_mode?: string;
+    include_scorecard?: boolean;
+    constraints?: {
+      exclude_food_ids: number[];
+      source_filter: string;
+      max_swaps: number;
+      vegetarian?: boolean;
+      same_functional_role?: boolean;
+      exclude_allergens?: string[];
+      cultural_context?: string;
+    };
+    elapsed_ms: number;
+  };
+}
+
+export interface SubstitutionApplyResponse {
+  success: boolean;
+  composition: SubstitutionCompositionItem[];
+  total_mass_g: number;
+  hefi: { total_score: number; max_score: number; components: Record<string, number> };
+  fcs: { total_score: number; max_score: number; nova_category?: string };
+  nutrients: Record<string, number>;
+  sustainability_proxy: number;
+  scorecard: Record<string, SubstitutionScorecardMetric>;
+}
+
+export interface SubstitutionBatchItem {
+  label?: string;
+  composition: SubstitutionCompositionItem[];
+  purpose?: SubstitutionPurpose;
+  max_suggestions?: number;
+  constraints?: SubstitutionConstraints;
+}
+
+export interface SubstitutionBatchResponse {
+  success: boolean;
+  results: Array<{ index: number; label?: string } & SubstitutionAnalyzeResponse>;
+  errors: Array<{ index: number; message: string }>;
+  metadata: {
+    phase: number;
+    count: number;
+    succeeded: number;
+    failed: number;
+  };
 }
 
 export interface PackagedFoodExtractCombinedResponse {

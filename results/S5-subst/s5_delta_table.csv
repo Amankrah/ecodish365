@@ -1,0 +1,5 @@
+swap_id,label,mass_g,baseline_hefi,replacement_hefi,delta_hefi,dir_hefi,baseline_heni_min,replacement_heni_min,delta_heni_min,dir_heni,baseline_fcs,replacement_fcs,delta_fcs,dir_fcs,baseline_env,replacement_env,delta_env,dir_env,analyzer_top_rule,direction_pass,analyzer_pass
+beef_to_legumes,Beef → lentils,100.0,27.282135766485027,35.0,7.718,up,3.34,-16.24,-19.58,up,57.26,100.0,42.74,up,0.0003831945636234627,6.901568804420464e-06,-0.0004,up,beef_to_legumes,True,True
+milk_to_soy,Cow's milk → fortified soy,250.0,16.038358424417407,0.0,-16.038,down,-0.72,-2.88,-2.16,up,49.11,11.78,-37.33,down,0.00010491445207185566,3.62830654083543e-05,-0.0001,flat,,True,False
+cola_to_water,Cola → water,355.0,0.0,0.0,0,flat,0.33,0.09,-0.24,up,1.0,3.83,2.83,up,5.1521952879863105e-05,5.1521952879863105e-05,0.0,flat,cola_to_water,True,True
+white_to_whole_wheat,White bread → whole wheat bread,80.0,18.648989898989903,30.0,11.351,up,2.36,0.6,-1.76,up,1.33,9.84,8.51,up,1.1610580930673377e-05,1.1610580930673377e-05,0.0,flat,white_to_whole_wheat,True,True

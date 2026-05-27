@@ -47,12 +47,12 @@ const lenses = [
   },
   {
     emoji: '🧭',
-    name: 'FCS-10',
+    name: 'Food Compass',
     tagline: 'How closely a food tracks longer-life eating patterns',
-    meaning: 'Scores a food from 1 to 10, or a full day from 1 to 100, across 18 nutritional attributes linked to longer, healthier lives.',
-    citation: 'Barrett 2025, AJCN',
+    meaning: 'Scores every food on a single 1 to 100 scale across nine areas of nutrition. Higher means the food more closely resembles patterns linked to longer, healthier lives in research studies.',
+    citation: 'Mozaffarian 2021, Nature Food',
     href: '/fcs',
-    linkLabel: 'Open FCS-10',
+    linkLabel: 'Open Food Compass',
     accent: 'from-blue-500 to-cyan-600',
   },
   {
@@ -160,8 +160,8 @@ export default function HomePageContent() {
           </p>
           <p className="mt-4 text-sm text-gray-500 max-w-3xl mx-auto leading-relaxed">
             HEFI-2019 (Brassard 2022), HENI healthy-life-minutes (Stylianou 2021), Health Star Rating
-            (HSRAC v9), FCS-10 (Barrett 2025), ReCiPe 2016 LCA (AGRIBALYSE 3.2), and dietary-pattern
-            resemblance across Mediterranean, DASH, Vegan, West African staple, and more.
+            (HSRAC v9), Food Compass (Mozaffarian 2021), ReCiPe 2016 LCA (AGRIBALYSE 3.2), and
+            dietary-pattern resemblance across Mediterranean, DASH, Vegan, West African staple, and more.
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
@@ -376,7 +376,7 @@ export default function HomePageContent() {
               <li><strong>Not clinical advice.</strong> Scoring is population-anchored, not a personal diagnosis or prescription.</li>
               <li><strong>Not a single composite score.</strong> The six lenses answer different questions, so we report all six rather than fold disagreement into one number.</li>
               <li><strong>Not a whole-life-cycle footprint.</strong> ReCiPe and AGRIBALYSE cover the production phase. Household preparation and end-of-life are out of scope in this version.</li>
-              <li><strong>Not yet Canadian-anchored everywhere.</strong> HEFI is Canadian by design. HENI uses US Global Burden of Disease epidemiology, with Canadian portability noted as future work, and FCS-10 is anchored to NHANES with Canadian validation still pending.</li>
+              <li><strong>Not yet Canadian-anchored everywhere.</strong> HEFI is Canadian by design. HENI uses US Global Burden of Disease epidemiology, with Canadian portability noted as future work, and Food Compass is anchored to NHANES with Canadian validation still pending.</li>
               <li><strong>No account, no health-data collection.</strong> Your recall history and active food list live in your browser only. There is no login and no personal data stored on our servers.</li>
             </ul>
           </div>
@@ -392,7 +392,7 @@ export default function HomePageContent() {
               <li>HSRAC, <em>HSR Implementation Guide v9</em> (Dec 2025); Shahid 2020, <em>Nutrients</em> 12, 1791.</li>
               <li>Brassard et al. 2022a/b. HEFI-2019 development and evaluation. <em>APNM</em> 47, 595–610 / 582–594.</li>
               <li>Stylianou et al. 2021. HENI healthy-life-minutes framework. <em>Nature Food</em> 2, 616–627.</li>
-              <li>Barrett et al. 2025. FCS-10 simplification. <em>AJCN</em> (Mozaffarian 2021 origin; O&apos;Hearn 2022 mortality validation).</li>
+              <li>Mozaffarian et al. 2021. Food Compass nutrient profiling system. <em>Nature Food</em> 2, 809–818. O&apos;Hearn et al. 2022 mortality validation, <em>Nature Communications</em> 13, 7066.</li>
             </ul>
             <ul className="space-y-1.5 list-disc list-inside">
               <li>Huijbregts et al. 2017. ReCiPe 2016 v1.1. <em>Int. J. LCA</em> 22, 138–147. RIVM 2016-0104a (2017).</li>

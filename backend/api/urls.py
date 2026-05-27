@@ -6,6 +6,7 @@ from .views import (
     hsr_views_consolidated, fcs_views, hefi_views, heni_views,
     cnf_ai_search_views,                # AI-MATCH-1 (AI-enhanced CNF search + recipe decomposer)
     packaged_food_views,                # PKG-IMG-1 Phase 1 (image → NF panel → HSR)
+    substitution_views,                 # SUBST-1 Phase 1 (ingredient substitution analyzer)
 )
 from .views.cnf_views import (
     # Food Management
@@ -190,6 +191,17 @@ urlpatterns = [
     path('packaged-food/decompose-ingredients/',
          packaged_food_views.packaged_food_decompose_ingredients,
          name='packaged_food_decompose_ingredients'),
+
+    # SUBST-1 Phase 1–3 — ingredient substitution analyzer
+    path('substitution/analyze/',
+         substitution_views.substitution_analyze,
+         name='substitution_analyze'),
+    path('substitution/apply/',
+         substitution_views.substitution_apply,
+         name='substitution_apply'),
+    path('substitution/batch/',
+         substitution_views.substitution_batch,
+         name='substitution_batch'),
 
     # =============================================================================
     # User Management & Social Features

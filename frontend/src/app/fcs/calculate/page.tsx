@@ -74,8 +74,8 @@ export default function FCSCalculate() {
 
   // AI-MATCH-2 (2026-05-24): pick up an aggregated 24-h recall payload
   // handed off from /recall-24h. FCS scores at the food level (no per-food
-  // mass in the request shape), but i.FCS at the diet level uses energy-
-  // weighted mean across daily intake — the food list is the right input.
+  // mass in the request shape); diet-level scoring uses the energy-weighted
+  // mean across daily intake — the food list is the right input.
   useRecall24hReceiver({
     target: 'fcs',
     onIngredients: (ingredients, meta) => {
@@ -254,14 +254,10 @@ export default function FCSCalculate() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">FCS Calculator</h1>
-          {/* FIX (FCS audit #3): the previous subtitle invented an "FCS 2.0
-              algorithm" label that has no anchor in the literature. The
-              implementation is FCS-10 (Barrett 2025), an 18-attribute
-              simplification of the original 54-attribute Food Compass
-              (Mozaffarian 2021). */}
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Food Compass Calculator</h1>
           <p className="text-lg text-gray-600">
-            Calculate Food Compass Scores (FCS-10) per Mozaffarian 2021 / Barrett 2025.
+            Score how closely a food, a meal, or a whole day of eating resembles the
+            patterns linked to longer, healthier lives. Every food sits on the same 1 to 100 scale.
           </p>
           {/* Audience selector (AUDIENCE-CODE-1 2026-05-23) */}
           <div className="mt-4">
@@ -272,23 +268,19 @@ export default function FCSCalculate() {
               staleResultHint={result !== null && lastCalcUserType !== null && userType !== lastCalcUserType}
             />
           </div>
-          {/* FIX (FCS audit #5): Advanced-Algorithm banner enumerates internal
-              domain names — researcher-mode jargon. Hidden in individual mode
-              to keep the consumer surface uncluttered. */}
+          {/* Researcher / policy banner — kept brief and free of internal codes. */}
           {userType !== 'individual' && (
             <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
               <div className="flex items-center">
                 <SparklesIcon className="w-5 h-5 text-blue-600 mr-2" />
                 <span className="text-sm font-medium text-blue-900">Algorithm</span>
               </div>
-              {/* FIX (FCS audit #2): the platform implements FCS-10 (18
-                  attributes, Barrett 2025), not the original 54-attribute
-                  Mozaffarian Food Compass. The previous "54 attributes" copy
-                  contradicted the backend explanations which correctly say 18. */}
               <p className="text-sm text-blue-800 mt-1">
-                Evaluates 18 attributes across 9 domains (Mozaffarian 2021 / Barrett 2025
-                FCS-10): nutrient ratios, vitamins, minerals, food ingredients,
-                additives, processing, specific lipids, fiber &amp; protein, and phytochemicals.
+                Implements the Food Compass nutrient profiling system (Mozaffarian 2021,
+                <em> Nature Food</em> 2:809-818). Nine domains: nutrient ratios, vitamins, minerals,
+                food ingredients, additives, processing, specific lipids, fiber &amp; protein,
+                and phytochemicals. Raw domain scores are rescaled to a single 1 to 100 output
+                per the published mapping (SI Table S3).
               </p>
             </div>
           )}
@@ -517,10 +509,10 @@ export default function FCSCalculate() {
               >
                 🍳 Score a homemade dish (decompose into CNF ingredients)
               </button>
-              {/* AI-MATCH-2 (2026-05-24): 24-h dietary recall — i.FCS
-                  (O'Hearn 2022 Nat Comm 13:7066) is the energy-weighted
-                  mean FCS across daily intake, so a full day is the right
-                  unit for diet-level scoring. */}
+              {/* AI-MATCH-2 (2026-05-24): 24-h dietary recall — the diet-level
+                  Food Compass score (O'Hearn 2022, Nat Comm 13:7066) is the
+                  energy-weighted mean FCS across daily intake, so a full day
+                  is the right unit for diet-level scoring. */}
               <a
                 href="/recall-24h?then=fcs"
                 className="w-full mt-1 flex items-center justify-center gap-1.5 text-sm text-blue-700 hover:text-blue-900 hover:underline"
@@ -696,35 +688,25 @@ export default function FCSCalculate() {
                   </div>
                 )}
 
-                {/* Algorithm Information — FIX (FCS audit #1): the previous
-                    block was visible in individual mode and quoted the
-                    "7% lower mortality risk per standard deviation" i.FCS
-                    hazard ratio (O'Hearn 2022 NHANES) as if it applied to a
-                    single food, directly contradicting the explanations
-                    panel's mandatory caveat ("mortality benefit measured at
-                    the DIET level, not from a single food"). Now gated
-                    researcher/policy only.
-                    FIX (FCS audit #2): "54 Attributes" → "18 Attributes" to
-                    match FCS-10 (Barrett 2025) implementation; the original
-                    Mozaffarian 2021 Food Compass had 54.
-                    FIX (FCS audit #3): "FCS 2.0 Algorithm Details" header
-                    renamed since there's no "FCS 2.0" in the literature. */}
+                {/* Researcher / policy algorithm card. The diet-level mortality
+                    finding is gated to non-individual modes because it does not
+                    apply to a single food. */}
                 {userType !== 'individual' && (
                   <div className="bg-white rounded-lg shadow-sm p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                      Food Compass Score — Algorithm Details (FCS-10)
+                      Food Compass &mdash; algorithm details
                     </h3>
 
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                       <h4 className="text-sm font-medium text-blue-900 mb-2 flex items-center">
                         <CheckCircleIcon className="w-4 h-4 mr-2" />
-                        Scientific Validation
+                        Scientific validation
                       </h4>
                       <div className="text-sm text-blue-800 space-y-1">
-                        <p>• <strong>9-Domain Structure:</strong> Mozaffarian 2021 (Nat Food 2:809-818)</p>
-                        <p>• <strong>18 Attributes (FCS-10):</strong> Barrett 2025 (AJCN), simplified label-only variant of the 54-attribute Food Compass</p>
-                        <p>• <strong>Population Validation:</strong> 47,999 U.S. adults (NHANES 1999-2018)</p>
-                        <p>• <strong>Diet-level outcome link:</strong> i.FCS (energy-weighted mean) per 1 SD (10.9 pts) → HR 0.92 (0.88-0.95) all-cause mortality (O&apos;Hearn 2022 Nat Comm 13:7066). NOT applicable to single-food rankings.</p>
+                        <p>• <strong>Nine-domain structure:</strong> Mozaffarian 2021, <em>Nature Food</em> 2:809-818.</p>
+                        <p>• <strong>Single 1 to 100 scale:</strong> raw domain sum rescaled per Mozaffarian 2021 SI Table S3 footnote * (truncate raw at [-10.7, 26.1]; FCS = 100 - ((26.1 - raw) / 36.8) &times; 99).</p>
+                        <p>• <strong>Population validation:</strong> 47,999 U.S. adults (NHANES 1999-2018).</p>
+                        <p>• <strong>Diet-level outcome link:</strong> energy-weighted mean across daily intake, per 1 SD (10.9 pts) &rarr; HR 0.92 (0.88-0.95) all-cause mortality (O&apos;Hearn 2022, <em>Nature Communications</em> 13:7066). NOT applicable to single-food rankings.</p>
                       </div>
                     </div>
 
@@ -759,9 +741,6 @@ export default function FCSCalculate() {
                     </div>
                   </div>
                 )}
-                {/* FIX (FCS audit #6): "Analyzed Food" card removed — it just
-                    restated FCS Score + Processing Level already shown two
-                    cards above (Food Compass Score Results header). */}
               </div>
             ) : (
               <div className="bg-white rounded-lg shadow-sm p-12 text-center">

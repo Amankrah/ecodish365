@@ -93,7 +93,7 @@ const SCORE_BUTTONS: Array<{
   { id: 'hefi',            emoji: '🥗', label: 'Score HEFI-2019',     path: '/hefi/calculate',          note: 'Natural fit (Brassard 2022b)' },
   { id: 'heni',            emoji: '🧬', label: 'Score HENI',          path: '/heni/calculate',          note: 'Sums healthy-life-minutes across the day' },
   { id: 'hsr',             emoji: '⭐', label: 'Score HSR',            path: '/hsr/calculate',           note: 'Informational only — HSR is per-product' },
-  { id: 'fcs',             emoji: '🧭', label: 'Score FCS',            path: '/fcs/calculate',           note: 'i.FCS energy-weighted diet score' },
+  { id: 'fcs',             emoji: '🧭', label: 'Score Food Compass',   path: '/fcs/calculate',           note: 'Energy-weighted score across all foods for the day' },
   { id: 'environmental',   emoji: '🌍', label: 'Score Environmental',  path: '/environmental/calculate', note: 'Per-day environmental footprint' },
   // DIET-PATTERN-1 (2026-05-24): descriptive resemblance vs canonical
   // patterns. Complements the 5 scoring lenses with categorical framing.

@@ -1,0 +1,32 @@
+{
+  "cases": [
+    {
+      "swap_id": "beef_to_legumes",
+      "expect_rule": "beef_to_legumes",
+      "top_rule": "beef_to_legumes",
+      "rule_candidate_pass": true,
+      "analyzer_rank_pass": true
+    },
+    {
+      "swap_id": "milk_to_soy",
+      "expect_rule": "milk_to_soy",
+      "top_rule": null,
+      "rule_candidate_pass": true,
+      "analyzer_rank_pass": false
+    },
+    {
+      "swap_id": "cola_to_water",
+      "expect_rule": "cola_to_water",
+      "top_rule": "cola_to_water",
+      "rule_candidate_pass": true,
+      "analyzer_rank_pass": true
+    },
+    {
+      "swap_id": "white_to_whole_wheat",
+      "expect_rule": "white_to_whole_wheat",
+      "top_rule": "white_to_whole_wheat",
+      "rule_candidate_pass": true,
+      "analyzer_rank_pass": true
+    }
+  ]
+}

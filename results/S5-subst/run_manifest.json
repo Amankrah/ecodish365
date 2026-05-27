@@ -1,0 +1,9 @@
+{
+  "harness": "S5-subst substitution panel",
+  "generated_at": "2026-05-27T14:41:24.678742+00:00",
+  "git_sha": "624ba079bc3281267d8199e9d8f2ff011124cca0",
+  "seed": 20260520,
+  "cases": 4,
+  "direction_pass": 4,
+  "analyzer_rule_pass": 4
+}

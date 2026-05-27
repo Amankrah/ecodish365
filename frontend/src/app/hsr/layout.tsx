@@ -1,36 +1,48 @@
 import type { Metadata } from 'next';
 
+const SITE_URL = 'https://ecodish365.com';
+
 export const metadata: Metadata = {
-  title: "Health Star Rating (HSR) Calculator",
-  description: "Calculate Health Star Ratings using Australia's official front-of-pack labeling system. Analyze foods with our comprehensive HSR calculator, compare nutritional quality, and get detailed health insights for informed food choices.",
+  title: 'Health Star Rating (HSR) Calculator',
+  description:
+    'Rate any packaged product from 0.5 to 5 stars with the Australian and New Zealand Health Star Rating system, applied to a 6,719-food catalogue. Built for comparing similar products: which yogurt, which cereal, which loaf of bread.',
   keywords: [
-    "Health Star Rating", "HSR calculator", "Australia food rating", "front of pack labeling",
-    "food health rating", "nutritional quality score", "food comparison tool",
-    "healthy food choices", "nutrition calculator", "food labeling system",
-    "dietary assessment", "food quality rating", "health score calculator"
+    'Health Star Rating',
+    'HSR calculator',
+    'Australia food rating',
+    'New Zealand food rating',
+    'front of pack labeling',
+    'food health rating',
+    'nutritional quality score',
+    'compare products',
+    'healthy food choices',
+    'nutrition calculator',
+    'HSRAC v9',
   ],
   openGraph: {
-    title: "Health Star Rating Calculator - EcoDish365",
-    description: "Calculate official Health Star Ratings for foods. Compare nutritional quality and make healthier food choices with detailed HSR analysis.",
-    type: "website",
-    url: "https://ecodish365.com/hsr",
+    title: 'Health Star Rating (HSR) Calculator | EcoDish365',
+    description:
+      'Rate any packaged product from 0.5 to 5 stars with the Australian and New Zealand Health Star Rating system, applied to a 6,719-food catalogue.',
+    type: 'website',
+    url: `${SITE_URL}/hsr`,
     images: [
       {
-        url: "/og-hsr.png", 
+        url: `${SITE_URL}/og-hsr.png`,
         width: 1200,
         height: 630,
-        alt: "Health Star Rating Calculator",
+        alt: 'Health Star Rating Calculator',
       },
     ],
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Health Star Rating Calculator",
-    description: "Calculate official Health Star Ratings for foods and compare nutritional quality with detailed analysis.",
-    images: ["/twitter-hsr.png"],
+    card: 'summary_large_image',
+    title: 'Health Star Rating (HSR) Calculator | EcoDish365',
+    description:
+      'Rate any packaged product from 0.5 to 5 stars. Built for comparing similar products: which yogurt, which cereal, which loaf of bread.',
+    images: [`${SITE_URL}/twitter-hsr.png`],
   },
   alternates: {
-    canonical: "https://ecodish365.com/hsr",
+    canonical: `${SITE_URL}/hsr`,
   },
 };
 
@@ -40,38 +52,31 @@ export default function HSRLayout({
   children: React.ReactNode;
 }) {
   const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "Health Star Rating Calculator",
-    "description": "Professional Health Star Rating calculator using Australia's official front-of-pack labeling algorithm",
-    "url": "https://ecodish365.com/hsr",
-    "applicationCategory": "HealthApplication",
-    "operatingSystem": "Web Browser",
-    "creator": {
-      "@type": "Organization", 
-      "name": "EcoDish365",
-      "url": "https://ecodish365.com"
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Health Star Rating Calculator',
+    description:
+      'Rate packaged products from 0.5 to 5 stars using the Australian and New Zealand Health Star Rating system (HSRAC v9).',
+    url: `${SITE_URL}/hsr`,
+    applicationCategory: 'HealthApplication',
+    operatingSystem: 'Web Browser',
+    creator: {
+      '@type': 'Organization',
+      name: 'EcoDish365',
+      url: SITE_URL,
     },
-    "featureList": [
-      "Official HSR calculation algorithm",
-      "Detailed nutritional analysis",
-      "Food comparison tools",
-      "Health insights and recommendations",
-      "Meal HSR calculation",
-      "Professional reporting"
+    featureList: [
+      'HSRAC v9 star rating',
+      'Packaged product label scan',
+      'Catalogue food scoring',
+      'Compare products side by side',
+      'Scorecard across all metrics',
     ],
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
     },
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "ratingCount": "150",
-      "bestRating": "5",
-      "worstRating": "1"
-    }
   };
 
   return (

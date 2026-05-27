@@ -15,17 +15,18 @@
  */
 'use client';
 
-import { useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { Loader2, Trash2, AlertTriangle, ChevronRight } from 'lucide-react';
 import type {
   DecomposedIngredient,
   DecompositionResult,
   NFPanelExtraction,
 } from '@/lib/api';
-// FOOD-LIST-PANEL (2026-05-26): persist into the cross-page active food
-// list so the user can transfer this same packaged-food composition to
-// other scorers without re-decomposing.
 import { fromRecallAggregated, saveActiveFoodList } from '@/lib/activeFoodList';
+import { SubstitutionSuggestionsPanel } from './SubstitutionSuggestionsPanel';
+import { AIEnhancedSearch } from './AIEnhancedSearch';
+import { SourceFilter, type SourceChoice } from './SourceFilter';
+import type { SubstitutionCompositionItem, SubstitutionSuggestion } from '@/lib/api';
 
 type UserType = 'individual' | 'researcher' | 'policy';
 
@@ -33,6 +34,8 @@ interface Props {
   decomposition: DecompositionResult;
   panel: NFPanelExtraction;
   userType: UserType;
+  /** SUBST-1 Phase 1: show rule-based substitution suggestions. */
+  showSubstitutions?: boolean;
 }
 
 // Scoring routes. Names match Recall24hWizard's SCORE_BUTTONS for consistency.
@@ -74,12 +77,15 @@ function confidenceColor(c: number): string {
 }
 
 export function PackagedFoodCompositionForm({
-  decomposition, panel, userType,
+  decomposition, panel, userType, showSubstitutions = false,
 }: Props): JSX.Element {
   const [rows, setRows] = useState<DecomposedIngredient[]>(
     () => decomposition.ingredients.map(i => ({ ...i })),
   );
   const [routing, setRouting] = useState<string | null>(null);
+  const [swappingIdx, setSwappingIdx] = useState<number | null>(null);
+  const [swapQuery, setSwapQuery] = useState('');
+  const [swapSource, setSwapSource] = useState<SourceChoice>('both');
 
   const totalMass = useMemo(
     () => rows.reduce((s, r) => s + (r.mass_g || 0), 0),
@@ -103,6 +109,49 @@ export function PackagedFoodCompositionForm({
   function removeRow(idx: number): void {
     setRows(r => r.filter((_, i) => i !== idx));
   }
+
+  function applySubstitution(
+    modified: SubstitutionCompositionItem[],
+    _suggestion: SubstitutionSuggestion,
+  ): void {
+    setRows(modified.map((m, i) => ({
+      label_name: m.label_name ?? rows[i]?.label_name ?? m.food_description ?? '',
+      position: m.position ?? rows[i]?.position ?? i + 1,
+      food_id: m.food_id,
+      food_description: m.food_description ?? `Food ID ${m.food_id}`,
+      food_group: m.food_group ?? null,
+      mass_g: m.mass_g,
+      confidence: rows[i]?.confidence ?? 0.7,
+      mass_source: rows[i]?.mass_source ?? 'position_inferred',
+    })));
+  }
+
+  function manualSwap(
+    idx: number,
+    picked: { food_id: number; food_description: string; food_group?: string },
+  ): void {
+    setRows(r => {
+      const next = [...r];
+      next[idx] = {
+        ...next[idx],
+        food_id: picked.food_id,
+        food_description: picked.food_description,
+        food_group: picked.food_group ?? next[idx].food_group,
+      };
+      return next;
+    });
+    setSwappingIdx(null);
+    setSwapQuery('');
+  }
+
+  const compositionForSubstitution: SubstitutionCompositionItem[] = rows.map(r => ({
+    food_id: r.food_id,
+    mass_g: r.mass_g,
+    food_description: r.food_description,
+    food_group: r.food_group ?? undefined,
+    label_name: r.label_name,
+    position: r.position,
+  }));
 
   function routeTo(route: typeof SCORE_ROUTES[number]): void {
     setRouting(route.id);
@@ -233,12 +282,13 @@ export function PackagedFoodCompositionForm({
               <th className="px-2 py-1.5 text-right w-24">Mass (g)</th>
               <th className="px-2 py-1.5 text-right w-20">% total</th>
               <th className="px-2 py-1.5 text-center w-16">Conf.</th>
-              <th className="px-2 py-1.5 text-right w-12"><span className="sr-only">Remove</span></th>
+              <th className="px-2 py-1.5 text-right w-20">Actions</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((r, idx) => (
-              <tr key={idx} className="border-t hover:bg-gray-50">
+              <Fragment key={idx}>
+              <tr className="border-t hover:bg-gray-50">
                 <td className="px-2 py-1.5 text-gray-500">{r.position}</td>
                 <td className="px-2 py-1.5">
                   <p className="text-gray-900">{r.label_name}</p>
@@ -270,17 +320,59 @@ export function PackagedFoodCompositionForm({
                     {(r.confidence * 100).toFixed(0)}
                   </span>
                 </td>
-                <td className="px-2 py-1.5 text-right">
+                <td className="px-2 py-1.5 text-right space-x-1">
+                  <button
+                    type="button"
+                    onClick={() => { setSwappingIdx(idx); setSwapQuery(r.food_description); }}
+                    className="text-xs text-violet-700 hover:underline"
+                  >
+                    Swap
+                  </button>
                   <button
                     type="button"
                     onClick={() => removeRow(idx)}
                     aria-label={`Remove ${r.label_name}`}
-                    className="text-gray-400 hover:text-red-600"
+                    className="text-gray-400 hover:text-red-600 inline-flex"
                   >
                     <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                   </button>
                 </td>
               </tr>
+              {swappingIdx === idx && (
+                <tr key={`swap-${idx}`} className="border-t bg-violet-50/30">
+                  <td colSpan={6} className="px-3 py-3">
+                    <p className="text-xs text-gray-600 mb-2">
+                      Manual swap for <em>{r.food_description}</em>:
+                    </p>
+                    <div className="mb-2">
+                      <SourceFilter source={swapSource} onChange={setSwapSource} accent="purple" />
+                    </div>
+                    <input
+                      type="text"
+                      value={swapQuery}
+                      onChange={e => setSwapQuery(e.target.value)}
+                      placeholder="Search CNF/WAFCT replacement…"
+                      className="w-full mb-2 border border-gray-300 rounded px-2 py-1.5 text-sm"
+                      aria-label={`Search replacement for ${r.label_name}`}
+                    />
+                    <AIEnhancedSearch
+                      query={swapQuery}
+                      userType={userType}
+                      accent="purple"
+                      source={swapSource}
+                      onSelect={picked => manualSwap(idx, picked)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => { setSwappingIdx(null); setSwapQuery(''); }}
+                      className="mt-2 text-xs text-gray-500 hover:text-gray-800"
+                    >
+                      Cancel
+                    </button>
+                  </td>
+                </tr>
+              )}
+              </Fragment>
             ))}
             {rows.length === 0 && (
               <tr><td colSpan={6} className="px-4 py-6 text-center text-gray-500 text-sm">
@@ -290,6 +382,14 @@ export function PackagedFoodCompositionForm({
           </tbody>
         </table>
       </div>
+
+      {showSubstitutions && (
+        <SubstitutionSuggestionsPanel
+          composition={compositionForSubstitution}
+          onApply={applySubstitution}
+          userType={userType}
+        />
+      )}
 
       {/* Macro reconciliation (researcher mode only — too dense for individual) */}
       {userType !== 'individual' && Object.keys(decomposition.macro_reconciliation).length > 0 && (

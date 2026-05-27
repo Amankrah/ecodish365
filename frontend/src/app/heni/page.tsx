@@ -12,16 +12,17 @@ import {
   BarChart3,
 } from 'lucide-react';
 
-// Stylianou 2021 (Nature Food 2:616-627), Suppl. Table 3 illustrative examples.
+// Illustrative per-serving values from Stylianou 2021 (Nature Food 2:616-627),
+// Supplementary Table 3. Positive minutes add to healthy life, negative subtract.
 const heniExamples = [
-  { food: 'Processed meat (hot dog)', minutes: -36, color: 'red' },
-  { food: 'Sugar-sweetened beverage (12 oz)', minutes: -12, color: 'red' },
-  { food: 'White bread (1 slice)', minutes: -1.8, color: 'amber' },
-  { food: 'Egg (1, scrambled)', minutes: -0.6, color: 'amber' },
-  { food: 'Chicken wing', minutes: +0.1, color: 'gray' },
-  { food: 'Apple (medium)', minutes: +2.0, color: 'green' },
-  { food: 'Broccoli (1 cup)', minutes: +4.9, color: 'green' },
-  { food: 'Walnuts (1 oz)', minutes: +7.6, color: 'green' },
+  { food: 'A hot dog',                   minutes: -36,   color: 'red'   },
+  { food: 'A 12 oz sugary drink',        minutes: -12,   color: 'red'   },
+  { food: 'A slice of white bread',      minutes: -1.8,  color: 'amber' },
+  { food: 'A scrambled egg',             minutes: -0.6,  color: 'amber' },
+  { food: 'A chicken wing',              minutes:  0.1,  color: 'gray'  },
+  { food: 'A medium apple',              minutes:  2.0,  color: 'green' },
+  { food: 'A cup of broccoli',           minutes:  4.9,  color: 'green' },
+  { food: 'A handful of walnuts (1 oz)', minutes:  7.6,  color: 'green' },
 ];
 
 const colorClasses: Record<string, string> = {
@@ -44,17 +45,19 @@ export default function HENIHomePage() {
             Health Nutritional Index (HENI)
           </h1>
           <p className="text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed">
-            Net <strong>minutes of healthy life</strong> a food adds or subtracts per serving —
-            computed from <strong>15 GBD dietary risk factors</strong> via Disability-Adjusted Life
-            Year (DALY) loss attributable to US adult diet, then converted to time.
+            How many <strong>minutes of healthy life</strong> does this food add or subtract,
+            on average, if it shows up in a typical day&apos;s eating? HENI takes the
+            best-known links between food and disease, and turns each serving into a
+            number of minutes you can feel in your bones.
           </p>
           <div className="inline-flex items-start gap-2 max-w-2xl mx-auto bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 mt-5 text-sm text-amber-900 text-left">
             <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
             <span>
-              <strong>Population-marginal estimate, not a personal prediction.</strong> Assumes
-              each food&apos;s effect is independent and multiplicative; US-anchored
-              epidemiology (Canadian portability is documented future work). For day-level
-              guideline adherence see <Link href="/hefi" className="underline">HEFI-2019</Link>.
+              The minutes are a population estimate, not a personal forecast. HENI assumes
+              each food adds or subtracts a small, independent effect on top of a typical
+              eating pattern, and it draws on US data, so the picture for any one person
+              will differ. For Food Guide adherence on a full day of eating, try{' '}
+              <Link href="/hefi" className="underline">HEFI-2019</Link>.
             </span>
           </div>
         </div>
@@ -66,10 +69,10 @@ export default function HENIHomePage() {
               <div className="inline-flex items-center justify-center p-3 bg-blue-100 rounded-full mb-3 group-hover:bg-blue-200 transition-colors">
                 <Calculator className="h-7 w-7 text-blue-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">HENI Calculator</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Score a food, meal, or day</h3>
               <p className="text-gray-600 leading-relaxed text-sm">
-                Score a meal or full day with healthy-life minutes, risk-factor breakdown,
-                and audience-aware explanations (individual, researcher, or policy).
+                Build the food list, pick serving sizes, and get the total minutes added or
+                subtracted. You can break the result down by which foods drove it.
               </p>
               <div className="mt-3 text-blue-700 font-medium group-hover:text-blue-800 text-sm">
                 Start analysis →
@@ -82,10 +85,11 @@ export default function HENIHomePage() {
               <div className="inline-flex items-center justify-center p-3 bg-purple-100 rounded-full mb-3 group-hover:bg-purple-200 transition-colors">
                 <LayoutGrid className="h-7 w-7 text-purple-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">✨ Multi-metric Scorecard</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">See it next to other lenses</h3>
               <p className="text-gray-600 leading-relaxed text-sm">
-                Combine HENI with HEFI, FCS, HSR, environmental impact, and dietary pattern on one
-                panel. Toggle <em>Policy</em> audience mode for procurement and briefing context.
+                The Scorecard runs HENI alongside HEFI, Food Compass, HSR, environmental
+                impact, and dietary pattern, on the same list of foods. Different questions,
+                one page.
               </p>
               <div className="mt-3 text-purple-700 font-medium group-hover:text-purple-800 text-sm">
                 Open Scorecard →
@@ -102,9 +106,9 @@ export default function HENIHomePage() {
           >
             <CalendarClock className="h-6 w-6 text-blue-700 flex-shrink-0" />
             <div className="flex-1">
-              <div className="text-sm font-semibold text-gray-900">Build a 24-h recall → HENI</div>
+              <div className="text-sm font-semibold text-gray-900">Build a 24-hour recall</div>
               <div className="text-xs text-gray-600">
-                Aggregate occasion-by-occasion eating, then sum HENI minutes across the day.
+                Log a full day one meal at a time, then read the total minutes across the day.
               </div>
             </div>
           </Link>
@@ -114,9 +118,9 @@ export default function HENIHomePage() {
           >
             <BarChart3 className="h-6 w-6 text-purple-700 flex-shrink-0" />
             <div className="flex-1">
-              <div className="text-sm font-semibold text-gray-900">Policy dashboard</div>
+              <div className="text-sm font-semibold text-gray-900">Policy view</div>
               <div className="text-xs text-gray-600">
-                Population-level framing for procurement, taxation, and food-environment analysis.
+                Population-level framing for procurement, food taxation, and menu policy work.
               </div>
             </div>
           </Link>
@@ -124,11 +128,12 @@ export default function HENIHomePage() {
 
         {/* Worked examples */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-12">
-          <h2 className="text-xl font-bold text-gray-900 mb-1">What does &quot;minutes of healthy life&quot; mean?</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-1">What does &ldquo;minutes of healthy life&rdquo; feel like?</h2>
           <p className="text-sm text-gray-600 mb-4">
-            Illustrative per-serving values from Stylianou et&nbsp;al.&nbsp;2021 (Nature Food, Suppl.&nbsp;Table 3).
-            Positive = adds time; negative = subtracts time. The signal is small per serving and
-            adds up across a day or year of eating.
+            A few published per-serving examples to set the scale. Positive numbers add
+            time. Negative numbers subtract. Most foods sit close to zero. A single
+            serving rarely moves the needle on its own. It is the day, the week, and the
+            year that add up.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {heniExamples.map((ex) => (
@@ -147,84 +152,96 @@ export default function HENIHomePage() {
 
         {/* Methodology summary */}
         <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">How HENI is computed</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">How the number is built</h2>
           <ol className="space-y-4 text-sm text-gray-700 list-decimal list-inside">
             <li>
-              <strong className="text-gray-900">15 GBD dietary risk factors.</strong> For each food,
-              identify which Global Burden of Disease 2017 dietary risks it contributes to
-              (fruits, vegetables, nuts, whole grains, legumes, milk, processed meat, red meat,
-              sugar-sweetened beverages, sodium, trans fat, fibre and sources, cholesterol,
-              polyunsaturated fat, alcohol).
+              <strong className="text-gray-900">Look at fifteen ways food affects health.</strong>{' '}
+              These are the dietary factors the Global Burden of Disease research has the
+              strongest evidence for: fruit, vegetables, legumes, nuts and seeds, whole
+              grains, milk, red meat, processed meat, sugary drinks, fibre, omega-3 fats,
+              polyunsaturated fats, trans fats, calcium, and sodium.
             </li>
             <li>
-              <strong className="text-gray-900">DALY-loss attribution.</strong> Use risk-outcome
-              dose-response functions from the GBD 2017 Diet Collaborators to compute the change in
-              DALYs (micro-units) per serving for the US adult diet population.
+              <strong className="text-gray-900">Translate to lost or gained healthy life.</strong>{' '}
+              For each factor your food carries, we apply a coefficient from the published
+              research that says how much disease burden one serving adds or removes,
+              on average, in the population.
             </li>
             <li>
-              <strong className="text-gray-900">Convert DALYs → minutes.</strong> Multiply by the
-              published constant <code className="text-xs bg-gray-100 px-1 py-0.5 rounded">−0.5256 min / μDALY</code>{' '}
-              (Stylianou&nbsp;2021), with sign convention so positive minutes = healthy life added.
+              <strong className="text-gray-900">Turn the burden into time.</strong> A
+              published conversion (Stylianou 2021) turns one micro-unit of disease
+              burden into about half a minute of healthy life. The sign is set so that
+              a positive number adds time and a negative number subtracts.
             </li>
             <li>
-              <strong className="text-gray-900">Aggregate across foods.</strong> Sum per-food minutes
-              for a meal or full day. The 24-h recall handoff above is the cleanest input.
+              <strong className="text-gray-900">Add up across your foods.</strong> Each
+              food contributes its own slice, plus or minus. The total is what shows in
+              the result. The 24-hour recall is the cleanest input because it lets you
+              see the day as a whole.
             </li>
           </ol>
         </div>
 
         {/* Stats */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-12">
-          <h2 className="text-xl font-bold text-gray-900 mb-5">Scope</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-5">At a glance</h2>
           <div className="grid md:grid-cols-4 gap-6">
             <div className="text-center">
               <div className="text-3xl font-bold text-blue-600 mb-1">15</div>
-              <div className="text-sm text-gray-700 font-medium">GBD dietary risk factors</div>
-              <div className="text-xs text-gray-500 mt-1">Stylianou 2021 Table 1</div>
+              <div className="text-sm text-gray-700 font-medium">Dietary factors</div>
+              <div className="text-xs text-gray-500 mt-1">
+                The strongest food-to-disease links in the global burden research.
+              </div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-green-600 mb-1">6,719</div>
-              <div className="text-sm text-gray-700 font-medium">Foods in catalog</div>
-              <div className="text-xs text-gray-500 mt-1">CNF 5,691 + WAFCT 1,028</div>
+              <div className="text-sm text-gray-700 font-medium">Foods in the catalogue</div>
+              <div className="text-xs text-gray-500 mt-1">
+                5,691 Canadian foods plus 1,028 West African foods.
+              </div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-purple-600 mb-1">−0.526</div>
-              <div className="text-sm text-gray-700 font-medium">min / μDALY conversion</div>
-              <div className="text-xs text-gray-500 mt-1">Published constant</div>
+              <div className="text-3xl font-bold text-purple-600 mb-1">½ min</div>
+              <div className="text-sm text-gray-700 font-medium">Per micro-DALY of burden</div>
+              <div className="text-xs text-gray-500 mt-1">
+                The published constant that turns burden into time.
+              </div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-amber-600 mb-1">GBD 2017</div>
-              <div className="text-sm text-gray-700 font-medium">Epidemiology vintage</div>
-              <div className="text-xs text-gray-500 mt-1">Lancet 392:1958</div>
+              <div className="text-3xl font-bold text-amber-600 mb-1">US</div>
+              <div className="text-sm text-gray-700 font-medium">Population base</div>
+              <div className="text-xs text-gray-500 mt-1">
+                Risk patterns are anchored to US adult eating. Canadian recalibration is on the roadmap.
+              </div>
             </div>
           </div>
         </div>
 
         {/* Food databases */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-12">
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Food composition databases</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Where the foods come from</h2>
           <p className="text-sm text-gray-700 mb-4">
-            HENI is computed on every food in our cross-database catalog. The 15 GBD dietary risk
-            factors are mapped to CNF + WAFCT food groups via the same pipeline used for HEFI / HSR / FCS.
-            WAFCT&apos;s phytate / IP3-6 columns (which would matter for iron / zinc bioavailability)
-            are not yet wired into HENI scoring — a researcher-mode caveat surfaces when a WAFCT food
-            is present.
+            HENI runs on the same food catalogue used by every other tool here. The
+            Canadian Nutrient File supplies most of it, and the FAO West African Food
+            Composition Table covers staples like fonio, baobab pulp, and dried fish.
+            When a West African food shows up in your meal, the researcher view flags
+            the small measurement differences so nothing slips by quietly.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="border border-gray-100 rounded-lg p-3">
-              <div className="text-xs font-semibold text-blue-700 uppercase tracking-wide">Active</div>
+              <div className="text-xs font-semibold text-blue-700 uppercase tracking-wide">Home base</div>
               <div className="text-sm font-medium text-gray-900 mt-1">Canadian Nutrient File</div>
-              <div className="text-xs text-gray-600 mt-0.5">5,691 foods · Health Canada</div>
+              <div className="text-xs text-gray-600 mt-0.5">5,691 foods from Health Canada.</div>
             </div>
             <div className="border border-gray-100 rounded-lg p-3">
-              <div className="text-xs font-semibold text-blue-700 uppercase tracking-wide">Active</div>
+              <div className="text-xs font-semibold text-blue-700 uppercase tracking-wide">Extension</div>
               <div className="text-sm font-medium text-gray-900 mt-1">FAO/INFOODS WAFCT 2019</div>
-              <div className="text-xs text-gray-600 mt-0.5">1,028 West African foods · researcher caveat for HENI</div>
+              <div className="text-xs text-gray-600 mt-0.5">1,028 West African foods.</div>
             </div>
             <div className="border border-dashed border-gray-300 rounded-lg p-3 text-gray-500">
               <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Planned</div>
-              <div className="text-sm font-medium text-gray-700 mt-1">Further composition tables</div>
-              <div className="text-xs mt-0.5">Additional regional FCTs + Canadian-anchored GBD risk-factor recalibration.</div>
+              <div className="text-sm font-medium text-gray-700 mt-1">More regional tables</div>
+              <div className="text-xs mt-0.5">Plus a future Canadian recalibration of the risk coefficients.</div>
             </div>
           </div>
         </div>
@@ -233,13 +250,30 @@ export default function HENIHomePage() {
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-12">
           <h2 className="text-xl font-semibold text-amber-900 mb-3 flex items-center gap-2">
             <AlertTriangle className="w-5 h-5" />
-            What HENI is <em>not</em>
+            What HENI is not
           </h2>
-          <ul className="space-y-1.5 text-sm text-amber-900 list-disc list-inside">
-            <li><strong>Not a personal life-expectancy prediction.</strong> HENI is the population-marginal effect; your individual outcome depends on factors HENI doesn&apos;t model.</li>
-            <li><strong>Not applicable to radical diet restructuring.</strong> Assumes small substitutions; the multiplicative-independence assumption breaks under wholesale change.</li>
-            <li><strong>Not Canadian-validated.</strong> Built on US epidemiology; Canadian portability is documented future work in the manuscript.</li>
-            <li><strong>Limited GBD scope.</strong> Excludes saturated fat (modelled indirectly via cholesterol), vitamin D, ultra-processing, cooking methods, and bioavailability.</li>
+          <ul className="space-y-2 text-sm text-amber-900 list-disc list-inside">
+            <li>
+              <strong>Not a personal life-expectancy prediction.</strong> The minutes are
+              what you would see on average in the population, not what you will see in
+              your own body. Your outcome depends on a lot HENI does not model.
+            </li>
+            <li>
+              <strong>Not built for dramatic diet changes.</strong> HENI assumes you are
+              adding or swapping a serving here and there. If you wholesale rebuild your
+              eating, the simple add-up no longer holds.
+            </li>
+            <li>
+              <strong>Not Canadian-validated.</strong> The risk coefficients are anchored
+              to US adult eating. Adapting them for Canadian intake is documented future
+              work.
+            </li>
+            <li>
+              <strong>Not everything that matters.</strong> Saturated fat on its own,
+              vitamin D, how food is processed, how it is cooked, and how well your
+              body absorbs nutrients are all left out. The fifteen factors are what the
+              evidence is strongest for, not the whole picture.
+            </li>
           </ul>
         </div>
 
@@ -249,14 +283,13 @@ export default function HENIHomePage() {
             <div className="inline-flex items-center justify-center p-2 bg-blue-100 rounded-lg mb-3">
               <TrendingUp className="h-5 w-5 text-blue-600" />
             </div>
-            <h3 className="font-semibold text-gray-900 mb-1">Audience modes</h3>
+            <h3 className="font-semibold text-gray-900 mb-1">Three ways to read every result</h3>
             <p className="text-sm text-gray-600">
-              Three explanation packs (AUDIENCE-CODE-1):
-              <strong> Individual</strong> (plain-English minutes-of-life framing),
-              <strong> Researcher</strong> (per-risk-factor breakdown, GBD 2017
-              dose-response provenance, conversion-constant audit), and
-              <strong> Policy</strong> (population framing for procurement &
-              substitution analyses).
+              The numbers stay the same. The story around them changes. The everyday view
+              gives you the minutes in plain English. The researcher view breaks the
+              minutes down across the fifteen factors and shows the coefficients behind
+              them. The policy view frames the same numbers for procurement, taxation,
+              and food-environment work.
             </p>
           </div>
 
@@ -266,10 +299,11 @@ export default function HENIHomePage() {
             </div>
             <h3 className="font-semibold text-gray-900 mb-1">Pair with other lenses</h3>
             <p className="text-sm text-gray-600">
-              HENI answers <em>&quot;how many minutes?&quot;</em>; HEFI answers <em>&quot;does this
-              align with the Food Guide?&quot;</em>; HSR answers <em>&quot;is this product
-              better than its peers?&quot;</em> — different questions about the same foods.
-              The <Link href="/scorecard" className="text-blue-700 underline">Scorecard</Link> runs all six in parallel.
+              HENI answers &ldquo;how many minutes?&rdquo;. HEFI answers &ldquo;does this
+              line up with Canada&apos;s Food Guide?&rdquo;. HSR answers &ldquo;is this
+              product better than the others next to it on the shelf?&rdquo;. The{' '}
+              <Link href="/scorecard" className="text-blue-700 underline">Scorecard</Link>{' '}
+              runs all six in one go.
             </p>
           </div>
 
@@ -277,12 +311,13 @@ export default function HENIHomePage() {
             <div className="inline-flex items-center justify-center p-2 bg-purple-100 rounded-lg mb-3">
               <Heart className="h-5 w-5 text-purple-600" />
             </div>
-            <h3 className="font-semibold text-gray-900 mb-1">Primary references</h3>
-            <ul className="text-xs text-gray-700 space-y-1 list-disc list-inside">
-              <li>Stylianou K. S. et al. (2021). HENI framework. <em>Nature Food</em> 2, 616–627.</li>
-              <li>Stylianou K. S. et al. (2016). LCA × nutrition method. <em>Int J LCA</em> 21, 734–746.</li>
-              <li>GBD 2017 Diet Collaborators. <em>Lancet</em> 393, 1958–1972.</li>
-            </ul>
+            <h3 className="font-semibold text-gray-900 mb-1">Where the science comes from</h3>
+            <p className="text-sm text-gray-700 leading-relaxed">
+              HENI was developed by Stylianou and colleagues and published in <em>Nature
+              Food</em> in 2021. It builds on the Global Burden of Disease food research
+              and on earlier life-cycle work that combined nutrition and environmental
+              impact in a single frame.
+            </p>
           </div>
         </div>
       </div>

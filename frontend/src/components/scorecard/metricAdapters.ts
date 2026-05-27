@@ -406,7 +406,6 @@ function extractFcsScore(raw: unknown): number | null {
 export function toFcsCard(
   outcome: MetricOutcome<{ data: FCSResult }>,
   userType: UserType,
-  nFoods: number,
 ): CardModel {
   if (outcome.status !== 'fulfilled') {
     return errorCard('fcs', outcome.status === 'rejected' ? outcome.reason : 'Skipped');
@@ -418,11 +417,17 @@ export function toFcsCard(
     : raw;
   const nova = typeof dataLayer.nova_category === 'string' ? dataLayer.nova_category : undefined;
   const meta = META.fcs;
-  const isDayScale = nFoods >= 2;
+  // Food Compass is a single 1-100 scale: 70+ encourage, 31-69 moderate, 30 or below limit.
+  // The same scale is used whether you score one food or a whole day's worth.
   const headline = fcs === null ? '—' : `${fcs.toFixed(0)} / 100`;
-  const subline = nova
-    ? nova.replace(/_/g, ' ').toLowerCase()
-    : undefined;
+  let band: string | undefined;
+  if (fcs !== null) {
+    if (fcs >= 70) band = 'Encourage';
+    else if (fcs >= 31) band = 'Moderate';
+    else band = 'Limit';
+  }
+  const novaPretty = nova ? nova.replace(/_/g, ' ').toLowerCase() : undefined;
+  const subline = [band, novaPretty].filter(Boolean).join(' · ') || undefined;
   return {
     metric: 'fcs',
     title: meta.title,
@@ -430,15 +435,13 @@ export function toFcsCard(
     headline,
     subline,
     meaning: pickMeaning('fcs', userType, outcome.explanations),
-    caveat: isDayScale
-      ? 'Combined-meal FCS uses energy-weighted nutrients and ingredient flags. For a full breakdown, open the FCS calculator.'
-      : pickCaveat('fcs', userType, outcome.explanations),
+    caveat: pickCaveat('fcs', userType, outcome.explanations),
     ctaHref: meta.ctaHref,
     ctaLabel: meta.ctaLabel,
     accent: meta.accent,
     status: fcs === null ? 'hint' : 'ok',
     hint: fcs === null
-      ? 'FCS could not score this combination. Open the full FCS breakdown for details.'
+      ? 'Food Compass could not score this combination. Open the full breakdown for details.'
       : undefined,
   };
 }

@@ -14,8 +14,8 @@ export const LENS_NUTRIENT_PANELS = {
     patterns: ['ENERGY', 'PROTEIN', 'FIBRE', 'SODIUM', 'SUGARS', 'SATURATED', 'CALCIUM'],
   },
   fcs: {
-    label: 'FCS-10 attributes',
-    hint: 'Longer-life eating pattern score uses 18 nutritional attributes; key ones shown here.',
+    label: 'Food Compass attributes',
+    hint: 'Longer-life eating pattern score looks at nine areas of nutrition; key items shown here.',
     patterns: ['ENERGY', 'PROTEIN', 'FIBRE', 'SODIUM', 'SUGARS', 'SATURATED', 'POTASSIUM', 'MAGNESIUM'],
   },
   heni: {

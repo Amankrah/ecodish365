@@ -19,7 +19,7 @@ const lenses = [
   { title: 'HEFI-2019', href: '/hefi' },
   { title: 'HENI', href: '/heni' },
   { title: 'HSR', href: '/hsr' },
-  { title: 'FCS-10', href: '/fcs' },
+  { title: 'Food Compass', href: '/fcs' },
   { title: 'Environmental', href: '/environmental' },
   { title: 'Dietary pattern', href: '/dietary-pattern' },
 ];

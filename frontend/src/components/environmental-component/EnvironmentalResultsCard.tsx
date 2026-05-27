@@ -415,11 +415,11 @@ export const EnvironmentalResultsCard: React.FC<EnvironmentalResultsCardProps> =
                 <span className="font-medium text-gray-900">Resource Scarcity</span>
               </div>
               <div className="text-sm font-medium text-orange-700">
-                Not estimable in v1
+                Not shown yet
               </div>
               <div className="text-xs text-gray-600 mt-1">
-                Both Fossil and Mineral resource scarcity midpoints are excluded
-                from the v1 consumed vector (returns when TODO-CODE-LCA-2 lands).
+                Fossil and mineral resource scarcity aren&apos;t shown yet — they need
+                a paid life-cycle dataset we plan to add later.
               </div>
             </div>
           </div>
