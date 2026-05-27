@@ -14,16 +14,10 @@ from heni_calculator.heni.models.ingredient import Ingredient
 from .heni_explanations import get_explanations as get_heni_explanations
 from .heni_analysis_helpers import (
     _identify_primary_health_drivers,
-    _get_epidemiological_context, 
+    _get_epidemiological_context,
     _estimate_population_impact,
     _generate_policy_recommendations,
     _get_comparison_benchmarks,
-    _classify_dietary_pattern,
-    _assess_intervention_priority,
-    _identify_target_food_groups,
-    _calculate_serving_impact,
-    _aggregate_disease_burdens,
-    _aggregate_risk_factors
 )
 
 logger = logging.getLogger(__name__)
@@ -43,6 +37,13 @@ def heni_calculate(request):
         user_type = str(request.data.get('user_type', 'individual'))
         if user_type not in ('individual', 'researcher', 'policy'):
             user_type = 'individual'
+        from api.views.packaged_food_caveat import (
+            parse_decomposition_provenance,
+            build_packaged_food_caveat,
+        )
+        decomposition_provenance = parse_decomposition_provenance(
+            request.data.get('decomposition_provenance'),
+        )
 
         if not meal_data:
             return Response({"error": "'meal' array with ingredients is required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -103,6 +104,12 @@ def heni_calculate(request):
             comprehensive_result['explanations'].update(build_wafct_caveat(
                 [item.get('food_id') for item in meal_data if item.get('food_id')],
                 indicator='heni', user_type=user_type,
+            ))
+        except Exception:  # noqa: BLE001
+            pass
+        try:
+            comprehensive_result['explanations'].update(build_packaged_food_caveat(
+                'heni', user_type, decomposition_provenance=decomposition_provenance,
             ))
         except Exception:  # noqa: BLE001
             pass
@@ -226,119 +233,3 @@ def get_food_heni_profile(request, food_id):
     except Exception as e:
         logger.exception(f"Error getting HENI profile for food ID {food_id}: {str(e)}")
         return Response({"error": "An unexpected error occurred while retrieving food profile"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-@api_view(['POST'])
-@permission_classes([AllowAny])
-@seo_metadata(
-    title="HENI Diet Pattern Analysis | DISH Research", 
-    description="Analyze complete dietary patterns for population health impact assessment",
-    keywords="HENI, diet analysis, population health, dietary patterns, epidemiology"
-)
-def analyze_dietary_pattern(request):
-    """
-    Comprehensive dietary pattern analysis for population health studies
-    Designed for researchers and policy makers analyzing dietary interventions
-    """
-    try:
-        pattern_data = request.data.get('dietary_pattern', {})
-        meals = pattern_data.get('meals', [])
-        analysis_parameters = pattern_data.get('parameters', {})
-        
-        if not meals:
-            return Response({"error": "At least one meal is required for dietary pattern analysis"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        integrator = get_cnf_integrator()
-
-        # Analyze each meal
-        meal_analyses = []
-        total_daily_heni = 0
-        total_daily_kcal = 0
-        
-        for i, meal in enumerate(meals):
-            meal_ingredients = []
-            meal_name = meal.get('meal_name', f'Meal {i+1}')
-            
-            for item in meal.get('foods', []):
-                ingredient = Ingredient(
-                    food_id=item['food_id'],
-                    amount=float(item['amount']),
-                    unit=item.get('unit', 'g'),
-                    cnf_integrator=integrator
-                )
-                meal_ingredients.append(ingredient)
-            
-            meal_analysis = calculate_meal_heni_response(
-                meal_ingredients,
-                llm_api_key=resolve_llm_api_key(),
-                cnf_integrator=integrator,
-            )
-            
-            meal_analysis['meal_name'] = meal_name
-            meal_analyses.append(meal_analysis)
-            
-            total_daily_heni += meal_analysis['heni_scores']['total_heni_score']
-            total_daily_kcal += meal_analysis['meal_composition']['total_energy_kcal']
-        
-        # Population analysis
-        population_size = analysis_parameters.get('population_size', 100000)
-        time_horizon_years = analysis_parameters.get('time_horizon_years', 10)
-        
-        # Calculate population impact
-        from heni_calculator.heni.core.daly_calculator import DALYCalculator
-        daly_calc = DALYCalculator()
-        
-        # Simulate population results (simplified for API)
-        mock_individual_results = []
-        for _ in range(min(1000, population_size // 100)):  # Sample for efficiency
-            # Create mock HENIResult with current analysis
-            class MockResult:
-                def __init__(self, total_heni, health_minutes):
-                    self.total_heni_score = total_heni
-                    self.health_impact_minutes = health_minutes
-            
-            mock_individual_results.append(MockResult(total_daily_heni, total_daily_heni * 0.5256))
-        
-        population_impact = daly_calc.calculate_population_impact(mock_individual_results, population_size)
-        
-        # Comprehensive analysis result
-        analysis_result = {
-            "dietary_pattern_summary": {
-                "total_meals_analyzed": len(meals),
-                "daily_heni_score": round(total_daily_heni, 2),
-                "daily_energy_kcal": round(total_daily_kcal, 1),
-                "daily_health_impact_minutes": round(total_daily_heni * 0.5256, 1),
-                "pattern_classification": _classify_dietary_pattern(total_daily_heni)
-            },
-            "meal_breakdowns": meal_analyses,
-            "population_health_impact": {
-                **population_impact,
-                "time_horizon_years": time_horizon_years,
-                "projected_dalys_avoided": population_impact.get('total_dalys_avoided', 0) * time_horizon_years,
-                "health_economic_value": population_impact.get('economic_value_usd', 0) * time_horizon_years
-            },
-            "policy_insights": {
-                "intervention_priority": _assess_intervention_priority(meal_analyses),
-                "target_food_groups": _identify_target_food_groups(meal_analyses),
-                "expected_impact_per_serving_change": _calculate_serving_impact(meal_analyses)
-            },
-            "epidemiological_context": {
-                "primary_disease_burdens": _aggregate_disease_burdens(meal_analyses),
-                "risk_factor_contributions": _aggregate_risk_factors(meal_analyses),
-                "evidence_strength": "High (based on Global Burden of Disease meta-analyses)"
-            }
-        }
-        
-        return Response({
-            "success": True,
-            "data": analysis_result,
-            "metadata": {
-                "analysis_type": "Comprehensive Dietary Pattern Assessment",
-                "population_scope": f"{population_size:,} individuals over {time_horizon_years} years",
-                "methodology": "DALY-based population health impact modeling"
-            }
-        })
-    
-    except Exception as e:
-        logger.exception(f"Error in dietary pattern analysis: {str(e)}")
-        return Response({"error": "An unexpected error occurred during dietary pattern analysis"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

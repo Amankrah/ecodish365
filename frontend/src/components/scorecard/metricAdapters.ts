@@ -145,11 +145,20 @@ function pickCaveat(
   userType: UserType,
   explanations: ExplanationsBlock | undefined,
 ): string {
+  const inferredMsg = explanations?.inferred_composition_caveat?.message;
+  const wafctMsg = explanations?.wafct_caveat?.message;
+
   if (userType !== 'individual') {
     const c = explanations?.score_summary?.mandatory_caveat
-      || explanations?.recall_context?.message;
+      || explanations?.recall_context?.message
+      || inferredMsg
+      || wafctMsg;
     if (c) return c;
   }
+
+  if (inferredMsg) return inferredMsg;
+  if (wafctMsg) return wafctMsg;
+
   return META[metric].caveatIndividual;
 }
 
@@ -161,7 +170,8 @@ function pickMeaning(
   if (userType !== 'individual') {
     const m = explanations?.score_summary?.interpretation
       || explanations?.score_summary?.description
-      || explanations?.score_summary?.message;
+      || explanations?.score_summary?.message
+      || explanations?.recall_context?.message;
     if (m) return m;
   }
   return META[metric].meaningIndividual;
@@ -360,14 +370,15 @@ export function toHsrCard(
     : `Range ${summary.min.toFixed(1)}–${summary.max.toFixed(1)}★`;
   const dist = summary.distribution;
   const goodOrBetter = dist.excellent + dist.good;
+  const multiMeaning = 'How healthy each individual product is within its own category — averaged across your list.';
   return {
     metric: 'hsr',
     title: meta.title,
     emoji: meta.emoji,
     headline: `~${wAvg.toFixed(1)}★ weighted avg · ${summary.n_foods} products`,
     subline: `${goodOrBetter} of ${summary.n_foods} items ≥ 3.5★`,
-    meaning: 'How healthy each individual product is within its own category — averaged across your list.',
-    caveat: 'HSR compares products within the same category, not whole days. For daily diet quality, see HEFI or FCS.',
+    meaning: pickMeaning('hsr', userType, outcome.explanations) || multiMeaning,
+    caveat: pickCaveat('hsr', userType, outcome.explanations),
     driver,
     ctaHref: '/hsr/compare?from=scorecard',
     ctaLabel: 'Compare products',

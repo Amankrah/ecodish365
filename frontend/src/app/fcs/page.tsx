@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { 
+import {
   BeakerIcon,
   CalculatorIcon,
   ChartBarIcon,
@@ -13,8 +13,8 @@ import {
   SparklesIcon,
   ArrowRightIcon,
   CheckCircleIcon,
-  TrophyIcon,
-  GlobeAltIcon
+  ExclamationTriangleIcon,
+  GlobeAltIcon,
 } from '@heroicons/react/24/outline';
 
 export default function FCSMainPage() {
@@ -29,38 +29,57 @@ export default function FCSMainPage() {
                 <SparklesIcon className="w-12 h-12 text-white" />
               </div>
             </div>
-            <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 mb-6">
-              Food Compass <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600">2.0</span>
+            <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 mb-4">
+              Food Compass <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600">FCS-10</span>
             </h1>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto mb-8 leading-relaxed">
-              The most comprehensive nutrient profiling system validated by cutting-edge research. 
-              Evaluating <strong>54 attributes</strong> across <strong>9 health-relevant domains</strong> to score foods from 1-100.
+            <p className="text-xl text-gray-600 max-w-4xl mx-auto mb-6 leading-relaxed">
+              An <strong>18-attribute</strong> label-grounded simplification of the original 54-attribute
+              Food Compass Score, scored 1–10 per food (FCS-10) or 1–100 for a full day&apos;s
+              eating (energy-weighted <strong>i.FCS</strong>).
             </p>
-            
-            {/* Latest Research Badge */}
-            <div className="inline-flex items-center bg-gradient-to-r from-blue-100 to-green-100 border border-blue-200 rounded-full px-6 py-3 mb-8">
-              <TrophyIcon className="w-5 h-5 text-blue-600 mr-2" />
-              <span className="text-sm font-semibold text-blue-900 mr-2">NEW:</span>
-              <span className="text-sm text-blue-800">
-                Food Compass 2.0 published in <a href="https://www.nature.com/articles/s43016-024-01053-3" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-900">Nature Food (Oct 2024)</a>
+
+            {/* Honest framing banner */}
+            <div className="inline-flex items-start gap-2 max-w-2xl mx-auto bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 mb-6 text-sm text-amber-900 text-left">
+              <ExclamationTriangleIcon className="w-4 h-4 flex-shrink-0 mt-0.5" />
+              <span>
+                FCS-10 is validated <em>indirectly</em>: Spearman r = 0.93 against the
+                mortality-validated full Food Compass (O&apos;Hearn 2022, NHANES). Built on
+                US data — Canadian validation is pending. Does not replace clinical nutrition advice.
               </span>
             </div>
 
-            {/* Key Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-8">
-              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-sm">
-                <div className="text-3xl font-bold text-blue-600 mb-2">9,273</div>
-                <div className="text-sm text-gray-600">Foods & Beverages Analyzed</div>
+            <div className="inline-flex items-center bg-gradient-to-r from-blue-100 to-green-100 border border-blue-200 rounded-full px-6 py-3 mb-8">
+              <SparklesIcon className="w-5 h-5 text-blue-600 mr-2" />
+              <span className="text-sm text-blue-800">
+                FCS-10 methodology:{' '}
+                <a href="https://doi.org/10.1016/j.ajcnut.2024.10.020" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-900">
+                  Barrett et al. 2025 (AJCN)
+                </a>{' '}
+                · Original Food Compass:{' '}
+                <a href="https://www.nature.com/articles/s43016-021-00381-y" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-900">
+                  Mozaffarian et al. 2021 (Nature Food)
+                </a>
+              </span>
+            </div>
+
+            {/* Score bands */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto mb-8">
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-5 shadow-sm border border-green-200">
+                <div className="text-2xl font-bold text-green-700 mb-1">Encourage</div>
+                <div className="text-sm text-gray-700">FCS-10 ≥ 7 / i.FCS ≥ 70</div>
+                <div className="text-xs text-gray-500 mt-1">Mostly whole vegetables, fruits, legumes, nuts, seafood, whole grains</div>
               </div>
-              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-sm">
-                <div className="text-3xl font-bold text-green-600 mb-2">7%</div>
-                <div className="text-sm text-gray-600">Lower Mortality Risk</div>
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-5 shadow-sm border border-amber-200">
+                <div className="text-2xl font-bold text-amber-700 mb-1">Moderate</div>
+                <div className="text-sm text-gray-700">FCS-10 4–6 / i.FCS 31–69</div>
+                <div className="text-xs text-gray-500 mt-1">Most dairy, eggs, poultry, lightly processed staples</div>
               </div>
-              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-sm">
-                <div className="text-3xl font-bold text-purple-600 mb-2">50,000</div>
-                <div className="text-sm text-gray-600">Adults in Validation Study</div>
-          </div>
-        </div>
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-5 shadow-sm border border-red-200">
+                <div className="text-2xl font-bold text-red-700 mb-1">Limit</div>
+                <div className="text-sm text-gray-700">FCS-10 ≤ 3 / i.FCS ≤ 30</div>
+                <div className="text-xs text-gray-500 mt-1">Most ultra-processed foods, sugary beverages, animal fats</div>
+              </div>
+            </div>
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -68,14 +87,14 @@ export default function FCSMainPage() {
                 href="/fcs/calculate"
                 className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 transition-all duration-200 shadow-lg hover:shadow-xl"
               >
-                Calculate FCS Now
+                Calculate FCS now
                 <ArrowRightIcon className="ml-2 w-5 h-5" />
               </Link>
               <Link
-                href="#research"
+                href="/scorecard"
                 className="inline-flex items-center justify-center px-8 py-3 border border-gray-300 text-base font-medium rounded-xl text-gray-700 bg-white/80 backdrop-blur-sm hover:bg-gray-50 transition-colors duration-200 shadow-sm"
               >
-                View Research
+                ✨ See FCS alongside all 6 metrics
               </Link>
             </div>
           </div>
@@ -84,64 +103,83 @@ export default function FCSMainPage() {
         {/* Feature Cards */}
         <section className="mb-16">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Comprehensive Analysis Tools</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">FCS tools</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Leverage the power of Food Compass 2.0 with our suite of analytical tools
+              Score a single packaged product, an entire day&apos;s eating, or rank multiple foods side-by-side.
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Calculator Card */}
-          <Link href="/fcs/calculate" className="group">
-              <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group-hover:-translate-y-1">
-                <div className="p-8">
-                  <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <CalculatorIcon className="w-8 h-8 text-white" />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Scan card */}
+            <Link href="/scan-product" className="group">
+              <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group-hover:-translate-y-1 h-full">
+                <div className="p-6">
+                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <SparklesIcon className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">FCS Calculator</h3>
-                  <p className="text-gray-600 mb-4 leading-relaxed">
-                    Calculate Food Compass Scores using the latest 2.0 algorithm with enhanced ingredient analysis and processing evaluation.
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">📷 Scan a product</h3>
+                  <p className="text-sm text-gray-600 mb-3 leading-relaxed">
+                    Photo of NF panel + ingredients → AI extracts → FCS-10 scores the product against its FCS-10 attribute set.
                   </p>
-                  <div className="flex items-center text-blue-600 font-medium">
-                    <span>Start Calculating</span>
+                  <div className="flex items-center text-amber-700 text-sm font-medium">
+                    <span>Scan now</span>
                     <ArrowRightIcon className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
-            </div>
-          </Link>
+              </div>
+            </Link>
 
-          {/* Food Profile Card */}
-          <Link href="/fcs/food-profile" className="group">
-              <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group-hover:-translate-y-1">
-                <div className="p-8">
-                  <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <BeakerIcon className="w-8 h-8 text-white" />
+            {/* Calculate card */}
+            <Link href="/fcs/calculate" className="group">
+              <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group-hover:-translate-y-1 h-full">
+                <div className="p-6">
+                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <CalculatorIcon className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">Food Profile</h3>
-                  <p className="text-gray-600 mb-4 leading-relaxed">
-                    Deep-dive analysis across all 9 domains with detailed breakdowns of the 54 attributes that determine food healthfulness.
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">FCS Calculator</h3>
+                  <p className="text-sm text-gray-600 mb-3 leading-relaxed">
+                    Pick foods from the integrated catalog (CNF or WAFCT). Single food → FCS-10 (1–10); multi-food day → i.FCS (1–100, energy-weighted mean).
                   </p>
-                  <div className="flex items-center text-green-600 font-medium">
-                    <span>Explore Profiles</span>
+                  <div className="flex items-center text-blue-700 text-sm font-medium">
+                    <span>Start calculating</span>
                     <ArrowRightIcon className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
-            </div>
-          </Link>
+              </div>
+            </Link>
 
-          {/* Comparison Card */}
-          <Link href="/fcs/compare" className="group">
-              <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group-hover:-translate-y-1">
-                <div className="p-8">
-                  <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <ScaleIcon className="w-8 h-8 text-white" />
+            {/* Food profile card */}
+            <Link href="/fcs/food-profile" className="group">
+              <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group-hover:-translate-y-1 h-full">
+                <div className="p-6">
+                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <BeakerIcon className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">Compare Foods</h3>
-                  <p className="text-gray-600 mb-4 leading-relaxed">
-                    Side-by-side comparison of nutritional quality with detailed analysis and evidence-based recommendations.
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Single-food profile</h3>
+                  <p className="text-sm text-gray-600 mb-3 leading-relaxed">
+                    Deep-dive across the 9 domains for any food in the catalog — every attribute, every penalty, every NOVA tier.
                   </p>
-                  <div className="flex items-center text-purple-600 font-medium">
-                    <span>Compare Now</span>
+                  <div className="flex items-center text-green-700 text-sm font-medium">
+                    <span>Explore profile</span>
+                    <ArrowRightIcon className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              </div>
+            </Link>
+
+            {/* Compare card */}
+            <Link href="/fcs/compare" className="group">
+              <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group-hover:-translate-y-1 h-full">
+                <div className="p-6">
+                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <ScaleIcon className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Compare Foods</h3>
+                  <p className="text-sm text-gray-600 mb-3 leading-relaxed">
+                    Rank products side-by-side. Works across food types (unlike HSR&apos;s within-category rule).
+                  </p>
+                  <div className="flex items-center text-purple-700 text-sm font-medium">
+                    <span>Compare</span>
                     <ArrowRightIcon className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
@@ -150,309 +188,221 @@ export default function FCSMainPage() {
           </div>
         </section>
 
-        {/* Research & Validation Section */}
-        <section id="research" className="mb-16">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Latest Research & Validation</h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Food Compass 2.0 represents the culmination of cutting-edge nutritional science, 
-              validated in the largest study of its kind
-            </p>
-        </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-            {/* What's New in 2.0 */}
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4">
-                  <SparklesIcon className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="text-2xl font-semibold text-gray-900">What&apos;s New in Food Compass 2.0</h3>
-              </div>
-              <div className="space-y-4">
-                <div className="flex items-start">
-                  <CheckCircleIcon className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <div className="font-medium text-gray-900">Enhanced Ingredient Analysis</div>
-                    <div className="text-sm text-gray-600">Updated data on specific ingredients and emerging nutrients</div>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <CheckCircleIcon className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <div className="font-medium text-gray-900">Refined Processing Evaluation</div>
-                    <div className="text-sm text-gray-600">Improved NOVA classification integration and processing penalties</div>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <CheckCircleIcon className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <div className="font-medium text-gray-900">Latest Diet-Health Evidence</div>
-                    <div className="text-sm text-gray-600">Incorporates 2024 research findings on food-health relationships</div>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <CheckCircleIcon className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <div className="font-medium text-gray-900">Expanded Food Database</div>
-                    <div className="text-sm text-gray-600">Analysis of 9,273 unique food and beverage items</div>
-                  </div>
+        {/* Day-level i.FCS via recall handoff */}
+        <section className="mb-16">
+          <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-2xl p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                  Build a full day → score i.FCS
+                </h2>
+                <p className="text-gray-700 mb-3">
+                  i.FCS (diet-level Food Compass) is an energy-weighted mean of per-food FCS-10
+                  scores across a complete day. The cleanest input is a 24-h dietary recall
+                  built occasion-by-occasion.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Link
+                    href="/recall-24h?then=fcs"
+                    className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+                  >
+                    Open 24-h recall wizard →
+                  </Link>
+                  <Link
+                    href="/recall-history"
+                    className="inline-flex items-center justify-center px-4 py-2 bg-white text-blue-700 text-sm font-medium rounded-md border border-blue-300 hover:bg-blue-50"
+                  >
+                    Or load a saved day
+                  </Link>
                 </div>
               </div>
-            </div>
-
-            {/* Key Findings */}
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mr-4">
-                  <TrophyIcon className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="text-2xl font-semibold text-gray-900">Key Research Findings</h3>
+              <div className="text-sm text-blue-900 space-y-1.5">
+                <p><strong>Energy-weighting</strong> — a 290 g bowl of oats contributes more than a 5 g sprinkle of cocoa, proportional to kcal. Avoids the &quot;everything counts the same&quot; pitfall.</p>
+                <p><strong>NOVA-aware</strong> — Domain 6 applies graded penalties (Group 1 = 0, Group 4 = −10) to flag ultra-processing.</p>
+                <p><strong>Audience modes</strong> — Researcher / Policy modes expose per-attribute breakdowns and Mozaffarian 2021 methodology notes.</p>
               </div>
-              <div className="space-y-6">
-                <div className="bg-green-50 rounded-xl p-4">
-                  <div className="text-2xl font-bold text-green-600 mb-1">7% Lower Risk</div>
-                  <div className="text-sm text-green-800">All-cause mortality reduction per standard deviation increase in diet FCS</div>
-                </div>
-                <div className="bg-blue-50 rounded-xl p-4">
-                  <div className="text-2xl font-bold text-blue-600 mb-1">Enhanced Validity</div>
-                  <div className="text-sm text-blue-800">Stronger associations with health outcomes compared to other nutrient profiling systems</div>
-                </div>
-                <div className="bg-purple-50 rounded-xl p-4">
-                  <div className="text-2xl font-bold text-purple-600 mb-1">Food Category Updates</div>
-                  <div className="text-sm text-purple-800">Meaningful score improvements for seafood (+9), eggs (+8), and meat products</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Score Distribution */}
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <div className="flex items-center mb-6">
-              <ChartBarIcon className="w-6 h-6 text-blue-600 mr-3" />
-              <h3 className="text-2xl font-semibold text-gray-900">FCS 2.0 Score Distribution</h3>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              <div className="text-center">
-                <div className="bg-gradient-to-br from-green-100 to-green-200 rounded-2xl p-6 mb-4">
-                  <div className="text-4xl font-bold text-green-600 mb-2">23%</div>
-                  <div className="text-green-800 font-medium">Score ≥70</div>
-                  <div className="text-sm text-green-600 mt-1">Encourage Daily</div>
-                </div>
-                <div className="text-sm text-gray-600">
-                  Most seafood (82%), legumes (80%), nuts (89%), vegetables (63%), and fruits (53%)
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-2xl p-6 mb-4">
-                  <div className="text-4xl font-bold text-yellow-600 mb-2">46%</div>
-                  <div className="text-yellow-800 font-medium">Score 31-69</div>
-                  <div className="text-sm text-yellow-600 mt-1">Consume in Moderation</div>
-                </div>
-                <div className="text-sm text-gray-600">
-                  Most meat (52%), poultry (91%), eggs (89%), and dairy products (73%)
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="bg-gradient-to-br from-red-100 to-red-200 rounded-2xl p-6 mb-4">
-                  <div className="text-4xl font-bold text-red-600 mb-2">31%</div>
-                  <div className="text-red-800 font-medium">Score ≤30</div>
-                  <div className="text-sm text-red-600 mt-1">Minimize Consumption</div>
-                </div>
-                <div className="text-sm text-gray-600">
-                  Most beverages (54%) and animal fats (92%), ultra-processed foods
-                </div>
-              </div>
-            </div>
-            <div className="bg-blue-50 rounded-xl p-4">
-              <p className="text-sm text-blue-800">
-                <strong>Note:</strong> FCS 2.0 shows enhanced differentiation compared to other systems like Health Star Rating, 
-                Nutri-Score, and NOVA processing classification, providing more nuanced nutritional assessment.
-              </p>
             </div>
           </div>
         </section>
 
-        {/* User-Specific Interpretation Guide */}
-        <div className="mt-8 bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">FCS Interpretation by User Type</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Individuals */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex items-center mb-3">
-                <UserIcon className="w-5 h-5 text-blue-600 mr-2" />
-                <h3 className="font-semibold text-blue-900">For Individuals</h3>
-              </div>
-              <div className="space-y-3 text-sm text-blue-800">
-                <div>
-                  <div className="font-medium">Daily Food Choices:</div>
-                  <ul className="list-disc list-inside ml-2 space-y-1">
-                    <li>Aim for foods with FCS ≥70 to comprise majority of your diet</li>
-                    <li>Use FCS 31-69 foods in moderation as part of balanced meals</li>
-                    <li>Limit FCS ≤30 foods to occasional treats</li>
-                  </ul>
-                </div>
-                <div>
-                  <div className="font-medium">Health Benefits:</div>
-                  <p>Higher overall diet FCS associated with 7% lower mortality risk and improved cardiometabolic markers.</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Businesses */}
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <div className="flex items-center mb-3">
-                <BuildingOfficeIcon className="w-5 h-5 text-green-600 mr-2" />
-                <h3 className="font-semibold text-green-900">For Businesses</h3>
-              </div>
-              <div className="space-y-3 text-sm text-green-800">
-                <div>
-                  <div className="font-medium">Product Development:</div>
-                  <ul className="list-disc list-inside ml-2 space-y-1">
-                    <li>Target FCS ≥70 for premium health-focused products</li>
-                    <li>Use FCS to optimize recipes and reformulations</li>
-                    <li>Compare products against competitors scientifically</li>
-                  </ul>
-                </div>
-                <div>
-                  <div className="font-medium">Marketing Advantages:</div>
-                  <p>Evidence-based nutritional claims supported by peer-reviewed research and validated methodology.</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Government */}
-            <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-              <div className="flex items-center mb-3">
-                <DocumentChartBarIcon className="w-5 h-5 text-purple-600 mr-2" />
-                <h3 className="font-semibold text-purple-900">For Government/Policy</h3>
-              </div>
-              <div className="space-y-3 text-sm text-purple-800">
-                <div>
-                  <div className="font-medium">Policy Applications:</div>
-                  <ul className="list-disc list-inside ml-2 space-y-1">
-                    <li>Inform taxation policies based on nutritional quality</li>
-                    <li>Establish procurement standards for public institutions</li>
-                    <li>Guide front-of-pack labeling regulations</li>
-                  </ul>
-                </div>
-                <div>
-                  <div className="font-medium">Population Health:</div>
-                  <p>Comprehensive tool for evaluating food environment and informing public health interventions.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Nine Domains Section */}
+        {/* FCS-10 attributes summary */}
         <section className="mb-16">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">The Nine Health-Relevant Domains</h2>
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-gray-900 mb-3">9 domains · 18 attributes (FCS-10)</h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Food Compass 2.0 evaluates 54 attributes across nine evidence-based domains, 
-              providing the most comprehensive nutritional assessment available
+              FCS-10 simplifies the original 54-attribute Food Compass by retaining the 18
+              attributes that drove ≥ 90 % of score variance across NHANES foods — making it
+              tractable for label-grounded scoring while preserving the discriminative signal.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { domain: "Nutrient Ratios", icon: "⚖️", description: "Balanced relationships between macronutrients, omega fatty acids, and key mineral ratios" },
-              { domain: "Vitamins", icon: "🌟", description: "Essential vitamin content focusing on the top 5 most health-relevant vitamins per food category" },
-              { domain: "Minerals", icon: "⛰️", description: "Critical mineral density evaluation of the top 5 most important minerals for each food type" },
-              { domain: "Food Ingredients", icon: "🥬", description: "Assessment of whole food components, plant-based ingredients, and beneficial compounds" },
-              { domain: "Additives", icon: "🧪", description: "Evaluation of processing additives, preservatives, and artificial ingredients impact" },
-              { domain: "Processing", icon: "🏭", description: "NOVA classification integration with enhanced penalties for ultra-processed foods" },
-              { domain: "Specific Lipids", icon: "🫒", description: "Detailed fatty acid profiles including omega-3, omega-6, and trans fat content" },
-              { domain: "Fiber & Protein", icon: "💪", description: "Structural and functional nutrient assessment for satiety and metabolic health" },
-              { domain: "Phytochemicals", icon: "🌿", description: "Plant-based bioactive compounds with proven health benefits and antioxidant properties" }
+              { domain: 'Nutrient ratios', icon: '⚖️', description: 'Macro balance, key omega and mineral ratios.' },
+              { domain: 'Vitamins', icon: '🌟', description: 'Top vitamins per food category.' },
+              { domain: 'Minerals', icon: '⛰️', description: 'Top minerals per food category.' },
+              { domain: 'Food ingredients', icon: '🥬', description: 'Whole-food components and ingredient quality (first 5 on the label).' },
+              { domain: 'Additives', icon: '🧪', description: 'Penalty for additives and preservatives.' },
+              { domain: 'Processing (NOVA)', icon: '🏭', description: 'NOVA-classification penalty; ultra-processed foods score −10.' },
+              { domain: 'Specific lipids', icon: '🫒', description: 'Fatty-acid profile (mono-, poly-, trans, omega-3/6).' },
+              { domain: 'Fibre & protein', icon: '💪', description: 'Density of fibre and protein per kcal.' },
+              { domain: 'Phytochemicals', icon: '🌿', description: 'Plant bioactives with documented health signals.' },
             ].map((item, index) => (
-              <div key={index} className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
-                <div className="text-4xl mb-4 text-center">{item.icon}</div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3 text-center">{item.domain}</h3>
-                <p className="text-sm text-gray-600 text-center leading-relaxed">{item.description}</p>
+              <div key={index} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                <div className="text-3xl mb-2">{item.icon}</div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">{item.domain}</h3>
+                <p className="text-sm text-gray-600">{item.description}</p>
               </div>
             ))}
           </div>
         </section>
 
-        {/* NOVA Integration */}
+        {/* NOVA explainer */}
         <section className="mb-16">
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <div className="flex items-center mb-6">
               <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mr-4">
                 <GlobeAltIcon className="w-6 h-6 text-white" />
               </div>
-              <h2 className="text-2xl font-semibold text-gray-900">NOVA Processing Integration</h2>
+              <h2 className="text-2xl font-semibold text-gray-900">NOVA processing tier (Domain 6)</h2>
             </div>
-            <div className="mb-6">
-              <p className="text-gray-600 mb-4">
-                <strong>Enhanced Processing Assessment:</strong> Food Compass 2.0 integrates NOVA classification 
-                into Domain 6 (Processing) with refined penalty scoring based on the latest research on ultra-processed foods.
-              </p>
-            </div>
+            <p className="text-gray-600 mb-6">
+              FCS-10 inherits NOVA&apos;s 4-tier industrial-processing classification. The processing
+              penalty enters the score as a graded penalty in Domain 6 — it does not replace
+              the score; it adjusts it.
+            </p>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl p-4">
-                <h3 className="font-semibold text-green-800 mb-2">🥬 Group 1</h3>
-                <h4 className="font-medium text-green-800 mb-2">Minimally Processed</h4>
-                <p className="text-sm text-green-700 mb-3">Fresh fruits, vegetables, grains, meats, and dairy</p>
-                <div className="bg-green-200 rounded-lg p-2">
-                  <div className="text-sm font-semibold text-green-800">Score: 0 (Optimal)</div>
-                </div>
+              <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                <h3 className="font-semibold text-green-800 mb-1">🥬 Group 1</h3>
+                <h4 className="font-medium text-green-800 text-sm">Minimally processed</h4>
+                <p className="text-xs text-green-700 mt-1 mb-2">Fresh fruit, raw meat, milk, dried grains.</p>
+                <div className="text-sm font-semibold text-green-900">Penalty: 0</div>
               </div>
-              <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 border border-yellow-200 rounded-xl p-4">
-                <h3 className="font-semibold text-yellow-800 mb-2">🧈 Group 2</h3>
-                <h4 className="font-medium text-yellow-800 mb-2">Culinary Ingredients</h4>
-                <p className="text-sm text-yellow-700 mb-3">Oils, butter, sugar, salt for cooking</p>
-                <div className="bg-yellow-200 rounded-lg p-2">
-                  <div className="text-sm font-semibold text-yellow-800">Score: -6</div>
-                </div>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+                <h3 className="font-semibold text-yellow-800 mb-1">🧈 Group 2</h3>
+                <h4 className="font-medium text-yellow-800 text-sm">Culinary ingredients</h4>
+                <p className="text-xs text-yellow-700 mt-1 mb-2">Oils, butter, sugar, salt.</p>
+                <div className="text-sm font-semibold text-yellow-900">Penalty: −6</div>
               </div>
-              <div className="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 rounded-xl p-4">
-                <h3 className="font-semibold text-orange-800 mb-2">🥫 Group 3</h3>
-                <h4 className="font-medium text-orange-800 mb-2">Processed Foods</h4>
-                <p className="text-sm text-orange-700 mb-3">Canned vegetables, cheese, simple breads</p>
-                <div className="bg-orange-200 rounded-lg p-2">
-                  <div className="text-sm font-semibold text-orange-800">Score: -7.5</div>
-                </div>
+              <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
+                <h3 className="font-semibold text-orange-800 mb-1">🥫 Group 3</h3>
+                <h4 className="font-medium text-orange-800 text-sm">Processed foods</h4>
+                <p className="text-xs text-orange-700 mt-1 mb-2">Cheese, canned vegetables, simple breads.</p>
+                <div className="text-sm font-semibold text-orange-900">Penalty: −7.5</div>
               </div>
-              <div className="bg-gradient-to-br from-red-50 to-red-100 border border-red-200 rounded-xl p-4">
-                <h3 className="font-semibold text-red-800 mb-2">🍟 Group 4</h3>
-                <h4 className="font-medium text-red-800 mb-2">Ultra-Processed</h4>
-                <p className="text-sm text-red-700 mb-3">Industrial formulations with additives</p>
-                <div className="bg-red-200 rounded-lg p-2">
-                  <div className="text-sm font-semibold text-red-800">Score: -10 (Max Penalty)</div>
-                </div>
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                <h3 className="font-semibold text-red-800 mb-1">🍟 Group 4</h3>
+                <h4 className="font-medium text-red-800 text-sm">Ultra-processed</h4>
+                <p className="text-xs text-red-700 mt-1 mb-2">Industrial formulations with additives.</p>
+                <div className="text-sm font-semibold text-red-900">Penalty: −10 (max)</div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Scientific Citation */}
-        <section className="bg-gradient-to-r from-blue-900 to-green-900 rounded-2xl p-8 text-white">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold mb-4">Scientific Foundation</h2>
-            <p className="text-blue-100 mb-6 max-w-4xl mx-auto leading-relaxed">
-              Food Compass 2.0 is based on peer-reviewed research published in Nature Food, 
-              one of the world&apos;s leading scientific journals. This system represents the most 
-              comprehensive and validated approach to food nutritional assessment available today.
+        {/* User-type interpretation */}
+        <section className="mb-16 bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">Audience modes</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-center mb-3">
+                <UserIcon className="w-5 h-5 text-blue-600 mr-2" />
+                <h3 className="font-semibold text-blue-900">Individual</h3>
+              </div>
+              <p className="text-sm text-blue-800">
+                Plain-language band (encourage / moderate / limit) without methodology jargon.
+                Treat it as a relative signal between products, not a personal health verdict.
+              </p>
+            </div>
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <div className="flex items-center mb-3">
+                <BuildingOfficeIcon className="w-5 h-5 text-green-600 mr-2" />
+                <h3 className="font-semibold text-green-900">Researcher</h3>
+              </div>
+              <p className="text-sm text-green-800">
+                Per-domain attribute breakdown, NOVA evidence, FCS-10 vs full-FCS Spearman
+                concordance, Mozaffarian 2021 and Barrett 2025 methodology pointers.
+              </p>
+            </div>
+            <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+              <div className="flex items-center mb-3">
+                <DocumentChartBarIcon className="w-5 h-5 text-purple-600 mr-2" />
+                <h3 className="font-semibold text-purple-900">Policy</h3>
+              </div>
+              <p className="text-sm text-purple-800">
+                Population framing for procurement standards, taxation analysis, and
+                food-environment surveillance. Indirect-validation caveat surfaced explicitly.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Food databases */}
+        <section className="mb-16">
+          <div className="bg-white border border-gray-200 rounded-2xl p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Food composition databases</h2>
+            <p className="text-sm text-gray-700 mb-4">
+              FCS-10 scores every food in our cross-database catalog. CNF + WAFCT today (6,719
+              foods); the source-tagged extension architecture means additional composition
+              databases plug in without re-keying scoring code.
             </p>
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 max-w-4xl mx-auto">
-              <div className="text-sm text-blue-100 mb-2">RESEARCH CITATION</div>
-              <div className="text-white font-medium mb-2">
-                Barrett, E.M., Shi, P., Blumberg, J.B. et al. Food Compass 2.0 is an improved nutrient profiling system to characterize healthfulness of foods and beverages. 
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="border border-gray-100 rounded-lg p-3">
+                <div className="text-xs font-semibold text-blue-700 uppercase tracking-wide">Active</div>
+                <div className="text-sm font-medium text-gray-900 mt-1">Canadian Nutrient File</div>
+                <div className="text-xs text-gray-600 mt-0.5">5,691 foods · Health Canada · authoritative for Canadian context</div>
               </div>
-              <div className="text-blue-200 text-sm">
-                <em>Nature Food</em> 5, 911–915 (2024). 
-                <a 
-                  href="https://www.nature.com/articles/s43016-024-01053-3" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="underline hover:text-white transition-colors ml-2"
-                >
-                  https://doi.org/10.1038/s43016-024-01053-3
-                </a>
+              <div className="border border-gray-100 rounded-lg p-3">
+                <div className="text-xs font-semibold text-blue-700 uppercase tracking-wide">Active</div>
+                <div className="text-sm font-medium text-gray-900 mt-1">FAO/INFOODS WAFCT 2019</div>
+                <div className="text-xs text-gray-600 mt-0.5">1,028 West African foods · Vincent et al. 2019 · per-source caveat surfaces mineral-bias</div>
               </div>
+              <div className="border border-dashed border-gray-300 rounded-lg p-3 text-gray-500">
+                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Planned</div>
+                <div className="text-sm font-medium text-gray-700 mt-1">Further composition tables</div>
+                <div className="text-xs mt-0.5">USDA / EuroFIR / additional regional FCTs via the same source-tagged extension pattern.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* What FCS-10 isn't */}
+        <section className="mb-16">
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
+            <h2 className="text-xl font-semibold text-amber-900 mb-3 flex items-center gap-2">
+              <ExclamationTriangleIcon className="w-5 h-5" />
+              What FCS-10 is <em>not</em>
+            </h2>
+            <ul className="space-y-1.5 text-sm text-amber-900 list-disc list-inside">
+              <li><strong>Not a clinical diagnosis.</strong> Validated to population mortality, not individual outcomes.</li>
+              <li><strong>Not directly Canadian-validated yet.</strong> Anchored to US NHANES; cross-national portability is documented future work.</li>
+              <li><strong>Not a replacement for HEFI.</strong> HEFI scores adherence to Canada&apos;s Food Guide; FCS scores resemblance to longer-life food patterns. Different questions.</li>
+              <li><strong>Not directly validated below the food level.</strong> Recipe-style decompositions inherit ingredient-list inference uncertainty.</li>
+            </ul>
+          </div>
+        </section>
+
+        {/* Citation */}
+        <section className="bg-gradient-to-r from-blue-900 to-green-900 rounded-2xl p-8 text-white">
+          <div className="text-center max-w-4xl mx-auto">
+            <h2 className="text-2xl font-bold mb-4">Primary references</h2>
+            <div className="space-y-3 text-sm text-blue-100 text-left">
+              <p>
+                <strong className="text-white">FCS-10 (the implementation):</strong>{' '}
+                Barrett E.M. et al. (2025). A simplified Food Compass Score for label-grounded
+                scoring. <em>American Journal of Clinical Nutrition</em>. Methods pp. 7–9.
+              </p>
+              <p>
+                <strong className="text-white">Original Food Compass:</strong>{' '}
+                Mozaffarian D. et al. (2021). Food Compass is a nutrient profiling system
+                using expanded characteristics for assessing healthfulness of foods.
+                <em> Nature Food</em> 2, 809–818.
+              </p>
+              <p>
+                <strong className="text-white">Mortality validation:</strong>{' '}
+                O&apos;Hearn M. et al. (2022). Incident type 2 diabetes attributable to suboptimal
+                diet. <em>Nature Communications</em> 13, 7066.
+              </p>
             </div>
           </div>
         </section>

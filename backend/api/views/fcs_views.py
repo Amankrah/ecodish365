@@ -31,6 +31,13 @@ def fcs_calculate(request):
         user_type = str(request.data.get('user_type', 'individual'))
         if user_type not in ('individual', 'researcher', 'policy'):
             user_type = 'individual'
+        from api.views.packaged_food_caveat import (
+            parse_decomposition_provenance,
+            build_packaged_food_caveat,
+        )
+        decomposition_provenance = parse_decomposition_provenance(
+            request.data.get('decomposition_provenance'),
+        )
 
         if not food_ids:
             return Response({"error": "No food IDs provided"}, status=status.HTTP_400_BAD_REQUEST)
@@ -96,6 +103,12 @@ def fcs_calculate(request):
             from api.views.wafct_caveat import build_wafct_caveat
             result['explanations'].update(build_wafct_caveat(
                 food_ids, indicator='fcs', user_type=user_type,
+            ))
+        except Exception:  # noqa: BLE001
+            pass
+        try:
+            result['explanations'].update(build_packaged_food_caveat(
+                'fcs', user_type, decomposition_provenance=decomposition_provenance,
             ))
         except Exception:  # noqa: BLE001
             pass

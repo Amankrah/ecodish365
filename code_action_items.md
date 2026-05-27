@@ -73,6 +73,24 @@ These were explicitly logged as v1 simplifications during HENI-CODE-1 implementa
 
 ## Done
 
+### 2026-05-26 — S4-lite 25-day cross-indicator panel (Scenario S4 fallback) SHIPPED
+
+**Why this matters.** Full Scenario S4 (100 CCHS-Nutrition medoids) is blocked on RDC access. S4-lite is the documented synthetic fallback: 25 curated full-day CNF diets scored across HEFI, HENI, HSR, FCS, environmental GW, and dietary-pattern — producing the Spearman matrix and §6.2 trade-off exemplars the case study requires.
+
+**Files added:**
+- [`backend/_smoke_s4_lite_panel.py`](backend/_smoke_s4_lite_panel.py) — batch scorer + Spearman matrix + trade-off picker
+- [`backend/_smoke_s4_lite_panel_results.json`](backend/_smoke_s4_lite_panel_results.json)
+- [`results/S4-lite/meals_panel.csv`](results/S4-lite/meals_panel.csv), [`spearman_matrix.csv`](results/S4-lite/spearman_matrix.csv), [`tradeoff_exemplars.json`](results/S4-lite/tradeoff_exemplars.json)
+
+**Headline results (n = 25 days, 25/25 core metrics complete):**
+- Nutrition coherence: HEFI–HENI ρ = **+0.837**, HEFI–FCS ρ = +0.797, HSR–FCS ρ = +0.763, HEFI–HSR ρ = +0.646
+- Nutrition–environment tension: HEFI–GW ρ = **−0.42**, HENI–GW ρ = −0.59, FCS–GW ρ = −0.51
+- §6.2 exemplars: win–win D19 (legume, GW 0.08), lose–lose D06 (BBQ, GW 1.56), tension D17 (active, GW 1.15)
+
+**Run:** `cd backend && python _smoke_s4_lite_panel.py` (~20 s). Manuscript §5.1 interim note + §6.2 populated.
+
+---
+
 ### 2026-05-23 — AI-enhanced CNF search + recipe decomposer (AI-MATCH-1) SHIPPED
 
 **Why this matters.** All seven user-facing search surfaces on the platform (CNF Explorer + the four calculate pages + FCS Compare + FCS Food Profile) called the existing `/api/cnf/search/` endpoint, which is pure fuzzywuzzy ([`backend/api/food_id_finder.py:176-242`](backend/api/food_id_finder.py#L176-L242)). Fine for exact CNF names ("apple raw", "white bread"), brittle for synonyms ("aubergine" → eggplant), foreign-language entries (the CNF has French `FoodDescriptionF` columns but fuzzywuzzy doesn't bridge them well), compound descriptors ("low-fat chocolate milk"), and impossible for free-text dish names ("homemade beef stew", "spaghetti bolognese"). The infrastructure to fix this — `LCAMatcher` RAG pattern + `RecipeDecomposer` 7-gate validation + `ChatJSONClient` multi-provider abstraction — already existed inside `environmental_impact_model/src/` for the LCA pipeline but was never exposed to the user-facing CNF endpoints. AI-MATCH-1 surfaces both as opt-in features behind a per-IP rate limit + monthly spend circuit breaker, with audit-grade smoke harnesses, while leaving fuzzywuzzy as the always-on default so basic searches stay instant.
@@ -387,14 +405,14 @@ Six follow-up items resolved against the four "what I'd watch" concerns surfaced
 - A confidence card showing `decomposition_confidence` (0-100 %) with band (high / moderate / low).
 - A mass-conservation card showing residual + tolerance status.
 - Researcher mode adds a full macro-reconciliation table (panel per-100g vs inferred per-100g vs Δ vs within-tolerance flag).
-- Backend swaps the dietary-pattern mandatory caveat to the inferred-composition variant (individual + researcher tiers).
+- Backend swaps inferred-composition mandatory caveat on **all six Scorecard scorers** when `decomposition_provenance='packaged_food_inferred'` is forwarded from the orchestrator: HEFI, HENI, FCS, HSR, environmental (`packaged_food_caveat.py`), plus dietary-pattern (pre-existing). Scorecard page renders an amber banner + per-metric caveat via `pickCaveat` / `metricAdapters.ts`.
 - Receiving pages get an amber "📦 Packaged product — inferred composition" banner with product name + decomposition confidence.
 
 **Out of scope — Phase 3 (PENDING, unchanged).** Barcode + Open Food Facts fast path. See the Phase 1 entry above for full description + gating criteria.
 
 **Out of scope — Phase 2.x follow-ups.**
 
-- Backend caveat swap for HEFI / HENI / FCS / environmental scorer endpoints (only dietary-pattern got the backend caveat swap in Phase 2 — the inferred-composition banner on the frontend covers the other 4 scorers' results pages, but the response payloads themselves don't yet carry the inferred-composition caveat). Trivial follow-up: replicate the `decomposition_provenance` parameter + caveat-swap pattern from `dietary_pattern_classify` across the 4 other views. ~30 LoC per view.
+- ~~Backend caveat swap for HEFI / HENI / FCS / environmental scorer endpoints~~ **SHIPPED 2026-05-26** — see `backend/api/views/packaged_food_caveat.py` + orchestrator `decomposition_provenance` fan-out.
 - Second-photo upload flow: when first photo has only NF panel (or only ingredients), automatically prompt for a second photo to fill the gap, then merge the two extractions. Current behaviour: user has to click "Try another photo" and re-do everything. Adds 1 frontend flow step + a merge helper in `packaged_food_extractor.py`.
 - Composition table: ability to swap a CNF food via free-text search (currently mass-only editing). Adds CNF search modal per row.
 - 50-product validation harness for the decomposer (analogous to Phase 1's `_smoke_packaged_food_panel.py`). Requires hand-typed ground-truth compositions for 50 products — significant effort.

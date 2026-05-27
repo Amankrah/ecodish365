@@ -116,13 +116,11 @@ export default function ScorecardPage(): JSX.Element {
     [ingredients],
   );
   const dailyKcal = list?.estimated_daily_kcal;
-  // < 300 kcal OR < 100 g signals a portion that's clearly less than a
-  // typical meal — most metrics (HEFI / HENI / environmental / dietary
-  // pattern) are designed for full days, so the absolute numbers will
-  // be tiny and ratio-driven metrics become noisy.
+  // Partial-day recall: < 1500 kcal is unlikely to be a full 24-h intake.
+  // Tiny samples: < 100 g total mass.
   const isSmallSample =
     nFoods > 0 &&
-    ((typeof dailyKcal === 'number' && dailyKcal > 0 && dailyKcal < 300)
+    ((typeof dailyKcal === 'number' && dailyKcal > 0 && dailyKcal < 1500)
       || (totalMassG > 0 && totalMassG < 100));
 
   const runOptions: RunOptions = useMemo(() => ({
@@ -266,8 +264,21 @@ export default function ScorecardPage(): JSX.Element {
               {typeof dailyKcal === 'number' && dailyKcal > 0 ? `, ${dailyKcal.toFixed(0)} kcal` : ''}).
               HEFI, HENI, Environmental, and Dietary Pattern need a fuller day to be meaningful —
               treat their absolute numbers below as illustrative, not as a personal diet diagnosis.
-              HSR here summarises individual products only (not a daily HSR score); FCS is reliable
-              at the product level.
+              HSR here summarises individual products only (not a daily HSR score); FCS aggregates
+              this list as one combined meal.
+            </span>
+          </div>
+        )}
+
+        {/* Packaged-food inferred-composition advisory */}
+        {list?.packaged_food && !scoring && (
+          <div role="status" className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-md p-3 text-sm text-amber-900">
+            <Info className="h-4 w-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <span>
+              <strong>Packaged product — inferred composition.</strong>{' '}
+              One or more foods came from a label scan; per-ingredient masses were inferred from
+              descending-mass-order + Nutrition Facts macros, not weighed. Metric caveats below
+              reflect this uncertainty.
             </span>
           </div>
         )}

@@ -5,6 +5,7 @@ Combines enhanced analysis with clean, user-friendly endpoints for better decisi
 
 import logging
 import time
+from concurrent.futures import ThreadPoolExecutor
 from typing import List, Dict, Optional, Union
 from functools import lru_cache
 from rest_framework.decorators import api_view, permission_classes
@@ -129,9 +130,18 @@ def calculate_hsr(request):
     user_type = str(request.data.get('user_type', 'individual'))
     if user_type not in ('individual', 'researcher', 'policy'):
         user_type = 'individual'
+    from api.views.packaged_food_caveat import (
+        parse_decomposition_provenance,
+        build_packaged_food_caveat,
+    )
+    decomposition_provenance = parse_decomposition_provenance(
+        request.data.get('decomposition_provenance'),
+    )
     
     # Validate inputs
     _validate_hsr_input(food_ids, serving_sizes)
+
+    skip_combined_hsr = from_recall24h and len(food_ids) > 1
 
     t0 = time.perf_counter()
 
@@ -147,44 +157,71 @@ def calculate_hsr(request):
     t1 = time.perf_counter()
     load_ms = (t1 - t0) * 1000.0
 
-    # FIX (HSR-CATEG-2 follow-up 2026-05-23): the previous logic hardcoded
-    # the meal category from the FIRST food in the list, completely bypassing
-    # the MealCategorizer. That meant a 30 g cheese + 60 g bread sandwich
-    # got Category 3D (because cheese was listed first) regardless of which
-    # food was actually dominant by mass / fitness. For single-food calls
-    # we keep the per-food category (no ambiguity); for multi-food meals we
-    # delegate to HSRMeal._determine_category which calls the MealCategorizer
-    # (with the new mass-dominant general-food override). This is the only
-    # path that respects the HSRAC v9 "mixed dish → Cat 2" intuition.
-    meal = HSRMeal(foods=foods)
-    if len(foods) == 1:
-        primary_food = foods[0]
-        meal.category = ThresholdProvider.get_category_from_food(
-            primary_food.food_name,
-            getattr(primary_food, "food_group_id", 0),
+    if skip_combined_hsr:
+        # SCORECARD-1 follow-up: skip the misleading combined-meal HSR calc;
+        # the Scorecard renders per-food energy-weighted summary instead.
+        per_ratings = _build_per_food_ratings(food_ids, serving_sizes)
+        per_summary = _summarise_per_food_ratings(per_ratings)
+        w_avg = (
+            float(per_summary.get('energy_weighted_avg', 0.0))
+            if per_summary.get('available') else 0.0
         )
-    # Multi-food meals: HSRMeal.__post_init__ already ran _determine_category,
-    # which invokes the MealCategorizer. No override needed here.
-
-    # Use standard HSR configuration
-    config = HSRConfig(
-        use_scientific_thresholds=False,
-        differentiate_sugar_sources=False,
-        apply_satiety_adjustments=False,
-        use_unified_energy_approach=False,
-        consider_processing_level=False,
-        include_confidence_metrics=True,
-        detailed_explanations=(analysis_level == "detailed"),
-    )
-    calculator = HSRCalculator(meal, config)
-
-    if analysis_level == "simple":
-        result = _calculate_simple_hsr(calculator)
+        meal = HSRMeal(foods=foods)
+        result = {
+            "success": True,
+            "hsr_result": {
+                "rating": {
+                    "star_rating": w_avg,
+                    "level": "per_item_summary",
+                    "description": f"Per-product energy-weighted summary (~{w_avg:.1f} stars)",
+                    "category": "per_item_summary",
+                },
+                "combined_meal_omitted": True,
+            },
+            "per_food_ratings": per_ratings,
+            "per_food_summary": per_summary,
+        }
+        t2 = time.perf_counter()
+        core_ms = (t2 - t1) * 1000.0
     else:
-        result = _calculate_detailed_hsr(calculator, include_alternatives, include_meal_insights)
+        # FIX (HSR-CATEG-2 follow-up 2026-05-23): the previous logic hardcoded
+        # the meal category from the FIRST food in the list, completely bypassing
+        # the MealCategorizer. That meant a 30 g cheese + 60 g bread sandwich
+        # got Category 3D (because cheese was listed first) regardless of which
+        # food was actually dominant by mass / fitness. For single-food calls
+        # we keep the per-food category (no ambiguity); for multi-food meals we
+        # delegate to HSRMeal._determine_category which calls the MealCategorizer
+        # (with the new mass-dominant general-food override). This is the only
+        # path that respects the HSRAC v9 "mixed dish → Cat 2" intuition.
+        meal = HSRMeal(foods=foods)
+        if len(foods) == 1:
+            primary_food = foods[0]
+            meal.category = ThresholdProvider.get_category_from_food(
+                primary_food.food_name,
+                getattr(primary_food, "food_group_id", 0),
+            )
+        # Multi-food meals: HSRMeal.__post_init__ already ran _determine_category,
+        # which invokes the MealCategorizer. No override needed here.
 
-    t2 = time.perf_counter()
-    core_ms = (t2 - t1) * 1000.0
+        # Use standard HSR configuration
+        config = HSRConfig(
+            use_scientific_thresholds=False,
+            differentiate_sugar_sources=False,
+            apply_satiety_adjustments=False,
+            use_unified_energy_approach=False,
+            consider_processing_level=False,
+            include_confidence_metrics=True,
+            detailed_explanations=(analysis_level == "detailed"),
+        )
+        calculator = HSRCalculator(meal, config)
+
+        if analysis_level == "simple":
+            result = _calculate_simple_hsr(calculator)
+        else:
+            result = _calculate_detailed_hsr(calculator, include_alternatives, include_meal_insights)
+
+        t2 = time.perf_counter()
+        core_ms = (t2 - t1) * 1000.0
 
     # Add food details for user context
     result["food_details"] = _get_food_details_summary(foods)
@@ -218,18 +255,15 @@ def calculate_hsr(request):
         ))
     except Exception:  # noqa: BLE001
         pass
+    try:
+        result["explanations"].update(build_packaged_food_caveat(
+            'hsr', user_type, decomposition_provenance=decomposition_provenance,
+        ))
+    except Exception:  # noqa: BLE001
+        pass
     result["user_type"] = user_type
     result["from_recall24h"] = from_recall24h
     result["meal_categorization"] = _get_basic_meal_categorization_summary(meal)
-
-    # SCORECARD-1 (2026-05-26): when scoring a 24-h recall (or any multi-food
-    # batch coming from the Scorecard), HSR's combined-meal star is
-    # methodologically weak — HSRAC v9 rates products WITHIN their category.
-    # Surface a per-item breakdown so the Scorecard can show energy-weighted
-    # range/anchors/distribution instead of a misleading single number.
-    if from_recall24h and len(foods) > 1:
-        result["per_food_ratings"] = _build_per_food_ratings(food_ids, serving_sizes)
-        result["per_food_summary"] = _summarise_per_food_ratings(result["per_food_ratings"])
 
     t3 = time.perf_counter()
     assembly_ms = (t3 - t2) * 1000.0
@@ -701,35 +735,53 @@ def _format_health_insight(insight) -> Dict:
     }
 
 
+def _score_single_food_hsr(fid: int, serving: float) -> Dict:
+    """Score one food in its own HSRAC v9 category at recall portion size."""
+    food = _load_food_data(int(fid), float(serving))
+    food_category = ThresholdProvider.get_category_from_food(
+        food.food_name,
+        getattr(food, 'food_group_id', 0),
+    )
+    per_meal = HSRMeal(foods=[food])
+    per_meal.category = food_category
+    per_calc = HSRCalculator(per_meal, HSRConfig(
+        use_scientific_thresholds=False,
+        differentiate_sugar_sources=False,
+        apply_satiety_adjustments=False,
+        use_unified_energy_approach=False,
+        consider_processing_level=False,
+    ))
+    per_result = per_calc.calculate_hsr()
+    return _format_food_comparison(food, per_result, float(serving))
+
+
 def _build_per_food_ratings(food_ids: List[int], serving_sizes: List[float]) -> List[Dict]:
     """SCORECARD-1: score each food individually in its own HSRAC v9 category
     at its actual gram amount (recall portion, not 100 g). This mirrors the
     /hsr/compare/ inner loop but uses the per-food serving size that arrived
     on the recall payload. One entry per food; failures are surfaced as
     {error: ...} so the caller can still summarise the rest."""
-    out: List[Dict] = []
-    for fid, serving in zip(food_ids, serving_sizes):
+    pairs = list(zip(food_ids, serving_sizes))
+    if not pairs:
+        return []
+
+    def _safe_score(args: tuple) -> Dict:
+        fid, serving = args
         try:
-            food = _load_food_data(int(fid), float(serving))
-            food_category = ThresholdProvider.get_category_from_food(
-                food.food_name,
-                getattr(food, 'food_group_id', 0),
-            )
-            per_meal = HSRMeal(foods=[food])
-            per_meal.category = food_category
-            per_calc = HSRCalculator(per_meal, HSRConfig(
-                use_scientific_thresholds=False,
-                differentiate_sugar_sources=False,
-                apply_satiety_adjustments=False,
-                use_unified_energy_approach=False,
-                consider_processing_level=False,
-            ))
-            per_result = per_calc.calculate_hsr()
-            out.append(_format_food_comparison(food, per_result, float(serving)))
+            return _score_single_food_hsr(int(fid), float(serving))
         except Exception as exc:  # noqa: BLE001 — surface per-food, don't fail the batch
-            out.append({"food_id": int(fid), "serving_size": float(serving),
-                        "error": f"Per-food HSR failed: {exc}"})
-    return out
+            return {
+                "food_id": int(fid),
+                "serving_size": float(serving),
+                "error": f"Per-food HSR failed: {exc}",
+            }
+
+    max_workers = min(8, len(pairs))
+    if max_workers <= 1:
+        return [_safe_score(p) for p in pairs]
+
+    with ThreadPoolExecutor(max_workers=max_workers) as pool:
+        return list(pool.map(_safe_score, pairs))
 
 
 def _summarise_per_food_ratings(ratings: List[Dict]) -> Dict:

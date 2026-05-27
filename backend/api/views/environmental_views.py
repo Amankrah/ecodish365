@@ -619,6 +619,13 @@ def environmental_impact(request):
         # Get request parameters
         food_data = request.data.get('foods', [])
         user_type = request.data.get('user_type', 'individual')  # individual, researcher, policy
+        from api.views.packaged_food_caveat import (
+            parse_decomposition_provenance,
+            build_packaged_food_caveat,
+        )
+        decomposition_provenance = parse_decomposition_provenance(
+            request.data.get('decomposition_provenance'),
+        )
         # §3.5 LCA matcher flag (default off — preserves existing behaviour bit-for-bit).
         enable_lca_matcher = bool(request.data.get('enable_lca_matcher', False))
         matcher = _get_default_lca_matcher() if enable_lca_matcher else None
@@ -712,6 +719,11 @@ def environmental_impact(request):
                 "keywords": f"environmental impact, {user_type}, LCA, food sustainability, carbon footprint, meal assessment"
             }
         }
+        packaged_caveat = build_packaged_food_caveat(
+            'environmental', user_type, decomposition_provenance=decomposition_provenance,
+        )
+        if packaged_caveat:
+            result["explanations"] = packaged_caveat
         
         return Response(result)
         

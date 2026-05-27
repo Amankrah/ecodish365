@@ -76,8 +76,7 @@ const navigation: NavItem[] = [
         name: 'HENI', 
         href: '/heni', 
         children: [
-          { name: 'Individual Calculator', href: '/heni/calculate' },
-          { name: 'Policy Dashboard', href: '/heni/policy-dashboard' },
+          { name: 'Calculate HENI', href: '/heni/calculate' },
         ]
       },
     ]

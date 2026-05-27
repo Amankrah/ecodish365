@@ -126,5 +126,9 @@ export interface ExplanationsBlock {
   nova_explainer?: ExplanationSection;
   /** 24-h recall handoff caveat (HSR calculate when from_recall24h). */
   recall_context?: ExplanationSection;
+  /** PKG-IMG-1 Phase 2.x inferred-composition caveat (all scorers). */
+  inferred_composition_caveat?: ExplanationSection;
+  /** WAFCT-EXTEND cross-database caveat (HEFI/HENI/HSR/FCS). */
+  wafct_caveat?: ExplanationSection;
   action_tips?: Record<string, string>;
 }

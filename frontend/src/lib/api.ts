@@ -1064,6 +1064,8 @@ export interface HSRCalculationRequest {
   from_recall24h?: boolean;
   /** Audience selector for the explanations block (AUDIENCE-CODE-1 2026-05-23). */
   user_type?: 'individual' | 'researcher' | 'policy';
+  /** PKG-IMG-1 Phase 2.x: swap caveat when list came from packaged-food decomposition. */
+  decomposition_provenance?: 'packaged_food_inferred';
 }
 
 export interface HSRComparisonRequest {
@@ -1452,6 +1454,8 @@ export interface FCSCalculationRequest {
   amounts_g?: number[];
   /** Audience selector for the explanations block (AUDIENCE-CODE-1 2026-05-23). */
   user_type?: 'individual' | 'researcher' | 'policy';
+  /** PKG-IMG-1 Phase 2.x: swap caveat when list came from packaged-food decomposition. */
+  decomposition_provenance?: 'packaged_food_inferred';
 }
 
 export interface FCSBatchRequest {
@@ -1539,6 +1543,8 @@ export interface HEFICalculationRequest {
   }>;
   /** Audience selector for the explanations block (AUDIENCE-CODE-1 2026-05-23). */
   user_type?: 'individual' | 'researcher' | 'policy';
+  /** PKG-IMG-1 Phase 2.x: swap caveat when list came from packaged-food decomposition. */
+  decomposition_provenance?: 'packaged_food_inferred';
 }
 
 export interface HEFIComparisonRequest {
@@ -1750,28 +1756,13 @@ export interface HENICalculationRequest {
   }>;
   /** Audience selector for the explanations block (AUDIENCE-CODE-1 2026-05-23). */
   user_type?: 'individual' | 'researcher' | 'policy';
+  /** PKG-IMG-1 Phase 2.x: swap caveat when list came from packaged-food decomposition. */
+  decomposition_provenance?: 'packaged_food_inferred';
 }
 
 export interface HENIFoodProfileRequest {
   food_id: number;
   amount_g?: number;
-}
-
-export interface HENIDietaryPatternRequest {
-  dietary_pattern: {
-    meals: Array<{
-      meal_name: string;
-      foods: Array<{
-        food_id: number;
-        amount: number;
-        unit?: string;
-      }>;
-    }>;
-    parameters?: {
-      population_size?: number;
-      time_horizon_years?: number;
-    };
-  };
 }
 
 export interface HENIScores {
@@ -1897,65 +1888,6 @@ export interface HENIFoodProfile {
   };
 }
 
-export interface HENIDietaryPatternResult {
-  success: boolean;
-  data: {
-    dietary_pattern_summary: {
-      total_meals_analyzed: number;
-      daily_heni_score: number;
-      daily_energy_kcal: number;
-      daily_health_impact_minutes: number;
-      pattern_classification: 'Healthy' | 'Moderate' | 'Poor';
-    };
-    meal_breakdowns: Array<{
-      meal_name: string;
-      heni_scores: HENIScores;
-      health_impact: HealthImpact;
-      component_breakdown: ComponentBreakdown;
-      risk_factor_analysis: RiskFactorAnalysis;
-      meal_composition: MealComposition;
-    }>;
-    population_health_impact: {
-      total_dalys_avoided: number;
-      economic_value_usd: number;
-      projected_dalys_avoided: number;
-      health_economic_value: number;
-      time_horizon_years: number;
-    };
-    policy_insights: {
-      intervention_priority: Array<{
-        priority: 'High' | 'Medium' | 'Low';
-        title: string;
-        description: string;
-        impact: string;
-      }>;
-      target_food_groups: Array<{
-        name: string;
-        impact: number;
-        action: 'increase' | 'decrease';
-      }>;
-      expected_impact_per_serving_change: Array<{
-        food_group: string;
-        impact: number;
-        recommendation: string;
-      }>;
-    };
-    epidemiological_context: {
-      primary_disease_burdens: Array<{
-        disease: string;
-        percentage: number;
-      }>;
-      risk_factor_contributions: Record<string, number>;
-      evidence_strength: string;
-    };
-  };
-  metadata?: {
-    analysis_type: string;
-    population_scope: string;
-    methodology: string;
-  };
-}
-
 // HENI API Service Class
 export class HENIApiService {
   static async calculateHENI(request: HENICalculationRequest): Promise<HENIResult> {
@@ -1976,16 +1908,6 @@ export class HENIApiService {
     return {
       success: response.data.data.success,
       data: response.data.data.data
-    };
-  }
-
-  static async analyzeDietaryPattern(request: HENIDietaryPatternRequest): Promise<HENIDietaryPatternResult> {
-    const response = await api.post('/heni/analyze-pattern/', request);
-    // Backend returns nested structure: { data: { success: true, data: {...} } }
-    return {
-      success: response.data.data.success,
-      data: response.data.data.data,
-      metadata: response.data.data.metadata
     };
   }
 }
@@ -2052,6 +1974,8 @@ export interface EnvironmentalImpactRequest {
    * `impacts_by_basis` and `endpoint_impacts_by_basis`.
    */
   basis?: LcaBasis;
+  /** PKG-IMG-1 Phase 2.x: swap caveat when list came from packaged-food decomposition. */
+  decomposition_provenance?: 'packaged_food_inferred';
 }
 
 /**

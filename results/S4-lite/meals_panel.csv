@@ -1,0 +1,26 @@
+day_id,label,stratum,nutrition_tier,n_foods,total_mass_g,hefi_score,heni_minutes,hsr_stars,fcs_score,env_gw_per_100kcal,env_sustainability_score,env_cost_cad,top_pattern,pattern_confidence,rationale
+D01,Deep-fried anti-pattern day,western_processed,low,6,1190.0,14.055904253687784,-13.5,1.68,1.0,0.3549560541806174,18.8377779169788,0.30981169539450565,dash,moderate,HEFI canonical anti-pattern; expect low nutrition across board.
+D02,Mixed-balanced representative day,north_american,mid,10,1240.0,51.52495098309356,14.2,3.83,30.85,0.6180024720794733,39.86448052396159,0.4639042762644292,dash,moderate,Brassard population-mean band target (~43 HEFI).
+D03,CFG-2019 aligned ideal day,cfg_plant_forward,high,12,1460.0,58.78687814742408,88.5,3.9,75.66,0.1861145320197045,47.86170477854415,0.13756213145144983,vegan,moderate,CFG ideal; HEFI ~67 literature target.
+D04,Greek Mediterranean village day,mediterranean,high,6,550.0,42.200218073200865,12.9,3.6,44.82,0.24529469724800637,47.38657873772151,0.15499034568590125,mediterranean,moderate,DIET-PATTERN G3 mediterranean reference.
+D05,Indian vegetarian thali day,vegetarian,mid,5,680.0,41.102766607553086,11.2,4.47,51.32,0.5144620292232128,40.60840695325787,0.46426681873885056,vegetarian,high,DIET-PATTERN G3 vegetarian reference.
+D06,BBQ pulled-pork Western day,western_processed,low,5,810.0,21.56460473178891,-3.9,2.63,1.0,1.5612873773111158,20.390715035736374,1.4169961403395326,western,high,DIET-PATTERN G3 western anti-pattern.
+D07,WAFCT West African staple day,west_african,mid,5,680.0,28.82213539998719,13.6,4.27,84.31,0.3791469194312797,32.32171735711515,0.2867548636138086,west_african_staple,high,WAFCT-EXTEND cross-database day; pattern west_african_staple.
+D08,Vegan tofu stir-fry day,vegan,high,5,780.0,41.83110171482265,16.4,4.4,90.21,0.18607000234907212,41.44976319905665,0.14903469947468884,vegan,high,DIET-PATTERN G3 vegan reference.
+D09,DASH-style day,dash,high,6,740.0,61.61889439410457,33.2,4.56,73.3,0.5103184984605785,39.77439603339508,0.4028591504903354,dash,high,DIET-PATTERN G3 DASH reference.
+D10,CFG healthy plate day,cfg_plant_forward,high,5,580.0,62.10395295935448,41.2,4.53,100.0,0.28721336960746213,53.130117726805736,0.15857448069923377,cfg_healthy,moderate,DIET-PATTERN G3 cfg_healthy reference.
+D11,EAT-Lancet reference day,planetary_health,high,6,677.0,51.71963087776763,47.0,4.73,88.59,0.08266592920353982,50.93768627717715,0.07707789226371767,vegan,moderate,DIET-PATTERN G3 eat_lancet reference.
+D12,Italian Mediterranean pasta day,mediterranean,mid,5,475.0,39.24092990489609,20.6,3.78,57.03,0.09791251977747155,44.661799062047805,0.07397703235106041,mediterranean,moderate,DIET-PATTERN G3 mediterranean (Italian variant).
+D13,Fast-food burger meal day,western_processed,low,5,850.0,21.80935379948978,-2.1,3.17,11.04,1.5147647008765208,21.497033489477865,1.3657621814327054,western,high,DIET-PATTERN G3 fast-food western.
+D14,Plant-forward quinoa dinner day,plant_forward,high,7,630.0,51.65520304893118,50.5,3.52,45.93,0.12872162120981256,53.32286915070998,0.09376568203836497,cfg_healthy,moderate,Cross-system plant-forward expanded to full day.
+D15,Sardines + greens day,pescatarian,high,5,460.0,53.55172776511395,14.6,4.0,93.8,0.3733990147783252,55.192310742264326,0.1835753542981758,mediterranean,moderate,HENI literature extremum anchor (sardines).
+D16,Sweet-beverage breakfast day,western_processed,low,7,755.0,31.233317724290302,12.7,2.09,36.11,0.5595351237469525,39.84643323638505,0.44244409323498823,dash,high,Cross-system sweet breakfast + modest lunch.
+D17,Active adult 6-occasion day,north_american,mid,12,1113.0,42.55057879403119,26.4,2.98,45.98,1.1527155569540535,38.1086570983851,1.0263791278979584,dash,moderate,Recall ACTIVE pattern proxy (~2500 kcal).
+D18,Beef-steak heavy day,red_meat,mid,6,680.0,28.523652794921105,-4.1,2.11,17.27,1.85589364897955,23.618929367060645,1.7090627360442996,dash,moderate,Red-meat dominant — nutrition/env tension exemplar.
+D19,Legume-forward win-win day,plant_forward,high,7,930.0,49.08282366564085,38.2,4.72,93.86,0.07850953206239168,54.41594354554608,0.06346494151575167,vegan,moderate,Low-footprint plant protein day.
+D20,High-dairy day,dairy_heavy,mid,6,900.0,5.908515030695492,-14.2,2.92,1.0,0.7604443599262866,22.001717727972196,0.6950387301790291,dash,moderate,"Calcium-rich dairy pattern; moderate HEFI, moderate env."
+D21,Low-calorie light day,light,mid,6,830.0,53.01647655259822,33.1,4.77,100.0,0.614632701421801,49.93020530511091,0.44984025658779975,cfg_healthy,moderate,Low energy (~800 kcal); ratio metrics noisy.
+D22,Ramen + processed meat day,ultra_processed,low,4,710.0,22.924657151770965,-3.0,2.28,1.0,0.2564376535954696,25.586164555527418,0.1889253020616239,western,high,Ultra-processed convenience pattern.
+D23,Sedentary 3-meal day,north_american,mid,8,860.0,33.61897627770133,5.2,3.9,1.0,1.2084735897172003,34.2957869283435,1.0984532654169796,dash,moderate,Recall SEDENTARY pattern proxy (~1800 kcal).
+D24,Youth lunchbox day,north_american,mid,5,508.0,28.153502416053474,17.9,3.61,9.56,0.519453192384575,35.63185761814028,0.4677293877629148,dash,high,Typical school-age lunch pattern.
+D25,Elderly light tea-and-toast day,light,mid,5,568.0,45.940151019680904,16.2,1.87,54.96,0.40594430856185815,36.569268998826324,0.32857558421294464,mediterranean,moderate,Small-portion older-adult pattern.

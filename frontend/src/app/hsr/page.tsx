@@ -17,20 +17,28 @@ import StarRating from '@/components/StarRating';
 
 const hsrFeatures = [
   {
+    name: '📷 Scan a packaged product',
+    description: 'Take 1–3 photos of the Nutrition Facts panel + ingredients + net weight. Multimodal AI extracts the panel; you confirm; HSR scores the product in its own category. The canonical single-product HSR flow.',
+    icon: CalculatorIcon,
+    href: '/scan-product',
+    color: 'primary',
+    features: ['Photo → NF panel → HSR', 'Multi-image upload (front/back/side)', 'You confirm before scoring', 'Best for single-product HSR'],
+  },
+  {
     name: 'Calculate HSR',
-    description: 'Calculate Health Star Ratings for individual foods or meals with detailed nutritional analysis.',
+    description: 'Pick foods from the integrated catalog (CNF or WAFCT) + serving sizes. Single food = standard HSR; multi-food list = per-product summary with energy-weighted average and per-item stars.',
     icon: CalculatorIcon,
     href: '/hsr/calculate',
     color: 'primary',
-    features: ['Detailed score breakdown', 'Nutritional analysis', 'Health insights', 'Recommendations'],
+    features: ['Detailed score breakdown', 'Per-component nutritional analysis', 'Per-item ratings on multi-food lists', 'Researcher / policy modes'],
   },
   {
     name: 'Compare Foods',
-    description: 'Compare Health Star Ratings across multiple foods to make better choices.',
+    description: 'Side-by-side HSR ranking for similar products — what HSR is best at. Use this for "which yogurt?" or "which cereal?" comparisons.',
     icon: ScaleIcon,
     href: '/hsr/compare',
     color: 'accent',
-    features: ['Side-by-side comparison', 'Ranking by HSR rating', 'Key nutrients comparison', 'Smart recommendations'],
+    features: ['Within-category compare', 'Ranking by star rating', 'Key nutrients table', 'Strongest/weakest highlights'],
   },
   {
     name: '✨ Scorecard (all metrics)',
@@ -44,23 +52,23 @@ const hsrFeatures = [
 
 const hsrBenefits = [
   {
-    title: 'Evidence-Based Rating',
-    description: 'Uses the official Australian Health Star Rating system based on rigorous nutritional science.',
+    title: 'HSRAC v9 algorithm',
+    description: 'Implements the current Australian / New Zealand Health Star Rating algorithm (HSRAC Implementation Guide v9, Dec 2025). Functionally equivalent to v6–v8; differs from pre-2020 versions.',
     icon: CheckCircleIcon,
   },
   {
-    title: 'Comprehensive Analysis',
-    description: 'Analyzes 7 key nutrients (energy, saturated fat, sugar, sodium, protein, fiber, FVNL) for accurate scoring.',
+    title: 'Within-category comparison',
+    description: 'Foods are scored against thresholds for their HSR category (Cat 1/1D beverages, Cat 2/2D foods, Cat 3/3D fats & oils). Compare yogurts to yogurts — not yogurts to oils.',
     icon: ChartBarIcon,
   },
   {
-    title: 'Actionable Insights',
-    description: 'Provides specific, actionable recommendations to help you make healthier food choices.',
+    title: 'Per-product, not per-day',
+    description: 'A 5-star product is not a healthy diet. For full-day diet quality use HEFI-2019 or FCS; for population-level health impact use HENI.',
     icon: LightBulbIcon,
   },
   {
-    title: 'Canadian Nutrient Data',
-    description: 'Based on the comprehensive Canadian Nutrient File with data for over 5,000 foods.',
+    title: 'Multi-database catalog',
+    description: 'Canadian Nutrient File (5,691 foods) + FAO/INFOODS WAFCT 2019 (1,028 West African foods) = 6,719 today, surfaced under a single source-tagged catalog. Per-source caveats flag analytical-method differences; further composition databases follow the same extension pattern.',
     icon: InformationCircleIcon,
   },
 ];
@@ -87,13 +95,26 @@ export default function HSRDashboard() {
               </div>
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
-              Health Star Rating <span className="text-blue-600">Calculator</span>
+              Health Star Rating <span className="text-blue-600">(HSRAC v9)</span>
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed">
-              Make informed food choices with our comprehensive Health Star Rating system. 
-              Analyze nutritional quality, compare foods, and get personalized recommendations 
-              based on the Australian front-of-pack labeling system.
+              Rate a packaged product 0.5–5 stars within its own HSR category — the Australian /
+              New Zealand front-of-pack rule for nutrient profiling, applied across our
+              integrated food composition catalog (Canadian Nutrient File + FAO/INFOODS WAFCT
+              today, with additional databases planned). HSR is per-product, designed to help
+              shoppers pick between similar items (yogurt vs yogurt, cereal vs cereal).
             </p>
+            <div className="inline-flex items-start gap-2 max-w-2xl mx-auto bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 mb-8 text-sm text-amber-900">
+              <ExclamationTriangleIcon className="w-4 h-4 flex-shrink-0 mt-0.5" />
+              <span>
+                <strong>Per-product, not per-day.</strong> A 5-star product is not a healthy diet.
+                For full-day diet quality see{' '}
+                <Link href="/hefi" className="underline">HEFI-2019</Link> or{' '}
+                <Link href="/fcs" className="underline">FCS</Link>;
+                for all metrics at once use the{' '}
+                <Link href="/scorecard" className="underline font-medium">✨ Scorecard</Link>.
+              </span>
+            </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/hsr/calculate"
@@ -294,6 +315,34 @@ export default function HSRDashboard() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Citations + audience modes */}
+      <section className="py-12 bg-white border-t border-gray-100">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-8 text-sm text-gray-700">
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2">Audience modes</h3>
+            <p>
+              Every HSR calculation toggles between three explanation packs (AUDIENCE-CODE-1):
+              <strong> Individual</strong> (plain-language interpretation, no jargon),
+              <strong> Researcher</strong> (full HSRAC v9 methodology, category-determination
+              audit trail, FVNL imputation notes), and
+              <strong> Policy</strong> (population framing for procurement and labeling regulation).
+            </p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2">Primary references</h3>
+            <ul className="space-y-1 list-disc list-inside text-gray-600">
+              <li>HSRAC, <em>Health Star Rating System Implementation Guide v9</em> (Dec 2025).</li>
+              <li>
+                Shahid M. et al. (2020). The Australian Health Star Rating System
+                — applicability for nutrient profiling.{' '}
+                <em>Nutrients</em> 12, 1791.
+              </li>
+              <li>HSR v9 is functionally equivalent to v6–v8 and differs from pre-2020 versions.</li>
+            </ul>
           </div>
         </div>
       </section>

@@ -1,7 +1,6 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import HENIDietaryPatternDashboard from '@/components/heni-component/HENIDietaryPatternDashboard';
-
-export default function HENIPolicyDashboardPage() {
-  return <HENIDietaryPatternDashboard />;
+/** Retired — population HENI dashboard removed; scorecard covers multi-metric policy view. */
+export default function HENIPolicyDashboardRedirect() {
+  redirect('/scorecard');
 }

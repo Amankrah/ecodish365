@@ -41,7 +41,8 @@ def _get_food_name(food_id, integrator):
         return f"Food ID {food_id}"
 
 def _format_hefi_response(result, food_ids=None, food_name=None, integrator=None,
-                            user_type: str = 'individual'):
+                            user_type: str = 'individual',
+                            decomposition_provenance=None):
     """Helper function to format HEFI response consistently.
 
     `user_type` controls the audience-aware `explanations` block per
@@ -158,11 +159,22 @@ def _format_hefi_response(result, food_ids=None, food_name=None, integrator=None
             # WAFCT-EXTEND (2026-05-24): per-source caveat block, only
             # populated when the meal contains ≥ 1 WAFCT food.
             **_wafct_caveat_for(food_ids, user_type),
+            **_packaged_food_caveat_for('hefi', user_type, decomposition_provenance),
         },
         'user_type': user_type,
     }
 
     return data
+
+
+def _packaged_food_caveat_for(indicator, user_type, decomposition_provenance):
+    try:
+        from api.views.packaged_food_caveat import build_packaged_food_caveat
+        return build_packaged_food_caveat(
+            indicator, user_type, decomposition_provenance=decomposition_provenance,
+        )
+    except Exception:  # noqa: BLE001
+        return {}
 
 
 def _wafct_caveat_for(food_ids, user_type):
@@ -191,6 +203,10 @@ def hefi_calculate(request):
         user_type = str(request.data.get('user_type', 'individual'))
         if user_type not in ('individual', 'researcher', 'policy'):
             user_type = 'individual'
+        from api.views.packaged_food_caveat import parse_decomposition_provenance
+        decomposition_provenance = parse_decomposition_provenance(
+            request.data.get('decomposition_provenance'),
+        )
 
         if not foods_data:
             return Response({"error": "'foods' array with food_id and amount_g is required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -232,7 +248,10 @@ def hefi_calculate(request):
         else:
             food_name = f"Meal with {len(food_ids)} foods ({total_amount}g total)"
 
-        data = _format_hefi_response(result, food_ids, food_name, integrator, user_type=user_type)
+        data = _format_hefi_response(
+            result, food_ids, food_name, integrator,
+            user_type=user_type, decomposition_provenance=decomposition_provenance,
+        )
         
         # Add detailed food breakdown
         food_breakdown = []
@@ -465,7 +484,10 @@ def compare_foods_hefi(request):
                 inputs = HEFIInputs(**agg)
                 result = compute_hefi(inputs)
                 
-                data = _format_hefi_response(result, food_ids, food_name, integrator, user_type=user_type)
+                data = _format_hefi_response(
+            result, food_ids, food_name, integrator,
+            user_type=user_type, decomposition_provenance=decomposition_provenance,
+        )
                 results.append(data)
                 
             except Exception as e:

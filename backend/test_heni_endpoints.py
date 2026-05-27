@@ -159,128 +159,6 @@ def test_food_profile():
         print(f"❌ Request failed: {e}")
         return False
 
-def test_dietary_pattern_analysis():
-    """Test comprehensive dietary pattern analysis for policy makers."""
-    print("\n" + "=" * 60)
-    print("🧪 Testing: Dietary Pattern Analysis")
-    print("=" * 60)
-    
-    url = f"{API_BASE}/heni/analyze-pattern/"
-    
-    # Test data: Daily meal pattern
-    test_data = {
-        "dietary_pattern": {
-            "meals": [
-                {
-                    "meal_name": "Breakfast",
-                    "foods": [
-                        {"food_id": 1001, "amount": 50},   # Oatmeal
-                        {"food_id": 1002, "amount": 200},  # Milk
-                        {"food_id": 9999, "amount": 30},   # Berries (if exists)
-                    ]
-                },
-                {
-                    "meal_name": "Lunch", 
-                    "foods": [
-                        {"food_id": 2003, "amount": 120},  # Salmon
-                        {"food_id": 3580, "amount": 150},  # Brown rice
-                        {"food_id": 2892, "amount": 100},  # Broccoli
-                    ]
-                },
-                {
-                    "meal_name": "Dinner",
-                    "foods": [
-                        {"food_id": 5001, "amount": 100},  # Chicken (if exists)
-                        {"food_id": 6001, "amount": 150},  # Sweet potato (if exists)
-                        {"food_id": 7001, "amount": 80},   # Spinach (if exists)
-                    ]
-                }
-            ],
-            "parameters": {
-                "population_size": 100000,
-                "time_horizon_years": 10
-            }
-        }
-    }
-    
-    try:
-        print("📤 Analyzing dietary pattern...")
-        response, data = _request_json("POST", url, json=test_data, timeout=max(DEFAULT_TIMEOUT, 60))
-        
-        if response is None:
-            return False
-        print(f"📥 Status Code: {response.status_code}")
-        
-        if response.status_code == 200 and isinstance(data, dict):
-            if data.get('data', {}).get('success') is True or 'data' in data.get('data', {}):
-                analysis_data = data['data']['data']
-                
-                print("✅ Analysis completed successfully!")
-                
-                # Pattern summary
-                pattern_summary = analysis_data.get('dietary_pattern_summary', {})
-                print(f"\n🍽️  DIETARY PATTERN SUMMARY:")
-                print(f"  Daily HENI Score: {pattern_summary.get('daily_heni_score', 'N/A')} μDALY")
-                print(f"  Daily Energy: {pattern_summary.get('daily_energy_kcal', 'N/A')} kcal")
-                print(f"  Health Impact: {pattern_summary.get('daily_health_impact_minutes', 'N/A')} minutes/day")
-                print(f"  Classification: {pattern_summary.get('pattern_classification', {}).get('category', 'Unknown')}")
-                
-                # Population impact
-                pop_impact = analysis_data.get('population_health_impact', {})
-                print(f"\n🌍 POPULATION IMPACT (10 years, 100K people):")
-                print(f"  Total DALYs Avoided: {pop_impact.get('projected_dalys_avoided', 'N/A')}")
-                economic_value = pop_impact.get('health_economic_value', 'N/A')
-                if isinstance(economic_value, (int, float)):
-                    print(f"  Economic Value: ${economic_value:,}")
-                else:
-                    print(f"  Economic Value: ${economic_value}")
-                print(f"  Life Years Saved: {pop_impact.get('total_life_years_saved', 'N/A')}")
-                
-                # Policy insights
-                policy_insights = analysis_data.get('policy_insights', {})
-                print(f"\n🏛️  POLICY INSIGHTS:")
-                
-                intervention_priorities = policy_insights.get('intervention_priority', [])
-                if intervention_priorities:
-                    print("  Intervention Priorities:")
-                    for priority in intervention_priorities[:3]:  # Show first 3
-                        print(f"    - {priority.get('meal', 'Unknown')}: {priority.get('priority', 'Unknown')} priority")
-                        print(f"      Reason: {priority.get('reason', 'Unknown')}")
-                
-                target_groups = policy_insights.get('target_food_groups', {})
-                if target_groups.get('increase'):
-                    print("  Recommended Increases:")
-                    for group in target_groups['increase'][:2]:  # Show first 2
-                        print(f"    - {group.get('food_group', 'Unknown')}: {group.get('total_contribution', 'Unknown')} μDALY")
-                
-                if target_groups.get('decrease'):
-                    print("  Recommended Decreases:")
-                    for group in target_groups['decrease'][:2]:  # Show first 2
-                        print(f"    - {group.get('food_group', 'Unknown')}: {group.get('total_contribution', 'Unknown')} μDALY")
-                
-                # Epidemiological context
-                epi_context = analysis_data.get('epidemiological_context', {})
-                disease_burdens = epi_context.get('primary_disease_burdens', [])
-                if disease_burdens and isinstance(disease_burdens, list):
-                    print(f"\n🦠 PRIMARY DISEASE IMPACTS:")
-                    for item in disease_burdens[:3]:  # Show first 3
-                        disease = item.get('disease', 'Unknown')
-                        burden = item.get('percentage', 0)
-                        print(f"  {disease}: {burden}% of total DALY burden")
-                
-                return True
-            else:
-                print(f"❌ Unexpected payload: {data}")
-                return False
-        else:
-            print(f"❌ HTTP Error: {response.status_code}")
-            print(f"Response: {response.text[:300]}...")
-            return False
-            
-    except Exception as e:
-        print(f"❌ Request failed: {e}")
-        return False
-
 def test_error_handling():
     """Test API error handling with invalid data."""
     print("\n" + "=" * 60)
@@ -439,16 +317,12 @@ def main():
     print("\n🎯 TEST 2: Food Profile Analysis")
     results["tests"]["food_profile"] = test_food_profile()
     
-    # Test 3: Dietary pattern analysis (may fail if complex)
-    print("\n🎯 TEST 3: Dietary Pattern Analysis")
-    results["tests"]["dietary_pattern"] = test_dietary_pattern_analysis()
-    
-    # Test 4: Error handling
-    print("\n🎯 TEST 4: Error Handling")
+    # Test 3: Error handling
+    print("\n🎯 TEST 3: Error Handling")
     results["tests"]["error_handling"] = test_error_handling()
     
-    # Test 5: Performance
-    print("\n🎯 TEST 5: Performance")
+    # Test 4: Performance
+    print("\n🎯 TEST 4: Performance")
     results["tests"]["performance"] = run_performance_test()
     
     # Summary

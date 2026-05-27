@@ -138,7 +138,6 @@ urlpatterns = [
     # Core HENI Endpoints using evidence-based DALY methodology with 14 risk factors
     path('heni/calculate/', heni_views.heni_calculate, name='heni_calculate'),
     path('heni/food/<int:food_id>/profile/', heni_views.get_food_heni_profile, name='get_food_heni_profile'),
-    path('heni/analyze-pattern/', heni_views.analyze_dietary_pattern, name='analyze_dietary_pattern'),
 
     # =============================================================================
     # AI-MATCH-1 (2026-05-23) — Recipe decomposer

@@ -43,9 +43,8 @@ export interface ScorerInput {
 
 export interface RunOptions {
   userType: UserType;
-  /** When the active list came from a packaged-food decomposition, the
-   *  dietary-pattern endpoint swaps its caveat language. Forwarded only
-   *  to the dietary-pattern call. */
+  /** When the active list came from a packaged-food decomposition, forward
+   *  to all scorer endpoints for inferred-composition caveat swap. */
   decompositionProvenance?: 'packaged_food_inferred';
   /** N-day average label (e.g. "5-day average, 2026-05-17 to 2026-05-21").
    *  Same dietary-pattern caveat swap as above. */
@@ -85,8 +84,8 @@ export interface ProfileResults {
 
 // --- Caching --------------------------------------------------------------
 
-// v3: bumped 2026-05-26 after FCS multi-food aggregation + adapter parse fix.
-const CACHE_PREFIX = 'scorecard_cache_v3:';
+// v4: bumped 2026-05-26 after PKG Phase 2.x caveat swap + HSR skip-combined path.
+const CACHE_PREFIX = 'scorecard_cache_v4:';
 const memoryCache = new Map<string, ProfileResults>();
 
 /** FNV-1a 32-bit hash, hex-encoded. Tiny, dependency-free, sufficient for
@@ -224,15 +223,18 @@ export async function runAllScorers(
 
   const enableLca = opts.enableLcaMatcher ?? true;
   const userType = opts.userType;
+  const decompProv = opts.decompositionProvenance;
 
   // Build per-scorer request bodies from the same canonical input shape.
   const hefiReq = {
     foods: ingredients.map(i => ({ food_id: i.food_id, amount_g: i.mass_g })),
     user_type: userType,
+    ...(decompProv ? { decomposition_provenance: decompProv } : {}),
   };
   const heniReq = {
     meal: ingredients.map(i => ({ food_id: i.food_id, amount: i.mass_g, unit: 'g' })),
     user_type: userType,
+    ...(decompProv ? { decomposition_provenance: decompProv } : {}),
   };
   const hsrReq = {
     food_ids: ingredients.map(i => i.food_id),
@@ -242,17 +244,20 @@ export async function runAllScorers(
     include_meal_insights: true,
     from_recall24h: ingredients.length > 1,
     user_type: userType,
+    ...(decompProv ? { decomposition_provenance: decompProv } : {}),
   };
   const fcsReq = {
     food_ids: ingredients.map(i => i.food_id),
     food_names: ingredients.map(i => i.food_description),
     serving_sizes: ingredients.map(i => i.mass_g),
     user_type: userType,
+    ...(decompProv ? { decomposition_provenance: decompProv } : {}),
   };
   const envReq = {
     foods: ingredients.map(i => ({ food_id: i.food_id, quantity: i.mass_g })),
     user_type: userType,
     enable_lca_matcher: enableLca,
+    ...(decompProv ? { decomposition_provenance: decompProv } : {}),
   };
 
   // Dietary pattern uses CNFApiService.classifyDietaryPattern(foods, options)

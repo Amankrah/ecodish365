@@ -84,25 +84,3 @@ class DALYCalculator:
             health_impact_minutes=float(out["health_impact_minutes"]),
             health_impact_description=str(out["health_impact_description"]),
         )
-
-    def calculate_population_impact(
-        self,
-        individual_results: List[HENIResult],
-        population_size: int = 100000,
-    ) -> Dict[str, float]:
-        if not individual_results:
-            return {}
-
-        avg_heni = sum(result.total_heni_score for result in individual_results) / len(individual_results)
-        total_minutes_saved = sum(result.health_impact_minutes for result in individual_results)
-        population_dalys_avoided = avg_heni * population_size / 1_000_000
-        population_life_years_saved = population_dalys_avoided
-
-        return {
-            "population_size": population_size,
-            "average_heni_score": avg_heni,
-            "total_dalys_avoided": population_dalys_avoided,
-            "total_life_years_saved": population_life_years_saved,
-            "total_minutes_saved": total_minutes_saved,
-            "economic_value_usd": population_dalys_avoided * 50000,
-        }

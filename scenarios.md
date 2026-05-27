@@ -138,10 +138,10 @@ Score 100 typical Canadian meals across all five indicators + monetised external
 - `results/S4/fig_pareto.pdf` → Figure 7.
 
 ### Effort
-2–3 weeks pending RDC access. If RDC is blocked, fall back to synthetic meals constructed from CFG-2019 plate guidance + CNF (documented as limitation).
+2–3 weeks pending RDC access. **S4-lite interim (2026-05-26):** 25-day curated panel shipped without RDC — see [`backend/_smoke_s4_lite_panel.py`](backend/_smoke_s4_lite_panel.py) and [`results/S4-lite/`](results/S4-lite/). If RDC is blocked, extend S4-lite or document as primary case study (limitation: not CCHS-representative).
 
 ### Success criterion
-Reproduce the qualitative weak-correlation finding of Stylianou et al. between nutritional and environmental indicators.
+Reproduce the qualitative weak-correlation finding of Stylianou et al. between nutritional and environmental indicators. **S4-lite partial pass:** nutrition–GW Spearman ρ = −0.42 to −0.59 across 25 days; full Pareto frontier awaits 100-meal panel.
 
 ---
 
