@@ -301,27 +301,78 @@ export function toHsrCard(
   if (outcome.status !== 'fulfilled') {
     return errorCard('hsr', outcome.status === 'rejected' ? outcome.reason : 'Skipped');
   }
-  const rating = outcome.result?.hsr_result?.rating?.star_rating ?? 0;
-  const level = outcome.result?.hsr_result?.rating?.level;
-  const stars = '★'.repeat(Math.floor(rating)) + (rating % 1 >= 0.5 ? '½' : '') + '☆'.repeat(5 - Math.ceil(rating));
   const meta = META.hsr;
   const multiFood = nFoods >= 2;
+
+  // n = 1 — keep the standard per-product star rating; this is HSR's
+  // native unit of analysis.
+  if (!multiFood) {
+    const rating = outcome.result?.hsr_result?.rating?.star_rating ?? 0;
+    const level = outcome.result?.hsr_result?.rating?.level;
+    const stars = '★'.repeat(Math.floor(rating))
+      + (rating % 1 >= 0.5 ? '½' : '')
+      + '☆'.repeat(Math.max(0, 5 - Math.ceil(rating)));
+    return {
+      metric: 'hsr',
+      title: meta.title,
+      emoji: meta.emoji,
+      headline: `${stars} · ${rating.toFixed(1)} / 5`,
+      subline: level ? level.replace(/_/g, ' ') : undefined,
+      meaning: pickMeaning('hsr', userType, outcome.explanations),
+      caveat: pickCaveat('hsr', userType, outcome.explanations),
+      ctaHref: meta.ctaHref,
+      ctaLabel: meta.ctaLabel,
+      accent: meta.accent,
+      status: 'ok',
+    };
+  }
+
+  // n ≥ 2 — use the per-food summary from the SCORECARD-1 backend
+  // extension. This avoids the misleading "combined-meal star treated as
+  // a day score" framing; instead we show within-category comparison
+  // anchors: energy-weighted average, range, and the best/worst items.
+  const summary = outcome.result?.per_food_summary;
+  if (!summary?.available) {
+    // Backend did not emit per-food summary (older deployment, or all
+    // per-food calls failed). Honest fallback: show a hint card pointing
+    // the user to the compare tool.
+    return {
+      metric: 'hsr',
+      title: meta.title,
+      emoji: meta.emoji,
+      headline: 'Per-product compare unavailable',
+      meaning: META.hsr.meaningIndividual,
+      caveat: 'HSR compares products within the same category, not whole days.',
+      ctaHref: '/hsr/compare?from=scorecard',
+      ctaLabel: 'Open HSR compare',
+      accent: meta.accent,
+      status: 'hint',
+      hint: 'Open HSR compare to score each product individually.',
+    };
+  }
+  const wAvg = summary.energy_weighted_avg;
+  const high = summary.highest;
+  const low = summary.lowest;
+  // Truncate long food names so the driver line stays one short sentence.
+  const trunc = (s: string, n = 32) => s.length > n ? `${s.slice(0, n - 1)}…` : s;
+  const driver = high && low && high.food_id !== low.food_id
+    ? `Range ${summary.min.toFixed(1)}–${summary.max.toFixed(1)}★ · strongest: ${trunc(high.food_name)} · weakest: ${trunc(low.food_name)}`
+    : `Range ${summary.min.toFixed(1)}–${summary.max.toFixed(1)}★`;
+  const dist = summary.distribution;
+  const goodOrBetter = dist.excellent + dist.good;
   return {
     metric: 'hsr',
     title: meta.title,
     emoji: meta.emoji,
-    headline: multiFood
-      ? `avg ${rating.toFixed(1)}★ across ${nFoods} items`
-      : `${stars} · ${rating.toFixed(1)} / 5`,
-    subline: !multiFood && level ? level.replace(/_/g, ' ') : undefined,
-    meaning: pickMeaning('hsr', userType, outcome.explanations),
-    caveat: multiFood
-      ? 'HSR rates products individually, not days. Scan a single product for a per-product rating.'
-      : pickCaveat('hsr', userType, outcome.explanations),
-    ctaHref: meta.ctaHref,
-    ctaLabel: meta.ctaLabel,
+    headline: `~${wAvg.toFixed(1)}★ weighted avg · ${summary.n_foods} products`,
+    subline: `${goodOrBetter} of ${summary.n_foods} items ≥ 3.5★`,
+    meaning: 'How healthy each individual product is within its own category — averaged across your list.',
+    caveat: 'HSR compares products within the same category, not whole days. For daily diet quality, see HEFI or FCS.',
+    driver,
+    ctaHref: '/hsr/compare?from=scorecard',
+    ctaLabel: 'Compare products',
     accent: meta.accent,
-    status: multiFood ? 'damped' : 'ok',
+    status: 'damped',
   };
 }
 

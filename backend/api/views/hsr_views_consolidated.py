@@ -222,6 +222,15 @@ def calculate_hsr(request):
     result["from_recall24h"] = from_recall24h
     result["meal_categorization"] = _get_basic_meal_categorization_summary(meal)
 
+    # SCORECARD-1 (2026-05-26): when scoring a 24-h recall (or any multi-food
+    # batch coming from the Scorecard), HSR's combined-meal star is
+    # methodologically weak — HSRAC v9 rates products WITHIN their category.
+    # Surface a per-item breakdown so the Scorecard can show energy-weighted
+    # range/anchors/distribution instead of a misleading single number.
+    if from_recall24h and len(foods) > 1:
+        result["per_food_ratings"] = _build_per_food_ratings(food_ids, serving_sizes)
+        result["per_food_summary"] = _summarise_per_food_ratings(result["per_food_ratings"])
+
     t3 = time.perf_counter()
     assembly_ms = (t3 - t2) * 1000.0
     total_ms = (t3 - t0) * 1000.0
@@ -689,6 +698,77 @@ def _format_health_insight(insight) -> Dict:
         "priority": insight.priority,
         "actionable": getattr(insight, 'actionable', False),
         "action_text": getattr(insight, 'action_text', None)
+    }
+
+
+def _build_per_food_ratings(food_ids: List[int], serving_sizes: List[float]) -> List[Dict]:
+    """SCORECARD-1: score each food individually in its own HSRAC v9 category
+    at its actual gram amount (recall portion, not 100 g). This mirrors the
+    /hsr/compare/ inner loop but uses the per-food serving size that arrived
+    on the recall payload. One entry per food; failures are surfaced as
+    {error: ...} so the caller can still summarise the rest."""
+    out: List[Dict] = []
+    for fid, serving in zip(food_ids, serving_sizes):
+        try:
+            food = _load_food_data(int(fid), float(serving))
+            food_category = ThresholdProvider.get_category_from_food(
+                food.food_name,
+                getattr(food, 'food_group_id', 0),
+            )
+            per_meal = HSRMeal(foods=[food])
+            per_meal.category = food_category
+            per_calc = HSRCalculator(per_meal, HSRConfig(
+                use_scientific_thresholds=False,
+                differentiate_sugar_sources=False,
+                apply_satiety_adjustments=False,
+                use_unified_energy_approach=False,
+                consider_processing_level=False,
+            ))
+            per_result = per_calc.calculate_hsr()
+            out.append(_format_food_comparison(food, per_result, float(serving)))
+        except Exception as exc:  # noqa: BLE001 — surface per-food, don't fail the batch
+            out.append({"food_id": int(fid), "serving_size": float(serving),
+                        "error": f"Per-food HSR failed: {exc}"})
+    return out
+
+
+def _summarise_per_food_ratings(ratings: List[Dict]) -> Dict:
+    """Build the energy-weighted summary the Scorecard renders as the HSR
+    card headline + driver. Weighting by energy avoids the "20 g banana
+    counts the same as 290 g milk" pitfall of a simple mean. Falls back to
+    simple mean when no energy data is available."""
+    valid = [r for r in ratings if 'hsr_rating' in r]
+    if not valid:
+        return {"available": False}
+    stars = [float(r['hsr_rating']) for r in valid]
+    energies = [float(r.get('energy_kj') or 0.0) for r in valid]
+    total_energy = sum(energies)
+    if total_energy > 0:
+        weighted = sum(s * e for s, e in zip(stars, energies)) / total_energy
+    else:
+        weighted = sum(stars) / len(stars)
+    simple = sum(stars) / len(stars)
+    highest = max(valid, key=lambda r: r['hsr_rating'])
+    lowest = min(valid, key=lambda r: r['hsr_rating'])
+    return {
+        "available": True,
+        "n_foods": len(valid),
+        "n_failed": len(ratings) - len(valid),
+        "energy_weighted_avg": round(weighted, 2),
+        "simple_avg": round(simple, 2),
+        "min": round(min(stars), 1),
+        "max": round(max(stars), 1),
+        "highest": {"food_id": highest['food_id'], "food_name": highest['food_name'],
+                    "star_rating": highest['hsr_rating']},
+        "lowest": {"food_id": lowest['food_id'], "food_name": lowest['food_name'],
+                   "star_rating": lowest['hsr_rating']},
+        "distribution": {
+            "excellent":     len([s for s in stars if s >= 4.5]),
+            "good":          len([s for s in stars if 3.5 <= s < 4.5]),
+            "average":       len([s for s in stars if 2.5 <= s < 3.5]),
+            "below_average": len([s for s in stars if 1.5 <= s < 2.5]),
+            "poor":          len([s for s in stars if s < 1.5]),
+        },
     }
 
 

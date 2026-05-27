@@ -264,9 +264,10 @@ export default function ScorecardPage(): JSX.Element {
             <span>
               <strong>Small sample</strong> ({totalMassG.toFixed(0)} g
               {typeof dailyKcal === 'number' && dailyKcal > 0 ? `, ${dailyKcal.toFixed(0)} kcal` : ''}).
-              HEFI, HENI, Environmental, and Dietary Pattern are designed for full days of eating —
+              HEFI, HENI, Environmental, and Dietary Pattern need a fuller day to be meaningful —
               treat their absolute numbers below as illustrative, not as a personal diet diagnosis.
-              HSR and FCS work fine at this scale because they rate products.
+              HSR here summarises individual products only (not a daily HSR score); FCS is reliable
+              at the product level.
             </span>
           </div>
         )}

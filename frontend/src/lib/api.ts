@@ -1202,6 +1202,42 @@ export interface HSRResult {
     category_source?: string;
   }>;
   meal_categorization?: MealCategorization;
+  // SCORECARD-1 (2026-05-26): present only when from_recall24h=true AND
+  // the request had ≥2 foods. Each food is scored individually in its own
+  // HSRAC v9 category at its actual serving size — the right framing for
+  // the Scorecard's multi-food "within-category compare" headline.
+  per_food_ratings?: Array<{
+    food_id: number;
+    food_name: string;
+    serving_size: number;
+    food_group: string;
+    hsr_rating: number;
+    hsr_level: string;
+    category: string;
+    energy_kj: number;
+    key_nutrients?: Record<string, number>;
+    top_strength?: string | null;
+    top_concern?: string | null;
+    error?: string;
+  }>;
+  per_food_summary?: {
+    available: boolean;
+    n_foods: number;
+    n_failed: number;
+    energy_weighted_avg: number;
+    simple_avg: number;
+    min: number;
+    max: number;
+    highest: { food_id: number; food_name: string; star_rating: number };
+    lowest: { food_id: number; food_name: string; star_rating: number };
+    distribution: {
+      excellent: number;
+      good: number;
+      average: number;
+      below_average: number;
+      poor: number;
+    };
+  };
 }
 
 export interface HSRComparison {

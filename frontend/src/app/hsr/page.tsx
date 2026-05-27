@@ -33,12 +33,12 @@ const hsrFeatures = [
     features: ['Side-by-side comparison', 'Ranking by HSR rating', 'Key nutrients comparison', 'Smart recommendations'],
   },
   {
-    name: 'Food profile (all scores)',
-    description: 'See HSR alongside FCS, HEFI, HENI, and environmental impact for one food in a single summary.',
+    name: '✨ Scorecard (all metrics)',
+    description: 'See HSR alongside FCS, HEFI, HENI, environmental impact, and dietary pattern for the same food list in one consumer-friendly summary.',
     icon: ChartBarIcon,
-    href: '/food-profile',
+    href: '/scorecard',
     color: 'primary',
-    features: ['All five metrics at once', 'Consumer-friendly summary', 'Adjust serving size', 'Deep links to each calculator'],
+    features: ['All six metrics at once', 'Consumer-friendly summary', 'Cross-metric transfer', 'Deep links to each calculator'],
   },
 ];
 
