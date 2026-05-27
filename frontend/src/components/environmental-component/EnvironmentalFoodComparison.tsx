@@ -4,7 +4,7 @@
  * Comprehensive side-by-side comparison with detailed analysis
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
@@ -13,7 +13,6 @@ import { Progress } from '../ui/progress';
 import {
   Leaf,
   Plus,
-  Trash2,
   TrendingUp,
   TrendingDown,
   AlertTriangle,
@@ -29,12 +28,12 @@ import {
 } from 'lucide-react';
 import { 
   EnvironmentalImpactApiService, 
-  CNFApiService, 
   type FoodComparisonResult,
-  type FilterOptions 
 } from '../../lib/api';
-import { AIEnhancedSearch } from '../shared/AIEnhancedSearch';
-import { RecipeDecomposerModal } from '../shared/RecipeDecomposerModal';
+import {
+  ScorerFoodInput,
+  type ScorerFoodPoolItem,
+} from '../shared/ScorerFoodInput';
 
 interface SelectedFood {
   FoodID: number;
@@ -44,98 +43,31 @@ interface SelectedFood {
   unit: string;
 }
 
-interface SearchResult {
-  FoodID: number;
-  FoodDescription: string;
-  FoodCode?: string;
+function envToPool(foods: SelectedFood[]): ScorerFoodPoolItem[] {
+  return foods.map(f => ({
+    food_id: f.FoodID,
+    food_name: f.FoodDescription,
+    amount_g: f.amount,
+  }));
+}
+
+function poolToEnv(pool: ScorerFoodPoolItem[]): SelectedFood[] {
+  return pool.map(p => ({
+    FoodID: p.food_id,
+    FoodDescription: p.food_name,
+    amount: p.amount_g,
+    unit: 'g',
+  }));
 }
 
 type UserType = 'individual' | 'researcher' | 'policy';
 
 const EnvironmentalFoodComparison = () => {
   const [selectedFoods, setSelectedFoods] = useState<SelectedFood[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [comparisonResults, setComparisonResults] = useState<FoodComparisonResult | null>(null);
   const [loading, setLoading] = useState(false);
-  const [searchIsLoading, setSearchIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
-  const [filters, setFilters] = useState<FilterOptions | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [selectedMethod, setSelectedMethod] = useState<string>('');
-  const [recipeModalOpen, setRecipeModalOpen] = useState(false);
   const [userType, setUserType] = useState<UserType>('individual');
-
-  useEffect(() => {
-    const loadFilters = async () => {
-      try {
-        const data = await CNFApiService.getFoodFilters();
-        setFilters(data);
-      } catch (e) {
-        console.warn('Failed to load CNF filters', e);
-      }
-    };
-    loadFilters();
-  }, []);
-
-  // Debounced search
-  useEffect(() => {
-    if (!searchQuery.trim() || searchQuery.trim().length < 2) {
-      setSearchResults([]);
-      return;
-    }
-
-    const timeoutId = setTimeout(async () => {
-      setSearchIsLoading(true);
-      try {
-        try {
-          const enhanced = await CNFApiService.searchFoodsEnhanced({
-            query: searchQuery,
-            limit: 50,
-            category: selectedCategory || undefined,
-            method: selectedMethod || undefined,
-          });
-          setSearchResults(enhanced.results || []);
-        } catch {
-          const basic = await CNFApiService.searchFoods(searchQuery, 50);
-          setSearchResults(basic.results || []);
-        }
-      } catch (err) {
-        console.error('Search error:', err);
-        setSearchResults([]);
-      } finally {
-        setSearchIsLoading(false);
-      }
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
-  }, [searchQuery, selectedCategory, selectedMethod]);
-
-  const addFood = (food: SearchResult) => {
-    const newFood: SelectedFood = {
-      FoodID: food.FoodID,
-      FoodDescription: food.FoodDescription,
-      FoodCode: food.FoodCode,
-      amount: 100,
-      unit: 'g'
-    };
-    
-    if (!selectedFoods.some(f => f.FoodID === food.FoodID)) {
-      setSelectedFoods([...selectedFoods, newFood]);
-    }
-    setSearchQuery('');
-    setSearchResults([]);
-  };
-
-  const removeFood = (foodId: number) => {
-    setSelectedFoods(selectedFoods.filter(f => f.FoodID !== foodId));
-  };
-
-  const updateFoodAmount = (foodId: number, amount: number) => {
-    setSelectedFoods(selectedFoods.map(f => 
-      f.FoodID === foodId ? { ...f, amount: Math.max(0.1, amount) } : f
-    ));
-  };
 
   const compareFoods = async () => {
     if (selectedFoods.length < 2) {
@@ -177,8 +109,6 @@ const EnvironmentalFoodComparison = () => {
     setSelectedFoods([]);
     setComparisonResults(null);
     setError('');
-    setSearchQuery('');
-    setSearchResults([]);
   };
 
   const exportResults = () => {
@@ -231,7 +161,8 @@ const EnvironmentalFoodComparison = () => {
           </div>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Compare the environmental impacts of different foods using comprehensive LCA methodology 
-            with Canadian-specific factors
+            with Canadian-specific factors. For one food across all metrics see{' '}
+            <a href="/food-profile" className="text-green-700 underline">Food profile</a>.
           </p>
           
           {/* User Type Selector */}
@@ -265,175 +196,36 @@ const EnvironmentalFoodComparison = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Search Filters */}
-              {filters && (
-                <div className="space-y-4 border-b pb-4">
-                  <h3 className="text-sm font-medium text-gray-700">Search Filters</h3>
-                  <div className="space-y-3">
-                    <div>
-                      <label htmlFor="compare-food-category" className="block text-xs font-medium text-gray-600 mb-1">Food Category</label>
-                      <select
-                        id="compare-food-category"
-                        value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                      >
-                        <option value="">All categories</option>
-                        {filters.categories.map((c) => (
-                          <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label htmlFor="compare-cooking-method" className="block text-xs font-medium text-gray-600 mb-1">Cooking Method</label>
-                      <select
-                        id="compare-cooking-method"
-                        value={selectedMethod}
-                        onChange={(e) => setSelectedMethod(e.target.value)}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                      >
-                        <option value="">All methods</option>
-                        {filters.methods.map((m) => (
-                          <option key={m} value={m}>{m.charAt(0).toUpperCase() + m.slice(1)}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                  {(selectedCategory || selectedMethod) && (
-                    <button
-                      onClick={() => { setSelectedCategory(''); setSelectedMethod(''); }}
-                      className="text-xs text-green-600 hover:text-green-800"
-                    >
-                      Clear filters
-                    </button>
-                  )}
-                </div>
-              )}
-
-              {/* Food Search */}
-              <div className="space-y-3">
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search for foods to compare..."
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                  />
-                </div>
-                {searchIsLoading && searchQuery && (
-                  <div className="text-sm text-gray-500">Searching...</div>
-                )}
-
-                <AIEnhancedSearch
-                  query={searchQuery}
-                  userType={userType}
-                  accent="green"
-                  onSelect={(food) =>
-                    addFood({
-                      FoodID: food.food_id,
-                      FoodDescription: food.food_description,
-                    })
-                  }
-                />
+              <ScorerFoodInput
+                mode="pool"
+                target="environmental"
+                accent="green"
+                userType={userType}
+                onUserTypeChange={setUserType}
+                pool={envToPool(selectedFoods)}
+                onPoolChange={pool => setSelectedFoods(poolToEnv(pool))}
+                poolSearchLabel="Search foods to compare (grams)"
+              >
                 <button
                   type="button"
-                  onClick={() => setRecipeModalOpen(true)}
-                  className="inline-flex items-center gap-1.5 text-sm text-green-700 hover:text-green-900 hover:underline"
+                  onClick={compareFoods}
+                  disabled={loading || selectedFoods.length < 2}
+                  className="w-full mt-2 inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
-                  🍳 Score a homemade dish (decompose into CNF ingredients)
+                  <BarChart3 className="mr-2 w-5 h-5" />
+                  {loading ? 'Comparing…' : 'Compare foods'}
                 </button>
-
-                {searchResults.length > 0 && (
-                  <div className="bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto">
-                    {searchResults.map((food) => (
-                      <button
-                        key={food.FoodID}
-                        onClick={() => addFood(food)}
-                        className="w-full text-left px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
-                      >
-                        <div className="font-medium text-gray-900">{food.FoodDescription}</div>
-                        <div className="text-sm text-gray-500">ID: {food.FoodID}</div>
-                      </button>
-                    ))}
-                  </div>
+                {selectedFoods.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={resetComparison}
+                    className="w-full text-xs text-gray-500 hover:text-gray-700 mt-1"
+                  >
+                    Clear all foods
+                  </button>
                 )}
-              </div>
+              </ScorerFoodInput>
 
-              {/* Selected Foods */}
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-medium text-gray-700">Selected Foods ({selectedFoods.length})</h3>
-                  {selectedFoods.length > 0 && (
-                    <button
-                      onClick={resetComparison}
-                      className="text-xs text-gray-500 hover:text-gray-700"
-                    >
-                      Clear all
-                    </button>
-                  )}
-                </div>
-
-                {selectedFoods.length === 0 ? (
-                  <div className="text-center py-6 text-gray-500">
-                    <BarChart3 className="w-10 h-10 mx-auto mb-2 opacity-50" />
-                    <p>No foods selected yet.</p>
-                    <p className="text-xs mt-1">Add at least 2 foods to compare.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {selectedFoods.map((food, index) => (
-                      <div key={food.FoodID} className="p-3 bg-gray-50 rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <Badge variant="outline" className="text-xs">
-                              {index + 1}
-                            </Badge>
-                            <div>
-                              <div className="font-medium text-gray-900 text-sm">{food.FoodDescription}</div>
-                              <div className="text-xs text-gray-500">ID: {food.FoodID}</div>
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => removeFood(food.FoodID)}
-                            className="text-red-500 hover:text-red-700 p-1"
-                            aria-label={`Remove ${food.FoodDescription}`}
-                            title={`Remove ${food.FoodDescription}`}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <label htmlFor={`amount-${food.FoodID}`} className="text-xs font-medium text-gray-600">Amount:</label>
-                          <input
-                            id={`amount-${food.FoodID}`}
-                            type="number"
-                            min="0.1"
-                            step="0.1"
-                            value={food.amount}
-                            onChange={(e) => updateFoodAmount(food.FoodID, parseFloat(e.target.value) || 0.1)}
-                            className="w-20 px-2 py-1 border border-gray-300 rounded text-xs focus:ring-2 focus:ring-green-500"
-                            placeholder="Amount in grams"
-                          />
-                          <span className="text-xs text-gray-500">grams</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Compare Button */}
-              <button
-                onClick={compareFoods}
-                disabled={loading || selectedFoods.length < 2}
-                className="w-full mt-2 inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
-              >
-                <BarChart3 className="mr-2 w-5 h-5" />
-                {loading ? 'Comparing...' : 'Compare Foods'}
-              </button>
-
-              {/* Error Display */}
               {error && (
                 <Alert className="border-red-200 bg-red-50">
                   <AlertTriangle className="h-4 w-4 text-red-500" />
@@ -676,25 +468,6 @@ const EnvironmentalFoodComparison = () => {
           </div>
         </div>
       </div>
-
-      <RecipeDecomposerModal
-        open={recipeModalOpen}
-        onClose={() => setRecipeModalOpen(false)}
-        userType={userType}
-        accent="green"
-        onApply={(ingredients) => {
-          const additions: SelectedFood[] = ingredients
-            .filter((i) => !selectedFoods.some((f) => f.FoodID === i.food_id))
-            .map((i) => ({
-              FoodID: i.food_id,
-              FoodDescription: i.food_description,
-              FoodCode: undefined,
-              amount: i.mass_g,
-              unit: 'g',
-            }));
-          setSelectedFoods([...selectedFoods, ...additions]);
-        }}
-      />
     </div>
   );
 };

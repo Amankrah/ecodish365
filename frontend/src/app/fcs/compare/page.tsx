@@ -1,151 +1,35 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { 
-  PlusIcon, 
-  TrashIcon, 
-  MagnifyingGlassIcon,
+import React, { useState } from 'react';
+import {
   ScaleIcon,
   ChartBarIcon,
   ArrowPathIcon,
   TrophyIcon,
   ExclamationTriangleIcon,
-  InformationCircleIcon
+  InformationCircleIcon,
 } from '@heroicons/react/24/outline';
-import { FCSApiService, CNFApiService, type FCSComparison, type SearchResult, type FilterOptions } from '@/lib/api';
-import { AIEnhancedSearch } from '@/components/shared/AIEnhancedSearch';
-
-interface FoodItem {
-  id: string;
-  food_id: number;
-  food_name: string;
-}
-
-interface SearchState {
-  query: string;
-  results: SearchResult['results'];
-  isLoading: boolean;
-  showResults: boolean;
-}
+import { FCSApiService, type FCSComparison } from '@/lib/api';
+import {
+  ScorerFoodInput,
+  ensureMinSlots,
+  type ScorerFoodSlot,
+} from '@/components/shared/ScorerFoodInput';
 
 export default function FCSCompare() {
-  const [foods, setFoods] = useState<FoodItem[]>([
-    { id: '1', food_id: 0, food_name: '' },
-    { id: '2', food_id: 0, food_name: '' }
-  ]);
-  const [search, setSearch] = useState<SearchState>({
-    query: '',
-    results: [],
-    isLoading: false,
-    showResults: false
-  });
-  const [activeSearch, setActiveSearch] = useState<string>('');
+  const [foods, setFoods] = useState<ScorerFoodSlot[]>(() =>
+    ensureMinSlots([], 2, 100),
+  );
   const [comparison, setComparison] = useState<FCSComparison | null>(null);
   const [isComparing, setIsComparing] = useState(false);
-  const [filters, setFilters] = useState<FilterOptions | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [selectedMethod, setSelectedMethod] = useState<string>('');
-
-  // Load filters on component mount
-  useEffect(() => {
-    const loadFilters = async () => {
-      try {
-        const filterOptions = await CNFApiService.getFoodFilters();
-        setFilters(filterOptions);
-      } catch (error) {
-        console.error('Failed to load filters:', error);
-      }
-    };
-    loadFilters();
-  }, []);
 
   // Helper to get the actual comparison data from the response
   const getComparisonData = (comparisonResponse: FCSComparison | { success: boolean; data: FCSComparison; message: string } | null): FCSComparison | null => {
     if (!comparisonResponse) return null;
-    // Check if we have the response wrapper structure
     if ('data' in comparisonResponse && 'success' in comparisonResponse) {
       return comparisonResponse.data;
     }
-    // Otherwise assume it's already the comparison data
     return comparisonResponse as FCSComparison;
-  };
-
-  // Debounced search
-  useEffect(() => {
-    if (search.query.length < 2) {
-      setSearch(prev => ({ ...prev, results: [], showResults: false }));
-      return;
-    }
-
-    const timeoutId = setTimeout(async () => {
-      setSearch(prev => ({ ...prev, isLoading: true }));
-      try {
-        // Try enhanced search first, fallback to regular search
-        let searchResult;
-        try {
-          searchResult = await CNFApiService.searchFoodsEnhanced({
-            query: search.query,
-            limit: 50,
-            category: selectedCategory || undefined,
-            method: selectedMethod || undefined
-          });
-        } catch (enhancedError) {
-          console.log('Enhanced search failed, falling back to regular search:', enhancedError);
-          try {
-            searchResult = await CNFApiService.searchFoods(search.query, 50);
-          } catch (regularError) {
-            console.error('Both search methods failed:', { enhancedError, regularError });
-            throw regularError;
-          }
-        }
-        setSearch(prev => ({ 
-          ...prev, 
-          results: searchResult.results, 
-          isLoading: false, 
-          showResults: true 
-        }));
-      } catch (error) {
-        console.error('Search error:', error);
-        setSearch(prev => ({ ...prev, isLoading: false, showResults: false }));
-      }
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
-  }, [search.query, selectedCategory, selectedMethod]);
-
-  const addFood = () => {
-    if (foods.length >= 10) {
-      alert('Maximum 10 foods can be compared at once.');
-      return;
-    }
-    const newId = (foods.length + 1).toString();
-    setFoods([...foods, { id: newId, food_id: 0, food_name: '' }]);
-  };
-
-  const removeFood = (id: string) => {
-    if (foods.length > 2) {
-      setFoods(foods.filter(food => food.id !== id));
-    }
-  };
-
-  const updateFood = (id: string, updates: Partial<FoodItem>) => {
-    setFoods(foods.map(food => 
-      food.id === id ? { ...food, ...updates } : food
-    ));
-  };
-
-  const selectFood = (foodId: string, selectedFood: SearchResult['results'][0]) => {
-    updateFood(foodId, {
-      food_id: selectedFood.FoodID,
-      food_name: selectedFood.FoodDescription
-    });
-    setSearch(prev => ({ ...prev, query: '', showResults: false }));
-    setActiveSearch('');
-  };
-
-  const handleSearch = (foodId: string, query: string) => {
-    setActiveSearch(foodId);
-    setSearch(prev => ({ ...prev, query }));
   };
 
   const compareFoods = async () => {
@@ -211,182 +95,45 @@ export default function FCSCompare() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Compare Foods</h1>
           <p className="text-lg text-gray-600">
-            Compare Food Compass Scores between multiple foods with detailed analysis and insights.
+            Rank products by Food Compass Score — works across all food types.
+            For one food across all metrics see{' '}
+            <a href="/food-profile" className="text-violet-700 underline">Food profile</a>.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Input Panel */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Foods to Compare</h2>
-              
-              {/* Search Filters */}
-              {filters && (
-                <div className="mb-6 space-y-4 border-b pb-4">
-                  <h3 className="text-sm font-medium text-gray-700">Search Filters</h3>
-                  
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
-                      Food Category
-                    </label>
-                    <select
-                      value={selectedCategory}
-                      onChange={(e) => setSelectedCategory(e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      aria-label="Food category filter"
-                    >
-                      <option value="">All categories</option>
-                      {filters.categories.map((category) => (
-                        <option key={category} value={category}>
-                          {category.charAt(0).toUpperCase() + category.slice(1)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
-                      Cooking Method
-                    </label>
-                    <select
-                      value={selectedMethod}
-                      onChange={(e) => setSelectedMethod(e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      aria-label="Cooking method filter"
-                    >
-                      <option value="">All methods</option>
-                      {filters.methods.map((method) => (
-                        <option key={method} value={method}>
-                          {method.charAt(0).toUpperCase() + method.slice(1)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  
-                  {(selectedCategory || selectedMethod) && (
-                    <button
-                      onClick={() => {
-                        setSelectedCategory('');
-                        setSelectedMethod('');
-                      }}
-                      className="text-xs text-blue-600 hover:text-blue-800"
-                    >
-                      Clear filters
-                    </button>
-                  )}
-                </div>
-              )}
-
-              {/* Food Inputs */}
-              <div className="space-y-4">
-                {foods.map((food) => (
-                  <div key={food.id} className="border border-gray-200 rounded-md p-4">
-                    <div className="flex justify-between items-start mb-3">
-                      <h3 className="text-sm font-medium text-gray-700">Food {food.id}</h3>
-                      {foods.length > 2 && (
-                        <button
-                          onClick={() => removeFood(food.id)}
-                          className="text-red-500 hover:text-red-700"
-                          aria-label={`Remove food ${food.id}`}
-                        >
-                          <TrashIcon className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                    
-                    {/* Food Search */}
-                    <div className="relative">
-                      <div className="relative">
-                        <input
-                          type="text"
-                          value={activeSearch === food.id ? search.query : food.food_name}
-                          onChange={(e) => handleSearch(food.id, e.target.value)}
-                          placeholder="Search for a food..."
-                          className="w-full border border-gray-300 rounded-md pl-10 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
-                        <MagnifyingGlassIcon className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
-                      </div>
-
-                      {/* AI-MATCH-1: opt-in LLM ranker for THIS slot */}
-                      {activeSearch === food.id && search.query.trim() && (
-                        <div className="mt-2">
-                          <AIEnhancedSearch
-                            query={search.query}
-                            userType="individual"
-                            accent="blue"
-                            onSelect={(picked) => selectFood(food.id, {
-                              FoodID: picked.food_id,
-                              FoodDescription: picked.food_description,
-                              FoodCode: undefined as unknown as string,
-                            } as SearchResult['results'][0])}
-                          />
-                        </div>
-                      )}
-
-                      {/* Search Results */}
-                      {activeSearch === food.id && search.showResults && (
-                        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto">
-                          {search.isLoading ? (
-                            <div className="p-3 text-center text-sm text-gray-500">
-                              Searching...
-                            </div>
-                          ) : search.results.length > 0 ? (
-                            search.results.map((item) => (
-                              <button
-                                key={item.FoodID}
-                                onClick={() => selectFood(food.id, item)}
-                                className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
-                              >
-                                <div className="font-medium text-gray-900 truncate">
-                                  {item.FoodDescription}
-                                </div>
-                                <div className="text-xs text-gray-500">
-                                  Code: {item.FoodCode}
-                                </div>
-                              </button>
-                            ))
-                          ) : (
-                            <div className="p-3 text-center text-sm text-gray-500">
-                              No foods found
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Add Food Button */}
-              {foods.length < 10 && (
-                <button
-                  onClick={addFood}
-                  className="w-full mt-4 flex items-center justify-center px-4 py-2 border border-dashed border-gray-300 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:border-gray-400"
-                >
-                  <PlusIcon className="w-4 h-4 mr-2" />
-                  Add Another Food
-                </button>
-              )}
-
-              {/* Compare Button */}
-              <button
-                onClick={compareFoods}
-                disabled={isComparing || foods.filter(food => food.food_id > 0).length < 2}
-                className="w-full mt-6 bg-purple-600 text-white px-4 py-3 rounded-md font-medium hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center"
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Foods to compare</h2>
+              <ScorerFoodInput
+                mode="slots"
+                target="fcs"
+                accent="blue"
+                userType="individual"
+                slots={foods}
+                onSlotsChange={setFoods}
+                minSlots={2}
+                maxSlots={10}
               >
-                {isComparing ? (
-                  <>
-                    <ArrowPathIcon className="w-4 h-4 mr-2 animate-spin" />
-                    Comparing...
-                  </>
-                ) : (
-                  <>
-                    <ScaleIcon className="w-4 h-4 mr-2" />
-                    Compare Foods
-                  </>
-                )}
-              </button>
+                <button
+                  type="button"
+                  onClick={compareFoods}
+                  disabled={isComparing || foods.filter(f => f.food_id > 0).length < 2}
+                  className="w-full mt-2 bg-purple-600 text-white px-4 py-3 rounded-md font-medium hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center"
+                >
+                  {isComparing ? (
+                    <>
+                      <ArrowPathIcon className="w-4 h-4 mr-2 animate-spin" />
+                      Comparing…
+                    </>
+                  ) : (
+                    <>
+                      <ScaleIcon className="w-4 h-4 mr-2" />
+                      Compare foods
+                    </>
+                  )}
+                </button>
+              </ScorerFoodInput>
             </div>
           </div>
 

@@ -582,6 +582,7 @@ export class CNFApiService {
     return {
       food_ids: ingredients.map(i => i.food_id),
       food_names: ingredients.map(i => i.food_description),
+      serving_sizes: ingredients.map(i => i.mass_g),
       user_type: userType,
     };
   }
@@ -1409,6 +1410,10 @@ export class HSRApiService {
 export interface FCSCalculationRequest {
   food_ids: number[];
   food_names?: string[];
+  /** Grams per food_id (parallel array). Defaults to 100 g each when omitted. */
+  serving_sizes?: number[];
+  /** Alias for serving_sizes (HEFI-style callers). */
+  amounts_g?: number[];
   /** Audience selector for the explanations block (AUDIENCE-CODE-1 2026-05-23). */
   user_type?: 'individual' | 'researcher' | 'policy';
 }

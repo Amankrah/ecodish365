@@ -35,14 +35,18 @@ interface Props {
   userType: UserType;
 }
 
-// Five scoring routes. Names match Recall24hWizard's SCORE_BUTTONS for consistency.
+// Scoring routes. Names match Recall24hWizard's SCORE_BUTTONS for consistency.
+// SCORECARD-1 (2026-05-26) tops the list with the consumer-friendly multi-metric view.
 const SCORE_ROUTES: Array<{
-  id: 'hefi' | 'heni' | 'fcs' | 'environmental' | 'dietary_pattern';
+  id: 'hefi' | 'heni' | 'fcs' | 'environmental' | 'dietary_pattern' | 'scorecard';
   emoji: string;
   label: string;
   path: string;
   note: string;
 }> = [
+  { id: 'scorecard', emoji: '✨', label: 'Scorecard',
+    path: '/scorecard',
+    note: 'All six metrics at a glance, framed for a lay reader' },
   { id: 'dietary_pattern', emoji: '🎯', label: 'Dietary pattern',
     path: '/dietary-pattern',
     note: 'Which canonical pattern does this product resemble?' },

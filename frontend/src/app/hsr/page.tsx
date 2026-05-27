@@ -33,20 +33,12 @@ const hsrFeatures = [
     features: ['Side-by-side comparison', 'Ranking by HSR rating', 'Key nutrients comparison', 'Smart recommendations'],
   },
   {
-    name: 'Meal Insights',
-    description: 'Get comprehensive meal-level analysis and personalized recommendations.',
-    icon: LightBulbIcon,
-    href: '/hsr/meal-insights',
-    color: 'secondary',
-    features: ['Meal composition analysis', 'Nutritional balance', 'Improvement opportunities', 'Dietary goal alignment'],
-  },
-  {
-    name: 'Food Profiles',
-    description: 'Explore detailed HSR profiles for individual foods with comprehensive analysis.',
+    name: 'Food profile (all scores)',
+    description: 'See HSR alongside FCS, HEFI, HENI, and environmental impact for one food in a single summary.',
     icon: ChartBarIcon,
-    href: '/hsr/food-profile',
+    href: '/food-profile',
     color: 'primary',
-    features: ['Complete nutritional analysis', 'Usage recommendations', 'Healthier alternatives', 'Confidence scoring'],
+    features: ['All five metrics at once', 'Consumer-friendly summary', 'Adjust serving size', 'Deep links to each calculator'],
   },
 ];
 

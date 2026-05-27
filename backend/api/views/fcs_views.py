@@ -35,6 +35,21 @@ def fcs_calculate(request):
         if not food_ids:
             return Response({"error": "No food IDs provided"}, status=status.HTTP_400_BAD_REQUEST)
 
+        serving_sizes = request.data.get('serving_sizes') or request.data.get('amounts_g')
+        if serving_sizes is not None:
+            if not isinstance(serving_sizes, list) or len(serving_sizes) != len(food_ids):
+                return Response(
+                    {"error": "serving_sizes must be a list with one value per food_id"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            try:
+                serving_sizes = [max(0.1, float(s)) for s in serving_sizes]
+            except (TypeError, ValueError):
+                return Response(
+                    {"error": "serving_sizes must be numeric grams"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
         if len(food_ids) > 1:
             food_name = f"Combined Food ({len(food_ids)} items)"
             if food_names:
@@ -45,7 +60,7 @@ def fcs_calculate(request):
             food_name = food_names[0] if food_names else "Single Food Item"
 
         try:
-            _, result = extract_and_score(food_ids, food_name)
+            _, result = extract_and_score(food_ids, food_name, amounts_g=serving_sizes)
         except KeyError as ke:
             logger.error("Data inconsistency in extract_nutrients_enhanced: %s", ke)
             return Response(
@@ -126,7 +141,8 @@ def fcs_calculate_batch(request):
                         "error": "No food IDs provided for this item"
                     })
                     continue
-                _, result = extract_and_score(food_ids, food_name)
+                amounts = food_data.get('serving_sizes') or food_data.get('amounts_g')
+                _, result = extract_and_score(food_ids, food_name, amounts_g=amounts)
                 results.append(result)
             except Exception as e:
                 logger.error("Error processing food item %s: %s", food_name, e)
@@ -224,7 +240,8 @@ def compare_foods_fcs(request):
                 if not food_ids:
                     continue
 
-                food_item, result = extract_and_score(food_ids, food_name)
+                amounts = food_data.get('serving_sizes') or food_data.get('amounts_g')
+                food_item, result = extract_and_score(food_ids, food_name, amounts_g=amounts)
                 out = dict(result)
                 out['domain_scores'] = domain_mean_scores(food_item)
                 results.append(out)

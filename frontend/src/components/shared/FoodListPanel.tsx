@@ -20,7 +20,7 @@
  */
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ChevronDown, ChevronUp, Download, Upload, Trash2, Send,
   Package, Info, AlertCircle, Check,
@@ -41,7 +41,8 @@ import {
 } from '@/lib/activeFoodList';
 
 export type ScoreTargetId =
-  | 'hefi' | 'heni' | 'hsr' | 'fcs' | 'environmental' | 'dietary_pattern';
+  | 'hefi' | 'heni' | 'hsr' | 'fcs' | 'environmental' | 'dietary_pattern'
+  | 'scorecard';
 
 interface ScoreTarget {
   id: ScoreTargetId;
@@ -51,6 +52,7 @@ interface ScoreTarget {
 }
 
 const SCORE_TARGETS: ScoreTarget[] = [
+  { id: 'scorecard',       label: 'Scorecard',       emoji: '✨', path: '/scorecard' },
   { id: 'hefi',            label: 'HEFI',            emoji: '🥗', path: '/hefi/calculate' },
   { id: 'heni',            label: 'HENI',            emoji: '🧬', path: '/heni/calculate' },
   { id: 'fcs',             label: 'FCS',             emoji: '🧭', path: '/fcs/calculate' },
@@ -111,14 +113,6 @@ export function FoodListPanel({ currentTarget, onChange }: Props): JSX.Element |
   // an inline callback) — call on every list change.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [list, hydrated]);
-
-  const toggleCollapsed = useCallback(() => {
-    setCollapsed(prev => {
-      const next = !prev;
-      savePanelCollapsed(next);
-      return next;
-    });
-  }, []);
 
   const totalMass = useMemo(
     () => list?.ingredients.reduce((s, i) => s + i.mass_g, 0) ?? 0,
@@ -259,18 +253,25 @@ export function FoodListPanel({ currentTarget, onChange }: Props): JSX.Element |
     : isImported ? 'Imported'
     : 'Recall (24h)';
 
+  const isOpen = hydrated ? !collapsed : true;
+
+  const handlePanelToggle = (e: React.SyntheticEvent<HTMLDetailsElement>) => {
+    const open = e.currentTarget.open;
+    setCollapsed(!open);
+    savePanelCollapsed(!open);
+  };
+
   return (
-    <div className={`border rounded-lg ${
-      isPackaged ? 'border-amber-300 bg-amber-50/60'
-      : isMultiDay ? 'border-violet-300 bg-violet-50/60'
-      : 'border-blue-300 bg-blue-50/60'
-    }`}>
-      <button
-        type="button"
-        onClick={toggleCollapsed}
-        aria-expanded={!collapsed}
-        className="w-full flex items-center gap-2 px-3 py-2 text-left"
-      >
+    <details
+      className={`border rounded-lg ${
+        isPackaged ? 'border-amber-300 bg-amber-50/60'
+        : isMultiDay ? 'border-violet-300 bg-violet-50/60'
+        : 'border-blue-300 bg-blue-50/60'
+      }`}
+      open={isOpen}
+      onToggle={handlePanelToggle}
+    >
+      <summary className="w-full flex items-center gap-2 px-3 py-2 text-left cursor-pointer list-none [&::-webkit-details-marker]:hidden">
         {isPackaged
           ? <Package className="h-4 w-4 text-amber-700 flex-shrink-0" aria-hidden="true" />
           : <Check className="h-4 w-4 text-blue-700 flex-shrink-0" aria-hidden="true" />}
@@ -283,13 +284,12 @@ export function FoodListPanel({ currentTarget, onChange }: Props): JSX.Element |
             {' · '}<em>{provenanceLabel}</em>
           </span>
         </span>
-        {collapsed
-          ? <ChevronDown className="h-4 w-4 text-gray-600" aria-hidden="true" />
-          : <ChevronUp className="h-4 w-4 text-gray-600" aria-hidden="true" />}
-      </button>
+        {isOpen
+          ? <ChevronUp className="h-4 w-4 text-gray-600" aria-hidden="true" />
+          : <ChevronDown className="h-4 w-4 text-gray-600" aria-hidden="true" />}
+      </summary>
 
-      {!collapsed && (
-        <div className="border-t px-3 py-3 space-y-3">
+      <div className="border-t px-3 py-3 space-y-3">
           {isPackaged && list.packaged_food && (
             <div className="text-[11px] text-amber-900 bg-amber-100/70 border border-amber-200 rounded px-2 py-1.5">
               <strong>{list.packaged_food.product_name ?? 'Packaged product'}</strong>
@@ -407,7 +407,6 @@ export function FoodListPanel({ currentTarget, onChange }: Props): JSX.Element |
             </div>
           </div>
         </div>
-      )}
-    </div>
+    </details>
   );
 }

@@ -54,3 +54,20 @@ class FCSRustIntegrationTests(TestCase):
         self.assertEqual(result["original_score"], -2.96)
         self.assertEqual(result["fcs"], 21.61)
         self.assertEqual(result["nova_category"], "PROCESSED_FOODS")
+
+    def test_multi_food_wafct_combo_not_inflated_to_100(self):
+        """Regression: equal 100 g portions must not OR-stack ingredient flags to FCS 100."""
+        combo_ids = [700153, 700479, 3005, 700532, 2402, 423]
+        amounts = [100.0] * len(combo_ids)
+        food_item = FoodItem("WAFCT combo regression")
+        create_cnf_integrator().extract_nutrients_enhanced(
+            combo_ids, food_item, amounts_g=amounts,
+        )
+        result = FoodAnalyzer().analyze_food_item(food_item)
+
+        self.assertLess(result["fcs"], 85.0)
+        self.assertGreater(result["fcs"], 40.0)
+        flags = food_item.attributes["food_ingredients"]
+        self.assertLess(flags["vegetable"], 50.0)
+        self.assertLess(flags["seafood"], 50.0)
+        self.assertGreater(flags["plant_oils"], 30.0)

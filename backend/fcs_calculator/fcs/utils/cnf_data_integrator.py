@@ -8,6 +8,7 @@ import os
 import pandas as pd
 from typing import List, Dict, Optional
 import logging
+from collections import defaultdict
 
 # Use the single process-wide CNF pipeline. See backend/api/cnf_cache.py.
 backend_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -112,86 +113,152 @@ class EnhancedCNFDataIntegrator:
             # Calculated ratios (Domain 1) - computed from the above nutrients
             # Food ingredients and processing - require additional food categorization
         }
+
+    @staticmethod
+    def _normalize_amounts(food_ids: List[int], amounts_g: Optional[List[float]]) -> List[float]:
+        """Default 100 g per food when amounts are missing or length-mismatched."""
+        if not amounts_g or len(amounts_g) != len(food_ids):
+            return [100.0] * len(food_ids)
+        return [max(0.1, float(a)) for a in amounts_g]
+
+    def _energy_kcal_per_100g(self, food_id: int) -> float:
+        food_nutrients = self.cnf_pipeline.nutrient_amount_df[
+            self.cnf_pipeline.nutrient_amount_df['FoodID'] == food_id
+        ]
+        energy_data = pd.merge(
+            food_nutrients,
+            self.cnf_pipeline.nutrient_name_df,
+            on='NutrientID',
+        )
+        energy_rows = energy_data[
+            energy_data['NutrientName'].str.contains('KILOCALORIES', case=False, na=False)
+        ]
+        if energy_rows.empty:
+            energy_rows = energy_data[
+                energy_data['NutrientName'].str.contains('ENERGY', case=False, na=False)
+                & ~energy_data['NutrientName'].str.contains('JOULE', case=False, na=False)
+            ]
+        if energy_rows.empty:
+            return 100.0
+        return float(energy_rows['NutrientValue'].iloc[0])
+
+    def _portion_energy_kcal(self, food_id: int, amount_g: float) -> float:
+        return self._energy_kcal_per_100g(food_id) * amount_g / 100.0
+
+    def _map_cnf_nutrient_to_fcs(self, nutrient_name: str) -> Optional[str]:
+        upper = nutrient_name.upper()
+        for cnf_name, fcs_name in self.nutrient_mapping.items():
+            if cnf_name in upper:
+                return fcs_name
+        return None
+
+    def _accumulate_portion_nutrients(
+        self,
+        food_id: int,
+        amount_g: float,
+        meal_totals: Dict[str, float],
+    ) -> float:
+        """Sum absolute nutrient amounts for one portion into *meal_totals*."""
+        scale = amount_g / 100.0
+        food_nutrients = self.cnf_pipeline.nutrient_amount_df[
+            self.cnf_pipeline.nutrient_amount_df['FoodID'] == food_id
+        ]
+        merged = pd.merge(
+            food_nutrients,
+            self.cnf_pipeline.nutrient_name_df,
+            on='NutrientID',
+        )
+        if merged.empty:
+            raise ValueError(f"No nutrient data found for food ID: {food_id}")
+
+        portion_energy = 0.0
+        portion_by_attr: Dict[str, float] = {}
+        for _, row in merged.iterrows():
+            nutrient_name = str(row['NutrientName'])
+            nutrient_value = float(row['NutrientValue'])
+            if 'KILOCALORIES' in nutrient_name.upper():
+                portion_energy += nutrient_value * scale
+                continue
+            if 'ENERGY' in nutrient_name.upper():
+                continue
+            fcs_attribute = self._map_cnf_nutrient_to_fcs(nutrient_name)
+            if fcs_attribute:
+                scaled = nutrient_value * scale
+                portion_by_attr[fcs_attribute] = scaled
+
+        for attr, val in portion_by_attr.items():
+            meal_totals[attr] += val
+
+        if portion_energy <= 0:
+            portion_energy = self._portion_energy_kcal(food_id, amount_g)
+        return portion_energy
+
+    @staticmethod
+    def _set_weighted_flag(
+        food_item: FoodItem,
+        domain: str,
+        attribute: str,
+        energy_weight: float,
+    ) -> None:
+        """Energy-fraction presence (0–100), not binary OR across ingredients."""
+        weighted = 100.0 * max(0.0, min(1.0, energy_weight))
+        current = food_item.attributes[domain][attribute]
+        if weighted > current:
+            food_item.set_attribute(domain, attribute, weighted)
     
-    def extract_nutrients_enhanced(self, food_ids: List[int], food_item: FoodItem) -> FoodItem:
+    def extract_nutrients_enhanced(
+        self,
+        food_ids: List[int],
+        food_item: FoodItem,
+        amounts_g: Optional[List[float]] = None,
+    ) -> FoodItem:
         """
-        Enhanced nutrient extraction using existing CNF pipeline infrastructure
-        Leverages established data loading while mapping to FCS 2.0 structure
+        Enhanced nutrient extraction using existing CNF pipeline infrastructure.
+        Multi-food meals aggregate absolute nutrients by portion, then normalize
+        to per 100 kcal (FCS / i.FCS methodology).
         """
         try:
-            # Get nutrient data using existing pipeline structure
-            food_nutrients = self.cnf_pipeline.nutrient_amount_df[
-                self.cnf_pipeline.nutrient_amount_df['FoodID'].isin(food_ids)
-            ]
-            
-            # Merge with nutrient names using existing pipeline
-            merged_data = pd.merge(
-                food_nutrients, 
-                self.cnf_pipeline.nutrient_name_df, 
-                on='NutrientID'
-            )
-            
-            if merged_data.empty:
-                raise ValueError(f"No nutrient data found for food IDs: {food_ids}")
-            
-            # Get energy value for normalization to 100 kcal
-            energy_rows = merged_data[merged_data['NutrientName'].str.contains('ENERGY', case=False, na=False)]
-            if energy_rows.empty:
-                logger.warning("Energy data not found, using default normalization")
-                energy_value = 100  # Default fallback
-            else:
-                energy_value = energy_rows['NutrientValue'].iloc[0]
-            
-            # Extract and map nutrients to FCS domains
-            mapped_count = 0
-            total_nutrients = len(merged_data)
-            
-            # Convert to numpy arrays for faster processing
-            nutrient_names = merged_data['NutrientName'].str.upper().values
-            nutrient_values = merged_data['NutrientValue'].values
-            
-            # Pre-compile nutrient mapping for faster lookup
-            nutrient_lookup = {}
-            for cnf_name, fcs_name in self.nutrient_mapping.items():
-                nutrient_lookup[cnf_name] = fcs_name
-            
-            # Pre-compile domain attribute lookup for faster search
-            domain_lookup = {}
+            if not food_ids:
+                raise ValueError("food_ids is empty")
+
+            amounts = self._normalize_amounts(food_ids, amounts_g)
+
+            domain_lookup: Dict[str, str] = {}
             for domain_name, attributes in food_item.attributes.items():
                 for attr_name in attributes:
                     domain_lookup[attr_name] = domain_name
-            
-            # Vectorized processing
-            for i, (nutrient_name, nutrient_value) in enumerate(zip(nutrient_names, nutrient_values)):
-                # Fast mapping lookup
-                fcs_attribute = None
-                for cnf_name, fcs_name in nutrient_lookup.items():
-                    if cnf_name in nutrient_name:
-                        fcs_attribute = fcs_name
-                        break
-                
-                if not fcs_attribute:
-                    continue  # Skip unmapped nutrients
-                
-                # Normalize to 100 kcal as per FCS 2.0 methodology
-                normalized_value = (nutrient_value / energy_value) * 100 if energy_value > 0 else 0
-                
-                # Fast domain lookup and set attribute
+
+            meal_totals: Dict[str, float] = defaultdict(float)
+            total_energy = 0.0
+            mapped_count = 0
+
+            for food_id, amount_g in zip(food_ids, amounts):
+                portion_energy = self._accumulate_portion_nutrients(
+                    int(food_id), amount_g, meal_totals,
+                )
+                total_energy += portion_energy
+
+            if total_energy <= 0:
+                logger.warning("Total meal energy is zero; using 100 kcal fallback")
+                total_energy = 100.0
+
+            for fcs_attribute, absolute_total in meal_totals.items():
+                normalized_value = (absolute_total / total_energy) * 100.0
                 domain_name = domain_lookup.get(fcs_attribute)
                 if domain_name:
                     food_item.set_attribute(domain_name, fcs_attribute, normalized_value)
                     mapped_count += 1
-            
-            logger.debug(f"CNF: Mapped {mapped_count} out of {total_nutrients} nutrients")
-            
-            # Calculate nutrient ratios using extracted values
+
+            logger.debug(
+                "CNF: Mapped %s nutrient attributes for %s foods (%.1f kcal total)",
+                mapped_count, len(food_ids), total_energy,
+            )
+
             self._calculate_nutrient_ratios(food_item)
-            
-            # Apply food categorization for ingredients and processing domains
-            self._categorize_food_ingredients(food_ids, food_item)
-            
+            self._categorize_food_ingredients(food_ids, food_item, amounts)
+
             return food_item
-            
+
         except Exception as e:
             logger.error(f"Error in enhanced CNF extraction: {str(e)}")
             raise
@@ -228,201 +295,212 @@ class EnhancedCNFDataIntegrator:
         except Exception as e:
             logger.warning(f"Could not calculate all nutrient ratios: {e}")
     
-    def _categorize_food_ingredients(self, food_ids: List[int], food_item: FoodItem) -> None:
+    def _categorize_food_ingredients(
+        self,
+        food_ids: List[int],
+        food_item: FoodItem,
+        amounts_g: Optional[List[float]] = None,
+    ) -> None:
         """
-        Enhanced food categorization with comprehensive NOVA classification support
-        Uses existing CNF food group and description data
+        Enhanced food categorization with comprehensive NOVA classification support.
+        Ingredient flags are energy-weighted on multi-food meals (no binary OR-stacking).
         """
         try:
-            # Get food information using existing pipeline
+            amounts = self._normalize_amounts(food_ids, amounts_g)
+            portion_energies = [
+                self._portion_energy_kcal(int(fid), amt)
+                for fid, amt in zip(food_ids, amounts)
+            ]
+            total_energy = sum(portion_energies) or 1.0
+            energy_weight_by_id = {
+                int(fid): portion_energies[i] / total_energy
+                for i, fid in enumerate(food_ids)
+            }
+
             food_info = self.cnf_pipeline.food_name_df[
                 self.cnf_pipeline.food_name_df['FoodID'].isin(food_ids)
             ]
-            
             if food_info.empty:
                 return
-            
-            # Merge with food group information
+
             food_with_groups = pd.merge(
                 food_info,
                 self.cnf_pipeline.food_group_df,
                 on='FoodGroupID',
-                how='left'
+                how='left',
             )
-            
-            # Track processing levels for combined foods (use worst case)
-            detected_processing_levels = []
 
-            # Enhanced food categorization using CNF food groups and descriptions
-            for _, row in food_with_groups.iterrows():
-                food_desc = row.get('FoodDescription', '').upper()
-                food_desc_orig = row.get('FoodDescription', '')
-                group_name = row.get('FoodGroupName', '').upper() if 'FoodGroupName' in row else ''
-                group_name_orig = row.get('FoodGroupName', '') if 'FoodGroupName' in row else ''
-                food_group_id = row.get('FoodGroupID', 0)
-                food_id_int = int(row.get('FoodID', 0))
+            detected_processing_levels: List[int] = []
+            nova_by_id: Dict[int, int] = {}
 
-                logger.debug(f" Categorizing food: '{food_desc}' in group: '{group_name}' (ID: {food_group_id})")
+            for food_id_int, amount_g in zip(food_ids, amounts):
+                food_id_int = int(food_id_int)
+                rows = food_with_groups[food_with_groups['FoodID'] == food_id_int]
+                if rows.empty:
+                    detected_processing_levels.append(1)
+                    nova_by_id[food_id_int] = 1
+                    continue
 
-                # Use CNF food group structure for food-ingredient attribute setting
-                # (this is the FCS attribute side; NOVA classification is now via
-                # nova_classifier.classify below)
-                if food_group_id == 9:  # Fruits and Fruit Juices
-                    food_item.set_attribute('food_ingredients', 'fruit', 100)
-                elif food_group_id == 11:  # Vegetables and Vegetable Products
-                    food_item.set_attribute('food_ingredients', 'vegetable', 100)
-                elif food_group_id == 16:  # Legumes and Legume Products
-                    food_item.set_attribute('food_ingredients', 'beans', 100)
-                elif food_group_id == 12:  # Nuts and Seeds
-                    food_item.set_attribute('food_ingredients', 'nuts', 100)
-                elif food_group_id == 15:  # Finfish and Shellfish Products
-                    food_item.set_attribute('food_ingredients', 'seafood', 100)
-                elif food_group_id == 4:  # Fats and Oils
-                    food_item.set_attribute('food_ingredients', 'plant_oils', 100)
-                elif food_group_id == 1:  # Dairy and Egg Products
+                row = rows.iloc[0]
+                food_desc = str(row.get('FoodDescription', '')).upper()
+                food_desc_orig = str(row.get('FoodDescription', ''))
+                group_name = str(row.get('FoodGroupName', '')).upper() if 'FoodGroupName' in row else ''
+                group_name_orig = str(row.get('FoodGroupName', '')) if 'FoodGroupName' in row else ''
+                food_group_id = int(row.get('FoodGroupID', 0) or 0)
+                ew = energy_weight_by_id.get(food_id_int, 1.0 / len(food_ids))
+
+                def flag(domain: str, attr: str) -> None:
+                    self._set_weighted_flag(food_item, domain, attr, ew)
+
+                logger.debug(
+                    f" Categorizing food: '{food_desc}' in group: '{group_name}' "
+                    f"(ID: {food_group_id}, energy_wt={ew:.3f})"
+                )
+
+                if food_group_id == 9:
+                    flag('food_ingredients', 'fruit')
+                elif food_group_id == 11:
+                    flag('food_ingredients', 'vegetable')
+                elif food_group_id == 16:
+                    flag('food_ingredients', 'beans')
+                elif food_group_id == 12:
+                    flag('food_ingredients', 'nuts')
+                elif food_group_id == 15:
+                    flag('food_ingredients', 'seafood')
+                elif food_group_id == 4:
+                    flag('food_ingredients', 'plant_oils')
+                elif food_group_id == 1:
                     if 'YOGURT' in food_desc or 'YOGHURT' in food_desc or 'YOGOURT' in food_desc:
-                        food_item.set_attribute('food_ingredients', 'yogurt', 100)
+                        flag('food_ingredients', 'yogurt')
 
-                # NOVA classification — delegate to the rigorous classifier.
-                # See `nova_classifier.py` for the architecture (CNF FoodGroup
-                # hard rules + word-boundary keyword matching + optional LLM
-                # augmentation). 2026-05-23 replaces the inline substring-
-                # keyword block whose bugs were surfaced by the FCS smoke
-                # audit (OIL/BOILED substring false-positives; missing food-
-                # group auto-routes for Fast Foods + Babyfoods + Snacks → NOVA 4).
                 from .nova_classifier import classify as nova_classify
                 nova_result = nova_classify(
                     food_id=food_id_int,
                     food_description=food_desc_orig,
                     food_group_name=group_name_orig,
-                    food_group_id=int(food_group_id),
+                    food_group_id=food_group_id,
                     chat_json_client=getattr(self, 'nova_llm_client', None),
                     enable_llm=getattr(self, 'enable_nova_llm', False),
                 )
                 current_processing_level = nova_result.level
-                detected_processing_levels.append(current_processing_level)
+                nova_by_id[food_id_int] = current_processing_level
                 logger.debug(
                     f" NOVA classifier: food_id={food_id_int} level={nova_result.level} "
                     f"conf={nova_result.confidence:.2f} reason={nova_result.rationale}"
                 )
 
-                # Side effects per NOVA level (carry-over from the previous block):
                 if current_processing_level == 4:
-                    food_item.set_attribute('food_ingredients', 'added_sugar', 100)
-                    self._detect_additives_from_description(food_desc, food_item, processing_level=4)
+                    flag('food_ingredients', 'added_sugar')
+                    self._detect_additives_from_description(
+                        food_desc, food_item, processing_level=4, energy_weight=ew,
+                    )
                     if 'FRIED' in food_desc:
-                        food_item.set_attribute('processing', 'frying', 100)
+                        flag('processing', 'frying')
                     if 'CANNED' in food_desc:
-                        food_item.set_attribute('processing', 'canning', 100)
+                        flag('processing', 'canning')
                 elif current_processing_level == 3:
                     if any(t in food_desc for t in ['HAM', 'BACON', 'SAUSAGE', 'DELI', 'LUNCH', 'HOT DOG', 'CURED']):
-                        food_item.set_attribute('food_ingredients', 'red_or_processed_meat', 100)
+                        flag('food_ingredients', 'red_or_processed_meat')
                     elif any(t in food_desc for t in ['BREAD', 'ROLL', 'BAGEL']):
-                        food_item.set_attribute('food_ingredients', 'refined_grains', 100)
-                    self._detect_additives_from_description(food_desc, food_item, processing_level=3)
+                        flag('food_ingredients', 'refined_grains')
+                    self._detect_additives_from_description(
+                        food_desc, food_item, processing_level=3, energy_weight=ew,
+                    )
                     if 'SMOKED' in food_desc or 'SMOKING' in food_desc:
-                        food_item.set_attribute('processing', 'smoking', 100)
+                        flag('processing', 'smoking')
                     if 'CANNED' in food_desc:
-                        food_item.set_attribute('processing', 'canning', 100)
+                        flag('processing', 'canning')
                     if 'FERMENTED' in food_desc or 'AGED' in food_desc:
-                        food_item.set_attribute('processing', 'fermentation', 100)
+                        flag('processing', 'fermentation')
                 elif current_processing_level == 2:
                     if any(t in food_desc for t in ['OIL', 'BUTTER', 'MARGARINE', 'SHORTENING']):
-                        food_item.set_attribute('food_ingredients', 'plant_oils', 100)
+                        flag('food_ingredients', 'plant_oils')
                 elif current_processing_level == 1:
-                    food_item.set_attribute('processing', 'minimal_processing', 100)
+                    flag('processing', 'minimal_processing')
 
-                # Whole-grain vs refined-grain attribute (unchanged from previous block)
-                if food_group_id == 20:  # Cereals, Grains and Pasta
+                if food_group_id == 20:
                     if any(term in food_desc for term in ['WHOLE', 'BROWN', 'BRAN', 'WHEAT GERM']):
-                        food_item.set_attribute('food_ingredients', 'whole_grains', 100)
+                        flag('food_ingredients', 'whole_grains')
                     else:
-                        food_item.set_attribute('food_ingredients', 'refined_grains', 100)
+                        flag('food_ingredients', 'refined_grains')
 
                 logger.debug(f" Food '{food_desc}' categorized as NOVA level {current_processing_level}")
-            
-            # For combined foods, use energy-weighted processing level
+
+            detected_processing_levels = [nova_by_id.get(int(fid), 1) for fid in food_ids]
+
             if detected_processing_levels:
-                final_processing_level = self._calculate_energy_weighted_processing(food_ids, detected_processing_levels)
+                final_processing_level = self._calculate_energy_weighted_processing(
+                    food_ids, detected_processing_levels, amounts,
+                )
                 logger.debug(f" Combined food processing levels: {detected_processing_levels}")
                 logger.debug(f" Energy-weighted final processing level: {final_processing_level}")
-                
-                # Store detailed processing information for mixed dishes
-                processing_details = self._get_processing_details(food_ids, detected_processing_levels, food_with_groups)
+
+                processing_details = self._get_processing_details(
+                    food_ids, detected_processing_levels, food_with_groups, amounts,
+                )
                 food_item.set_processing_details(processing_details)
-                
-                # Store the final NOVA processing level in the food item for the analyzer to use
                 self._set_final_nova_processing_level(food_item, final_processing_level)
-                
-                # Set a flag to indicate this is a combined food with mixed processing levels
+
                 if len(set(detected_processing_levels)) > 1:
-                    logger.debug(f" Mixed processing levels detected in combined food - using energy weighting")
+                    logger.debug(" Mixed processing levels detected — using energy weighting")
             else:
-                # Default to minimally processed if no processing levels detected
-                logger.debug(f" No processing levels detected, defaulting to NOVA 1 (minimally processed)")
+                logger.debug(" No processing levels detected, defaulting to NOVA 1 (minimally processed)")
                 self._set_final_nova_processing_level(food_item, 1)
-                    
+
         except Exception as e:
             logger.warning(f"Could not fully categorize food ingredients: {e}")
             logger.debug(f" Error in food categorization: {e}")
     
-    def _get_processing_details(self, food_ids: List[int], processing_levels: List[int], food_with_groups) -> Dict:
-        """
-        Get detailed processing information for each food component in mixed dishes
-        """
+    def _get_processing_details(
+        self,
+        food_ids: List[int],
+        processing_levels: List[int],
+        food_with_groups,
+        amounts_g: Optional[List[float]] = None,
+    ) -> Dict:
+        """Detailed processing information for each food component in mixed dishes."""
         try:
+            amounts = self._normalize_amounts(food_ids, amounts_g)
             details = {
                 "is_mixed_dish": len(set(processing_levels)) > 1,
                 "individual_foods": [],
                 "energy_weights": [],
-                "final_processing_level": None
+                "final_processing_level": None,
             }
-            
-            # Get energy values for weighting calculation
-            food_energies = []
-            for food_id in food_ids:
-                food_nutrients = self.cnf_pipeline.nutrient_amount_df[
-                    self.cnf_pipeline.nutrient_amount_df['FoodID'] == food_id
-                ]
-                energy_data = pd.merge(food_nutrients, self.cnf_pipeline.nutrient_name_df, on='NutrientID')
-                energy_rows = energy_data[energy_data['NutrientName'].str.contains('ENERGY', case=False, na=False)]
-                
-                if not energy_rows.empty:
-                    energy_value = energy_rows['NutrientValue'].iloc[0]
-                    food_energies.append(energy_value)
-                else:
-                    food_energies.append(100)  # Default fallback
-            
-            total_energy = sum(food_energies)
-            
-            # Map NOVA levels to category names
+
+            food_energies = [
+                self._portion_energy_kcal(int(fid), amt)
+                for fid, amt in zip(food_ids, amounts)
+            ]
+            total_energy = sum(food_energies) or 1.0
+
             nova_level_names = {
                 1: "MINIMALLY_PROCESSED",
-                2: "PROCESSED_CULINARY_INGREDIENTS", 
+                2: "PROCESSED_CULINARY_INGREDIENTS",
                 3: "PROCESSED_FOODS",
-                4: "ULTRA_PROCESSED_FOODS"
+                4: "ULTRA_PROCESSED_FOODS",
             }
-            
-            # Collect details for each food
+
             for i, (food_id, processing_level) in enumerate(zip(food_ids, processing_levels)):
-                # Get food name
                 food_row = food_with_groups[food_with_groups['FoodID'] == food_id]
-                food_name = food_row['FoodDescription'].iloc[0] if not food_row.empty else f"Food ID {food_id}"
-                
-                energy_weight = food_energies[i] / total_energy if total_energy > 0 else 0
-                
+                food_name = (
+                    food_row['FoodDescription'].iloc[0]
+                    if not food_row.empty else f"Food ID {food_id}"
+                )
+                energy_weight = food_energies[i] / total_energy
+
                 food_detail = {
                     "food_id": food_id,
                     "food_name": food_name,
                     "nova_level": processing_level,
                     "nova_category": nova_level_names.get(processing_level, "UNKNOWN"),
-                    "energy_kcal": food_energies[i],
-                    "energy_weight": round(energy_weight, 3)
+                    "energy_kcal": round(food_energies[i], 2),
+                    "energy_weight": round(energy_weight, 3),
                 }
-                
+
                 details["individual_foods"].append(food_detail)
                 details["energy_weights"].append(round(energy_weight, 3))
-            
+
             return details
             
         except Exception as e:
@@ -434,13 +512,20 @@ class EnhancedCNFDataIntegrator:
                 "final_processing_level": None
             }
     
-    def _detect_additives_from_description(self, food_desc: str, food_item: FoodItem, processing_level: int) -> None:
+    def _detect_additives_from_description(
+        self,
+        food_desc: str,
+        food_item: FoodItem,
+        processing_level: int,
+        energy_weight: float = 1.0,
+    ) -> None:
         """
         Comprehensive additives detection from food descriptions
         Uses pattern matching to identify common food additives and assign penalties
         """
         try:
-            
+            def add(attr: str) -> None:
+                self._set_weighted_flag(food_item, 'additives', attr, energy_weight)
             # Artificial Sweeteners - Most common and well-documented
             artificial_sweetener_terms = [
                 'ASPARTAME', 'SUCRALOSE', 'SACCHARIN', 'ACESULFAME', 'STEVIA', 
@@ -449,7 +534,7 @@ class EnhancedCNFDataIntegrator:
             ]
             
             if any(term in food_desc for term in artificial_sweetener_terms):
-                food_item.set_attribute('additives', 'artificial_sweeteners', 100)
+                self._set_weighted_flag(food_item, 'additives', 'artificial_sweeteners', energy_weight)
             
             # Preservatives - Common in processed foods
             preservative_terms = [
@@ -462,15 +547,15 @@ class EnhancedCNFDataIntegrator:
             if processing_level >= 3:  # Processed or ultra-processed
                 # Baked goods likely have preservatives
                 if any(term in food_desc for term in ['BREAD', 'CAKE', 'MUFFIN', 'COOKIE', 'CRACKER']):
-                    food_item.set_attribute('additives', 'preservatives', 100)
+                    add('preservatives')
                 
                 # Processed meats definitely have preservatives
                 if any(term in food_desc for term in ['HAM', 'BACON', 'SAUSAGE', 'DELI', 'CURED', 'SMOKED']):
-                    food_item.set_attribute('additives', 'preservatives', 100)
-                    food_item.set_attribute('additives', 'nitrites', 100)  # Nitrites common in processed meats
+                    add('preservatives')
+                    add('nitrites')  # Nitrites common in processed meats
             
             if any(term in food_desc for term in preservative_terms):
-                food_item.set_attribute('additives', 'preservatives', 100)
+                add('preservatives')
             
             # Artificial Colors - Common in ultra-processed foods
             artificial_color_terms = [
@@ -480,7 +565,7 @@ class EnhancedCNFDataIntegrator:
             ]
             
             if any(term in food_desc for term in artificial_color_terms):
-                food_item.set_attribute('additives', 'artificial_colors', 100)
+                add('artificial_colors')
                 logger.debug(f" Detected artificial colors in '{food_desc}'")
             
             # Infer artificial colors from food types
@@ -490,7 +575,7 @@ class EnhancedCNFDataIntegrator:
                     'ENERGY DRINK', 'SPORTS DRINK', 'FLAVORED', 'COLOURED'
                 ]
                 if any(term in food_desc for term in color_likely_foods):
-                    food_item.set_attribute('additives', 'artificial_colors', 100)
+                    add('artificial_colors')
                     logger.debug(f" Inferred artificial colors in colored processed food: '{food_desc}'")
             
             # Hydrogenated Oils - Trans fats
@@ -500,7 +585,7 @@ class EnhancedCNFDataIntegrator:
             ]
             
             if any(term in food_desc for term in hydrogenated_terms):
-                food_item.set_attribute('additives', 'hydrogenated_oils', 100)
+                add('hydrogenated_oils')
                 logger.debug(f" Detected hydrogenated oils in '{food_desc}'")
             
             # High Fructose Corn Syrup
@@ -510,7 +595,7 @@ class EnhancedCNFDataIntegrator:
             ]
             
             if any(term in food_desc for term in hfcs_terms):
-                food_item.set_attribute('additives', 'high_fructose_corn_syrup', 100)
+                add('high_fructose_corn_syrup')
                 logger.debug(f" Detected HFCS in '{food_desc}'")
             
             # Monosodium Glutamate
@@ -520,7 +605,7 @@ class EnhancedCNFDataIntegrator:
             ]
             
             if any(term in food_desc for term in msg_terms):
-                food_item.set_attribute('additives', 'monosodium_glutamate', 100)
+                add('monosodium_glutamate')
                 logger.debug(f" Detected MSG in '{food_desc}'")
             
             # Nitrites/Nitrates - Cured meats
@@ -530,7 +615,7 @@ class EnhancedCNFDataIntegrator:
             ]
             
             if any(term in food_desc for term in nitrite_terms):
-                food_item.set_attribute('additives', 'nitrites', 100)
+                add('nitrites')
                 logger.debug(f" Detected nitrites from description: '{food_desc}'")
             
             # Additional ultra-processed indicators
@@ -544,11 +629,11 @@ class EnhancedCNFDataIntegrator:
                 
                 # For gluten-free bread (like rice bran bread), emulsifiers are very common
                 if 'GLUTEN FREE' in food_desc or 'GLUTEN-FREE' in food_desc:
-                    food_item.set_attribute('additives', 'preservatives', 100)  # Likely has emulsifiers
+                    add('preservatives')  # Likely has emulsifiers
                     logger.debug(f" Inferred emulsifiers in gluten-free product: '{food_desc}'")
                 
                 if any(term in food_desc for term in emulsifier_terms):
-                    food_item.set_attribute('additives', 'preservatives', 100)
+                    add('preservatives')
                     logger.debug(f" Detected emulsifiers/stabilizers in '{food_desc}'")
             
         except Exception as e:
@@ -597,50 +682,40 @@ class EnhancedCNFDataIntegrator:
         if processing_level != int(processing_level):
             logger.debug(f" Mixed dish detected - using energy-weighted processing penalty instead of single NOVA category")
     
-    def _calculate_energy_weighted_processing(self, food_ids: List[int], processing_levels: List[int]) -> float:
+    def _calculate_energy_weighted_processing(
+        self,
+        food_ids: List[int],
+        processing_levels: List[int],
+        amounts_g: Optional[List[float]] = None,
+    ) -> float:
         """
         Calculate energy-weighted NOVA processing level for combined foods
         Uses calorie contribution of each food to weight the final processing score
         """
         try:
-            # Get energy values for each food
-            food_energies = []
-            for food_id in food_ids:
-                # Get energy data from CNF pipeline
-                food_nutrients = self.cnf_pipeline.nutrient_amount_df[
-                    self.cnf_pipeline.nutrient_amount_df['FoodID'] == food_id
-                ]
-                energy_data = pd.merge(food_nutrients, self.cnf_pipeline.nutrient_name_df, on='NutrientID')
-                energy_rows = energy_data[energy_data['NutrientName'].str.contains('ENERGY', case=False, na=False)]
-                
-                if not energy_rows.empty:
-                    energy_value = energy_rows['NutrientValue'].iloc[0]
-                    food_energies.append(energy_value)
-                    logger.debug(f" Food ID {food_id} has {energy_value} kcal")
-                else:
-                    food_energies.append(100)  # Default fallback
-                    logger.debug(f" Food ID {food_id} - no energy data, using 100 kcal default")
-            
-            # Calculate energy weights
+            amounts = self._normalize_amounts(food_ids, amounts_g)
+            food_energies = [
+                self._portion_energy_kcal(int(fid), amt)
+                for fid, amt in zip(food_ids, amounts)
+            ]
+
             total_energy = sum(food_energies)
             if total_energy == 0:
-                # Fallback to simple average if no energy data
                 return round(sum(processing_levels) / len(processing_levels))
-            
-            # Calculate weighted processing level
-            weighted_sum = sum(processing_levels[i] * food_energies[i] for i in range(len(processing_levels)))
+
+            weighted_sum = sum(
+                processing_levels[i] * food_energies[i]
+                for i in range(len(processing_levels))
+            )
             energy_weighted_level = weighted_sum / total_energy
-            
+
             logger.debug(f" Energy weights: {[round(e/total_energy, 2) for e in food_energies]}")
             logger.debug(f" Weighted processing calculation: {weighted_sum}/{total_energy} = {energy_weighted_level}")
-            
-            # Keep fractional level for mixed dishes - don't round to integer
-            final_level = max(1.0, min(4.0, energy_weighted_level))
-            return final_level
-            
+
+            return max(1.0, min(4.0, energy_weighted_level))
+
         except Exception as e:
             logger.warning(f"Error calculating energy-weighted processing: {e}")
-            # Fallback to worst-case approach if energy weighting fails
             return max(processing_levels) if processing_levels else 1
 
 # Factory function to create integrator using existing CNF data directory

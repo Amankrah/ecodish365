@@ -129,7 +129,11 @@ class MealCalculationService:
         # --- FCS ---
         try:
             food_ids = [int(item['food_id']) for item in food_items]
-            _, fcs_result = extract_and_score(food_ids, "Meal Analysis")
+            amounts_g = [
+                float(self._convert_to_grams(item['quantity'], item['unit']))
+                for item in food_items
+            ]
+            _, fcs_result = extract_and_score(food_ids, "Meal Analysis", amounts_g=amounts_g)
             scores['fcs_score'] = fcs_result.get('fcs')
         except Exception as e:
             logger.error("FCS calculation error: %s", e)

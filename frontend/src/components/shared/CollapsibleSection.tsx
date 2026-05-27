@@ -9,7 +9,7 @@
  */
 'use client';
 
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode, type SyntheticEvent } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 interface Props {
@@ -70,31 +70,28 @@ export function CollapsibleSection({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [persistKey]);
 
-  const toggle = useCallback(() => {
-    setCollapsed(prev => {
-      const next = !prev;
-      savePersisted(persistKey, next);
-      return next;
-    });
-  }, [persistKey]);
+  const isOpen = hydrated ? !collapsed : !defaultCollapsed;
+
+  const handleToggle = (e: SyntheticEvent<HTMLDetailsElement>) => {
+    const open = e.currentTarget.open;
+    setCollapsed(!open);
+    savePersisted(persistKey, !open);
+  };
 
   return (
-    <div className={className}>
-      <button
-        type="button"
-        onClick={toggle}
-        aria-expanded={collapsed ? 'false' : 'true'}
-        className={`w-full flex items-center gap-2 text-left ${headerClassName}`}
+    <details className={className} open={isOpen} onToggle={handleToggle}>
+      <summary
+        className={`w-full flex items-center gap-2 text-left cursor-pointer list-none [&::-webkit-details-marker]:hidden ${headerClassName}`}
       >
         {icon}
         <span className="flex-1 font-semibold text-gray-900">{title}</span>
         {badge && <span className="text-xs text-gray-600">{badge}</span>}
-        {collapsed
-          ? <ChevronDown className="h-4 w-4 text-gray-600 flex-shrink-0" aria-hidden="true" />
-          : <ChevronUp   className="h-4 w-4 text-gray-600 flex-shrink-0" aria-hidden="true" />}
-      </button>
-      {hydrated && !collapsed && children}
-      {hydrated && collapsed && whenCollapsedHint}
-    </div>
+        {isOpen
+          ? <ChevronUp className="h-4 w-4 text-gray-600 flex-shrink-0" aria-hidden="true" />
+          : <ChevronDown className="h-4 w-4 text-gray-600 flex-shrink-0" aria-hidden="true" />}
+      </summary>
+      {hydrated && isOpen && children}
+      {hydrated && !isOpen && whenCollapsedHint}
+    </details>
   );
 }

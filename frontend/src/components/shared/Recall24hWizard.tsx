@@ -60,7 +60,7 @@ import { fromRecallAggregated, saveActiveFoodList } from '@/lib/activeFoodList';
 interface Recall24hWizardProps {
   userType: UserType;
   /** When set, pre-highlights one score-routing button on step 4. */
-  preselectScore?: 'hefi' | 'heni' | 'hsr' | 'fcs' | 'environmental' | 'dietary_pattern';
+  preselectScore?: 'hefi' | 'heni' | 'hsr' | 'fcs' | 'environmental' | 'dietary_pattern' | 'scorecard';
 }
 
 interface OccasionMeta {
@@ -82,12 +82,14 @@ const OCCASIONS: OccasionMeta[] = [
 ];
 
 const SCORE_BUTTONS: Array<{
-  id: 'hefi' | 'heni' | 'hsr' | 'fcs' | 'environmental' | 'dietary_pattern';
+  id: 'hefi' | 'heni' | 'hsr' | 'fcs' | 'environmental' | 'dietary_pattern' | 'scorecard';
   emoji: string;
   label: string;
   path: string;
   note?: string;
 }> = [
+  // SCORECARD-1 (2026-05-26): one-click consumer view across all six lenses.
+  { id: 'scorecard',       emoji: '✨', label: 'View Scorecard (all metrics)', path: '/scorecard',              note: 'See HEFI + HENI + HSR + FCS + Environmental + Pattern in one consumer-friendly view' },
   { id: 'hefi',            emoji: '🥗', label: 'Score HEFI-2019',     path: '/hefi/calculate',          note: 'Natural fit (Brassard 2022b)' },
   { id: 'heni',            emoji: '🧬', label: 'Score HENI',          path: '/heni/calculate',          note: 'Sums healthy-life-minutes across the day' },
   { id: 'hsr',             emoji: '⭐', label: 'Score HSR',            path: '/hsr/calculate',           note: 'Informational only — HSR is per-product' },

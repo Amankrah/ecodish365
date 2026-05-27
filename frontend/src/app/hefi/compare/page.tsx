@@ -1,16 +1,35 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { 
+import React, { useState } from 'react';
+import {
   ChartBarIcon,
-  XMarkIcon,
   InformationCircleIcon,
   TrophyIcon,
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
-import { HEFIApiService, CNFApiService, type HEFIComparison, type FilterOptions, type SearchResult as CNFSearchResult, type HEFIInterpretation } from '../../../lib/api';
+import { HEFIApiService, type HEFIComparison, type HEFIInterpretation } from '../../../lib/api';
+import {
+  ScorerFoodInput,
+  type ScorerFoodPoolItem,
+} from '@/components/shared/ScorerFoodInput';
 
 type SelectedFood = { FoodID: number; FoodDescription: string; FoodCode?: string; amount_g: number };
+
+function poolToSelected(pool: ScorerFoodPoolItem[]): SelectedFood[] {
+  return pool.map(p => ({
+    FoodID: p.food_id,
+    FoodDescription: p.food_name,
+    amount_g: p.amount_g,
+  }));
+}
+
+function selectedToPool(selected: SelectedFood[]): ScorerFoodPoolItem[] {
+  return selected.map(s => ({
+    food_id: s.FoodID,
+    food_name: s.FoodDescription,
+    amount_g: s.amount_g,
+  }));
+}
 
 const HEFIComparisonDisplay = ({ result }: { result: HEFIComparison }) => {
   const { data } = result;
@@ -161,92 +180,9 @@ export default function HEFIComparePage() {
   const [selectedFoods, setSelectedFoods] = useState<SelectedFood[]>([]);
   const [meals, setMeals] = useState<Array<{ name: string; items: SelectedFood[] }>>([]);
   const [mealName, setMealName] = useState<string>('Meal 1');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<CNFSearchResult['results']>([]);
-  const [searchIsLoading, setSearchIsLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<HEFIComparison | null>(null);
   const [error, setError] = useState<string>('');
-  const [filters, setFilters] = useState<FilterOptions | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [selectedMethod, setSelectedMethod] = useState<string>('');
-  const [showResults, setShowResults] = useState<boolean>(false);
-
-  // Load filters on mount
-  useEffect(() => {
-    const loadFilters = async () => {
-      try {
-        const filterOptions = await CNFApiService.getFoodFilters();
-        setFilters(filterOptions);
-      } catch (e) {
-        console.warn('Failed to load CNF filters', e);
-      }
-    };
-    loadFilters();
-  }, []);
-
-  // Debounced search with filters (enhanced -> fallback)
-  useEffect(() => {
-    if (searchQuery.trim().length < 2) {
-      setSearchResults([]);
-      setShowResults(false);
-      return;
-    }
-
-    const timeoutId = setTimeout(async () => {
-      setSearchIsLoading(true);
-      try {
-        let searchResult;
-        try {
-          searchResult = await CNFApiService.searchFoodsEnhanced({
-            query: searchQuery,
-            limit: 50,
-            category: selectedCategory || undefined,
-            method: selectedMethod || undefined,
-          });
-        } catch {
-          // Fallback to basic search
-          searchResult = await CNFApiService.searchFoods(searchQuery, 50);
-        }
-        setSearchResults(searchResult.results || []);
-        setShowResults(true);
-      } catch (err) {
-        console.error('Search error:', err);
-        setSearchResults([]);
-        setShowResults(false);
-      } finally {
-        setSearchIsLoading(false);
-      }
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
-  }, [searchQuery, selectedCategory, selectedMethod]);
-
-  const addFood = (food: CNFSearchResult['results'][0]) => {
-    const newFood: SelectedFood = {
-      FoodID: food.FoodID,
-      FoodDescription: food.FoodDescription,
-      FoodCode: food.FoodCode,
-      amount_g: 100 // Default amount
-    };
-    setSelectedFoods((prev) => {
-      if (prev.some((f) => f.FoodID === food.FoodID)) return prev;
-      return [...prev, newFood];
-    });
-    setSearchQuery('');
-    setSearchResults([]);
-    setShowResults(false);
-  };
-
-  const updateFoodAmount = (foodId: number, amount: number) => {
-    setSelectedFoods(prev => prev.map(f => 
-      f.FoodID === foodId ? { ...f, amount_g: Math.max(0.1, amount) } : f
-    ));
-  };
-
-  const removeFood = (foodId: number) => {
-    setSelectedFoods((prev) => prev.filter((f) => f.FoodID !== foodId));
-  };
 
   const addMealFromSelection = () => {
     if (selectedFoods.length === 0) {
@@ -294,11 +230,6 @@ export default function HEFIComparePage() {
     setMealName('Meal 1');
     setResult(null);
     setError('');
-    setSearchQuery('');
-    setSearchResults([]);
-    setShowResults(false);
-    setSelectedCategory('');
-    setSelectedMethod('');
   };
 
   return (
@@ -324,142 +255,21 @@ export default function HEFIComparePage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Sidebar Configuration */}
           <aside className="lg:col-span-1 space-y-6">
-            {/* Search Filters */}
-            {filters && (
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h3 className="text-sm font-medium text-gray-700 mb-4">Search Filters</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">Food Category</label>
-                    <select
-                      value={selectedCategory}
-                      onChange={(e) => setSelectedCategory(e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      aria-label="Food category filter"
-                    >
-                      <option value="">All categories</option>
-                      {filters.categories.map((c) => (
-                        <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">Cooking Method</label>
-                    <select
-                      value={selectedMethod}
-                      onChange={(e) => setSelectedMethod(e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      aria-label="Cooking method filter"
-                    >
-                      <option value="">All methods</option>
-                      {filters.methods.map((m) => (
-                        <option key={m} value={m}>{m.charAt(0).toUpperCase() + m.slice(1)}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-                {(selectedCategory || selectedMethod) && (
-                  <button
-                    onClick={() => { setSelectedCategory(''); setSelectedMethod(''); }}
-                    className="mt-3 text-xs text-purple-600 hover:text-purple-800"
-                  >
-                    Clear filters
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* Build a Meal */}
             <div className="bg-white rounded-lg shadow-sm p-6">
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Search Foods to add to current meal</label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search foods to add to meal..."
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                  />
-                  {showResults && (
-                    <div className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto mt-1">
-                      {searchIsLoading ? (
-                        <div className="p-3 text-center text-sm text-gray-500">Searching...</div>
-                      ) : searchResults.length > 0 ? (
-                        searchResults.map((food) => (
-                          <button
-                            key={food.FoodID}
-                            onClick={() => addFood(food)}
-                            className="w-full text-left px-4 py-2 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
-                          >
-                            <div className="font-medium text-gray-900">{food.FoodDescription}</div>
-                            <div className="text-sm text-gray-500">ID: {food.FoodID}</div>
-                          </button>
-                        ))
-                      ) : (
-                        <div className="p-3 text-center text-sm text-gray-500">No foods found</div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Selected Foods */}
-              <div className="mt-4">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm font-medium text-gray-700">Current Meal Foods ({selectedFoods.length})</h3>
-                  {selectedFoods.length > 0 && (
-                    <button
-                      onClick={() => setSelectedFoods([])}
-                      className="text-xs text-gray-500 hover:text-gray-700"
-                    >
-                      Clear all
-                    </button>
-                  )}
-                </div>
-                {selectedFoods.length === 0 ? (
-                  <div className="text-center py-4 text-gray-500">
-                    <InformationCircleIcon className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                    <p>No foods selected yet.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {selectedFoods.map((food) => (
-                      <div key={food.FoodID} className="p-2 bg-gray-50 rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <div>
-                            <div className="text-sm font-medium text-gray-900 truncate max-w-[200px]">{food.FoodDescription}</div>
-                            <div className="text-xs text-gray-500">ID: {food.FoodID}</div>
-                          </div>
-                          <button
-                            onClick={() => removeFood(food.FoodID)}
-                            className="text-red-500 hover:text-red-700 p-1"
-                            aria-label={`Remove ${food.FoodDescription}`}
-                          >
-                            <XMarkIcon className="w-4 h-4" />
-                          </button>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <label htmlFor={`amount-g-${food.FoodID}`} className="text-xs font-medium text-gray-600">Amount:</label>
-                          <input
-                            id={`amount-g-${food.FoodID}`}
-                            type="number"
-                            min="0.1"
-                            step="0.1"
-                            value={food.amount_g}
-                            onChange={(e) => updateFoodAmount(food.FoodID, parseFloat(e.target.value) || 0.1)}
-                            className="w-20 px-2 py-1 border border-gray-300 rounded text-xs focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                            aria-label={`Amount in grams for ${food.FoodDescription}`}
-                          />
-                          <span className="text-xs text-gray-500">g</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Save Meal */}
+              <h2 className="text-lg font-semibold text-gray-900 mb-2">Build a meal</h2>
+              <p className="text-xs text-gray-600 mb-4">
+                Add foods, save as a named meal, then compare 2+ meals. For a full day use{' '}
+                <a href="/hefi/calculate" className="text-purple-700 underline">Calculate HEFI</a>.
+              </p>
+              <ScorerFoodInput
+                mode="pool"
+                target="hefi"
+                accent="purple"
+                userType="individual"
+                pool={selectedToPool(selectedFoods)}
+                onPoolChange={pool => setSelectedFoods(poolToSelected(pool))}
+                poolSearchLabel="Search foods for the current meal"
+              />
               <div className="mt-4 space-y-2">
                 <div className="flex items-center gap-2">
                   <label htmlFor="meal-name" className="text-xs font-medium text-gray-600">Meal name:</label>

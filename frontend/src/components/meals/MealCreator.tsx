@@ -426,24 +426,20 @@ export default function MealCreator() {
         <div className="card">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-gray-900">Photos & Videos</h2>
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
-            >
-              <PhotoIcon className="w-4 h-4 mr-2" />
+            <label className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 cursor-pointer">
+              <PhotoIcon className="w-4 h-4 mr-2" aria-hidden="true" />
               Add Media
-            </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept="image/*,video/*"
+                onChange={handleMediaUpload}
+                className="sr-only"
+                title="Upload meal photos and videos"
+              />
+            </label>
           </div>
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            multiple
-            accept="image/*,video/*"
-            onChange={handleMediaUpload}
-            className="hidden"
-          />
 
           {mediaFiles.length === 0 && (
             <div className="text-center py-8 text-gray-500">
@@ -484,9 +480,12 @@ export default function MealCreator() {
                     <button
                       type="button"
                       onClick={() => removeMediaFile(mediaFile.id)}
+                      aria-label="Remove media file"
+                      title="Remove media file"
                       className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
                     >
-                      <TrashIcon className="w-4 h-4" />
+                      <TrashIcon className="w-4 h-4" aria-hidden="true" />
+                      <span className="sr-only">Remove media file</span>
                     </button>
                     
                     {/* Set Primary Button */}

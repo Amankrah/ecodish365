@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-05-26T23:51:29.738Z",
+  "source": "recall_24h",
+  "ingredients": [
+    {
+      "food_id": 502063,
+      "food_description": "Cereal, ready to eat, Acai Plus Granola, Nature's Path",
+      "food_group": "Breakfast cereals",
+      "mass_g": 20
+    },
+    {
+      "food_id": 5390,
+      "food_description": "Cranberry, dried, sweetened",
+      "food_group": "Fruits and fruit juices",
+      "mass_g": 12
+    },
+    {
+      "food_id": 2562,
+      "food_description": "Nuts, coconut meat, desiccated, toasted",
+      "food_group": "Nuts and Seeds",
+      "mass_g": 8
+    },
+    {
+      "food_id": 2516,
+      "food_description": "Seeds, pumpkin and squash seed kernels, dried",
+      "food_group": "Nuts and Seeds",
+      "mass_g": 6
+    },
+    {
+      "food_id": 1584,
+      "food_description": "Jujube (chinese date), dried",
+      "food_group": "Fruits and fruit juices",
+      "mass_g": 4
+    },
+    {
+      "food_id": 61,
+      "food_description": "Milk, fluid, partly skimmed, 2% M.F.",
+      "food_group": "Dairy and Egg Products",
+      "mass_g": 3
+    },
+    {
+      "food_id": 502040,
+      "food_description": "Sweetener, granulated brown sugar",
+      "food_group": "Sweets",
+      "mass_g": 1.8
+    },
+    {
+      "food_id": 115,
+      "food_description": "Milk, dry, skim, powder, instant",
+      "food_group": "Dairy and Egg Products",
+      "mass_g": 1
+    },
+    {
+      "food_id": 700190,
+      "food_description": "Cassava, flour, from white cassava",
+      "food_group": "WAFCT — Starchy roots, tubers and their products",
+      "mass_g": 0.6
+    },
+    {
+      "food_id": 2409,
+      "food_description": "Peas, green, raw",
+      "food_group": "Vegetables and Vegetable Products",
+      "mass_g": 0.34
+    },
+    {
+      "food_id": 4234,
+      "food_description": "Sweets, gelatin, dry powder, unsweetened",
+      "food_group": "Sweets",
+      "mass_g": 0.3
+    },
+    {
+      "food_id": 2536,
+      "food_description": "Nuts, almonds, dry roasted, unblanched",
+      "food_group": "Nuts and Seeds",
+      "mass_g": 0.2
+    },
+    {
+      "food_id": 1497,
+      "food_description": "Apple juice, frozen concentrate, diluted, without added vitamin C",
+      "food_group": "Fruits and fruit juices",
+      "mass_g": 0.15
+    },
+    {
+      "food_id": 3302,
+      "food_description": "Peanuts, all types, dry-roasted, salted",
+      "food_group": "Legumes and Legume Products",
+      "mass_g": 0.15
+    },
+    {
+      "food_id": 4366,
+      "food_description": "Snacks, sesame sticks, wheat-based, salted",
+      "food_group": "Snacks",
+      "mass_g": 0.11
+    },
+    {
+      "food_id": 2907,
+      "food_description": "Strawberry flavour mix, powder",
+      "food_group": "Beverages",
+      "mass_g": 0.1
+    },
+    {
+      "food_id": 2628,
+      "food_description": "Nuts, cashew nuts, oil roasted, salted",
+      "food_group": "Nuts and Seeds",
+      "mass_g": 0.08
+    },
+    {
+      "food_id": 4394,
+      "food_description": "Snacks, pretzels, hard, plain, salted",
+      "food_group": "Snacks",
+      "mass_g": 0.06
+    },
+    {
+      "food_id": 124,
+      "food_description": "Milk, fluid, buttermilk, cultured, 1% M.F.",
+      "food_group": "Dairy and Egg Products",
+      "mass_g": 0.05
+    },
+    {
+      "food_id": 451,
+      "food_description": "Vegetable oil, canola",
+      "food_group": "Fats and Oils",
+      "mass_g": 0.04
+    },
+    {
+      "food_id": 502422,
+      "food_description": "Seasoning mix, chili, dry mix",
+      "food_group": "Spices and Herbs",
+      "mass_g": 0.02
+    }
+  ],
+  "estimated_daily_kcal": 237.3,
+  "packaged_food_occasions": [
+    {
+      "occasion": "breakfast",
+      "product_name": null,
+      "brand": "Nestle (bebenestle.ca)",
+      "decomposition_confidence": 0.45
+    },
+    {
+      "occasion": "lunch",
+      "product_name": "Texan Sriracha Spicy Mix",
+      "brand": "Yupik",
+      "decomposition_confidence": 0.4
+    },
+    {
+      "occasion": "dinner",
+      "product_name": "Fiji Mix",
+      "brand": "Elan",
+      "decomposition_confidence": 0.5
+    }
+  ],
+  "meals_meta": [
+    {
+      "occasion": "breakfast",
+      "dish_name": "Nestle (bebenestle.ca)",
+      "total_mass_g": 7
+    },
+    {
+      "occasion": "lunch",
+      "dish_name": "Yupik Texan Sriracha Spicy Mix",
+      "total_mass_g": 1
+    },
+    {
+      "occasion": "dinner",
+      "dish_name": "Elan Fiji Mix",
+      "total_mass_g": 50
+    }
+  ],
+  "exported_by": "ecodish365",
+  "exported_at": "2026-05-26T23:51:56.075Z"
+}

@@ -54,7 +54,7 @@ from .hsr_explanations import (
     build_recall24h_caveat,
 )
 
-# Manual meal builder + 24-h recall handoff (compare endpoint stays at 20).
+# Manual meal builder + 24-h recall handoff; calculate and compare share this cap.
 HSR_CALCULATE_MAX_FOODS = 100
 
 
@@ -263,8 +263,10 @@ def compare_foods(request):
     if not food_ids:
         raise HSRAPIError("food_ids is required")
     
-    if len(food_ids) > 20:
-        raise HSRAPIError("Maximum 20 foods can be compared at once")
+    if len(food_ids) > HSR_CALCULATE_MAX_FOODS:
+        raise HSRAPIError(
+            f"Maximum {HSR_CALCULATE_MAX_FOODS} foods can be compared at once"
+        )
     
     if not isinstance(serving_size, (int, float)) or serving_size <= 0:
         raise HSRAPIError("serving_size must be a positive number")

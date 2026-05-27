@@ -25,6 +25,7 @@ interface FoodItem {
   id: string;
   food_id: number;
   food_name: string;
+  serving_size: number;
 }
 
 interface SearchState {
@@ -36,7 +37,7 @@ interface SearchState {
 
 export default function FCSCalculate() {
   const [foods, setFoods] = useState<FoodItem[]>([
-    { id: '1', food_id: 0, food_name: '' }
+    { id: '1', food_id: 0, food_name: '', serving_size: 100 }
   ]);
   const [search, setSearch] = useState<SearchState>({
     query: '',
@@ -83,6 +84,7 @@ export default function FCSCalculate() {
         id: String(idx + 1),
         food_id: i.food_id,
         food_name: i.food_description,
+        serving_size: i.mass_g ?? 100,
       })));
     },
   });
@@ -133,7 +135,7 @@ export default function FCSCalculate() {
 
   const addFood = () => {
     const newId = (foods.length + 1).toString();
-    setFoods([...foods, { id: newId, food_id: 0, food_name: '' }]);
+    setFoods([...foods, { id: newId, food_id: 0, food_name: '', serving_size: 100 }]);
   };
 
   const removeFood = (id: string) => {
@@ -175,6 +177,7 @@ export default function FCSCalculate() {
       const fcsResult = await FCSApiService.calculateFCS({
         food_ids: validFoods.map(food => food.food_id),
         food_names: validFoods.map(food => food.food_name),
+        serving_sizes: validFoods.map(food => food.serving_size),
         user_type: userType
       });
       
@@ -304,6 +307,7 @@ export default function FCSCalculate() {
                 id: String(idx + 1),
                 food_id: i.food_id,
                 food_name: i.food_description,
+                serving_size: i.mass_g ?? 100,
               })));
             }}
           />
@@ -468,6 +472,30 @@ export default function FCSCalculate() {
                         </div>
                       )}
                     </div>
+
+                    {food.food_id > 0 && (
+                      <div className="mt-3">
+                        <label
+                          htmlFor={`fcs-serving-${food.id}`}
+                          className="block text-xs font-medium text-gray-700 mb-1"
+                        >
+                          Amount (grams)
+                        </label>
+                        <input
+                          id={`fcs-serving-${food.id}`}
+                          type="number"
+                          min={0.1}
+                          step={1}
+                          value={food.serving_size}
+                          onChange={e =>
+                            updateFood(food.id, {
+                              serving_size: Math.max(0.1, Number(e.target.value) || 100),
+                            })
+                          }
+                          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -768,6 +796,7 @@ export default function FCSCalculate() {
               id: nextId(),
               food_id: i.food_id,
               food_name: i.food_description,
+              serving_size: i.mass_g ?? 100,
             }));
           setFoods(seed.length === 0 ? additions : [...seed, ...additions]);
         }}

@@ -31,9 +31,13 @@ def get_cnf_integrator() -> EnhancedCNFDataIntegrator:
     return _integrator
 
 
-def extract_and_score(food_ids: List[int], display_name: str) -> Tuple[FoodItem, Dict[str, Any]]:
+def extract_and_score(
+    food_ids: List[int],
+    display_name: str,
+    amounts_g: Optional[List[float]] = None,
+) -> Tuple[FoodItem, Dict[str, Any]]:
     food_item = FoodItem(display_name)
-    get_cnf_integrator().extract_nutrients_enhanced(food_ids, food_item)
+    get_cnf_integrator().extract_nutrients_enhanced(food_ids, food_item, amounts_g=amounts_g)
     summary = _analyzer.analyze_food_item(food_item)
     return food_item, summary
 

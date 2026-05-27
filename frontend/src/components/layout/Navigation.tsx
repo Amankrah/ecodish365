@@ -47,14 +47,13 @@ const navigation: NavItem[] = [
     href: '/hsr', 
     icon: ScaleIcon,
     dropdown: [
+      { name: '✨ Scorecard (all metrics)', href: '/scorecard' },
       { 
         name: 'HSR', 
         href: '/hsr', 
         children: [
           { name: 'Calculate HSR', href: '/hsr/calculate' },
-          { name: 'Compare Foods', href: '/hsr/compare' },
-          { name: 'Food Profile', href: '/hsr/food-profile' },
-          { name: 'Meal Insights', href: '/hsr/meal-insights' },
+          { name: 'Compare products', href: '/hsr/compare' },
         ]
       },
       { 
@@ -62,8 +61,7 @@ const navigation: NavItem[] = [
         href: '/fcs', 
         children: [
           { name: 'Calculate FCS', href: '/fcs/calculate' },
-          { name: 'Compare Foods', href: '/fcs/compare' },
-          { name: 'Food Profile', href: '/fcs/food-profile' },
+          { name: 'Compare products', href: '/fcs/compare' },
         ]
       },
       { 
@@ -71,8 +69,7 @@ const navigation: NavItem[] = [
         href: '/hefi', 
         children: [
           { name: 'Calculate HEFI', href: '/hefi/calculate' },
-          { name: 'Compare Foods', href: '/hefi/compare' },
-          { name: 'Food Profile', href: '/hefi/food-profile' },
+          { name: 'Compare meals', href: '/hefi/compare' },
         ]
       },
       { 
