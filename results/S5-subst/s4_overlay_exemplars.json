@@ -1,45 +1,44 @@
 {
   "best_heni_env_overlay": {
-    "day_id": "D06",
-    "label": "BBQ pulled-pork Western day",
-    "n_swaps": 3,
+    "day_id": "D13",
+    "label": "Fast-food burger meal day",
+    "overlay_mode": "greedy_reformulation",
     "delta": {
-      "hefi": 31.3699,
-      "heni_min": -26.93,
-      "hsr": 0.58,
-      "fcs": 25.49,
-      "environmental": -0.0007
+      "hefi": 36.4702,
+      "heni_min": -31.68,
+      "hsr": 0.65,
+      "fcs": 33.03,
+      "environmental": -0.0006
     },
     "win_win_heni_env": true
   },
   "largest_hefi_gain": {
-    "day_id": "D06",
-    "label": "BBQ pulled-pork Western day",
+    "day_id": "D13",
+    "label": "Fast-food burger meal day",
     "delta": {
-      "hefi": 31.3699,
-      "heni_min": -26.93,
-      "hsr": 0.58,
-      "fcs": 25.49,
-      "environmental": -0.0007
+      "hefi": 36.4702,
+      "heni_min": -31.68,
+      "hsr": 0.65,
+      "fcs": 33.03,
+      "environmental": -0.0006
     }
   },
-  "pre_overlay_lose_lose_anchor": {
-    "day_id": "D20",
-    "label": "High-dairy day",
-    "baseline": {
-      "hefi": 5.908515030695492,
-      "heni_min": 27.05,
-      "hsr": 2.92,
-      "fcs": 1.0,
-      "environmental": 0.0003337679399940395,
-      "top_pattern": "dash"
+  "tradeoff_day": {
+    "day_id": "D13",
+    "label": "Fast-food burger meal day",
+    "delta": {
+      "hefi": 36.4702,
+      "heni_min": -31.68,
+      "hsr": 0.65,
+      "fcs": 33.03,
+      "environmental": -0.0006
     },
-    "delta_after_s5": {
-      "hefi": 8.478,
-      "heni_min": -6.98,
-      "hsr": 0.03,
-      "fcs": 0.0,
-      "environmental": -0.0001
+    "improved": {
+      "hefi": true,
+      "heni": true,
+      "hsr": true,
+      "fcs": true,
+      "environmental": true
     }
   }
 }

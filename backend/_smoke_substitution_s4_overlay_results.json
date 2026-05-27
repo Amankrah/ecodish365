@@ -1,14 +1,13 @@
 {
   "manifest": {
     "harness": "S4-lite S5 substitution overlay (Tier D)",
-    "generated_at": "2026-05-27T14:59:47.929882+00:00",
-    "git_sha": "624ba079bc3281267d8199e9d8f2ff011124cca0",
-    "overlay_method": "deterministic_all_s5",
+    "generated_at": "2026-05-27T15:08:17.180557+00:00",
+    "git_sha": "73493c6c091f44e18fb31349c218d3b9142a61bd",
     "s4_lite_days": 25,
     "s5_eligible_days": 14,
     "overlay_success": 14,
-    "win_win_heni_env_count": 9,
-    "hefi_improved_count": 14
+    "win_win_heni_env_count": 7,
+    "hefi_improved_count": 12
   },
   "days": [
     {
@@ -25,16 +24,32 @@
         }
       ],
       "rationale": "HEFI canonical anti-pattern; expect low nutrition across board.",
-      "overlay_mode": "deterministic_all_s5",
-      "n_swaps_applied": 1,
+      "overlay_mode": "greedy_reformulation",
+      "n_swaps_applied": 4,
       "swaps": [
         {
-          "rule_id": "white_to_whole_wheat",
+          "rule_id": 4067,
           "original_food_id": 4066,
-          "original_description": "Bread, white, commercial",
           "replacement_food_id": 4067,
-          "replacement_description": "Bread, whole wheat, commercial",
           "mass_g": 90.0
+        },
+        {
+          "rule_id": 61,
+          "original_food_id": 70,
+          "replacement_food_id": 61,
+          "mass_g": 500.0
+        },
+        {
+          "rule_id": 4645,
+          "original_food_id": 4644,
+          "replacement_food_id": 4645,
+          "mass_g": 200.0
+        },
+        {
+          "rule_id": 502500,
+          "original_food_id": 4962,
+          "replacement_food_id": 502500,
+          "mass_g": 220.0
         }
       ],
       "baseline": {
@@ -43,20 +58,22 @@
         "hsr": 1.68,
         "fcs": 1.0,
         "environmental": 0.0003182059310703894,
+        "dietary_pattern_cosine": 0.8434110879898071,
         "top_pattern": "dash"
       },
       "modified": {
-        "hefi": 22.063800544092373,
-        "heni_min": 23.0,
-        "hsr": 1.75,
+        "hefi": 28.047295113664617,
+        "heni_min": 25.43,
+        "hsr": 2.0,
         "fcs": 1.0,
         "environmental": 0.0003182059310703894,
+        "dietary_pattern_cosine": 0.8529618978500366,
         "top_pattern": "dash"
       },
       "delta": {
-        "hefi": 8.0079,
-        "heni_min": -2.78,
-        "hsr": 0.07,
+        "hefi": 13.9914,
+        "heni_min": -0.35,
+        "hsr": 0.32,
         "fcs": 0.0,
         "environmental": 0.0
       },
@@ -68,11 +85,11 @@
         "environmental": null
       },
       "s4_lite_baseline_hefi": 14.055904253687784,
-      "s4_lite_baseline_heni": -13.5,
       "s4_lite_baseline_env_gw": 0.3549560541806174,
+      "analyzer_suggestions": 5,
+      "elapsed_ms": 70695.3,
       "win_win_heni_env": false,
-      "win_win_hefi_heni_env": false,
-      "elapsed_ms": 2839.6
+      "win_win_hefi_heni_env": false
     },
     {
       "day_id": "D02",
@@ -88,16 +105,32 @@
         }
       ],
       "rationale": "Brassard population-mean band target (~43 HEFI).",
-      "overlay_mode": "deterministic_all_s5",
-      "n_swaps_applied": 1,
+      "overlay_mode": "greedy_reformulation",
+      "n_swaps_applied": 4,
       "swaps": [
         {
-          "rule_id": "milk_to_soy",
+          "rule_id": 501528,
           "original_food_id": 61,
-          "original_description": "Milk, fluid, partly skimmed, 2% M.F.",
           "replacement_food_id": 501528,
-          "replacement_description": "Plant-based beverage, soy, enriched, all flavours, low fat",
           "mass_g": 200.0
+        },
+        {
+          "rule_id": 5683,
+          "original_food_id": 1220,
+          "replacement_food_id": 5683,
+          "mass_g": 100.0
+        },
+        {
+          "rule_id": 1414,
+          "original_food_id": 1413,
+          "replacement_food_id": 1414,
+          "mass_g": 40.0
+        },
+        {
+          "rule_id": 3131,
+          "original_food_id": 3081,
+          "replacement_food_id": 3131,
+          "mass_g": 90.0
         }
       ],
       "baseline": {
@@ -106,36 +139,38 @@
         "hsr": 3.83,
         "fcs": 30.85,
         "environmental": 0.00019227034935577977,
+        "dietary_pattern_cosine": 0.9191243648529053,
         "top_pattern": "dash"
       },
       "modified": {
-        "hefi": 52.111886889866184,
-        "heni_min": -29.71,
-        "hsr": 3.73,
-        "fcs": 38.49,
+        "hefi": 51.27507099985036,
+        "heni_min": -35.44,
+        "hsr": 3.83,
+        "fcs": 52.77,
         "environmental": 0.00013736524002497865,
+        "dietary_pattern_cosine": 0.8975381851196289,
         "top_pattern": "mediterranean"
       },
       "delta": {
-        "hefi": 0.5869,
-        "heni_min": -2.73,
-        "hsr": -0.1,
-        "fcs": 7.64,
+        "hefi": -0.2499,
+        "heni_min": -8.46,
+        "hsr": 0.0,
+        "fcs": 21.92,
         "environmental": -0.0001
       },
       "improved": {
-        "hefi": true,
+        "hefi": false,
         "heni": true,
-        "hsr": false,
+        "hsr": null,
         "fcs": true,
         "environmental": true
       },
       "s4_lite_baseline_hefi": 51.52495098309356,
-      "s4_lite_baseline_heni": 14.2,
       "s4_lite_baseline_env_gw": 0.6180024720794733,
+      "analyzer_suggestions": 5,
+      "elapsed_ms": 84111.9,
       "win_win_heni_env": true,
-      "win_win_hefi_heni_env": true,
-      "elapsed_ms": 1928.8
+      "win_win_hefi_heni_env": false
     },
     {
       "day_id": "D05",
@@ -151,16 +186,32 @@
         }
       ],
       "rationale": "DIET-PATTERN G3 vegetarian reference.",
-      "overlay_mode": "deterministic_all_s5",
-      "n_swaps_applied": 1,
+      "overlay_mode": "greedy_reformulation",
+      "n_swaps_applied": 4,
       "swaps": [
         {
-          "rule_id": "milk_to_soy",
+          "rule_id": 27,
+          "original_food_id": 25,
+          "replacement_food_id": 27,
+          "mass_g": 80.0
+        },
+        {
+          "rule_id": 501528,
           "original_food_id": 114,
-          "original_description": "Milk, fluid, skim",
           "replacement_food_id": 501528,
-          "replacement_description": "Plant-based beverage, soy, enriched, all flavours, low fat",
           "mass_g": 150.0
+        },
+        {
+          "rule_id": 4473,
+          "original_food_id": 4523,
+          "replacement_food_id": 4473,
+          "mass_g": 200.0
+        },
+        {
+          "rule_id": 2273,
+          "original_food_id": 2213,
+          "replacement_food_id": 2273,
+          "mass_g": 100.0
         }
       ],
       "baseline": {
@@ -169,36 +220,38 @@
         "hsr": 4.47,
         "fcs": 51.32,
         "environmental": 0.00012274077330065827,
+        "dietary_pattern_cosine": 0.9761509895324707,
         "top_pattern": "vegetarian"
       },
       "modified": {
-        "hefi": 43.46101139041499,
-        "heni_min": -22.82,
-        "hsr": 4.16,
-        "fcs": 40.68,
+        "hefi": 45.58681185722928,
+        "heni_min": -24.05,
+        "hsr": 4.08,
+        "fcs": 54.78,
         "environmental": 8.156194130255744e-05,
+        "dietary_pattern_cosine": 0.9476984739303589,
         "top_pattern": "vegan"
       },
       "delta": {
-        "hefi": 2.3582,
-        "heni_min": -1.44,
-        "hsr": -0.31,
-        "fcs": -10.64,
+        "hefi": 4.484,
+        "heni_min": -2.67,
+        "hsr": -0.39,
+        "fcs": 3.46,
         "environmental": -0.0
       },
       "improved": {
         "hefi": true,
         "heni": true,
         "hsr": false,
-        "fcs": false,
+        "fcs": true,
         "environmental": null
       },
       "s4_lite_baseline_hefi": 41.102766607553086,
-      "s4_lite_baseline_heni": 11.2,
       "s4_lite_baseline_env_gw": 0.5144620292232128,
+      "analyzer_suggestions": 5,
+      "elapsed_ms": 65632.1,
       "win_win_heni_env": false,
-      "win_win_hefi_heni_env": false,
-      "elapsed_ms": 1128.7
+      "win_win_hefi_heni_env": false
     },
     {
       "day_id": "D06",
@@ -222,32 +275,32 @@
         }
       ],
       "rationale": "DIET-PATTERN G3 western anti-pattern.",
-      "overlay_mode": "deterministic_all_s5",
-      "n_swaps_applied": 3,
+      "overlay_mode": "greedy_reformulation",
+      "n_swaps_applied": 4,
       "swaps": [
         {
-          "rule_id": "white_to_whole_wheat",
-          "original_food_id": 4066,
-          "original_description": "Bread, white, commercial",
-          "replacement_food_id": 4067,
-          "replacement_description": "Bread, whole wheat, commercial",
-          "mass_g": 120.0
-        },
-        {
-          "rule_id": "beef_to_legumes",
+          "rule_id": 3392,
           "original_food_id": 2683,
-          "original_description": "Beef, ground, lean, raw",
           "replacement_food_id": 3392,
-          "replacement_description": "Lentils, raw",
           "mass_g": 180.0
         },
         {
-          "rule_id": "cola_to_water",
+          "rule_id": 2933,
           "original_food_id": 2920,
-          "original_description": "Carbonated drinks, cola, fast-food cola",
           "replacement_food_id": 2933,
-          "replacement_description": "Water, municipal",
           "mass_g": 350.0
+        },
+        {
+          "rule_id": 4067,
+          "original_food_id": 4066,
+          "replacement_food_id": 4067,
+          "mass_g": 120.0
+        },
+        {
+          "rule_id": 4158,
+          "original_food_id": 4163,
+          "replacement_food_id": 4158,
+          "mass_g": 100.0
         }
       ],
       "baseline": {
@@ -256,21 +309,23 @@
         "hsr": 2.63,
         "fcs": 1.0,
         "environmental": 0.0007811835393512856,
+        "dietary_pattern_cosine": 0.992633581161499,
         "top_pattern": "western"
       },
       "modified": {
-        "hefi": 52.934458067662774,
-        "heni_min": -19.44,
-        "hsr": 3.21,
-        "fcs": 26.49,
+        "hefi": 52.769757137017464,
+        "heni_min": -19.72,
+        "hsr": 3.19,
+        "fcs": 26.06,
         "environmental": 0.00010385614867700969,
+        "dietary_pattern_cosine": 0.8194320201873779,
         "top_pattern": "western"
       },
       "delta": {
-        "hefi": 31.3699,
-        "heni_min": -26.93,
-        "hsr": 0.58,
-        "fcs": 25.49,
+        "hefi": 31.2052,
+        "heni_min": -27.21,
+        "hsr": 0.56,
+        "fcs": 25.06,
         "environmental": -0.0007
       },
       "improved": {
@@ -281,11 +336,11 @@
         "environmental": true
       },
       "s4_lite_baseline_hefi": 21.56460473178891,
-      "s4_lite_baseline_heni": -3.9,
       "s4_lite_baseline_env_gw": 1.5612873773111158,
+      "analyzer_suggestions": 5,
+      "elapsed_ms": 74245.7,
       "win_win_heni_env": true,
-      "win_win_hefi_heni_env": true,
-      "elapsed_ms": 1291.6
+      "win_win_hefi_heni_env": true
     },
     {
       "day_id": "D09",
@@ -301,16 +356,32 @@
         }
       ],
       "rationale": "DIET-PATTERN G3 DASH reference.",
-      "overlay_mode": "deterministic_all_s5",
-      "n_swaps_applied": 1,
+      "overlay_mode": "greedy_reformulation",
+      "n_swaps_applied": 4,
       "swaps": [
         {
-          "rule_id": "milk_to_soy",
-          "original_food_id": 114,
-          "original_description": "Milk, fluid, skim",
-          "replacement_food_id": 501528,
-          "replacement_description": "Plant-based beverage, soy, enriched, all flavours, low fat",
-          "mass_g": 240.0
+          "rule_id": 5410,
+          "original_food_id": 2374,
+          "replacement_food_id": 5410,
+          "mass_g": 120.0
+        },
+        {
+          "rule_id": 2545,
+          "original_food_id": 2589,
+          "replacement_food_id": 2545,
+          "mass_g": 30.0
+        },
+        {
+          "rule_id": 558,
+          "original_food_id": 555,
+          "replacement_food_id": 558,
+          "mass_g": 120.0
+        },
+        {
+          "rule_id": 3738,
+          "original_food_id": 3737,
+          "replacement_food_id": 3738,
+          "mass_g": 80.0
         }
       ],
       "baseline": {
@@ -319,36 +390,38 @@
         "hsr": 4.56,
         "fcs": 73.3,
         "environmental": 0.00017875558117659294,
+        "dietary_pattern_cosine": 0.9789162874221802,
         "top_pattern": "dash"
       },
       "modified": {
-        "hefi": 64.75850297129853,
-        "heni_min": -65.05,
-        "hsr": 4.46,
-        "fcs": 60.78,
-        "environmental": 0.0001128694499796316,
+        "hefi": 61.585545783428174,
+        "heni_min": -63.25,
+        "hsr": 4.3,
+        "fcs": 78.19,
+        "environmental": 0.00017875558117659294,
+        "dietary_pattern_cosine": 0.9677911400794983,
         "top_pattern": "dash"
       },
       "delta": {
-        "hefi": 3.1396,
-        "heni_min": -1.88,
-        "hsr": -0.1,
-        "fcs": -12.52,
-        "environmental": -0.0001
+        "hefi": -0.0333,
+        "heni_min": -0.08,
+        "hsr": -0.26,
+        "fcs": 4.89,
+        "environmental": 0.0
       },
       "improved": {
-        "hefi": true,
+        "hefi": false,
         "heni": true,
         "hsr": false,
-        "fcs": false,
-        "environmental": true
+        "fcs": true,
+        "environmental": null
       },
       "s4_lite_baseline_hefi": 61.61889439410457,
-      "s4_lite_baseline_heni": 33.2,
       "s4_lite_baseline_env_gw": 0.5103184984605785,
-      "win_win_heni_env": true,
-      "win_win_hefi_heni_env": true,
-      "elapsed_ms": 1293.5
+      "analyzer_suggestions": 5,
+      "elapsed_ms": 78376.3,
+      "win_win_heni_env": false,
+      "win_win_hefi_heni_env": false
     },
     {
       "day_id": "D13",
@@ -372,32 +445,32 @@
         }
       ],
       "rationale": "DIET-PATTERN G3 fast-food western.",
-      "overlay_mode": "deterministic_all_s5",
-      "n_swaps_applied": 3,
+      "overlay_mode": "greedy_reformulation",
+      "n_swaps_applied": 4,
       "swaps": [
         {
-          "rule_id": "white_to_whole_wheat",
-          "original_food_id": 4066,
-          "original_description": "Bread, white, commercial",
-          "replacement_food_id": 4067,
-          "replacement_description": "Bread, whole wheat, commercial",
-          "mass_g": 100.0
+          "rule_id": 2933,
+          "original_food_id": 2920,
+          "replacement_food_id": 2933,
+          "mass_g": 400.0
         },
         {
-          "rule_id": "beef_to_legumes",
+          "rule_id": 3392,
           "original_food_id": 2683,
-          "original_description": "Beef, ground, lean, raw",
           "replacement_food_id": 3392,
-          "replacement_description": "Lentils, raw",
           "mass_g": 150.0
         },
         {
-          "rule_id": "cola_to_water",
-          "original_food_id": 2920,
-          "original_description": "Carbonated drinks, cola, fast-food cola",
-          "replacement_food_id": 2933,
-          "replacement_description": "Water, municipal",
-          "mass_g": 400.0
+          "rule_id": 4067,
+          "original_food_id": 4066,
+          "replacement_food_id": 4067,
+          "mass_g": 100.0
+        },
+        {
+          "rule_id": 2436,
+          "original_food_id": 700206,
+          "replacement_food_id": 2436,
+          "mass_g": 120.0
         }
       ],
       "baseline": {
@@ -406,21 +479,23 @@
         "hsr": 3.17,
         "fcs": 11.04,
         "environmental": 0.000676384428578586,
+        "dietary_pattern_cosine": 0.9907883405685425,
         "top_pattern": "western"
       },
       "modified": {
-        "hefi": 52.417413566499945,
-        "heni_min": -21.61,
-        "hsr": 3.83,
-        "fcs": 40.43,
-        "environmental": 0.00011194493635002274,
+        "hefi": 58.279524610937216,
+        "heni_min": -27.66,
+        "hsr": 3.82,
+        "fcs": 44.07,
+        "environmental": 9.777734052783692e-05,
+        "dietary_pattern_cosine": 0.8111481666564941,
         "top_pattern": "western"
       },
       "delta": {
-        "hefi": 30.6081,
-        "heni_min": -25.63,
-        "hsr": 0.66,
-        "fcs": 29.39,
+        "hefi": 36.4702,
+        "heni_min": -31.68,
+        "hsr": 0.65,
+        "fcs": 33.03,
         "environmental": -0.0006
       },
       "improved": {
@@ -431,11 +506,11 @@
         "environmental": true
       },
       "s4_lite_baseline_hefi": 21.80935379948978,
-      "s4_lite_baseline_heni": -2.1,
       "s4_lite_baseline_env_gw": 1.5147647008765208,
+      "analyzer_suggestions": 5,
+      "elapsed_ms": 24847.2,
       "win_win_heni_env": true,
-      "win_win_hefi_heni_env": true,
-      "elapsed_ms": 1208.9
+      "win_win_hefi_heni_env": true
     },
     {
       "day_id": "D16",
@@ -451,16 +526,32 @@
         }
       ],
       "rationale": "Cross-system sweet breakfast + modest lunch.",
-      "overlay_mode": "deterministic_all_s5",
-      "n_swaps_applied": 1,
+      "overlay_mode": "greedy_reformulation",
+      "n_swaps_applied": 4,
       "swaps": [
         {
-          "rule_id": "white_to_whole_wheat",
+          "rule_id": 4067,
           "original_food_id": 4066,
-          "original_description": "Bread, white, commercial",
           "replacement_food_id": 4067,
-          "replacement_description": "Bread, whole wheat, commercial",
           "mass_g": 60.0
+        },
+        {
+          "rule_id": 3131,
+          "original_food_id": 3081,
+          "replacement_food_id": 3131,
+          "mass_g": 90.0
+        },
+        {
+          "rule_id": 502695,
+          "original_food_id": 1495,
+          "replacement_food_id": 502695,
+          "mass_g": 200.0
+        },
+        {
+          "rule_id": 63,
+          "original_food_id": 70,
+          "replacement_food_id": 63,
+          "mass_g": 250.0
         }
       ],
       "baseline": {
@@ -469,21 +560,23 @@
         "hsr": 2.09,
         "fcs": 36.11,
         "environmental": 0.0001598732036022287,
+        "dietary_pattern_cosine": 0.9005095362663269,
         "top_pattern": "dash"
       },
       "modified": {
-        "hefi": 35.447764896031615,
-        "heni_min": -25.43,
-        "hsr": 2.17,
-        "fcs": 38.44,
+        "hefi": 37.583567190323045,
+        "heni_min": -41.64,
+        "hsr": 2.27,
+        "fcs": 46.17,
         "environmental": 0.0001598732036022287,
+        "dietary_pattern_cosine": 0.9035415053367615,
         "top_pattern": "dash"
       },
       "delta": {
-        "hefi": 4.2144,
-        "heni_min": -1.18,
-        "hsr": 0.08,
-        "fcs": 2.33,
+        "hefi": 6.3502,
+        "heni_min": -17.39,
+        "hsr": 0.18,
+        "fcs": 10.06,
         "environmental": 0.0
       },
       "improved": {
@@ -494,11 +587,11 @@
         "environmental": null
       },
       "s4_lite_baseline_hefi": 31.233317724290302,
-      "s4_lite_baseline_heni": 12.7,
       "s4_lite_baseline_env_gw": 0.5595351237469525,
+      "analyzer_suggestions": 5,
+      "elapsed_ms": 34787.3,
       "win_win_heni_env": false,
-      "win_win_hefi_heni_env": false,
-      "elapsed_ms": 1350.7
+      "win_win_hefi_heni_env": false
     },
     {
       "day_id": "D17",
@@ -518,24 +611,32 @@
         }
       ],
       "rationale": "Recall ACTIVE pattern proxy (~2500 kcal).",
-      "overlay_mode": "deterministic_all_s5",
-      "n_swaps_applied": 2,
+      "overlay_mode": "greedy_reformulation",
+      "n_swaps_applied": 4,
       "swaps": [
         {
-          "rule_id": "white_to_whole_wheat",
+          "rule_id": 3392,
+          "original_food_id": 2683,
+          "replacement_food_id": 3392,
+          "mass_g": 150.0
+        },
+        {
+          "rule_id": 4067,
           "original_food_id": 3732,
-          "original_description": "Bread, white, commercial, toasted",
           "replacement_food_id": 4067,
-          "replacement_description": "Bread, whole wheat, commercial",
           "mass_g": 50.0
         },
         {
-          "rule_id": "beef_to_legumes",
-          "original_food_id": 2683,
-          "original_description": "Beef, ground, lean, raw",
-          "replacement_food_id": 3392,
-          "replacement_description": "Lentils, raw",
-          "mass_g": 150.0
+          "rule_id": 5308,
+          "original_food_id": 118,
+          "replacement_food_id": 5308,
+          "mass_g": 10.0
+        },
+        {
+          "rule_id": 127,
+          "original_food_id": 125,
+          "replacement_food_id": 127,
+          "mass_g": 90.0
         }
       ],
       "baseline": {
@@ -544,21 +645,23 @@
         "hsr": 2.98,
         "fcs": 45.98,
         "environmental": 0.0007555716983114952,
+        "dietary_pattern_cosine": 0.9428349733352661,
         "top_pattern": "dash"
       },
       "modified": {
-        "hefi": 45.44913259438018,
-        "heni_min": -67.21,
-        "hsr": 3.15,
-        "fcs": 59.64,
+        "hefi": 45.51209802022212,
+        "heni_min": -72.51,
+        "hsr": 3.3,
+        "fcs": 64.0,
         "environmental": 0.00019113220608293197,
+        "dietary_pattern_cosine": 0.9487438201904297,
         "top_pattern": "dash"
       },
       "delta": {
-        "hefi": 2.8986,
-        "heni_min": -17.06,
-        "hsr": 0.17,
-        "fcs": 13.66,
+        "hefi": 2.9615,
+        "heni_min": -22.36,
+        "hsr": 0.32,
+        "fcs": 18.02,
         "environmental": -0.0006
       },
       "improved": {
@@ -569,11 +672,11 @@
         "environmental": true
       },
       "s4_lite_baseline_hefi": 42.55057879403119,
-      "s4_lite_baseline_heni": 26.4,
       "s4_lite_baseline_env_gw": 1.1527155569540535,
+      "analyzer_suggestions": 5,
+      "elapsed_ms": 75453.0,
       "win_win_heni_env": true,
-      "win_win_hefi_heni_env": true,
-      "elapsed_ms": 2192.6
+      "win_win_hefi_heni_env": true
     },
     {
       "day_id": "D18",
@@ -597,32 +700,32 @@
         }
       ],
       "rationale": "Red-meat dominant \u2014 nutrition/env tension exemplar.",
-      "overlay_mode": "deterministic_all_s5",
-      "n_swaps_applied": 3,
+      "overlay_mode": "greedy_reformulation",
+      "n_swaps_applied": 4,
       "swaps": [
         {
-          "rule_id": "beef_to_legumes",
+          "rule_id": 3392,
           "original_food_id": 2683,
-          "original_description": "Beef, ground, lean, raw",
           "replacement_food_id": 3392,
-          "replacement_description": "Lentils, raw",
           "mass_g": 200.0
         },
         {
-          "rule_id": "white_to_whole_wheat",
+          "rule_id": 4067,
           "original_food_id": 4066,
-          "original_description": "Bread, white, commercial",
           "replacement_food_id": 4067,
-          "replacement_description": "Bread, whole wheat, commercial",
           "mass_g": 60.0
         },
         {
-          "rule_id": "milk_to_soy",
+          "rule_id": 501528,
           "original_food_id": 114,
-          "original_description": "Milk, fluid, skim",
           "replacement_food_id": 501528,
-          "replacement_description": "Plant-based beverage, soy, enriched, all flavours, low fat",
           "mass_g": 200.0
+        },
+        {
+          "rule_id": 5732,
+          "original_food_id": 3580,
+          "replacement_food_id": 5732,
+          "mass_g": 150.0
         }
       ],
       "baseline": {
@@ -631,21 +734,23 @@
         "hsr": 2.11,
         "fcs": 17.27,
         "environmental": 0.0008964482330948468,
+        "dietary_pattern_cosine": 0.8894402980804443,
         "top_pattern": "dash"
       },
       "modified": {
-        "hefi": 39.97950636808699,
-        "heni_min": -17.93,
-        "hsr": 2.43,
-        "fcs": 43.55,
+        "hefi": 39.919625525419704,
+        "heni_min": -17.41,
+        "hsr": 2.42,
+        "fcs": 46.94,
         "environmental": 8.895713412596131e-05,
+        "dietary_pattern_cosine": 0.882472038269043,
         "top_pattern": "vegan"
       },
       "delta": {
-        "hefi": 11.4559,
-        "heni_min": -25.79,
-        "hsr": 0.32,
-        "fcs": 26.28,
+        "hefi": 11.396,
+        "heni_min": -25.27,
+        "hsr": 0.31,
+        "fcs": 29.67,
         "environmental": -0.0008
       },
       "improved": {
@@ -656,11 +761,11 @@
         "environmental": true
       },
       "s4_lite_baseline_hefi": 28.523652794921105,
-      "s4_lite_baseline_heni": -4.1,
       "s4_lite_baseline_env_gw": 1.85589364897955,
+      "analyzer_suggestions": 5,
+      "elapsed_ms": 27261.9,
       "win_win_heni_env": true,
-      "win_win_hefi_heni_env": true,
-      "elapsed_ms": 1289.1
+      "win_win_hefi_heni_env": true
     },
     {
       "day_id": "D20",
@@ -680,23 +785,31 @@
         }
       ],
       "rationale": "Calcium-rich dairy pattern; moderate HEFI, moderate env.",
-      "overlay_mode": "deterministic_all_s5",
-      "n_swaps_applied": 2,
+      "overlay_mode": "greedy_reformulation",
+      "n_swaps_applied": 4,
       "swaps": [
         {
-          "rule_id": "milk_to_soy",
+          "rule_id": 4067,
+          "original_food_id": 4066,
+          "replacement_food_id": 4067,
+          "mass_g": 60.0
+        },
+        {
+          "rule_id": 501528,
           "original_food_id": 113,
-          "original_description": "Milk, fluid, whole, pasteurized, homogenized, 3.25% M.F.",
           "replacement_food_id": 501528,
-          "replacement_description": "Plant-based beverage, soy, enriched, all flavours, low fat",
           "mass_g": 400.0
         },
         {
-          "rule_id": "white_to_whole_wheat",
-          "original_food_id": 4066,
-          "original_description": "Bread, white, commercial",
-          "replacement_food_id": 4067,
-          "replacement_description": "Bread, whole wheat, commercial",
+          "rule_id": 700888,
+          "original_food_id": 108,
+          "replacement_food_id": 700888,
+          "mass_g": 80.0
+        },
+        {
+          "rule_id": 502215,
+          "original_food_id": 502213,
+          "replacement_food_id": 502215,
           "mass_g": 60.0
         }
       ],
@@ -706,36 +819,38 @@
         "hsr": 2.92,
         "fcs": 1.0,
         "environmental": 0.0003337679399940395,
+        "dietary_pattern_cosine": 0.7880174517631531,
         "top_pattern": "dash"
       },
       "modified": {
-        "hefi": 14.386506053816305,
-        "heni_min": 20.07,
-        "hsr": 2.95,
+        "hefi": 20.84226730147412,
+        "heni_min": 12.59,
+        "hsr": 1.9,
         "fcs": 1.0,
-        "environmental": 0.00022395772133243735,
+        "environmental": 0.00020199567760011692,
+        "dietary_pattern_cosine": 0.7772153615951538,
         "top_pattern": "western"
       },
       "delta": {
-        "hefi": 8.478,
-        "heni_min": -6.98,
-        "hsr": 0.03,
+        "hefi": 14.9338,
+        "heni_min": -14.46,
+        "hsr": -1.02,
         "fcs": 0.0,
         "environmental": -0.0001
       },
       "improved": {
         "hefi": true,
         "heni": true,
-        "hsr": true,
+        "hsr": false,
         "fcs": null,
         "environmental": true
       },
       "s4_lite_baseline_hefi": 5.908515030695492,
-      "s4_lite_baseline_heni": -14.2,
       "s4_lite_baseline_env_gw": 0.7604443599262866,
+      "analyzer_suggestions": 5,
+      "elapsed_ms": 38837.1,
       "win_win_heni_env": true,
-      "win_win_hefi_heni_env": true,
-      "elapsed_ms": 1279.1
+      "win_win_hefi_heni_env": true
     },
     {
       "day_id": "D22",
@@ -751,16 +866,32 @@
         }
       ],
       "rationale": "Ultra-processed convenience pattern.",
-      "overlay_mode": "deterministic_all_s5",
-      "n_swaps_applied": 1,
+      "overlay_mode": "greedy_reformulation",
+      "n_swaps_applied": 4,
       "swaps": [
         {
-          "rule_id": "cola_to_water",
+          "rule_id": 2933,
           "original_food_id": 2920,
-          "original_description": "Carbonated drinks, cola, fast-food cola",
           "replacement_food_id": 2933,
-          "replacement_description": "Water, municipal",
           "mass_g": 350.0
+        },
+        {
+          "rule_id": 4645,
+          "original_food_id": 4644,
+          "replacement_food_id": 4645,
+          "mass_g": 120.0
+        },
+        {
+          "rule_id": 4527,
+          "original_food_id": 4464,
+          "replacement_food_id": 4527,
+          "mass_g": 200.0
+        },
+        {
+          "rule_id": 4088,
+          "original_food_id": 4117,
+          "replacement_food_id": 4088,
+          "mass_g": 40.0
         }
       ],
       "baseline": {
@@ -769,20 +900,22 @@
         "hsr": 2.28,
         "fcs": 1.0,
         "environmental": 8.717768130944293e-05,
+        "dietary_pattern_cosine": 0.932137131690979,
         "top_pattern": "western"
       },
       "modified": {
-        "hefi": 36.12195464724068,
-        "heni_min": 5.48,
-        "hsr": 2.36,
+        "hefi": 39.286815398449875,
+        "heni_min": -0.38,
+        "hsr": 2.62,
         "fcs": 1.0,
         "environmental": 8.717768130944293e-05,
+        "dietary_pattern_cosine": 0.7829322814941406,
         "top_pattern": "western"
       },
       "delta": {
-        "hefi": 13.1973,
-        "heni_min": -0.24,
-        "hsr": 0.08,
+        "hefi": 16.3622,
+        "heni_min": -6.1,
+        "hsr": 0.34,
         "fcs": 0.0,
         "environmental": 0.0
       },
@@ -794,11 +927,11 @@
         "environmental": null
       },
       "s4_lite_baseline_hefi": 22.924657151770965,
-      "s4_lite_baseline_heni": -3.0,
       "s4_lite_baseline_env_gw": 0.2564376535954696,
+      "analyzer_suggestions": 5,
+      "elapsed_ms": 33334.3,
       "win_win_heni_env": false,
-      "win_win_hefi_heni_env": false,
-      "elapsed_ms": 956.8
+      "win_win_hefi_heni_env": false
     },
     {
       "day_id": "D23",
@@ -818,24 +951,32 @@
         }
       ],
       "rationale": "Recall SEDENTARY pattern proxy (~1800 kcal).",
-      "overlay_mode": "deterministic_all_s5",
-      "n_swaps_applied": 2,
+      "overlay_mode": "greedy_reformulation",
+      "n_swaps_applied": 4,
       "swaps": [
         {
-          "rule_id": "milk_to_soy",
+          "rule_id": 3392,
+          "original_food_id": 2683,
+          "replacement_food_id": 3392,
+          "mass_g": 100.0
+        },
+        {
+          "rule_id": 501528,
           "original_food_id": 114,
-          "original_description": "Milk, fluid, skim",
           "replacement_food_id": 501528,
-          "replacement_description": "Plant-based beverage, soy, enriched, all flavours, low fat",
           "mass_g": 200.0
         },
         {
-          "rule_id": "beef_to_legumes",
-          "original_food_id": 2683,
-          "original_description": "Beef, ground, lean, raw",
-          "replacement_food_id": 3392,
-          "replacement_description": "Lentils, raw",
-          "mass_g": 100.0
+          "rule_id": 4469,
+          "original_food_id": 4464,
+          "replacement_food_id": 4469,
+          "mass_g": 200.0
+        },
+        {
+          "rule_id": 5683,
+          "original_food_id": 1220,
+          "replacement_food_id": 5683,
+          "mass_g": 80.0
         }
       ],
       "baseline": {
@@ -844,21 +985,23 @@
         "hsr": 3.9,
         "fcs": 1.0,
         "environmental": 0.0005230114630837407,
+        "dietary_pattern_cosine": 0.9410982131958008,
         "top_pattern": "dash"
       },
       "modified": {
-        "hefi": 36.362337833008276,
-        "heni_min": -32.84,
-        "hsr": 4.05,
-        "fcs": 10.97,
+        "hefi": 38.20667506887046,
+        "heni_min": -35.88,
+        "hsr": 4.11,
+        "fcs": 24.22,
         "environmental": 9.181335893389747e-05,
+        "dietary_pattern_cosine": 0.927038311958313,
         "top_pattern": "mediterranean"
       },
       "delta": {
-        "hefi": 2.7434,
-        "heni_min": -23.04,
-        "hsr": 0.15,
-        "fcs": 9.97,
+        "hefi": 4.5877,
+        "heni_min": -26.08,
+        "hsr": 0.21,
+        "fcs": 23.22,
         "environmental": -0.0004
       },
       "improved": {
@@ -869,11 +1012,11 @@
         "environmental": true
       },
       "s4_lite_baseline_hefi": 33.61897627770133,
-      "s4_lite_baseline_heni": 5.2,
       "s4_lite_baseline_env_gw": 1.2084735897172003,
+      "analyzer_suggestions": 5,
+      "elapsed_ms": 637884.9,
       "win_win_heni_env": true,
-      "win_win_hefi_heni_env": true,
-      "elapsed_ms": 1399.7
+      "win_win_hefi_heni_env": true
     },
     {
       "day_id": "D24",
@@ -893,24 +1036,32 @@
         }
       ],
       "rationale": "Typical school-age lunch pattern.",
-      "overlay_mode": "deterministic_all_s5",
-      "n_swaps_applied": 2,
+      "overlay_mode": "greedy_reformulation",
+      "n_swaps_applied": 4,
       "swaps": [
         {
-          "rule_id": "white_to_whole_wheat",
+          "rule_id": 3942,
+          "original_food_id": 3941,
+          "replacement_food_id": 3942,
+          "mass_g": 60.0
+        },
+        {
+          "rule_id": 4067,
           "original_food_id": 4066,
-          "original_description": "Bread, white, commercial",
           "replacement_food_id": 4067,
-          "replacement_description": "Bread, whole wheat, commercial",
           "mass_g": 50.0
         },
         {
-          "rule_id": "milk_to_soy",
+          "rule_id": 501528,
           "original_food_id": 61,
-          "original_description": "Milk, fluid, partly skimmed, 2% M.F.",
           "replacement_food_id": 501528,
-          "replacement_description": "Plant-based beverage, soy, enriched, all flavours, low fat",
           "mass_g": 250.0
+        },
+        {
+          "rule_id": 3366,
+          "original_food_id": 3414,
+          "replacement_food_id": 3366,
+          "mass_g": 28.0
         }
       ],
       "baseline": {
@@ -919,36 +1070,38 @@
         "hsr": 3.61,
         "fcs": 9.56,
         "environmental": 0.00012602069498377378,
+        "dietary_pattern_cosine": 0.8834261894226074,
         "top_pattern": "dash"
       },
       "modified": {
-        "hefi": 33.22535771065183,
-        "heni_min": -38.5,
-        "hsr": 3.63,
-        "fcs": 15.8,
+        "hefi": 37.032530869155494,
+        "heni_min": -34.07,
+        "hsr": 3.96,
+        "fcs": 28.78,
         "environmental": 5.7389308320272446e-05,
+        "dietary_pattern_cosine": 0.802415132522583,
         "top_pattern": "dash"
       },
       "delta": {
-        "hefi": 5.0719,
-        "heni_min": -4.4,
-        "hsr": 0.02,
-        "fcs": 6.24,
+        "hefi": 8.879,
+        "heni_min": 0.03,
+        "hsr": 0.35,
+        "fcs": 19.22,
         "environmental": -0.0001
       },
       "improved": {
         "hefi": true,
-        "heni": true,
+        "heni": false,
         "hsr": true,
         "fcs": true,
         "environmental": true
       },
       "s4_lite_baseline_hefi": 28.153502416053474,
-      "s4_lite_baseline_heni": 17.9,
       "s4_lite_baseline_env_gw": 0.519453192384575,
-      "win_win_heni_env": true,
-      "win_win_hefi_heni_env": true,
-      "elapsed_ms": 1151.8
+      "analyzer_suggestions": 5,
+      "elapsed_ms": 30799.7,
+      "win_win_heni_env": false,
+      "win_win_hefi_heni_env": false
     },
     {
       "day_id": "D25",
@@ -964,16 +1117,32 @@
         }
       ],
       "rationale": "Small-portion older-adult pattern.",
-      "overlay_mode": "deterministic_all_s5",
-      "n_swaps_applied": 1,
+      "overlay_mode": "greedy_reformulation",
+      "n_swaps_applied": 4,
       "swaps": [
         {
-          "rule_id": "white_to_whole_wheat",
+          "rule_id": 4067,
           "original_food_id": 4066,
-          "original_description": "Bread, white, commercial",
           "replacement_food_id": 4067,
-          "replacement_description": "Bread, whole wheat, commercial",
           "mass_g": 40.0
+        },
+        {
+          "rule_id": 5308,
+          "original_food_id": 118,
+          "replacement_food_id": 5308,
+          "mass_g": 8.0
+        },
+        {
+          "rule_id": 4985,
+          "original_food_id": 2873,
+          "replacement_food_id": 4985,
+          "mass_g": 300.0
+        },
+        {
+          "rule_id": 1661,
+          "original_food_id": 1704,
+          "replacement_food_id": 1661,
+          "mass_g": 100.0
         }
       ],
       "baseline": {
@@ -982,21 +1151,23 @@
         "hsr": 1.87,
         "fcs": 54.96,
         "environmental": 6.36584930428029e-05,
+        "dietary_pattern_cosine": 0.7627097368240356,
         "top_pattern": "mediterranean"
       },
       "modified": {
-        "hefi": 57.36283917768435,
-        "heni_min": -31.56,
-        "hsr": 1.97,
-        "fcs": 56.49,
+        "hefi": 55.949405078594936,
+        "heni_min": -33.12,
+        "hsr": 2.86,
+        "fcs": 58.23,
         "environmental": 6.36584930428029e-05,
-        "top_pattern": "mediterranean"
+        "dietary_pattern_cosine": 0.7672660946846008,
+        "top_pattern": "vegan"
       },
       "delta": {
-        "hefi": 11.4227,
-        "heni_min": -0.77,
-        "hsr": 0.1,
-        "fcs": 1.53,
+        "hefi": 10.0093,
+        "heni_min": -2.33,
+        "hsr": 0.99,
+        "fcs": 3.27,
         "environmental": 0.0
       },
       "improved": {
@@ -1007,55 +1178,54 @@
         "environmental": null
       },
       "s4_lite_baseline_hefi": 45.940151019680904,
-      "s4_lite_baseline_heni": 16.2,
       "s4_lite_baseline_env_gw": 0.40594430856185815,
+      "analyzer_suggestions": 5,
+      "elapsed_ms": 27963.4,
       "win_win_heni_env": false,
-      "win_win_hefi_heni_env": false,
-      "elapsed_ms": 1222.5
+      "win_win_hefi_heni_env": false
     }
   ],
   "exemplars": {
     "best_heni_env_overlay": {
-      "day_id": "D06",
-      "label": "BBQ pulled-pork Western day",
-      "n_swaps": 3,
+      "day_id": "D13",
+      "label": "Fast-food burger meal day",
+      "overlay_mode": "greedy_reformulation",
       "delta": {
-        "hefi": 31.3699,
-        "heni_min": -26.93,
-        "hsr": 0.58,
-        "fcs": 25.49,
-        "environmental": -0.0007
+        "hefi": 36.4702,
+        "heni_min": -31.68,
+        "hsr": 0.65,
+        "fcs": 33.03,
+        "environmental": -0.0006
       },
       "win_win_heni_env": true
     },
     "largest_hefi_gain": {
-      "day_id": "D06",
-      "label": "BBQ pulled-pork Western day",
+      "day_id": "D13",
+      "label": "Fast-food burger meal day",
       "delta": {
-        "hefi": 31.3699,
-        "heni_min": -26.93,
-        "hsr": 0.58,
-        "fcs": 25.49,
-        "environmental": -0.0007
+        "hefi": 36.4702,
+        "heni_min": -31.68,
+        "hsr": 0.65,
+        "fcs": 33.03,
+        "environmental": -0.0006
       }
     },
-    "pre_overlay_lose_lose_anchor": {
-      "day_id": "D20",
-      "label": "High-dairy day",
-      "baseline": {
-        "hefi": 5.908515030695492,
-        "heni_min": 27.05,
-        "hsr": 2.92,
-        "fcs": 1.0,
-        "environmental": 0.0003337679399940395,
-        "top_pattern": "dash"
+    "tradeoff_day": {
+      "day_id": "D13",
+      "label": "Fast-food burger meal day",
+      "delta": {
+        "hefi": 36.4702,
+        "heni_min": -31.68,
+        "hsr": 0.65,
+        "fcs": 33.03,
+        "environmental": -0.0006
       },
-      "delta_after_s5": {
-        "hefi": 8.478,
-        "heni_min": -6.98,
-        "hsr": 0.03,
-        "fcs": 0.0,
-        "environmental": -0.0001
+      "improved": {
+        "hefi": true,
+        "heni": true,
+        "hsr": true,
+        "fcs": true,
+        "environmental": true
       }
     }
   },
@@ -1079,29 +1249,11 @@
     "win_win_days": [
       "D02",
       "D06",
-      "D09",
       "D13",
       "D17",
       "D18",
       "D20",
-      "D23",
-      "D24"
-    ],
-    "hefi_improved_days": [
-      "D01",
-      "D02",
-      "D05",
-      "D06",
-      "D09",
-      "D13",
-      "D16",
-      "D17",
-      "D18",
-      "D20",
-      "D22",
-      "D23",
-      "D24",
-      "D25"
+      "D23"
     ]
   }
 }

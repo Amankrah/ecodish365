@@ -114,15 +114,15 @@ export function PackagedFoodCompositionForm({
     modified: SubstitutionCompositionItem[],
     _suggestion: SubstitutionSuggestion,
   ): void {
-    setRows(modified.map((m, i) => ({
-      label_name: m.label_name ?? rows[i]?.label_name ?? m.food_description ?? '',
-      position: m.position ?? rows[i]?.position ?? i + 1,
+    setRows(prev => modified.map((m, i) => ({
+      label_name: m.label_name ?? prev[i]?.label_name ?? m.food_description ?? '',
+      position: m.position ?? prev[i]?.position ?? i + 1,
       food_id: m.food_id,
       food_description: m.food_description ?? `Food ID ${m.food_id}`,
       food_group: m.food_group ?? null,
       mass_g: m.mass_g,
-      confidence: rows[i]?.confidence ?? 0.7,
-      mass_source: rows[i]?.mass_source ?? 'position_inferred',
+      confidence: prev[i]?.confidence ?? 0.7,
+      mass_source: prev[i]?.mass_source ?? 'position_inferred',
     })));
   }
 
