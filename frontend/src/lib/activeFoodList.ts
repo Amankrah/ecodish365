@@ -178,6 +178,33 @@ export function updateIngredientMass(food_id: number, mass_g: number): ActiveFoo
   return next;
 }
 
+/** Append or merge one food into the active scorecard list. */
+export function appendToActiveFoodList(
+  ing: ActiveFoodListIngredient,
+  userType?: ActiveFoodList['user_type'],
+): ActiveFoodList {
+  const current = loadActiveFoodList();
+  const existing = current?.ingredients ?? [];
+  const idx = existing.findIndex(i => i.food_id === ing.food_id);
+  const nextIngs = idx >= 0
+    ? existing.map((i, k) => k === idx ? { ...i, mass_g: i.mass_g + ing.mass_g } : i)
+    : [...existing, ing];
+  const next: ActiveFoodList = {
+    schema_version: ACTIVE_FOOD_LIST_SCHEMA_VERSION,
+    captured_at: new Date().toISOString(),
+    source: current?.source ?? 'manual',
+    ingredients: nextIngs,
+    estimated_daily_kcal: current?.estimated_daily_kcal,
+    user_type: current?.user_type ?? userType,
+    meals_meta: current?.meals_meta,
+    packaged_food: current?.packaged_food,
+    packaged_food_occasions: current?.packaged_food_occasions,
+    multi_day: current?.multi_day,
+  };
+  saveActiveFoodList(next);
+  return next;
+}
+
 export function removeIngredient(food_id: number): ActiveFoodList | null {
   const current = loadActiveFoodList();
   if (!current) return null;

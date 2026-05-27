@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { 
   ScaleIcon,
@@ -10,7 +10,9 @@ import {
   InformationCircleIcon,
   MagnifyingGlassIcon,
   CheckCircleIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  SparklesIcon,
+  BeakerIcon,
 } from '@heroicons/react/24/outline';
 import { CNFApiService, FoodComparison, Food, SearchResult, NutrientValue } from '@/lib/api';
 import toast from 'react-hot-toast';
@@ -18,6 +20,14 @@ import toast from 'react-hot-toast';
 import { SourceFilter, type SourceChoice } from '@/components/shared/SourceFilter';
 import { SourceBadge } from '@/components/shared/SourceBadge';
 import { AIEnhancedSearch } from '@/components/shared/AIEnhancedSearch';
+import Link from 'next/link';
+import { useCnfExplorer } from '@/components/cnf/CnfExplorerContext';
+import { FoodDetailDrawer } from '@/components/cnf/FoodProfileContent';
+import { appendToActiveFoodList } from '@/lib/activeFoodList';
+import { LENS_NUTRIENT_PANELS } from '@/lib/cnfNutrientPanels';
+import { NutrientDiscoverPanel } from '@/components/cnf/NutrientDiscoverPanel';
+
+type AddFoodMode = 'search' | 'discover';
 
 interface ComparisonData {
   foods: Food[];
@@ -34,6 +44,7 @@ const NUTRIENT_CATEGORIES = {
 
 function CNFComparePageContent() {
   const searchParams = useSearchParams();
+  const { userType, resolveGroupName } = useCnfExplorer();
   const [comparisonData, setComparisonData] = useState<ComparisonData>({ foods: [], comparison: null });
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult | null>(null);
@@ -41,11 +52,13 @@ function CNFComparePageContent() {
   const [loading, setLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('Energy');
+  const [detailFood, setDetailFood] = useState<Food | null>(null);
   const [showExportModal, setShowExportModal] = useState(false);
   const [exportFormat, setExportFormat] = useState<'json' | 'csv'>('json');
   const [selectedFoodIds, setSelectedFoodIds] = useState<Set<number>>(new Set());
   // WAFCT-EXTEND (2026-05-24): food-database scope inside the add-food modal.
   const [modalSource, setModalSource] = useState<SourceChoice>('both');
+  const [addFoodMode, setAddFoodMode] = useState<AddFoodMode>('search');
 
   useEffect(() => {
     // Load initial foods from URL parameters
@@ -71,15 +84,17 @@ function CNFComparePageContent() {
   const loadFoodsForComparison = async (foodIds: number[]) => {
     try {
       setLoading(true);
-      
-      // Load individual food details
+
       const foodPromises = foodIds.map(id => CNFApiService.getFoodDetails(id));
       const foods = await Promise.all(foodPromises);
-      
-      // Load comparison data
-      const comparison = await CNFApiService.compareFoods(foodIds);
-      
-      setComparisonData({ foods, comparison });
+
+      // Compare API requires ≥2 foods; a single ?foods= id is a valid staging state.
+      if (foods.length >= 2) {
+        const comparison = await CNFApiService.compareFoods(foodIds);
+        setComparisonData({ foods, comparison });
+      } else {
+        setComparisonData({ foods, comparison: null });
+      }
     } catch (error) {
       console.error('Failed to load foods for comparison:', error);
       toast.error('Failed to load foods for comparison');
@@ -428,6 +443,41 @@ function CNFComparePageContent() {
     return Math.max(...values);
   };
 
+  const sendAllToScorecard = () => {
+    if (comparisonData.foods.length === 0) return;
+    for (const food of comparisonData.foods) {
+      appendToActiveFoodList(
+        {
+          food_id: food.FoodID,
+          food_description: food.FoodDescription,
+          food_group: food.FoodGroupName ?? resolveGroupName(food.FoodGroupID),
+          mass_g: 100,
+        },
+        userType,
+      );
+    }
+    toast.success(`Added ${comparisonData.foods.length} food(s) to Scorecard at 100 g each`);
+  };
+
+  const categoryOptions = useMemo(() => {
+    const base = Object.keys(NUTRIENT_CATEGORIES);
+    if (userType === 'researcher') {
+      return [...base, 'Lens highlights (HSR/FCS)'];
+    }
+    return base;
+  }, [userType]);
+
+  const getCategoryNutrients = (category: string): string[] => {
+    if (category === 'Lens highlights (HSR/FCS)') {
+      const patterns = [
+        ...LENS_NUTRIENT_PANELS.hsr.patterns,
+        ...LENS_NUTRIENT_PANELS.fcs.patterns,
+      ];
+      return [...new Set(patterns)];
+    }
+    return NUTRIENT_CATEGORIES[category as keyof typeof NUTRIENT_CATEGORIES] ?? [];
+  };
+
   const getValuePercentage = (value: number | null, maxValue: number): number => {
     if (!value || maxValue === 0) return 0;
     return (value / maxValue) * 100;
@@ -448,6 +498,15 @@ function CNFComparePageContent() {
     );
   }
 
+  const searchTabA11y =
+    addFoodMode === 'search'
+      ? ({ 'aria-selected': 'true' as const })
+      : ({ 'aria-selected': 'false' as const });
+  const discoverTabA11y =
+    addFoodMode === 'discover'
+      ? ({ 'aria-selected': 'true' as const })
+      : ({ 'aria-selected': 'false' as const });
+
   return (
     <div className="min-h-screen bg-gray-50 py-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -459,10 +518,10 @@ function CNFComparePageContent() {
                 Food Comparison
               </h1>
               <p className="text-gray-600">
-                Compare nutritional profiles of multiple foods side-by-side
+                Compare up to six foods side by side, then send the set to the Scorecard for all six published lenses.
               </p>
             </div>
-                              <div className="flex items-center space-x-4">
+                              <div className="flex items-center flex-wrap gap-3">
                     <button
                       onClick={() => setShowAddFood(true)}
                       className="btn-primary inline-flex items-center"
@@ -472,13 +531,22 @@ function CNFComparePageContent() {
                       Add Food
                     </button>
                     {comparisonData.foods.length > 0 && (
-                      <button
-                        onClick={() => setShowExportModal(true)}
-                        className="btn-outline inline-flex items-center"
-                      >
-                        <ArrowDownTrayIcon className="w-4 h-4 mr-2" />
-                        Export Data
-                      </button>
+                      <>
+                        <button
+                          onClick={sendAllToScorecard}
+                          className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg text-emerald-800 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100"
+                        >
+                          <SparklesIcon className="w-4 h-4 mr-2" />
+                          Send to Scorecard
+                        </button>
+                        <button
+                          onClick={() => setShowExportModal(true)}
+                          className="btn-outline inline-flex items-center"
+                        >
+                          <ArrowDownTrayIcon className="w-4 h-4 mr-2" />
+                          Export Data
+                        </button>
+                      </>
                     )}
                   </div>
           </div>
@@ -506,8 +574,15 @@ function CNFComparePageContent() {
                       {food.FoodDescription}
                     </h3>
                     <p className="text-xs text-gray-500">
-                      Code: {food.FoodCode}
+                      Code: {food.FoodCode} · {resolveGroupName(food.FoodGroupID, food.FoodGroupName)}
                     </p>
+                    <button
+                      type="button"
+                      onClick={() => setDetailFood(food)}
+                      className="mt-2 text-xs font-medium text-blue-700 hover:text-blue-900"
+                    >
+                      View full profile →
+                    </button>
                   </div>
                 </div>
               ))}
@@ -555,7 +630,7 @@ function CNFComparePageContent() {
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
-                {Object.keys(NUTRIENT_CATEGORIES).map((category) => (
+                {categoryOptions.map((category) => (
                   <button
                     key={category}
                     onClick={() => setSelectedCategory(category)}
@@ -591,7 +666,7 @@ function CNFComparePageContent() {
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {(() => {
-                    const categoryNutrients = NUTRIENT_CATEGORIES[selectedCategory as keyof typeof NUTRIENT_CATEGORIES];
+                    const categoryNutrients = getCategoryNutrients(selectedCategory);
                     const availableNutrients = categoryNutrients.filter((nutrientName) => {
                       const hasData = comparisonData.foods.some(food => 
                         getNutrientValue(food.FoodID, nutrientName) !== null
@@ -678,16 +753,27 @@ function CNFComparePageContent() {
             <h3 className="text-lg font-medium text-gray-900 mb-2">
               No Foods Selected for Comparison
             </h3>
-            <p className="text-gray-600 mb-6">
-              Add foods to compare their nutritional profiles side-by-side
+            <p className="text-gray-600 mb-6 max-w-lg mx-auto">
+              Search the catalogue, pick up to six foods, or start from{' '}
+              <Link href="/cnf/search" className="text-blue-700 hover:underline">Advanced Search</Link>
+              {' '}or{' '}
+              <Link href="/cnf/groups" className="text-blue-700 hover:underline">Food Groups</Link>.
             </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
               onClick={() => setShowAddFood(true)}
-              className="btn-primary inline-flex items-center"
+              className="btn-primary inline-flex items-center justify-center"
             >
               <PlusIcon className="w-4 h-4 mr-2" />
               Add Your First Food
             </button>
+            <Link
+              href="/cnf/search"
+              className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+            >
+              Browse in Search
+            </Link>
+            </div>
           </div>
         )}
 
@@ -715,6 +801,53 @@ function CNFComparePageContent() {
               </div>
               
               <div className="px-6 py-4">
+                <div className="flex gap-1 mb-4 p-1 bg-gray-100 rounded-lg" role="tablist" aria-label="Add food method">
+                  <button
+                    type="button"
+                    role="tab"
+                    id="add-food-tab-search"
+                    {...searchTabA11y}
+                    aria-controls="add-food-panel-search"
+                    onClick={() => setAddFoodMode('search')}
+                    className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition ${
+                      addFoodMode === 'search'
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    Search by name
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    id="add-food-tab-discover"
+                    {...discoverTabA11y}
+                    aria-controls="add-food-panel-discover"
+                    onClick={() => setAddFoodMode('discover')}
+                    className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition inline-flex items-center justify-center gap-1.5 ${
+                      addFoodMode === 'discover'
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    <BeakerIcon className="w-4 h-4" aria-hidden="true" />
+                    Discover by nutrient
+                  </button>
+                </div>
+
+                {addFoodMode === 'discover' ? (
+                  <div id="add-food-panel-discover" role="tabpanel" aria-labelledby="add-food-tab-discover">
+                    <NutrientDiscoverPanel
+                      compact
+                      userType={userType}
+                      resolveGroupName={resolveGroupName}
+                      onAddFood={addFoodToComparison}
+                      excludeFoodIds={comparisonData.foods.map(f => f.FoodID)}
+                    />
+                  </div>
+                ) : (
+                <div id="add-food-panel-search" role="tabpanel" aria-labelledby="add-food-tab-search">
+                <>
                 {/* WAFCT-EXTEND (2026-05-24): scope picker — applies to BOTH
                     the basic-text search and the AI ranker below. */}
                 <div className="mb-3">
@@ -742,7 +875,7 @@ function CNFComparePageContent() {
                 <div className="mb-4">
                   <AIEnhancedSearch
                     query={searchQuery}
-                    userType="individual"
+                    userType={userType}
                     accent="green"
                     source={modalSource}
                     onSelect={(food) => {
@@ -827,7 +960,7 @@ function CNFComparePageContent() {
                                     {food.FoodDescription}
                                   </h4>
                                   {/* WAFCT-EXTEND (2026-05-24): per-row provenance */}
-                                  <SourceBadge foodId={food.FoodID} userType="researcher" />
+                                  <SourceBadge foodId={food.FoodID} userType={userType} />
                                 </div>
                                 <p className="text-xs text-gray-500">
                                   Code: {food.FoodCode} • Group: {food.FoodGroupID}
@@ -865,8 +998,12 @@ function CNFComparePageContent() {
                       <code className="bg-gray-100 px-1 rounded">salmon</code>,{' '}
                       <code className="bg-gray-100 px-1 rounded">fonio</code>, or{' '}
                       <code className="bg-gray-100 px-1 rounded">baobab</code>.
+                      Or use <strong>Discover by nutrient</strong> to find foods by iron, fibre, sodium, and more.
                     </div>
                   </div>
+                )}
+                </>
+                </div>
                 )}
               </div>
             </div>
@@ -951,6 +1088,14 @@ function CNFComparePageContent() {
               </div>
             </div>
           </div>
+        )}
+        {detailFood && (
+          <FoodDetailDrawer
+            food={detailFood}
+            userType={userType}
+            groupLabel={resolveGroupName(detailFood.FoodGroupID, detailFood.FoodGroupName)}
+            onClose={() => setDetailFood(null)}
+          />
         )}
       </div>
     </div>

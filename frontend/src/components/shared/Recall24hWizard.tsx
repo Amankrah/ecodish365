@@ -60,7 +60,7 @@ import { fromRecallAggregated, saveActiveFoodList } from '@/lib/activeFoodList';
 interface Recall24hWizardProps {
   userType: UserType;
   /** When set, pre-highlights one score-routing button on step 4. */
-  preselectScore?: 'hefi' | 'heni' | 'hsr' | 'fcs' | 'environmental' | 'dietary_pattern' | 'scorecard';
+  preselectScore?: 'hefi' | 'heni' | 'hsr' | 'fcs' | 'environmental' | 'dietary_pattern' | 'scorecard' | 'planetary';
 }
 
 interface OccasionMeta {
@@ -82,7 +82,7 @@ const OCCASIONS: OccasionMeta[] = [
 ];
 
 const SCORE_BUTTONS: Array<{
-  id: 'hefi' | 'heni' | 'hsr' | 'fcs' | 'environmental' | 'dietary_pattern' | 'scorecard';
+  id: 'hefi' | 'heni' | 'hsr' | 'fcs' | 'environmental' | 'dietary_pattern' | 'scorecard' | 'planetary';
   emoji: string;
   label: string;
   path: string;
@@ -98,6 +98,9 @@ const SCORE_BUTTONS: Array<{
   // DIET-PATTERN-1 (2026-05-24): descriptive resemblance vs canonical
   // patterns. Complements the 5 scoring lenses with categorical framing.
   { id: 'dietary_pattern', emoji: '🎯', label: 'Score Dietary Pattern', path: '/dietary-pattern',        note: 'Which canonical pattern (Mediterranean / DASH / etc.) does your day resemble?' },
+  // PLANETARY-1 (2026-05-27): EAT-Lancet 2.0 Table 2 per-capita-per-day food-
+  // system boundary share (3 of 9 boundaries in v1: climate, land, water).
+  { id: 'planetary',       emoji: '🪐', label: 'Planetary boundaries',  path: '/planetary',              note: 'EAT-Lancet 2.0 Table 2 — % of one person\'s daily food-system budget' },
 ];
 
 interface MealRow {

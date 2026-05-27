@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { 
   CubeIcon,
   ChevronRightIcon,
@@ -10,11 +11,13 @@ import {
   Squares2X2Icon,
   InformationCircleIcon,
   ScaleIcon,
-  XMarkIcon
 } from '@heroicons/react/24/outline';
 import { CNFApiService, FoodGroup, Food } from '@/lib/api';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import { useCnfExplorer } from '@/components/cnf/CnfExplorerContext';
+import { FoodDetailDrawer } from '@/components/cnf/FoodProfileContent';
+import { SourceBadge } from '@/components/shared/SourceBadge';
 
 interface FoodGroupWithFoods extends FoodGroup {
   foods?: Partial<Food>[];
@@ -22,6 +25,20 @@ interface FoodGroupWithFoods extends FoodGroup {
 }
 
 export default function CNFGroupsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 py-8 flex items-center justify-center text-gray-600">
+        Loading food groups…
+      </div>
+    }>
+      <CNFGroupsPageContent />
+    </Suspense>
+  );
+}
+
+function CNFGroupsPageContent() {
+  const searchParams = useSearchParams();
+  const { userType, resolveGroupName, groupCountById } = useCnfExplorer();
   const [foodGroups, setFoodGroups] = useState<FoodGroupWithFoods[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<FoodGroupWithFoods | null>(null);
   const [groupFoods, setGroupFoods] = useState<Partial<Food>[]>([]);
@@ -35,6 +52,18 @@ export default function CNFGroupsPage() {
   useEffect(() => {
     loadFoodGroups();
   }, []);
+
+  useEffect(() => {
+    const groupParam = searchParams.get('group');
+    if (!groupParam || foodGroups.length === 0) return;
+    const groupId = parseInt(groupParam, 10);
+    if (Number.isNaN(groupId)) return;
+    const group = foodGroups.find(g => g.FoodGroupID === groupId);
+    if (group && selectedGroup?.FoodGroupID !== groupId) {
+      loadFoodsForGroup(group);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, foodGroups]);
 
   const loadFoodGroups = async () => {
     try {
@@ -154,7 +183,8 @@ export default function CNFGroupsPage() {
                 Browse by Food Groups
               </h1>
               <p className="text-gray-600">
-                Explore foods organized by their nutritional categories and food groups
+                Explore foods by category. Select a group to see its foods, open a profile for lens-relevant
+                nutrients, or send items to compare or the Scorecard.
               </p>
             </div>
             {selectedFoods.length > 0 && (
@@ -188,7 +218,9 @@ export default function CNFGroupsPage() {
                 Food Groups ({foodGroups.length})
               </h2>
               <div className="space-y-2">
-                {foodGroups.map((group) => (
+                {foodGroups.map((group) => {
+                  const count = groupCountById.get(group.FoodGroupID);
+                  return (
                   <button
                     key={group.FoodGroupID}
                     onClick={() => loadFoodsForGroup(group)}
@@ -205,13 +237,13 @@ export default function CNFGroupsPage() {
                           {group.FoodGroupName}
                         </div>
                         <div className="text-xs text-gray-500">
-                          ID: {group.FoodGroupID}
+                          {count != null ? `${count.toLocaleString()} foods` : `ID ${group.FoodGroupID}`}
                         </div>
                       </div>
                       <ChevronRightIcon className="w-4 h-4 text-gray-400" />
                     </div>
                   </button>
-                ))}
+                );})}
               </div>
             </div>
           </div>
@@ -345,14 +377,16 @@ export default function CNFGroupsPage() {
                                 <h3 className={`font-medium text-gray-900 ${
                                   viewMode === 'grid' ? 'text-sm mb-1' : 'text-sm'
                                 }`}>
-                                  {food.FoodDescription}
+                                  <Link href={`/cnf/foods/${food.FoodID}`} className="hover:text-primary-700">
+                                    {food.FoodDescription}
+                                  </Link>
                                 </h3>
                                 <div className={`text-xs text-gray-500 ${
-                                  viewMode === 'grid' ? 'space-y-1' : 'flex items-center space-x-4'
+                                  viewMode === 'grid' ? 'space-y-1' : 'flex items-center flex-wrap gap-x-3'
                                 }`}>
                                   <span>Code: {food.FoodCode}</span>
-                                  {viewMode === 'grid' && (
-                                    <span>Group: {food.FoodGroupID}</span>
+                                  {food.FoodID != null && (
+                                    <SourceBadge foodId={food.FoodID} userType={userType} />
                                   )}
                                 </div>
                               </div>
@@ -375,89 +409,19 @@ export default function CNFGroupsPage() {
           </div>
         </div>
 
-        {/* Food Details Modal */}
         {selectedFood && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Food Details
-                </h3>
-                <button
-                  type="button"
-                  onClick={() => setSelectedFood(null)}
-                  className="p-2 text-gray-400 hover:text-gray-600"
-                  title="Close"
-                >
-                  <XMarkIcon className="w-5 h-5" />
-                </button>
-              </div>
-              
-              <div className="px-6 py-4">
-                <div className="mb-4">
-                  <h4 className="text-xl font-medium text-gray-900 mb-2">
-                    {selectedFood.FoodDescription}
-                  </h4>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="font-medium text-gray-700">Food Code:</span>
-                      <span className="ml-2 text-gray-600">{selectedFood.FoodCode}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Food Group:</span>
-                      <span className="ml-2 text-gray-600">{selectedFood.FoodGroupID}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Country:</span>
-                      <span className="ml-2 text-gray-600">{selectedFood.CountryCode}</span>
-                    </div>
-                    {selectedFood.ScientificName && (
-                      <div>
-                        <span className="font-medium text-gray-700">Scientific Name:</span>
-                        <span className="ml-2 text-gray-600 italic">{selectedFood.ScientificName}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Nutrients */}
-                <div className="mb-4">
-                  <h5 className="text-lg font-medium text-gray-900 mb-3">
-                    Nutritional Information
-                  </h5>
-                  <div className="grid grid-cols-1 gap-2 max-h-60 overflow-y-auto">
-                    {selectedFood.NutrientValues.map((nutrient, index) => (
-                      <div key={index} className="flex justify-between items-center py-2 px-3 bg-gray-50 rounded">
-                        <span className="text-sm text-gray-700">{nutrient.NutrientName}</span>
-                        <span className="text-sm font-medium text-gray-900">
-                          {nutrient.NutrientValue} {nutrient.NutrientUnit}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Conversion Factors */}
-                {selectedFood.ConversionFactors.length > 0 && (
-                  <div>
-                    <h5 className="text-lg font-medium text-gray-900 mb-3">
-                      Conversion Factors
-                    </h5>
-                    <div className="grid grid-cols-1 gap-2">
-                      {selectedFood.ConversionFactors.map((conversion, index) => (
-                        <div key={index} className="flex justify-between items-center py-2 px-3 bg-gray-50 rounded">
-                          <span className="text-sm text-gray-700">{conversion.MeasureDescription}</span>
-                          <span className="text-sm font-medium text-gray-900">
-                            {conversion.ConversionFactorValue}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+          <FoodDetailDrawer
+            food={selectedFood}
+            userType={userType}
+            groupLabel={selectedGroup ? selectedGroup.FoodGroupName : resolveGroupName(selectedFood.FoodGroupID, selectedFood.FoodGroupName)}
+            onClose={() => setSelectedFood(null)}
+            onAddToCompare={() => {
+              if (!selectedFoods.includes(selectedFood.FoodID)) {
+                setSelectedFoods(prev => [...prev, selectedFood.FoodID]);
+              }
+              toast.success('Added to compare selection');
+            }}
+          />
         )}
       </div>
     </div>

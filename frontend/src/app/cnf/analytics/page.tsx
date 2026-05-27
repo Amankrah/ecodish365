@@ -15,6 +15,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { CNFApiService, DatabaseStats, IntegrityCheck } from '@/lib/api';
 import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
+import { useCnfExplorer } from '@/components/cnf/CnfExplorerContext';
 
 interface AnalyticsData {
   stats: DatabaseStats | null;
@@ -27,6 +29,8 @@ const CHART_COLORS = [
 ];
 
 export default function CNFAnalyticsPage() {
+  const router = useRouter();
+  const { groupIdByName } = useCnfExplorer();
   const [data, setData] = useState<AnalyticsData>({ stats: null, integrityCheck: null });
   const [loading, setLoading] = useState(true);
   const [selectedChart, setSelectedChart] = useState<'foodGroups' | 'topNutrients'>('foodGroups');
@@ -153,7 +157,7 @@ export default function CNFAnalyticsPage() {
                 Database Analytics
               </h1>
               <p className="text-gray-600">
-                Comprehensive insights and statistics about the Canadian Nutrient File database
+                Catalogue statistics for CNF + WAFCT combined. Click a food group to browse its foods.
               </p>
             </div>
             <div className="flex items-center space-x-4">
@@ -283,7 +287,21 @@ export default function CNFAnalyticsPage() {
                   {getChartData().map((item, index) => (
                     <div key={item.name} className="flex items-center space-x-4">
                       <div className="w-32 text-sm text-gray-700 truncate font-medium">
-                        {item.name}
+                        {selectedChart === 'foodGroups' ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const id = groupIdByName.get(item.name);
+                              if (id != null) router.push(`/cnf/groups?group=${id}`);
+                            }}
+                            className="text-left hover:text-primary-700 hover:underline truncate w-full"
+                            title={`Browse ${item.name}`}
+                          >
+                            {item.name}
+                          </button>
+                        ) : (
+                          item.name
+                        )}
                       </div>
                       <div className="flex-1 relative">
                         <div className="w-full bg-gray-200 rounded-full h-4">

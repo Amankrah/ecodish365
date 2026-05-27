@@ -38,7 +38,7 @@ interface Props {
 // Scoring routes. Names match Recall24hWizard's SCORE_BUTTONS for consistency.
 // SCORECARD-1 (2026-05-26) tops the list with the consumer-friendly multi-metric view.
 const SCORE_ROUTES: Array<{
-  id: 'hefi' | 'heni' | 'fcs' | 'environmental' | 'dietary_pattern' | 'scorecard';
+  id: 'hefi' | 'heni' | 'fcs' | 'environmental' | 'dietary_pattern' | 'scorecard' | 'planetary';
   emoji: string;
   label: string;
   path: string;
@@ -62,6 +62,9 @@ const SCORE_ROUTES: Array<{
   { id: 'environmental', emoji: '🌍', label: 'Environmental',
     path: '/environmental/calculate',
     note: 'Per-100g environmental footprint (ReCiPe + AGRIBALYSE)' },
+  { id: 'planetary', emoji: '🪐', label: 'Planetary boundaries',
+    path: '/planetary',
+    note: 'EAT-Lancet 2.0 Table 2 — % of one person\'s daily food-system budget' },
 ];
 
 function confidenceColor(c: number): string {

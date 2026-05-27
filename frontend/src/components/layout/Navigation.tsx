@@ -37,6 +37,7 @@ const navigation: NavItem[] = [
     icon: ChartBarIcon,
     dropdown: [
       { name: 'Food Search', href: '/cnf/search' },
+      { name: 'Discover by Nutrient', href: '/cnf/discover' },
       { name: 'Compare Foods', href: '/cnf/compare' },
       { name: 'Food Groups', href: '/cnf/groups' },
       { name: 'Analytics', href: '/cnf/analytics' },
@@ -88,6 +89,8 @@ const navigation: NavItem[] = [
     dropdown: [
       { name: 'Calculate Impact', href: '/environmental/calculate' },
       { name: 'Compare Foods', href: '/environmental/compare' },
+      // PLANETARY-1 (2026-05-27): EAT-Lancet 2.0 Table 2 food-system share.
+      { name: '🪐 Planetary boundaries (EAT-Lancet 2.0)', href: '/planetary' },
     ]
   },
   // RECALL-HISTORY-1 (2026-05-24): surface the 24-h recall → history →

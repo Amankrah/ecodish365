@@ -1,0 +1,132 @@
+{
+  "source": {
+    "citation": "Rockström J, Thilsted SH, Willett WC, Gordon LJ, Herrero M, Hicks CC, Mason-D'Croz D, Rao N, Springmann M, Wright EC, et al. The EAT-Lancet Commission on healthy, sustainable, and just food systems. Lancet. 2025;406(10510):1625-1700.",
+    "doi": "10.1016/S0140-6736(25)01201-2",
+    "table": "Table 2 (p. 1640) — food-system boundaries (selected control variables)",
+    "manuscript_anchor": "literature_extractions.md §E28 Table 2"
+  },
+  "per_capita_derivation": {
+    "world_population": 8000000000,
+    "days_per_year": 365,
+    "rationale": "Simple proportional cut by world population (~8 B). NOT a modelled equity allocation; the manuscript already documents (E28 Section 3, p. 1661) that the richest 30 % of the global population drives >70 % of food-system environmental pressures. The per-capita-per-day figure is an interpretive scaffold for 'is this meal a lot?', not a normative entitlement."
+  },
+  "boundaries": [
+    {
+      "key": "climate_change",
+      "label": "Climate change",
+      "control_variable": "Atmospheric CO₂ (CO₂-eq emissions)",
+      "available_in_v1": true,
+      "recipe_midpoint_key": "Global warming",
+      "unit": "kg CO₂e",
+      "global_boundary_per_year": 5e12,
+      "global_boundary_unit": "kg CO₂e/yr",
+      "global_boundary_source": "E28 Table 2 row 1: 5 Gt CO₂e/yr",
+      "current_food_system_contribution": "16-17.7 Gt CO₂e/yr (~30 % of anthropogenic emissions; E28 p. 1641)",
+      "method_note": "GWP100 (IPCC AR5) production-stage CO₂-eq aggregated from AGRIBALYSE 3.2 / Poore & Nemecek 2018."
+    },
+    {
+      "key": "land_use",
+      "label": "Land system change",
+      "control_variable": "Agricultural land area (current footprint, no further conversion of intact nature)",
+      "available_in_v1": true,
+      "recipe_midpoint_key": "Land use",
+      "unit": "m²·yr",
+      "global_boundary_per_year": 48e12,
+      "global_boundary_unit": "m² (stock, treated as m²·yr/yr proportional cut)",
+      "global_boundary_source": "E28 Table 2 row 2: <48 M km² agricultural area; treated as 48×10¹² m²·yr held per year.",
+      "current_food_system_contribution": "48 M km² = 34 % of land surface (E28 Table 2)",
+      "method_note": "E28 land-use boundary is a STOCK (total agricultural area). ReCiPe Land use is a FLUX (m²·yr/serving). We treat the per-capita-allocated share as a comparable flux — standard LCA-vs-planetary-boundary reconciliation. The boundary asks: halt conversion of intact nature, not absolute reduction; our share is therefore an attribution proxy."
+    },
+    {
+      "key": "water_consumption",
+      "label": "Blue water consumption",
+      "control_variable": "Freshwater (consumptive) use",
+      "available_in_v1": true,
+      "recipe_midpoint_key": "Water consumption",
+      "unit": "m³",
+      "global_boundary_per_year": 2e12,
+      "global_boundary_unit": "m³/yr",
+      "global_boundary_source": "E28 Table 2 row 8: 2000 km³/yr",
+      "current_food_system_contribution": "1200-1800 km³/yr (E28 Table 2)",
+      "method_note": "ReCiPe blue-water consumption weighted by local water-scarcity factor. The E28 boundary is an absolute global volume; we apply it as a flat per-capita allocation."
+    },
+    {
+      "key": "biosphere_integrity_hanpp",
+      "label": "Biosphere integrity (HANPP)",
+      "control_variable": "Human appropriation of net primary production",
+      "available_in_v1": false,
+      "recipe_midpoint_key": null,
+      "unit": "Gt C/yr",
+      "global_boundary_per_year": 5.5e9,
+      "global_boundary_unit": "kg C/yr (stock-equivalent: 5.5 Gt C/yr)",
+      "global_boundary_source": "E28 Table 2 row 3: 5.5 Gt C/yr",
+      "current_food_system_contribution": "9.9-11.7 Gt C/yr (72-85 % of total HANPP)",
+      "reason_unavailable": "ReCiPe Land use is a local impact metric, not a global HANPP attribution. Per-food HANPP factors require Spartina-level biodiversity modelling not available in AGRIBALYSE 3.2 or Poore & Nemecek 2018."
+    },
+    {
+      "key": "stratospheric_ozone_n2o",
+      "label": "Stratospheric ozone (N₂O)",
+      "control_variable": "Reactive nitrogen as N₂O",
+      "available_in_v1": false,
+      "recipe_midpoint_key": null,
+      "unit": "Tg N₂O-N",
+      "global_boundary_per_year": 1.8e9,
+      "global_boundary_unit": "kg N₂O-N/yr (1.8 Tg)",
+      "global_boundary_source": "E28 Table 2 row 4: 1.8 Tg N₂O-N",
+      "current_food_system_contribution": "3.9-4.2 Tg N₂O-N/yr (54-69 % of total)",
+      "reason_unavailable": "ReCiPe stratospheric ozone depletion is in the v1.1 method but not consumed by the platform v1 (per code_action_items.md TODO-CODE-LCA-2). AGRIBALYSE carries per-food N₂O figures — wiring this through is in scope for v2."
+    },
+    {
+      "key": "ocean_acidification",
+      "label": "Ocean acidification",
+      "control_variable": "CO₂ from food-chain land-use change + fossil energy",
+      "available_in_v1": false,
+      "recipe_midpoint_key": null,
+      "unit": "% of food-chain CO₂",
+      "global_boundary_per_year": 0,
+      "global_boundary_unit": "kg CO₂/yr (zero LUC + fossil)",
+      "global_boundary_source": "E28 Table 2 row 5: zero CO₂ from land-use change + fossil energy in the food chain",
+      "current_food_system_contribution": "25 % of CO₂ emissions",
+      "reason_unavailable": "ReCiPe 2016 v1.1 does not include an ocean-acidification midpoint. E28 reports it as a CO₂ sub-allocation; quantifying the food-chain-attributable share requires LUC + fossil-energy disaggregation not surfaced by AGRIBALYSE."
+    },
+    {
+      "key": "nitrogen_surplus",
+      "label": "Nitrogen surplus",
+      "control_variable": "Net reactive-N input minus removal",
+      "available_in_v1": false,
+      "recipe_midpoint_key": null,
+      "unit": "Tg N/yr",
+      "global_boundary_per_year": 57e9,
+      "global_boundary_unit": "kg N/yr (57 Tg)",
+      "global_boundary_source": "E28 Table 2 row 6: <57 Tg N/yr",
+      "current_food_system_contribution": "119 Tg N/yr",
+      "reason_unavailable": "Not a ReCiPe midpoint and not in AGRIBALYSE per-food columns. Closest proxy is Freshwater / Marine eutrophication, but these are local impact metrics, not nitrogen surplus."
+    },
+    {
+      "key": "phosphorus_loss",
+      "label": "Phosphorus loss to surface water",
+      "control_variable": "P loss from agricultural land to surface water",
+      "available_in_v1": false,
+      "recipe_midpoint_key": null,
+      "unit": "Tg P/yr",
+      "global_boundary_per_year": 4.6e9,
+      "global_boundary_unit": "kg P/yr (4.6 Tg)",
+      "global_boundary_source": "E28 Table 2 row 7: 4.6 Tg P/yr",
+      "current_food_system_contribution": "7.2 Tg P/yr (75 % of total P loss)",
+      "reason_unavailable": "ReCiPe Freshwater eutrophication exists but is not in the v1 consumed midpoint vector (per code_action_items.md). Per-food P-loss factors are available in AGRIBALYSE and EF 3.1; wiring through is in scope for v2."
+    },
+    {
+      "key": "novel_entities_pesticides",
+      "label": "Novel entities (pesticides)",
+      "control_variable": "Pesticide active-substance use (kg PAS/yr)",
+      "available_in_v1": false,
+      "recipe_midpoint_key": null,
+      "unit": "Tg PAS/yr",
+      "global_boundary_per_year": 1e9,
+      "global_boundary_unit": "kg PAS/yr (1 Tg high-risk avoidance; 0.2 Tg low risk)",
+      "global_boundary_source": "E28 Table 2 row 9: 1 Tg PAS/yr (high-risk avoidance); 0.2 Tg PAS/yr (low risk)",
+      "current_food_system_contribution": "3.3-3.7 Tg PAS/yr (85-90 % of use)",
+      "reason_unavailable": "AGRIBALYSE does not track pesticide residues / application rates. ReCiPe characterises environmental release, not ingestion. Outside the platform's v1 LCA scope by design."
+    }
+  ]
+}

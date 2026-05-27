@@ -14,6 +14,9 @@ from environmental_impact_model.src.cnf_integrator import get_cnf_integrator
 from environmental_impact_model.src.methodology_factors import (
     get_methodology_pack, list_available_methodologies,
 )
+from environmental_impact_model.src.planetary_boundaries import (
+    compute_planetary_boundary_shares, build_planetary_explanations,
+)
 from environmental_impact_model.src.utils import format_impact_value, categorize_sustainability_score
 from api.seo_utils import seo_metadata
 
@@ -429,6 +432,18 @@ def format_environmental_results(meal_data: Dict[str, Any], user_type: str = "in
         "recipe_decomposer_enabled": lca_data.get('recipe_decomposer_enabled', False),
         "recipe_decomposition_decisions": lca_data.get('recipe_decomposition_decisions', []),
     }
+
+    # PLANETARY-1 (2026-05-27): per-meal share of per-capita-per-day food-system
+    # planetary boundary (EAT-Lancet 2.0 Table 2, Rockström et al. 2025).
+    # Sourced from the same `midpoint_impacts` dict above so the shares track
+    # whatever basis the user requested. v1 covers 3 of 9 boundaries (climate /
+    # land / water); the other 6 surface as `available=False` placeholders.
+    _midpoints_for_planetary = lca_data.get('midpoint_impacts', {}) or {}
+    _planetary_shares = compute_planetary_boundary_shares(_midpoints_for_planetary)
+    formatted_lca["planetary_boundary_shares"] = _planetary_shares
+    formatted_lca["planetary_explanations"] = build_planetary_explanations(
+        _planetary_shares, user_type,
+    )
     
     # Surface sustainability scores (numeric) calculated server-side so the UI
     # does not need to infer them. Keep a minimal, stable shape — additive

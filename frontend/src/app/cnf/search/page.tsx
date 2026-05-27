@@ -22,6 +22,8 @@ import { AIEnhancedSearch } from '@/components/shared/AIEnhancedSearch';
 // WAFCT-EXTEND (2026-05-24): explorer surfaces both CNF + WAFCT now.
 import { SourceFilter, type SourceChoice } from '@/components/shared/SourceFilter';
 import { SourceBadge } from '@/components/shared/SourceBadge';
+import { useCnfExplorer } from '@/components/cnf/CnfExplorerContext';
+import { FoodDetailDrawer } from '@/components/cnf/FoodProfileContent';
 
 interface SearchFilters {
   foodGroup: string;
@@ -40,6 +42,7 @@ const INITIAL_FILTERS: SearchFilters = {
 };
 
 export default function CNFSearchPage() {
+  const { userType, resolveGroupName } = useCnfExplorer();
   const [query, setQuery] = useState('');
   const [filters, setFilters] = useState<SearchFilters>(INITIAL_FILTERS);
   const [results, setResults] = useState<SearchResult | null>(null);
@@ -259,7 +262,7 @@ export default function CNFSearchPage() {
           <div className="mb-4">
             <AIEnhancedSearch
               query={query}
-              userType="individual"
+              userType={userType}
               accent="blue"
               source={source}
               onSelect={(food) => {
@@ -499,18 +502,29 @@ export default function CNFSearchPage() {
                         />
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <h3 className="text-sm font-medium text-gray-900">
+                            <Link
+                              href={`/cnf/foods/${food.FoodID}`}
+                              className="text-sm font-medium text-gray-900 hover:text-primary-700"
+                            >
                               {food.FoodDescription}
-                            </h3>
+                            </Link>
                             {/* WAFCT-EXTEND (2026-05-24): provenance badge.
                                 Derives source from FoodID (≥700,000 = WAFCT)
                                 so it works for the basic search response
                                 which doesn't carry a `source` field per row. */}
-                            <SourceBadge foodId={food.FoodID} userType="researcher" />
+                            <SourceBadge foodId={food.FoodID} userType={userType} />
                           </div>
-                          <div className="flex items-center space-x-4 text-xs text-gray-500">
+                          <div className="flex items-center flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
                             <span>Code: {food.FoodCode}</span>
-                            <span>Group: {food.FoodGroupID}</span>
+                            <span>{resolveGroupName(food.FoodGroupID)}</span>
+                            {userType === 'researcher' && (
+                              <Link
+                                href={`/cnf/groups?group=${food.FoodGroupID}`}
+                                className="text-blue-600 hover:text-blue-800"
+                              >
+                                Browse group →
+                              </Link>
+                            )}
                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRelevanceColor(food.relevance)}`}>
                               <SparklesIcon className="w-3 h-3 inline mr-1" />
                               {getRelevanceLabel(food.relevance)} ({(food.relevance * 100).toFixed(0)}%)
@@ -560,89 +574,19 @@ export default function CNFSearchPage() {
           </div>
         )}
 
-        {/* Food Details Modal */}
         {selectedFood && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Food Details
-                </h3>
-                <button
-                  type="button"
-                  onClick={() => setSelectedFood(null)}
-                  className="p-2 text-gray-400 hover:text-gray-600"
-                  title="Close"
-                >
-                  <XMarkIcon className="w-5 h-5" />
-                </button>
-              </div>
-              
-              <div className="px-6 py-4">
-                <div className="mb-4">
-                  <h4 className="text-xl font-medium text-gray-900 mb-2">
-                    {selectedFood.FoodDescription}
-                  </h4>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="font-medium text-gray-700">Food Code:</span>
-                      <span className="ml-2 text-gray-600">{selectedFood.FoodCode}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Food Group:</span>
-                      <span className="ml-2 text-gray-600">{selectedFood.FoodGroupID}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Country:</span>
-                      <span className="ml-2 text-gray-600">{selectedFood.CountryCode}</span>
-                    </div>
-                    {selectedFood.ScientificName && (
-                      <div>
-                        <span className="font-medium text-gray-700">Scientific Name:</span>
-                        <span className="ml-2 text-gray-600 italic">{selectedFood.ScientificName}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Nutrients */}
-                <div className="mb-4">
-                  <h5 className="text-lg font-medium text-gray-900 mb-3">
-                    Nutritional Information
-                  </h5>
-                  <div className="grid grid-cols-1 gap-2 max-h-60 overflow-y-auto">
-                    {selectedFood.NutrientValues.map((nutrient, index) => (
-                      <div key={index} className="flex justify-between items-center py-2 px-3 bg-gray-50 rounded">
-                        <span className="text-sm text-gray-700">{nutrient.NutrientName}</span>
-                        <span className="text-sm font-medium text-gray-900">
-                          {nutrient.NutrientValue} {nutrient.NutrientUnit}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Conversion Factors */}
-                {selectedFood.ConversionFactors.length > 0 && (
-                  <div>
-                    <h5 className="text-lg font-medium text-gray-900 mb-3">
-                      Conversion Factors
-                    </h5>
-                    <div className="grid grid-cols-1 gap-2">
-                      {selectedFood.ConversionFactors.map((conversion, index) => (
-                        <div key={index} className="flex justify-between items-center py-2 px-3 bg-gray-50 rounded">
-                          <span className="text-sm text-gray-700">{conversion.MeasureDescription}</span>
-                          <span className="text-sm font-medium text-gray-900">
-                            {conversion.ConversionFactorValue}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+          <FoodDetailDrawer
+            food={selectedFood}
+            userType={userType}
+            groupLabel={resolveGroupName(selectedFood.FoodGroupID, selectedFood.FoodGroupName)}
+            onClose={() => setSelectedFood(null)}
+            onAddToCompare={() => {
+              if (!selectedFoods.includes(selectedFood.FoodID)) {
+                setSelectedFoods(prev => [...prev, selectedFood.FoodID]);
+              }
+              toast.success('Added to compare selection');
+            }}
+          />
         )}
       </div>
     </div>

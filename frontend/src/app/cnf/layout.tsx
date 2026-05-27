@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { CnfExplorerShell } from '@/components/cnf/CnfExplorerShell';
 
 export const metadata: Metadata = {
   title: "Food Composition Database Explorer — CNF + WAFCT",
@@ -97,7 +98,7 @@ export default function CNFLayout({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      {children}
+      <CnfExplorerShell>{children}</CnfExplorerShell>
     </>
   );
 }

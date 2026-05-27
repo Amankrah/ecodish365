@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
 import Navigation from "@/components/layout/Navigation";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "@/contexts/AuthContext";
+
+const SITE_URL = "https://ecodish365.com";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -11,11 +14,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "EcoDish365 - Professional Nutrition Analysis & Food Research Platform",
-    template: "%s | EcoDish365 - Nutrition Research Platform"
+    default: "EcoDish365 — Honest nutrition and sustainability scoring for any food",
+    template: "%s | EcoDish365",
   },
-  description: "Professional nutrition analysis platform with 5000+ foods, Canadian Nutrient File database, Health Star Rating calculator, Food Compass Score, and environmental impact assessment tools for researchers and health professionals.",
+  description:
+    "Score any food, meal, or full day against six published research measures. Plain-language results, real uncertainty, and the limits the science actually states. 6,719 foods, no invented grades, no single score pretending to settle it.",
   keywords: [
     "nutrition analysis", "Canadian Nutrient File", "CNF database", "food research", 
     "Health Star Rating", "HSR calculator", "Food Compass Score", "FCS calculator",
@@ -40,40 +45,34 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://ecodish365.com",
+    canonical: SITE_URL,
   },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://ecodish365.com",
+    url: SITE_URL,
     siteName: "EcoDish365",
-    title: "EcoDish365 - Professional Nutrition Analysis & Food Research Platform",
-    description: "Advanced nutrition analysis tools with 5000+ foods from Canadian Nutrient File. Calculate Health Star Ratings, Food Compass Scores, and assess environmental impact for research and professional use.",
+    title: "EcoDish365 — Honest nutrition and sustainability scoring for any food",
+    description:
+      "Score any food, meal, or full day against six published research measures. Plain-language results with the limits the science states. 6,719 foods.",
     images: [
       {
-        url: "/og-image.png",
+        url: `${SITE_URL}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: "EcoDish365 - Professional Nutrition Analysis Platform",
+        alt: "EcoDish365 — Honest nutrition and sustainability scoring",
         type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "EcoDish365 - Professional Nutrition Analysis Platform",
-    description: "Advanced nutrition research tools with CNF database, HSR calculator, FCS scoring, and environmental impact assessment for professionals.",
-    images: ["/twitter-image.png"],
+    title: "EcoDish365 — Honest nutrition and sustainability scoring for any food",
+    description:
+      "Six published lenses. Plain-language results. No single composite score.",
+    images: [`${SITE_URL}/og-image.png`],
     creator: "@ecodish365",
     site: "@ecodish365",
-  },
-  verification: {
-    google: "your-google-verification-code",
-    yandex: "your-yandex-verification-code",
-    yahoo: "your-yahoo-verification-code",
-    other: {
-      "msvalidate.01": "your-bing-verification-code",
-    },
   },
   manifest: "/manifest.json",
   icons: {
@@ -168,19 +167,19 @@ export default function RootLayout({
                 <div className="flex flex-col md:flex-row justify-between items-center">
                   <div className="flex items-center space-x-2 mb-4 md:mb-0">
                     <span className="text-sm text-gray-600">
-                      © 2025 EcoDish365. All rights reserved.
+                      © 2026 EcoDish365. All rights reserved.
                     </span>
                   </div>
                   <div className="flex items-center space-x-6">
-                    <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                    <Link href="/privacy" className="text-sm text-gray-600 hover:text-gray-900">
                       Privacy Policy
-                    </a>
-                    <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                    </Link>
+                    <Link href="/terms" className="text-sm text-gray-600 hover:text-gray-900">
                       Terms of Service
-                    </a>
-                    <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                    </Link>
+                    <Link href="/documentation" className="text-sm text-gray-600 hover:text-gray-900">
                       Documentation
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </div>

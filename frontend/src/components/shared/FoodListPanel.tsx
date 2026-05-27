@@ -42,7 +42,7 @@ import {
 
 export type ScoreTargetId =
   | 'hefi' | 'heni' | 'hsr' | 'fcs' | 'environmental' | 'dietary_pattern'
-  | 'scorecard';
+  | 'scorecard' | 'planetary';
 
 interface ScoreTarget {
   id: ScoreTargetId;
@@ -59,6 +59,7 @@ const SCORE_TARGETS: ScoreTarget[] = [
   { id: 'hsr',             label: 'HSR',             emoji: '⭐', path: '/hsr/calculate' },
   { id: 'environmental',   label: 'Environmental',   emoji: '🌍', path: '/environmental/calculate' },
   { id: 'dietary_pattern', label: 'Dietary pattern', emoji: '🎯', path: '/dietary-pattern' },
+  { id: 'planetary',       label: 'Planetary',       emoji: '🪐', path: '/planetary' },
 ];
 
 interface Props {
@@ -69,9 +70,19 @@ interface Props {
    *  via this panel. Use it to keep the host page's local food state in sync.
    *  Also called once on mount with the loaded list (or null). */
   onChange?: (list: ActiveFoodList | null) => void;
+  /** Scorecard: let user include/exclude foods from a scoring run without removing them. */
+  selectable?: boolean;
+  selectedFoodIds?: Set<number>;
+  onSelectionChange?: (ids: Set<number>) => void;
 }
 
-export function FoodListPanel({ currentTarget, onChange }: Props): JSX.Element | null {
+export function FoodListPanel({
+  currentTarget,
+  onChange,
+  selectable = false,
+  selectedFoodIds,
+  onSelectionChange,
+}: Props): JSX.Element | null {
   const [list, setList] = useState<ActiveFoodList | null>(() => null);
   const [collapsed, setCollapsed] = useState<boolean>(false);
   const [importError, setImportError] = useState<string | null>(null);
@@ -118,6 +129,28 @@ export function FoodListPanel({ currentTarget, onChange }: Props): JSX.Element |
     () => list?.ingredients.reduce((s, i) => s + i.mass_g, 0) ?? 0,
     [list],
   );
+
+  const selectedCount = useMemo(() => {
+    if (!selectable || !selectedFoodIds || !list) return list?.ingredients.length ?? 0;
+    return list.ingredients.filter(i => selectedFoodIds.has(i.food_id)).length;
+  }, [selectable, selectedFoodIds, list]);
+
+  function toggleFoodSelection(food_id: number): void {
+    if (!onSelectionChange || !selectedFoodIds) return;
+    const next = new Set(selectedFoodIds);
+    if (next.has(food_id)) next.delete(food_id);
+    else next.add(food_id);
+    onSelectionChange(next);
+  }
+
+  function selectAllFoods(): void {
+    if (!onSelectionChange || !list) return;
+    onSelectionChange(new Set(list.ingredients.map(i => i.food_id)));
+  }
+
+  function deselectAllFoods(): void {
+    onSelectionChange?.(new Set());
+  }
 
   function handleEditMass(food_id: number, mass_g: number): void {
     if (!Number.isFinite(mass_g) || mass_g < 0) return;
@@ -301,9 +334,47 @@ export function FoodListPanel({ currentTarget, onChange }: Props): JSX.Element |
             </div>
           )}
 
+          {selectable && onSelectionChange && selectedFoodIds && (
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+              <span className="text-gray-600">
+                <strong>{selectedCount}</strong> of {list.ingredients.length} selected for scoring
+              </span>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={selectAllFoods}
+                  className="text-blue-700 hover:text-blue-900 font-medium"
+                >
+                  Select all
+                </button>
+                <button
+                  type="button"
+                  onClick={deselectAllFoods}
+                  className="text-gray-600 hover:text-gray-900 font-medium"
+                >
+                  Deselect all
+                </button>
+              </div>
+            </div>
+          )}
+
           <ul className="divide-y divide-gray-200 bg-white border border-gray-200 rounded">
-            {list.ingredients.map(ing => (
-              <li key={ing.food_id} className="flex items-center gap-2 px-2 py-1.5 text-xs">
+            {list.ingredients.map(ing => {
+              const isSelected = !selectable || !selectedFoodIds || selectedFoodIds.has(ing.food_id);
+              return (
+              <li
+                key={ing.food_id}
+                className={`flex items-center gap-2 px-2 py-1.5 text-xs ${!isSelected ? 'opacity-50 bg-gray-50' : ''}`}
+              >
+                {selectable && selectedFoodIds && onSelectionChange && (
+                  <input
+                    type="checkbox"
+                    checked={selectedFoodIds.has(ing.food_id)}
+                    onChange={() => toggleFoodSelection(ing.food_id)}
+                    aria-label={`Include ${ing.food_description} in scoring`}
+                    className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded flex-shrink-0"
+                  />
+                )}
                 <span className="flex-1 min-w-0">
                   <span className="text-gray-900 truncate block">{ing.food_description}</span>
                   <span className="text-[10px] text-gray-500">
@@ -333,7 +404,7 @@ export function FoodListPanel({ currentTarget, onChange }: Props): JSX.Element |
                   <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>
               </li>
-            ))}
+            );})}
           </ul>
 
           <div className="flex flex-wrap items-center gap-2">

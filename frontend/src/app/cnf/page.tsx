@@ -11,13 +11,21 @@ import {
   ArrowTopRightOnSquareIcon,
   ClockIcon,
   CircleStackIcon,
-  CubeIcon
+  CubeIcon,
+  BeakerIcon,
 } from '@heroicons/react/24/outline';
 import { CNFApiService, DatabaseStats } from '@/lib/api';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 
 const quickActions = [
+  {
+    name: 'Discover by Nutrient',
+    description: 'Find foods by iron, fibre, sodium, and other nutrient ranges',
+    icon: BeakerIcon,
+    href: '/cnf/discover',
+    color: 'from-teal-500 to-cyan-600',
+  },
   {
     name: 'Advanced Search',
     description: 'Search foods with filters and relevance scoring',
@@ -177,10 +185,46 @@ export default function CNFDashboard() {
           </div>
         )}
 
+        {/* Researcher workflow */}
+        <div className="mb-12 bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Learn a food, then score it</h2>
+          <p className="text-gray-600 mb-6 max-w-3xl">
+            Use Researcher mode in the toolbar on any explorer page. Open a food profile to see which
+            nutrients each published lens reads, then add it to the Scorecard at your chosen portion size.
+          </p>
+          <ol className="grid md:grid-cols-4 gap-4 text-sm">
+            <li className="border border-gray-100 rounded-lg p-4">
+              <div className="font-semibold text-gray-900 mb-1">1. Search or browse</div>
+              <p className="text-gray-600">Find foods by name, group, or AI match across CNF and WAFCT.</p>
+            </li>
+            <li className="border border-gray-100 rounded-lg p-4">
+              <div className="font-semibold text-gray-900 mb-1">2. Open the profile</div>
+              <p className="text-gray-600">Lens nutrient panels show what HEFI, HSR, FCS, and HENI draw from the catalogue.</p>
+            </li>
+            <li className="border border-gray-100 rounded-lg p-4">
+              <div className="font-semibold text-gray-900 mb-1">3. Compare alternatives</div>
+              <p className="text-gray-600">Select up to six foods and contrast key nutrients side by side.</p>
+            </li>
+            <li className="border border-gray-100 rounded-lg p-4">
+              <div className="font-semibold text-gray-900 mb-1">4. Score all six lenses</div>
+              <p className="text-gray-600">Send foods to the Scorecard for HEFI, HENI, HSR, FCS, environmental, and dietary pattern.</p>
+            </li>
+          </ol>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link href="/cnf/search" className="btn-primary inline-flex items-center">
+              Start in Search
+              <MagnifyingGlassIcon className="ml-2 w-4 h-4" />
+            </Link>
+            <Link href="/scorecard" className="btn-outline inline-flex items-center">
+              Open Scorecard
+            </Link>
+          </div>
+        </div>
+
         {/* Quick Actions */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {quickActions.map((action) => (
               <Link
                 key={action.name}

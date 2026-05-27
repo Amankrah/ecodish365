@@ -13,7 +13,7 @@
  */
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Loader2, RefreshCw, Sparkles, AlertCircle, Info } from 'lucide-react';
 import {
   AudienceToggle, type UserType,
@@ -59,6 +59,8 @@ export default function ScorecardPage(): JSX.Element {
   const [scoredAtIngHash, setScoredAtIngHash] = useState<string | null>(null);
   const [scoredAtUserType, setScoredAtUserType] = useState<UserType | null>(null);
   const [retryingMetric, setRetryingMetric] = useState<MetricKey | null>(null);
+  const [selectedFoodIds, setSelectedFoodIds] = useState<Set<number>>(() => new Set());
+  const prevFoodIdsRef = useRef<Set<number>>(new Set());
 
   // Hydrate from localStorage on mount + subscribe to changes.
   useEffect(() => {
@@ -70,6 +72,27 @@ export default function ScorecardPage(): JSX.Element {
     window.addEventListener(ACTIVE_FOOD_LIST_EVENT, handler);
     return () => window.removeEventListener(ACTIVE_FOOD_LIST_EVENT, handler);
   }, []);
+
+  // Sync selection when the active list changes: keep user choices, auto-select new foods.
+  useEffect(() => {
+    const ids = list?.ingredients.map(i => i.food_id) ?? [];
+    const currentIdSet = new Set(ids);
+    if (ids.length === 0) {
+      setSelectedFoodIds(new Set());
+      prevFoodIdsRef.current = new Set();
+      return;
+    }
+    setSelectedFoodIds(prev => {
+      const next = new Set<number>();
+      for (const id of ids) {
+        if (!prevFoodIdsRef.current.has(id) || prev.has(id)) {
+          next.add(id);
+        }
+      }
+      return next;
+    });
+    prevFoodIdsRef.current = currentIdSet;
+  }, [list]);
 
   // Pick up a recall handoff (target='scorecard'). Per spec, we do NOT
   // auto-score — receiving the list is enough; the user clicks "Score all".
@@ -84,8 +107,8 @@ export default function ScorecardPage(): JSX.Element {
     },
   });
 
-  // Derived: what input would the orchestrator see?
-  const ingredients = useMemo(
+  // Derived: foods selected for the next scoring run.
+  const allIngredients = useMemo(
     () => (list?.ingredients ?? []).map(i => ({
       food_id: i.food_id,
       mass_g: i.mass_g,
@@ -93,7 +116,13 @@ export default function ScorecardPage(): JSX.Element {
     })),
     [list],
   );
+  const ingredients = useMemo(
+    () => allIngredients.filter(i => selectedFoodIds.has(i.food_id)),
+    [allIngredients, selectedFoodIds],
+  );
   const nFoods = ingredients.length;
+  const nTotalFoods = allIngredients.length;
+  const hasPartialSelection = nTotalFoods > 0 && nFoods < nTotalFoods;
 
   // Cheap stale detector: if the active list (or audience) changes after a
   // scoring run, the displayed cards are stale until the user re-scores.
@@ -210,8 +239,12 @@ export default function ScorecardPage(): JSX.Element {
                 : isStale
                   ? 'Re-score'
                   : nFoods === 0
-                    ? 'Add foods to score'
-                    : `Score all (${nFoods} food${nFoods > 1 ? 's' : ''})`}
+                    ? nTotalFoods > 0
+                      ? 'Select foods to score'
+                      : 'Add foods to score'
+                    : hasPartialSelection
+                      ? `Score selected (${nFoods} of ${nTotalFoods})`
+                      : `Score all (${nFoods} food${nFoods > 1 ? 's' : ''})`}
             </button>
           </div>
         </header>
@@ -219,6 +252,9 @@ export default function ScorecardPage(): JSX.Element {
         {/* Active food list */}
         <FoodListPanel
           currentTarget="scorecard"
+          selectable
+          selectedFoodIds={selectedFoodIds}
+          onSelectionChange={setSelectedFoodIds}
           onChange={() => setList(loadActiveFoodList())}
         />
 
@@ -249,7 +285,16 @@ export default function ScorecardPage(): JSX.Element {
           <div role="alert" className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-md p-3 text-sm text-amber-900">
             <RefreshCw className="h-4 w-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
             <span>
-              Your food list or audience has changed since the last score. Click <strong>Re-score</strong> to refresh.
+              Your food list, selection, or audience has changed since the last score. Click <strong>Re-score</strong> to refresh.
+            </span>
+          </div>
+        )}
+
+        {hasPartialSelection && !scoring && !isStale && (
+          <div role="status" className="flex items-start gap-2 bg-gray-50 border border-gray-200 rounded-md p-3 text-sm text-gray-700">
+            <Info className="h-4 w-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <span>
+              Scoring <strong>{nFoods} of {nTotalFoods}</strong> foods. Deselected items stay in your saved list but are excluded from this run.
             </span>
           </div>
         )}

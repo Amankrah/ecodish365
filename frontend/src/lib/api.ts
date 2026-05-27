@@ -66,6 +66,8 @@ export interface Food {
   ScientificName?: string;
   NutrientValues: NutrientValue[];
   ConversionFactors: ConversionFactor[];
+  /** Present when food came from nutrient-range search. */
+  queried_nutrient_value?: number;
 }
 
 export interface NutrientValue {
@@ -2216,6 +2218,58 @@ export interface UserExplanation {
   technical_notes?: string[];
 }
 
+/** PLANETARY-1: EAT-Lancet 2.0 Table 2 per-capita-per-day boundary share.
+ *  Mirrors `backend/environmental_impact_model/src/planetary_boundaries.py`
+ *  `compute_planetary_boundary_shares()` output. */
+export interface PlanetaryBoundaryShareRow {
+  key:
+    | 'climate_change' | 'land_use' | 'water_consumption'
+    | 'biosphere_integrity_hanpp' | 'stratospheric_ozone_n2o'
+    | 'ocean_acidification' | 'nitrogen_surplus' | 'phosphorus_loss'
+    | 'novel_entities_pesticides';
+  label: string;
+  control_variable: string;
+  unit: string;
+  available: boolean;
+  global_boundary_per_year: number;
+  global_boundary_source: string;
+  current_food_system_contribution: string;
+  /** Present on available rows: ReCiPe midpoint we read from the meal. */
+  recipe_midpoint_key?: string;
+  /** Present on available rows: the meal's value in `unit`. */
+  meal_value?: number | null;
+  /** Present on available rows: per-capita-per-day allocation in `unit`. */
+  per_capita_daily_budget?: number;
+  /** Present on available rows: 100 × meal_value / per_capita_daily_budget. */
+  share_of_daily_budget_pct?: number | null;
+  method_note?: string;
+  /** Present on unavailable rows (and on available rows when the meal value
+   *  is missing). Explains why no share is shown. */
+  reason?: string;
+}
+
+export interface PlanetaryBoundaryShares {
+  shares: PlanetaryBoundaryShareRow[];
+  n_covered: number;
+  n_total: number;
+  population_assumption: number;
+  days_per_year: number;
+  citation: {
+    citation: string;
+    doi: string;
+    table: string;
+    manuscript_anchor: string;
+  };
+  method_note: string;
+}
+
+export interface PlanetaryBoundaryExplanations {
+  title: string;
+  headline: string;
+  message: string;
+  mandatory_caveat: string;
+}
+
 export interface EnvironmentalImpactResult {
   success: boolean;
   data: {
@@ -2262,6 +2316,14 @@ export interface EnvironmentalImpactResult {
       impacts_by_basis?: Record<string, Partial<LCAResults>>;
       /** Advanced-panel basis matching `lca_results` normalization. */
       reporting_basis?: string;
+      /** PLANETARY-1 (2026-05-27): per-meal share of per-capita-per-day
+       *  food-system planetary boundary (EAT-Lancet 2.0 Table 2). v1 covers
+       *  3 of 9 boundaries (climate, land, water); the other 6 surface as
+       *  `available=false` placeholders. */
+      planetary_boundary_shares?: PlanetaryBoundaryShares;
+      /** PLANETARY-1: audience-aware explanation pack for the planetary
+       *  overlay (Individual / Researcher / Policy). */
+      planetary_explanations?: PlanetaryBoundaryExplanations;
     };
     user_explanation: UserExplanation;
     comparison_to_references: {
@@ -2466,6 +2528,13 @@ export class EnvironmentalImpactApiService {
             typeof envImpacts.reporting_basis === 'string'
               ? envImpacts.reporting_basis
               : 'per_100_kcal',
+          // PLANETARY-1: pass through E28 Table 2 boundary shares + audience-
+          // aware explanations. Backward-compatible: undefined when an older
+          // backend deploy doesn't emit them, in which case the UI hides the card.
+          planetary_boundary_shares:
+            (envImpacts.planetary_boundary_shares as PlanetaryBoundaryShares | undefined) || undefined,
+          planetary_explanations:
+            (envImpacts.planetary_explanations as PlanetaryBoundaryExplanations | undefined) || undefined,
         },
         user_explanation: {
           summary: envImpacts.explanation?.simple_explanation || '',

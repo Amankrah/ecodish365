@@ -461,10 +461,31 @@ export function toEnvironmentalCard(
   if (typeof land === 'number') parts.push(`${land.toFixed(2)} m²·yr`);
   if (typeof water === 'number') parts.push(`${water.toFixed(2)} m³ water`);
   const headline = parts.join(' · ') || 'Computed';
-  const co2Band = bands['Global warming'];
-  const driver = co2Band && typeof co2Band.low === 'number' && typeof co2Band.high === 'number'
-    ? `CO₂e uncertainty: ${co2Band.low.toFixed(2)}–${co2Band.high.toFixed(2)} kg`
-    : undefined;
+
+  // PLANETARY-1 (2026-05-27): prefer the EAT-Lancet 2.0 Table 2 share line as
+  // the driver — it's more interpretable than raw CO₂e uncertainty for a
+  // consumer audience. Falls back to the CO₂e band line when the backend
+  // doesn't emit the planetary block (older deploys).
+  const planetary = outcome.result?.data?.meal_analysis?.planetary_boundary_shares;
+  let driver: string | undefined;
+  if (planetary && planetary.n_covered > 0) {
+    const byKey = new Map(planetary.shares.map(r => [r.key, r]));
+    const climatePct = byKey.get('climate_change')?.share_of_daily_budget_pct;
+    const landPct = byKey.get('land_use')?.share_of_daily_budget_pct;
+    const waterPct = byKey.get('water_consumption')?.share_of_daily_budget_pct;
+    const fmt = (p: number | null | undefined): string => {
+      if (p === null || p === undefined || !Number.isFinite(p)) return '—';
+      if (p >= 100) return `${p.toFixed(0)} %`;
+      if (p >= 10) return `${p.toFixed(1)} %`;
+      return `${p.toFixed(2)} %`;
+    };
+    driver = `Climate ${fmt(climatePct)} · Land ${fmt(landPct)} · Water ${fmt(waterPct)} of daily food-system budget`;
+  } else {
+    const co2Band = bands['Global warming'];
+    driver = co2Band && typeof co2Band.low === 'number' && typeof co2Band.high === 'number'
+      ? `CO₂e uncertainty: ${co2Band.low.toFixed(2)}–${co2Band.high.toFixed(2)} kg`
+      : undefined;
+  }
   return {
     metric: 'environmental',
     title: meta.title,
