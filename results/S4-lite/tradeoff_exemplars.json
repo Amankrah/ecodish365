@@ -1,62 +1,62 @@
 {
   "nutrition_env_tension": {
     "archetype": "nutrition_high_env_cost",
-    "day_id": "D21",
-    "label": "Low-calorie light day",
-    "hefi_score": 53.01647655259822,
-    "heni_minutes": 33.1,
-    "hsr_stars": 4.77,
-    "fcs_score": 100.0,
-    "env_gw_per_100kcal": 0.614632701421801,
-    "top_pattern": "cfg_healthy",
-    "nutrition_z": 1.058,
-    "env_footprint_z": 0.073
+    "day_id": "D17",
+    "label": "Active adult 6-occasion day",
+    "hefi_score": 42.14886607510263,
+    "heni_minutes": 52.3,
+    "hsr_stars": 2.98,
+    "fcs_score": 45.22,
+    "env_gw_per_100kcal": 1.1485640491772036,
+    "top_pattern": "dash",
+    "nutrition_z": 0.173,
+    "env_footprint_z": 1.148
   },
   "win_win": {
     "archetype": "nutrition_high_env_low",
-    "day_id": "D03",
-    "label": "CFG-2019 aligned ideal day",
-    "hefi_score": 58.78687814742408,
-    "heni_minutes": 88.5,
-    "hsr_stars": 3.9,
-    "fcs_score": 75.66,
-    "env_gw_per_100kcal": 0.1861145320197045,
+    "day_id": "D11",
+    "label": "EAT-Lancet reference day",
+    "hefi_score": 51.71963087776763,
+    "heni_minutes": 53.0,
+    "hsr_stars": 4.7,
+    "fcs_score": 88.42,
+    "env_gw_per_100kcal": 0.08212087912087912,
     "top_pattern": "vegan",
-    "nutrition_z": 1.368,
-    "env_footprint_z": -0.787
+    "nutrition_z": 1.08,
+    "env_footprint_z": -0.995
   },
   "lose_lose": {
     "archetype": "nutrition_low_env_high",
     "day_id": "D18",
     "label": "Beef-steak heavy day",
-    "hefi_score": 28.523652794921105,
-    "heni_minutes": -4.1,
+    "hefi_score": 28.99246670955929,
+    "heni_minutes": 1.7,
     "hsr_stars": 2.11,
-    "fcs_score": 17.27,
-    "env_gw_per_100kcal": 1.85589364897955,
+    "fcs_score": 17.06,
+    "env_gw_per_100kcal": 1.8532492980192372,
     "top_pattern": "dash",
-    "nutrition_z": -1.011,
-    "env_footprint_z": 2.567
+    "nutrition_z": -0.991,
+    "env_footprint_z": 2.563
   },
   "max_divergence": {
     "archetype": "largest_nutrition_env_gap",
     "day_id": "D18",
     "label": "Beef-steak heavy day",
-    "hefi_score": 28.523652794921105,
-    "heni_minutes": -4.1,
+    "hefi_score": 28.99246670955929,
+    "heni_minutes": 1.7,
     "hsr_stars": 2.11,
-    "fcs_score": 17.27,
-    "env_gw_per_100kcal": 1.85589364897955,
+    "fcs_score": 17.06,
+    "env_gw_per_100kcal": 1.8532492980192372,
     "top_pattern": "dash",
-    "nutrition_z": -1.011,
-    "env_footprint_z": 2.567
+    "nutrition_z": -0.991,
+    "env_footprint_z": 2.563
   },
   "manuscript_narrative": {
     "win_win": {
       "day_id": "D19",
       "label": "Legume-forward win-win day",
       "hefi_score": 49.08282366564085,
-      "heni_minutes": 38.2,
+      "heni_minutes": 46.5,
       "fcs_score": 93.86,
       "env_gw_per_100kcal": 0.07850953206239168,
       "note": "Legume-forward day: FCS 94, GW 0.08 kg CO\u2082e/100 kcal."
@@ -64,17 +64,17 @@
     "lose_lose": {
       "day_id": "D06",
       "label": "BBQ pulled-pork Western day",
-      "hefi_score": 21.56460473178891,
+      "hefi_score": 21.623075977332213,
       "fcs_score": 1.0,
-      "env_gw_per_100kcal": 1.5612873773111158,
+      "env_gw_per_100kcal": 1.559863169897377,
       "note": "BBQ Western day: HEFI 21.6/80, FCS 1, GW 1.56."
     },
     "nutrition_env_tension": {
       "day_id": "D17",
       "label": "Active adult 6-occasion day",
-      "hefi_score": 42.55057879403119,
-      "heni_minutes": 26.4,
-      "env_gw_per_100kcal": 1.1527155569540535,
+      "hefi_score": 42.14886607510263,
+      "heni_minutes": 52.3,
+      "env_gw_per_100kcal": 1.1485640491772036,
       "note": "Active day: HENI +26 min but GW 1.15 from beef-heavy mix."
     }
   }

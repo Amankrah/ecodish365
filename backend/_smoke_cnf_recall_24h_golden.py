@@ -94,14 +94,14 @@ GOLDEN: GoldenRecall = GoldenRecall(
     #   bread white commercial    (4066)   = 50 + 70 = 120 g
     #   egg whole raw             (125)    = 90 g (lunch only)
     #   bread white toasted       (3732)   = 50 g (lunch only)
-    #   cheese processed cheddar  (502213) = 40 g (dinner only)
+    #   cheese processed cheddar  (7005) = 40 g (dinner only)
     #   peanut butter smooth      (3414)   = 28 g (breakfast only)
     #   butter regular            (118)    = 10 + 8 = 18 g (lunch + dinner)
     expected_aggregate={
         4066:   120.0,
         125:     90.0,
         3732:    50.0,
-        502213:  40.0,
+        7005:  40.0,
         3414:    28.0,
         118:     18.0,
     },

@@ -1,6 +1,5 @@
 FoodGroupID,FoodGroupCode,FoodGroupName,FoodGroupNameF
-1,1,Dairy and Egg Products,"Produits laitiers et d'oeufs
-"
+1,1,Dairy and Egg Products,Produits laitiers et d'oeufs
 2,2,Spices and Herbs,Épices et fines herbes
 3,3,Babyfoods,Aliments pour bébés
 4,4,Fats and Oils,Matières grasses et huiles
@@ -16,7 +15,7 @@ FoodGroupID,FoodGroupCode,FoodGroupName,FoodGroupNameF
 14,14,Beverages,Boissons
 15,15,Finfish and Shellfish Products,"Produits de poissons, mollusques et crustacés"
 16,16,Legumes and Legume Products,Légumineuses et produits de légumineuses
-17,17,"Lamb, Veal and Game","Ageau, veau et gibier"
+17,17,"Lamb, Veal and Game","Agneau, veau et gibier"
 18,18,Baked Products,Produits de boulangerie
 19,19,Sweets,Sucreries
 20,20,"Cereals, Grains and Pasta","Céréales, grains et pâtes"

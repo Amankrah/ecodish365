@@ -82,12 +82,12 @@ PANEL_A_CANONICAL: List[FoodProbe] = [
     FoodProbe(555,  'Chicken, broiler, meat, skin, raw',  '2',  0.7, 'raw meat (FG5)'),
 
     # Category 2D — Other dairy foods
-    FoodProbe(502157, 'Yogourt, plain, fat-free',         '2D', 0.7, 'plain yogurt (FG1, non-cheese, non-beverage)'),
-    FoodProbe(502188, 'Yogourt, Greek, plain, fat-free',  '2D', 0.7, 'Greek yogurt (FG1)'),
+    FoodProbe(6948, 'Yogourt, plain, fat-free',         '2D', 0.7, 'plain yogurt (FG1, non-cheese, non-beverage)'),
+    FoodProbe(6979, 'Yogourt, Greek, plain, fat-free',  '2D', 0.7, 'Greek yogurt (FG1)'),
 
     # Category 3 — Oils and spreads
     FoodProbe(422,    'Vegetable oil, olive',             '3',  0.7, 'vegetable oil (FG4)'),
-    FoodProbe(502758, 'Margarine, stick, canola/soybean', '3',  0.7, 'margarine (FG4)'),
+    FoodProbe(7458, 'Margarine, stick, canola/soybean', '3',  0.7, 'margarine (FG4)'),
     FoodProbe(527,    'Salad dressing, mayonnaise',       '3',  0.7, 'oil-based spread (FG4)'),
     FoodProbe(16,     'Butter, whipped',                  '3',  0.7, 'butter — FG1 but oil/spread keyword override'),
 
@@ -139,7 +139,7 @@ PANEL_B_ADVERSARIAL: List[FoodProbe] = [
               'bagel (FG18) — should land in Cat 2 like other baked goods'),
 
     # Yogurt parfait with non-dairy components (granola).
-    FoodProbe(502041, 'Yogourt parfait, fruit, granola, reduced-fat', '2D', 0.5,
+    FoodProbe(6821, 'Yogourt parfait, fruit, granola, reduced-fat', '2D', 0.5,
               'parfait — dominant component is yogurt → 2D'),
 ]
 
@@ -167,7 +167,7 @@ PANEL_C_MEALS: List[MealProbe] = [
               '"cereal bowl" classification they should match the dairy portion '
               'to a typical pour (~75 g).'),
     MealProbe('Greek yogurt + apple',
-              [(502188, 150.0), (1696, 80.0)], '2D',
+              [(6979, 150.0), (1696, 80.0)], '2D',
               'dairy food + fruit — dairy component dominant'),
     MealProbe('Salad + chicken + olive oil',
               [(1990, 80.0), (555, 100.0), (422, 10.0)], '2',

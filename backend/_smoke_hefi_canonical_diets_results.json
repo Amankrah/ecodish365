@@ -50,11 +50,11 @@
       "target_low": 0.0,
       "target_high": 30.0,
       "target_description": "one-sided: HEFI <= 30/80 (below population p10)",
-      "total_score": 13.629870415035205,
+      "total_score": 12.824438334051953,
       "within_gate": true,
       "verdict": "PASS",
       "diagnostics": {
-        "percentage": 17.037338018794006,
+        "percentage": 16.03054791756494,
         "components": {
           "C1_VF": 0.0,
           "C2_WHOLEGR": 0.0,
@@ -62,10 +62,10 @@
           "C4_PROFOODS": 5.0,
           "C5_PLANTPRO": 0.0,
           "C6_BEVERAGES": 0.0,
-          "C7_FATTYACID": 1.9099927584136853,
+          "C7_FATTYACID": 1.6440576891141292,
           "C8_SFAT": 0.0,
-          "C9_FREESUGARS": 5.281714483235394,
-          "C10_SODIUM": 1.4381631733861244
+          "C9_FREESUGARS": 4.0631133594515685,
+          "C10_SODIUM": 2.117267285486255
         },
         "ratios": {
           "RATIO_VF": 0.0,
@@ -74,14 +74,14 @@
           "RATIO_PRO": 0.33354797166773986,
           "RATIO_PLANT": 0.0,
           "RATIO_BEV": 0.0,
-          "RATIO_UNSFAT": 0.9931962343751164,
-          "SFA_PERC": 23.187175941928796,
-          "SUG_PERC": 14.718285516764606,
-          "SODDEN": 1.8418020509275264
+          "RATIO_UNSFAT": 0.8549099983393472,
+          "SFA_PERC": 23.24307479430249,
+          "SUG_PERC": 15.936886640548432,
+          "SODDEN": 1.767100598596512
         },
         "inputs": {
           "total_foods_ra": 10.353333333333333,
-          "energy_kcal": 2603.7,
+          "energy_kcal": 2486.9637097045998,
           "vf_ra": 0.0,
           "whole_grains_ra": 0.0,
           "total_grains_ra": 1.2,
@@ -89,11 +89,11 @@
           "plant_protein_foods_ra": 0.0,
           "total_beverages_g": 0.0,
           "recommended_beverages_g": 0.0,
-          "sfa_g": 67.0805,
-          "mufa_g": 53.4871,
-          "pufa_g": 13.137,
-          "free_sugars_g": 95.805,
-          "sodium_mg": 4795.5
+          "sfa_g": 64.2274261282,
+          "mufa_g": 43.681658253,
+          "pufa_g": 11.2270105116,
+          "free_sugars_g": 99.0861468018,
+          "sodium_mg": 4394.715060106801
         }
       }
     },
@@ -155,11 +155,11 @@
       "target_low": 35.0,
       "target_high": 55.0,
       "target_description": "Brassard 2022 p25-p75 band (population mean 43.1/80)",
-      "total_score": 51.52495098309356,
+      "total_score": 52.49850798506698,
       "within_gate": true,
       "verdict": "PASS",
       "diagnostics": {
-        "percentage": 64.40618872886695,
+        "percentage": 65.62313498133372,
         "components": {
           "C1_VF": 14.999163459929733,
           "C2_WHOLEGR": 4.098544420277731,
@@ -167,9 +167,9 @@
           "C4_PROFOODS": 5.0,
           "C5_PLANTPRO": 0.0,
           "C6_BEVERAGES": 10.0,
-          "C7_FATTYACID": 2.9766652951894734,
+          "C7_FATTYACID": 2.9042224939078647,
           "C8_SFAT": 5.0,
-          "C9_FREESUGARS": 4.45057780769662,
+          "C9_FREESUGARS": 5.496577610951643,
           "C10_SODIUM": 0.0
         },
         "ratios": {
@@ -179,14 +179,14 @@
           "RATIO_PRO": 0.3762924544085662,
           "RATIO_PLANT": 0.0,
           "RATIO_BEV": 1.0,
-          "RATIO_UNSFAT": 1.5478659534985262,
-          "SFA_PERC": 4.625210366879839,
-          "SUG_PERC": 15.54942219230338,
-          "SODDEN": 2.6165152025131837
+          "RATIO_UNSFAT": 1.5101956968320898,
+          "SFA_PERC": 4.594888496356812,
+          "SUG_PERC": 14.503422389048357,
+          "SODDEN": 2.58887171561051
         },
         "inputs": {
           "total_foods_ra": 9.132161955691368,
-          "energy_kcal": 891.3,
+          "energy_kcal": 905.8,
           "vf_ra": 3.42436974789916,
           "whole_grains_ra": 1.8714285714285714,
           "total_grains_ra": 1.8714285714285714,
@@ -194,11 +194,11 @@
           "plant_protein_foods_ra": 0.0,
           "total_beverages_g": 250.0,
           "recommended_beverages_g": 250.0,
-          "sfa_g": 4.580500000000001,
-          "mufa_g": 3.655,
-          "pufa_g": 3.4349999999999996,
-          "free_sugars_g": 34.648,
-          "sodium_mg": 2332.1000000000004
+          "sfa_g": 4.6245,
+          "mufa_g": 3.5243999999999995,
+          "pufa_g": 3.4595,
+          "free_sugars_g": 32.843,
+          "sodium_mg": 2345.0
         }
       }
     },
@@ -270,11 +270,11 @@
       "target_low": 55.0,
       "target_high": 80.0,
       "target_description": "one-sided: HEFI >= 55/80 (CFG-recipe-based diets ~67)",
-      "total_score": 58.78687814742408,
+      "total_score": 58.00252375461197,
       "within_gate": true,
       "verdict": "PASS",
       "diagnostics": {
-        "percentage": 73.4835976842801,
+        "percentage": 72.50315469326496,
         "components": {
           "C1_VF": 19.80511406027447,
           "C2_WHOLEGR": 3.6666591304741014,
@@ -284,7 +284,7 @@
           "C6_BEVERAGES": 0.0,
           "C7_FATTYACID": 5.0,
           "C8_SFAT": 5.0,
-          "C9_FREESUGARS": 7.767017465293327,
+          "C9_FREESUGARS": 6.982663072481218,
           "C10_SODIUM": 10.0
         },
         "ratios": {
@@ -294,14 +294,14 @@
           "RATIO_PRO": 0.14243403947457664,
           "RATIO_PLANT": 0.07533178087766498,
           "RATIO_BEV": 0.0,
-          "RATIO_UNSFAT": 6.462404830228739,
-          "SFA_PERC": 3.7966230967308556,
-          "SUG_PERC": 12.232982534706673,
-          "SODDEN": 0.6401841692789969
+          "RATIO_UNSFAT": 6.272584341077492,
+          "SFA_PERC": 3.681415142102599,
+          "SUG_PERC": 13.017336927518782,
+          "SODDEN": 0.561637087615112
         },
         "inputs": {
           "total_foods_ra": 12.389635854341737,
-          "energy_kcal": 1429.12,
+          "energy_kcal": 1461.62,
           "vf_ra": 6.1344537815126055,
           "whole_grains_ra": 2.2714285714285714,
           "total_grains_ra": 3.557142857142857,
@@ -309,11 +309,11 @@
           "plant_protein_foods_ra": 0.9333333333333333,
           "total_beverages_g": 250.0,
           "recommended_beverages_g": 0.0,
-          "sfa_g": 6.0287,
-          "mufa_g": 18.06508,
-          "pufa_g": 20.89482,
-          "free_sugars_g": 43.706,
-          "sodium_mg": 914.9
+          "sfa_g": 5.9787,
+          "mufa_g": 17.542579999999997,
+          "pufa_g": 19.95932,
+          "free_sugars_g": 47.566,
+          "sodium_mg": 820.9
         }
       }
     }

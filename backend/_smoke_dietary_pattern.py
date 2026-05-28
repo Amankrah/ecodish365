@@ -275,7 +275,7 @@ G3_REFERENCE_DAYS: List[Dict[str, Any]] = [
         'name': 'CFG-Healthy plate day (half veg, whole grain, plant protein)',
         'expected': 'cfg_healthy',
         'foods': [
-            {'food_id': 4457, 'mass_g': 200},  # macaroni, whole wheat, cooked
+            {'food_id': 4517, 'mass_g': 200},  # pasta (spaghetti, macaroni), whole wheat, cooked (CNF 2026)
             {'food_id': 2374, 'mass_g': 100},  # broccoli
             {'food_id': 2395, 'mass_g': 100},  # kale
             {'food_id': 3404, 'mass_g': 100},  # tofu

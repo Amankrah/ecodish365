@@ -1,0 +1,110 @@
+{
+  "harness": "FPED-FPID readiness audit (2026-05-26)",
+  "data_paths": {
+    "fped": "C:\\Users\\Windows\\Desktop\\Dev_Projects\\ecodish365\\backend\\raw_fped\\FPED_1718.xls",
+    "fpid": "C:\\Users\\Windows\\Desktop\\Dev_Projects\\ecodish365\\backend\\raw_fpid\\FPID_1718.xls",
+    "fndds": "C:\\Users\\Windows\\Desktop\\Dev_Projects\\ecodish365\\backend\\raw_fndds\\FoodData_Central_survey_food_csv_2024-10-31",
+    "bridge": "C:\\Users\\Windows\\Desktop\\Dev_Projects\\ecodish365\\backend\\heni_calculator\\data\\cnf_to_fndds_bridge.json",
+    "composition": "C:\\Users\\Windows\\Desktop\\Dev_Projects\\ecodish365\\backend\\heni_calculator\\data\\cnf_heni_composition.json"
+  },
+  "recommendations": [
+    "FPED is architecturally integrated for HENI but only smoke-scale (23 CNF foods). Run full bridge: python -m heni_calculator.heni.etl.build_cnf_to_fndds_bridge then build_cnf_heni_composition (~$1 one-time LLM cost).",
+    "FPID has a loader stub at heni_calculator.heni.data.fpid_loader but no consumer is wired in yet. It uses ingredient CODE (via FNDDS input_food.sr_code), not FOODCODE — use for ingredient-level pattern decomposition of composite foods.",
+    "Do NOT compare FPED/FPID to CNF/WAFCT with the per-100g nutrient delta harness; they answer different questions (pattern equivalents vs nutrient composition).",
+    "WAFCT foods (700k+ FoodIDs) have no FPED/FPID path — HENI for WAFCT meals still uses legacy literal-100 food-group attribution unless a WA-specific bridge is built."
+  ],
+  "fped_file": {
+    "exists": true,
+    "size_kb": 6070.5
+  },
+  "fpid_file": {
+    "exists": true,
+    "size_kb": 1852.0
+  },
+  "fndds_bundle": {
+    "exists": true,
+    "path": "C:\\Users\\Windows\\Desktop\\Dev_Projects\\ecodish365\\backend\\raw_fndds\\FoodData_Central_survey_food_csv_2024-10-31"
+  },
+  "fped": {
+    "rows": 7083,
+    "key_column": "FOODCODE",
+    "pattern_columns": [
+      "F_TOTAL (cup eq.)",
+      "F_CITMLB (cup eq.)",
+      "F_OTHER (cup eq.)",
+      "F_JUICE (cup eq.)",
+      "V_TOTAL (cup eq.)",
+      "V_DRKGR (cup eq.)",
+      "V_REDOR_TOTAL (cup eq.)",
+      "V_REDOR_TOMATO (cup eq.)"
+    ]
+  },
+  "fpid": {
+    "rows": 2322,
+    "key_column": "CODE",
+    "pattern_columns": [
+      "F_TOTAL (cup eq.)",
+      "F_CITMLB (cup eq.)",
+      "F_OTHER (cup eq.)",
+      "F_JUICE (cup eq.)",
+      "V_TOTAL (cup eq.)",
+      "V_DRKGR (cup eq.)",
+      "V_REDOR_TOTAL (cup eq.)",
+      "V_REDOR_TOMATO (cup eq.)"
+    ]
+  },
+  "key_alignment": {
+    "fndds_food_codes": 5432,
+    "fndds_sr_codes": 2336,
+    "fped_fndds_overlap": 5029,
+    "fped_fndds_overlap_pct": 92.6,
+    "fpid_sr_overlap": 1618,
+    "fpid_sr_overlap_pct": 69.3,
+    "fped_fpid_code_overlap": 0
+  },
+  "current_integration": {
+    "fped_runtime_wired": true,
+    "fped_etl": "heni_calculator.heni.etl.build_cnf_heni_composition",
+    "fped_loader": "heni_calculator.heni.data.composition_loader",
+    "fpid_runtime_wired": false,
+    "cnf_bridged": 8086,
+    "cnf_compositions": 7661,
+    "bridged_with_fped_row": 7661,
+    "bridged_with_fpid_row": 0,
+    "bridge_provenance": {
+      "date_utc": "2026-05-28T05:57:47Z",
+      "embedding_model": "text-embedding-3-small",
+      "ranking_model": "gpt-4.1-mini",
+      "top_k": 20,
+      "min_bridge_confidence": 0.5,
+      "cnf_total": 7021,
+      "fndds_total": 5432,
+      "cnf_bridged": 8086,
+      "cnf_unbridged": 151
+    }
+  },
+  "contrast_with_wafct_explore": {
+    "wafct_harness": "_explore_wafct_vs_cnf_per100g.py",
+    "wafct_purpose": "Compare per-100g NUTRIENT values between two nutrient DBs (CNF vs WAFCT)",
+    "fped_fpid_purpose": "Food-pattern cup/oz equivalents for HENI risk-factor masses — not nutrients",
+    "analogous_validation": [
+      "Bridge coverage audit (this harness)",
+      "FPED vs legacy literal-100 attribution panel (_smoke_heni_literature_panel.py)",
+      "Per-composite-food decomposition sanity (pepperoni pizza, apple pie)"
+    ]
+  },
+  "data_layout": {
+    "raw_sources_at_backend_root": {
+      "raw_cnf": "Canadian Nutrient File CSVs",
+      "raw_wafct": "WAFCT_2019.xlsx",
+      "raw_fndds": "FoodData_Central_survey_food_csv_2024-10-31/ (relocated 2026-05-27)",
+      "raw_fped": "FPED_1718.xls (relocated 2026-05-27)",
+      "raw_fpid": "FPID_1718.xls (relocated 2026-05-27)"
+    },
+    "derived_artifacts_module_local": {
+      "cnf_to_fndds_bridge.json": "heni_calculator/data/",
+      "cnf_heni_composition.json": "heni_calculator/data/",
+      "fndds_embeddings.npz": "heni_calculator/data/"
+    }
+  }
+}

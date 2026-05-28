@@ -115,7 +115,7 @@ NOVA_PANEL: List[NovaPanelRow] = [
     NovaPanelRow('Pizza, pepperoni, frozen, cooked (4962)', 4962, 4,
                  'Monteiro §4.3 LITERAL CANONICAL EXAMPLE: "pre-prepared '
                  'frozen dishes". Pre-fix this was misclassified as NOVA 3.'),
-    NovaPanelRow('Plant-based beverage, almond, sweetened (502442)', 502442, 4,
+    NovaPanelRow('Plant-based beverage, almond, sweetened (7225)', 7225, 4,
                  'Monteiro §4.3: sweetened plant-based beverage = added-sugar '
                  'industrial formulation in the SSB band.'),
     NovaPanelRow('Cereal, ready to eat, Honey Bunches of Oats (1314)', 1314, 4,

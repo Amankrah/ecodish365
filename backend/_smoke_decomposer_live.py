@@ -46,13 +46,13 @@ def main():
     # CNF foods picked to maximise the chance of triggering Tier γ:
     canadian_specific = [
         (4082,   'Bannock',                                              'Baked Products',   100),
-        (502097, 'Tourtiere, homemade',                                  'Baked Products',   150),
-        (501999, 'Poutine',                                              'Mixed Dishes',     250),
-        (501844, 'Butter tart, with raisins, homemade',                  'Baked Products',    50),
-        (502000, "Shepherd's pie with corn",                             'Mixed Dishes',     250),
+        (6883, 'Tourtiere, homemade',                                  'Baked Products',   150),
+        (6772, 'Poutine',                                              'Mixed Dishes',     250),
+        (6621, 'Butter tart, with raisins, homemade',                  'Baked Products',    50),
+        (6773, "Shepherd's pie with corn",                             'Mixed Dishes',     250),
         # Composite babyfoods (unlikely to be in v32's `aliments infantiles`):
-        (502852, 'Babyfood, dinner, beef with vegetables',               'Babyfoods',        110),
-        (502857, 'Babyfood, dinner, chicken with cheese pasta and veg',  'Babyfoods',        110),
+        (7505, 'Babyfood, dinner, beef with vegetables',               'Babyfoods',        110),
+        (7509, 'Babyfood, dinner, chicken with cheese pasta and veg',  'Babyfoods',        110),
     ]
 
     print('=' * 78)

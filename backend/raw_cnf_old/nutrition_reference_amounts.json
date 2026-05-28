@@ -1,0 +1,825 @@
+{
+  "title": "Nutrition Labelling - Table of Reference Amounts for Food",
+  "source": "Health Canada",
+  "publication_date": "December 2016",
+  "categories": {
+    "A_BAKERY_PRODUCTS": {
+      "A.1": {
+        "product": "Bread, excluding sweet quick-type",
+        "reference_amount": "75 g"
+      },
+      "A.2": {
+        "product": "Tea biscuits, scones, rolls, buns, English muffins, croissants, tortillas, pita, soft bread sticks, soft pretzels and corn bread",
+        "reference_amount": "55 g"
+      },
+      "A.3": {
+        "product": "Bagels, naan, flat bread",
+        "reference_amount": "85 g"
+      },
+      "A.4": {
+        "product": "Brownies, dessert squares and bars",
+        "reference_amount": "40 g"
+      },
+      "A.5": {
+        "product": "Heavy weight cake: 10 g or more per 2.5 cm cube, such as cheese cake, pineapple upside-down, cake with at least 35% of the finished weight as fruit, nuts, or vegetables, or any of these combined, pound cake",
+        "reference_amount": "125 g"
+      },
+      "A.6": {
+        "product": "Medium weight cake: 4 g or more per 2.5 cm cube but less than 10 g per 2.5 cm cube, such as cake with or without icing or filling, cake with less than 35% of the finished weight as fruit, nuts or vegetables or any of these combined; light weight cake with icing; Boston cream pie, cupcakes, eclairs, or cream puffs, individually wrapped snack cakes such as Swiss rolls",
+        "reference_amount": "80 g"
+      },
+      "A.7": {
+        "product": "Light weight cake: less than 4 g per 2.5 cm cube, such as angel food, chiffon, or sponge cake without icing or filling",
+        "reference_amount": "55 g"
+      },
+      "A.8": {
+        "product": "Coffee cakes, doughnuts, danishes, sweet rolls, sweet quick-type breads and flaky type pastries, with or without filling and/or icing",
+        "reference_amount": "55 g"
+      },
+      "A.9": {
+        "product": "Muffins",
+        "reference_amount": "110 g"
+      },
+      "A.10": {
+        "product": "Cookies, with or without coating or filling; graham wafers",
+        "reference_amount": "30 g"
+      },
+      "A.11": {
+        "product": "Accompaniment crackers, hard bread sticks and melba toast",
+        "reference_amount": "20 g"
+      },
+      "A.12": {
+        "product": "Snack crackers, crackers and cheese dip pack",
+        "reference_amount": "30 g"
+      },
+      "A.13": {
+        "product": "Dry breads, matzo, and rusks",
+        "reference_amount": "30 g"
+      },
+      "A.14": {
+        "product": "Toaster pastries",
+        "reference_amount": "55 g"
+      },
+      "A.15": {
+        "product": "Ice cream cones",
+        "reference_amount": "5 g"
+      },
+      "A.16": {
+        "product": "Croutons",
+        "reference_amount": "7 g"
+      },
+      "A.17": {
+        "product": "French toast, pancakes, and waffles",
+        "reference_amount": "75 g"
+      },
+      "A.18": {
+        "product": "Grain-based bars with filling or partial or full coating",
+        "reference_amount": "40 g"
+      },
+      "A.19": {
+        "product": "Grain-based bars, without filling or coating",
+        "reference_amount": "30 g"
+      },
+      "A.20": {
+        "product": "Energy and protein bars",
+        "reference_amount": "45 g"
+      },
+      "A.21": {
+        "product": "Rice cakes and corn cakes",
+        "reference_amount": "15 g"
+      },
+      "A.22": {
+        "product": "Pies, tarts, cobblers, turnovers, other pastries not listed as a separate item in column 1",
+        "reference_amount": "110 g"
+      },
+      "A.23": {
+        "product": "Pie crust",
+        "reference_amount": "21 g"
+      },
+      "A.24": {
+        "product": "Pizza crust",
+        "reference_amount": "55 g"
+      },
+      "A.25": {
+        "product": "Taco shell, hard",
+        "reference_amount": "30 g"
+      }
+    },
+    "B_BEVERAGES": {
+      "B.1": {
+        "product": "Carbonated and non-carbonated beverages, including energy drinks, water, coconut and maple water, sports drinks and vitamin water; Iced tea, including flavoured and sweetened; Iced coffee and iced specialty coffee, including flavoured and sweetened",
+        "reference_amount": "375 mL"
+      },
+      "B.2": {
+        "product": "Alcoholic beverages",
+        "reference_amount": {
+          "wine_sangria_spritzer": "188 mL",
+          "beer": "333 mL",
+          "alcoholic_beverages_coolers_mixed_drinks": "333 mL"
+        }
+      },
+      "B.3": {
+        "product": "Coffee",
+        "reference_amount": {
+          "regular_instant_specialty": "250 mL",
+          "espresso": "30 mL"
+        }
+      },
+      "B.4": {
+        "product": "Tea and herbal tea, including regular and instant (hot), and flavoured and sweetened, prepared from mixes",
+        "reference_amount": "250 mL"
+      },
+      "B.5": {
+        "product": "Cocoa and chocolate beverages (hot)",
+        "reference_amount": "250 mL"
+      }
+    },
+    "C_CEREALS_AND_OTHER_GRAIN_PRODUCTS": {
+      "C.1": {
+        "product": "Hot breakfast cereals, such as oatmeal, or cream of wheat",
+        "reference_amount": {
+          "dry": "40 g",
+          "prepared": "250 mL"
+        }
+      },
+      "C.2": {
+        "product": "Ready-to-eat breakfast cereals, puffed and uncoated (weighing less than 20 g per 250 mL)",
+        "reference_amount": "15 g"
+      },
+      "C.3": {
+        "product": "Ready-to-eat breakfast cereals, puffed and coated, flaked, extruded, without fruit or nuts (weighing 20 g to 42 g per 250 mL), very high fibre cereals (with 28 g or more fibre per 100 g)",
+        "reference_amount": "30 g"
+      },
+      "C.4": {
+        "product": "Ready-to-eat breakfast cereals, fruit and nut type, granola (weighing 43 g or more per 250 mL) and biscuit type cereals",
+        "reference_amount": "55 g"
+      },
+      "C.5": {
+        "product": "Bran and wheat germ, milled flax, hemp and chia seeds",
+        "reference_amount": "15 g"
+      },
+      "C.6": {
+        "product": "Flours and cornmeal, including rye, potato, corn, barley, sorghum, buckwheat flours and gluten-free blends, but not including nut and other flours listed in item O.4",
+        "reference_amount": "30 g"
+      },
+      "C.7": {
+        "product": "Grains, such as rice or barley, including flavoured rice and grains",
+        "reference_amount": {
+          "dry": "45 g",
+          "cooked": "140 g"
+        }
+      },
+      "C.8": {
+        "product": "Pastas, including filled pastas, gnocchi, without sauce",
+        "reference_amount": {
+          "dry": "85 g",
+          "cooked": "215 g"
+        }
+      },
+      "C.9": {
+        "product": "Pastas, dry and ready-to-eat, such as fried chow mein noodles",
+        "reference_amount": "25 g"
+      },
+      "C.10": {
+        "product": "Starch, such as cornstarch, potato starch, tapioca starch or wheat starch",
+        "reference_amount": "10 g"
+      },
+      "C.11": {
+        "product": "Stuffing",
+        "reference_amount": "100 g"
+      }
+    },
+    "D_DAIRY_PRODUCTS_AND_SUBSTITUTES": {
+      "D.1": {
+        "product": "Cheese, including cream cheese and cheese spread, except those listed as a separate item in column 1",
+        "reference_amount": "30 g"
+      },
+      "D.2": {
+        "product": "Cottage cheese",
+        "reference_amount": "125 g"
+      },
+      "D.3": {
+        "product": "Cheese used as an ingredient, such as dry cottage cheese or ricotta cheese",
+        "reference_amount": "55 g"
+      },
+      "D.4": {
+        "product": "Hard cheese, including grated, such as parmesan or romano",
+        "reference_amount": "15 g"
+      },
+      "D.5": {
+        "product": "Quark, fresh cheese and fresh dairy desserts",
+        "reference_amount": "100 g"
+      },
+      "D.6": {
+        "product": "Cream and cream substitute, except those listed as separate item",
+        "reference_amount": "15 mL"
+      },
+      "D.7": {
+        "product": "Cream and cream substitute, powder",
+        "reference_amount": "2 g"
+      },
+      "D.8": {
+        "product": "Cream and cream substitute, aerosol or whipped",
+        "reference_amount": "15 g"
+      },
+      "D.9": {
+        "product": "Eggnog",
+        "reference_amount": "125 mL"
+      },
+      "D.10": {
+        "product": "Milk, evaporated or condensed",
+        "reference_amount": "15 mL"
+      },
+      "D.11": {
+        "product": "Milk, buttermilk and milk-based drinks, such as chocolate milk, plant-based beverages",
+        "reference_amount": "250 mL"
+      },
+      "D.12": {
+        "product": "Fermented dairy drinks including drinkable yogurts, kefir",
+        "reference_amount": "188 mL"
+      },
+      "D.13": {
+        "product": "Shakes, with or without coffee or juice, including protein shakes and dairy substitute shakes, smoothies (if whey/dairy or plant-based beverage is a main ingredient)",
+        "reference_amount": "250 mL"
+      },
+      "D.14": {
+        "product": "Sour cream",
+        "reference_amount": "30 mL"
+      },
+      "D.15": {
+        "product": "Yogurt",
+        "reference_amount": "175 g"
+      }
+    },
+    "E_DESSERTS": {
+      "E.1": {
+        "product": "Ice cream, ice milk, frozen yogurt, sherbet, other frozen dairy and non-dairy desserts sold in tubs, including sorbet and gelato",
+        "reference_amount": "188 mL"
+      },
+      "E.2": {
+        "product": "Ice cream, ice milk, frozen yogurt, sherbet, frozen dairy and non-dairy desserts sold as cakes, sandwiches or cones",
+        "reference_amount": "125 mL"
+      },
+      "E.3": {
+        "product": "Ice cream, ice milk, frozen yogurt, sherbet, other frozen dairy and non-dairy desserts sold as pops, bars or cups",
+        "reference_amount": "75 mL"
+      },
+      "E.4": {
+        "product": "Sundaes",
+        "reference_amount": "250 mL"
+      },
+      "E.5": {
+        "product": "Custard, gelatin and pudding",
+        "reference_amount": "130 g"
+      }
+    },
+    "F_DESSERT_TOPPINGS_AND_FILLINGS": {
+      "F.1": {
+        "product": "Dessert toppings, such as maple butter and marshmallow cream",
+        "reference_amount": "30 g"
+      },
+      "F.2": {
+        "product": "Cake frostings, icings and streusel topping",
+        "reference_amount": "35 g"
+      },
+      "F.3": {
+        "product": "Pie fillings",
+        "reference_amount": "83 mL"
+      }
+    },
+    "G_EGGS_AND_EGG_SUBSTITUTES": {
+      "G.1": {
+        "product": "Egg mixtures, such as egg foo young, scrambled eggs, omelettes",
+        "reference_amount": "110 g"
+      },
+      "G.2": {
+        "product": "Eggs, including eggs in the shell, liquid or dried whole egg and liquid egg-white",
+        "reference_amount": "100 g"
+      },
+      "G.3": {
+        "product": "Egg substitutes",
+        "reference_amount": "100 g"
+      }
+    },
+    "H_FATS_AND_OILS": {
+      "H.1": {
+        "product": "Butter, margarine, shortening, lard, solid coconut oil, butter-flavoured spread",
+        "reference_amount": "10 g"
+      },
+      "H.2": {
+        "product": "Vegetable oil, including liquid coconut oil",
+        "reference_amount": "10 mL"
+      },
+      "H.3": {
+        "product": "Butter replacement, powder",
+        "reference_amount": "2 g"
+      },
+      "H.4": {
+        "product": "Dressings for salad",
+        "reference_amount": "30 mL"
+      },
+      "H.5": {
+        "product": "Mayonnaise, sandwich spread and mayonnaise-type dressing",
+        "reference_amount": "15 mL"
+      },
+      "H.6": {
+        "product": "Oil, spray type",
+        "reference_amount": "0.5 g"
+      }
+    },
+    "I_MARINE_AND_FRESH_WATER_ANIMALS": {
+      "I.1": {
+        "product": "Anchovies, anchovy paste and caviar",
+        "reference_amount": "15 g"
+      },
+      "I.2": {
+        "product": "Marine and fresh water animals with sauce, such as fish with cream sauce or shrimp with lobster sauce",
+        "reference_amount": "140 g cooked"
+      },
+      "I.3": {
+        "product": "Marine and fresh water animals without sauce, such as plain or fried fish or shellfish, or fish or shellfish cakes, with or without breading or batter",
+        "reference_amount": {
+          "raw": "125 g",
+          "cooked": "100 g"
+        }
+      },
+      "I.4": {
+        "product": "Marine and fresh water animals, canned",
+        "reference_amount": "55 g"
+      },
+      "I.5": {
+        "product": "Marine and fresh water animals, smoked or pickled, or spreads",
+        "reference_amount": "55 g"
+      }
+    },
+    "J_FRUIT_AND_FRUIT_JUICES": {
+      "J.1": {
+        "product": "Fruit, including fruit salad or mixed fruit, fresh, frozen or canned, coated or uncoated, except those listed as a separate item in column 1",
+        "reference_amount": {
+          "fresh_frozen": "140 g",
+          "canned": "167 mL"
+        }
+      },
+      "J.2": {
+        "product": "Blueberries, raspberries, blackberries or a mixture of these",
+        "reference_amount": "80 g"
+      },
+      "J.3": {
+        "product": "Watermelon, cantaloupe, honeydew and other melons or a mixture of these",
+        "reference_amount": "150 g"
+      },
+      "J.4": {
+        "product": "Avocado, used as an ingredient",
+        "reference_amount": "30 g"
+      },
+      "J.5": {
+        "product": "Cranberries, lemons and limes, used as ingredients",
+        "reference_amount": "55 g"
+      },
+      "J.6": {
+        "product": "Apple sauces, including those that contain other fruit and vegetables",
+        "reference_amount": {
+          "weight": "110 g",
+          "volume": "125 mL"
+        }
+      },
+      "J.7": {
+        "product": "Dried fruit, including raisins, cranberries, apricots, prunes, dates, figs",
+        "reference_amount": "40 g"
+      },
+      "J.8": {
+        "product": "Candied or pickled fruit",
+        "reference_amount": "30 g"
+      },
+      "J.9": {
+        "product": "Fruit for garnish or flavour, such as maraschino cherries",
+        "reference_amount": "4 g"
+      },
+      "J.10": {
+        "product": "Fruit relishes",
+        "reference_amount": "60 mL"
+      },
+      "J.11": {
+        "product": "Juices, nectars and fruit drinks represented for use as substitutes for fruit juices, juice-based smoothies",
+        "reference_amount": "250 mL"
+      },
+      "J.12": {
+        "product": "Juices, used as ingredients, such as lemon juice or lime juice",
+        "reference_amount": "5 mL"
+      }
+    },
+    "K_LEGUMES": {
+      "K.1": {
+        "product": "Tofu (bean curd) or tempeh",
+        "reference_amount": "85 g"
+      },
+      "K.2": {
+        "product": "Beans, peas and lentils, such as white beans, kidney beans, romano beans, soybeans or chick peas",
+        "reference_amount": {
+          "dry": "35 g",
+          "cooked_or_canned": "125 mL"
+        }
+      }
+    },
+    "L_MEAT_POULTRY_PRODUCTS_AND_SUBSTITUTES": {
+      "L.1": {
+        "product": "Pork rinds and bacon",
+        "reference_amount": {
+          "uncooked": "54 g",
+          "cooked": "15 g"
+        }
+      },
+      "L.2": {
+        "product": "Beef, pork and poultry breakfast strips",
+        "reference_amount": {
+          "uncooked": "30 g",
+          "cooked": "15 g"
+        }
+      },
+      "L.3": {
+        "product": "Dried meat and poultry, such as jerky, dried beef or parma ham, sausage products with a water activity of 0.90 or less, such as salami, dried thuringer or cervelat",
+        "reference_amount": "30 g"
+      },
+      "L.4": {
+        "product": "Luncheon meats such as bologna, blood pudding, liver sausage, mortadella, ham and cheese loaf or headcheese; pâté, sandwich spread, potted meat food product; taco fillings; meat pie fillings and cretons",
+        "reference_amount": {
+          "uncooked": "75 g",
+          "cooked": "55 g"
+        }
+      },
+      "L.5": {
+        "product": "Sausage products, such as linked sausage, Vienna sausage, wieners, breakfast sausage, frankfurters, pork sausage, bratwurst, kielbasa, Polish sausage, summer sausage, smoked sausage, smoked country sausage, pepperoni, knackwurst, thuringer and cervelat, sausage made with combination of seafood and pork",
+        "reference_amount": {
+          "uncooked": "75 g",
+          "cooked": "55 g"
+        }
+      },
+      "L.6": {
+        "product": "Cuts of meat and poultry without sauce, and ready-to-cook cuts, with or without breading or batter, including marinated, tenderized and injected cuts, skewered meat and poultry, including kebabs and souvlaki, whole poultry (no stuffing)",
+        "reference_amount": {
+          "raw": "125 g",
+          "cooked": "100 g"
+        }
+      },
+      "L.7": {
+        "product": "Patties, including burger patties, cutlettes, chopettes, steakettes, meatballs, sausage meat and ground meat, with or without breading or batter, corn dog on a stick (breaded), falafels, including simulated meat and poultry products",
+        "reference_amount": {
+          "raw": "100 g",
+          "cooked": "60 g"
+        }
+      },
+      "L.8": {
+        "product": "Cured meat and poultry products such as cured ham, dry cured ham, back bacon, cured pork back, dry cured cappicolo, corned beef, pastrami, country ham, cured pork shoulder picnic, poultry ham products, smoked meat or pickled meat",
+        "reference_amount": {
+          "raw": "85 g",
+          "cooked": "55 g"
+        }
+      },
+      "L.9": {
+        "product": "Canned meat and poultry",
+        "reference_amount": "55 g"
+      },
+      "L.10": {
+        "product": "Meat and poultry with sauce, such as meat in barbecue sauce or turkey with gravy, but excluding combination dishes",
+        "reference_amount": "140 g"
+      }
+    },
+    "M_MISCELLANEOUS_CATEGORY": {
+      "M.1": {
+        "product": "Baking powder, baking soda, pectin, yeast",
+        "reference_amount": "0.6 g"
+      },
+      "M.2": {
+        "product": "Baking decorations, such as coloured sugars or sprinkles for cookies",
+        "reference_amount": "4 g"
+      },
+      "M.3": {
+        "product": "Bread crumbs and batter mixes",
+        "reference_amount": "30 g"
+      },
+      "M.4": {
+        "product": "Cooking wine",
+        "reference_amount": "30 mL"
+      },
+      "M.5": {
+        "product": "Cocoa powder, carob powder, unsweetened",
+        "reference_amount": "5 g"
+      },
+      "M.6": {
+        "product": "Non-alcoholic drink mixers, such as pina colada or daiquiri",
+        "reference_amount": "Amount to make 250 mL of drink"
+      },
+      "M.7": {
+        "product": "Chewing gum",
+        "reference_amount": "3 g"
+      },
+      "M.8": {
+        "product": "Salad and potato toppers, such as salad crunchies, salad crispins or substitutes for bacon bits",
+        "reference_amount": "7 g"
+      },
+      "M.9": {
+        "product": "Salt, salt substitutes and seasoned salts such as garlic salt and salt-based seasonings (which may contain herbs, spices, dehydrated vegetables, etc.), flavour enhancers, such as steak spice",
+        "reference_amount": "1 g"
+      },
+      "M.10": {
+        "product": "Spices and herbs, without salt",
+        "reference_amount": "0.5 g"
+      },
+      "M.11": {
+        "product": "Coconut milk",
+        "reference_amount": "83 mL"
+      },
+      "M.12": {
+        "product": "Dried coconut, flakes, shredded",
+        "reference_amount": "15 g"
+      }
+    },
+    "N_COMBINATION_DISHES": {
+      "N.1": {
+        "product": "Combination dishes, such as chicken and rice casserole, hash, macaroni and cheese with or without meat, spaghetti with sauce, lasagna, stir fry, meat or poultry casserole, baked or refried beans, wieners and beans, meat chili, chili with beans, creamed chipped beef, beef or poultry ravioli with sauce, beef stroganoff, poultry à la king, Brunswick stew, goulash, stew, ragout or poutine, butter chicken with rice, shepherd's pie, stuffed cannelloni, stuffed poultry",
+        "reference_amount": "300 g"
+      },
+      "N.2": {
+        "product": "Burritos, enchiladas, pizza, pizza rolls, sausage rolls, pastry rolls, cabbage rolls, quiche, sandwiches, crackers and meat or poultry lunch-type packages, gyros, burger on a bun, frank on a bun, calzones, tacos, pockets stuffed with meat, chicken cordon bleu, stuffed vegetables with meat or poultry, kabobs and souvlaki (meat and vegetables), empanadas, fajitas, sushi, souvlaki, pot pie, meat pie or tourtière",
+        "reference_amount": "200 g"
+      },
+      "N.3": {
+        "product": "Hors d'oeuvres, such as onion rings, egg rolls and breaded zucchini sticks",
+        "reference_amount": {
+          "without_sauce": "85 g",
+          "with_sauce": "120 g"
+        }
+      }
+    },
+    "O_NUTS_AND_SEEDS": {
+      "O.1": {
+        "product": "Nuts and seeds, not for use as snacks: whole, chopped, sliced, slivered or ground",
+        "reference_amount": "30 g shelled"
+      },
+      "O.2": {
+        "product": "Pastes and creams, including marzipan",
+        "reference_amount": "30 g"
+      },
+      "O.3": {
+        "product": "Peanut butter, nut butters and substitutes, such as coconut and soya butter",
+        "reference_amount": "15 g"
+      },
+      "O.4": {
+        "product": "Nut flours, such as almond flour and similar flours, including coconut, peanut and soya flours",
+        "reference_amount": "15 g"
+      }
+    },
+    "P_POTATOES_SWEET_POTATOES_AND_YAMS": {
+      "P.1": {
+        "product": "French fries, including spirales, smiles, wedges, fried potatoes, hash browns, potato skins and pancakes",
+        "reference_amount": {
+          "frozen": "85 g",
+          "prepared": "70 g"
+        }
+      },
+      "P.2": {
+        "product": "Potatoes, mashed, candied, stuffed or with sauce",
+        "reference_amount": "140 g"
+      },
+      "P.3": {
+        "product": "Potatoes, plain, fresh, canned or frozen",
+        "reference_amount": {
+          "fresh_or_frozen": "110 g",
+          "vacuum_packed": "125 g",
+          "canned": "167 mL"
+        }
+      }
+    },
+    "Q_SALADS": {
+      "Q.1": {
+        "product": "Salads, such as egg, fish, shellfish, bean, vegetable, meat, ham or poultry salad, except those listed as a separate item in column 1",
+        "reference_amount": "100 g"
+      },
+      "Q.2": {
+        "product": "Gelatin salad",
+        "reference_amount": "120 g"
+      },
+      "Q.3": {
+        "product": "Pasta or potato salad",
+        "reference_amount": "140 g"
+      }
+    },
+    "R_SAUCES_DIPS_GRAVIES_AND_CONDIMENTS": {
+      "R.1": {
+        "product": "Sauces for dipping, such as barbecue, cocktail sauce, hollandaise, tartar, mustard or sweet and sour sauce, plum, cherry and pineapple sauce, satay and peanut sauce, Vietnamese and sweet chili dipping sauce, spare rib sauce, garlic sauce",
+        "reference_amount": "30 mL"
+      },
+      "R.2": {
+        "product": "Dips, spreads and tapenades, such as vegetables, legume or dairy-based",
+        "reference_amount": "30 g"
+      },
+      "R.3": {
+        "product": "Major main entrée sauce, such as spaghetti sauce, cooking sauces such as butter chicken sauce, curry sauce, pulled pork, sloppy Joe, garlic sauce, stir fry sauce",
+        "reference_amount": "125 mL"
+      },
+      "R.4": {
+        "product": "Minor main entrée sauce such as pizza sauce, pad thai sauce, pesto sauce, chicken wing sauce, or other sauces used as toppings such as white sauce, cheese sauce, salsa or gravy",
+        "reference_amount": "60 mL"
+      },
+      "R.5": {
+        "product": "Major condiments, such as ketchup, chili sauce, chutney, steak sauce, soy sauce, vinegar, fish sauce, hoisin sauce, black bean sauce, teriyaki sauce, curry paste or marinades",
+        "reference_amount": "15 mL"
+      },
+      "R.6": {
+        "product": "Minor condiments, such as horseradish, hot sauce, mustard, liquid smoke or Worcestershire sauce",
+        "reference_amount": "5 mL"
+      }
+    },
+    "S_SNACKS": {
+      "S.1": {
+        "product": "Chips, pretzels, popcorn, extruded snacks, grain and pulse-based snacks, pita chips and fruit-based snacks, such as fruit chips",
+        "reference_amount": "50 g"
+      },
+      "S.2": {
+        "product": "Nuts or seeds, or a mixture of these, with or without chocolate, candies, dried fruit or other food added, for use as snacks",
+        "reference_amount": "50 g shelled"
+      },
+      "S.3": {
+        "product": "Meat or poultry snack food sticks",
+        "reference_amount": "20 g"
+      }
+    },
+    "T_SOUPS": {
+      "T.1": {
+        "product": "All varieties of soup",
+        "reference_amount": "250 mL"
+      }
+    },
+    "U_SUGARS_AND_SWEETS": {
+      "U.1": {
+        "product": "Candies, confectionaries and chocolates, including a mixture of these with or without other food added, chocolate bars and other chocolate products, Halloween candy, box of assorted chocolates, except those listed as a separate item in column 1",
+        "reference_amount": "40 g"
+      },
+      "U.2": {
+        "product": "After-dinner confections",
+        "reference_amount": "10 g"
+      },
+      "U.3": {
+        "product": "Hard candies, powdered or liquid candies, except those listed as a separate item in column 1",
+        "reference_amount": {
+          "solid": "15 g",
+          "liquid": "15 mL"
+        }
+      },
+      "U.4": {
+        "product": "Baking candies, such as chocolate chips",
+        "reference_amount": "15 g"
+      },
+      "U.5": {
+        "product": "Breath mints",
+        "reference_amount": "2 g"
+      },
+      "U.6": {
+        "product": "Roll-type hard candies and mini size hard candies in dispenser packages",
+        "reference_amount": "5 g"
+      },
+      "U.7": {
+        "product": "Confectioner's or icing sugar",
+        "reference_amount": "30 g"
+      },
+      "U.8": {
+        "product": "Honey, molasses and bread spreads",
+        "reference_amount": "20 g"
+      },
+      "U.9": {
+        "product": "Jams, jellies, marmalades, fruit butters and spreads",
+        "reference_amount": "15 mL"
+      },
+      "U.10": {
+        "product": "Fruit leather, bar or mini pieces, that may or may not contain vegetable ingredients",
+        "reference_amount": "20 g"
+      },
+      "U.11": {
+        "product": "Marshmallows",
+        "reference_amount": "30 g"
+      },
+      "U.12": {
+        "product": "Sugars, except those listed as a separate item in column 1",
+        "reference_amount": "4 g"
+      },
+      "U.13": {
+        "product": "Sugar substitute",
+        "reference_amount": "amount equivalent in sweetness to 4 g sugar"
+      },
+      "U.14": {
+        "product": "Syrups used as toppings, such as pancake syrups, maple syrup, fruit syrups and ice cream sundae syrups",
+        "reference_amount": "60 mL"
+      },
+      "U.15": {
+        "product": "Syrups used as ingredients, such as corn syrup, agave syrup and flavoured syrups for milk",
+        "reference_amount": "30 mL"
+      }
+    },
+    "V_VEGETABLES": {
+      "V.1": {
+        "product": "Vegetables without sauce, including cream style corn and stewed tomatoes, artichoke hearts and hearts of palm, packed in water, lettuce, all varieties, but not including vegetables without sauce listed as a separate item in column 1",
+        "reference_amount": {
+          "fresh_or_frozen": "85 g",
+          "canned": "125 mL"
+        }
+      },
+      "V.2": {
+        "product": "Vegetables with sauce",
+        "reference_amount": {
+          "fresh_or_frozen": "110 g",
+          "canned": "125 mL"
+        }
+      },
+      "V.3": {
+        "product": "Vegetables primarily used for garnish or flavouring, fresh, canned or frozen, but not dried, such as parsley or garlic",
+        "reference_amount": {
+          "fresh_or_frozen": "4 g",
+          "canned": "5 mL"
+        }
+      },
+      "V.4": {
+        "product": "Chili pepper and green onion",
+        "reference_amount": "30 g"
+      },
+      "V.5": {
+        "product": "Seaweed, dehydrated mushrooms",
+        "reference_amount": "15 g"
+      },
+      "V.6": {
+        "product": "Sprouts",
+        "reference_amount": "65 g"
+      },
+      "V.7": {
+        "product": "Vegetable juice and vegetable drink",
+        "reference_amount": "250 mL"
+      },
+      "V.8": {
+        "product": "Olives",
+        "reference_amount": "15 g"
+      },
+      "V.9": {
+        "product": "Sun-dried tomatoes, artichoke hearts and other vegetables packed in oil, pickles, giardiniera and other pickled vegetables",
+        "reference_amount": "30 g"
+      },
+      "V.10": {
+        "product": "Relish",
+        "reference_amount": "15 mL"
+      },
+      "V.11": {
+        "product": "Vegetable pastes, such as tomato paste",
+        "reference_amount": "30 mL"
+      },
+      "V.12": {
+        "product": "Vegetable sauce or purée, such as tomato sauce or tomato purée",
+        "reference_amount": "60 mL"
+      }
+    },
+    "W_FOODS_FOR_CHILDREN_UNDER_FOUR": {
+      "W.1": {
+        "product": "Cereals, dry, instant, to be prepared with water, breast milk or infant formula",
+        "reference_amount": "30 g"
+      },
+      "W.2": {
+        "product": "Ready-to-eat cereal and cereal bars, represented for children one year of age or older but less than four years of age",
+        "reference_amount": "20 g"
+      },
+      "W.3": {
+        "product": "Cookies, teething biscuits, toasts, puffs and other finger foods, such as yogurt melts",
+        "reference_amount": "7 g"
+      },
+      "W.4": {
+        "product": "Strained or junior meat, desserts, fruit, vegetables and combination dishes",
+        "reference_amount": "110 mL"
+      },
+      "W.5": {
+        "product": "Combination dishes represented for children one year of age or older but less than four years of age",
+        "reference_amount": "170 g"
+      },
+      "W.6": {
+        "product": "Juices, all varieties",
+        "reference_amount": "125 mL"
+      },
+      "W.7": {
+        "product": "Yogurt, represented for children one year of age or older but less than four years of age",
+        "reference_amount": "100 g"
+      }
+    },
+    "X_MEAL_REPLACEMENTS_AND_SUPPLEMENTS": {
+      "X.1": {
+        "product": "Meal replacements or nutritional supplements, ready to consume or requiring preparation, such as drinks, shakes, soups, bars, puddings, cereal",
+        "reference_amount": "Amount required to meet the compositional requirements set out in B.24.200, or B.24.201, when prepared according to directions for use, if the food requires preparation"
+      }
+    }
+  },
+  "notes": [
+    "Unless otherwise noted, the reference amounts are for the ready-to-serve or almost ready-to-serve form of the food.",
+    "If not listed separately, the reference amount for the unprepared form, such as dry mixes, concentrates, dough, batter, and fresh or frozen pasta, is the amount required to make one reference amount of the prepared form.",
+    "Excludes any liquid in which the solid food may be packed or canned, unless the liquid is customarily consumed with the solid food.",
+    "The terms piece(s) or unit(s), container, package, pan, fruit and other similar terms are used as generic descriptors."
+  ],
+  "definitions": {
+    "MM": "Metric Measure",
+    "HM": "Household Measure", 
+    "RA": "Reference Amount"
+  }
+}

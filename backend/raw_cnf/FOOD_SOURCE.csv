@@ -1,17 +1,17 @@
 FoodSourceID,FoodSourceCode,FoodSourceDescription,FoodSourceDescriptionF
-0,0,FOODS BASED ON DATA FROM USDA: NO CHANGES,ALIMENTS BASÉS SUR LE USDA: AUCUNE MODIFICATION APPORTÉE
-1,1,FOOD BASED ON DATA FROM USDA: SOME NUTRIENTS CHANGED TO MEET CANADIAN REGULATIONS,ALIMENT BASÉ SUR LE USDA: CERTAINS ÉLÉMENTS NUTRITIFS ONT ÉTÉ MODIFIÉS POUR SE CONFORMER À LA RÉGLEMENTATION CANADIENNE
-3,3,FOOD BASED ON DATA FROM USDA: SOME NUTRIENTS ANALYZED IN THE CANADIAN PRODUCT,ALIMENT BASÉ SUR LE USDA: CERTAINS ÉLÉMENTS NUTRITIFS ONT ÉTÉ ANALYSÉS DANS LE PRODUIT CANADIEN
-4,4,FOOD BASED ON DATA FROM USDA: SOME NUTRIENTS CALCULATED IN THE CANADIAN PRODUCT,ALIMENT BASÉ SUR LE USDA: CERTAINS ÉLÉMENTS NUTRITIFS ONT ÉTÉ CALCULÉS DANS LE PRODUIT CANADIEN
-6,6,FOOD BASED ON DATA FROM USDA: SOME VALUES SUPPLIED BY MANUFACTURERS OF THE CANADIAN PRODUCT,ALIMENT BASÉ SUR LE USDA: CERTAINES VALEURS ONT ÉTÉ FOURNIES PAR LE MANUFACTURIER DU PRODUIT CANADIEN
-9,9,DATA SUPPLIED BY AN INTERNATIONAL DATABASE OTHER THAN USDA,DONNÉES PROVENANT D'UNE BASE DE DONNÉES AUTRE QUE LE USDA
-20,20,"FOOD AVAILABLE IN THE CANADIAN FOOD SUPPLY, BUT NOT FOUND IN THE USDA: NO CHANGES FROM NUTRITION CANADA SURVEY (1970-1972)","ALIMENT DISPONIBLE SUR LE MARCHÉ CANADIEN, MAIS NON RETROUVÉ DANS LE USDA: AUCUNE MODIFICATION À LA BASE DE DONNÉES DE L'ENQUÊTE NATIONALE DE NUTRITION CANADA (1970-1972)"
-23,23,"FOOD AVAILABLE IN THE CANADIAN FOOD SUPPLY, MAJOR NUTRIENTS ANALYZED IN THE CANADIAN PRODUCT","ALIMENT DISPONIBLE SUR LE MARCHÉ CANADIEN, LA VALEUR DES PRICIPAUX ÉLÉMENTS NUTRITIFS  A ÉTÉ ANALYSÉE DANS LE PRODUIT CANADIEN"
-24,24,MAJOR NUTRIENTS CALCULATED IN THE CANADIAN PRODUCT;  NOT A SNAP-CAN FOOD,ÉLÉMENTS NUTRITIFS PRINCIPAUX CALCULÉS DANS LE PRODUIT CANADIEN; N'EST PAS UN ALIMENT DE PÉAN-CAN
-26,26,"FOOD AVAILABLE IN THE CANADIAN FOOD SUPPLY, BUT NOT FOUND IN USDA: NUTRIENT VALUES SUPPLIED BY MANUFACTURERS OF THE CANADIAN PRODUCT","ALIMENT DISPONIBLE SUR LE MARCHÉ CANADIEN, MAIS NON RETROUVÉ DANS LE USDA: LA VALEUR DES ÉLÉMENTS NUTRITIFS A ÉTÉ FOURNIE PAR LES MANUFACTURIERS DU PRODUIT"
-28,28,TRADITIONAL FOOD,ALIMENT TRADITIONNEL
-29,10,FOOD BASED ON DATA FROM USDA: SOME NUTRIENT ANALYZED IN THE CANADIAN PRODUCT.  FOOD HAS BEEN DELETED FROM USDA,ALIMENT BASÉ SUR LE USDA: LA VALEUR DE CERTAINS ÉLÉMENTS NUTRITIFS A ÉTÉ ANALYSÉE DANS LE PRODUIT CANADIEN.  ALIMENT RETIRÉ DE L'USDA.
-30,11,FOOD BASED ON DATA FROM USDA.  FOOD HAS BEEN DELETED FROM USDA,ALIMENT BASÉ SUR LE USDA.  ALIMENT RETIRÉ DE L'USDA
-35,12,FOOD BASED ON DATA FROM USDA: INFORMATION FROM USDA SURVEY FILES,ALIMENT BASÉ SUR LE USDA: INFORMATION PROVIENT DES FICHIERS DES ENQUÊTES
-36,35,CNF RECIPE COMPILATION,COMPILATION DE RECETTES FCEN
-38,37,CNF Sampling and Analysis Program (SNAP-CAN),Programme d'échantillonage et d'analyse du FCÉN (PÉAÉN-CAN)
+0,0,Food based on data from USDA: No changes,Aliment basé sur le USDA: aucune modification apportée
+1,1,Food based on data from USDA: some nutrients changed to meet Canadian regulations,Aliment basé sur le USDA: certains éléments nutritifs ont été modifiés pour se conformer à la réglementation canadienne
+3,3,Food based on data from USDA: some nutrients analyzed in the Canadian product,Aliment basé sur le USDA: certains éléments nutritifs ont été analysés dans le produit canadien
+4,4,Food based on data from USDA: some nutrients calculated in the Canadian product,Aliment basé sur le USDA: certains éléments nutritifs ont été calculés dans le produit canadien
+6,6,Food based on data from USDA: some values supplied by manufacturers of the Canadian product,Aliment basé sur le USDA: certaines valeurs ont été fournies par le manufacturier du produit canadien
+9,9,Data supplied by an international database other than USDA,Données provenant d'une base de données autre que le USDA
+10,10,Food based on data from USDA: some nutrient analyzed in the Canadian product. Food has been deleted from USDA,Aliment basé sur le USDA: la valeur de certains éléments nutritifs a été analysée dans le produit canadien. Aliment retiré de l'USDA.
+11,11,Food based on data from USDA. Food has been deleted from USDA,Aliment basé sur le USDA. Aliment retiré de l'USDA
+12,12,Food based on data from USDA: information from USDA survey files,Aliment basé sur le USDA: information provient des fichiers des enquêtes
+20,20,"Food available in the Canadian food supply, but not found in the USDA: no changes from Nutrition Canada Survey (1970?1972)","Aliment disponible sur le marché canadien, mais non retrouvé dans le USDA: aucune modification à la base de données de l'Enquête nationale de Nutrition Canada (1970?1972)"
+23,23,"Food available in the Canadian food supply, major nutrients analyzed in the Canadian product","Aliment disponible sur le marché canadien, la valeur des principaux éléments nutritifs a été analysée dans le produit canadien"
+24,24,Major nutrients calculated in the Canadian product; not a SNAP-CAN food,Éléments nutritifs principaux calculés dans le produit canadien; n'est pas un aliment de SNAP-CAN
+26,26,"Food available in the Canadian food supply, but not found in USDA: nutrient values supplied by manufacturers of the Canadian product","Aliment disponible sur le marché canadien, mais non retrouvé dans le USDA: la valeur des éléments nutritifs a été fournie par les manufacturiers du produit"
+28,28,Traditional food,Aliment traditionnel
+35,35,CNF recipe compilation,Compilation de recettes FCÉN
+37,37,CNF Sampling and Analysis Program (SNAP-CAN),Programme d'échantillonage et d'analyse du FCÉN (PÉAÉN-CAN)

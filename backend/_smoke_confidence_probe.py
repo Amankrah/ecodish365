@@ -60,13 +60,13 @@ django.setup()
 PROBES = [
     # (food_id, label, qty_g, hand-labelled difficulty 0..1)
     (502049, 'Lasagna with meat and tomato sauce',           250, 0.10),
-    (501958, 'Macaroni and cheese, prepared',                250, 0.20),
-    (501981, 'Chicken noodle soup, canned, prepared',        250, 0.30),
-    (501999, 'Poutine',                                      250, 0.55),
-    (502000, "Shepherd's pie with corn",                     250, 0.60),
+    (6730, 'Macaroni and cheese, prepared',                250, 0.20),
+    (6754, 'Chicken noodle soup, canned, prepared',        250, 0.30),
+    (6772, 'Poutine',                                      250, 0.55),
+    (6773, "Shepherd's pie with corn",                     250, 0.60),
     (4082,   'Bannock',                                      100, 0.75),
-    (501844, 'Butter tart, with raisins, homemade',           50, 0.80),
-    (502097, 'Tourtiere, homemade',                          150, 0.85),
+    (6621, 'Butter tart, with raisins, homemade',           50, 0.80),
+    (6883, 'Tourtiere, homemade',                          150, 0.85),
 ]
 
 

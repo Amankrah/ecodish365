@@ -9,7 +9,10 @@ Usage (one-time, requires OPENAI_API_KEY):
     cd backend
     python -m heni_calculator.heni.etl.build_cnf_to_fndds_bridge
 
-Outputs:
+Inputs:
+    backend/raw_fndds/FoodData_Central_survey_food_csv_2024-10-31/  (raw FNDDS)
+
+Outputs (derived artifacts, kept next to the consuming module):
     backend/heni_calculator/data/fndds_embeddings.npz      (~30 MB; cached)
     backend/heni_calculator/data/cnf_to_fndds_bridge.json  (the bridge)
 
@@ -41,8 +44,12 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(mess
 
 
 _THIS_DIR = Path(__file__).resolve().parent
+# Derived artifacts live next to the consuming HENI module.
 _DATA_DIR = _THIS_DIR.parent.parent / 'data'
-_FNDDS_DIR = _DATA_DIR / 'FoodData_Central_survey_food_csv_2024-10-31'
+# Immutable raw inputs sit at backend/raw_* alongside raw_cnf / raw_wafct.
+# _THIS_DIR is backend/heni_calculator/heni/etl; parents[2] is backend/.
+_BACKEND_ROOT = _THIS_DIR.parents[2]
+_FNDDS_DIR = _BACKEND_ROOT / 'raw_fndds' / 'FoodData_Central_survey_food_csv_2024-10-31'
 
 FNDDS_EMBEDDINGS_PATH = _DATA_DIR / 'fndds_embeddings.npz'
 CNF_TO_FNDDS_BRIDGE_PATH = _DATA_DIR / 'cnf_to_fndds_bridge.json'
@@ -53,6 +60,45 @@ TOP_K = 20
 MIN_BRIDGE_CONFIDENCE = 0.5
 EMBED_BATCH_SIZE = 256
 RANKING_TEMPERATURE = 0.0
+
+# Pricing snapshot used for the cost projection at --checkpoint-at. Update
+# alongside OpenAI rate changes. USD per 1M tokens.
+_PRICE_EMBED_PER_1M = 0.020   # text-embedding-3-small
+_PRICE_RANK_PROMPT_PER_1M = 0.150
+_PRICE_RANK_COMPLETION_PER_1M = 0.600
+
+# Cumulative token usage across the run (filled by _embed_batch + _rank_with_llm).
+_TOKEN_USAGE: Dict[str, int] = {
+    'embed_prompt': 0,
+    'rank_prompt': 0,
+    'rank_completion': 0,
+}
+
+
+def _accumulated_cost_usd() -> float:
+    """USD spent so far on this run, based on cumulative token usage."""
+    return (
+        _TOKEN_USAGE['embed_prompt'] / 1_000_000 * _PRICE_EMBED_PER_1M
+        + _TOKEN_USAGE['rank_prompt'] / 1_000_000 * _PRICE_RANK_PROMPT_PER_1M
+        + _TOKEN_USAGE['rank_completion'] / 1_000_000 * _PRICE_RANK_COMPLETION_PER_1M
+    )
+
+
+def _log_cost_projection(processed: int, remaining: int) -> float:
+    """Log spend so far + projection for the full remaining queue. Returns
+    projected total USD."""
+    spent = _accumulated_cost_usd()
+    per_food = spent / max(1, processed)
+    projected_total = spent + per_food * remaining
+    logger.info(
+        'COST CHECKPOINT: processed=%d, spent=$%.4f, per-food=$%.5f, '
+        'remaining=%d, projected-additional=$%.4f, projected-total=$%.4f '
+        '(embed=%d, rank-prompt=%d, rank-completion=%d tokens)',
+        processed, spent, per_food, remaining, per_food * remaining, projected_total,
+        _TOKEN_USAGE['embed_prompt'], _TOKEN_USAGE['rank_prompt'],
+        _TOKEN_USAGE['rank_completion'],
+    )
+    return projected_total
 
 
 def _load_fndds_catalog() -> pd.DataFrame:
@@ -116,6 +162,10 @@ def _load_cnf_foods() -> List[Dict]:
 def _embed_batch(client, texts: List[str]) -> np.ndarray:
     """Embed a batch of strings via OpenAI."""
     resp = client.embeddings.create(model=EMBEDDING_MODEL, input=texts)
+    try:
+        _TOKEN_USAGE['embed_prompt'] += int(getattr(resp.usage, 'prompt_tokens', 0) or 0)
+    except Exception:  # noqa: BLE001
+        pass
     return np.array([d.embedding for d in resp.data], dtype=np.float32)
 
 
@@ -198,6 +248,11 @@ def _rank_with_llm(client, cnf_query: str, candidates: pd.DataFrame) -> Optional
             response_format={'type': 'json_object'},
             max_tokens=200,
         )
+        try:
+            _TOKEN_USAGE['rank_prompt'] += int(getattr(resp.usage, 'prompt_tokens', 0) or 0)
+            _TOKEN_USAGE['rank_completion'] += int(getattr(resp.usage, 'completion_tokens', 0) or 0)
+        except Exception:  # noqa: BLE001
+            pass
         parsed = json.loads(resp.choices[0].message.content)
         fdc = int(parsed.get('fdc_id'))
         conf = float(parsed.get('confidence', 0.0))
@@ -248,7 +303,8 @@ def _save_bridge(bridges: Dict[str, Dict], unbridged: List[int],
 
 
 def main(limit: Optional[int] = None,
-         food_ids: Optional[List[int]] = None) -> int:
+         food_ids: Optional[List[int]] = None,
+         checkpoint_at: Optional[int] = None) -> int:
     # Load .env first so OPENAI_API_KEY is populated. env_bootstrap is also
     # imported inside _load_cnf_foods() but that's after the key check.
     _here = Path(__file__).resolve()
@@ -324,7 +380,18 @@ def main(limit: Optional[int] = None,
             logger.info('progress: %d / %d processed (%d bridged, %d unbridged)',
                         i, len(to_process), len(bridges), len(unbridged))
 
+        if checkpoint_at is not None and i >= checkpoint_at:
+            _save_bridge(bridges, unbridged, len(cnf_foods), len(fndds))
+            _log_cost_projection(processed=i, remaining=len(to_process) - i)
+            logger.info(
+                '--checkpoint-at %d reached; exiting cleanly. '
+                'Re-run without the flag to resume from the saved bridge.',
+                checkpoint_at,
+            )
+            return 0
+
     _save_bridge(bridges, unbridged, len(cnf_foods), len(fndds))
+    _log_cost_projection(processed=len(to_process), remaining=0)
     logger.info('DONE. bridged=%d unbridged=%d out=%s',
                 len(bridges), len(unbridged), CNF_TO_FNDDS_BRIDGE_PATH)
     return 0
@@ -337,8 +404,11 @@ if __name__ == '__main__':
                    help='Bridge only the first N CNF foods (for smoke testing)')
     p.add_argument('--food-ids', type=str, default=None,
                    help='Bridge only these CNF FoodIDs (comma-separated)')
+    p.add_argument('--checkpoint-at', type=int, default=None,
+                   help='Exit cleanly after processing N newly-bridged foods and '
+                        'log a cost projection. Re-run without the flag to resume.')
     args = p.parse_args()
     fids = None
     if args.food_ids:
         fids = [int(x.strip()) for x in args.food_ids.split(',') if x.strip()]
-    sys.exit(main(limit=args.limit, food_ids=fids))
+    sys.exit(main(limit=args.limit, food_ids=fids, checkpoint_at=args.checkpoint_at))

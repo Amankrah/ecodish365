@@ -1,12 +1,12 @@
 {
   "harness": "HSR categorisation smoke + stress test",
   "summary": {
-    "pass": 36,
-    "fail": 0,
+    "pass": 35,
+    "fail": 1,
     "total": 36,
     "panel_a_pass": 20,
     "panel_a_total": 20,
-    "panel_b_pass": 8,
+    "panel_b_pass": 7,
     "panel_b_total": 8,
     "panel_c_pass": 8,
     "panel_c_total": 8
@@ -136,7 +136,7 @@
     {
       "panel": "A",
       "name": "Yogourt, plain, fat-free",
-      "food_id": 502157,
+      "food_id": 6948,
       "expected_category": "2D",
       "observed_category": "2D",
       "observed_confidence": 0.9,
@@ -147,7 +147,7 @@
     {
       "panel": "A",
       "name": "Yogourt, Greek, plain, fat-free",
-      "food_id": 502188,
+      "food_id": 6979,
       "expected_category": "2D",
       "observed_category": "2D",
       "observed_confidence": 0.9,
@@ -169,7 +169,7 @@
     {
       "panel": "A",
       "name": "Margarine, stick, canola/soybean",
-      "food_id": 502758,
+      "food_id": 7458,
       "expected_category": "3",
       "observed_category": "3",
       "observed_confidence": 0.9,
@@ -237,11 +237,11 @@
       "name": "Milk shake, chocolate, thick (FG14)",
       "food_id": 75,
       "expected_category": "1D",
-      "observed_category": "1D",
+      "observed_category": "1",
       "observed_confidence": 0.9,
       "observed_meal_confidence": null,
-      "passed": true,
-      "detail": "FG14 beverage with milk keyword \u2192 1D override (correct)"
+      "passed": false,
+      "detail": "expected '1D', got '1' \u2014 FG14 beverage with milk keyword \u2192 1D override (correct)"
     },
     {
       "panel": "B",
@@ -312,7 +312,7 @@
     {
       "panel": "B",
       "name": "Yogourt parfait, fruit, granola, reduced-fat",
-      "food_id": 502041,
+      "food_id": 6821,
       "expected_category": "2D",
       "observed_category": "2D",
       "observed_confidence": 0.9,

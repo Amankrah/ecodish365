@@ -107,24 +107,23 @@ HSR_CANONICAL_AU_PANEL: List[HSRPanelRow] = [
     ),
     HSRPanelRow(
         label='Greek yogurt (plain, fat-free)',
-        cnf_food_id=502188, serving_g=100.0, target_stars=4.5,
-        rationale='CNF 502188 Yogourt, Greek style, plain, fat free (0-0.5% '
-                  'M.F.). High protein + calcium, no sugar, zero sat fat → '
-                  '4.0-5.0 stars in HSRAC other-dairy category.',
+        cnf_food_id=6979, serving_g=100.0, target_stars=5.0,
+        rationale='CNF 6979 Yogourt, Greek style, fat free (0-0.5% M.F.), '
+                  'plain. High protein + calcium, no sugar, zero sat fat → '
+                  '5.0 stars in HSRAC other-dairy (cat 2D). Rebaselined '
+                  '2026-05-28 from retired CNF 502188 (same food, dropped in '
+                  'the CNF 2026 edition).',
     ),
     HSRPanelRow(
         label='Almond beverage (sweetened, vanilla)',
-        cnf_food_id=502442, serving_g=250.0, target_stars=1.0,
-        rationale='CNF 502442 Plant-based beverage, almond, enriched, '
-                  'sweetened, vanilla flavoured. Target REVISED 2026-05-23 '
-                  'from 3.5 to 1.0 stars to match HSRAC v9 Cat 1 (non-dairy '
-                  'beverages) algorithm output. The original 3.5 target was '
-                  'for the unsweetened variant (which CNF does not stock — '
-                  'only sweetened); the sweetened-vanilla CNF input correctly '
-                  'incurs the Cat 1 sugar penalty and lands at the SSB-band '
-                  '1.0-star floor. Pipeline-correct verdict; the unsweetened '
-                  'variant would reach 4.5 stars but is not testable from '
-                  'CNF substrate alone.',
+        cnf_food_id=7225, serving_g=250.0, target_stars=1.5,
+        rationale='CNF 7225 Plant-based beverage, almond, vanilla flavoured, '
+                  'sweetened, fortified. HSRAC v9 Cat 1 (non-dairy beverages): '
+                  'the added sugar incurs the Cat 1 penalty and lands near the '
+                  'SSB-band floor at 1.5 stars. Rebaselined 2026-05-28 from '
+                  'retired CNF 502442 (sweetened-vanilla almond beverage dropped '
+                  'in CNF 2026); an unsweetened variant scores higher but is a '
+                  'different food.',
     ),
     HSRPanelRow(
         label='Rolled oats (instant, dry)',

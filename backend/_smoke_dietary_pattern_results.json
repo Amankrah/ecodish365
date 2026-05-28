@@ -13,42 +13,32 @@
         "relaxed_correct": 21,
         "eat_lancet_skipped": 3,
         "failures": [
-          "(co-leading) vegetarian::Lacto-ovo balanced day with whole grains + legumes → top=dash (cos 0.945); expected vegetarian at 0.936 (Δ 0.009)"
+          "(co-leading) vegetarian::Lacto-ovo balanced day with whole grains + legumes → top=dash (cos 0.948); expected vegetarian at 0.932 (Δ 0.016)"
         ]
       }
     },
     {
       "gate": "G2 Cross-distinguishability (individual-mode prototypes)",
       "passed": true,
-      "detail": "median cross-prototype cosine = 0.827 (≤ 0.92 threshold); max pair vegan vs vegetarian = 0.956",
+      "detail": "median cross-prototype cosine = 0.825 (≤ 0.92 threshold); max pair vegan vs vegetarian = 0.958",
       "metrics": {
-        "median_cross_cosine": 0.827,
+        "median_cross_cosine": 0.825,
         "threshold": 0.92,
         "max_pair": [
           "vegan",
           "vegetarian",
-          0.956
+          0.958
         ],
         "all_pairs": [
           [
             "vegan",
             "vegetarian",
-            0.956
+            0.958
           ],
           [
             "mediterranean",
             "vegan",
-            0.954
-          ],
-          [
-            "cfg_healthy",
-            "vegan",
-            0.952
-          ],
-          [
-            "cfg_healthy",
-            "mediterranean",
-            0.946
+            0.949
           ],
           [
             "mediterranean",
@@ -57,48 +47,53 @@
           ],
           [
             "cfg_healthy",
-            "dash",
-            0.942
+            "vegan",
+            0.94
           ],
           [
-            "dash",
-            "vegetarian",
-            0.937
+            "cfg_healthy",
+            "mediterranean",
+            0.936
           ],
           [
             "cfg_healthy",
             "vegetarian",
-            0.935
+            0.922
+          ],
+          [
+            "cfg_healthy",
+            "dash",
+            0.922
+          ],
+          [
+            "dash",
+            "vegetarian",
+            0.915
           ],
           [
             "dash",
             "mediterranean",
-            0.913
+            0.883
           ],
           [
             "dash",
             "vegan",
-            0.886
+            0.855
           ],
           [
             "mediterranean",
             "west_african_staple",
-            0.827
+            0.825
           ],
           [
             "cfg_healthy",
             "west_african_staple",
-            0.817
+            0.813
           ],
           [
             "vegetarian",
             "west_african_staple",
-            0.81
-          ],
-          [
-            "dash",
-            "west_african_staple",
-            0.806
+            0.811
           ],
           [
             "vegan",
@@ -107,33 +102,38 @@
           ],
           [
             "dash",
+            "west_african_staple",
+            0.8
+          ],
+          [
+            "dash",
             "western",
-            0.803
+            0.799
           ],
           [
             "vegetarian",
             "western",
-            0.787
+            0.781
           ],
           [
             "mediterranean",
             "western",
-            0.783
+            0.778
           ],
           [
             "vegan",
             "western",
-            0.767
+            0.763
           ],
           [
             "cfg_healthy",
             "western",
-            0.756
+            0.752
           ],
           [
             "west_african_staple",
             "western",
-            0.711
+            0.712
           ]
         ],
         "note": "EAT-Lancet excluded (researcher-mode-only composite by design)"
@@ -151,8 +151,8 @@
             "name": "Greek-village day (olive oil + feta + salmon + kale + lentils)",
             "expected": "mediterranean",
             "got": "mediterranean",
-            "cosine": 0.96,
-            "expected_cosine": 0.96,
+            "cosine": 0.962,
+            "expected_cosine": 0.962,
             "verdict": "top-1",
             "pass": true
           },
@@ -160,8 +160,8 @@
             "name": "Indian vegetarian thali (rice + dal + paneer + greens)",
             "expected": "vegetarian",
             "got": "vegetarian",
-            "cosine": 0.976,
-            "expected_cosine": 0.976,
+            "cosine": 0.973,
+            "expected_cosine": 0.973,
             "verdict": "top-1",
             "pass": true
           },
@@ -187,8 +187,8 @@
             "name": "Vegan tofu-stir-fry day (tofu + soy beverage + greens + rice)",
             "expected": "vegan",
             "got": "vegan",
-            "cosine": 0.963,
-            "expected_cosine": 0.963,
+            "cosine": 0.961,
+            "expected_cosine": 0.961,
             "verdict": "top-1",
             "pass": true
           },
@@ -196,8 +196,8 @@
             "name": "DASH-style day (whole wheat + chicken + low-fat dairy + broccoli + walnuts)",
             "expected": "dash",
             "got": "dash",
-            "cosine": 0.979,
-            "expected_cosine": 0.979,
+            "cosine": 0.981,
+            "expected_cosine": 0.981,
             "verdict": "top-1",
             "pass": true
           },
@@ -205,8 +205,8 @@
             "name": "CFG-Healthy plate day (half veg, whole grain, plant protein)",
             "expected": "cfg_healthy",
             "got": "cfg_healthy",
-            "cosine": 0.958,
-            "expected_cosine": 0.958,
+            "cosine": 0.941,
+            "expected_cosine": 0.941,
             "verdict": "top-1",
             "pass": true
           },
@@ -214,8 +214,8 @@
             "name": "EAT-Lancet reference day (whole grains + tofu + legumes + vegetables)",
             "expected": "eat_lancet",
             "got": "eat_lancet",
-            "cosine": 0.985,
-            "expected_cosine": 0.985,
+            "cosine": 0.978,
+            "expected_cosine": 0.978,
             "verdict": "top-1",
             "pass": true
           },
@@ -223,8 +223,8 @@
             "name": "Italian Mediterranean day (pasta + olive oil + tomato + chickpea)",
             "expected": "mediterranean",
             "got": "mediterranean",
-            "cosine": 0.948,
-            "expected_cosine": 0.948,
+            "cosine": 0.945,
+            "expected_cosine": 0.945,
             "verdict": "top-1",
             "pass": true
           },
@@ -254,23 +254,23 @@
           ],
           [
             "mediterranean",
-            0.812
+            0.808
           ],
           [
             "cfg_healthy",
-            0.799
+            0.791
           ],
           [
             "vegan",
-            0.789
+            0.787
           ],
           [
             "vegetarian",
-            0.784
+            0.781
           ],
           [
             "dash",
-            0.764
+            0.749
           ],
           [
             "western",
@@ -298,7 +298,7 @@
               "vegan"
             ],
             "matches_base": true,
-            "top_cosine": 0.96
+            "top_cosine": 0.962
           },
           {
             "scale": 2.0,
@@ -308,7 +308,7 @@
               "vegan"
             ],
             "matches_base": true,
-            "top_cosine": 0.96
+            "top_cosine": 0.962
           },
           {
             "scale": 5.0,
@@ -318,7 +318,7 @@
               "vegan"
             ],
             "matches_base": true,
-            "top_cosine": 0.96
+            "top_cosine": 0.962
           }
         ]
       }

@@ -19,8 +19,8 @@ specific FCS values:
 Per-food gates: the actual FCS must fall in its expected band.
 Cross-panel gate: directional rank — any encourage food's FCS must exceed
 any limit food's FCS. Plus a single pytest-anchored regression: CNF FoodID
-29 (Cheese, edam) must reproduce FCS=21.61 from the FCS-CODE-1 (2026-05-21)
-Mozaffarian rescaling formula audit (pinned in
+29 (Cheese, edam, mini wheel) must reproduce FCS=16.49 under the CNF 2026
+edition (rebaselined 2026-05-28; pinned in
 `fcs_calculator/tests/test_fcs_rust.py::test_golden_food_29_scores_stable`).
 
 Run from `backend/`:
@@ -77,16 +77,12 @@ FCS_CANONICAL_PANEL: List[FCSPanelRow] = [
     # Moderate band — dairy, juice, refined grain in modest amounts
     FCSPanelRow('Milk, fluid, whole 3.25%', 113, 'moderate',
                 'Dairy beverage: protein + calcium offset moderate sat fat.'),
-    FCSPanelRow('Yogurt, Greek style, plain, fat free', 502188, 'encourage',
+    FCSPanelRow('Yogurt, Greek style, fat free, plain', 6979, 'encourage',
                 'Plain fat-free Greek yogurt: high protein, calcium, no added '
-                'sugar, fermented dairy. REVISED 2026-05-23 (target moderate '
-                '-> encourage) after the NOVA classifier refactor also fixed '
-                'a latent YOGURT-detection bug — the previous "YOGURT in desc" '
-                'check missed the Canadian "YOGOURT" spelling, so Greek '
-                'yogurt did not receive the yogurt food_ingredients attribute. '
-                'With the attribute correctly set, plain fat-free Greek yogurt '
-                'lands at FCS 84.1, in the top decile of Mozaffarian 2021\'s '
-                'NHANES distribution (only ~0.5%% of foods score >=70).'),
+                'sugar, fermented dairy. Rebaselined 2026-05-28 from retired '
+                'CNF 502188 to CNF 6979 (same food, renumbered in the CNF 2026 '
+                'edition). Lands at FCS 84.1, in the top decile of Mozaffarian '
+                '2021\'s NHANES distribution (only ~0.5%% of foods score >=70).'),
     FCSPanelRow('Apple juice, canned/bottled', 1495, 'moderate',
                 '100% juice: no added sugar, some fruit nutrients but no '
                 'fibre — Mozaffarian Discussion identifies juices as a '
@@ -108,11 +104,12 @@ FCS_CANONICAL_PANEL: List[FCSPanelRow] = [
 
 
 # Golden test (mirrors `fcs_calculator/tests/test_fcs_rust.py::test_golden_food_29_scores_stable`).
-# Pinned by the FCS-CODE-1 (2026-05-21) Mozaffarian rescaling formula audit:
+# Mozaffarian rescaling formula (FCS-CODE-1, 2026-05-21):
 #   FCS = 100 - ((26.1 - original_score) / 36.7) × 99
-# For food_id=29 (Cheese, edam) original_score=12.07, FCS=21.61.
+# Rebaselined 2026-05-28 to the CNF 2026 edition: food_id=29 is now
+# "Cheese, edam, mini wheel" with original_score=-4.86, FCS=16.49.
 GOLDEN_FOOD_ID = 29
-GOLDEN_FCS_EXPECTED = 21.61
+GOLDEN_FCS_EXPECTED = 16.49
 GOLDEN_FCS_TOLERANCE = 0.5  # generous; tighter pinning is in pytest
 
 
@@ -243,8 +240,8 @@ def main() -> int:
                                  f'(encourage >= {BAND_ENCOURAGE_FLOOR}; limit <= {BAND_LIMIT_CEILING}; '
                                  'moderate in between)',
                 'directional_rank': 'min(FCS of encourage foods) > max(FCS of limit foods)',
-                'golden_regression': f'food_id={GOLDEN_FOOD_ID} (Cheese, edam) must reproduce '
-                                     f'FCS={GOLDEN_FCS_EXPECTED} from FCS-CODE-1 audit',
+                'golden_regression': f'food_id={GOLDEN_FOOD_ID} (Cheese, edam, mini wheel) must reproduce '
+                                     f'FCS={GOLDEN_FCS_EXPECTED} under the CNF 2026 edition',
             },
             'summary': {
                 'n_pass_band': n_pass,
@@ -261,9 +258,9 @@ def main() -> int:
                 'O\'Hearn 2022 NHANES distribution: ~33% limit, ~67% moderate, ~0.5% encourage '
                 '(the encourage band is exclusive in practice). Our smoke panel oversamples '
                 'the encourage and limit bands for dynamic-range testing.',
-                'The golden regression at food_id=29 reproduces the FCS-CODE-1 (2026-05-21) '
-                'Mozaffarian rescaling formula audit value (21.61); tighter pinning '
-                '(+-0.01) lives in pytest at fcs_calculator/tests/test_fcs_rust.py.',
+                'The golden regression at food_id=29 reproduces the CNF 2026 edition '
+                'value (16.49) via the FCS-CODE-1 Mozaffarian rescaling formula; tighter '
+                'pinning (+-0.01) lives in pytest at fcs_calculator/tests/test_fcs_rust.py.',
             ],
             'rows': results,
         }, f, indent=2)

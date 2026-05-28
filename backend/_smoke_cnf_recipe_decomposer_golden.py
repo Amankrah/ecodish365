@@ -62,7 +62,9 @@ GOLDEN_PANEL: List[GoldenRecipe] = [
         total_mass_g=80.0,
         expected_ingredients={
             4066: 50.0,    # Bread, white, commercial
-            3414: 25.0,    # Peanut butter, smooth type, fat and sugar added
+            3399: 25.0,    # Peanut butter, smooth type, fat, sugar and salt added
+                           # (rebaselined 2026-05-28: the CNF 2026 embeddings rank this
+                           #  interchangeable smooth peanut butter above 3414)
         },
         expected_resolved_mass_g=75.0,
         expected_unresolved_mass_g=5.0,
@@ -84,7 +86,7 @@ GOLDEN_PANEL: List[GoldenRecipe] = [
         total_mass_g=120.0,
         expected_ingredients={
             4066:    70.0, # Bread, white, commercial
-            502213:  30.0, # Cheese, processed product, cheddar, slices
+            7005:  30.0, # Cheese, processed product, cheddar, slices
             118:     10.0, # Butter, regular
         },
         expected_resolved_mass_g=110.0,

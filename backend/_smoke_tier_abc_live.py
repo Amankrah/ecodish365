@@ -161,7 +161,7 @@ def run() -> int:
     #   - Cheeseburger with condiments (Fast Foods)
     decomposer_test_foods = [
         (924,    'Soup, bean with bacon, canned, condensed',          'Soups, Sauces and Gravies', 250),
-        (501969, 'Lasagna with meat sauce, homemade',                 'Mixed Dishes',              250),
+        (5870, 'Lasagna with meat sauce, homemade',                 'Mixed Dishes',              250),
         (4617,   'Fast foods, cheeseburger with condiments',          'Fast Foods',                150),
     ]
     decomp_summaries = []
@@ -210,7 +210,7 @@ def run() -> int:
     hr('Cross-tier check: decomposition consistency vs Agribalyse direct match')
     # Run lasagna once with decomposer on (Tier γ may fire if matcher fails),
     # once with decomposer off (matcher only) → compare GW magnitudes.
-    fid_lasagna = 501969
+    fid_lasagna = 5870
     qty = 250
     results = {}
     for flag in (False, True):

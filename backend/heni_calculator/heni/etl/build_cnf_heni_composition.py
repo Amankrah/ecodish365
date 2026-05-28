@@ -54,9 +54,13 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(mess
 
 
 _THIS_DIR = Path(__file__).resolve().parent
+# Derived artifacts (bridge + composition JSON + meta) live next to the
+# HENI module that consumes them.
 _DATA_DIR = _THIS_DIR.parent.parent / 'data'
-_FNDDS_DIR = _DATA_DIR / 'FoodData_Central_survey_food_csv_2024-10-31'
-_FPED_PATH = _DATA_DIR / 'FPED_1718.xls'
+# Immutable raw inputs sit at backend/raw_* alongside raw_cnf / raw_wafct.
+_BACKEND_ROOT = _THIS_DIR.parents[2]
+_FNDDS_DIR = _BACKEND_ROOT / 'raw_fndds' / 'FoodData_Central_survey_food_csv_2024-10-31'
+_FPED_PATH = _BACKEND_ROOT / 'raw_fped' / 'FPED_1718.xls'
 
 BRIDGE_PATH = _DATA_DIR / 'cnf_to_fndds_bridge.json'
 COMPOSITION_PATH = _DATA_DIR / 'cnf_heni_composition.json'

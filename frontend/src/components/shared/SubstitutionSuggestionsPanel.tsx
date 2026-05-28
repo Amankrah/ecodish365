@@ -443,7 +443,7 @@ export function SubstitutionSuggestionsPanel({
                     type="button"
                     onClick={() => handleApply(s, i)}
                     disabled={applied || isRefreshing}
-                    aria-pressed={applied}
+                    {...(applied ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
                     className={`flex-shrink-0 inline-flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-md ${
                       applied
                         ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 cursor-default'

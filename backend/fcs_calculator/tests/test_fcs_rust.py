@@ -37,22 +37,23 @@ class FCSRustIntegrationTests(TestCase):
         self.assertLessEqual(result["fcs"], 100.0)
 
     def test_golden_food_29_scores_stable(self):
-        """Golden FCS for food_id 29. Recomputed 2026-05-21 under FCS-CODE-1
-        (Mozaffarian 2021 SI Table S3 rescaling). Pre-audit value was 48.41
-        under the incorrect [-70, +70] linear stretch; the new value is the
-        Mozaffarian formula applied to the same upstream raw score (-2.96):
-        100 - ((26.1 - (-2.96)) / 36.7) × 99 ≈ 21.60.
+        """Golden FCS for food_id 29. Rebaselined 2026-05-28 against the CNF 2026
+        edition (food 29 = "Cheese, edam, mini wheel"; the 2015 edition called it
+        "Cheese, edam" with different nutrient values). Under CNF 2026 the upstream
+        raw score is -4.86, so the Mozaffarian 2021 SI Table S3 rescaling gives
+        100 - ((26.1 - (-4.86)) / 36.7) × 99 ≈ 16.49. The methodology is unchanged;
+        only the underlying nutrient data moved with the edition upgrade.
         (36.7 is the denominator Mozaffarian publishes verbatim, rounded from
         the derived range 26.1 - (-10.7) = 36.8.)
 
-        Update expected values only when FCS methodology intentionally changes.
+        Update expected values only when FCS methodology or the CNF edition changes.
         """
         food_item = FoodItem("Golden test")
         create_cnf_integrator().extract_nutrients_enhanced([29], food_item)
         result = FoodAnalyzer().analyze_food_item(food_item)
 
-        self.assertEqual(result["original_score"], -2.96)
-        self.assertEqual(result["fcs"], 21.61)
+        self.assertEqual(result["original_score"], -4.86)
+        self.assertEqual(result["fcs"], 16.49)
         self.assertEqual(result["nova_category"], "PROCESSED_FOODS")
 
     def test_multi_food_wafct_combo_not_inflated_to_100(self):
