@@ -26,6 +26,7 @@ import { FoodDetailDrawer } from '@/components/cnf/FoodProfileContent';
 import { appendToActiveFoodList } from '@/lib/activeFoodList';
 import { LENS_NUTRIENT_PANELS } from '@/lib/cnfNutrientPanels';
 import { NutrientDiscoverPanel } from '@/components/cnf/NutrientDiscoverPanel';
+import { percentDV } from '@/lib/cnfDailyValues';
 
 type AddFoodMode = 'search' | 'discover';
 
@@ -424,6 +425,19 @@ function CNFComparePageContent() {
   const getNutrientValue = (foodId: number, nutrientKey: string): number | null =>
     getNutrientCell(foodId, nutrientKey)?.value ?? null;
 
+  // Look up a food's value for a specific CNF NutrientID (used to sum saturated + trans
+  // for the %DV, since Health Canada's saturated-fat DV applies to the combined total).
+  const getValueByNutrientId = (foodId: number, nutrientId: number): number | null => {
+    const comp = comparisonData.comparison;
+    if (!comp) return null;
+    for (const key of Object.keys(comp.nutrients)) {
+      if (comp.nutrients[key].nutrient_id === nutrientId) {
+        return comp.nutrients[key].by_food_id?.[String(foodId)]?.value ?? null;
+      }
+    }
+    return null;
+  };
+
   const getHighestValue = (nutrientName: string): number => {
     if (!comparisonData.comparison) return 0;
     
@@ -610,7 +624,7 @@ function CNFComparePageContent() {
                 <div className="flex items-center space-x-2">
                   <InformationCircleIcon className="w-4 h-4 text-gray-400" />
                   <span className="text-xs text-gray-500">
-                    Values per 100 g (units shown) • Green bars indicate highest values
+                    Values per 100 g (units shown) • % DV vs Health Canada Daily Values • Green bars indicate highest values
                   </span>
                 </div>
               </div>
@@ -696,6 +710,10 @@ function CNFComparePageContent() {
                             const unit = cell?.unit;
                             const percentage = getValuePercentage(value, maxValue);
                             const isHighest = value === maxValue && value !== null && value > 0;
+                            const pdv = (value !== null && entry)
+                              ? percentDV(entry.nutrient_id, value,
+                                  (otherId) => getValueByNutrientId(food.FoodID, otherId))
+                              : null;
                             const sourceTitle = cell?.nutrient_source
                               ? `${cell.database?.toUpperCase() ?? 'CNF'} · ${cell.nutrient_source}`
                               : undefined;
@@ -718,13 +736,18 @@ function CNFComparePageContent() {
                                       )}
                                     </div>
                                     <div className="w-full bg-gray-200 rounded-full h-2">
-                                      <div 
+                                      <div
                                         className={`h-2 rounded-full transition-all duration-300 ${
                                           isHighest ? 'bg-green-500' : 'bg-primary-500'
                                         }`}
                                         style={{ width: `${percentage}%` }}
                                       />
                                     </div>
+                                    {pdv !== null && (
+                                      <div className="text-[11px] text-gray-500 tabular-nums" title="% of the Health Canada Daily Value">
+                                        {Math.round(pdv)}% DV
+                                      </div>
+                                    )}
                                   </div>
                                 ) : (
                                   <div className="flex items-center text-gray-400">
@@ -741,6 +764,13 @@ function CNFComparePageContent() {
                   })()}
                 </tbody>
               </table>
+            </div>
+            <div className="px-6 py-3 border-t border-gray-200 text-xs text-gray-500 leading-relaxed">
+              <strong>% DV</strong> is the share of the Health Canada Daily Value contributed per 100 g
+              (adult reference; Table of Daily Values, 2022). Saturated fat is shown against the combined
+              saturated + trans limit. Cholesterol, protein, and total carbohydrate carry no %DV in Canada,
+              and iodide, chromium, molybdenum, and chloride aren&rsquo;t recorded in the CNF, so no %DV
+              appears for those.
             </div>
           </div>
         )}
