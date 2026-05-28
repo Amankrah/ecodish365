@@ -26,6 +26,7 @@ import { SubstitutionSuggestionsPanel } from '@/components/shared/SubstitutionSu
 import { useRecall24hReceiver } from '@/components/shared/useRecall24hReceiver';
 import {
   loadActiveFoodList, saveActiveFoodList, ACTIVE_FOOD_LIST_EVENT,
+  type ActiveFoodList,
 } from '@/lib/activeFoodList';
 import type { SubstitutionCompositionItem, SubstitutionSuggestion } from '@/lib/api';
 import {
@@ -117,6 +118,7 @@ export default function ScorecardPage(): JSX.Element {
       food_id: i.food_id,
       mass_g: i.mass_g,
       food_description: i.food_description,
+      food_group: i.food_group,
     })),
     [list],
   );

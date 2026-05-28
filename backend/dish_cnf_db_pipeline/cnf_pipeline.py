@@ -344,6 +344,21 @@ class CNFDataPipeline:
                     601,  # CHOLESTEROL
                 ]
             
+            # FoodID → database provenance (CNF vs WAFCT) for per-cell metadata.
+            food_name_df = self.data_loader.food_name_df
+            has_source_col = 'source' in food_name_df.columns
+            food_database: Dict[int, str] = {}
+            for fid in food_ids:
+                row = food_name_df[food_name_df['FoodID'] == fid]
+                if row.empty:
+                    food_database[fid] = 'cnf'
+                elif has_source_col:
+                    food_database[fid] = str(row['source'].iloc[0])
+                else:
+                    food_database[fid] = 'cnf'
+
+            nutrient_source_df = self.data_loader.nutrient_source_df
+
             for nutrient_id in target_nutrients:
                 nutrient_data = self.data_loader.nutrient_amount_df[
                     (self.data_loader.nutrient_amount_df['NutrientID'] == nutrient_id) &
@@ -361,13 +376,32 @@ class CNFDataPipeline:
                     comparison_data['nutrients'][nutrient_name] = {
                         'nutrient_id': nutrient_id,
                         'unit': nutrient_unit,
-                        'values': {}
+                        'values': {},
+                        'by_food_id': {},
                     }
                     
                     for _, row in nutrient_data.iterrows():
-                        food_id = row['FoodID']
+                        food_id = int(row['FoodID'])
                         food_name = next((f['FoodDescription'] for f in comparison_data['foods'] if f['FoodID'] == food_id), f"Food {food_id}")
-                        comparison_data['nutrients'][nutrient_name]['values'][food_name] = float(row['NutrientValue'])
+                        value = float(row['NutrientValue'])
+                        comparison_data['nutrients'][nutrient_name]['values'][food_name] = value
+
+                        ns_id = int(row.get('NutrientSourceID', 0) or 0)
+                        ns_row = nutrient_source_df[
+                            nutrient_source_df['NutrientSourceID'] == ns_id
+                        ]
+                        nutrient_source = (
+                            str(ns_row['NutrientSourceDescription'].iloc[0])
+                            if not ns_row.empty else 'Unknown'
+                        )
+
+                        comparison_data['nutrients'][nutrient_name]['by_food_id'][str(food_id)] = {
+                            'value': value,
+                            'unit': str(nutrient_unit),
+                            'nutrient_source_id': ns_id,
+                            'nutrient_source': nutrient_source,
+                            'database': food_database.get(food_id, 'cnf'),
+                        }
             
             return comparison_data
             
