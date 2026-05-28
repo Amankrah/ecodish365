@@ -1,14 +1,14 @@
 {
   "_provenance": {
-    "date_utc": "2026-05-28T15:45:02Z",
+    "date_utc": "2026-05-28T16:06:22Z",
     "embedding_model": "text-embedding-3-small",
     "ranking_model": "gpt-4.1-mini",
     "top_k": 20,
     "min_bridge_confidence": 0.5,
     "cnf_total": 7021,
     "fndds_total": 5432,
-    "cnf_bridged": 7807,
-    "cnf_unbridged": 339
+    "cnf_bridged": 7765,
+    "cnf_unbridged": 381
   },
   "bridges": {
     "2": {
@@ -29621,18 +29621,6 @@
       "confidence": 0.7,
       "rationale": "Bread, white is a close analog to tea bread, white as both are yeast breads with similar base ingredients and preparation."
     },
-    "700000": {
-      "fdc_id": 2708375,
-      "food_code": 56201517,
-      "confidence": 0.5,
-      "rationale": "Cornmeal mush is a cooked cereal porridge similar in category to sorghum porridge but differs in ingredients and flavor profile."
-    },
-    "700001": {
-      "fdc_id": 2708375,
-      "food_code": 56201517,
-      "confidence": 0.5,
-      "rationale": "Cornmeal mush with fat added is a plausible analog to sorghum porridge with potash, water, and sugar as both are cooked cereal porridges, though ingredients differ."
-    },
     "700002": {
       "fdc_id": 2708373,
       "food_code": 56201515,
@@ -29644,12 +29632,6 @@
       "food_code": 52104040,
       "confidence": 0.7,
       "rationale": "This entry is a plain wheat biscuit, closely matching the CNF sweet plain biscuit but may differ slightly in sweetness or fortification."
-    },
-    "700004": {
-      "fdc_id": 2706726,
-      "food_code": 27363000,
-      "confidence": 0.5,
-      "rationale": "Boalboal is a millet ball dish with fried fish and vegetables, and gumbo with rice is a mixed dish with seafood and vegetables, making it a plausible analog though ingredients and base differ."
     },
     "700005": {
       "fdc_id": 2707598,
@@ -29699,107 +29681,17 @@
       "confidence": 0.9,
       "rationale": "Exact match with same food description 'Croissant' indicating a direct equivalent."
     },
-    "700013": {
-      "fdc_id": 2708489,
-      "food_code": 57602100,
-      "confidence": 0.5,
-      "rationale": "Fonio is a whole grain cereal similar to oats, raw, making oats the closest plausible analog among candidates."
-    },
-    "700014": {
-      "fdc_id": 2710789,
-      "food_code": 99995625,
-      "confidence": 0.5,
-      "rationale": "Brown rice cooked as ingredient is a plausible analog to boiled whole grain fonio due to similar cereal grain category and cooking method, though not the same grain."
-    },
-    "700015": {
-      "fdc_id": 2708358,
-      "food_code": 56132990,
-      "confidence": 0.5,
-      "rationale": "Fonio is a cereal grain similar to whole grain pasta, making whole grain cooked pasta a plausible analog."
-    },
-    "700016": {
-      "fdc_id": 2708489,
-      "food_code": 57602100,
-      "confidence": 0.5,
-      "rationale": "Fonio is a cereal grain similar to oats in category, but no exact match exists; oats raw is a plausible analog."
-    },
-    "700017": {
-      "fdc_id": 2708375,
-      "food_code": 56201517,
-      "confidence": 0.5,
-      "rationale": "Cornmeal mush, fat added is a plausible analog as a cooked cereal grain dish, though not the same grain as fonio."
-    },
-    "700018": {
-      "fdc_id": 2708360,
-      "food_code": 56200300,
-      "confidence": 0.5,
-      "rationale": "Fonio is a cooked cereal grain; the closest analog is a generic cooked cereal, though not the same grain."
-    },
-    "700019": {
-      "fdc_id": 2708489,
-      "food_code": 57602100,
-      "confidence": 0.5,
-      "rationale": "Fonio is a cereal grain similar to oats in category, but no exact match exists in candidates."
-    },
-    "700020": {
-      "fdc_id": 2708375,
-      "food_code": 56201517,
-      "confidence": 0.5,
-      "rationale": "Fonio is a cooked cereal grain similar to cornmeal mush, but exact match is unavailable, so cornmeal mush is a plausible analog."
-    },
-    "700021": {
-      "fdc_id": 2708375,
-      "food_code": 56201517,
-      "confidence": 0.5,
-      "rationale": "Fonio is a cooked cereal grain similar to cornmeal mush, making this a plausible analog though not a direct equivalent."
-    },
-    "700022": {
-      "fdc_id": 2708489,
-      "food_code": 57602100,
-      "confidence": 0.5,
-      "rationale": "Fonio is a whole grain cereal similar to oats, and oats raw is the closest whole grain raw cereal in the candidates."
-    },
-    "700023": {
-      "fdc_id": 2710788,
-      "food_code": 99995620,
-      "confidence": 0.5,
-      "rationale": "Fonio is a whole grain cereal, and the closest available analog is white cooked rice as an ingredient, which is a cooked grain but not the same species."
-    },
     "700024": {
       "fdc_id": 2708408,
       "food_code": 56205008,
       "confidence": 0.7,
       "rationale": "Rice, white, cooked, no added fat is a close analog to boiled whole grain fonio without salt as both are cooked whole grains without added fat."
     },
-    "700025": {
-      "fdc_id": 2705686,
-      "food_code": 13210450,
-      "confidence": 0.5,
-      "rationale": "Fura saamdin is a fermented millet porridge with milk and sugar, and Firni is a pudding with milk and sugar, making it a plausible analog though ingredients and grain differ."
-    },
-    "700026": {
-      "fdc_id": 2708416,
-      "food_code": 56205060,
-      "confidence": 0.5,
-      "rationale": "Pearl millet porridge with milk and sugar is a cooked cereal with milk and sweetener, closest to 'Rice, cooked, with milk' among candidates."
-    },
-    "700028": {
-      "fdc_id": 2708354,
-      "food_code": 56116000,
-      "confidence": 0.5,
-      "rationale": "Noodles, chow mein is a plausible analog as it is a fried noodle product, though cooked and seasoned differently from unprepared instant noodles."
-    },
     "700029": {
       "fdc_id": 2708352,
       "food_code": 56112000,
       "confidence": 0.7,
       "rationale": "Noodles, cooked is a close analog to instant noodles without flavoring, matching the wheat-based noodle category and preparation method."
-    },
-    "700030": {
-      "fdc_id": 2706573,
-      "food_code": 27250810,
-      "confidence": 0.5,
-      "rationale": "Fish and rice with tomato-based sauce is a plausible analog to fonio with fish and vegetables, though the grain differs and recipe specifics may vary."
     },
     "700031": {
       "fdc_id": 2706657,
@@ -29819,30 +29711,6 @@
       "confidence": 0.7,
       "rationale": "Cornmeal mush with fat added is a close analog to stiff porridge from white degermed maize flour, sharing main ingredient and preparation style."
     },
-    "700034": {
-      "fdc_id": 2708417,
-      "food_code": 56205070,
-      "confidence": 0.5,
-      "rationale": "Pearl millet porridge with water and sugar is a cereal porridge with sweetener, best matched by rice sweet cooked with honey as a plausible analog in cereals with sweetener."
-    },
-    "700035": {
-      "fdc_id": 2708441,
-      "food_code": 56207160,
-      "confidence": 0.5,
-      "rationale": "Couscous, plain, cooked is a cooked grain dish similar in category to millet porridge but differs in grain type and preparation."
-    },
-    "700036": {
-      "fdc_id": 2708441,
-      "food_code": 56207160,
-      "confidence": 0.5,
-      "rationale": "Kiou gonré is a steamed cereal and legume dish, and couscous is a cooked grain dish, making it a plausible analog though ingredients differ."
-    },
-    "700037": {
-      "fdc_id": 2708375,
-      "food_code": 56201517,
-      "confidence": 0.5,
-      "rationale": "Cornmeal mush is a cooked cereal porridge similar in category to fonio porridge, though ingredients differ."
-    },
     "700038": {
       "fdc_id": 2708374,
       "food_code": 56201516,
@@ -29860,12 +29728,6 @@
       "food_code": 56130000,
       "confidence": 0.9,
       "rationale": "This entry is plain cooked pasta, closely matching boiled macaroni without added ingredients."
-    },
-    "700041": {
-      "fdc_id": 2708376,
-      "food_code": 56201600,
-      "confidence": 0.5,
-      "rationale": "Masa harina, cooked is a plausible analog as it is a cooked corn product similar to fermented maize dough but differs in fermentation and preparation."
     },
     "700042": {
       "fdc_id": 2708376,
@@ -29945,42 +29807,6 @@
       "confidence": 0.7,
       "rationale": "Cornmeal mush with fat added is a close analog to white maize meal, though it includes added fat."
     },
-    "700055": {
-      "fdc_id": 2708453,
-      "food_code": 57134000,
-      "confidence": 0.5,
-      "rationale": "Both are corn-based cereal products, but the CNF food is maize meal while the FNDDS entry is a ready-to-eat corn flakes cereal, so composition differs."
-    },
-    "700056": {
-      "fdc_id": 2707622,
-      "food_code": 51115010,
-      "confidence": 0.5,
-      "rationale": "Bread, cornmeal and molasses is a plausible analog as it contains cornmeal but is a processed bread product rather than whole grain maize meal."
-    },
-    "700057": {
-      "fdc_id": 2707598,
-      "food_code": 51101000,
-      "confidence": 0.5,
-      "rationale": "Closest available analog is white bread, which shares the refined grain base but differs in form and processing from white refined maize flour."
-    },
-    "700058": {
-      "fdc_id": 2707598,
-      "food_code": 51101000,
-      "confidence": 0.5,
-      "rationale": "Closest match is white bread, but no direct refined white maize flour analog; plausible analog within yeast breads category."
-    },
-    "700059": {
-      "fdc_id": 2707598,
-      "food_code": 51101000,
-      "confidence": 0.5,
-      "rationale": "The candidate is white bread, which is a processed product from refined flour, making it a plausible analog though not a direct match to unfortified white maize flour."
-    },
-    "700060": {
-      "fdc_id": 2707622,
-      "food_code": 51115010,
-      "confidence": 0.5,
-      "rationale": "Closest available analog is cornmeal bread, which shares the maize base but differs in form and fortification."
-    },
     "700061": {
       "fdc_id": 2709783,
       "food_code": 75109600,
@@ -30023,12 +29849,6 @@
       "confidence": 0.7,
       "rationale": "Both are raw corn products, with the CNF food being degermed yellow corn grit and the FNDDS food being raw corn, making it a close analog despite slight processing differences."
     },
-    "700068": {
-      "fdc_id": 2707622,
-      "food_code": 51115010,
-      "confidence": 0.5,
-      "rationale": "Closest match is 'Bread, cornmeal and molasses' but it is a prepared bread product, not whole grain yellow cornmeal; plausible analog within cereals category but not a direct equivalent."
-    },
     "700069": {
       "fdc_id": 2709783,
       "food_code": 75109600,
@@ -30047,23 +29867,11 @@
       "confidence": 0.9,
       "rationale": "Corn, fresh, cooked, no added fat closely matches boiled yellow whole kernel corn without salt."
     },
-    "700072": {
-      "fdc_id": 2708377,
-      "food_code": 56202000,
-      "confidence": 0.5,
-      "rationale": "Millet dough is best matched by cooked millet, though preparation differs slightly."
-    },
     "700073": {
       "fdc_id": 2708377,
       "food_code": 56202000,
       "confidence": 0.7,
       "rationale": "Millet cooked grain is the closest analog to millet dough (tô) made from whole millet, sharing the same main ingredient and cooking method with minor preparation differences."
-    },
-    "700074": {
-      "fdc_id": 2708377,
-      "food_code": 56202000,
-      "confidence": 0.5,
-      "rationale": "Millet cooked grain is the closest match though it lacks fermentation and porridge preparation details."
     },
     "700075": {
       "fdc_id": 2708416,
@@ -30095,12 +29903,6 @@
       "confidence": 0.9,
       "rationale": "Oatmeal, regular or quick, made with water, no added fat closely matches oats porridge without salt in preparation and ingredients."
     },
-    "700080": {
-      "fdc_id": 2708377,
-      "food_code": 56202000,
-      "confidence": 0.5,
-      "rationale": "The best available analog is 'Millet' though it is cooked and the CNF food is raw pearl millet, so composition may differ."
-    },
     "700081": {
       "fdc_id": 2708377,
       "food_code": 56202000,
@@ -30124,12 +29926,6 @@
       "food_code": 56202000,
       "confidence": 0.7,
       "rationale": "Millet in FNDDS is a close analog to raw pearl millet whole grains from CNF, matching the same grain type with minor possible differences in variety or preparation."
-    },
-    "700085": {
-      "fdc_id": 2708377,
-      "food_code": 56202000,
-      "confidence": 0.5,
-      "rationale": "Millet is the same grain category but the candidate is cooked while CNF food is raw whole grain, so composition differs."
     },
     "700086": {
       "fdc_id": 2708377,
@@ -30155,12 +29951,6 @@
       "confidence": 0.7,
       "rationale": "The FNDDS entry 'Millet' is a close analog to raw whole grain pearl millet, matching the same grain type with minor possible differences in variety or preparation."
     },
-    "700090": {
-      "fdc_id": 2708377,
-      "food_code": 56202000,
-      "confidence": 0.5,
-      "rationale": "The candidate 'Millet' is the closest match in the FNDDS list, though it is cooked and the CNF food is raw whole grain, so composition may differ."
-    },
     "700091": {
       "fdc_id": 2708377,
       "food_code": 56202000,
@@ -30185,65 +29975,11 @@
       "confidence": 0.7,
       "rationale": "The FNDDS entry 'Millet' is a close analog to raw pearl millet grains, matching the same food type with minor possible differences in variety or processing."
     },
-    "700095": {
-      "fdc_id": 2708441,
-      "food_code": 56207160,
-      "confidence": 0.5,
-      "rationale": "Couscous is a cooked cereal grain product similar to boiled pearl millet, making it a plausible analog within cereals and their products."
-    },
-    "700096": {
-      "fdc_id": 2708441,
-      "food_code": 56207160,
-      "confidence": 0.5,
-      "rationale": "Couscous, plain, cooked is a plausible analog as it is a cooked cereal grain similar to boiled pearl millet, though the grain type differs."
-    },
-    "700097": {
-      "fdc_id": 2708489,
-      "food_code": 57602100,
-      "confidence": 0.5,
-      "rationale": "Oats, raw is a cereal grain like pearl millet, making it a plausible analog despite not being the same grain."
-    },
     "700098": {
       "fdc_id": 2708377,
       "food_code": 56202000,
       "confidence": 0.7,
       "rationale": "Millet cooked grain is the closest match to decorticated boiled pearl millet as an ingredient."
-    },
-    "700099": {
-      "fdc_id": 2708416,
-      "food_code": 56205060,
-      "confidence": 0.5,
-      "rationale": "Pearl millet is a cereal grain and the closest analog among candidates is cooked rice, which is also a boiled cereal grain, though a different species."
-    },
-    "700100": {
-      "fdc_id": 2708377,
-      "food_code": 56202000,
-      "confidence": 0.5,
-      "rationale": "Millet is the same grain but the candidate is cooked millet, not flour with bran removed, so composition differs."
-    },
-    "700101": {
-      "fdc_id": 2708489,
-      "food_code": 57602100,
-      "confidence": 0.5,
-      "rationale": "Pearl millet whole grain is a raw cereal grain similar to oats, raw, making it a plausible analog though not a direct match."
-    },
-    "700102": {
-      "fdc_id": 2708442,
-      "food_code": 56207200,
-      "confidence": 0.5,
-      "rationale": "Whole wheat cereal, cooked is a plausible analog to boiled whole grain pearl millet as both are whole grain cooked cereals, though not the same grain."
-    },
-    "700103": {
-      "fdc_id": 2708353,
-      "food_code": 56113000,
-      "confidence": 0.5,
-      "rationale": "Noodles, whole grain, cooked is a plausible analog as a cooked whole grain product, though not the same grain type as pearl millet."
-    },
-    "700104": {
-      "fdc_id": 2708441,
-      "food_code": 56207160,
-      "confidence": 0.5,
-      "rationale": "Both are steamed cereal grain products, with couscous being a plausible analog to steamed pearl millet balls."
     },
     "700105": {
       "fdc_id": 2708374,
@@ -30437,23 +30173,11 @@
       "confidence": 0.7,
       "rationale": "Rice cake is the closest match, though the CNF specifies fried in unfortified vegetable oil, which may differ slightly from the FNDDS entry."
     },
-    "700137": {
-      "fdc_id": 2708422,
-      "food_code": 56205190,
-      "confidence": 0.5,
-      "rationale": "Closest match is cooked white glutinous rice, but no direct match for raw white rice flour in candidates."
-    },
     "700138": {
       "fdc_id": 2706461,
       "food_code": 27150325,
       "confidence": 0.85,
       "rationale": "Fish curry with rice closely matches the CNF food of rice with fish and vegetable curry, sharing main ingredients and preparation style."
-    },
-    "700139": {
-      "fdc_id": 2708414,
-      "food_code": 56205018,
-      "confidence": 0.5,
-      "rationale": "The CNF food is raw brown rice, but all candidates are cooked brown rice variants; the closest is plain cooked brown rice with no added fat, making it a plausible analog."
     },
     "700140": {
       "fdc_id": 2710789,
@@ -30467,12 +30191,6 @@
       "confidence": 0.9,
       "rationale": "Exact match for brown rice cooked with no added fat, closely matching CNF boiled brown rice without salt."
     },
-    "700142": {
-      "fdc_id": 2708423,
-      "food_code": 56205205,
-      "confidence": 0.5,
-      "rationale": "Closest available analog is wild rice, raw not available, so cooked wild rice without added fat is a plausible analog though differs in type and preparation."
-    },
     "700143": {
       "fdc_id": 2710789,
       "food_code": 99995625,
@@ -30485,12 +30203,6 @@
       "confidence": 0.7,
       "rationale": "Rice, white, cooked, no added fat is the closest match to red native rice boiled without salt, differing mainly in rice variety and color."
     },
-    "700145": {
-      "fdc_id": 2708424,
-      "food_code": 56205210,
-      "confidence": 0.5,
-      "rationale": "Closest available analog is wild rice, cooked with no added fat, but no raw red native milled rice is present in candidates."
-    },
     "700146": {
       "fdc_id": 2710789,
       "food_code": 99995625,
@@ -30502,12 +30214,6 @@
       "food_code": 56205008,
       "confidence": 0.7,
       "rationale": "Rice, white, cooked, no added fat is the closest available analog to red native milled boiled rice without salt, differing mainly in rice variety and color."
-    },
-    "700148": {
-      "fdc_id": 2708408,
-      "food_code": 56205008,
-      "confidence": 0.5,
-      "rationale": "Closest available FNDDS entry is cooked white rice with no added fat, while CNF food is raw polished white rice, so preparation differs."
     },
     "700149": {
       "fdc_id": 2710788,
@@ -30539,143 +30245,17 @@
       "confidence": 0.9,
       "rationale": "Exact match for white rice, cooked with no added fat, matching CNF boiled white rice without salt."
     },
-    "700154": {
-      "fdc_id": 2708375,
-      "food_code": 56201517,
-      "confidence": 0.5,
-      "rationale": "Cornmeal mush is a cooked cereal similar to sorghum flour, but no direct flour analog is present in candidates."
-    },
-    "700155": {
-      "fdc_id": 2709783,
-      "food_code": 75109600,
-      "confidence": 0.5,
-      "rationale": "Corn, raw is a plausible analog as both are whole grains and raw, though sorghum and corn differ botanically and nutritionally."
-    },
-    "700156": {
-      "fdc_id": 2710789,
-      "food_code": 99995625,
-      "confidence": 0.5,
-      "rationale": "Brown rice, cooked as ingredient, is a plausible analog for boiled whole grain sorghum due to similar cereal grain category and cooking method, though not the same grain."
-    },
-    "700157": {
-      "fdc_id": 2708442,
-      "food_code": 56207200,
-      "confidence": 0.5,
-      "rationale": "Whole wheat cereal, cooked is a plausible analog as both are cooked whole grain cereals, though not the same grain."
-    },
-    "700158": {
-      "fdc_id": 2708489,
-      "food_code": 57602100,
-      "confidence": 0.5,
-      "rationale": "Oats, raw is a plausible analog as it is a whole grain cereal similar to sorghum, though not the same grain."
-    },
-    "700159": {
-      "fdc_id": 2708442,
-      "food_code": 56207200,
-      "confidence": 0.5,
-      "rationale": "Whole wheat cereal, cooked is a plausible analog to boiled whole grain sorghum as both are cooked whole grain cereals, though the grain type differs."
-    },
-    "700160": {
-      "fdc_id": 2708358,
-      "food_code": 56132990,
-      "confidence": 0.5,
-      "rationale": "Pasta, whole grain, cooked is a plausible analog as a cooked whole grain product, though not the same grain type as sorghum."
-    },
     "700161": {
       "fdc_id": 2708489,
       "food_code": 57602100,
       "confidence": 0.7,
       "rationale": "Oats, raw is a whole grain raw cereal similar to raw whole grain sorghum, making it a close analog."
     },
-    "700162": {
-      "fdc_id": 2708442,
-      "food_code": 56207200,
-      "confidence": 0.5,
-      "rationale": "Whole wheat cereal, cooked is a plausible analog to boiled whole grain sorghum as both are cooked whole grain cereals, though not the exact grain."
-    },
-    "700163": {
-      "fdc_id": 2708408,
-      "food_code": 56205008,
-      "confidence": 0.5,
-      "rationale": "Both are cooked whole grains without added fat, but sorghum and rice differ in grain type and nutrient profile."
-    },
-    "700164": {
-      "fdc_id": 2708489,
-      "food_code": 57602100,
-      "confidence": 0.5,
-      "rationale": "Oats, raw is a plausible analog as a raw whole grain cereal similar to raw teff grains, though not the same grain."
-    },
-    "700165": {
-      "fdc_id": 2708442,
-      "food_code": 56207200,
-      "confidence": 0.5,
-      "rationale": "Whole wheat cereal, cooked is a plausible analog as both are cooked whole grain cereals, though teff is a different grain than wheat."
-    },
-    "700166": {
-      "fdc_id": 2708442,
-      "food_code": 56207200,
-      "confidence": 0.5,
-      "rationale": "Whole wheat cereal, cooked is a plausible analog as both are cooked whole grain cereals, though teff is a different grain than wheat."
-    },
     "700167": {
       "fdc_id": 2708480,
       "food_code": 57418000,
       "confidence": 0.7,
       "rationale": "Cereal, wheat flakes is a close analog to Weet-Bix as both are wheat-based ready-to-eat cereals with similar preparation and no fortification."
-    },
-    "700168": {
-      "fdc_id": 2708441,
-      "food_code": 56207160,
-      "confidence": 0.5,
-      "rationale": "Both are couscous products, but the CNF food includes bambara groundnuts and yellow maize, while the FNDDS analog is plain couscous, making it a plausible but not exact match."
-    },
-    "700169": {
-      "fdc_id": 2707598,
-      "food_code": 51101000,
-      "confidence": 0.5,
-      "rationale": "No direct flour analog found; white bread is a plausible analog as it is made primarily from white wheat flour."
-    },
-    "700171": {
-      "fdc_id": 2707805,
-      "food_code": 52104040,
-      "confidence": 0.5,
-      "rationale": "Wheat flour is closest to wheat biscuit among candidates, but no direct flour analog is present."
-    },
-    "700172": {
-      "fdc_id": 2707598,
-      "food_code": 51101000,
-      "confidence": 0.5,
-      "rationale": "Closest available analog is plain white bread, but no direct match for white wheat flour."
-    },
-    "700173": {
-      "fdc_id": 2707805,
-      "food_code": 52104040,
-      "confidence": 0.5,
-      "rationale": "Wheat flour is closest to wheat biscuit among candidates, but no direct flour analog is present, so this is a plausible analog in the same cereal category."
-    },
-    "700174": {
-      "fdc_id": 2707805,
-      "food_code": 52104040,
-      "confidence": 0.5,
-      "rationale": "Wheat flour is closest to wheat biscuit in category but no direct flour analog in candidates."
-    },
-    "700175": {
-      "fdc_id": 2707805,
-      "food_code": 52104040,
-      "confidence": 0.5,
-      "rationale": "Wheat flour is closest to wheat biscuit among candidates, but no direct flour analog is present."
-    },
-    "700176": {
-      "fdc_id": 2707598,
-      "food_code": 51101000,
-      "confidence": 0.5,
-      "rationale": "The CNF food is white wheat flour fortified with vitamins and minerals, but the closest FNDDS analog is white bread, which is a processed product rather than flour, making it a plausible but not direct match."
-    },
-    "700177": {
-      "fdc_id": 2707805,
-      "food_code": 52104040,
-      "confidence": 0.5,
-      "rationale": "Wheat flour is not directly represented; biscuit, wheat is a plausible analog within the same cereal product category but differs in preparation and composition."
     },
     "700178": {
       "fdc_id": 2708488,
@@ -30749,12 +30329,6 @@
       "confidence": 0.7,
       "rationale": "Fufu in FNDDS is a close analog to fermented cassava flour used for dry fufu, sharing similar preparation and ingredients."
     },
-    "700190": {
-      "fdc_id": 2709564,
-      "food_code": 71930120,
-      "confidence": 0.5,
-      "rationale": "Cassava flour is a processed form of cassava root, and 'Cassava, cooked' is the closest available form in the FNDDS, though it is not flour and thus composition differs."
-    },
     "700191": {
       "fdc_id": 2709564,
       "food_code": 71930120,
@@ -30803,12 +30377,6 @@
       "confidence": 0.9,
       "rationale": "Exact match for cooked cassava, same preparation without added ingredients."
     },
-    "700199": {
-      "fdc_id": 2709560,
-      "food_code": 71905000,
-      "confidence": 0.5,
-      "rationale": "Plantain, raw is a starchy tuber-like vegetable similar in category to cocoyam, but not a direct equivalent."
-    },
     "700200": {
       "fdc_id": 2709567,
       "food_code": 71962040,
@@ -30821,12 +30389,6 @@
       "confidence": 0.7,
       "rationale": "Taro, cooked is a close analog to cocoyam tuber, both being starchy tropical root vegetables cooked without added fat."
     },
-    "700202": {
-      "fdc_id": 2709560,
-      "food_code": 71905000,
-      "confidence": 0.5,
-      "rationale": "Plantain, raw is a starchy tuber-like vegetable similar in category to cocoyam, but not a direct equivalent."
-    },
     "700203": {
       "fdc_id": 2709567,
       "food_code": 71962040,
@@ -30838,12 +30400,6 @@
       "food_code": 71962040,
       "confidence": 0.7,
       "rationale": "Taro, cooked is a close analog to cocoyam tuber, both are starchy tropical tubers with similar texture and nutrient profiles."
-    },
-    "700205": {
-      "fdc_id": 2707479,
-      "food_code": 41812800,
-      "confidence": 0.5,
-      "rationale": "Vegetarian stew is a plausible analog to yam and vegetable stew, sharing the stew preparation and vegetable content but likely differing in specific ingredients and starch source."
     },
     "700206": {
       "fdc_id": 2709458,
@@ -31007,12 +30563,6 @@
       "confidence": 0.7,
       "rationale": "Raw plantain is the closest match to unripe plantain flour, sharing the same base ingredient with minor differences in form and processing."
     },
-    "700233": {
-      "fdc_id": 2705696,
-      "food_code": 13230500,
-      "confidence": 0.5,
-      "rationale": "Porridge from gari and tomato paste is a starchy, cooked cereal-like dish; tapioca pudding is a plausible analog as a starchy pudding, though ingredients differ."
-    },
     "700234": {
       "fdc_id": 2709554,
       "food_code": 71703990,
@@ -31133,65 +30683,11 @@
       "confidence": 0.9,
       "rationale": "Taro, cooked in FNDDS closely matches CNF taro tuber boiled without salt, making it a direct equivalent."
     },
-    "700254": {
-      "fdc_id": 2709209,
-      "food_code": 62120000,
-      "confidence": 0.5,
-      "rationale": "Tiger nut is a starchy tuber and dried persimmon is a dried plant product with some similar carbohydrate content, making it a plausible analog among the dried plant foods listed."
-    },
-    "700255": {
-      "fdc_id": 2709560,
-      "food_code": 71905000,
-      "confidence": 0.5,
-      "rationale": "Plantain, raw is a starchy tuber-like food similar in category to tiger nut tuber, making it a plausible analog despite botanical differences."
-    },
-    "700256": {
-      "fdc_id": 2709567,
-      "food_code": 71962040,
-      "confidence": 0.5,
-      "rationale": "Taro, cooked is a starchy tuber similar to tiger nut tuber, both being starchy roots, making it a plausible analog."
-    },
-    "700257": {
-      "fdc_id": 2709567,
-      "food_code": 71962040,
-      "confidence": 0.5,
-      "rationale": "Taro, cooked is a starchy tuber similar to tiger nut tuber, both being starchy roots, making it a plausible analog."
-    },
-    "700258": {
-      "fdc_id": 2709560,
-      "food_code": 71905000,
-      "confidence": 0.5,
-      "rationale": "Plantain, raw is a starchy tuber-like vegetable similar in category to water yam, but not the exact same food."
-    },
-    "700259": {
-      "fdc_id": 2709564,
-      "food_code": 71930120,
-      "confidence": 0.5,
-      "rationale": "Water yam is a starchy tuber similar to cassava, which is also a starchy root vegetable; both are boiled tubers though different species, making cassava a plausible analog."
-    },
     "700260": {
       "fdc_id": 2709567,
       "food_code": 71962040,
       "confidence": 0.7,
       "rationale": "Taro, cooked is a close analog to boiled water yam as both are starchy tubers with similar preparation and nutrient profiles."
-    },
-    "700261": {
-      "fdc_id": 2709561,
-      "food_code": 71905008,
-      "confidence": 0.5,
-      "rationale": "Plantain, cooked, fat added is a starchy tuber cooked with added fat, somewhat analogous to deep fried yam but not exact."
-    },
-    "700262": {
-      "fdc_id": 2710308,
-      "food_code": 91407120,
-      "confidence": 0.5,
-      "rationale": "Yam flour is a starchy root product similar in category to sweet potato paste, though the exact form differs."
-    },
-    "700263": {
-      "fdc_id": 2709560,
-      "food_code": 71905000,
-      "confidence": 0.5,
-      "rationale": "Plantain, raw is a starchy tuber-like vegetable and the closest available analog among candidates, though not a perfect match for yam."
     },
     "700264": {
       "fdc_id": 2710794,
@@ -31205,77 +30701,11 @@
       "confidence": 0.7,
       "rationale": "Cassava, cooked is a starchy tuber similar to yam and matches the CNF food category closely, making it a close analog."
     },
-    "700266": {
-      "fdc_id": 2709564,
-      "food_code": 71930120,
-      "confidence": 0.5,
-      "rationale": "Yam and cassava are both starchy tubers common in West Africa, making cooked cassava a plausible analog for raw yam Isu akoko."
-    },
-    "700267": {
-      "fdc_id": 2709560,
-      "food_code": 71905000,
-      "confidence": 0.5,
-      "rationale": "Plantain, raw is a starchy tuber-like vegetable similar in category to yam but not the same species, making it a plausible analog."
-    },
-    "700268": {
-      "fdc_id": 2709560,
-      "food_code": 71905000,
-      "confidence": 0.5,
-      "rationale": "Plantain, raw is a starchy tuber-like vegetable similar to yam, making it a plausible analog though not identical."
-    },
-    "700269": {
-      "fdc_id": 2709564,
-      "food_code": 71930120,
-      "confidence": 0.5,
-      "rationale": "Cassava, cooked is a starchy root tuber similar to yam, making it a plausible analog though not identical."
-    },
-    "700270": {
-      "fdc_id": 2709564,
-      "food_code": 71930120,
-      "confidence": 0.5,
-      "rationale": "Cassava, cooked is a starchy root similar to yam but differs in species and preparation, making it a plausible analog."
-    },
-    "700271": {
-      "fdc_id": 2709564,
-      "food_code": 71930120,
-      "confidence": 0.5,
-      "rationale": "Cassava, cooked is a starchy root similar to yam tuber but differs in species and preparation state."
-    },
-    "700272": {
-      "fdc_id": 2709560,
-      "food_code": 71905000,
-      "confidence": 0.5,
-      "rationale": "Plantain, raw is a starchy tuber-like vegetable similar in category to yam, but not the same species or exact composition."
-    },
-    "700273": {
-      "fdc_id": 2709564,
-      "food_code": 71930120,
-      "confidence": 0.5,
-      "rationale": "Cassava, cooked is a starchy root similar to yam but differs in species and preparation state."
-    },
-    "700274": {
-      "fdc_id": 2709702,
-      "food_code": 73405010,
-      "confidence": 0.5,
-      "rationale": "Yam is a starchy tuber similar to sweet potato; boiled sweet potato without added fat is a plausible analog though not identical."
-    },
     "700275": {
       "fdc_id": 2709567,
       "food_code": 71962040,
       "confidence": 0.7,
       "rationale": "Taro, cooked is a close analog to yam tuber boiled without salt as both are starchy tropical tubers with similar cooking methods and nutrient profiles."
-    },
-    "700276": {
-      "fdc_id": 2709560,
-      "food_code": 71905000,
-      "confidence": 0.5,
-      "rationale": "Plantain, raw is a starchy tuber-like vegetable and the closest available analog among candidates, though not a perfect match for yam tuber."
-    },
-    "700277": {
-      "fdc_id": 2709567,
-      "food_code": 71962040,
-      "confidence": 0.5,
-      "rationale": "Taro, cooked is a starchy tuber similar to yam, making it a plausible analog though not exact."
     },
     "700278": {
       "fdc_id": 2709567,
@@ -31283,89 +30713,17 @@
       "confidence": 0.7,
       "rationale": "Taro, cooked is a close analog to three-leaved yam tuber as both are starchy tropical tubers with similar cooking methods and nutrient profiles."
     },
-    "700279": {
-      "fdc_id": 2707349,
-      "food_code": 41101020,
-      "confidence": 0.5,
-      "rationale": "Both are dried legumes with similar usage, though African locust bean is a distinct species not directly represented in FNDDS."
-    },
-    "700280": {
-      "fdc_id": 2707388,
-      "food_code": 41107010,
-      "confidence": 0.5,
-      "rationale": "Soybeans, cooked, are legumes similar to fermented African locust bean but differ in fermentation and preparation."
-    },
-    "700281": {
-      "fdc_id": 2707367,
-      "food_code": 41102210,
-      "confidence": 0.5,
-      "rationale": "African locust bean is a legume similar to fava beans, making fava beans a plausible analog though not a direct equivalent."
-    },
-    "700282": {
-      "fdc_id": 2707389,
-      "food_code": 41108010,
-      "confidence": 0.5,
-      "rationale": "Mung beans, cooked, is a plausible analog as both are cooked legumes, though they differ in species and typical nutrient profiles."
-    },
-    "700283": {
-      "fdc_id": 2707367,
-      "food_code": 41102210,
-      "confidence": 0.5,
-      "rationale": "Fava beans, cooked, is a plausible analog as both are legumes with similar preparation, though not the exact same species."
-    },
-    "700284": {
-      "fdc_id": 2707389,
-      "food_code": 41108010,
-      "confidence": 0.5,
-      "rationale": "Mung beans, cooked, is a plausible analog as both are legumes cooked without added fat or salt, though they differ in species and exact nutrient profile."
-    },
     "700285": {
       "fdc_id": 2707369,
       "food_code": 41103010,
       "confidence": 0.7,
       "rationale": "Lima beans, from dried, is a close analog as both are dried legumes with similar nutritional profiles."
     },
-    "700286": {
-      "fdc_id": 2707389,
-      "food_code": 41108010,
-      "confidence": 0.5,
-      "rationale": "African yam bean is a legume and mung beans are a plausible analog legume with similar preparation (cooked), though not the same species."
-    },
     "700287": {
       "fdc_id": 2707389,
       "food_code": 41108010,
       "confidence": 0.7,
       "rationale": "Mung beans, cooked, is a close analog legume with similar preparation and nutrient profile to African yam bean, boiled without salt."
-    },
-    "700288": {
-      "fdc_id": 2707389,
-      "food_code": 41108010,
-      "confidence": 0.5,
-      "rationale": "Mung beans, cooked, is a plausible analog as both are legumes cooked without added fat, though they are different species."
-    },
-    "700289": {
-      "fdc_id": 2707367,
-      "food_code": 41102210,
-      "confidence": 0.5,
-      "rationale": "Fava beans, cooked, is a plausible analog as it is a legume similar to African yam bean but not an exact match."
-    },
-    "700290": {
-      "fdc_id": 2707486,
-      "food_code": 42101000,
-      "confidence": 0.5,
-      "rationale": "Afzelia africana is a legume nut, and almonds unroasted are a plausible analog as nuts with similar nutrient profiles, though not the same species or preparation."
-    },
-    "700291": {
-      "fdc_id": 2707519,
-      "food_code": 42111210,
-      "confidence": 0.5,
-      "rationale": "Peanuts are legumes like Bambara groundnut, making them a plausible analog despite differences in species and composition."
-    },
-    "700292": {
-      "fdc_id": 2707389,
-      "food_code": 41108010,
-      "confidence": 0.5,
-      "rationale": "Mung beans, cooked, is a legume similar to Bambara groundnut but not the same species, making it a plausible analog."
     },
     "700293": {
       "fdc_id": 2707389,
@@ -31427,35 +30785,11 @@
       "confidence": 0.55,
       "rationale": "Blackeyed peas, from dried, is a legume similar to Bambara groundnut, making it a plausible analog despite not being the exact same species."
     },
-    "700303": {
-      "fdc_id": 2707389,
-      "food_code": 41108010,
-      "confidence": 0.5,
-      "rationale": "Mung beans, cooked, is a plausible analog as both are cooked legumes, though different species and possibly different nutrient profiles."
-    },
     "700304": {
       "fdc_id": 2707389,
       "food_code": 41108010,
       "confidence": 0.7,
       "rationale": "Mung beans, cooked, is a close analog as both are cooked legumes with similar nutrient profiles."
-    },
-    "700305": {
-      "fdc_id": 2707494,
-      "food_code": 42104050,
-      "confidence": 0.5,
-      "rationale": "Cashews, unroasted are the closest legume/nut option available, though not a direct match to Bambara groundnut."
-    },
-    "700306": {
-      "fdc_id": 2707389,
-      "food_code": 41108010,
-      "confidence": 0.5,
-      "rationale": "Mung beans, cooked, is a plausible analog as both are cooked legumes, though Bambara groundnut is a different species."
-    },
-    "700307": {
-      "fdc_id": 2707389,
-      "food_code": 41108010,
-      "confidence": 0.5,
-      "rationale": "Mung beans, cooked, is a plausible analog as both are cooked legumes, though Bambara groundnut is a different species with potentially different nutrient profiles."
     },
     "700308": {
       "fdc_id": 2707355,
@@ -31487,35 +30821,11 @@
       "confidence": 0.7,
       "rationale": "White beans, from dried, fat added is the closest match to soaked and boiled white beans with cooking liquid, differing mainly by fat content."
     },
-    "700313": {
-      "fdc_id": 2707389,
-      "food_code": 41108010,
-      "confidence": 0.5,
-      "rationale": "Mung beans, cooked is a plausible analog as it is a cooked legume similar to cowpeas, though the addition of vegetables in the CNF food is not exactly matched."
-    },
     "700314": {
       "fdc_id": 2708441,
       "food_code": 56207160,
       "confidence": 0.7,
       "rationale": "Couscous, plain, cooked is a close analog to pearl millet couscous, combined with cowpeas similar to legumes in the CNF food."
-    },
-    "700315": {
-      "fdc_id": 2707413,
-      "food_code": 41301010,
-      "confidence": 0.5,
-      "rationale": "The CNF food is a mixture of cowpeas and degermed white maize, boiled, and the closest analog is blackeyed peas from dried, which is a legume but does not include maize, making it a plausible but not exact match."
-    },
-    "700317": {
-      "fdc_id": 2707389,
-      "food_code": 41108010,
-      "confidence": 0.5,
-      "rationale": "Mung beans, cooked is a plausible analog as it is a cooked legume dish similar to cowpeas in the CNF food, though the preparation and additional ingredients differ."
-    },
-    "700318": {
-      "fdc_id": 2709552,
-      "food_code": 71701000,
-      "confidence": 0.5,
-      "rationale": "Boussan touba is a fried cowpea pancake, and the closest analog is a potato pancake, which is a fried pancake-like food, though the main ingredient differs."
     },
     "700319": {
       "fdc_id": 2707349,
@@ -31564,12 +30874,6 @@
       "food_code": 41301010,
       "confidence": 0.7,
       "rationale": "Blackeyed peas, from dried, is a close analog to cowpeas as they are similar legumes prepared from dried form without added fat."
-    },
-    "700328": {
-      "fdc_id": 2707388,
-      "food_code": 41107010,
-      "confidence": 0.5,
-      "rationale": "Soybeans, cooked, is a plausible analog as it is a cooked legume similar to cowpeas but not the exact same species or preparation."
     },
     "700329": {
       "fdc_id": 2707413,
@@ -31649,12 +30953,6 @@
       "confidence": 0.7,
       "rationale": "Blackeyed peas, from dried, is a close analog to white cowpeas, both being legumes prepared from dried form without added fat or salt."
     },
-    "700343": {
-      "fdc_id": 2707389,
-      "food_code": 41108010,
-      "confidence": 0.5,
-      "rationale": "Mung beans, cooked, is a plausible analog as it is a cooked legume similar to cowpea but not the exact same species or preparation."
-    },
     "700344": {
       "fdc_id": 2707413,
       "food_code": 41301010,
@@ -31691,30 +30989,6 @@
       "confidence": 0.7,
       "rationale": "Rice, brown, with peas, fat added is a close analog to cowpeas and rice, boiled, sharing similar ingredients and preparation style."
     },
-    "700350": {
-      "fdc_id": 2708991,
-      "food_code": 58160120,
-      "confidence": 0.5,
-      "rationale": "Both are legume and grain dishes with mixed ingredients, but the CNF food includes eggs and potash which are not represented in the FNDDS analog."
-    },
-    "700351": {
-      "fdc_id": 2710054,
-      "food_code": 75414500,
-      "confidence": 0.5,
-      "rationale": "Fried okra is the closest match due to the presence of okra and frying, but it lacks the cowpea, egg, and onion components of the CNF food."
-    },
-    "700352": {
-      "fdc_id": 2707414,
-      "food_code": 41301990,
-      "confidence": 0.5,
-      "rationale": "Chickpeas, NFS is a legume similar to cowpeas, making it a plausible analog for steamed cowpea paste."
-    },
-    "700353": {
-      "fdc_id": 2707414,
-      "food_code": 41301990,
-      "confidence": 0.5,
-      "rationale": "Chickpeas, NFS is a plausible analog as it is a legume similar to cowpea, though preparation and ingredients differ."
-    },
     "700354": {
       "fdc_id": 2707349,
       "food_code": 41101020,
@@ -31727,12 +31001,6 @@
       "confidence": 0.7,
       "rationale": "Both are cooked beans from dried without added fat, making it a close analog despite unspecified bean type in FNDDS."
     },
-    "700356": {
-      "fdc_id": 2707370,
-      "food_code": 41103070,
-      "confidence": 0.5,
-      "rationale": "Pink beans, cooked is a plausible analog as it is a cooked legume similar to ground bean, though not the exact type."
-    },
     "700357": {
       "fdc_id": 2707370,
       "food_code": 41103070,
@@ -31744,36 +31012,6 @@
       "food_code": 41103070,
       "confidence": 0.7,
       "rationale": "Pink beans, cooked is a close analog to soaked and boiled ground beans, matching the legume category and cooking method with minor differences in bean type."
-    },
-    "700359": {
-      "fdc_id": 2707349,
-      "food_code": 41101020,
-      "confidence": 0.5,
-      "rationale": "This entry represents dried beans of unspecified type, which is the closest available analog to raw, dry jack beans in the candidate list."
-    },
-    "700360": {
-      "fdc_id": 2707349,
-      "food_code": 41101020,
-      "confidence": 0.5,
-      "rationale": "Both are cooked beans without added fat or salt, but jack bean is less common and may differ in nutrient profile from the generic cooked beans listed."
-    },
-    "700361": {
-      "fdc_id": 2707389,
-      "food_code": 41108010,
-      "confidence": 0.5,
-      "rationale": "Mung beans, cooked, is a plausible analog as it is a cooked legume similar to jack bean but not the exact type."
-    },
-    "700362": {
-      "fdc_id": 2707389,
-      "food_code": 41108010,
-      "confidence": 0.5,
-      "rationale": "Mung beans, cooked, is a plausible analog as it is a cooked legume similar to jack bean but not the same species."
-    },
-    "700363": {
-      "fdc_id": 2707389,
-      "food_code": 41108010,
-      "confidence": 0.5,
-      "rationale": "Mung beans, cooked, is a plausible analog as it is a cooked legume similar to jack bean but not the same species or preparation."
     },
     "700364": {
       "fdc_id": 2707425,
@@ -31847,12 +31085,6 @@
       "confidence": 0.7,
       "rationale": "Blackeyed peas from dried are a close analog to pigeon peas, both being legumes with similar preparation and nutrient profiles."
     },
-    "700376": {
-      "fdc_id": 2707416,
-      "food_code": 41302020,
-      "confidence": 0.5,
-      "rationale": "Chickpeas, from dried, no added fat, is a plausible analog as it is a legume cooked without added fat, though it is a different species from pigeon pea."
-    },
     "700377": {
       "fdc_id": 2707413,
       "food_code": 41301010,
@@ -31876,12 +31108,6 @@
       "food_code": 41302020,
       "confidence": 0.7,
       "rationale": "Chickpeas from dried, no added fat, is a close analog legume to pigeon peas, both being cooked dry legumes without added fat."
-    },
-    "700381": {
-      "fdc_id": 2707389,
-      "food_code": 41108010,
-      "confidence": 0.5,
-      "rationale": "Mung beans, cooked, is a plausible analog as it is a cooked legume similar to pigeon pea but not the exact type."
     },
     "700382": {
       "fdc_id": 2707413,
@@ -31907,23 +31133,11 @@
       "confidence": 0.7,
       "rationale": "Chickpeas, from dried, no added fat is a close analog as both are legumes cooked without added fat, though pigeon pea is a different species."
     },
-    "700386": {
-      "fdc_id": 2707416,
-      "food_code": 41302020,
-      "confidence": 0.5,
-      "rationale": "Chickpeas from dried, no added fat, is a legume similar to pigeon peas but not the exact same species or preparation."
-    },
     "700387": {
       "fdc_id": 2707416,
       "food_code": 41302020,
       "confidence": 0.7,
       "rationale": "Chickpeas from dried, no added fat, is a close analog to pigeon peas as a cooked legume without added fat."
-    },
-    "700388": {
-      "fdc_id": 2707370,
-      "food_code": 41103070,
-      "confidence": 0.5,
-      "rationale": "Pink beans, cooked, is a plausible analog within the same legumes category but differs from pigeon pea in species and preparation."
     },
     "700389": {
       "fdc_id": 2707413,
@@ -31943,29 +31157,11 @@
       "confidence": 0.7,
       "rationale": "Chickpeas, from dried, no added fat, is a close analog legume to pigeon pea, both being cooked dried legumes without added fat."
     },
-    "700392": {
-      "fdc_id": 2707420,
-      "food_code": 41303000,
-      "confidence": 0.5,
-      "rationale": "Split peas, from dried, no added fat, is a plausible analog as it is a legume similar to pigeon pea but not the exact same species or preparation."
-    },
     "700393": {
       "fdc_id": 2707389,
       "food_code": 41108010,
       "confidence": 0.7,
       "rationale": "Mung beans, cooked, is a close analog to pigeon pea, both being cooked legumes with similar nutrient profiles."
-    },
-    "700394": {
-      "fdc_id": 2707414,
-      "food_code": 41301990,
-      "confidence": 0.5,
-      "rationale": "Chickpeas are legumes like cowpeas, making this a plausible analog despite differences in preparation and additional ingredients like yam and potash."
-    },
-    "700395": {
-      "fdc_id": 2707389,
-      "food_code": 41108010,
-      "confidence": 0.5,
-      "rationale": "Bambara groundnuts are legumes, so mung beans as cooked legumes are a plausible analog despite different species and preparation."
     },
     "700396": {
       "fdc_id": 2707388,
@@ -32003,12 +31199,6 @@
       "confidence": 0.7,
       "rationale": "Soybeans, cooked is the closest analog to raw dry soya beans, representing the same food with a different preparation state."
     },
-    "700402": {
-      "fdc_id": 2707388,
-      "food_code": 41107010,
-      "confidence": 0.5,
-      "rationale": "The CNF food is raw dry soybeans, while the best FNDDS analog is cooked soybeans, so composition differs but both are soybeans in the legumes category."
-    },
     "700403": {
       "fdc_id": 2707388,
       "food_code": 41107010,
@@ -32027,41 +31217,11 @@
       "confidence": 0.9,
       "rationale": "Soybeans cooked is a direct equivalent to soaked and boiled soya beans without salt."
     },
-    "700406": {
-      "fdc_id": 2709235,
-      "food_code": 63119010,
-      "confidence": 0.5,
-      "rationale": "Fig, raw is a plausible analog as a raw sweet fruit similar to sweet dattock, though not the same species."
-    },
     "700407": {
       "fdc_id": 2709702,
       "food_code": 73405010,
       "confidence": 0.9,
       "rationale": "Sweet potato, boiled, no added fat is a direct equivalent to sweet dattock boiled without salt and drained."
-    },
-    "700408": {
-      "fdc_id": 2709701,
-      "food_code": 73405000,
-      "confidence": 0.5,
-      "rationale": "Sweet dattock is a legume product, and the closest available analog is sweet potato, boiled, which is a starchy vegetable with similar cooking method but different botanical category."
-    },
-    "700409": {
-      "fdc_id": 2709567,
-      "food_code": 71962040,
-      "confidence": 0.5,
-      "rationale": "Taro, cooked is a starchy tuber similar to sweet dattock in texture and category, making it a plausible analog."
-    },
-    "700410": {
-      "fdc_id": 2709567,
-      "food_code": 71962040,
-      "confidence": 0.5,
-      "rationale": "Taro, cooked is a plausible analog as both are starchy tuber vegetables, though not exact matches."
-    },
-    "700411": {
-      "fdc_id": 2707387,
-      "food_code": 41106510,
-      "confidence": 0.5,
-      "rationale": "Peruvian beans from dried are a plausible analog to raw dry velvet beans as both are dried legumes, though not the exact species."
     },
     "700412": {
       "fdc_id": 2707367,
@@ -32104,18 +31264,6 @@
       "food_code": 72119211,
       "confidence": 0.7,
       "rationale": "Kale, fresh, cooked, no added fat is a close analog as both are cooked dark green leafy vegetables without added fat or salt."
-    },
-    "700419": {
-      "fdc_id": 2710038,
-      "food_code": 75365000,
-      "confidence": 0.5,
-      "rationale": "The best available analog is a dried vegetable mixture, which is plausible but not a direct match to dried baobab leaves."
-    },
-    "700420": {
-      "fdc_id": 2709606,
-      "food_code": 72122100,
-      "confidence": 0.5,
-      "rationale": "Mustard greens, raw, is a dark green leafy vegetable and the closest available analog to fresh baobab leaves in the candidate list."
     },
     "700421": {
       "fdc_id": 2709633,
@@ -32183,12 +31331,6 @@
       "confidence": 0.9,
       "rationale": "Carrots, fresh, cooked, no added fat closely matches boiled carrots without salt and drained in preparation and composition."
     },
-    "700433": {
-      "fdc_id": 2709564,
-      "food_code": 71930120,
-      "confidence": 0.5,
-      "rationale": "Cassava leaves are a leafy green vegetable, but the closest candidate is cassava root cooked, which differs in plant part and preparation, making it a plausible but not close analog."
-    },
     "700434": {
       "fdc_id": 2709633,
       "food_code": 72126001,
@@ -32218,12 +31360,6 @@
       "food_code": 72126001,
       "confidence": 0.7,
       "rationale": "Taro leaves, cooked, is a close analog to cocoyam leaves, boiled, as both are cooked leafy tropical root vegetable leaves with similar nutrient profiles."
-    },
-    "700439": {
-      "fdc_id": 2709642,
-      "food_code": 72133201,
-      "confidence": 0.5,
-      "rationale": "This entry represents cooked bean leaves, which is the closest available analog to dried cowpea leaves among the candidates, though preparation and drying differ."
     },
     "700440": {
       "fdc_id": 2709614,
@@ -32267,23 +31403,11 @@
       "confidence": 0.9,
       "rationale": "Eggplant, cooked, no added fat is a direct equivalent to boiled eggplant without salt, drained."
     },
-    "700448": {
-      "fdc_id": 2709642,
-      "food_code": 72133201,
-      "confidence": 0.5,
-      "rationale": "No direct match for eggplant leaves; closest is cooked leaves of similar vegetables, plausible analog by category and preparation."
-    },
     "700449": {
       "fdc_id": 2709929,
       "food_code": 75217010,
       "confidence": 0.7,
       "rationale": "Eggplant, cooked, no added fat is a close analog to boiled fresh eggplant leaves without salt, matching cooking method and vegetable type closely."
-    },
-    "700450": {
-      "fdc_id": 2709943,
-      "food_code": 75219100,
-      "confidence": 0.5,
-      "rationale": "Closest match is 'Mushroom, Asian, cooked, from dried' as a dried vegetable product, though not the same plant."
     },
     "700451": {
       "fdc_id": 2709606,
@@ -32309,12 +31433,6 @@
       "confidence": 0.9,
       "rationale": "Exact match for raw garlic, same preparation and ingredient."
     },
-    "700455": {
-      "fdc_id": 2710082,
-      "food_code": 75503085,
-      "confidence": 0.5,
-      "rationale": "Closest match is ginger root but pickled, which differs from raw ginger in preparation and composition."
-    },
     "700456": {
       "fdc_id": 2709614,
       "food_code": 72125100,
@@ -32332,12 +31450,6 @@
       "food_code": 72118211,
       "confidence": 0.7,
       "rationale": "This entry is 'Greens, fresh, cooked, no added fat,' closely matching the CNF's green leafy vegetable, fresh, boiled without salt, drained."
-    },
-    "700459": {
-      "fdc_id": 2709639,
-      "food_code": 72130100,
-      "confidence": 0.5,
-      "rationale": "Watercress is a dark green leafy vegetable similar to hibiscus leaves, making it a plausible analog in the absence of a direct match."
     },
     "700460": {
       "fdc_id": 2709633,
@@ -32357,23 +31469,11 @@
       "confidence": 0.7,
       "rationale": "Dandelion greens, raw, is a close analog as a leafy green vegetable similar to fresh hibiscus leaves."
     },
-    "700463": {
-      "fdc_id": 2709633,
-      "food_code": 72126001,
-      "confidence": 0.5,
-      "rationale": "Taro leaves, cooked, is a plausible analog as both are cooked leafy greens though different species."
-    },
     "700464": {
       "fdc_id": 2709633,
       "food_code": 72126001,
       "confidence": 0.6,
       "rationale": "Taro leaves, cooked, is a dark green leafy vegetable similar to hibiscus leaves boiled without salt, making it a plausible analog though not exact."
-    },
-    "700465": {
-      "fdc_id": 2709641,
-      "food_code": 72132201,
-      "confidence": 0.5,
-      "rationale": "Jute mallow leaves dried are best approximated by cooked jute or similar leaves, though the candidate is cooked not dried, making it a plausible but not exact match."
     },
     "700466": {
       "fdc_id": 2709606,
@@ -32429,12 +31529,6 @@
       "confidence": 0.7,
       "rationale": "Spinach, raw is a close analog to fresh raw moringa leaves as both are leafy green vegetables with similar nutrient profiles."
     },
-    "700475": {
-      "fdc_id": 2709641,
-      "food_code": 72132201,
-      "confidence": 0.5,
-      "rationale": "Closest match is cooked dark green leafy vegetables, though not exact moringa leaves, it is a plausible analog in the same category."
-    },
     "700476": {
       "fdc_id": 2709633,
       "food_code": 72126001,
@@ -32488,12 +31582,6 @@
       "food_code": 75220011,
       "confidence": 0.9,
       "rationale": "Exact match for fresh okra cooked without added fat, closely matching boiled okra without salt."
-    },
-    "700487": {
-      "fdc_id": 2709795,
-      "food_code": 75117020,
-      "confidence": 0.5,
-      "rationale": "The best available analog is raw onions, which is the same food but differs in preparation (dried vs raw)."
     },
     "700488": {
       "fdc_id": 2709795,
@@ -32603,12 +31691,6 @@
       "confidence": 0.9,
       "rationale": "Pumpkin, cooked matches the CNF food of boiled pumpkin with light orange flesh without salt, making it a direct equivalent."
     },
-    "700506": {
-      "fdc_id": 2709988,
-      "food_code": 75232000,
-      "confidence": 0.5,
-      "rationale": "Sicklepod leaves are dried leafy vegetables, and the closest available analog is dried seaweed, which is also a dried plant-based product, though not a leaf vegetable; this is a plausible but imperfect match."
-    },
     "700507": {
       "fdc_id": 2709606,
       "food_code": 72122100,
@@ -32621,29 +31703,11 @@
       "confidence": 0.7,
       "rationale": "Bitter melon, horseradish, jute, or radish leaves, cooked is a close analog as it is a cooked leafy green vegetable similar to sicklepod leaves."
     },
-    "700509": {
-      "fdc_id": 2709642,
-      "food_code": 72133201,
-      "confidence": 0.5,
-      "rationale": "Sweet potato, squash, pumpkin, chrysanthemum, or bean leaves, cooked is a plausible analog as it is cooked leafy greens similar to sicklepod leaves, though exact species differ."
-    },
     "700510": {
       "fdc_id": 2709614,
       "food_code": 72125100,
       "confidence": 0.7,
       "rationale": "Spinach, raw is a leafy green vegetable similar in texture and nutrient profile to spider plant leaves, making it a close analog."
-    },
-    "700511": {
-      "fdc_id": 2709642,
-      "food_code": 72133201,
-      "confidence": 0.5,
-      "rationale": "This entry is cooked leaves of various plants similar to spider plant leaves, making it a plausible analog though not an exact match."
-    },
-    "700512": {
-      "fdc_id": 2709642,
-      "food_code": 72133201,
-      "confidence": 0.5,
-      "rationale": "This entry includes cooked leaves of similar types (sweet potato, squash, pumpkin, chrysanthemum, or bean leaves), which are dark green leafy vegetables like spider plant leaves, making it a plausible analog."
     },
     "700513": {
       "fdc_id": 2709614,
@@ -32663,12 +31727,6 @@
       "confidence": 0.9,
       "rationale": "Spinach, fresh, cooked, no added fat matches boiled fresh spinach without salt closely."
     },
-    "700516": {
-      "fdc_id": 2709642,
-      "food_code": 72133201,
-      "confidence": 0.5,
-      "rationale": "Closest match is cooked sweet potato leaves and similar leafy greens, but CNF food is raw leaves, so composition differs."
-    },
     "700517": {
       "fdc_id": 2709642,
       "food_code": 72133201,
@@ -32680,18 +31738,6 @@
       "food_code": 72133201,
       "confidence": 0.7,
       "rationale": "This entry is for cooked sweet potato leaves, closely matching the CNF food of boiled sweet potato leaves without salt."
-    },
-    "700519": {
-      "fdc_id": 2709269,
-      "food_code": 63148750,
-      "confidence": 0.5,
-      "rationale": "Tamarind fruit is the closest available analog to tamarind leaves, but the part of the plant differs, so composition may vary."
-    },
-    "700521": {
-      "fdc_id": 2709633,
-      "food_code": 72126001,
-      "confidence": 0.5,
-      "rationale": "Taro leaves, cooked, is a dark green leafy vegetable similar to tamarind leaves boiled, but not the exact same species."
     },
     "700522": {
       "fdc_id": 2709633,
@@ -32771,12 +31817,6 @@
       "confidence": 0.9,
       "rationale": "Turnip, cooked in FNDDS closely matches CNF's boiled turnip without salt, making it a direct equivalent."
     },
-    "700536": {
-      "fdc_id": 2709614,
-      "food_code": 72125100,
-      "confidence": 0.5,
-      "rationale": "Spinach, raw is a plausible analog as a leafy green vegetable similar to Vernonia leaves, though exact bitterness and nutrient profile may differ."
-    },
     "700537": {
       "fdc_id": 2709641,
       "food_code": 72132201,
@@ -32813,12 +31853,6 @@
       "confidence": 0.7,
       "rationale": "Watercress, raw is a close analog to fresh raw waterleaf as both are leafy green vegetables with similar nutrient profiles."
     },
-    "700543": {
-      "fdc_id": 2709633,
-      "food_code": 72126001,
-      "confidence": 0.5,
-      "rationale": "Taro leaves, cooked, is a plausible analog as it is a cooked dark green leafy vegetable similar to waterleaf leaves boiled, though not the exact same species."
-    },
     "700544": {
       "fdc_id": 2709633,
       "food_code": 72126001,
@@ -32842,42 +31876,6 @@
       "food_code": 72125211,
       "confidence": 0.9,
       "rationale": "Spinach, fresh, cooked, no added fat closely matches wild spinach leaves boiled without salt, drained."
-    },
-    "700548": {
-      "fdc_id": 2709265,
-      "food_code": 63143010,
-      "confidence": 0.5,
-      "rationale": "African black plum is a fruit similar to plum, making raw plum a plausible analog though not a direct equivalent."
-    },
-    "700549": {
-      "fdc_id": 2709228,
-      "food_code": 63109700,
-      "confidence": 0.5,
-      "rationale": "Starfruit is a raw tropical fruit similar in category to African fan palm fruit, making it a plausible analog though not a direct equivalent."
-    },
-    "700550": {
-      "fdc_id": 2707369,
-      "food_code": 41103010,
-      "confidence": 0.5,
-      "rationale": "African locust bean flour is a legume product, and dried lima beans are a plausible analog within the same category though not identical in preparation or species."
-    },
-    "700551": {
-      "fdc_id": 2709228,
-      "food_code": 63109700,
-      "confidence": 0.5,
-      "rationale": "Starfruit is a raw tropical fruit somewhat similar in category to African locust bean fruit, making it a plausible analog given the lack of direct matches."
-    },
-    "700552": {
-      "fdc_id": 2709228,
-      "food_code": 63109700,
-      "confidence": 0.5,
-      "rationale": "African star apple is a tropical fruit similar in category to starfruit, raw, but they differ in species and exact nutrient profiles."
-    },
-    "700553": {
-      "fdc_id": 2709228,
-      "food_code": 63109700,
-      "confidence": 0.5,
-      "rationale": "Starfruit is a tropical fruit somewhat similar to akee in category but differs in composition, making it a plausible analog."
     },
     "700554": {
       "fdc_id": 2709215,
@@ -32927,12 +31925,6 @@
       "confidence": 0.9,
       "rationale": "Exact match for raw banana, same preparation and food type."
     },
-    "700562": {
-      "fdc_id": 2709879,
-      "food_code": 75208501,
-      "confidence": 0.5,
-      "rationale": "Breadfruit, cooked is a tropical fruit similar in category to baobab fruit but differs in preparation and composition."
-    },
     "700563": {
       "fdc_id": 2709879,
       "food_code": 75208501,
@@ -32944,12 +31936,6 @@
       "food_code": 63109700,
       "confidence": 0.9,
       "rationale": "Exact match with the same food name and preparation (raw starfruit)."
-    },
-    "700565": {
-      "fdc_id": 2709215,
-      "food_code": 63101000,
-      "confidence": 0.5,
-      "rationale": "Cashew apple is a fruit, but no exact match exists; apple, raw is a plausible analog as a raw fruit with similar general composition."
     },
     "700566": {
       "fdc_id": 2709164,
@@ -32963,23 +31949,11 @@
       "confidence": 0.7,
       "rationale": "This entry is a general dried fruit category and best matches dried raw dates in the CNF as a close analog."
     },
-    "700568": {
-      "fdc_id": 2709235,
-      "food_code": 63119010,
-      "confidence": 0.5,
-      "rationale": "Fig, raw is a plausible analog as it is a soft, raw fruit similar in texture and sugar content to dates, though not the exact same fruit."
-    },
     "700569": {
       "fdc_id": 2709197,
       "food_code": 62104100,
       "confidence": 0.7,
       "rationale": "Dattock is a dried fruit similar to apricot, making 'Apricot, dried' a close analog."
-    },
-    "700570": {
-      "fdc_id": 2709221,
-      "food_code": 63103010,
-      "confidence": 0.5,
-      "rationale": "Dattock is a fruit and the closest available analog in the candidates is apricot, raw, which is a similar type of fresh fruit though not the same species."
     },
     "700571": {
       "fdc_id": 2709204,
@@ -33023,24 +31997,6 @@
       "confidence": 0.9,
       "rationale": "Exact match for raw guava, same preparation and ingredients."
     },
-    "700578": {
-      "fdc_id": 2709238,
-      "food_code": 63125010,
-      "confidence": 0.5,
-      "rationale": "Gumvine fruit is a tropical fruit and guava is a plausible analog as a raw tropical fruit, though exact composition may differ."
-    },
-    "700579": {
-      "fdc_id": 2709238,
-      "food_code": 63125010,
-      "confidence": 0.5,
-      "rationale": "Jujube is a fruit and the closest analog among candidates is guava, another tropical fruit with similar usage, though they differ in composition."
-    },
-    "700580": {
-      "fdc_id": 2709248,
-      "food_code": 63134010,
-      "confidence": 0.5,
-      "rationale": "Passion fruit, raw is a plausible analog as it is a tropical fruit with similar usage, though exact composition may differ."
-    },
     "700581": {
       "fdc_id": 2709168,
       "food_code": 61113010,
@@ -33083,12 +32039,6 @@
       "confidence": 0.7,
       "rationale": "Mombin/hog-plum is a type of plum fruit, making raw plum the closest analog in the FNDDS list."
     },
-    "700588": {
-      "fdc_id": 2709954,
-      "food_code": 75221160,
-      "confidence": 0.5,
-      "rationale": "Palm hearts, cooked is the closest available analog related to palm fruit, though it differs in preparation and part of the plant used."
-    },
     "700589": {
       "fdc_id": 2709171,
       "food_code": 61119010,
@@ -33113,12 +32063,6 @@
       "confidence": 0.95,
       "rationale": "Exact match for raw pomegranate fruit in FNDDS, directly equivalent to CNF entry."
     },
-    "700594": {
-      "fdc_id": 2709238,
-      "food_code": 63125010,
-      "confidence": 0.5,
-      "rationale": "Soapberry is a fruit with limited direct matches; guava is a plausible analog as a tropical fruit with similar usage and nutritional profile."
-    },
     "700595": {
       "fdc_id": 2709350,
       "food_code": 64221010,
@@ -33130,12 +32074,6 @@
       "food_code": 63101000,
       "confidence": 0.9,
       "rationale": "Exact match for raw apple, same food and preparation."
-    },
-    "700597": {
-      "fdc_id": 2710307,
-      "food_code": 91407100,
-      "confidence": 0.5,
-      "rationale": "Guava paste is a fruit paste similar in form and use to sweet baobab paste, making it a plausible analog despite different fruit origins."
     },
     "700598": {
       "fdc_id": 2709269,
@@ -33190,18 +32128,6 @@
       "food_code": 11370000,
       "confidence": 0.9,
       "rationale": "Exact match for coconut milk, fresh or canned, making it a direct equivalent."
-    },
-    "700610": {
-      "fdc_id": 2707492,
-      "food_code": 42102000,
-      "confidence": 0.5,
-      "rationale": "Cola nut is a dried nut, and Brazil nuts are the closest nut category available, though not the same species."
-    },
-    "700611": {
-      "fdc_id": 2707500,
-      "food_code": 42106000,
-      "confidence": 0.5,
-      "rationale": "Cola nut is a nut and the closest available analog is coconut, fresh, which is also a fresh nut, though composition may differ."
     },
     "700613": {
       "fdc_id": 2707586,
@@ -33293,24 +32219,6 @@
       "confidence": 0.7,
       "rationale": "Pumpkin seeds, unsalted, are the closest available nuts and seeds analog to dried raw melon seed kernels."
     },
-    "700629": {
-      "fdc_id": 2707583,
-      "food_code": 43102100,
-      "confidence": 0.5,
-      "rationale": "Best available analog is sunflower seeds, plain, salted, as no melon seed entries exist; both are seeds but differ in species and preparation."
-    },
-    "700630": {
-      "fdc_id": 2707582,
-      "food_code": 43102000,
-      "confidence": 0.5,
-      "rationale": "Sunflower seeds, plain, unsalted are the closest nuts/seeds analog available, though melon seed kernel is distinct and not directly represented."
-    },
-    "700631": {
-      "fdc_id": 2707492,
-      "food_code": 42102000,
-      "confidence": 0.5,
-      "rationale": "Brazil nuts are a plausible analog as they are nuts with similar nutrient profiles, though not the same species as palm nut kernel."
-    },
     "700632": {
       "fdc_id": 2707581,
       "food_code": 43101150,
@@ -33323,41 +32231,17 @@
       "confidence": 0.9,
       "rationale": "Exact match for whole sesame seeds, raw and dried, making it a direct equivalent."
     },
-    "700634": {
-      "fdc_id": 2707494,
-      "food_code": 42104050,
-      "confidence": 0.5,
-      "rationale": "Shea nut kernel is a nut similar to cashews in category, but no exact match is available in candidates."
-    },
-    "700636": {
-      "fdc_id": 2707449,
-      "food_code": 41421020,
-      "confidence": 0.5,
-      "rationale": "Bamboo caterpillar is a fried insect protein, closest analog is fried soybean curd as a fried protein product, though not the same ingredient."
-    },
     "700637": {
       "fdc_id": 2706157,
       "food_code": 25130000,
       "confidence": 0.9,
       "rationale": "Both are raw beef kidney, making this a direct equivalent."
     },
-    "700638": {
-      "fdc_id": 2706153,
-      "food_code": 25110140,
-      "confidence": 0.5,
-      "rationale": "Closest available beef organ meat is beef liver, which is a plausible analog though not kidney."
-    },
     "700639": {
       "fdc_id": 2706153,
       "food_code": 25110140,
       "confidence": 0.7,
       "rationale": "Beef liver is the closest organ meat analog available, though not kidney, it shares similar nutritional profile and preparation style."
-    },
-    "700640": {
-      "fdc_id": 2706592,
-      "food_code": 27311410,
-      "confidence": 0.5,
-      "rationale": "The candidate is a beef stew, which is a plausible analog to stewed beef kidney though the organ meat differs from muscle meat."
     },
     "700641": {
       "fdc_id": 2706153,
@@ -33388,12 +32272,6 @@
       "food_code": 21500000,
       "confidence": 0.7,
       "rationale": "Ground beef raw is a close analog to fatty beef with about 30% fat content, matching preparation and fat level closely."
-    },
-    "700646": {
-      "fdc_id": 2705854,
-      "food_code": 21500100,
-      "confidence": 0.5,
-      "rationale": "Beef, ground is a plausible analog for fatty boiled beef though it differs in preparation and fat content."
     },
     "700647": {
       "fdc_id": 2705833,
@@ -33461,12 +32339,6 @@
       "confidence": 0.7,
       "rationale": "Ground beef, raw, is a close analog to moderately fat raw beef with about 20% fat content."
     },
-    "700658": {
-      "fdc_id": 2705854,
-      "food_code": 21500100,
-      "confidence": 0.5,
-      "rationale": "Beef, ground is a plausible analog for moderately fatty boiled beef, though the preparation and fat content may differ."
-    },
     "700659": {
       "fdc_id": 2705854,
       "food_code": 21500100,
@@ -33508,24 +32380,6 @@
       "food_code": 21416000,
       "confidence": 0.9,
       "rationale": "Exact match for canned corned beef, same preparation and ingredients."
-    },
-    "700666": {
-      "fdc_id": 2705853,
-      "food_code": 21500000,
-      "confidence": 0.5,
-      "rationale": "Ground beef is the closest available analog as it is raw red meat, though camel meat differs in species and specific nutrient profile."
-    },
-    "700668": {
-      "fdc_id": 2705968,
-      "food_code": 24123301,
-      "confidence": 0.5,
-      "rationale": "Camel meat is a red meat similar to other lean meats; grilled chicken breast without skin is a plausible analog in the absence of camel meat in FNDDS."
-    },
-    "700669": {
-      "fdc_id": 2706592,
-      "food_code": 27311410,
-      "confidence": 0.5,
-      "rationale": "Camel meat stew is closest to beef stew in category and preparation, though camel meat is distinct from beef."
     },
     "700673": {
       "fdc_id": 2706678,
@@ -33611,12 +32465,6 @@
       "confidence": 0.7,
       "rationale": "Turkey light meat with skin eaten is a close analog to raw chicken light meat with skin, both being poultry light meat with skin, though different species and cooking state."
     },
-    "700687": {
-      "fdc_id": 2705940,
-      "food_code": 24103020,
-      "confidence": 0.5,
-      "rationale": "Closest available chicken entry is stewed with skin not eaten, while CNF is boiled with skin eaten, so plausible but not exact match."
-    },
     "700688": {
       "fdc_id": 2705967,
       "food_code": 24123300,
@@ -33652,30 +32500,6 @@
       "food_code": 24123120,
       "confidence": 0.85,
       "rationale": "Chicken breast, stewed, skin not eaten closely matches light meat without skin, stewed in the CNF food."
-    },
-    "700696": {
-      "fdc_id": 2706346,
-      "food_code": 26307140,
-      "confidence": 0.5,
-      "rationale": "Cricket (katydid) is an insect protein source; closest available analog is shellfish (crab, soft shell) as another animal protein, though not an insect."
-    },
-    "700698": {
-      "fdc_id": 2706015,
-      "food_code": 24143220,
-      "confidence": 0.5,
-      "rationale": "Crocodile meat is a type of meat similar to poultry; chicken drumstick stewed without skin is a plausible analog though not exact."
-    },
-    "700699": {
-      "fdc_id": 2706010,
-      "food_code": 24142500,
-      "confidence": 0.5,
-      "rationale": "Crocodile meat is a lean exotic meat; grilled chicken drumstick without sauce and skin eaten is a plausible analog within the meat category but differs in species and fat content."
-    },
-    "700700": {
-      "fdc_id": 2705849,
-      "food_code": 21410000,
-      "confidence": 0.5,
-      "rationale": "Beef stew meat is a plausible analog for stewed crocodile meat as both are red meats used in stews, though species differ."
     },
     "700702": {
       "fdc_id": 2705860,
@@ -33761,24 +32585,6 @@
       "confidence": 0.7,
       "rationale": "Both are chicken stews with vegetables, making this a close analog despite possible recipe differences."
     },
-    "700717": {
-      "fdc_id": 2705907,
-      "food_code": 23132000,
-      "confidence": 0.5,
-      "rationale": "The candidate is lamb meat (ground), which is the same animal source but a different part and preparation than lamb brain."
-    },
-    "700718": {
-      "fdc_id": 2705906,
-      "food_code": 23101000,
-      "confidence": 0.5,
-      "rationale": "No direct brain equivalent; lamb chop is closest lamb meat analog though composition differs significantly."
-    },
-    "700719": {
-      "fdc_id": 2706660,
-      "food_code": 27330210,
-      "confidence": 0.5,
-      "rationale": "The candidate is a lamb stew which is a plausible analog but does not specifically match lamb brain as the main ingredient."
-    },
     "700720": {
       "fdc_id": 2706153,
       "food_code": 25110140,
@@ -33796,12 +32602,6 @@
       "food_code": 25110140,
       "confidence": 0.7,
       "rationale": "Liver, beef is the closest organ meat analog to lamb liver, sharing similar nutrient profiles despite species difference."
-    },
-    "700723": {
-      "fdc_id": 2706660,
-      "food_code": 27330210,
-      "confidence": 0.5,
-      "rationale": "The candidate is a lamb stew which is the closest available analog, but it is not specifically lamb liver stewed, so composition may differ."
     },
     "700724": {
       "fdc_id": 2705907,
@@ -33850,12 +32650,6 @@
       "food_code": 27330210,
       "confidence": 0.9,
       "rationale": "Stew, lamb is a direct equivalent to moderately fat lamb stewed as part of a recipe."
-    },
-    "700733": {
-      "fdc_id": 2706086,
-      "food_code": 24198570,
-      "confidence": 0.5,
-      "rationale": "Canned chicken meat is the closest available protein canned meat analog to canned mopane worm, though they differ in species and nutrient profile."
     },
     "700734": {
       "fdc_id": 2705928,
@@ -33994,30 +32788,6 @@
       "food_code": 26321110,
       "confidence": 0.9,
       "rationale": "Exact match with same food and preparation: Escargot in FNDDS corresponds directly to cooked snail in CNF."
-    },
-    "700757": {
-      "fdc_id": 2705849,
-      "food_code": 21410000,
-      "confidence": 0.5,
-      "rationale": "Springbok meat is a type of game meat similar to beef stew meat in category but differs in species and possibly nutrient profile."
-    },
-    "700758": {
-      "fdc_id": 2705940,
-      "food_code": 24103020,
-      "confidence": 0.5,
-      "rationale": "Candidate is cooked chicken meat, a similar type of lean meat, but not the same species as springbok."
-    },
-    "700759": {
-      "fdc_id": 2705854,
-      "food_code": 21500100,
-      "confidence": 0.5,
-      "rationale": "Springbok is a game meat similar to beef in category; ground beef is the closest available analog though not the same cut or preparation."
-    },
-    "700760": {
-      "fdc_id": 2706592,
-      "food_code": 27311410,
-      "confidence": 0.5,
-      "rationale": "Stew, beef is a plausible analog to stewed springbok meat as both are red meat stews, though species differ."
     },
     "700763": {
       "fdc_id": 2707152,
@@ -34211,12 +32981,6 @@
       "confidence": 0.7,
       "rationale": "Barracuda fillet is a raw fish fillet, best matched by a generic raw fish fillet in FNDDS."
     },
-    "700795": {
-      "fdc_id": 2706317,
-      "food_code": 26157160,
-      "confidence": 0.5,
-      "rationale": "Barracuda is a fish and the closest available USDA analog is whiting, steamed, a similar white fish prepared by steaming."
-    },
     "700796": {
       "fdc_id": 2706296,
       "food_code": 26141121,
@@ -34325,12 +33089,6 @@
       "confidence": 0.9,
       "rationale": "Exact match for steamed crab flesh without salt, directly equivalent to CNF food."
     },
-    "700814": {
-      "fdc_id": 2706230,
-      "food_code": 26100190,
-      "confidence": 0.5,
-      "rationale": "No dried whole fish in candidates; smoked fish is closest in preservation method but differs in moisture and texture."
-    },
     "700815": {
       "fdc_id": 2706263,
       "food_code": 26121110,
@@ -34379,29 +33137,11 @@
       "confidence": 0.7,
       "rationale": "Fish, tilapia, grilled is a close analog to mahi mahi fillet grilled, both being white fish fillets prepared by grilling without added fat or salt."
     },
-    "700823": {
-      "fdc_id": 2706323,
-      "food_code": 26158050,
-      "confidence": 0.5,
-      "rationale": "Tilapia steamed is a plausible analog as both are white fish steamed without salt, though species differ."
-    },
     "700824": {
       "fdc_id": 2706223,
       "food_code": 26100100,
       "confidence": 0.7,
       "rationale": "General raw fish is the closest available analog to raw Mola carplet with viscera, fins, and scales removed."
-    },
-    "700825": {
-      "fdc_id": 2710783,
-      "food_code": 99992600,
-      "confidence": 0.5,
-      "rationale": "Generic cooked fish as ingredient is a plausible analog for boiled Mola carplet with viscera, fins, and scales removed."
-    },
-    "700826": {
-      "fdc_id": 2706265,
-      "food_code": 26121121,
-      "confidence": 0.5,
-      "rationale": "Mola carplet is a small whole fish grilled without fat or salt; fish mackerel grilled is a plausible analog as a grilled fish with similar preparation but different species."
     },
     "700827": {
       "fdc_id": 2706328,
@@ -34546,30 +33286,6 @@
       "food_code": 26213120,
       "confidence": 0.7,
       "rationale": "Calamari, cooked is a close analog to sea snail/whelk, boiled as both are cooked mollusk shellfish with similar nutrient profiles."
-    },
-    "700851": {
-      "fdc_id": 2706357,
-      "food_code": 26317121,
-      "confidence": 0.5,
-      "rationale": "Scallops, grilled is a plausible analog as a grilled shellfish, though not the same species as sea snail/whelk."
-    },
-    "700852": {
-      "fdc_id": 2706353,
-      "food_code": 26315130,
-      "confidence": 0.5,
-      "rationale": "Sea snail/whelk is a shellfish and the closest available analog is oysters, steamed, which is also a shellfish prepared by steaming, though species differ."
-    },
-    "700853": {
-      "fdc_id": 2706223,
-      "food_code": 26100100,
-      "confidence": 0.5,
-      "rationale": "Both are raw fish fillets, but species differ; closest available match in raw fish category."
-    },
-    "700854": {
-      "fdc_id": 2706307,
-      "food_code": 26151160,
-      "confidence": 0.5,
-      "rationale": "Both are fish fillets cooked by boiling/steaming, making this a plausible analog despite species differences."
     },
     "700855": {
       "fdc_id": 2706314,
@@ -34721,12 +33437,6 @@
       "confidence": 0.7,
       "rationale": "Fish, raw is the closest match to raw white grouper fillet in the candidate list."
     },
-    "700880": {
-      "fdc_id": 2706328,
-      "food_code": 26158140,
-      "confidence": 0.5,
-      "rationale": "Fish, white, mixed species, steamed is a plausible analog for white grouper fillet boiled, as both are white fish prepared by moist heat methods, though species differ."
-    },
     "700881": {
       "fdc_id": 2706329,
       "food_code": 26158150,
@@ -34805,12 +33515,6 @@
       "confidence": 0.7,
       "rationale": "Infant formula powder for 6 months is closely matched by Enfamil Infant powder formula, a common fortified infant formula."
     },
-    "700894": {
-      "fdc_id": 2705385,
-      "food_code": 11111000,
-      "confidence": 0.5,
-      "rationale": "Camel milk is similar to whole milk in composition but differs in some nutrients, making whole milk a plausible analog."
-    },
     "700895": {
       "fdc_id": 2705402,
       "food_code": 11220000,
@@ -34870,12 +33574,6 @@
       "food_code": 11116000,
       "confidence": 0.9,
       "rationale": "Exact match for fresh goat milk in FNDDS."
-    },
-    "700905": {
-      "fdc_id": 2705395,
-      "food_code": 11116000,
-      "confidence": 0.5,
-      "rationale": "Goat milk is the closest available analog to fermented sheep or goat milk, though fermentation changes composition."
     },
     "700906": {
       "fdc_id": 2705395,
@@ -35003,29 +33701,11 @@
       "confidence": 0.7,
       "rationale": "Coconut oil is the closest available FNDDS analog to palm kernel oil as both are tropical oils with similar fat profiles."
     },
-    "700927": {
-      "fdc_id": 2710182,
-      "food_code": 82101500,
-      "confidence": 0.5,
-      "rationale": "Palm kernel oil is a tropical oil similar in fatty acid profile to coconut oil, making coconut oil the closest available analog despite differences in fortification and exact source."
-    },
     "700928": {
       "fdc_id": 2710182,
       "food_code": 82101500,
       "confidence": 0.7,
       "rationale": "Coconut oil is the closest available analog to palm kernel oil in the FNDDS fats and oils category, both being tropical oils with similar fat profiles, though palm kernel oil is fortified with vitamin A which is a minor variant."
-    },
-    "700929": {
-      "fdc_id": 2710180,
-      "food_code": 82101000,
-      "confidence": 0.5,
-      "rationale": "Vegetable oil, NFS is a plausible analog as it is in the same fats and oils category, though not specifically red palm oil."
-    },
-    "700930": {
-      "fdc_id": 2710180,
-      "food_code": 82101000,
-      "confidence": 0.5,
-      "rationale": "Vegetable oil, NFS is a plausible analog as it is a general category of oils, but it is not specifically palm oil."
     },
     "700931": {
       "fdc_id": 2710180,
@@ -35038,12 +33718,6 @@
       "food_code": 82101000,
       "confidence": 0.7,
       "rationale": "Vegetable oil, NFS is a close analog to refined palm oil, though it may lack specific vitamin A fortification."
-    },
-    "700933": {
-      "fdc_id": 2710157,
-      "food_code": 81101520,
-      "confidence": 0.5,
-      "rationale": "Shea butter is a fat and oil similar to butter, but composition differs, making butter a plausible analog."
     },
     "700934": {
       "fdc_id": 2710191,
@@ -35135,12 +33809,6 @@
       "confidence": 0.7,
       "rationale": "Both are beers with alcohol content around 3%, making this a close analog despite different grain base."
     },
-    "700949": {
-      "fdc_id": 2710619,
-      "food_code": 93106000,
-      "confidence": 0.5,
-      "rationale": "Both are alcoholic malt beverages, but sorghum beer is a different grain base than typical malt beverages in FNDDS."
-    },
     "700950": {
       "fdc_id": 2710541,
       "food_code": 92410310,
@@ -35213,18 +33881,6 @@
       "confidence": 0.9,
       "rationale": "Exact match as mango nectar, canned, same preparation and ingredients."
     },
-    "700962": {
-      "fdc_id": 2710689,
-      "food_code": 93401020,
-      "confidence": 0.5,
-      "rationale": "Palm wine is an alcoholic beverage similar in alcohol content to white wine, making 'Wine, white' a plausible analog despite different raw materials."
-    },
-    "700963": {
-      "fdc_id": 2709315,
-      "food_code": 64100100,
-      "confidence": 0.5,
-      "rationale": "Palm sap is a fresh plant-derived beverage with low alcohol content, best matched to a generic fruit juice in the FNDDS due to lack of a direct palm sap entry."
-    },
     "700964": {
       "fdc_id": 2705405,
       "food_code": 11320100,
@@ -35255,53 +33911,17 @@
       "confidence": 0.7,
       "rationale": "Lemonade, fruit juice drink is a close analog to water with fresh lemon juice and added sugar, matching the main ingredients and preparation style."
     },
-    "700970": {
-      "fdc_id": 2707586,
-      "food_code": 43103000,
-      "confidence": 0.5,
-      "rationale": "Anis seed is a spice seed, and among candidates, sesame seeds are the closest in category as seeds, though composition differs."
-    },
-    "700972": {
-      "fdc_id": 2707492,
-      "food_code": 42102000,
-      "confidence": 0.5,
-      "rationale": "Brazil nuts are the closest nut seed analog available, though calabash nutmeg is a spice seed with different composition."
-    },
     "700973": {
       "fdc_id": 2709798,
       "food_code": 75121000,
       "confidence": 0.7,
       "rationale": "Peppers, hot, raw is a close analog to dried chili pepper, sharing the same food type with minor differences in preparation."
     },
-    "700974": {
-      "fdc_id": 2710261,
-      "food_code": 91104100,
-      "confidence": 0.5,
-      "rationale": "No exact ground cinnamon match; 'Sugar, cinnamon' is closest by ingredient but includes sugar, so only a plausible analog."
-    },
-    "700975": {
-      "fdc_id": 2705858,
-      "food_code": 21602000,
-      "confidence": 0.5,
-      "rationale": "Beef, dried, chipped, uncooked is the closest in preparation to a dry beef cube but exact composition likely differs."
-    },
     "700976": {
       "fdc_id": 2707586,
       "food_code": 43103000,
       "confidence": 0.7,
       "rationale": "Sesame seeds are the closest available analog to cumin seeds among the candidates as both are seeds with similar nutrient profiles."
-    },
-    "700977": {
-      "fdc_id": 2710178,
-      "food_code": 81312100,
-      "confidence": 0.5,
-      "rationale": "Curry sauce is the closest available analog to curry powder, though it is a prepared sauce rather than a dry spice mix."
-    },
-    "700978": {
-      "fdc_id": 2710082,
-      "food_code": 75503085,
-      "confidence": 0.5,
-      "rationale": "Closest available analog is pickled ginger root, which is the same food but differs in preparation (pickled vs dried)."
     },
     "700979": {
       "fdc_id": 2710281,
@@ -35351,12 +33971,6 @@
       "confidence": 0.7,
       "rationale": "Chocolate beverage powder, dry mix, not reconstituted is a close analog to Ovaltine powder, fortified as both are fortified powdered chocolate drink mixes."
     },
-    "700990": {
-      "fdc_id": 2709798,
-      "food_code": 75121000,
-      "confidence": 0.5,
-      "rationale": "Both are hot peppers, but the CNF food is dried Ethiopian pepper while the FNDDS analog is raw hot peppers, making it a plausible but not close match."
-    },
     "700991": {
       "fdc_id": 2709351,
       "food_code": 64401000,
@@ -35374,54 +33988,6 @@
       "food_code": 75236500,
       "confidence": 0.85,
       "rationale": "Yeast extract spread is a close analog to Marmite yeast extract, sharing similar preparation and use as a savory spread."
-    },
-    "700994": {
-      "fdc_id": 2706628,
-      "food_code": 27315510,
-      "confidence": 0.5,
-      "rationale": "Both are sauces with rice and vegetables including dark-green leafy components, but the CNF includes groundnut powder and specific African leaves not reflected in the FNDDS beef and soy-based sauce mixture."
-    },
-    "700995": {
-      "fdc_id": 2706657,
-      "food_code": 27330060,
-      "confidence": 0.5,
-      "rationale": "This dish includes rice and vegetables with a sauce, somewhat similar to Babenda-2's composition of green leaves, rice, and groundnut powder, but the protein and sauce base differ."
-    },
-    "700996": {
-      "fdc_id": 2706460,
-      "food_code": 27150320,
-      "confidence": 0.5,
-      "rationale": "Fish curry is a seafood mixed dish with fish and sauce, somewhat analogous to cassava leaf sauce with fish and vegetables, though ingredients differ."
-    },
-    "700997": {
-      "fdc_id": 2707404,
-      "food_code": 41205100,
-      "confidence": 0.5,
-      "rationale": "Both are legume-based sauces with complex ingredients, but the candidate lacks specific components like fish and fermented locust beans present in Bengedo."
-    },
-    "700998": {
-      "fdc_id": 2706459,
-      "food_code": 27150310,
-      "confidence": 0.5,
-      "rationale": "Fish with tomato-based sauce is a plausible analog to hibiscus leaf sauce with fish and tomatoes, though it lacks the fermented locust beans and hibiscus leaves."
-    },
-    "700999": {
-      "fdc_id": 2706657,
-      "food_code": 27330060,
-      "confidence": 0.5,
-      "rationale": "This dish includes lamb, vegetables, and a tomato-based sauce, which is somewhat similar to the CNF food's lamb and vegetable sauce, though the specific ingredients like jute mallow leaf and fermented locust beans are not represented."
-    },
-    "701000": {
-      "fdc_id": 2706717,
-      "food_code": 27350110,
-      "confidence": 0.5,
-      "rationale": "Both are seafood-based soups or sauces with vegetables, making bouillabaisse a plausible analog to the jute mallow leaf sauce with fish and vegetables."
-    },
-    "701001": {
-      "fdc_id": 2706717,
-      "food_code": 27350110,
-      "confidence": 0.5,
-      "rationale": "Both are seafood-based soups or sauces, but the FNDDS entry is a bouillabaisse which differs in ingredients and preparation from the clear sauce with fish and red palm oil."
     },
     "701002": {
       "fdc_id": 2706388,
@@ -35453,48 +34019,6 @@
       "confidence": 0.7,
       "rationale": "Peanut sauce is the closest match to groundnut sauce with fish and vegetables, sharing the primary ingredient though lacking the fish and vegetables components explicitly."
     },
-    "701007": {
-      "fdc_id": 2706868,
-      "food_code": 27451010,
-      "confidence": 0.5,
-      "rationale": "Both are fish-based dishes with sauce and vegetables, but the CNF food is a sauce while the FNDDS food is a mixed dish, making it a plausible analog."
-    },
-    "701008": {
-      "fdc_id": 2707404,
-      "food_code": 41205100,
-      "confidence": 0.5,
-      "rationale": "Both are vegetable-based sauces with legumes, but the CNF food includes unique ingredients like shea butter and fermented locust beans not present in the black bean sauce."
-    },
-    "701009": {
-      "fdc_id": 2709947,
-      "food_code": 75220021,
-      "confidence": 0.5,
-      "rationale": "The CNF food is a complex fresh leaf sauce with vegetables and fats, best matched by cooked okra with fat added as a plausible analog in the vegetable and sauce category."
-    },
-    "701010": {
-      "fdc_id": 2706523,
-      "food_code": 27232000,
-      "confidence": 0.5,
-      "rationale": "This dish is a lamb and vegetable sauce, similar in category to the white eggplant sauce with lamb and vegetables, though the exact ingredients and preparation differ."
-    },
-    "701011": {
-      "fdc_id": 2706717,
-      "food_code": 27350110,
-      "confidence": 0.5,
-      "rationale": "Both are seafood mixed dishes with a sauce component, making it a plausible analog despite different specific ingredients."
-    },
-    "701012": {
-      "fdc_id": 2710048,
-      "food_code": 75412010,
-      "confidence": 0.5,
-      "rationale": "Fried eggplant is a plausible analog as it shares the main vegetable ingredient, but lacks fish and other vegetables present in Koum zindo."
-    },
-    "701013": {
-      "fdc_id": 2706726,
-      "food_code": 27363000,
-      "confidence": 0.5,
-      "rationale": "Gumbo with rice is a plausible analog as it is a sauce with okra and meat, similar to the dried okra sauce with beef and vegetables in the CNF food, though ingredients and preparation differ."
-    },
     "701014": {
       "fdc_id": 2706657,
       "food_code": 27330060,
@@ -35507,77 +34031,17 @@
       "confidence": 0.55,
       "rationale": "Gumbo with okra and seafood is a plausible analog to fresh okra sauce with fish and vegetables, though ingredients and preparation differ."
     },
-    "701016": {
-      "fdc_id": 2709642,
-      "food_code": 72133201,
-      "confidence": 0.5,
-      "rationale": "This entry is cooked sweet potato or similar leaves, which matches the main ingredient of the CNF food, though it lacks fish and red palm oil components."
-    },
     "701017": {
       "fdc_id": 2706523,
       "food_code": 27232000,
       "confidence": 0.7,
       "rationale": "Lamb with tomato-based sauce and vegetables closely matches the CNF food's main ingredients and preparation style."
     },
-    "701018": {
-      "fdc_id": 2707404,
-      "food_code": 41205100,
-      "confidence": 0.5,
-      "rationale": "Black bean sauce is a plausible analog as a legume-based sauce, though it lacks fish and fermented locust beans present in the CNF food."
-    },
-    "701019": {
-      "fdc_id": 2706452,
-      "food_code": 27150140,
-      "confidence": 0.5,
-      "rationale": "Seafood sauce is a plausible analog to sesame sauce with fish and vegetables, sharing the sauce and seafood components though differing in specific ingredients."
-    },
-    "701020": {
-      "fdc_id": 2707134,
-      "food_code": 28340660,
-      "confidence": 0.5,
-      "rationale": "Both are chicken-based broth soups, but the CNF food includes unique ingredients like beer yeast and fermented African locust beans not present in the FNDDS analog."
-    },
     "701021": {
       "fdc_id": 2710113,
       "food_code": 75649110,
       "confidence": 0.7,
       "rationale": "This is a vegetable soup broth-based, closely matching the CNF's cabbage and vegetable soup from Burkina Faso."
-    },
-    "701022": {
-      "fdc_id": 2706574,
-      "food_code": 27250820,
-      "confidence": 0.5,
-      "rationale": "Both are fish-based dishes with sauce, but the CNF food uses red palm oil and vegetables, while the FNDDS analog is fish with cream sauce, making it a plausible but not close match."
-    },
-    "701023": {
-      "fdc_id": 2706717,
-      "food_code": 27350110,
-      "confidence": 0.5,
-      "rationale": "Both are seafood-based soups or sauces with vegetables, but the specific ingredients and preparation differ, making it a plausible analog."
-    },
-    "701024": {
-      "fdc_id": 2706460,
-      "food_code": 27150320,
-      "confidence": 0.5,
-      "rationale": "Both are fish-based dishes with sauce and vegetables, but the specific palm fruit oil and regional ingredients in the CNF food are not represented exactly in the FNDDS options."
-    },
-    "701025": {
-      "fdc_id": 2706717,
-      "food_code": 27350110,
-      "confidence": 0.5,
-      "rationale": "Both are seafood-based soups with vegetables and complex flavors, making bouillabaisse a plausible analog for the baobab leaf sauce with fish and vegetables."
-    },
-    "701026": {
-      "fdc_id": 2706717,
-      "food_code": 27350110,
-      "confidence": 0.5,
-      "rationale": "Both are seafood-based soups or sauces with mixed ingredients, making bouillabaisse a plausible analog for the baobab leaf sauce with fish and vegetables."
-    },
-    "701027": {
-      "fdc_id": 2706523,
-      "food_code": 27232000,
-      "confidence": 0.5,
-      "rationale": "This entry is a lamb dish with tomato-based sauce, which is a plausible analog to Yassa sauce with lamb, onion, and mustard, though the specific ingredients and flavor profile differ."
     },
     "6303": {
       "fdc_id": 2708445,
@@ -46852,6 +45316,1290 @@
       "food_code": 58109100,
       "confidence": 0.6,
       "rationale": "Closest match is a gluten-free thin crust cheese pizza, but CNF specifies soy and dairy free cheeses while FNDDS likely uses dairy cheese, so a moderate confidence."
+    },
+    "700001": {
+      "fdc_id": 2708375,
+      "food_code": 56201517,
+      "confidence": 0.5,
+      "rationale": "Both are cooked cereals porridges, but the CNF food is sorghum porridge with potash and sugar, while the FNDDS analog is cornmeal mush with fat added, so similar form but different grain and recipe."
+    },
+    "700004": {
+      "fdc_id": 2706726,
+      "food_code": 27363000,
+      "confidence": 0.5,
+      "rationale": "Boalboal is millet balls with fried fish and vegetables, a mixed dish with grains and seafood; Gumbo with rice is a mixed seafood dish with grains, matching form and preparation reasonably well though ingredients differ."
+    },
+    "700013": {
+      "fdc_id": 2708489,
+      "food_code": 57602100,
+      "confidence": 0.5,
+      "rationale": "Both are raw whole grains, though oats differ in species from fonio, making it a moderate analog."
+    },
+    "700014": {
+      "fdc_id": 2710789,
+      "food_code": 99995625,
+      "confidence": 0.5,
+      "rationale": "Fonio is a cooked whole grain; brown rice cooked as ingredient is a similar cooked whole grain but different species, making it a moderate analog."
+    },
+    "700015": {
+      "fdc_id": 2708414,
+      "food_code": 56205018,
+      "confidence": 0.5,
+      "rationale": "Fonio is a cooked whole grain similar in form to cooked brown rice without added fat, making it a reasonable species/variety substitution within the same form and food group."
+    },
+    "700016": {
+      "fdc_id": 2708489,
+      "food_code": 57602100,
+      "confidence": 0.5,
+      "rationale": "Fonio grains are uncooked dry cereal grains; oats raw is a different species but similar form and state, making it a moderate analog."
+    },
+    "700017": {
+      "fdc_id": 2708439,
+      "food_code": 56207120,
+      "confidence": 0.5,
+      "rationale": "Bulgur, fat added is a cooked cereal grain similar in form and preparation to boiled fonio grains, though a different species."
+    },
+    "700018": {
+      "fdc_id": 2708360,
+      "food_code": 56200300,
+      "confidence": 0.5,
+      "rationale": "Fonio is a cooked cereal grain similar in form to generic cooked cereal; no exact match but this is the closest cooked cereal analog available."
+    },
+    "700019": {
+      "fdc_id": 2709783,
+      "food_code": 75109600,
+      "confidence": 0.5,
+      "rationale": "Fonio is a raw cereal grain; the closest FNDDS analog is raw corn, a raw cereal grain of different species but similar form and state."
+    },
+    "700020": {
+      "fdc_id": 2709933,
+      "food_code": 75217520,
+      "confidence": 0.5,
+      "rationale": "Fonio is a cooked cereal grain; hominy is a cooked cereal grain of a different species but similar form and preparation state."
+    },
+    "700021": {
+      "fdc_id": 2708360,
+      "food_code": 56200300,
+      "confidence": 0.5,
+      "rationale": "Fonio is a cooked cereal grain; the closest FNDDS analog is a generic cooked cereal (cooked, NFS) despite species difference."
+    },
+    "700022": {
+      "fdc_id": 2708489,
+      "food_code": 57602100,
+      "confidence": 0.5,
+      "rationale": "Oats, raw is a raw whole grain similar in form and state to raw fonio, though a different species."
+    },
+    "700023": {
+      "fdc_id": 2710788,
+      "food_code": 99995620,
+      "confidence": 0.5,
+      "rationale": "Fonio is a cooked whole grain; the closest analog is cooked white rice as an ingredient, matching form and preparation but differing species."
+    },
+    "700025": {
+      "fdc_id": 2705686,
+      "food_code": 13210450,
+      "confidence": 0.7,
+      "rationale": "Fura saamdin is a fermented millet porridge with milk, water, and sugar, closely matching the form and preparation of Firni, an Indian pudding, which is a cooked milk-based cereal dessert."
+    },
+    "700026": {
+      "fdc_id": 2708416,
+      "food_code": 56205060,
+      "confidence": 0.5,
+      "rationale": "Pearl millet porridge with milk and sugar is a cooked cereal with milk and sweetener; rice cooked with milk is a similar cooked cereal with milk, though a different grain species."
+    },
+    "700030": {
+      "fdc_id": 2706573,
+      "food_code": 27250810,
+      "confidence": 0.5,
+      "rationale": "Both are cooked mixed dishes with fish and rice or grain in a tomato-based sauce, matching form and preparation though different grain species (fonio vs rice)."
+    },
+    "700034": {
+      "fdc_id": 2705685,
+      "food_code": 13210410,
+      "confidence": 0.5,
+      "rationale": "Pearl millet porridge with water and sugar is closest to rice pudding in form as a cooked cereal porridge with added sweetener, though species differ."
+    },
+    "700035": {
+      "fdc_id": 2708441,
+      "food_code": 56207160,
+      "confidence": 0.5,
+      "rationale": "Both are cooked grain-based porridges; while the CNF food is pearl millet porridge and the FNDDS analog is couscous (cooked grains), they share similar form and preparation state."
+    },
+    "700036": {
+      "fdc_id": 2708441,
+      "food_code": 56207160,
+      "confidence": 0.5,
+      "rationale": "Kiou gonré are steamed balls of grains and legumes, closest form is plain cooked couscous, a steamed grain dish, though species and ingredients differ."
+    },
+    "700037": {
+      "fdc_id": 2708375,
+      "food_code": 56201517,
+      "confidence": 0.6,
+      "rationale": "Cornmeal mush with fat added is a cooked cereal porridge similar in form to fonio and maize flour porridge, though not the exact grains used."
+    },
+    "700041": {
+      "fdc_id": 2709933,
+      "food_code": 75217520,
+      "confidence": 0.5,
+      "rationale": "Hominy, cooked is a cooked maize product similar in form to fermented maize dough but differs in fermentation and preparation details."
+    },
+    "700072": {
+      "fdc_id": 2708377,
+      "food_code": 56202000,
+      "confidence": 0.5,
+      "rationale": "Millet dough is cooked millet grain formed into a dough, closest analog is cooked millet grain though not formed as dough."
+    },
+    "700074": {
+      "fdc_id": 2708377,
+      "food_code": 56202000,
+      "confidence": 0.5,
+      "rationale": "Millet cooked grains is the closest form and food group, but the CNF food is fermented porridge, which is not matched exactly in FNDDS."
+    },
+    "700080": {
+      "fdc_id": 2708489,
+      "food_code": 57602100,
+      "confidence": 0.7,
+      "rationale": "Both are raw whole grains of cereals; 'Oats, raw' is the closest available raw whole grain analog to raw pearl millet."
+    },
+    "700085": {
+      "fdc_id": 2708489,
+      "food_code": 57602100,
+      "confidence": 0.7,
+      "rationale": "Both are raw whole grains of cereal; although the CNF is pearl millet and FNDDS is oats, they share the same form and preparation state."
+    },
+    "700095": {
+      "fdc_id": 2708441,
+      "food_code": 56207160,
+      "confidence": 0.5,
+      "rationale": "Pearl millet boiled whole grains best match cooked whole grain couscous as a similar cooked cereal grain form, though species differ."
+    },
+    "700096": {
+      "fdc_id": 2708441,
+      "food_code": 56207160,
+      "confidence": 0.5,
+      "rationale": "Pearl millet boiled whole grains best match cooked couscous as a similar cooked grain product, though species differ."
+    },
+    "700097": {
+      "fdc_id": 2708489,
+      "food_code": 57602100,
+      "confidence": 0.5,
+      "rationale": "Oats, raw is a raw cereal grain similar in form and state to raw decorticated pearl millet, though a different species."
+    },
+    "700099": {
+      "fdc_id": 2708416,
+      "food_code": 56205060,
+      "confidence": 0.5,
+      "rationale": "Pearl millet boiled is closest to cooked rice in form and preparation, though species differ and no exact millet entry is available."
+    },
+    "700101": {
+      "fdc_id": 2708489,
+      "food_code": 57602100,
+      "confidence": 0.5,
+      "rationale": "Both are raw whole grains, but candidate is oats while CNF is pearl millet, so same form but different species."
+    },
+    "700102": {
+      "fdc_id": 2710788,
+      "food_code": 99995620,
+      "confidence": 0.5,
+      "rationale": "Pearl millet boiled grains have no exact match; white cooked rice as ingredient is the closest same form cooked whole grain in FNDDS."
+    },
+    "700103": {
+      "fdc_id": 2708353,
+      "food_code": 56113000,
+      "confidence": 0.5,
+      "rationale": "Pearl millet, whole grains, boiled is best matched by cooked whole grain noodles as a similar cooked whole grain form, though species differ."
+    },
+    "700104": {
+      "fdc_id": 2708441,
+      "food_code": 56207160,
+      "confidence": 0.5,
+      "rationale": "Both are cooked cereal grain products in ball or grain form, but the CNF food is steamed pearl millet balls while the FNDDS analog is plain cooked couscous (semolina wheat), a different grain species."
+    },
+    "700155": {
+      "fdc_id": 2709783,
+      "food_code": 75109600,
+      "confidence": 0.5,
+      "rationale": "Both are raw whole grains in the cereal group, but sorghum and corn are different species."
+    },
+    "700156": {
+      "fdc_id": 2710789,
+      "food_code": 99995625,
+      "confidence": 0.5,
+      "rationale": "Both are cooked whole grains used as recipe ingredients, but sorghum and brown rice are different species."
+    },
+    "700157": {
+      "fdc_id": 2708442,
+      "food_code": 56207200,
+      "confidence": 0.5,
+      "rationale": "Both are cooked whole grain cereals, but sorghum and whole wheat are different species."
+    },
+    "700158": {
+      "fdc_id": 2708489,
+      "food_code": 57602100,
+      "confidence": 0.5,
+      "rationale": "Both are raw whole grains in the cereal group, but oats differ in species from sorghum."
+    },
+    "700159": {
+      "fdc_id": 2710789,
+      "food_code": 99995625,
+      "confidence": 0.5,
+      "rationale": "Boiled red sorghum grain best matches cooked whole grain rice as ingredient, same form but different species."
+    },
+    "700160": {
+      "fdc_id": 2708353,
+      "food_code": 56113000,
+      "confidence": 0.5,
+      "rationale": "Both are cooked whole grains, but sorghum and whole grain noodles differ in species and texture, making this a moderate analog."
+    },
+    "700162": {
+      "fdc_id": 2710788,
+      "food_code": 99995620,
+      "confidence": 0.5,
+      "rationale": "Both are cooked whole grains used as ingredients, but sorghum and rice are different species."
+    },
+    "700163": {
+      "fdc_id": 2708408,
+      "food_code": 56205008,
+      "confidence": 0.5,
+      "rationale": "Both are cooked whole grains without added fat, but different species (sorghum vs rice)"
+    },
+    "700164": {
+      "fdc_id": 2708489,
+      "food_code": 57602100,
+      "confidence": 0.5,
+      "rationale": "Teff whole grains raw best matches raw whole grain oats as a similar raw cereal grain, though species differ."
+    },
+    "700165": {
+      "fdc_id": 2708442,
+      "food_code": 56207200,
+      "confidence": 0.5,
+      "rationale": "Teff boiled whole grains have no exact match; whole wheat cereal cooked is the closest same form and preparation but different species."
+    },
+    "700166": {
+      "fdc_id": 2708442,
+      "food_code": 56207200,
+      "confidence": 0.5,
+      "rationale": "Teff whole grains boiled is closest to whole wheat cereal cooked as a similar cooked whole grain cereal, though species differ."
+    },
+    "700168": {
+      "fdc_id": 2708441,
+      "food_code": 56207160,
+      "confidence": 0.7,
+      "rationale": "Both are cooked couscous products; although the CNF couscous includes yellow maize and bambara groundnuts, the FNDDS analog is plain cooked couscous, making it a close analog in form and preparation."
+    },
+    "700199": {
+      "fdc_id": 2709560,
+      "food_code": 71905000,
+      "confidence": 0.5,
+      "rationale": "Cocoyam is a starchy tuber similar in form and use to plantain, both raw starchy vegetables, though different species."
+    },
+    "700202": {
+      "fdc_id": 2709560,
+      "food_code": 71905000,
+      "confidence": 0.5,
+      "rationale": "Plantain, raw is a starchy tuber-like vegetable in raw form, making it the closest analog to raw yellow cocoyam tuber among the candidates despite species difference."
+    },
+    "700205": {
+      "fdc_id": 2710063,
+      "food_code": 75439010,
+      "confidence": 0.7,
+      "rationale": "Both are cooked vegetable stews, matching preparation and form closely, making this a close analog despite different specific recipe."
+    },
+    "700233": {
+      "fdc_id": 2709564,
+      "food_code": 71930120,
+      "confidence": 0.5,
+      "rationale": "Both are cooked starchy root products; CNF porridge from gari (cassava) and tomato paste is closest to cooked cassava, though tomato paste addition differs."
+    },
+    "700255": {
+      "fdc_id": 2709809,
+      "food_code": 75129000,
+      "confidence": 0.5,
+      "rationale": "Tiger nut is a starchy tuber, raw; turnip, raw is a raw starchy root vegetable and the closest available analog in form and state despite species difference."
+    },
+    "700256": {
+      "fdc_id": 2709567,
+      "food_code": 71962040,
+      "confidence": 0.5,
+      "rationale": "Taro, cooked is a starchy tuber cooked vegetable similar in form and preparation to boiled tiger nut tuber, but a different species."
+    },
+    "700257": {
+      "fdc_id": 2709567,
+      "food_code": 71962040,
+      "confidence": 0.5,
+      "rationale": "Tiger nut tuber is a starchy root/tuber, boiled and drained, best matched by taro cooked, a similar starchy tuber cooked form though different species."
+    },
+    "700258": {
+      "fdc_id": 2709560,
+      "food_code": 71905000,
+      "confidence": 0.5,
+      "rationale": "Plantain, raw is a starchy tuberous vegetable in raw form, similar in preparation and form to raw water yam, though a different species."
+    },
+    "700259": {
+      "fdc_id": 2709567,
+      "food_code": 71962040,
+      "confidence": 0.6,
+      "rationale": "Taro, cooked is a similar cooked starchy tuber vegetable, matching form and preparation state, though species differs from water yam."
+    },
+    "700261": {
+      "fdc_id": 2709561,
+      "food_code": 71905008,
+      "confidence": 0.5,
+      "rationale": "Both are cooked starchy tubers fried with added fat, but yam and plantain are different species."
+    },
+    "700263": {
+      "fdc_id": 2709809,
+      "food_code": 75129000,
+      "confidence": 0.5,
+      "rationale": "Turnip, raw is a raw starchy root vegetable similar in form and preparation to raw pale yam tuber, though a different species."
+    },
+    "700266": {
+      "fdc_id": 2709560,
+      "food_code": 71905000,
+      "confidence": 0.5,
+      "rationale": "Yam (Isu akoko) raw tuber matched best with plantain raw as both are raw starchy tuber-like foods, though species differ."
+    },
+    "700267": {
+      "fdc_id": 2709560,
+      "food_code": 71905000,
+      "confidence": 0.5,
+      "rationale": "Plantain, raw is a starchy tuber-like vegetable in raw form, similar in preparation state and category to raw yam, though a different species."
+    },
+    "700268": {
+      "fdc_id": 2709560,
+      "food_code": 71905000,
+      "confidence": 0.5,
+      "rationale": "Yam, Amara is a raw starchy tuber similar in form and state to raw plantain, making plantain the closest available analog despite species difference."
+    },
+    "700269": {
+      "fdc_id": 2709560,
+      "food_code": 71905000,
+      "confidence": 0.5,
+      "rationale": "Yam (Chika, kundu) is a starchy tuber similar in form and raw state to plantain, raw, making it a reasonable analog despite species difference."
+    },
+    "700270": {
+      "fdc_id": 2709560,
+      "food_code": 71905000,
+      "confidence": 0.5,
+      "rationale": "Yam (Giwa) is a starchy tuber similar in form and raw state to plantain, another raw starchy vegetable, but species differ."
+    },
+    "700271": {
+      "fdc_id": 2709560,
+      "food_code": 71905000,
+      "confidence": 0.5,
+      "rationale": "Yam (Isu Abuja) raw tuber is best matched by plantain, raw, as both are raw starchy tubers though different species; no exact yam raw tuber found in FNDDS."
+    },
+    "700272": {
+      "fdc_id": 2709560,
+      "food_code": 71905000,
+      "confidence": 0.5,
+      "rationale": "Plantain, raw is a starchy tuber-like vegetable in raw form, closest in form and state to raw yam tuber, though a different species."
+    },
+    "700274": {
+      "fdc_id": 2709567,
+      "food_code": 71962040,
+      "confidence": 0.6,
+      "rationale": "Yam (Dioscorea) and taro are both cooked starchy tubers with similar form and preparation, making taro a reasonable analog despite species difference."
+    },
+    "700276": {
+      "fdc_id": 2709560,
+      "food_code": 71905000,
+      "confidence": 0.5,
+      "rationale": "Plantain, raw is a starchy tuberous vegetable similar in form and raw state to yam, but a different species."
+    },
+    "700277": {
+      "fdc_id": 2709567,
+      "food_code": 71962040,
+      "confidence": 0.5,
+      "rationale": "Yam, tuber, three-leaved, pale, boiled is best matched by taro, cooked, as both are cooked starchy tubers though different species."
+    },
+    "700279": {
+      "fdc_id": 2707349,
+      "food_code": 41101020,
+      "confidence": 0.5,
+      "rationale": "Both are dry, raw legumes from dried beans, though species differ; form and preparation state match."
+    },
+    "700280": {
+      "fdc_id": 2707388,
+      "food_code": 41107010,
+      "confidence": 0.5,
+      "rationale": "African locust bean, fermented is a cooked legume product; closest available analog is cooked soybeans, a different species but similar form and food group."
+    },
+    "700281": {
+      "fdc_id": 2707388,
+      "food_code": 41107010,
+      "confidence": 0.5,
+      "rationale": "African locust bean is a cooked legume; soybeans cooked is a different species but same form and preparation state, making it a reasonable analog."
+    },
+    "700282": {
+      "fdc_id": 2707388,
+      "food_code": 41107010,
+      "confidence": 0.5,
+      "rationale": "Both are cooked legumes in similar form, but different species (African locust bean vs soybean)"
+    },
+    "700283": {
+      "fdc_id": 2707389,
+      "food_code": 41108010,
+      "confidence": 0.5,
+      "rationale": "African locust bean is a cooked legume; mung beans, cooked, share the same form and food group but differ in species."
+    },
+    "700284": {
+      "fdc_id": 2707388,
+      "food_code": 41107010,
+      "confidence": 0.5,
+      "rationale": "Both are cooked legumes with similar preparation state, but different species (African locust bean vs soybean)."
+    },
+    "700286": {
+      "fdc_id": 2707388,
+      "food_code": 41107010,
+      "confidence": 0.5,
+      "rationale": "Both are cooked legumes without added fat or salt, but different species (African yam bean vs soybean)"
+    },
+    "700288": {
+      "fdc_id": 2707389,
+      "food_code": 41108010,
+      "confidence": 0.5,
+      "rationale": "African yam bean is a legume cooked by soaking and boiling, best matched by mung beans cooked, a different legume species but same form and preparation."
+    },
+    "700289": {
+      "fdc_id": 2707389,
+      "food_code": 41108010,
+      "confidence": 0.5,
+      "rationale": "Both are cooked legumes with similar preparation (soaked, boiled without salt), but different species (African yam bean vs mung beans)."
+    },
+    "700291": {
+      "fdc_id": 2707519,
+      "food_code": 42111210,
+      "confidence": 0.5,
+      "rationale": "Peanuts, dry roasted, unsalted is a legume in dry form similar to dry raw Bambara groundnut, but species differ."
+    },
+    "700292": {
+      "fdc_id": 2707389,
+      "food_code": 41108010,
+      "confidence": 0.5,
+      "rationale": "Bambara groundnut is a legume boiled without salt and drained; mung beans cooked is a different species but same form and preparation, making it a reasonable analog."
+    },
+    "700303": {
+      "fdc_id": 2707389,
+      "food_code": 41108010,
+      "confidence": 0.5,
+      "rationale": "Both are cooked legumes in a similar form, but different species (Bambara groundnut vs mung beans)."
+    },
+    "700305": {
+      "fdc_id": 2707492,
+      "food_code": 42102000,
+      "confidence": 0.5,
+      "rationale": "Bambara groundnut is a dry raw legume; Brazil nuts are dry raw nuts/seeds, same form and food group but different species."
+    },
+    "700306": {
+      "fdc_id": 2707389,
+      "food_code": 41108010,
+      "confidence": 0.5,
+      "rationale": "Both are cooked legumes without added fat or seasoning, but different species (mung beans vs bambara groundnut)."
+    },
+    "700307": {
+      "fdc_id": 2707389,
+      "food_code": 41108010,
+      "confidence": 0.5,
+      "rationale": "Bambara groundnut is a legume, and mung beans are cooked legumes with similar form and preparation, though different species."
+    },
+    "700313": {
+      "fdc_id": 2707389,
+      "food_code": 41108010,
+      "confidence": 0.5,
+      "rationale": "Both are cooked legumes with vegetables, but different species and likely different vegetable mix, making it a reasonable but not perfect analog."
+    },
+    "700315": {
+      "fdc_id": 2707413,
+      "food_code": 41301010,
+      "confidence": 0.5,
+      "rationale": "Boiled cowpeas and degermed white maize is best approximated by cooked blackeyed peas, a cooked legume, though the maize component is missing."
+    },
+    "700317": {
+      "fdc_id": 2707389,
+      "food_code": 41108010,
+      "confidence": 0.5,
+      "rationale": "Beng saagbo is a porridge from cowpeas with maize flour and potash, so the closest analog is a cooked legume dish; mung beans, cooked is a different legume but similar form and preparation."
+    },
+    "700318": {
+      "fdc_id": 2709552,
+      "food_code": 71701000,
+      "confidence": 0.5,
+      "rationale": "Both are fried pancakes made from legumes (cowpea vs potato), matching form and preparation though different main ingredient species."
+    },
+    "700328": {
+      "fdc_id": 2707388,
+      "food_code": 41107010,
+      "confidence": 0.55,
+      "rationale": "Soybeans, cooked is a different legume species but matches the cooked, soaked, boiled form of cowpeas."
+    },
+    "700343": {
+      "fdc_id": 2707388,
+      "food_code": 41107010,
+      "confidence": 0.5,
+      "rationale": "Soybeans, cooked, is a different legume species but matches the cooked legume form and preparation state."
+    },
+    "700350": {
+      "fdc_id": 2708992,
+      "food_code": 58160132,
+      "confidence": 0.5,
+      "rationale": "The CNF food is a cooked legume dish with eggs and vegetables; the best FNDDS analog is a cooked bean and rice dish with meat, matching form and food group but differing in species and recipe."
+    },
+    "700351": {
+      "fdc_id": 2707414,
+      "food_code": 41301990,
+      "confidence": 0.5,
+      "rationale": "Both are cooked legume-based foods, but the CNF food is a fried paste with added egg and onion, while the FNDDS analog is plain chickpeas, so form and recipe differ."
+    },
+    "700352": {
+      "fdc_id": 2707389,
+      "food_code": 41108010,
+      "confidence": 0.5,
+      "rationale": "Both are cooked legumes in a soft form, though different species; closest available analog in FNDDS."
+    },
+    "700353": {
+      "fdc_id": 2707389,
+      "food_code": 41108010,
+      "confidence": 0.5,
+      "rationale": "Both are cooked legumes in a similar form, though the CNF food is a steamed paste of non-dehulled cowpea and potash, while the FNDDS analog is cooked mung beans; species differ but form and preparation are comparable."
+    },
+    "700356": {
+      "fdc_id": 2707370,
+      "food_code": 41103070,
+      "confidence": 0.5,
+      "rationale": "Pink beans, cooked, is a different species but same form and preparation as ground bean boiled with cooking liquid."
+    },
+    "700359": {
+      "fdc_id": 2707349,
+      "food_code": 41101020,
+      "confidence": 0.5,
+      "rationale": "Both are dry, raw beans from legumes group but species is unspecified and form is not exactly jack bean."
+    },
+    "700360": {
+      "fdc_id": 2707388,
+      "food_code": 41107010,
+      "confidence": 0.5,
+      "rationale": "Jack bean is a cooked legume; soybeans cooked is a different species but same form and food group, making it a reasonable analog."
+    },
+    "700361": {
+      "fdc_id": 2707389,
+      "food_code": 41108010,
+      "confidence": 0.5,
+      "rationale": "Both are cooked legumes with cooking liquid, but different species (mung beans vs jack beans)."
+    },
+    "700362": {
+      "fdc_id": 2707388,
+      "food_code": 41107010,
+      "confidence": 0.5,
+      "rationale": "Both are cooked legumes, but different species (jack bean vs soybean) with similar preparation (soaked, boiled, drained)."
+    },
+    "700363": {
+      "fdc_id": 2707388,
+      "food_code": 41107010,
+      "confidence": 0.5,
+      "rationale": "Jack bean is a legume and the candidate is cooked soybeans, a different species but same form and food group."
+    },
+    "700376": {
+      "fdc_id": 2707389,
+      "food_code": 41108010,
+      "confidence": 0.5,
+      "rationale": "Pigeon pea is a cooked legume; mung beans cooked is a different species but same form and food group, making it a reasonable analog."
+    },
+    "700381": {
+      "fdc_id": 2707389,
+      "food_code": 41108010,
+      "confidence": 0.5,
+      "rationale": "Mung beans, cooked, is a different legume species but matches the cooked form and legume group of pigeon pea, making it a reasonable analog."
+    },
+    "700386": {
+      "fdc_id": 2707388,
+      "food_code": 41107010,
+      "confidence": 0.5,
+      "rationale": "Pigeon pea is a legume and the closest cooked legume analog is cooked soybeans, matching form and preparation but differing species."
+    },
+    "700388": {
+      "fdc_id": 2707389,
+      "food_code": 41108010,
+      "confidence": 0.5,
+      "rationale": "Pigeon pea is a legume and the candidate mung beans are cooked legumes, matching form and preparation but differing species."
+    },
+    "700392": {
+      "fdc_id": 2707389,
+      "food_code": 41108010,
+      "confidence": 0.55,
+      "rationale": "Pigeon pea is a legume and the candidate is cooked mung beans, also a legume, matching form and preparation closely though species differ."
+    },
+    "700394": {
+      "fdc_id": 2707414,
+      "food_code": 41301990,
+      "confidence": 0.5,
+      "rationale": "Cooked cowpeas porridge analog not found; closest is cooked chickpeas (legume) in natural form, matching form and food group but different species."
+    },
+    "700395": {
+      "fdc_id": 2707389,
+      "food_code": 41108010,
+      "confidence": 0.5,
+      "rationale": "Bambara groundnuts are legumes and the closest cooked legume analog is mung beans, cooked, though species differ."
+    },
+    "700406": {
+      "fdc_id": 2709235,
+      "food_code": 63119010,
+      "confidence": 0.5,
+      "rationale": "Sweet dattock is a raw whole fruit legume; the closest analog is raw fig, a similar raw whole fruit in the same broad category but different species."
+    },
+    "700408": {
+      "fdc_id": 2709567,
+      "food_code": 71962040,
+      "confidence": 0.5,
+      "rationale": "Sweet dattock is a cooked legume-like tuber boiled with liquid; taro, cooked, is a similar cooked starchy vegetable matching form and preparation, though species differ."
+    },
+    "700409": {
+      "fdc_id": 2709567,
+      "food_code": 71962040,
+      "confidence": 0.5,
+      "rationale": "Taro, cooked is a cooked starchy vegetable similar in form and preparation to soaked and boiled sweet dattock, both being cooked legumes or tuber-like vegetables."
+    },
+    "700410": {
+      "fdc_id": 2709567,
+      "food_code": 71962040,
+      "confidence": 0.5,
+      "rationale": "Sweet dattock is a legume cooked by soaking and boiling, best matched by taro, cooked, a cooked starchy vegetable with similar preparation state and form."
+    },
+    "700411": {
+      "fdc_id": 2707387,
+      "food_code": 41106510,
+      "confidence": 0.5,
+      "rationale": "Both are dry, raw legumes but different species; closest available analog in same form and group."
+    },
+    "700419": {
+      "fdc_id": 2710038,
+      "food_code": 75365000,
+      "confidence": 0.5,
+      "rationale": "Both are dried vegetable products, though baobab leaves are a specific leafy vegetable and the candidate is a dried vegetable mixture; form and state match but species differ."
+    },
+    "700420": {
+      "fdc_id": 2709606,
+      "food_code": 72122100,
+      "confidence": 0.5,
+      "rationale": "Mustard greens, raw, is a leafy green vegetable raw like baobab leaves, making it the closest available analog despite species difference."
+    },
+    "700433": {
+      "fdc_id": 2709576,
+      "food_code": 72107100,
+      "confidence": 0.5,
+      "rationale": "Cassava leaves raw are best matched to another raw dark green leafy vegetable (collards) due to lack of exact cassava leaves in FNDDS."
+    },
+    "700439": {
+      "fdc_id": 2709988,
+      "food_code": 75232000,
+      "confidence": 0.7,
+      "rationale": "Both are dried vegetables; cowpea leaves dried and seaweed dried share the dried form, making seaweed the closest available analog despite species difference."
+    },
+    "700448": {
+      "fdc_id": 2709642,
+      "food_code": 72133201,
+      "confidence": 0.5,
+      "rationale": "No exact match for boiled eggplant leaves; closest is cooked leafy vegetables, a different species but similar form and preparation."
+    },
+    "700459": {
+      "fdc_id": 2709639,
+      "food_code": 72130100,
+      "confidence": 0.5,
+      "rationale": "Both are raw, fresh leafy green vegetables, making watercress the closest available analog despite species difference."
+    },
+    "700463": {
+      "fdc_id": 2709633,
+      "food_code": 72126001,
+      "confidence": 0.5,
+      "rationale": "Both are cooked dark green leafy vegetables, making taro leaves a reasonable species analog for boiled fresh hibiscus leaves."
+    },
+    "700475": {
+      "fdc_id": 2709633,
+      "food_code": 72126001,
+      "confidence": 0.5,
+      "rationale": "Moringa leaves, fresh, boiled as part of a recipe best matches cooked leafy greens like taro leaves, cooked, sharing form and preparation though different species."
+    },
+    "700506": {
+      "fdc_id": 2710038,
+      "food_code": 75365000,
+      "confidence": 0.5,
+      "rationale": "Both are dried vegetables, but the FNDDS analog is a vegetable mixture rather than specifically sicklepod leaves."
+    },
+    "700509": {
+      "fdc_id": 2709633,
+      "food_code": 72126001,
+      "confidence": 0.5,
+      "rationale": "Both are cooked leafy green vegetables with no added fat, but species differ (sicklepod vs taro leaves)."
+    },
+    "700511": {
+      "fdc_id": 2709633,
+      "food_code": 72126001,
+      "confidence": 0.5,
+      "rationale": "Boiled spider plant leaves best match cooked taro leaves as a similar cooked leafy green vegetable form and group."
+    },
+    "700512": {
+      "fdc_id": 2709642,
+      "food_code": 72133201,
+      "confidence": 0.5,
+      "rationale": "Spider plant leaves boiled without salt are best matched to cooked leaves of similar leafy vegetables like sweet potato or bean leaves, sharing form and preparation but differing species."
+    },
+    "700516": {
+      "fdc_id": 2709588,
+      "food_code": 72113100,
+      "confidence": 0.7,
+      "rationale": "Beet greens, raw, are a close analog to sweet potato leaves, raw, as both are fresh leafy greens with similar form and preparation state."
+    },
+    "700521": {
+      "fdc_id": 2709633,
+      "food_code": 72126001,
+      "confidence": 0.55,
+      "rationale": "Taro leaves, cooked, is a cooked leafy green vegetable similar in form and preparation to boiled tamarind leaves, making it a reasonable analog despite species difference."
+    },
+    "700536": {
+      "fdc_id": 2709796,
+      "food_code": 75119000,
+      "confidence": 0.5,
+      "rationale": "Parsley, raw is a raw leafy green vegetable similar in form and state to fresh raw Vernonia leaves, though species differ."
+    },
+    "700543": {
+      "fdc_id": 2709633,
+      "food_code": 72126001,
+      "confidence": 0.5,
+      "rationale": "Boiled waterleaf leaves matched to cooked taro leaves as a similar cooked dark green leafy vegetable species."
+    },
+    "700548": {
+      "fdc_id": 2709265,
+      "food_code": 63143010,
+      "confidence": 0.5,
+      "rationale": "African black plum is a fruit similar in form and state to raw plums, though a different species, making raw plum the closest available analog."
+    },
+    "700549": {
+      "fdc_id": 2709228,
+      "food_code": 63109700,
+      "confidence": 0.5,
+      "rationale": "African fan palm fruit raw has no exact match; starfruit raw is a similar raw tropical fruit in form and category but different species."
+    },
+    "700551": {
+      "fdc_id": 2709242,
+      "food_code": 63129010,
+      "confidence": 0.5,
+      "rationale": "African locust bean fruit raw is a raw fruit; mango raw is a different species but same form and food group, making it a moderate analog."
+    },
+    "700552": {
+      "fdc_id": 2709228,
+      "food_code": 63109700,
+      "confidence": 0.5,
+      "rationale": "African star apple is a raw tropical fruit; starfruit, raw, is a similar form and category though a different species."
+    },
+    "700553": {
+      "fdc_id": 2709228,
+      "food_code": 63109700,
+      "confidence": 0.5,
+      "rationale": "Akee fruit raw has no exact match; starfruit raw is a similar raw tropical fruit in form and category, making it the best available analog."
+    },
+    "700562": {
+      "fdc_id": 2709221,
+      "food_code": 63103010,
+      "confidence": 0.5,
+      "rationale": "Baobab fruit raw has no exact match; apricot raw is a different species but same form and food group, making it the best available analog."
+    },
+    "700565": {
+      "fdc_id": 2709215,
+      "food_code": 63101000,
+      "confidence": 0.5,
+      "rationale": "Cashew apple is a raw fruit but no exact match exists; apple, raw is a similar raw fruit form and category, making it a moderate analog."
+    },
+    "700568": {
+      "fdc_id": 2709235,
+      "food_code": 63119010,
+      "confidence": 0.5,
+      "rationale": "Same form and state (raw fruit) but different species (fig vs date) within fruits group."
+    },
+    "700570": {
+      "fdc_id": 2709221,
+      "food_code": 63103010,
+      "confidence": 0.5,
+      "rationale": "Dattock fruit raw has no exact match; apricot raw is a similar raw fruit in form and category but different species."
+    },
+    "700578": {
+      "fdc_id": 2709238,
+      "food_code": 63125010,
+      "confidence": 0.5,
+      "rationale": "Gumvine fruit raw has no exact match; guava raw is a similar raw tropical fruit in form and category."
+    },
+    "700579": {
+      "fdc_id": 2709238,
+      "food_code": 63125010,
+      "confidence": 0.5,
+      "rationale": "Jujube is a fruit, raw and whole; the closest available raw fruit analog is guava, raw, matching form and state but differing species."
+    },
+    "700580": {
+      "fdc_id": 2709248,
+      "food_code": 63134010,
+      "confidence": 0.5,
+      "rationale": "Landolphia fruit is a raw fruit; passion fruit, raw is a different species but same form and category, making it the best available analog."
+    },
+    "700594": {
+      "fdc_id": 2709221,
+      "food_code": 63103010,
+      "confidence": 0.5,
+      "rationale": "Soapberry fruit raw has no exact match; apricot raw is a similar raw fruit in form and category but different species."
+    },
+    "700597": {
+      "fdc_id": 2710307,
+      "food_code": 91407100,
+      "confidence": 0.7,
+      "rationale": "Guava paste is a sweet fruit paste similar in form and preparation to sweet baobab paste, making it a close analog."
+    },
+    "700610": {
+      "fdc_id": 2707505,
+      "food_code": 42110050,
+      "confidence": 0.5,
+      "rationale": "Cola nut, dried and raw, is a nut in dried form; the closest FNDDS analog is mixed nuts, unroasted, matching form and state but different species."
+    },
+    "700611": {
+      "fdc_id": 2707500,
+      "food_code": 42106000,
+      "confidence": 0.5,
+      "rationale": "Cola nut is a fresh raw nut; the closest analog is coconut, fresh, also a raw nut, though a different species."
+    },
+    "700629": {
+      "fdc_id": 2707583,
+      "food_code": 43102100,
+      "confidence": 0.5,
+      "rationale": "Both are seeds in dried form, but the candidate is sunflower seeds, not melon seeds, making it a same form but different species analog."
+    },
+    "700630": {
+      "fdc_id": 2707582,
+      "food_code": 43102000,
+      "confidence": 0.5,
+      "rationale": "Sunflower seeds, plain, unsalted are the closest available seeds in raw form, matching the dried raw kernel form of melon seed, though species differ."
+    },
+    "700631": {
+      "fdc_id": 2707492,
+      "food_code": 42102000,
+      "confidence": 0.5,
+      "rationale": "Palm nut kernel is a raw nut similar in form to Brazil nuts, making it the closest available raw nut analog despite species difference."
+    },
+    "700634": {
+      "fdc_id": 2707494,
+      "food_code": 42104050,
+      "confidence": 0.5,
+      "rationale": "Shea nut kernel is a raw dried nut; cashews unroasted are raw nuts in the same form and group but different species, making it a moderate analog."
+    },
+    "700636": {
+      "fdc_id": 2707449,
+      "food_code": 41421020,
+      "confidence": 0.5,
+      "rationale": "Both are deep fried animal protein products with coating, but species differ (bamboo caterpillar vs soybean curd)."
+    },
+    "700638": {
+      "fdc_id": 2706153,
+      "food_code": 25110140,
+      "confidence": 0.7,
+      "rationale": "Beef liver is a cooked organ meat similar in form and preparation to boiled beef kidney, making it a close analog."
+    },
+    "700640": {
+      "fdc_id": 2706592,
+      "food_code": 27311410,
+      "confidence": 0.5,
+      "rationale": "Beef kidney stewed is a cooked organ meat, but the best FNDDS analog is a beef stew (mixed dish) rather than kidney specifically, so same form but different specific ingredient."
+    },
+    "700646": {
+      "fdc_id": 2705849,
+      "food_code": 21410000,
+      "confidence": 0.7,
+      "rationale": "Beef stew meat is cooked and similar in form to boiled fatty beef, making it a close analog though exact fat content may vary."
+    },
+    "700658": {
+      "fdc_id": 2705849,
+      "food_code": 21410000,
+      "confidence": 0.7,
+      "rationale": "Beef stew meat is cooked and similar in form to boiled moderately fat beef, making it a close analog though exact fat content may vary."
+    },
+    "700666": {
+      "fdc_id": 2705853,
+      "food_code": 21500000,
+      "confidence": 0.5,
+      "rationale": "Both are raw meats, but camel meat and ground beef are different species and forms, making ground beef a moderate analog."
+    },
+    "700668": {
+      "fdc_id": 2705907,
+      "food_code": 23132000,
+      "confidence": 0.5,
+      "rationale": "Camel meat grilled is not available; lamb ground is same food group but different species and form, so moderate confidence."
+    },
+    "700669": {
+      "fdc_id": 2706592,
+      "food_code": 27311410,
+      "confidence": 0.5,
+      "rationale": "Stewed beef is the closest available analog in form and preparation to stewed camel meat, though species differ."
+    },
+    "700687": {
+      "fdc_id": 2705939,
+      "food_code": 24103010,
+      "confidence": 0.7,
+      "rationale": "Chicken light meat with skin boiled matches best with chicken stewed with skin eaten, both cooked with skin and similar form."
+    },
+    "700696": {
+      "fdc_id": 2706308,
+      "food_code": 26153100,
+      "confidence": 0.5,
+      "rationale": "Both are raw animal proteins (insect vs fish) in the meat/seafood group, matching form and state but differing species."
+    },
+    "700698": {
+      "fdc_id": 2706015,
+      "food_code": 24143220,
+      "confidence": 0.5,
+      "rationale": "Both are cooked meats from animals, but crocodile meat is bridged to stewed chicken drumstick as the closest available cooked meat analog in FNDDS."
+    },
+    "700699": {
+      "fdc_id": 2706236,
+      "food_code": 26107123,
+      "confidence": 0.5,
+      "rationale": "Grilled crocodile meat has no exact match; grilled catfish is a cooked animal protein with similar preparation, so it is a reasonable analog despite species difference."
+    },
+    "700700": {
+      "fdc_id": 2705849,
+      "food_code": 21410000,
+      "confidence": 0.5,
+      "rationale": "Crocodile meat stewed is best matched by beef stew meat as a different species but same form and preparation state."
+    },
+    "700717": {
+      "fdc_id": 2705907,
+      "food_code": 23132000,
+      "confidence": 0.5,
+      "rationale": "Same food group (lamb), but different form (ground vs brain) and no exact brain entry available in FNDDS."
+    },
+    "700718": {
+      "fdc_id": 2705906,
+      "food_code": 23101000,
+      "confidence": 0.5,
+      "rationale": "No exact lamb brain entry; lamb chop is same species and cooked form, closest available analog."
+    },
+    "700723": {
+      "fdc_id": 2706660,
+      "food_code": 27330210,
+      "confidence": 0.5,
+      "rationale": "No exact lamb liver stewed found; closest is lamb stew, which matches species and cooked stew form but differs in organ meat content."
+    },
+    "700733": {
+      "fdc_id": 2706345,
+      "food_code": 26305180,
+      "confidence": 0.5,
+      "rationale": "Both are canned animal protein products, but mopane worm is an insect and crab is shellfish, so species differ though form and preservation match."
+    },
+    "700757": {
+      "fdc_id": 2705853,
+      "food_code": 21500000,
+      "confidence": 0.5,
+      "rationale": "Springbok meat raw is best matched to raw ground beef as same form (raw meat) but different species."
+    },
+    "700758": {
+      "fdc_id": 2705940,
+      "food_code": 24103020,
+      "confidence": 0.5,
+      "rationale": "Boiled springbok meat is best matched to stewed chicken (cooked meat) as a same form cooked meat analog despite species difference."
+    },
+    "700759": {
+      "fdc_id": 2705943,
+      "food_code": 24103060,
+      "confidence": 0.5,
+      "rationale": "Springbok meat grilled is closest to grilled chicken pieces without skin, matching cooked form and meat category but differing species."
+    },
+    "700760": {
+      "fdc_id": 2706592,
+      "food_code": 27311410,
+      "confidence": 0.5,
+      "rationale": "Stewed springbok meat is best matched to stewed beef as a different species but same form and preparation."
+    },
+    "700795": {
+      "fdc_id": 2710783,
+      "food_code": 99992600,
+      "confidence": 0.5,
+      "rationale": "Boiled barracuda fillet matched to generic cooked fish as ingredient due to lack of exact species match but same cooked form."
+    },
+    "700814": {
+      "fdc_id": 2706230,
+      "food_code": 26100190,
+      "confidence": 0.6,
+      "rationale": "Fish, smoked is the closest form to dried whole fish among candidates, though not exactly dried; species unspecified but same food group and similar preservation method."
+    },
+    "700823": {
+      "fdc_id": 2706323,
+      "food_code": 26158050,
+      "confidence": 0.5,
+      "rationale": "Mahi mahi steamed fillet has no exact match; steamed tilapia fillet is the closest same form and preparation but different species."
+    },
+    "700825": {
+      "fdc_id": 2706317,
+      "food_code": 26157160,
+      "confidence": 0.5,
+      "rationale": "Boiled mola carplet is closest to steamed fish in form and preparation, though species differ; no exact boiled small fish analog available."
+    },
+    "700826": {
+      "fdc_id": 2706265,
+      "food_code": 26121121,
+      "confidence": 0.5,
+      "rationale": "Grilled fish matches the preparation and form, but species differs (mackerel vs mola carplet)."
+    },
+    "700851": {
+      "fdc_id": 2706357,
+      "food_code": 26317121,
+      "confidence": 0.5,
+      "rationale": "Scallops, grilled is the closest cooked shellfish analog to grilled sea snail/whelk, matching form and cooking method but differing species."
+    },
+    "700852": {
+      "fdc_id": 2706358,
+      "food_code": 26317130,
+      "confidence": 0.5,
+      "rationale": "Steamed sea snail/whelk is a shellfish steamed product; closest available analog is steamed scallops, a different shellfish species but same form and preparation."
+    },
+    "700853": {
+      "fdc_id": 2706223,
+      "food_code": 26100100,
+      "confidence": 0.7,
+      "rationale": "Fish, raw matches the raw fillet form and is a close analog despite species difference."
+    },
+    "700854": {
+      "fdc_id": 2706307,
+      "food_code": 26151160,
+      "confidence": 0.5,
+      "rationale": "Both are fish fillets, boiled/steamed, but species differ (Shiny-nose vs trout), making it a reasonable but not perfect analog."
+    },
+    "700880": {
+      "fdc_id": 2706328,
+      "food_code": 26158140,
+      "confidence": 0.55,
+      "rationale": "Both are steamed/boiled white fish fillets, different species but similar form and preparation."
+    },
+    "700894": {
+      "fdc_id": 2705385,
+      "food_code": 11111000,
+      "confidence": 0.5,
+      "rationale": "Camel milk is fresh milk like cow's whole milk, but species differ; form and state match, so moderate confidence."
+    },
+    "700905": {
+      "fdc_id": 2705418,
+      "food_code": 11411100,
+      "confidence": 0.7,
+      "rationale": "Yogurt, whole milk, plain is a fermented milk product similar in form and state to fermented sheep or goat milk, making it a close analog despite species difference."
+    },
+    "700927": {
+      "fdc_id": 2710182,
+      "food_code": 82101500,
+      "confidence": 0.7,
+      "rationale": "Palm kernel oil is a pure oil similar in form and use to coconut oil, making it a close analog despite species difference and fortification."
+    },
+    "700929": {
+      "fdc_id": 2710180,
+      "food_code": 82101000,
+      "confidence": 0.7,
+      "rationale": "Palm oil, red is a pure vegetable oil, best matched to 'Vegetable oil, NFS' which is the same form and preparation state."
+    },
+    "700930": {
+      "fdc_id": 2710180,
+      "food_code": 82101000,
+      "confidence": 0.7,
+      "rationale": "Both are refined, unfortified vegetable oils in liquid form, making vegetable oil, NFS the closest analog to refined palm oil."
+    },
+    "700933": {
+      "fdc_id": 2710157,
+      "food_code": 81101520,
+      "confidence": 0.5,
+      "rationale": "Shea butter is a plant-based fat similar in form to butter, but differs in source and composition, making butter a moderate analog."
+    },
+    "700949": {
+      "fdc_id": 2710616,
+      "food_code": 93101000,
+      "confidence": 0.7,
+      "rationale": "Both are beers in liquid form with alcohol, making 'Beer' the closest analog despite different base grain."
+    },
+    "700962": {
+      "fdc_id": 2710689,
+      "food_code": 93401020,
+      "confidence": 0.7,
+      "rationale": "Palm wine is an alcoholic beverage similar in form and alcohol content to white wine, making 'Wine, white' the closest analog."
+    },
+    "700963": {
+      "fdc_id": 2709315,
+      "food_code": 64100100,
+      "confidence": 0.5,
+      "rationale": "Palm sap is a fresh beverage with low alcohol content, best matched to a generic fruit juice (NFS) as a similar liquid form and category, though species differs."
+    },
+    "700970": {
+      "fdc_id": 2707586,
+      "food_code": 43103000,
+      "confidence": 0.5,
+      "rationale": "Anis seed is a dry seed similar in form to sesame seeds, making it the closest available analog despite species difference."
+    },
+    "700972": {
+      "fdc_id": 2707492,
+      "food_code": 42102000,
+      "confidence": 0.5,
+      "rationale": "Calabash nutmeg seed is a dried seed similar in form to Brazil nuts, but species differ; no exact match available."
+    },
+    "700978": {
+      "fdc_id": 2710082,
+      "food_code": 75503085,
+      "confidence": 0.7,
+      "rationale": "Ginger root, pickled is the closest form and species match available, though pickled differs from dried, it is the best analog among candidates."
+    },
+    "700990": {
+      "fdc_id": 2709205,
+      "food_code": 62114050,
+      "confidence": 0.5,
+      "rationale": "Both are dried fruits/seeds, but Uda (Ethiopian pepper) is a spice seed and mango is a dried fruit, so only a moderate analog."
+    },
+    "700994": {
+      "fdc_id": 2707404,
+      "food_code": 41205100,
+      "confidence": 0.5,
+      "rationale": "Both are sauces with vegetable and legume components, but Babenda-1 includes specific ingredients (green leaves, groundnut powder, rice, onion) not exactly matched by the black bean sauce; form and preparation as sauce is similar."
+    },
+    "700995": {
+      "fdc_id": 2706657,
+      "food_code": 27330060,
+      "confidence": 0.5,
+      "rationale": "Closest analog is a cooked sauce with rice and vegetables, but includes lamb and tomato-based sauce unlike the CNF's green leaf and groundnut powder sauce."
+    },
+    "700996": {
+      "fdc_id": 2706717,
+      "food_code": 27350110,
+      "confidence": 0.5,
+      "rationale": "The CNF food is a cassava leaf sauce with fish and vegetables, a cooked sauce with fish, vegetables, and palm oil; the closest FNDDS analog is bouillabaisse, a seafood soup, matching the cooked mixed dish form but differing in ingredients and cuisine, so confidence is moderate."
+    },
+    "700997": {
+      "fdc_id": 2707404,
+      "food_code": 41205100,
+      "confidence": 0.5,
+      "rationale": "Both are sauces with legumes and similar mixed ingredients, but the CNF food is a specific West African cowpea leaf sauce with fish and fermented locust beans, while the FNDDS analog is a black bean sauce; form and preparation are similar but species and recipe differ."
+    },
+    "700998": {
+      "fdc_id": 2706459,
+      "food_code": 27150310,
+      "confidence": 0.5,
+      "rationale": "Fish with tomato-based sauce matches the CNF's fish and tomato sauce components and is a cooked sauce dish, though it lacks the specific hibiscus leaf and fermented locust beans."
+    },
+    "700999": {
+      "fdc_id": 2706660,
+      "food_code": 27330210,
+      "confidence": 0.5,
+      "rationale": "Both are cooked lamb stews with vegetables and sauce, matching form and preparation though not exact recipe or ingredients."
+    },
+    "701000": {
+      "fdc_id": 2706717,
+      "food_code": 27350110,
+      "confidence": 0.5,
+      "rationale": "Both are cooked seafood-based mixed dishes with sauce, but the CNF food is a specific West African leafy vegetable sauce with fish and palm oil, while the FNDDS analog is a French seafood soup (bouillabaisse), so form and ingredients differ somewhat."
+    },
+    "701001": {
+      "fdc_id": 2706452,
+      "food_code": 27150140,
+      "confidence": 0.5,
+      "rationale": "Both are seafood sauces, but the CNF food is a clear sauce with fish and red palm oil, while the FNDDS analog is a generic seafood sauce without specification of clear or palm oil, making it a reasonable but not close match."
+    },
+    "701007": {
+      "fdc_id": 2706452,
+      "food_code": 27150140,
+      "confidence": 0.5,
+      "rationale": "Both are seafood sauces with vegetables, matching form and preparation state, though specific recipe and origin differ."
+    },
+    "701008": {
+      "fdc_id": 2707404,
+      "food_code": 41205100,
+      "confidence": 0.5,
+      "rationale": "Both are sauces with legume base and vegetables, but the CNF food is a specific traditional sauce with shea butter and fermented locust beans, while the FNDDS analog is a black bean sauce; form and preparation are similar but ingredients differ."
+    },
+    "701009": {
+      "fdc_id": 2709947,
+      "food_code": 75220021,
+      "confidence": 0.5,
+      "rationale": "The CNF food is a fresh leaf sauce with added fats and fermented beans, best matched by cooked fresh okra with fat added as a similar cooked vegetable-based dish with added fat, though not identical in ingredients or species."
+    },
+    "701010": {
+      "fdc_id": 2706660,
+      "food_code": 27330210,
+      "confidence": 0.7,
+      "rationale": "This is a lamb stew, a cooked meat mixed dish similar in form and preparation to the white eggplant sauce with lamb and vegetables, matching the cooked sauce form better than other candidates."
+    },
+    "701011": {
+      "fdc_id": 2710049,
+      "food_code": 75412030,
+      "confidence": 0.5,
+      "rationale": "The CNF food is a wild eggplant leaf sauce with fish and vegetables, a cooked sauce with mixed ingredients; the closest FNDDS analog is 'Eggplant dip' which is a cooked eggplant-based sauce, though it lacks fish and vegetables, so it is a similar form but different recipe."
+    },
+    "701012": {
+      "fdc_id": 2706576,
+      "food_code": 27250900,
+      "confidence": 0.5,
+      "rationale": "Fish and noodles with mushroom sauce is a seafood mixed dish with sauce, similar in form to the eggplant sauce with fish and vegetables, though not the exact recipe or ingredients."
+    },
+    "701013": {
+      "fdc_id": 2707404,
+      "food_code": 41205100,
+      "confidence": 0.5,
+      "rationale": "Both are sauces with vegetables and protein, but the CNF food is a specific dried okra sauce with beef and red palm oil, while the FNDDS analog is a black bean sauce; similar form but different ingredients."
+    },
+    "701016": {
+      "fdc_id": 2709642,
+      "food_code": 72133201,
+      "confidence": 0.7,
+      "rationale": "Sweet potato leaves cooked is the closest form and composition analog to the sweet potato leaf sauce with fish and palm oil, matching the cooked leafy vegetable form though not including fish or oil explicitly."
+    },
+    "701018": {
+      "fdc_id": 2707404,
+      "food_code": 41205100,
+      "confidence": 0.5,
+      "rationale": "Both are sauces with legumes and savory ingredients, but the CNF food includes fish and fermented locust beans, making it a different recipe; form and preparation as a sauce match."
+    },
+    "701019": {
+      "fdc_id": 2706452,
+      "food_code": 27150140,
+      "confidence": 0.5,
+      "rationale": "Both are seafood sauces with mixed ingredients, matching the form and preparation state, though the specific recipe and cultural origin differ."
+    },
+    "701020": {
+      "fdc_id": 2707134,
+      "food_code": 28340660,
+      "confidence": 0.5,
+      "rationale": "Closest match is 'Soup, chicken' broth-based soup, same form and preparation but different recipe ingredients."
+    },
+    "701022": {
+      "fdc_id": 2706460,
+      "food_code": 27150320,
+      "confidence": 0.5,
+      "rationale": "Both are cooked fish dishes with sauce, but the CNF food is a red palm oil sauce with fish and vegetables, while the candidate is a fish curry; similar form but different recipe."
+    },
+    "701023": {
+      "fdc_id": 2706879,
+      "food_code": 27464000,
+      "confidence": 0.5,
+      "rationale": "Both are seafood-based sauces with vegetables and okra, but the CNF food is a specific palm oil fruit sauce from Burkina Faso, while the FNDDS analog is a gumbo without rice; similar form but different regional recipe."
+    },
+    "701024": {
+      "fdc_id": 2706460,
+      "food_code": 27150320,
+      "confidence": 0.5,
+      "rationale": "Both are cooked fish dishes with sauce and vegetables, but the CNF food is a specific palm fruit sauce from Burkina Faso, while the FNDDS analog is a generic fish curry; form and preparation are similar but recipe differs."
+    },
+    "701025": {
+      "fdc_id": 2706717,
+      "food_code": 27350110,
+      "confidence": 0.5,
+      "rationale": "Both are cooked seafood-based soups or sauces with mixed ingredients, but the CNF food is a specific West African dried baobab leaf sauce with fish and fermented locust beans, while the FNDDS analog is a bouillabaisse soup; similar form but different recipe and cultural origin."
+    },
+    "701026": {
+      "fdc_id": 2706717,
+      "food_code": 27350110,
+      "confidence": 0.5,
+      "rationale": "Both are cooked sauces with fish and vegetables, but the specific ingredients and cultural preparation differ."
+    },
+    "701027": {
+      "fdc_id": 2706390,
+      "food_code": 27116200,
+      "confidence": 0.5,
+      "rationale": "Lamb with sauce is the closest form and species match, though the sauce differs from Yassa's mustard-onion base."
     }
   },
   "unbridged": [
@@ -47159,17 +46907,55 @@
     502077,
     502107,
     502422,
+    700000,
     700027,
+    700028,
+    700055,
+    700056,
+    700057,
+    700058,
+    700059,
+    700060,
+    700068,
+    700090,
+    700100,
+    700137,
+    700139,
+    700142,
+    700145,
+    700148,
+    700154,
+    700169,
     700170,
+    700171,
+    700172,
+    700173,
+    700174,
+    700175,
+    700176,
+    700177,
+    700190,
+    700254,
+    700262,
+    700273,
+    700290,
     700316,
     700325,
     700340,
+    700402,
     700423,
     700447,
+    700450,
+    700455,
+    700465,
     700480,
     700483,
+    700487,
+    700519,
     700520,
     700526,
+    700550,
+    700588,
     700593,
     700601,
     700603,
@@ -47186,11 +46972,15 @@
     700697,
     700701,
     700716,
+    700719,
     700732,
     700761,
     700762,
     700969,
     700971,
+    700974,
+    700975,
+    700977,
     700983,
     700984,
     700985
