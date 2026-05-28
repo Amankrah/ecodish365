@@ -9,6 +9,13 @@ from __future__ import annotations
 import re
 from typing import Optional
 
+from api.services.substitution_roles import (
+    ROLE_SEASONING,
+    ROLE_SWEETENER,
+    infer_functional_role,
+    is_primary_seasoning,
+)
+
 _DRIED = re.compile(
     r'\b(dried|dehydrated|powder|flour|meal\b|flakes\b)\b',
     re.IGNORECASE,
@@ -77,6 +84,18 @@ def culinary_swap_plausible(
 
     # Rice/grain staples should stay in the grain category.
     if _RICE.search(orig) and not _RICE.search(repl):
+        return False
+
+    # Seasonings/sweeteners must not swap into whole foods (or vice versa).
+    orig_role = infer_functional_role(orig)
+    repl_role = infer_functional_role(repl)
+    _CLOSED_ROLES = {ROLE_SEASONING, ROLE_SWEETENER}
+    if orig_role in _CLOSED_ROLES and repl_role != orig_role:
+        return False
+    if repl_role in _CLOSED_ROLES and orig_role != repl_role:
+        return False
+    # Extra guard: primary salt/spice rows never become non-seasonings.
+    if is_primary_seasoning(orig) and not is_primary_seasoning(repl):
         return False
 
     return True

@@ -33,8 +33,21 @@ class WafctRecipe:
     ingredients: Tuple[WafctRecipeIngredient, ...]
 
 
+# Tokens ignored when matching ingredient names — avoids "without salt" ↔ "Salt, table".
+_TOKEN_STOP = frozenset({
+    'without', 'unsalted', 'salted', 'with', 'and', 'the', 'for', 'from', 'part',
+    'recipe', 'drained', 'boiled', 'cooked', 'fresh', 'ripe', 'raw', 'year',
+    'round', 'average', 'medium', 'grain', 'table', 'concentrated',
+    'no', 'low', 'free', 'less', 'lite', 'reduced', 'added', 'contains', 'salt',
+})
+
+
 def _tokenize(text: str) -> Set[str]:
     return {t for t in re.findall(r'[a-z]{3,}', (text or '').lower()) if len(t) >= 3}
+
+
+def _meaningful_tokens(text: str) -> Set[str]:
+    return {t for t in _tokenize(text) if t not in _TOKEN_STOP}
 
 
 @lru_cache(maxsize=1)
@@ -142,11 +155,23 @@ def recipe_swap_candidates(
     limit: int = 3,
 ) -> List[Dict[str, Any]]:
     """Suggest replacements drawn from similar WAFCT traditional recipes."""
+    from api.services.substitution_roles import (
+        ROLE_SEASONING,
+        ROLE_SWEETENER,
+        infer_functional_role,
+        is_primary_seasoning,
+    )
+
     code_map = _code_to_food_id()
     if not code_map:
         return []
 
-    ing_tokens = _tokenize(ingredient_description)
+    # Primary seasonings are not swappable via regional-recipe discovery.
+    if is_primary_seasoning(ingredient_description):
+        return []
+
+    ing_tokens = _meaningful_tokens(ingredient_description)
+    orig_role = infer_functional_role(ingredient_description)
     candidates: Dict[int, Dict[str, Any]] = {}
 
     for recipe in find_similar_recipes(dish_name, limit=8):
@@ -154,8 +179,13 @@ def recipe_swap_candidates(
             fid = code_map.get(ri.code)
             if fid is None or fid in exclude_ids:
                 continue
-            rt = _tokenize(ri.name_en)
+            rt = _meaningful_tokens(ri.name_en)
             if ing_tokens and not (ing_tokens & rt):
+                continue
+            repl_role = infer_functional_role(ri.name_en)
+            if orig_role in (ROLE_SEASONING, ROLE_SWEETENER) and repl_role != orig_role:
+                continue
+            if repl_role in (ROLE_SEASONING, ROLE_SWEETENER) and orig_role != repl_role:
                 continue
             if fid not in candidates:
                 candidates[fid] = {

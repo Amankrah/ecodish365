@@ -306,9 +306,7 @@ def _build_suggestion(
         purpose=purpose,
     )
     swapped_mass = swaps[0]['original']['mass_g'] if swaps else 0.0
-    if candidate_source == 'nutrient_discovery' and extreme_nutrient_swing(
-        ev['nutrients'], swapped_mass,
-    ):
+    if extreme_nutrient_swing(ev['nutrients'], swapped_mass):
         return None
     if ev['rank_score'] <= 0.01:
         return None
@@ -447,6 +445,11 @@ def _discovery_candidates(
     source_filter = constraints['source_filter']
 
     for idx, ing in enumerate(rows):
+        # Pure seasonings (salt, spice) are not 1:1 mass food swaps — skip discovery.
+        from api.services.substitution_roles import is_primary_seasoning
+        if is_primary_seasoning(ing.get('food_description', '')):
+            continue
+
         discovered = discover_candidates_for_ingredient(
             food_id=ing['food_id'],
             food_description=ing['food_description'],

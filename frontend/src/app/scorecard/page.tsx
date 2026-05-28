@@ -20,11 +20,13 @@ import {
 } from '@/components/shared/AudienceToggle';
 import { FoodListPanel } from '@/components/shared/FoodListPanel';
 import { FpedPanel } from '@/components/shared/FpedPanel';
+import { CollapsibleSection } from '@/components/shared/CollapsibleSection';
+import { SubstitutionSuggestionsPanel } from '@/components/shared/SubstitutionSuggestionsPanel';
 import { useRecall24hReceiver } from '@/components/shared/useRecall24hReceiver';
 import {
-  loadActiveFoodList, ACTIVE_FOOD_LIST_EVENT,
-  type ActiveFoodList,
+  loadActiveFoodList, saveActiveFoodList, ACTIVE_FOOD_LIST_EVENT,
 } from '@/lib/activeFoodList';
+import type { SubstitutionCompositionItem, SubstitutionSuggestion } from '@/lib/api';
 import {
   runAllScorers, retryOneMetric, clearScorecardCache,
   type ProfileResults, type RunOptions, type MetricKey,
@@ -192,6 +194,41 @@ export default function ScorecardPage(): JSX.Element {
     }
   }, [results, ingredients, runOptions]);
 
+  const compositionForSubstitution = useMemo(
+    () => allIngredients.map(i => ({
+      food_id: i.food_id,
+      mass_g: i.mass_g,
+      food_description: i.food_description,
+      food_group: i.food_group,
+    })),
+    [allIngredients],
+  );
+
+  const dishNameForSubstitution = useMemo(() => {
+    const names = list?.meals_meta?.map(m => m.dish_name).filter(Boolean);
+    if (names?.length) return names.join(' / ');
+    return list?.packaged_food?.product_name ?? undefined;
+  }, [list]);
+
+  const handleSubstitutionApply = useCallback((
+    modified: SubstitutionCompositionItem[],
+    _suggestion: SubstitutionSuggestion,
+  ) => {
+    const current = loadActiveFoodList();
+    if (!current) return;
+    saveActiveFoodList({
+      ...current,
+      ingredients: modified.map(m => ({
+        food_id: m.food_id,
+        food_description: m.food_description ?? `Food ${m.food_id}`,
+        food_group: m.food_group,
+        mass_g: m.mass_g,
+      })),
+    });
+    setList(loadActiveFoodList());
+    setSelectedFoodIds(new Set(modified.map(m => m.food_id)));
+  }, []);
+
   // Renderable card models, derived from outcomes + audience.
   const cardModels = useMemo(() => {
     if (!results) return null;
@@ -261,6 +298,26 @@ export default function ScorecardPage(): JSX.Element {
 
         {/* Add foods inline */}
         <ScorecardAddBar userType={userType} />
+
+        {nTotalFoods > 0 && (
+          <CollapsibleSection
+            title="Ingredient swaps"
+            icon={<Sparkles className="h-4 w-4 text-violet-600" aria-hidden="true" />}
+            badge={`${nTotalFoods} food${nTotalFoods > 1 ? 's' : ''}`}
+            persistKey="scorecard_substitution"
+            defaultCollapsed={false}
+          >
+            <p className="text-xs text-gray-500 mb-3">
+              Realistic ingredient swaps for your current list. Applying a swap updates the food list above — re-score to refresh the metrics.
+            </p>
+            <SubstitutionSuggestionsPanel
+              composition={compositionForSubstitution}
+              onApply={handleSubstitutionApply}
+              userType={userType}
+              dishName={dishNameForSubstitution}
+            />
+          </CollapsibleSection>
+        )}
 
         {/* Empty state */}
         {nFoods === 0 && !scoring && !results && (

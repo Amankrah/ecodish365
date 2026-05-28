@@ -164,6 +164,79 @@ class TestSubstitutionAnalyzer(unittest.TestCase):
             'Oil, peanut',
         ))
 
+    def test_culinary_blocks_salt_to_tomato_paste(self):
+        self.assertFalse(culinary_swap_plausible(
+            'Salt, table',
+            'Tomato paste, concentrated, without salt',
+            original_mass_g=5.0,
+        ))
+
+    def test_culinary_blocks_salt_to_taro_with_salt(self):
+        self.assertFalse(culinary_swap_plausible(
+            'Salt, table',
+            'Taro, dasheen, tannia, cooked, with salt',
+            original_mass_g=5.0,
+        ))
+
+    def test_primary_seasoning_not_confused_with_modified_foods(self):
+        from api.services.substitution_roles import is_primary_seasoning, infer_functional_role
+        self.assertTrue(is_primary_seasoning('Salt, table'))
+        self.assertFalse(is_primary_seasoning('Taro, cooked, with salt'))
+        self.assertFalse(is_primary_seasoning('Tomato paste, concentrated, without salt'))
+        self.assertEqual(infer_functional_role('Taro, cooked, with salt'), 'other')
+
+    def test_wafct_recipe_does_not_match_salt_to_tomato_paste(self):
+        from api.services.wafct_recipes import recipe_swap_candidates
+        cands = recipe_swap_candidates(
+            dish_name='RICE AND GARDEN EGGS STEW WITH FISH',
+            ingredient_description='Salt, table',
+            exclude_ids=set(),
+            limit=5,
+        )
+        repl_descs = [c['food_description'].lower() for c in cands]
+        self.assertEqual(cands, [])
+        self.assertFalse(any('tomato paste' in d for d in repl_descs))
+
+    def test_stew_with_salt_never_suggests_tomato_paste_for_salt(self):
+        """Regression: salt slot must not swap to tomato paste via WAFCT/matcher."""
+        composition = [
+            {'food_id': 700153, 'mass_g': 200, 'food_description': 'Grains, rice, white, medium-grain, cooked'},
+            {'food_id': 700420, 'mass_g': 150, 'food_description': 'Eggplant (aubergine, brinjal), raw'},
+            {'food_id': 700512, 'mass_g': 150, 'food_description': 'Fish, tuna, skipjack (aku), fresh, raw'},
+            {'food_id': 700589, 'mass_g': 50, 'food_description': 'Tomato, red, ripe, raw, year round average'},
+            {'food_id': 700532, 'mass_g': 25, 'food_description': 'Onion, raw'},
+            {'food_id': 700876, 'mass_g': 15, 'food_description': 'Vegetable oil, palm'},
+            {'food_id': 214, 'mass_g': 5, 'food_description': 'Salt, table'},
+        ]
+        result = analyze_substitutions(
+            composition,
+            purpose='general_health',
+            max_suggestions=8,
+            dish_name='RICE AND GARDEN EGGS STEW WITH FISH',
+            reformulation_mode='greedy',
+            constraints={'max_swaps': 3},
+            include_scorecard=False,
+        )
+        self.assertTrue(result['success'])
+        banned = ('tomato paste', 'taro', 'cracker', 'saltine')
+        for s in result['suggestions']:
+            for sw in (s.get('swaps') or [s]):
+                orig = (sw.get('original') or s.get('original', {})).get('food_description', '')
+                if 'salt' in orig.lower() and orig.lower().startswith('salt'):
+                    repl = (sw.get('replacement') or s.get('replacement', {})).get('food_description', '').lower()
+                    for b in banned:
+                        self.assertNotIn(b, repl, msg=f'Bad salt swap: {repl}')
+
+    def test_extreme_nutrient_swing_blocks_absurd_sodium_delta(self):
+        self.assertTrue(extreme_nutrient_swing(
+            {'sodium_mg': {'diff': -1936.0}, 'fibre_g': {'diff': 0.0}},
+            swapped_mass_g=5.0,
+        ))
+        self.assertFalse(extreme_nutrient_swing(
+            {'sodium_mg': {'diff': -50.0}, 'fibre_g': {'diff': 0.5}},
+            swapped_mass_g=100.0,
+        ))
+
     def test_stew_composition_blocks_nonsense_swaps(self):
         """West African stew — should not suggest cloud-ear mushroom for tomato."""
         composition = [

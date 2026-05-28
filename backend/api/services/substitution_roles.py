@@ -29,15 +29,28 @@ _RX_SAUCE = re.compile(r'\b(tomato|paste|sauce|stock|broth|gravy)\b', re.I)
 _RX_BEVERAGE = re.compile(r'\b(water|juice|cola|soda|tea|coffee|milk|beverage)\b', re.I)
 _RX_SWEETENER = re.compile(r'\b(sugar|honey|syrup|molasses)\b', re.I)
 _RX_SEASONING = re.compile(r'\b(salt|pepper|spice|curry|seasoning)\b', re.I)
+# Primary seasonings only — not "Taro, with salt" or "Tomato paste, without salt".
+_RX_PRIMARY_SEASONING = re.compile(
+    r'^(Salt|Pepper,|Spice|Seasoning|Curry powder|Yeast|Baking powder|Baking soda)\b',
+    re.I,
+)
 _RX_VEG = re.compile(
     r'\b(eggplant|aubergine|garden egg|okra|pepper|carrot|spinach|lettuce|'
     r'cabbage|cucumber|squash|vegetable|tomato)\b', re.I,
 )
 
 
+def is_primary_seasoning(description: str) -> bool:
+    """True when the food *is* a seasoning (salt, spice), not a food modified with salt."""
+    d = (description or '').strip()
+    return bool(_RX_PRIMARY_SEASONING.search(d))
+
+
 def infer_functional_role(description: str) -> str:
     """Classify an ingredient's culinary role from its food description."""
     d = description or ''
+    if is_primary_seasoning(d):
+        return ROLE_SEASONING
     if _RX_BEVERAGE.search(d) and not _RX_FAT.search(d):
         return ROLE_BEVERAGE
     if _RX_SWEETENER.search(d):
@@ -52,8 +65,6 @@ def infer_functional_role(description: str) -> str:
         return ROLE_AROMATIC
     if _RX_SAUCE.search(d):
         return ROLE_SAUCE
-    if _RX_SEASONING.search(d):
-        return ROLE_SEASONING
     if _RX_VEG.search(d):
         return ROLE_VEGETABLE
     return ROLE_OTHER

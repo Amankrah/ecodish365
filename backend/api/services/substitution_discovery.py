@@ -15,6 +15,9 @@ from api.services.cnf_matcher import get_default_matcher
 
 logger = logging.getLogger(__name__)
 
+# Matcher alternatives below this cosine are too weak to show as culinary substitutes.
+MIN_MATCHER_COSINE = 0.65
+
 # CNF NutrientID → discovery query per purpose (per 100 g edible).
 PURPOSE_NUTRIENT_QUERIES: Dict[str, Dict[str, Any]] = {
     'lower_sodium': {'nutrient_id': 307, 'max_value': 100.0, 'limit': 20},
@@ -146,6 +149,8 @@ def _matcher_alternative_candidates(
 
     for alt in result.alternatives:
         if alt.food_id in seen:
+            continue
+        if alt.similarity < MIN_MATCHER_COSINE:
             continue
         if not _passes_source_filter(alt.food_id, source_filter):
             continue

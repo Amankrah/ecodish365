@@ -11,8 +11,9 @@
  */
 'use client';
 
-import { Target, FlaskConical, Trash2, Eye, Loader2 } from 'lucide-react';
+import { Target, FlaskConical, Trash2, Eye, Loader2, Sparkles } from 'lucide-react';
 import type { SavedRecallDay } from '@/lib/recallHistory';
+import { fromRecallAggregated, saveActiveFoodList } from '@/lib/activeFoodList';
 
 interface RecallHistoryCardProps {
   day: SavedRecallDay;
@@ -54,28 +55,35 @@ const PATTERN_COLOR: Record<string, string> = {
 
 function routeDayTo(
   day: SavedRecallDay,
-  target: 'hefi' | 'heni' | 'dietary_pattern',
+  target: 'hefi' | 'heni' | 'dietary_pattern' | 'scorecard',
   path: string,
 ): void {
+  const payload = {
+    source: 'recall_24h' as const,
+    user_type: day.user_type,
+    captured_at: new Date().toISOString(),
+    target,
+    meals_meta: day.meals.map(m => ({
+      occasion: m.occasion,
+      dish_name: m.decomposition.dish_name,
+      total_mass_g: m.decomposition.total_mass_g,
+    })),
+    aggregated_daily_ingredients: day.aggregated_daily_ingredients,
+    estimated_daily_kcal: day.estimated_daily_kcal,
+  };
   try {
-    const payload = {
-      source: 'recall_24h',
-      user_type: day.user_type,
-      captured_at: new Date().toISOString(),
-      target,
-      meals_meta: day.meals.map(m => ({
-        occasion: m.occasion,
-        dish_name: m.decomposition.dish_name,
-        total_mass_g: m.decomposition.total_mass_g,
-      })),
-      aggregated_daily_ingredients: day.aggregated_daily_ingredients,
-      estimated_daily_kcal: day.estimated_daily_kcal,
-    };
     sessionStorage.setItem('recall_24h_payload', JSON.stringify(payload));
   } catch {
     // sessionStorage may be unavailable in private mode — target page
     // still works standalone.
   }
+  try {
+    saveActiveFoodList(fromRecallAggregated(payload.aggregated_daily_ingredients, {
+      user_type: day.user_type,
+      estimated_daily_kcal: payload.estimated_daily_kcal,
+      meals_meta: payload.meals_meta,
+    }));
+  } catch { /* localStorage unavailable — non-fatal */ }
   window.location.href = `${path}?from=recall24h`;
 }
 
@@ -170,6 +178,14 @@ export function RecallHistoryCard({
         >
           <FlaskConical className="h-3.5 w-3.5" aria-hidden="true" />
           Score HENI
+        </button>
+        <button
+          type="button"
+          onClick={() => routeDayTo(day, 'scorecard', '/scorecard')}
+          className="inline-flex items-center gap-1 px-2.5 py-1 bg-violet-600 hover:bg-violet-700 text-white rounded-md text-xs font-medium"
+        >
+          <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+          Scorecard + swaps
         </button>
         <span className="flex-1" />
         <button
