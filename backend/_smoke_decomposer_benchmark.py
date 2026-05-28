@@ -124,7 +124,8 @@ def _classify(matched: bool, kcal_err: Optional[float], macro_err: Optional[floa
     return 'borderline'
 
 
-def _eval_one(food_id: int, cnf_name: str, cnf_group: str) -> Dict[str, Any]:
+def _eval_one(food_id: int, cnf_name: str, cnf_group: str,
+              force_decompose: bool = False) -> Dict[str, Any]:
     from api.services.cnf_recipe_decomposer import get_default_decomposer
     from api.services.decomposition_validation import (
         nutrient_reconstruction, fndds_recipe_comparison,
@@ -134,7 +135,7 @@ def _eval_one(food_id: int, cnf_name: str, cnf_group: str) -> Dict[str, Any]:
     t0 = time.time()
     decomposer = get_default_decomposer()
     try:
-        recipe = decomposer.decompose(cnf_name, 100.0)
+        recipe = decomposer.decompose(cnf_name, 100.0, force_decompose=force_decompose)
     except Exception as exc:  # noqa: BLE001
         return {
             'food_id': food_id, 'cnf_name': cnf_name, 'cnf_group': cnf_group,
@@ -207,6 +208,8 @@ def _aggregate(rows: List[Dict[str, Any]], seed: int) -> Dict[str, Any]:
     overall['matched_rate'] = round(sum(1 for r in rows if r['matched']) / max(1, len(rows)), 3)
     overall['pass_rate_of_scored'] = round(verdicts.count('pass') / n_scored, 3)
     overall['flagged_rate_of_scored'] = round(verdicts.count('flagged') / n_scored, 3)
+    n_catalog = sum(1 for r in rows if str(r.get('fallback_reason') or '').startswith('catalog_'))
+    overall['catalog_hit_rate'] = round(n_catalog / max(1, len(rows)), 3)
 
     by_group: Dict[str, Dict[str, Any]] = {}
     for g in sorted(set(r['cnf_group'] for r in rows)):
@@ -247,19 +250,22 @@ def _aggregate(rows: List[Dict[str, Any]], seed: int) -> Dict[str, Any]:
     }
 
 
-def run_benchmark(per_group: int, seed: int, limit: Optional[int], workers: int) -> Dict[str, Any]:
+def run_benchmark(per_group: int, seed: int, limit: Optional[int], workers: int,
+                  force_decompose: bool = False) -> Dict[str, Any]:
     sample = _stratified_composite_sample(per_group, seed)
     random.seed(seed)
     random.shuffle(sample)
     if limit:
         sample = sample[:limit]
+    mode = 'force-decompose' if force_decompose else 'full-pipeline'
     print(f'Sampled {len(sample)} composite foods across '
-          f'{len(set(g for _, _, g in sample))} groups (per_group={per_group}, seed={seed})')
+          f'{len(set(g for _, _, g in sample))} groups (per_group={per_group}, seed={seed}, mode={mode})')
 
     rows: List[Dict[str, Any]] = []
     done = 0
     with ThreadPoolExecutor(max_workers=workers) as ex:
-        futs = {ex.submit(_eval_one, fid, name, grp): fid for fid, name, grp in sample}
+        futs = {ex.submit(_eval_one, fid, name, grp, force_decompose): fid
+                for fid, name, grp in sample}
         for fut in as_completed(futs):
             rows.append(fut.result())
             done += 1
@@ -270,6 +276,7 @@ def run_benchmark(per_group: int, seed: int, limit: Optional[int], workers: int)
         'git_rev': _git_rev_short(),
         'generated_at_utc': datetime.now(timezone.utc).isoformat(),
         'seed': seed, 'per_group': per_group, 'sample_size': len(rows),
+        'mode': mode, 'force_decompose': bool(force_decompose),
         'summary': _aggregate(rows, seed),
         'per_food': rows,
     }
@@ -277,8 +284,9 @@ def run_benchmark(per_group: int, seed: int, limit: Optional[int], workers: int)
 
 def _write_artefacts(bench: Dict[str, Any]) -> Tuple[str, str]:
     stamp = _utc_stamp()
-    json_path = os.path.join(_BACKEND, f'decomposer_benchmark_{bench["git_rev"]}_{stamp}.json')
-    md_path = os.path.join(_BACKEND, 'decomposer_benchmark_flagged_for_review.md')
+    suffix = '_forcedecomp' if bench.get('force_decompose') else ''
+    json_path = os.path.join(_BACKEND, f'decomposer_benchmark_{bench["git_rev"]}{suffix}_{stamp}.json')
+    md_path = os.path.join(_BACKEND, f'decomposer_benchmark_flagged_for_review{suffix}.md')
     with open(json_path, 'wb') as fh:
         fh.write((json.dumps(bench, ensure_ascii=False, indent=2) + '\n').encode('utf-8'))
 
@@ -303,9 +311,10 @@ def _print_summary(bench: Dict[str, Any]) -> None:
     s = bench['summary']
     o = s['overall']
     print('\n' + '=' * 78)
-    print(f'DECOMPOSER BENCHMARK — {bench["sample_size"]} composite foods (git {bench["git_rev"]})')
+    print(f'DECOMPOSER BENCHMARK — {bench["sample_size"]} composite foods '
+          f'(git {bench["git_rev"]}, mode={bench.get("mode", "full-pipeline")})')
     print('=' * 78)
-    print(f'matched: {o["matched_rate"]*100:.0f}%   '
+    print(f'matched: {o["matched_rate"]*100:.0f}%   catalog-hit: {o.get("catalog_hit_rate", 0)*100:.0f}%   '
           f'pass: {o["pass"]} / borderline: {o["borderline"]} / flagged: {o["flagged"]} '
           f'/ no_truth: {o["no_truth"]}')
     print(f'pass-rate (of scored): {o["pass_rate_of_scored"]*100:.0f}%   '
@@ -331,11 +340,14 @@ def main():
     p.add_argument('--seed', type=int, default=42)
     p.add_argument('--limit', type=int, default=None)
     p.add_argument('--workers', type=int, default=6)
+    p.add_argument('--force-decompose', action='store_true',
+                   help='Bypass catalog preference + override; measure raw decomposition quality.')
     args = p.parse_args()
     if not os.environ.get('OPENAI_API_KEY'):
         print('OPENAI_API_KEY not set; aborting.')
         return 1
-    bench = run_benchmark(args.per_group, args.seed, args.limit, args.workers)
+    bench = run_benchmark(args.per_group, args.seed, args.limit, args.workers,
+                          force_decompose=args.force_decompose)
     json_path, md_path = _write_artefacts(bench)
     _print_summary(bench)
     print(f'\nWrote {os.path.basename(json_path)} + {os.path.basename(md_path)}')

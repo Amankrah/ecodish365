@@ -60,6 +60,13 @@ DEFAULT_RANKING_MODEL = 'gpt-4.1-mini'
 DEFAULT_TEMPERATURE = 0.0
 DEFAULT_MAX_TOKENS = 600
 
+# Catalog preference (2026-05-28): when the dish name itself matches a CNF food that
+# has its own measured nutrients, prefer that food over an LLM decomposition.
+CATALOG_SHORTCIRCUIT_CONF = 0.88   # use the catalog food directly, skip decomposition
+CATALOG_OVERRIDE_CONF = 0.70       # override a bad decomposition with the catalog food
+RECON_OVERRIDE_KCAL = 0.25         # |kcal recon error| above this -> override to catalog
+RECON_OVERRIDE_MACRO = 0.30        # macro mean-abs-rel error above this -> override
+
 
 _NORMALISE_RE = re.compile(r'\s+')
 
@@ -85,6 +92,29 @@ def _mass_tolerance(target_mass_g: float) -> float:
     flaking on the cooking-fat overshoot. Tablespoon ≈ 15 g for context.
     """
     return max(10.0, target_mass_g * 0.04)
+
+
+def _should_override_with_catalog(
+    recon: Optional[Dict[str, Any]],
+    decomp_matched: bool,
+    kcal_thresh: float = RECON_OVERRIDE_KCAL,
+    macro_thresh: float = RECON_OVERRIDE_MACRO,
+) -> bool:
+    """Decide whether to replace a decomposition with a confidently-matched catalog food.
+
+    Pure (no I/O) so the gate logic is unit-testable without an LLM.
+      - failed decomposition  -> override (the confident catalog food is better)
+      - no reconstruction      -> keep the decomposition (can't assess; don't second-guess)
+      - reconstruction diverges (kcal or macro error over threshold) -> override
+    """
+    if not decomp_matched:
+        return True
+    if recon is None:
+        return False
+    kcal = recon.get('kcal_rel_error')
+    macro = recon.get('macro_mean_abs_rel_error')
+    return ((kcal is not None and kcal > kcal_thresh)
+            or (macro is not None and macro > macro_thresh))
 
 
 # --- Result payloads ------------------------------------------------------
@@ -215,6 +245,20 @@ class CNFRecipeDecomposer:
         "\"unsalted peanut butter sandwich\" → unsalted peanut butter). "
         "Don't gratuitously pick the lowest-sodium or fat-free CNF entry "
         "when the user said \"chicken soup\" or \"peanut butter sandwich\".\n\n"
+        "COOKED / AS-SERVED + WATER RULE (2026-05-28): decompose into "
+        "ingredients in their AS-SERVED form and density, so the mass-weighted "
+        "nutrients reproduce the dish as eaten — NOT raw/dry-ingredient density. "
+        "For dishes that are cooked, hydrated, reconstituted, or diluted (soups, "
+        "broths, stews, porridges/oatmeal, sauces, gravies, casseroles, "
+        "rehydrated mixes, purées and baby foods, cooked rice/pasta/grains), (a) "
+        "pick CNF entries in their COOKED/PREPARED form (\"rice, cooked\" not "
+        "\"rice, dry\"; \"chicken, roasted\" not \"chicken, raw\"), and (b) "
+        "explicitly represent the dish's WATER — either add a \"water\" "
+        "ingredient for the absorbed/added water, or choose the prepared/diluted "
+        "CNF entry. A 100 g serving of soup is mostly water (~20-40 kcal), a "
+        "cooked grain has absorbed 2-3x its dry weight in water; if you list dry/"
+        "raw ingredients at the cooked total mass you will overstate calories ~2x. "
+        "Make the explicit water/cooked-form choice so the energy density is right.\n\n"
         "CONFIDENCE CALIBRATION: `decomposition_confidence` = P(a "
         "nutrition curator would call this list LCA-equivalent to the dish). "
         "If you ran this 10 times with different proportions within plausible "
@@ -275,6 +319,7 @@ class CNFRecipeDecomposer:
         dish_name: str,
         total_mass_g: float,
         source: Optional[str] = None,
+        force_decompose: bool = False,
     ) -> CNFDecomposedRecipe:
         """Decompose a free-text dish into CNF / WAFCT ingredients.
 
@@ -283,6 +328,11 @@ class CNFRecipeDecomposer:
         None (default) searches both. Source is included in the cache
         key so a CNF-only query and a both-query for the same dish
         cache independently.
+
+        `force_decompose` (2026-05-28) bypasses catalog preference (fix 3) and
+        the reconstruction-gated override (fix 2), forcing the raw LLM
+        decomposition path. Used by the validation harnesses + golden smokes so
+        they keep measuring decomposition quality rather than the catalog shortcut.
         """
         t0 = time.perf_counter()
         if not dish_name or not dish_name.strip():
@@ -305,7 +355,7 @@ class CNFRecipeDecomposer:
         # cnf-only / wafct-only / both queries cache independently for the
         # same dish + mass.
         src_key = source if source in ('cnf', 'wafct') else 'both'
-        key = (ndn, round(total_mass_g, 1), src_key)
+        key = (ndn, round(total_mass_g, 1), src_key, bool(force_decompose))
         cached = self._cache_get(key)
         if cached is not None:
             return CNFDecomposedRecipe(
@@ -325,6 +375,66 @@ class CNFRecipeDecomposer:
             self._cache_put(key, result)
             return result
 
+        # --- Catalog preference (fix 3): if the dish name strongly matches a CNF
+        # food that has its own measured nutrients, use that food directly (most
+        # accurate + cheapest). `force_decompose` skips this for the harnesses.
+        cm = None if force_decompose else self._catalog_match(dish_name, source)
+        if (cm is not None and cm.matched and cm.food_id is not None
+                and cm.confidence >= CATALOG_SHORTCIRCUIT_CONF
+                and self._has_nutrients(int(cm.food_id))):
+            result = self._catalog_recipe(cm, dish_name, ndn, total_mass_g,
+                                          reason='catalog_direct_match', t0=t0)
+            self._cache_put(key, result)
+            return result
+
+        # LLM decomposition (Stage 1 + Stage 2 + the 7 gates).
+        decomp = self._decompose_via_llm(dish_name, ndn, total_mass_g, source, t0, key)
+
+        # --- Reconstruction-gated catalog override (fix 2): for a weaker catalog
+        # match, replace a decomposition whose reconstructed nutrients diverge from
+        # the catalog food's own measured profile (or that failed outright).
+        if (cm is not None and cm.matched and cm.food_id is not None
+                and cm.confidence >= CATALOG_OVERRIDE_CONF
+                and self._has_nutrients(int(cm.food_id))):
+            recon = None
+            if decomp.matched and decomp.ingredients:
+                try:
+                    from .decomposition_validation import nutrient_reconstruction
+                    recon = nutrient_reconstruction(
+                        int(cm.food_id),
+                        [{'food_id': i.food_id, 'mass_g': i.mass_g} for i in decomp.ingredients],
+                        total_mass_g=total_mass_g,
+                    )
+                except Exception:  # noqa: BLE001
+                    recon = None
+            if _should_override_with_catalog(recon, decomp.matched):
+                if recon and recon.get('kcal_rel_error') is not None:
+                    detail = f"kcal_err={recon['kcal_rel_error']}"
+                elif not decomp.matched:
+                    detail = f'decomp_failed:{decomp.fallback_reason}'
+                else:
+                    detail = 'recon_unavailable'
+                result = self._catalog_recipe(cm, dish_name, ndn, total_mass_g,
+                                              reason=f'catalog_override:{detail}', t0=t0)
+                self._cache_put(key, result)
+                return result
+
+        return decomp
+
+    def _decompose_via_llm(
+        self,
+        dish_name: str,
+        ndn: str,
+        total_mass_g: float,
+        source: Optional[str],
+        t0: float,
+        key: Tuple,
+    ) -> CNFDecomposedRecipe:
+        """Stage 1 (LLM decompose) + Stage 2 (CNFMatcher resolve) + the 7 gates.
+
+        Returns (and caches under `key`) a CNFDecomposedRecipe. Split out of
+        `decompose()` so catalog preference + the reconstruction gate can wrap it.
+        """
         # Stage 1: LLM decomposition
         try:
             parsed = self._stage1_decompose(dish_name, total_mass_g)
@@ -525,6 +635,46 @@ class CNFRecipeDecomposer:
         )
         self._cache_put(key, result)
         return result
+
+    # --- Catalog preference helpers --------------------------------------
+
+    def _catalog_match(self, dish_name: str, source: Optional[str]):
+        """Match the whole dish name to a CNF food (None on matcher failure)."""
+        try:
+            return self.cnf_matcher.match(dish_name, source=source)
+        except Exception:  # noqa: BLE001
+            return None
+
+    @staticmethod
+    def _has_nutrients(food_id: int) -> bool:
+        """True if the CNF food has a positive measured energy value."""
+        try:
+            from api.cnf_cache import get_api_cnf_pipeline
+            n = get_api_cnf_pipeline().nutrients_for(int(food_id)) or {}
+            return float(n.get('ENERGY (KILOCALORIES)', 0.0) or 0.0) > 0
+        except Exception:  # noqa: BLE001
+            return False
+
+    def _catalog_recipe(self, cm, dish_name: str, ndn: str, total_mass_g: float,
+                        reason: str, t0: float) -> CNFDecomposedRecipe:
+        """Build a single-ingredient recipe = the matched catalog food at full mass."""
+        ing = CNFIngredient(
+            food_id=int(cm.food_id),
+            food_description=cm.food_description or '',
+            food_group=cm.food_group or '',
+            mass_g=total_mass_g,
+            rationale='Dish matched a CNF catalog food directly; using its measured profile.',
+            resolution_confidence=float(cm.confidence),
+        )
+        return CNFDecomposedRecipe(
+            dish_name=dish_name, normalised_dish_name=ndn,
+            total_mass_g=total_mass_g, matched=True,
+            ingredients=[ing], resolved_mass_g=total_mass_g,
+            unresolved_mass_g=0.0, unresolved_description='',
+            decomposition_confidence=float(cm.confidence),
+            fallback_reason=reason,
+            timing_ms=(time.perf_counter() - t0) * 1000,
+        )
 
     # --- Stage 2 (per-ingredient resolution, runs concurrently) ----------
 

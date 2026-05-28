@@ -74,7 +74,9 @@ GOLDEN_PANEL: List[GoldenRecipe] = [
         dish_name='scrambled eggs with toast',
         total_mass_g=150.0,
         expected_ingredients={
-            125:  90.0,    # Egg, chicken, whole, fresh or frozen, raw
+            # Re-baselined 2026-05-28: the cooked-form prompt rule now correctly
+            # resolves scrambled eggs to the COOKED entry (133) instead of raw (125).
+            133:  90.0,    # Egg, chicken, whole, cooked, scrambled or omelet
             3732: 50.0,    # Bread, white, commercial, toasted
         },
         expected_resolved_mass_g=140.0,
@@ -129,7 +131,8 @@ def run_golden(decomposer) -> List[GoldenCheck]:
     out: List[GoldenCheck] = []
     for r in GOLDEN_PANEL:
         try:
-            d = decomposer.decompose(r.dish_name, r.total_mass_g)
+            # force_decompose: pin the DECOMPOSITION path, not the catalog shortcut.
+            d = decomposer.decompose(r.dish_name, r.total_mass_g, force_decompose=True)
         except Exception as exc:  # noqa: BLE001
             out.append(GoldenCheck(
                 dish_name=r.dish_name,

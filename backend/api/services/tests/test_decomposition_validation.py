@@ -74,6 +74,36 @@ def test_fndds_comparison_bridged_vs_unbridged():
     assert fndds_recipe_comparison(99999999, dairy_split) is None
 
 
+def test_should_override_with_catalog():
+    # Pure gate-decision logic (no LLM).
+    from api.services.cnf_recipe_decomposer import _should_override_with_catalog as so
+    assert so(None, decomp_matched=False) is True          # failed decomposition -> use catalog
+    assert so(None, decomp_matched=True) is False           # no recon -> keep decomposition
+    assert so({'kcal_rel_error': 0.10, 'macro_mean_abs_rel_error': 0.15}, True) is False  # faithful
+    assert so({'kcal_rel_error': 0.50, 'macro_mean_abs_rel_error': 0.10}, True) is True   # bad kcal
+    assert so({'kcal_rel_error': 0.10, 'macro_mean_abs_rel_error': 0.50}, True) is True   # bad macro
+
+
+def test_catalog_recipe_and_has_nutrients():
+    from api.services.cnf_recipe_decomposer import get_default_decomposer
+    dec = get_default_decomposer()
+    assert dec._has_nutrients(_APPLE) is True
+    assert dec._has_nutrients(99999999) is False
+
+    class _M:  # minimal stand-in for a MatchResult
+        food_id = _APPLE
+        food_description = 'Apple, raw'
+        food_group = 'Fruits and fruit juices'
+        confidence = 0.93
+    r = dec._catalog_recipe(_M(), 'apple', 'apple', 150.0, reason='catalog_direct_match', t0=0.0)
+    assert r.matched is True
+    assert len(r.ingredients) == 1
+    assert r.ingredients[0].food_id == _APPLE
+    assert r.ingredients[0].mass_g == 150.0
+    assert r.resolved_mass_g == 150.0 and r.unresolved_mass_g == 0.0
+    assert r.fallback_reason == 'catalog_direct_match'
+
+
 def test_benchmark_artifact_schema_if_present():
     # Mirror test_matcher_benchmark: pin the artifact shape when one exists; skip otherwise.
     files = sorted(glob.glob(os.path.join(_BACKEND, 'decomposer_benchmark_*.json')))

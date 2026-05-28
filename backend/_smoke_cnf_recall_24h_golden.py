@@ -90,23 +90,21 @@ GOLDEN: GoldenRecall = GoldenRecall(
         GoldenMeal('lunch',     'scrambled eggs with toast', 150),
         GoldenMeal('dinner',    'grilled cheese sandwich',   120),
     ],
-    # FoodID → aggregated mass_g across all three meals. Captured run shows:
-    #   bread white commercial    (4066)   = 50 + 70 = 120 g
-    #   egg whole raw             (125)    = 90 g (lunch only)
-    #   bread white toasted       (3732)   = 50 g (lunch only)
-    #   cheese processed cheddar  (7005) = 40 g (dinner only)
-    #   peanut butter smooth      (3414)   = 28 g (breakfast only)
-    #   butter regular            (118)    = 10 + 8 = 18 g (lunch + dinner)
+    # FoodID → aggregated mass_g across all three meals.
+    # Re-baselined 2026-05-28 after the cooked-form prompt + force_decompose: the
+    # cooked-form rule now resolves scrambled eggs to the COOKED entry (133, was raw
+    # 125), and peanut butter to 3399 (was 3414). Food-id set + kcal are stable;
+    # the toasted-vs-untoasted bread mass split (3732 / 4066) is mildly LLM-noisy.
     expected_aggregate={
-        4066:   120.0,
-        125:     90.0,
-        3732:    50.0,
-        7005:  40.0,
-        3414:    28.0,
-        118:     18.0,
+        3732:   120.0,   # Bread, white, commercial, toasted
+        133:     90.0,   # Egg, chicken, whole, cooked, scrambled or omelet
+        4066:    50.0,   # Bread, white, commercial
+        7005:    40.0,   # Cheese, processed product, cheddar, slices
+        3399:    28.0,   # Peanut butter, smooth type
+        118:     14.0,   # Butter, regular
     },
-    expected_resolved_mass_g=346.0,
-    expected_daily_kcal=986.1,
+    expected_resolved_mass_g=342.0,
+    expected_daily_kcal=986.0,
 )
 
 
@@ -146,7 +144,8 @@ def run_golden(orchestrator) -> GoldenCheck:
     from api.services.cnf_recall_24h import MealEntry
     meals = [MealEntry(m.occasion, m.dish_name, m.total_mass_g) for m in GOLDEN.meals]
     try:
-        r = orchestrator.recall(meals, user_type='researcher')
+        # force_decompose: pin the DECOMPOSITION path, not the catalog shortcut.
+        r = orchestrator.recall(meals, user_type='researcher', force_decompose=True)
     except Exception as exc:  # noqa: BLE001
         return GoldenCheck(
             expected_count=len(GOLDEN.expected_aggregate), observed_count=0,

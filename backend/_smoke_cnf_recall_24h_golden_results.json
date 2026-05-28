@@ -8,16 +8,16 @@
     "total": 1
   },
   "result": {
-    "overlap": 0.83,
+    "overlap": 1.0,
     "observed_count": 6,
     "expected_count": 6,
-    "observed_resolved_mass_g": 345.0,
-    "expected_resolved_mass_g": 346.0,
-    "observed_kcal": 985.3,
-    "expected_kcal": 986.1,
+    "observed_resolved_mass_g": 343.0,
+    "expected_resolved_mass_g": 342.0,
+    "observed_kcal": 990.8,
+    "expected_kcal": 986.0,
     "observed_food_ids": [
       118,
-      125,
+      133,
       3399,
       3732,
       4066,
@@ -25,8 +25,8 @@
     ],
     "expected_food_ids": [
       118,
-      125,
-      3414,
+      133,
+      3399,
       3732,
       4066,
       7005

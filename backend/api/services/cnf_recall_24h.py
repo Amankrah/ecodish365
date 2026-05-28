@@ -200,6 +200,7 @@ class CNFRecall24h:
         user_type: str = 'individual',
         parallel_meals: bool = True,
         source: Optional[str] = None,
+        force_decompose: bool = False,
     ) -> CNFRecall24hResult:
         """Decompose each meal, aggregate into a single daily ingredient list.
 
@@ -272,7 +273,7 @@ class CNFRecall24h:
         # Cache lookup — include source in the key so cnf-only / wafct-only
         # / both recalls cache independently.
         src_norm = source if source in ('cnf', 'wafct') else 'both'
-        key = (_meals_cache_key(cleaned), src_norm)
+        key = (_meals_cache_key(cleaned), src_norm, bool(force_decompose))
         cached = self._cache_get(key)
         if cached is not None:
             return CNFRecall24hResult(
@@ -306,13 +307,15 @@ class CNFRecall24h:
                     thread_name_prefix='cnf-recall-24h',
             ) as ex:
                 text_decompositions = list(ex.map(
-                    lambda m: self._decompose_meal(m, source=meal_source),
+                    lambda m: self._decompose_meal(m, source=meal_source,
+                                                   force_decompose=force_decompose),
                     text_meals,
                 ))
             text_results = list(zip([m.occasion for m in text_meals], text_decompositions))
         else:
             text_results = [
-                (m.occasion, self._decompose_meal(m, source=meal_source))
+                (m.occasion, self._decompose_meal(m, source=meal_source,
+                                                  force_decompose=force_decompose))
                 for m in text_meals
             ]
         precomposed_results = [
@@ -331,15 +334,19 @@ class CNFRecall24h:
 
     # --- per-meal decompose + single-food fallback -----------------------
 
-    def _decompose_meal(self, meal: MealEntry, source: Optional[str] = None):
+    def _decompose_meal(self, meal: MealEntry, source: Optional[str] = None,
+                        force_decompose: bool = False):
         """Decompose one meal, falling back to a single-FoodID match if the
         per-dish decomposer rejects the input as too few ingredients (the
         common case for snack entries like "banana", "almonds", "apple").
 
         WAFCT-EXTEND (2026-05-24): `source` forwards to both the compound
-        decompose path AND the snack-fallback matcher call.
+        decompose path AND the snack-fallback matcher call. `force_decompose`
+        (2026-05-28) forwards to the per-dish decomposer to bypass catalog
+        preference (used by the recall golden smoke).
         """
-        dec = self.decomposer.decompose(meal.dish_name, meal.total_mass_g, source=source)
+        dec = self.decomposer.decompose(meal.dish_name, meal.total_mass_g, source=source,
+                                        force_decompose=force_decompose)
         # If matched OR failed for any reason OTHER than the single-food gate,
         # return as-is — the orchestrator's aggregation handles partial
         # decompositions cleanly.
