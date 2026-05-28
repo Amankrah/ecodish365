@@ -1,0 +1,27 @@
+{
+  "_provenance": {
+    "purpose": "Daily food-group reference targets in USDA Food Pattern equivalent units, for computing 'gap vs guideline' on FPED-aggregated meals/days.",
+    "basis": "~2000 kcal/day reference pattern.",
+    "myplate_source": "USDA & HHS. Dietary Guidelines for Americans 2020-2025, Appendix 3 (Healthy U.S.-Style Dietary Pattern at 2000 kcal). Weekly subgroup amounts divided by 7 for daily equivalents.",
+    "cfg_source": "Health Canada. Canada's Food Guide 2019 (plate model). CFG-2019 dropped numeric servings in favour of plate proportions (half vegetables & fruits, quarter whole grains, quarter protein foods, water as the drink of choice), so the cfg2019_approx values are DERIVED cup/oz-equivalent approximations of those proportions at ~2000 kcal, NOT official Health Canada serving numbers.",
+    "caveats": [
+      "MyPlate/DGA targets are US reference amounts; they are unit-matched to FPED (cup/oz/tsp equivalents) and to NHANES/HEI literature, but are a US guideline applied to a Canadian-anchored platform.",
+      "CFG-2019 values are an approximation of the plate model in FPED units, with no official numeric backing; treat as directional, not authoritative.",
+      "Targets assume ~2000 kcal/day; they are not energy-adjusted to the individual's intake in v1.",
+      "Food Pattern equivalents are borrowed from each food's closest US analog (neither CNF nor WAFCT publishes them natively); most reliable for foods with a close US match, least reliable for region-specific dishes, which are left out when no analog exists."
+    ]
+  },
+  "targets": {
+    "fruit_total_cup":   {"myplate_2000kcal": 2.0,  "cfg2019_approx": 2.0,  "direction": "aim_at_least", "unit": "cup eq.", "label": "Fruit"},
+    "veg_total_cup":     {"myplate_2000kcal": 2.5,  "cfg2019_approx": 2.5,  "direction": "aim_at_least", "unit": "cup eq.", "label": "Vegetables"},
+    "veg_dark_green_cup":{"myplate_2000kcal": 0.21, "cfg2019_approx": 0.21, "direction": "aim_at_least", "unit": "cup eq.", "label": "Dark-green vegetables"},
+    "grain_total_oz":    {"myplate_2000kcal": 6.0,  "cfg2019_approx": 6.0,  "direction": "aim_at_least", "unit": "oz eq.",  "label": "Grains (total)"},
+    "grain_whole_oz":    {"myplate_2000kcal": 3.0,  "cfg2019_approx": 6.0,  "direction": "aim_at_least", "unit": "oz eq.",  "label": "Whole grains"},
+    "grain_refined_oz":  {"myplate_2000kcal": 3.0,  "cfg2019_approx": 0.0,  "direction": "keep_at_most",  "unit": "oz eq.",  "label": "Refined grains"},
+    "protein_total_oz":  {"myplate_2000kcal": 5.5,  "cfg2019_approx": 5.5,  "direction": "aim_at_least", "unit": "oz eq.",  "label": "Protein foods"},
+    "protein_seafood_total_oz": {"myplate_2000kcal": 1.14, "cfg2019_approx": 1.14, "direction": "aim_at_least", "unit": "oz eq.", "label": "Seafood", "derived_from": ["protein_seafood_high_omega3_oz", "protein_seafood_low_omega3_oz"]},
+    "dairy_total_cup":   {"myplate_2000kcal": 3.0,  "cfg2019_approx": 2.0,  "direction": "aim_at_least", "unit": "cup eq.", "label": "Dairy / fortified alternatives"},
+    "added_sugars_tsp":  {"myplate_2000kcal": 12.5, "cfg2019_approx": 12.5, "direction": "keep_at_most",  "unit": "tsp eq.", "label": "Added sugars"},
+    "oils_g":            {"myplate_2000kcal": 27.0, "cfg2019_approx": 27.0, "direction": "aim_at_least", "unit": "g",       "label": "Oils"}
+  }
+}

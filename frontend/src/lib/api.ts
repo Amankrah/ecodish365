@@ -291,11 +291,26 @@ export interface PatternResemblanceResult {
   cache_hit: boolean;
 }
 
+export interface PatternFpedDriver {
+  component: string;
+  label: string;
+  delta: number;          // user-day minus prototype-day, in the unit below
+  unit: string;
+  direction: 'more' | 'less';
+}
+
 export interface PatternExplanations {
   plain_summary?: { title: string; message: string };
   mandatory_caveat?: { title: string; message: string };
   methodology?: { title: string; message: string };
   narrative?: { title: string; message: string };
+  /** FPED-1: food-group drivers of the resemblance (interpretive overlay). */
+  fped_drivers?: {
+    title: string;
+    pattern: string;
+    drivers: PatternFpedDriver[];
+    caveat: string;
+  };
 }
 
 export interface PatternClassifyResponse {
@@ -834,6 +849,79 @@ export class CNFApiService {
       nf_panel: panel, ingredient_list,
     });
     return response.data as PackagedFoodDecomposeResponse;
+  }
+}
+
+// ===========================================================================
+// FPED-1 (2026-05-28) — USDA Food Pattern food-group exposure.
+// POST /api/fped/analyze/ aggregates a food list into cup/oz/tsp equivalents +
+// gaps vs MyPlate/DGA and Canada's Food Guide. Deterministic; bridged CNF + WAFCT.
+// ===========================================================================
+
+export type FpedDirection = 'aim_at_least' | 'keep_at_most';
+export type FpedStatus = 'short' | 'met' | 'over';
+
+export interface FpedGap {
+  component: string;
+  label: string;
+  unit: string;
+  intake: number;
+  direction: FpedDirection;
+  myplate_target: number;
+  cfg_target: number;
+  myplate_pct_of_target: number | null;
+  cfg_pct_of_target: number | null;
+  myplate_status: FpedStatus;
+  cfg_status: FpedStatus;
+}
+
+export interface FpedCoverage {
+  n_foods: number;
+  n_covered: number;
+  n_no_profile: number;
+  covered_mass_g: number;
+  total_mass_g: number;
+  coverage_pct_by_mass: number;
+}
+
+/** Audience-aware block from `explanations.fped_component_analysis`. */
+export interface FpedComponentAnalysis {
+  title: string;
+  caveat?: string;
+  coverage_note?: string;
+  // individual / clinician
+  headline?: string;
+  eat_more?: string[];   // everyday groups the day was light on
+  eat_less?: string[];   // groups to go easier on
+  // researcher / policy
+  component_totals?: Record<string, number>;
+  component_units?: Record<string, string>;
+  gaps?: FpedGap[];
+  coverage?: FpedCoverage;
+  methodology?: string;
+  caveats?: string[];
+}
+
+export interface FpedAnalyzeResponse {
+  result: {
+    component_totals: Record<string, number>;
+    component_units: Record<string, string>;
+    gaps: FpedGap[];
+    coverage: FpedCoverage;
+  };
+  analysis: FpedComponentAnalysis;
+}
+
+export class FpedApiService {
+  static async analyze(
+    foods: Array<{ food_id: number; mass_g: number }>,
+    userType: 'individual' | 'researcher' | 'policy' = 'individual',
+  ): Promise<FpedAnalyzeResponse> {
+    const response = await api.post('/fped/analyze/', { foods, user_type: userType });
+    return {
+      result: response.data.result,
+      analysis: response.data.explanations.fped_component_analysis as FpedComponentAnalysis,
+    };
   }
 }
 

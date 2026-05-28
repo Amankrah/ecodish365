@@ -141,8 +141,9 @@ def main() -> int:
         'bridged_with_fpid_row': in_fpid,
         'bridge_provenance': bridge.get('_provenance', {}),
     }
-    print(f'\nCurrent CNF→FNDDS bridge: {len(bridges)} foods (full CNF corpus; CNF 2026 ≈ 5,993)')
-    print(f'  → FPED composition lookup: {len(compositions)} entries ({in_fped} direct FPED hits)')
+    print(f'\nCurrent CNF/WAFCT→FNDDS bridge: {len(bridges)} foods')
+    print(f'  → FPED composition lookup (HENI 8-bucket): {len(compositions)} entries ({in_fped} direct FPED hits)')
+    print(f'  → Full 37-component FPED profiles: api/data/cnf_fped_profile.json (bridged CNF + WAFCT)')
     print(f'  → FPID: not integrated ({in_fpid} bridged foods match FPID CODE — expected 0)')
 
     # --- Contrast with WAFCT explore -------------------------------------
@@ -182,8 +183,9 @@ def main() -> int:
         'FOODCODE — use for ingredient-level pattern decomposition of composite foods.',
         'Do NOT compare FPED/FPID to CNF/WAFCT with the per-100g nutrient delta harness; '
         'they answer different questions (pattern equivalents vs nutrient composition).',
-        'WAFCT foods (700k+ FoodIDs) have no FPED/FPID path — HENI for WAFCT meals still '
-        'uses legacy literal-100 food-group attribution unless a WA-specific bridge is built.',
+        'Full 37-component FPED profiles (api/data/cnf_fped_profile.json) include bridged '
+        'WAFCT foods the same as CNF — inclusion is bridge-gated, not source-gated. Foods '
+        'with no close US analog have no profile and are flagged in coverage notes.',
     ]
 
     print('\n## Recommendations')

@@ -7,6 +7,7 @@ from .views import (
     cnf_ai_search_views,                # AI-MATCH-1 (AI-enhanced CNF search + recipe decomposer)
     packaged_food_views,                # PKG-IMG-1 Phase 1 (image → NF panel → HSR)
     substitution_views,                 # SUBST-1 Phase 1 (ingredient substitution analyzer)
+    fped_views,                         # FPED-1 (food-group exposure: cup/oz equivalents + guideline gaps)
 )
 from .views.cnf_views import (
     # Food Management
@@ -168,6 +169,11 @@ urlpatterns = [
     path('dietary-pattern/classify/',
          cnf_ai_search_views.dietary_pattern_classify,
          name='dietary_pattern_classify'),
+
+    # FPED-1 (2026-05-28) — food-group exposure: aggregate a meal/day into USDA
+    # Food Pattern equivalents (cup/oz/tsp) + gaps vs MyPlate & Canada's Food Guide.
+    # Deterministic (no LLM, no rate limit); bridged CNF + WAFCT foods included.
+    path('fped/analyze/', fped_views.fped_analyze, name='fped_analyze'),
 
     # =============================================================================
     # PKG-IMG-1 (2026-05-26) Phase 1 — packaged-food image → HSR

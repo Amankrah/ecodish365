@@ -19,6 +19,7 @@ import {
   AudienceToggle, type UserType,
 } from '@/components/shared/AudienceToggle';
 import { FoodListPanel } from '@/components/shared/FoodListPanel';
+import { FpedPanel } from '@/components/shared/FpedPanel';
 import { useRecall24hReceiver } from '@/components/shared/useRecall24hReceiver';
 import {
   loadActiveFoodList, ACTIVE_FOOD_LIST_EVENT,
@@ -350,6 +351,12 @@ export default function ScorecardPage(): JSX.Element {
               />
             ))}
           </section>
+        )}
+
+        {/* FPED-1: food-group exposure (cup/oz equivalents + reference-plate gaps).
+            Deterministic + cheap, so it fetches on its own once a score has run. */}
+        {!scoring && cardModels && nFoods > 0 && (
+          <FpedPanel foods={ingredients} userType={userType} />
         )}
       </div>
     </main>

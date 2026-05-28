@@ -1029,6 +1029,29 @@ def dietary_pattern_classify(request):
         meta_label=meta_label,
         decomposition_provenance=decomposition_provenance,
     )
+
+    # FPED-1 (2026-05-28): explain the opaque embedding resemblance in food-group
+    # terms — the top component deltas of the user's day vs the winning prototype's
+    # average day. Pure interpretive overlay; wrapped so it can never break the
+    # classification response.
+    if result.matched and result_dict.get('top_pattern'):
+        try:
+            from api.views.fped_explanations import fped_pattern_drivers
+            proto_foods, n_days = matcher.prototype_example_foods(result_dict['top_pattern'])
+            drivers = fped_pattern_drivers(cleaned, proto_foods, n_days)
+            if drivers:
+                explanations['fped_drivers'] = {
+                    'title': 'What drives the resemblance (food groups)',
+                    'pattern': result_dict['top_pattern'],
+                    'drivers': drivers,
+                    'caveat': ('Food-group deltas vs the average prototype day '
+                               '(USDA FPED equivalents borrowed from each food\'s US '
+                               'analog). Interpretive overlay — does not affect the '
+                               'resemblance score.'),
+                }
+        except Exception:  # noqa: BLE001 — overlay must never break classification
+            logger.debug('FPED driver overlay skipped', exc_info=True)
+
     return Response(
         {'success': True, 'result': payload, 'explanations': explanations},
         status=status.HTTP_200_OK,

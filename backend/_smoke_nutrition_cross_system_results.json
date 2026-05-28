@@ -2,13 +2,13 @@
   "panel_description": "Cross-system nutrition meal-panel (Scenario S4)",
   "rationale": "For each meal, computes HENI minutes / HEFI score / HSR stars and checks (a) Spearman rank correlation across systems >= 0.6 and (b) per-meal expected_quality direction matches.",
   "spearman": {
-    "heni_vs_hefi": 0.8857142857142857,
+    "heni_vs_hefi": 0.7714285714285715,
     "heni_vs_hsr": 0.6571428571428571,
-    "hefi_vs_hsr": 0.7714285714285715,
+    "hefi_vs_hsr": 0.6,
     "n_valid_meals": 6
   },
   "directional_sanity": {
-    "passes": 4,
+    "passes": 5,
     "total_evaluable": 6
   },
   "meals": [
@@ -28,8 +28,8 @@
       ],
       "expected_quality": "low",
       "rationale": "High sodium, high sat fat, processed meat. Should rank BELOW midpoint on all 3 systems.",
-      "heni_minutes": -10.8,
-      "hefi_score": 15.159722571778286,
+      "heni_minutes": -10.6,
+      "hefi_score": 14.414991073358218,
       "hsr_stars": 2.0
     },
     {
@@ -48,7 +48,7 @@
       ],
       "expected_quality": "low",
       "rationale": "High free sugars, sat fat, low protein. Should rank low on HEFI sugars/sat-fat, low HSR (other-food cat), HENI mildly negative.",
-      "heni_minutes": 4.6,
+      "heni_minutes": 4.0,
       "hefi_score": 11.42517341138424,
       "hsr_stars": 2.0
     },
@@ -78,8 +78,8 @@
       ],
       "expected_quality": "mid",
       "rationale": "Standard mixed lunch: whole grain, lean protein, veg, fruit. Should rank mid-to-high on all 3 systems.",
-      "heni_minutes": 11.3,
-      "hefi_score": 39.84095428085102,
+      "heni_minutes": 34.2,
+      "hefi_score": 39.83092848927369,
       "hsr_stars": 4.0
     },
     {
@@ -113,7 +113,7 @@
       ],
       "expected_quality": "high",
       "rationale": "Whole grain + plant protein + 2 vegetables. Should rank HIGH on all 3 systems.",
-      "heni_minutes": 39.8,
+      "heni_minutes": 22.3,
       "hefi_score": 51.440366972477065,
       "hsr_stars": 4.0
     },
@@ -138,7 +138,7 @@
       ],
       "expected_quality": "high",
       "rationale": "Omega-3-rich sardines + dark leafy + fruit. HENI Fig 4 sardine extremum is +82 min/serving; HEFI/HSR should also score high.",
-      "heni_minutes": 11.0,
+      "heni_minutes": 30.2,
       "hefi_score": 36.20983714899343,
       "hsr_stars": 4.0
     },
@@ -168,9 +168,9 @@
       ],
       "expected_quality": "low",
       "rationale": "SSB + refined grain + sat fat. Should rank low across all 3 systems on Beverages, Sugars, Sodium components.",
-      "heni_minutes": 11.1,
-      "hefi_score": 27.78318908198398,
-      "hsr_stars": 3.0
+      "heni_minutes": 10.8,
+      "hefi_score": 28.306413172146648,
+      "hsr_stars": 0.5
     }
   ],
   "caveats": [

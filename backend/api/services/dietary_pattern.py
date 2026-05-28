@@ -192,6 +192,26 @@ class DietaryPatternMatcher:
         logger.info('DietaryPatternMatcher loaded %d prototypes from %s',
                     len(self._prototypes), self.prototypes_path)
 
+    def prototype_example_foods(self, pattern_id: str) -> Tuple[List[Dict[str, Any]], int]:
+        """Return (flattened [{food_id, mass_g}] across the pattern's example days,
+        n_example_days). Used by the FPED-driver overlay to express a day's
+        food-group deltas vs the average prototype day. Empty list if unknown."""
+        for proto in self._prototypes:
+            if proto.get('pattern_id') == pattern_id:
+                days = proto.get('example_days', []) or []
+                foods: List[Dict[str, Any]] = []
+                for d in days:
+                    for f in d.get('foods', []):
+                        try:
+                            fid = int(f.get('food_id'))
+                            mass = float(f.get('mass_g'))
+                        except (TypeError, ValueError):
+                            continue
+                        if fid > 0 and mass > 0:
+                            foods.append({'food_id': fid, 'mass_g': mass})
+                return foods, max(1, len(days))
+        return [], 1
+
     # --- Vector construction --------------------------------------------
 
     def _build_day_vector(

@@ -211,6 +211,30 @@ export function DietaryPatternResult({ data, userType }: DietaryPatternResultPro
         </ul>
       </div>
 
+      {/* FPED-1: food-group drivers — makes the embedding resemblance explainable.
+          "Most like DASH because: more refined grains, less whole grains vs the
+          prototype day." Shown to every audience. */}
+      {explanations.fped_drivers && explanations.fped_drivers.drivers.length > 0 && (
+        <div className="bg-teal-50 rounded-lg border border-teal-200 p-4">
+          <p className="font-medium text-teal-900 text-sm">{explanations.fped_drivers.title}</p>
+          <ul className="mt-2 space-y-1">
+            {explanations.fped_drivers.drivers.map((d) => (
+              <li key={d.component} className="flex items-center gap-2 text-sm text-gray-800">
+                <span className={`text-xs font-semibold px-1.5 py-0.5 rounded ${
+                  d.direction === 'more'
+                    ? 'bg-rose-100 text-rose-800'
+                    : 'bg-blue-100 text-blue-800'
+                }`}>
+                  {d.direction === 'more' ? '▲ more' : '▼ less'}
+                </span>
+                <span>{Math.abs(d.delta)} {d.unit} {d.label}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 text-xs text-gray-500">{explanations.fped_drivers.caveat}</p>
+        </div>
+      )}
+
       {/* Researcher-mode methodology block */}
       {userType !== 'individual' && explanations.methodology && (
         <details className="bg-gray-50 rounded-lg border p-4 text-sm">
