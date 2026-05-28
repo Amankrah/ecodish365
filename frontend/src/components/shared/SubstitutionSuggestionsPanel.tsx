@@ -473,6 +473,29 @@ export function SubstitutionSuggestionsPanel({
                   )}
                 </div>
 
+                {/* FPED-1: the swap in food-group language (DASH/Mediterranean/CFG). */}
+                {s.fped_deltas && s.fped_deltas.changed.length > 0 && (
+                  <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                    <span className="text-[11px] text-gray-400">food groups:</span>
+                    {s.fped_deltas.changed.map((c) => (
+                      <span
+                        key={c.component}
+                        className="text-[11px] px-1.5 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200"
+                      >
+                        {c.direction === 'more' ? '▲' : '▼'} {Math.abs(c.delta)} {c.unit} {c.label}
+                      </span>
+                    ))}
+                    {s.fped_deltas.partial && (
+                      <span
+                        className="text-[11px] text-amber-700"
+                        title="Based only on the foods we could map to a food-group profile"
+                      >
+                        ⚠ partial
+                      </span>
+                    )}
+                  </div>
+                )}
+
                 {s.scorecard?.deltas && (
                   <SubstitutionScorecardDelta deltas={s.scorecard.deltas} compact />
                 )}

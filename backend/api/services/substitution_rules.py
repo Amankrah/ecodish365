@@ -37,7 +37,9 @@ def _rx(pattern: str) -> Pattern[str]:
 
 # Canonical CNF FoodIDs (resolved against raw_cnf/FOOD_NAME.csv, 2026-05-26).
 _LENTILS_RAW = 3392
-_SOY_ENRICHED = 501528
+# Rebaselined 2026-05-28: CNF 2015 code 501528 was retired in the CNF 2026 edition;
+# 6331 is the surviving "soy beverage, all flavours, low fat, fortified".
+_SOY_ENRICHED = 6331
 _WATER_MUNICIPAL = 2933
 _WW_BREAD = 4067
 
@@ -64,7 +66,7 @@ SUBSTITUTION_RULES: List[SubstitutionRule] = [
         ),
         purposes=frozenset({'general_health', 'lower_sat_fat'}),
         target_food_id=_SOY_ENRICHED,
-        target_food_description='Plant-based beverage, soy, enriched, all flavours, low fat',
+        target_food_description='Plant-based beverage, soy beverage, all flavours, low fat, fortified',
         source_group_ids=frozenset({1}),
         source_group_names=frozenset({'Dairy and Egg Products'}),
         source_description_patterns=(_rx(r'\bmilk\b'),),

@@ -321,6 +321,21 @@ def _build_suggestion(
     elif candidate_source == 'matcher_alternative':
         rank_score += 5.0
 
+    # FPED-1 (2026-05-28): express the swap in food-group terms (−red meat,
+    # +legumes, …) — the DASH/Mediterranean/CFG currency the ΔHEFI/ΔFCS deltas
+    # don't convey. Aggregates all swapped-out foods vs all swapped-in foods.
+    # Wrapped so it can never break a suggestion (overlay only).
+    fped_deltas = None
+    try:
+        from api.services.fped_aggregator import fped_swap_delta
+        baseline_foods = [{'food_id': sw['original']['food_id'],
+                           'mass_g': sw['original']['mass_g']} for sw in swaps]
+        replacement_foods = [{'food_id': sw['replacement']['food_id'],
+                              'mass_g': sw['replacement']['mass_g']} for sw in swaps]
+        fped_deltas = fped_swap_delta(baseline_foods, replacement_foods)
+    except Exception:  # noqa: BLE001
+        fped_deltas = None
+
     return {
         'id': suggestion_id,
         'rule_id': rule_id,
@@ -335,6 +350,7 @@ def _build_suggestion(
         'replacement': swaps[0]['replacement'],
         **ev,
         'rank_score': rank_score,
+        'fped_deltas': fped_deltas,
         'modified_composition': _serialize_composition(ev['modified_composition']),
     }
 

@@ -1220,6 +1220,20 @@ export interface SubstitutionSuggestion {
   rank_score: number;
   scorecard?: SubstitutionScorecard;
   pareto?: SubstitutionParetoInfo;
+  /** FPED-1: the swap expressed in food-group terms (−red meat, +legumes, …). */
+  fped_deltas?: {
+    changed: Array<{
+      component: string;
+      label: string;
+      unit: string;
+      before: number;
+      after: number;
+      delta: number;
+      direction: 'more' | 'less';
+    }>;
+    n_changed: number;
+    partial: boolean;
+  } | null;
 }
 
 export interface SubstitutionAnalyzeResponse {
