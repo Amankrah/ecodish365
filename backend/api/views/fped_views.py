@@ -19,7 +19,26 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from api.services.fped_aggregator import aggregate_fped, decomposition_plausibility
-from api.views.fped_explanations import build_fped_explanations
+from api.services.fped_cohort import aggregate_cohort
+from api.views.fped_explanations import build_cohort_explanations, build_fped_explanations
+
+
+def _clean_foods(foods_raw) -> List[Dict[str, Any]]:
+    """Keep only {food_id>0, mass_g>0} entries from a raw food list."""
+    cleaned: List[Dict[str, Any]] = []
+    if not isinstance(foods_raw, list):
+        return cleaned
+    for f in foods_raw:
+        if not isinstance(f, dict):
+            continue
+        try:
+            fid = int(f.get('food_id'))
+            mass = float(f.get('mass_g'))
+        except (TypeError, ValueError):
+            continue
+        if fid > 0 and mass > 0:
+            cleaned.append({'food_id': fid, 'mass_g': mass})
+    return cleaned
 
 
 @api_view(['POST'])
@@ -33,18 +52,7 @@ def fped_analyze(request):
             'message': 'Field "foods" is required (non-empty list of {food_id, mass_g}).',
         }, status=status.HTTP_400_BAD_REQUEST)
 
-    cleaned: List[Dict[str, Any]] = []
-    for f in foods_raw:
-        if not isinstance(f, dict):
-            continue
-        try:
-            fid = int(f.get('food_id'))
-            mass = float(f.get('mass_g'))
-        except (TypeError, ValueError):
-            continue
-        if fid <= 0 or mass <= 0:
-            continue
-        cleaned.append({'food_id': fid, 'mass_g': mass})
+    cleaned = _clean_foods(foods_raw)
 
     if not cleaned:
         return Response({
@@ -80,3 +88,45 @@ def fped_analyze(request):
             body['decomposition_plausibility'] = decomposition_plausibility(composite_id, cleaned)
 
     return Response(body, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def fped_cohort(request):
+    """Food-group exposure distribution across N recalls (each a food list).
+
+    Body: {"recalls": [[{food_id, mass_g}, ...], ...], "user_type": "researcher"}
+    Returns per food group the median/IQR/range of intake across recalls + the % of
+    recalls meeting the MyPlate/CFG target, wrapped in an audience-aware analysis block.
+    """
+    recalls_raw = request.data.get('recalls')
+    if not isinstance(recalls_raw, list) or not recalls_raw:
+        return Response({
+            'success': False, 'error': 'invalid_request',
+            'message': 'Field "recalls" is required (non-empty list of food lists).',
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    recalls: List[List[Dict[str, Any]]] = []
+    for r in recalls_raw:
+        cleaned = _clean_foods(r)
+        if cleaned:
+            recalls.append(cleaned)
+
+    if not recalls:
+        return Response({
+            'success': False, 'error': 'invalid_request',
+            'message': 'No recalls contained foods with positive food_id and mass_g.',
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    user_type = str(request.data.get('user_type', 'individual'))
+    if user_type not in ('individual', 'researcher', 'policy'):
+        user_type = 'individual'
+
+    cohort = aggregate_cohort(recalls)
+    explanations = build_cohort_explanations(cohort, user_type=user_type)
+
+    return Response({
+        'success': True,
+        'result': cohort,
+        'explanations': explanations,
+    }, status=status.HTTP_200_OK)

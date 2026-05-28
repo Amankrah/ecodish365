@@ -22,6 +22,8 @@ import type { UserType } from '@/components/shared/AudienceToggle';
 interface FpedPanelProps {
   foods: Array<{ food_id: number; mass_g: number }>;
   userType: UserType;
+  /** Optional one-line hint shown under the panel subtitle. */
+  contextHint?: string;
 }
 
 const STATUS_STYLE: Record<FpedStatus, string> = {
@@ -73,7 +75,7 @@ function GapsTable({ gaps }: { gaps: FpedGap[] }) {
   );
 }
 
-export function FpedPanel({ foods, userType }: FpedPanelProps): JSX.Element | null {
+export function FpedPanel({ foods, userType, contextHint }: FpedPanelProps): JSX.Element | null {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<FpedComponentAnalysis | null>(null);
@@ -107,6 +109,9 @@ export function FpedPanel({ foods, userType }: FpedPanelProps): JSX.Element | nu
             {analysis?.title ?? 'Food-group pattern'}
           </h3>
           <p className="text-xs text-gray-500">USDA Food Pattern equivalents vs a reference plate</p>
+          {contextHint && (
+            <p className="text-xs text-teal-700 mt-0.5">{contextHint}</p>
+          )}
         </div>
       </div>
 

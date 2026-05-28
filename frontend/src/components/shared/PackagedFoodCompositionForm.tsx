@@ -24,6 +24,7 @@ import type {
 } from '@/lib/api';
 import { fromRecallAggregated, saveActiveFoodList } from '@/lib/activeFoodList';
 import { SubstitutionSuggestionsPanel } from './SubstitutionSuggestionsPanel';
+import { FpedPanel } from './FpedPanel';
 import { AIEnhancedSearch } from './AIEnhancedSearch';
 import { SourceFilter, type SourceChoice } from './SourceFilter';
 import type { SubstitutionCompositionItem, SubstitutionSuggestion } from '@/lib/api';
@@ -89,6 +90,10 @@ export function PackagedFoodCompositionForm({
 
   const totalMass = useMemo(
     () => rows.reduce((s, r) => s + (r.mass_g || 0), 0),
+    [rows],
+  );
+  const fpedFoods = useMemo(
+    () => rows.map(r => ({ food_id: r.food_id, mass_g: r.mass_g })),
     [rows],
   );
   const residual = totalMass - decomposition.net_weight_g_assumed;
@@ -382,6 +387,14 @@ export function PackagedFoodCompositionForm({
           </tbody>
         </table>
       </div>
+
+      {showSubstitutions && rows.length > 0 && (
+        <FpedPanel
+          foods={fpedFoods}
+          userType={userType}
+          contextHint="Reformulated product profile — updates when you apply a swap."
+        />
+      )}
 
       {showSubstitutions && (
         <SubstitutionSuggestionsPanel

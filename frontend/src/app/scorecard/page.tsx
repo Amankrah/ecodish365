@@ -20,6 +20,7 @@ import {
 } from '@/components/shared/AudienceToggle';
 import { FoodListPanel } from '@/components/shared/FoodListPanel';
 import { FpedPanel } from '@/components/shared/FpedPanel';
+import { FpidDrilldownSection } from '@/components/shared/FpidDrilldownSection';
 import { CollapsibleSection } from '@/components/shared/CollapsibleSection';
 import { SubstitutionSuggestionsPanel } from '@/components/shared/SubstitutionSuggestionsPanel';
 import { useRecall24hReceiver } from '@/components/shared/useRecall24hReceiver';
@@ -414,6 +415,10 @@ export default function ScorecardPage(): JSX.Element {
             Deterministic + cheap, so it fetches on its own once a score has run. */}
         {!scoring && cardModels && nFoods > 0 && (
           <FpedPanel foods={ingredients} userType={userType} />
+        )}
+
+        {!scoring && cardModels && nFoods > 0 && (
+          <FpidDrilldownSection foods={ingredients} userType={userType} />
         )}
       </div>
     </main>

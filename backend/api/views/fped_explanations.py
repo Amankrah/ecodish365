@@ -148,6 +148,89 @@ def fped_pattern_drivers(
     return [d for _sev, d in drivers[:top_n]]
 
 
+_COHORT_USUALLY_THRESHOLD = 50.0  # below this % of days meeting a target → "usually short/over"
+
+
+def build_cohort_explanations(cohort: Dict, user_type: str = 'individual') -> Dict:
+    """Return {'fped_cohort_analysis': {...}} for food-group exposure across N recalls.
+
+    `cohort` is the dict from `api.services.fped_cohort.aggregate_cohort`. Researcher/policy
+    get the full per-component distribution table; individual/clinician get a plain-language
+    "across your N days you were usually short on X / over on Y" read plus per-group
+    target-adherence rates.
+    """
+    n = int(cohort.get('n_recalls', 0))
+    components = cohort.get('components', [])
+    cov = cohort.get('coverage', {})
+    by_comp = {c['component']: c for c in components}
+
+    coverage_note = ''
+    if int(cov.get('n_recalls_with_unmatched', 0)) > 0:
+        coverage_note = (
+            f"{cov['n_recalls_with_unmatched']} of {n} recalls contained foods with no "
+            f"food-group profile (mean coverage {cov.get('mean_coverage_pct_by_mass', 0)}% "
+            "of mass), so some groups may read lower than reality."
+        )
+
+    if user_type in ('researcher', 'policy'):
+        block = {
+            'title': f'Food-group exposure across {n} recalls (USDA FPED 2017-2018)',
+            'n_recalls': n,
+            'components': components,
+            'coverage': cov,
+            'methodology': _METHODOLOGY,
+            'caveats': _CAVEATS,
+        }
+        if coverage_note:
+            block['coverage_note'] = coverage_note
+        return {'fped_cohort_analysis': block}
+
+    # individual / clinician — plain-language adherence across days.
+    short_groups, over_groups, adherence = [], [], []
+    for comp, label in _CONSUMER_ENCOURAGE.items():
+        c = by_comp.get(comp)
+        if not c:
+            continue
+        pct = float(c['pct_meeting_myplate'])
+        adherence.append({'label': label, 'pct_meeting': pct, 'goal': 'more'})
+        if pct < _COHORT_USUALLY_THRESHOLD:
+            short_groups.append(label)
+    for comp, label in _CONSUMER_LIMIT.items():
+        c = by_comp.get(comp)
+        if not c:
+            continue
+        pct = float(c['pct_meeting_myplate'])
+        adherence.append({'label': label, 'pct_meeting': pct, 'goal': 'less'})
+        if pct < _COHORT_USUALLY_THRESHOLD:
+            over_groups.append(label)
+
+    if short_groups and over_groups:
+        headline = (f"Across your {n} saved days, you were usually short on "
+                    f"{_natural_join(short_groups)} and over on {_natural_join(over_groups)}.")
+    elif short_groups:
+        headline = f"Across your {n} saved days, you were usually short on {_natural_join(short_groups)}."
+    elif over_groups:
+        headline = f"Across your {n} saved days, you were usually over on {_natural_join(over_groups)}."
+    elif n == 0:
+        headline = "No saved days yet to read a food-group pattern from."
+    else:
+        headline = f"Across your {n} saved days, your food groups usually lined up with a balanced plate."
+
+    block = {
+        'title': f'Your food groups across {n} days',
+        'n_recalls': n,
+        'headline': headline,
+        'adherence': adherence,   # [{label, pct_meeting, goal}] for everyday groups
+        'caveat': (
+            'How often your saved days met a balanced ~2000-calorie plate, for the foods '
+            'we could map. Guidance, not a diagnosis.'
+        ),
+    }
+    if coverage_note:
+        block['coverage_note'] = coverage_note
+    return {'fped_cohort_analysis': block}
+
+
 def build_fped_explanations(agg: FpedAggregate, user_type: str = 'individual') -> Dict:
     """Return {'fped_component_analysis': {...}} for the given audience."""
     cov = agg.coverage

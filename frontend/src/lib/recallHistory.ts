@@ -400,6 +400,47 @@ export function subscribe(listener: () => void): () => void {
   return () => window.removeEventListener('storage', handler);
 }
 
+// --- Display helpers (improve-product, scorecard pickers) -----------------
+
+/** Human-readable title for a saved recall day. */
+export function recallDayDisplayTitle(day: SavedRecallDay): string {
+  const label = day.label?.trim();
+  if (label) return label;
+  const mealNames = day.meals
+    .map(m => m.decomposition?.dish_name?.trim())
+    .filter((n): n is string => Boolean(n));
+  if (mealNames.length === 1) return mealNames[0];
+  if (mealNames.length > 1) return `${day.date} · ${mealNames.length} meals`;
+  return `24-h recall — ${day.date}`;
+}
+
+/** Best dish name for WAFCT/substitution context (largest meal by mass). */
+export function recallDaySubstitutionDishName(day: SavedRecallDay): string {
+  let best = '';
+  let bestMass = -1;
+  for (const m of day.meals) {
+    const mass = m.decomposition?.total_mass_g ?? 0;
+    const name = m.decomposition?.dish_name?.trim() ?? '';
+    if (name && mass > bestMass) {
+      bestMass = mass;
+      best = name;
+    }
+  }
+  return best || recallDayDisplayTitle(day);
+}
+
+/** Ingredient rows for substitution UIs. */
+export function recallDayToIngredientRows(
+  day: SavedRecallDay,
+): Array<{ food_id: number; food_description: string; mass_g: number; food_group?: string }> {
+  return day.aggregated_daily_ingredients.map(i => ({
+    food_id: i.food_id,
+    food_description: i.food_description,
+    mass_g: i.mass_g,
+    food_group: i.food_group || undefined,
+  }));
+}
+
 // --- Browser download helper --------------------------------------------
 
 /** Trigger a download of `content` as `filename` with the given MIME type.

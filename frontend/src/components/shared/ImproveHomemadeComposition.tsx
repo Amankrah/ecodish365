@@ -8,6 +8,7 @@ import { ChevronRight, Trash2 } from 'lucide-react';
 import type { DecomposedIngredient, SubstitutionCompositionItem, SubstitutionSuggestion } from '@/lib/api';
 import { fromRecallAggregated, saveActiveFoodList } from '@/lib/activeFoodList';
 import { SubstitutionSuggestionsPanel } from './SubstitutionSuggestionsPanel';
+import { FpedPanel } from './FpedPanel';
 import { AIEnhancedSearch } from './AIEnhancedSearch';
 import { SourceFilter, type SourceChoice } from './SourceFilter';
 
@@ -21,6 +22,8 @@ const SCORE_ROUTES = [
 
 interface Props {
   dishName: string;
+  /** WAFCT recipe / cultural context hint; defaults to dishName. */
+  substitutionDishName?: string;
   initialRows: Array<{
     food_id: number;
     food_description: string;
@@ -31,7 +34,7 @@ interface Props {
 }
 
 export function ImproveHomemadeComposition({
-  dishName, initialRows, userType,
+  dishName, substitutionDishName, initialRows, userType,
 }: Props): JSX.Element {
   const [rows, setRows] = useState<DecomposedIngredient[]>(() =>
     initialRows.map((r, i) => ({
@@ -51,6 +54,11 @@ export function ImproveHomemadeComposition({
   const [swapSource, setSwapSource] = useState<SourceChoice>('both');
 
   const totalMass = useMemo(() => rows.reduce((s, r) => s + r.mass_g, 0), [rows]);
+
+  const fpedFoods = useMemo(
+    () => rows.map(r => ({ food_id: r.food_id, mass_g: r.mass_g })),
+    [rows],
+  );
 
   function setMass(idx: number, value: string): void {
     const n = parseFloat(value);
@@ -210,11 +218,19 @@ export function ImproveHomemadeComposition({
         </table>
       </div>
 
+      {rows.length > 0 && (
+        <FpedPanel
+          foods={fpedFoods}
+          userType={userType}
+          contextHint="Updates when you edit masses or apply a swap."
+        />
+      )}
+
       <SubstitutionSuggestionsPanel
         composition={compositionForSubstitution}
         onApply={applySubstitution}
         userType={userType}
-        dishName={dishName}
+        dishName={substitutionDishName ?? dishName}
       />
 
       <div className="border-t pt-3">

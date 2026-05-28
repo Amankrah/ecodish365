@@ -55,7 +55,7 @@ const PATTERN_COLOR: Record<string, string> = {
 
 function routeDayTo(
   day: SavedRecallDay,
-  target: 'hefi' | 'heni' | 'dietary_pattern' | 'scorecard',
+  target: 'hefi' | 'heni' | 'dietary_pattern' | 'scorecard' | 'improve_product',
   path: string,
 ): void {
   const payload = {
@@ -186,6 +186,13 @@ export function RecallHistoryCard({
         >
           <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
           Scorecard + swaps
+        </button>
+        <button
+          type="button"
+          onClick={() => routeDayTo(day, 'improve_product', '/improve-product')}
+          className="inline-flex items-center gap-1 px-2.5 py-1 bg-violet-50 hover:bg-violet-100 text-violet-800 border border-violet-300 rounded-md text-xs font-medium"
+        >
+          Try swaps
         </button>
         <span className="flex-1" />
         <button

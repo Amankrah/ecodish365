@@ -50,38 +50,58 @@ FPED_COMPONENT_UNITS: Dict[str, str] = {
 
 _lock = threading.Lock()
 _cache: Optional[Dict[int, Dict[str, float]]] = None
+# Per-food bridge meta ({food_code, fdc_id, bridge_confidence}), parsed from the same
+# JSON in one read. Kept separate from the numeric component cache so callers that only
+# want food-group values aren't burdened with bridge plumbing. The FPID ingredient path
+# needs fdc_id/food_code to reach the FNDDS recipe.
+_meta_cache: Optional[Dict[int, Dict]] = None
 
 
-def _load_profiles() -> Dict[int, Dict[str, float]]:
+def _load_all() -> tuple[Dict[int, Dict[str, float]], Dict[int, Dict]]:
+    """Parse cnf_fped_profile.json once into (component table, bridge-meta table)."""
     if not _PROFILE_PATH.exists():
         logger.info('No FPED profile file at %s; food-group exposure unavailable', _PROFILE_PATH)
-        return {}
+        return {}, {}
     try:
         raw = json.loads(_PROFILE_PATH.read_text(encoding='utf-8'))
     except Exception as exc:  # noqa: BLE001
         logger.warning('FPED profile file unreadable: %s', exc)
-        return {}
-    out: Dict[int, Dict[str, float]] = {}
+        return {}, {}
+    profiles: Dict[int, Dict[str, float]] = {}
+    meta: Dict[int, Dict] = {}
     for cnf_id_str, prof in raw.get('profiles', {}).items():
         try:
             fid = int(cnf_id_str)
         except Exception:  # noqa: BLE001
             continue
-        out[fid] = {k: float(v) for k, v in prof.items()
-                    if not k.startswith('_') and isinstance(v, (int, float))}
+        profiles[fid] = {k: float(v) for k, v in prof.items()
+                         if not k.startswith('_') and isinstance(v, (int, float))}
+        fc, fdc = prof.get('_food_code'), prof.get('_fdc_id')
+        if fc is not None and fdc is not None:
+            meta[fid] = {
+                'food_code': int(fc),
+                'fdc_id': int(fdc),
+                'bridge_confidence': float(prof.get('_bridge_confidence', 0.0) or 0.0),
+            }
     logger.info('Loaded FPED profile lookup: %d bridged foods covered (%s)',
-                len(out), _PROFILE_PATH.name)
-    return out
+                len(profiles), _PROFILE_PATH.name)
+    return profiles, meta
+
+
+def _ensure_loaded() -> None:
+    """Populate both caches under the lock from a single file read; idempotent."""
+    global _cache, _meta_cache
+    if _cache is not None and _meta_cache is not None:
+        return
+    with _lock:
+        if _cache is None or _meta_cache is None:
+            _cache, _meta_cache = _load_all()
 
 
 def get_profiles() -> Dict[int, Dict[str, float]]:
     """Full lookup table (lazy-loaded, cached process-wide)."""
-    global _cache
-    if _cache is not None:
-        return _cache
-    with _lock:
-        if _cache is None:
-            _cache = _load_profiles()
+    _ensure_loaded()
+    assert _cache is not None
     return _cache
 
 
@@ -95,8 +115,22 @@ def get_fped_profile_for_food(food_id: int) -> Optional[Dict[str, float]]:
     return get_profiles().get(int(food_id))
 
 
+def get_food_meta(food_id: int) -> Optional[Dict]:
+    """Return {food_code, fdc_id, bridge_confidence} for a bridged food, or None.
+
+    None means the food never bridged to a US FNDDS analog (so it has neither an FPED
+    profile nor an FNDDS recipe to reach for the FPID ingredient path). `bridge_confidence`
+    is the analog-match quality the bridge scored; callers gate on it before trusting the
+    FNDDS analog's recipe as a stand-in for the catalog food.
+    """
+    _ensure_loaded()
+    assert _meta_cache is not None
+    return _meta_cache.get(int(food_id))
+
+
 def reset_for_test() -> None:
-    """Reset the singleton cache (test-helper; not for production use)."""
-    global _cache
+    """Reset the singleton caches (test-helper; not for production use)."""
+    global _cache, _meta_cache
     with _lock:
         _cache = None
+        _meta_cache = None

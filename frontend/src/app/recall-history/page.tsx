@@ -35,6 +35,7 @@ import {
 } from '@/lib/recallHistory';
 import { CNFApiService } from '@/lib/api';
 import { RecallHistoryCard } from '@/components/shared/RecallHistoryCard';
+import { FpedCohortPanel } from '@/components/shared/FpedCohortPanel';
 
 // Number of pattern-classify requests we'll issue in parallel for the
 // per-day timeline refresh. Picked to stay well under the per-IP 50/hr rate
@@ -115,6 +116,16 @@ export default function RecallHistoryPage() {
     () => days.filter(d => selectedIds.has(d.id)),
     [days, selectedIds],
   );
+
+  // Cohort food-group exposure operates on the selected days (or all days if none
+  // selected): one recall per day, each its aggregated daily ingredients.
+  const cohortTargetDays = selectedDays.length > 0 ? selectedDays : days;
+  const cohortRecalls = useMemo(
+    () => cohortTargetDays.map(d =>
+      d.aggregated_daily_ingredients.map(i => ({ food_id: i.food_id, mass_g: i.mass_g }))),
+    [cohortTargetDays],
+  );
+  const cohortUserType = cohortTargetDays[0]?.user_type ?? 'individual';
 
   const totalKcal = useMemo(
     () => days.reduce((s, d) => s + d.estimated_daily_kcal, 0),
@@ -545,6 +556,9 @@ export default function RecallHistoryPage() {
                 multi-day caveat in place of the single-day disclaimer.
               </p>
             </section>
+
+            {/* Food-group exposure across days (FPED cohort) */}
+            <FpedCohortPanel recalls={cohortRecalls} userType={cohortUserType} />
 
             {/* Cards */}
             <section className="space-y-3">

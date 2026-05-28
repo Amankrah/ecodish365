@@ -8,6 +8,7 @@ from .views import (
     packaged_food_views,                # PKG-IMG-1 Phase 1 (image → NF panel → HSR)
     substitution_views,                 # SUBST-1 Phase 1 (ingredient substitution analyzer)
     fped_views,                         # FPED-1 (food-group exposure: cup/oz equivalents + guideline gaps)
+    fpid_views,                         # FPID-1 (ingredient-level food-group attribution + reconstruction QC)
 )
 from .views.cnf_views import (
     # Food Management
@@ -174,6 +175,16 @@ urlpatterns = [
     # Food Pattern equivalents (cup/oz/tsp) + gaps vs MyPlate & Canada's Food Guide.
     # Deterministic (no LLM, no rate limit); bridged CNF + WAFCT foods included.
     path('fped/analyze/', fped_views.fped_analyze, name='fped_analyze'),
+
+    # FPED-COHORT (2026-05-28) — food-group exposure distribution across N recalls:
+    # median/IQR per food group + % of recalls meeting MyPlate/CFG targets. Stateless;
+    # fed by the user's own saved recall days.
+    path('fped/cohort/', fped_views.fped_cohort, name='fped_cohort'),
+
+    # FPID-1 (2026-05-28) — ingredient-level food-group attribution: for one composite
+    # food, which ingredients contribute which food groups (from its US FNDDS recipe
+    # analog, USDA FPID 2017-18) + a reconstruction QC vs the food's own FPED profile.
+    path('fpid/breakdown/', fpid_views.fpid_breakdown_view, name='fpid_breakdown'),
 
     # =============================================================================
     # PKG-IMG-1 (2026-05-26) Phase 1 — packaged-food image → HSR

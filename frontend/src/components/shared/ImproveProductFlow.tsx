@@ -1,15 +1,16 @@
 /**
  * ImproveProductFlow — SUBST-1 Phase 1 primary UX.
  *
- * Two input paths:
+ * Three input paths:
  *   1. Scan packaged food (NF + ingredients → decompose → find swaps)
  *   2. Describe homemade meal (recipe decomposer → find swaps)
+ *   3. Load a saved 24-h recall day (recall history → find swaps)
  */
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
-  Camera, ChefHat, Loader2, AlertCircle, RotateCcw, Sparkles,
+  Camera, ChefHat, Loader2, AlertCircle, RotateCcw, Sparkles, CalendarClock,
 } from 'lucide-react';
 import {
   CNFApiService,
@@ -17,19 +18,53 @@ import {
   type IngredientListExtraction,
   type NFPanelExtraction,
 } from '@/lib/api';
+import {
+  recallDayDisplayTitle,
+  recallDaySubstitutionDishName,
+  recallDayToIngredientRows,
+  type SavedRecallDay,
+} from '@/lib/recallHistory';
 import { AudienceToggle, type UserType } from './AudienceToggle';
 import { PackagedFoodCompositionForm } from './PackagedFoodCompositionForm';
 import { ImproveHomemadeComposition } from './ImproveHomemadeComposition';
 import { RecipeDecomposerModal } from './RecipeDecomposerModal';
+import { RecallDayPicker } from './RecallDayPicker';
+import { useRecall24hReceiver } from './useRecall24hReceiver';
 
 const MAX_IMAGES = 3;
 
-type InputMode = 'scan' | 'describe';
+type InputMode = 'scan' | 'describe' | 'recall';
 type ScanStep = 'capture' | 'reviewing' | 'decomposing' | 'ready' | 'error';
 
-interface HomemadeState {
+interface CompositionState {
   dishName: string;
+  substitutionDishName?: string;
   ingredients: Array<{ food_id: number; food_description: string; mass_g: number; food_group?: string }>;
+  recallMeta?: { date?: string; kcal: number; occasions: number };
+}
+
+function recallStashTitle(
+  meals: Array<{ dish_name: string; total_mass_g: number }>,
+): string {
+  const names = meals.map(m => m.dish_name?.trim()).filter(Boolean) as string[];
+  if (names.length === 1) return names[0];
+  if (names.length > 1) return `${names.length} meals — 24-h recall`;
+  return '24-h recall';
+}
+
+function recallStashSubstitutionDish(
+  meals: Array<{ dish_name: string; total_mass_g: number }>,
+): string {
+  let best = '';
+  let bestMass = -1;
+  for (const m of meals) {
+    const name = m.dish_name?.trim() ?? '';
+    if (name && m.total_mass_g > bestMass) {
+      bestMass = m.total_mass_g;
+      best = name;
+    }
+  }
+  return best || recallStashTitle(meals);
 }
 
 export function ImproveProductFlow(): JSX.Element {
@@ -47,9 +82,45 @@ export function ImproveProductFlow(): JSX.Element {
   const [decomposing, setDecomposing] = useState(false);
   const [scanError, setScanError] = useState<string | null>(null);
 
-  // Homemade state
-  const [homemade, setHomemade] = useState<HomemadeState | null>(null);
+  // Homemade / recall composition state
+  const [composition, setComposition] = useState<CompositionState | null>(null);
   const [decomposerOpen, setDecomposerOpen] = useState(false);
+
+  const loadRecallDay = useCallback((day: SavedRecallDay): void => {
+    setUserType(day.user_type);
+    setComposition({
+      dishName: recallDayDisplayTitle(day),
+      substitutionDishName: recallDaySubstitutionDishName(day),
+      ingredients: recallDayToIngredientRows(day),
+      recallMeta: {
+        date: day.date,
+        kcal: day.estimated_daily_kcal,
+        occasions: day.occasions_count,
+      },
+    });
+  }, []);
+
+  useRecall24hReceiver({
+    target: 'improve_product',
+    onIngredients: (ingredients, meta) => {
+      setUserType(meta.user_type);
+      setMode('recall');
+      setComposition({
+        dishName: recallStashTitle(meta.meals_meta),
+        substitutionDishName: recallStashSubstitutionDish(meta.meals_meta),
+        ingredients: ingredients.map(i => ({
+          food_id: i.food_id,
+          food_description: i.food_description,
+          mass_g: i.mass_g,
+          food_group: i.food_group || undefined,
+        })),
+        recallMeta: {
+          kcal: meta.estimated_daily_kcal,
+          occasions: meta.meals_meta.length,
+        },
+      });
+    },
+  });
 
   function resetScan(): void {
     for (const url of previewUrls) URL.revokeObjectURL(url);
@@ -64,7 +135,21 @@ export function ImproveProductFlow(): JSX.Element {
 
   function resetAll(): void {
     resetScan();
-    setHomemade(null);
+    setComposition(null);
+  }
+
+  function clearComposition(): void {
+    setComposition(null);
+  }
+
+  function switchMode(next: InputMode): void {
+    setMode(next);
+    if (next === 'scan') {
+      setComposition(null);
+    } else {
+      resetScan();
+      if (next === 'describe') setComposition(null);
+    }
   }
 
   function appendFiles(incoming: FileList | File[] | null): void {
@@ -128,14 +213,10 @@ export function ImproveProductFlow(): JSX.Element {
     }
   }
 
-  const modeTabA11y =
-    mode === 'scan'
-      ? ({ 'aria-selected': 'true' as const })
-      : ({ 'aria-selected': 'false' as const });
-  const describeTabA11y =
-    mode === 'describe'
-      ? ({ 'aria-selected': 'true' as const })
-      : ({ 'aria-selected': 'false' as const });
+  const tabClass = (active: boolean) =>
+    `flex-1 flex items-center justify-center gap-1.5 px-2 py-2 text-sm font-medium rounded-md ${
+      active ? 'bg-white shadow-sm text-gray-900' : 'text-gray-600'
+    }`;
 
   return (
     <div className="space-y-6">
@@ -148,12 +229,10 @@ export function ImproveProductFlow(): JSX.Element {
           type="button"
           role="tab"
           id="improve-tab-scan"
-          {...modeTabA11y}
+          aria-selected={mode === 'scan' ? 'true' : 'false'}
           aria-controls="improve-panel-scan"
-          onClick={() => { setMode('scan'); setHomemade(null); }}
-          className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-md ${
-            mode === 'scan' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-600'
-          }`}
+          onClick={() => switchMode('scan')}
+          className={tabClass(mode === 'scan')}
         >
           <Camera className="h-4 w-4" aria-hidden="true" />
           Scan product
@@ -162,15 +241,25 @@ export function ImproveProductFlow(): JSX.Element {
           type="button"
           role="tab"
           id="improve-tab-describe"
-          {...describeTabA11y}
+          aria-selected={mode === 'describe' ? 'true' : 'false'}
           aria-controls="improve-panel-describe"
-          onClick={() => { setMode('describe'); resetScan(); }}
-          className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-md ${
-            mode === 'describe' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-600'
-          }`}
+          onClick={() => switchMode('describe')}
+          className={tabClass(mode === 'describe')}
         >
           <ChefHat className="h-4 w-4" aria-hidden="true" />
           Describe meal
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="improve-tab-recall"
+          aria-selected={mode === 'recall' ? 'true' : 'false'}
+          aria-controls="improve-panel-recall"
+          onClick={() => switchMode('recall')}
+          className={tabClass(mode === 'recall')}
+        >
+          <CalendarClock className="h-4 w-4" aria-hidden="true" />
+          24-h recall
         </button>
       </div>
 
@@ -202,7 +291,7 @@ export function ImproveProductFlow(): JSX.Element {
               </p>
 
               <div className="flex flex-wrap gap-2">
-                {previewUrls.map((url, i) => (
+                {previewUrls.map(url => (
                   <img key={url} src={url} alt="" className="h-20 w-20 object-cover rounded border" />
                 ))}
               </div>
@@ -259,16 +348,17 @@ export function ImproveProductFlow(): JSX.Element {
 
       {mode === 'describe' && (
         <div id="improve-panel-describe" role="tabpanel" aria-labelledby="improve-tab-describe">
-          {homemade ? (
+          {composition ? (
             <div className="space-y-4">
               <div className="flex justify-end">
-                <button type="button" onClick={() => setHomemade(null)} className="text-sm text-gray-500 hover:text-gray-800">
+                <button type="button" onClick={clearComposition} className="text-sm text-gray-500 hover:text-gray-800">
                   Describe another meal
                 </button>
               </div>
               <ImproveHomemadeComposition
-                dishName={homemade.dishName}
-                initialRows={homemade.ingredients}
+                dishName={composition.dishName}
+                substitutionDishName={composition.substitutionDishName}
+                initialRows={composition.ingredients}
                 userType={userType}
               />
             </div>
@@ -291,13 +381,45 @@ export function ImproveProductFlow(): JSX.Element {
         </div>
       )}
 
+      {mode === 'recall' && (
+        <div id="improve-panel-recall" role="tabpanel" aria-labelledby="improve-tab-recall">
+          {composition ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                {composition.recallMeta && (
+                  <p className="text-xs text-gray-500">
+                    Loaded 24-h recall
+                    {composition.recallMeta.date ? ` · ${composition.recallMeta.date}` : ''}
+                    {' · '}
+                    {composition.recallMeta.kcal.toFixed(0)} kcal
+                    {' · '}
+                    {composition.recallMeta.occasions} occasion{composition.recallMeta.occasions !== 1 ? 's' : ''}
+                  </p>
+                )}
+                <button type="button" onClick={clearComposition} className="text-sm text-gray-500 hover:text-gray-800 ml-auto">
+                  Choose another day
+                </button>
+              </div>
+              <ImproveHomemadeComposition
+                dishName={composition.dishName}
+                substitutionDishName={composition.substitutionDishName}
+                initialRows={composition.ingredients}
+                userType={userType}
+              />
+            </div>
+          ) : (
+            <RecallDayPicker onSelect={loadRecallDay} />
+          )}
+        </div>
+      )}
+
       <RecipeDecomposerModal
         open={decomposerOpen}
         onClose={() => setDecomposerOpen(false)}
         userType={userType}
         accent="purple"
         onApply={(ingredients, name) => {
-          setHomemade({
+          setComposition({
             dishName: name?.trim() || 'Homemade meal',
             ingredients,
           });

@@ -94,6 +94,47 @@ function sourceLabel(source?: string, userType?: UserType): string | null {
   }
 }
 
+function FpedSwapDeltaBlock({
+  deltas,
+  userType,
+}: {
+  deltas: NonNullable<SubstitutionSuggestion['fped_deltas']>;
+  userType: UserType;
+}): JSX.Element {
+  const parts = deltas.changed.map(c => {
+    const verb = c.direction === 'more' ? 'more' : 'less';
+    return `${verb} ${Math.abs(c.delta).toFixed(1)} ${c.unit} ${c.label}`;
+  });
+  const summary = parts.join('; ');
+
+  return (
+    <div className="mt-2 rounded-md border border-teal-200 bg-teal-50/80 px-2.5 py-2">
+      <p className={`font-medium text-teal-900 ${userType === 'individual' ? 'text-sm' : 'text-xs'}`}>
+        {userType === 'individual' ? 'What this changes on your plate' : 'Food-group shift'}
+      </p>
+      {userType === 'individual' ? (
+        <p className="text-xs text-teal-800 mt-0.5 capitalize">{summary}</p>
+      ) : (
+        <div className="mt-1 flex flex-wrap gap-1.5">
+          {deltas.changed.map(c => (
+            <span
+              key={c.component}
+              className="text-[11px] px-1.5 py-0.5 rounded-full bg-white text-teal-800 border border-teal-200"
+            >
+              {c.direction === 'more' ? '▲' : '▼'} {Math.abs(c.delta)} {c.unit} {c.label}
+            </span>
+          ))}
+        </div>
+      )}
+      {deltas.partial && (
+        <p className="text-[11px] text-amber-800 mt-1">
+          Partial mapping — some foods could not be linked to a food-group profile.
+        </p>
+      )}
+    </div>
+  );
+}
+
 export function SubstitutionSuggestionsPanel({
   composition, onApply, userType = 'individual', dishName, autoRun = false,
 }: Props): JSX.Element {
@@ -437,6 +478,10 @@ export function SubstitutionSuggestionsPanel({
                       </p>
                     ))}
 
+                    {s.fped_deltas && s.fped_deltas.changed.length > 0 && (
+                      <FpedSwapDeltaBlock deltas={s.fped_deltas} userType={userType} />
+                    )}
+
                     <p className="text-xs text-gray-500 mt-2">{s.rationale}</p>
                   </div>
                   <button
@@ -472,29 +517,6 @@ export function SubstitutionSuggestionsPanel({
                     <DeltaBadge value={s.nutrients.sat_fat_g.diff} unit=" g sat fat" invert />
                   )}
                 </div>
-
-                {/* FPED-1: the swap in food-group language (DASH/Mediterranean/CFG). */}
-                {s.fped_deltas && s.fped_deltas.changed.length > 0 && (
-                  <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                    <span className="text-[11px] text-gray-400">food groups:</span>
-                    {s.fped_deltas.changed.map((c) => (
-                      <span
-                        key={c.component}
-                        className="text-[11px] px-1.5 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200"
-                      >
-                        {c.direction === 'more' ? '▲' : '▼'} {Math.abs(c.delta)} {c.unit} {c.label}
-                      </span>
-                    ))}
-                    {s.fped_deltas.partial && (
-                      <span
-                        className="text-[11px] text-amber-700"
-                        title="Based only on the foods we could map to a food-group profile"
-                      >
-                        ⚠ partial
-                      </span>
-                    )}
-                  </div>
-                )}
 
                 {s.scorecard?.deltas && (
                   <SubstitutionScorecardDelta deltas={s.scorecard.deltas} compact />

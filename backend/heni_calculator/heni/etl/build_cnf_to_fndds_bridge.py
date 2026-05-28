@@ -222,8 +222,16 @@ def _rank_with_llm(client, cnf_query: str, candidates: pd.DataFrame) -> Optional
     system_msg = (
         'You are bridging a Canadian Nutrient File (CNF) food to its best '
         'analog in the USDA FNDDS 2017-2018 survey food catalog. Pick the '
-        'FNDDS entry whose composition is closest to the CNF food. Respond '
-        'with JSON only.'
+        'FNDDS entry whose composition AND form are closest to the CNF food. '
+        "A valid analog must match the food's preparation state and physical "
+        'form, not just its broad category. Raw ingredients normally eaten only '
+        'after cooking or as part of a recipe — flours, raw or dry uncooked '
+        'grains and seeds, pure culinary oils and rendered fats, and dehydrated '
+        'powders/concentrates — usually have NO as-consumed analog in FNDDS: '
+        'prefer a low confidence (<0.5, leaving the food unbridged) over forcing '
+        'a finished product such as bread, a cooked dish, or a whole fish/animal. '
+        'When the CNF food is plain or unsweetened, do not pick a sweetened, '
+        'flavoured, or ready-to-eat sibling. Respond with JSON only.'
     )
     user_msg = (
         f'CNF food:\n{cnf_query}\n\n'
@@ -231,13 +239,21 @@ def _rank_with_llm(client, cnf_query: str, candidates: pd.DataFrame) -> Optional
         f'{candidate_block}\n\n'
         'Pick the single best analog and report your confidence. JSON schema:\n'
         '{"fdc_id": <int>, "confidence": <float in [0,1]>, "rationale": "<one short sentence>"}\n\n'
+        'Judge FORM/STATE and SPECIES differently:\n'
+        '  - FORM/STATE mismatch is NOT a valid analog (confidence < 0.5, leave '
+        'unbridged): raw or dry/uncooked vs cooked, flour vs bread, pure oil/fat vs a '
+        'whole food, dehydrated powder vs reconstituted, plain vs sweetened/flavoured. '
+        'It is better to leave the food unbridged than to attach a mismatched profile.\n'
+        '  - SPECIES/VARIETY substitution within the SAME form and food group IS '
+        'acceptable (~0.5): e.g. one cooked leafy/root vegetable for another, one '
+        'cooked legume for another, one natural cheese for another.\n'
         'Confidence anchors:\n'
-        '  0.90 = direct equivalent (same preparation, same ingredients)\n'
-        '  0.70 = close analog (same food, minor variant — fat content, fortification)\n'
-        '  0.50 = plausible analog (same category, possibly different recipe / proportions)\n'
-        '  0.30 = stretched match (similar category but key composition differs)\n'
-        '  0.10 = no good analog in candidates\n'
-        'Do not default to 0.40 — vary your estimate. If no candidate is good, set confidence < 0.5.'
+        '  0.90 = direct equivalent (same food, same preparation/state)\n'
+        '  0.70 = close analog (same food and form; minor variant — fat %, fortification)\n'
+        '  0.50 = same FORM and food group, but a different species/variety or recipe\n'
+        '  0.30 = same broad category but DIFFERENT form/state — treat as no valid analog\n'
+        '  0.10 = no good analog among the candidates\n'
+        'Vary your estimate; do not default to 0.40 or 0.50.'
     )
     try:
         resp = client.chat.completions.create(

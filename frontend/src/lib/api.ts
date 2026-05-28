@@ -912,6 +912,57 @@ export interface FpedAnalyzeResponse {
   analysis: FpedComponentAnalysis;
 }
 
+// --- Cohort (food-group exposure across N recalls) ---------------------------
+
+export interface FpedCohortComponent {
+  component: string;
+  label: string;
+  unit: string;
+  direction: FpedDirection;
+  myplate_target: number;
+  cfg_target: number;
+  median: number;
+  q1: number;
+  q3: number;
+  min: number;
+  max: number;
+  mean: number;
+  pct_meeting_myplate: number;
+  pct_meeting_cfg: number;
+}
+
+export interface FpedCohortCoverage {
+  mean_coverage_pct_by_mass: number;
+  n_recalls_with_unmatched: number;
+}
+
+export interface FpedCohortResult {
+  n_recalls: number;
+  components: FpedCohortComponent[];
+  coverage: FpedCohortCoverage;
+}
+
+/** Audience-aware block from `explanations.fped_cohort_analysis`. */
+export interface FpedCohortAnalysis {
+  title: string;
+  n_recalls: number;
+  caveat?: string;
+  coverage_note?: string;
+  // individual / clinician
+  headline?: string;
+  adherence?: Array<{ label: string; pct_meeting: number; goal: 'more' | 'less' }>;
+  // researcher / policy
+  components?: FpedCohortComponent[];
+  coverage?: FpedCohortCoverage;
+  methodology?: string;
+  caveats?: string[];
+}
+
+export interface FpedCohortResponse {
+  result: FpedCohortResult;
+  analysis: FpedCohortAnalysis;
+}
+
 export class FpedApiService {
   static async analyze(
     foods: Array<{ food_id: number; mass_g: number }>,
@@ -922,6 +973,95 @@ export class FpedApiService {
       result: response.data.result,
       analysis: response.data.explanations.fped_component_analysis as FpedComponentAnalysis,
     };
+  }
+
+  static async cohort(
+    recalls: Array<Array<{ food_id: number; mass_g: number }>>,
+    userType: 'individual' | 'researcher' | 'policy' = 'individual',
+  ): Promise<FpedCohortResponse> {
+    const response = await api.post('/fped/cohort/', { recalls, user_type: userType });
+    return {
+      result: response.data.result,
+      analysis: response.data.explanations.fped_cohort_analysis as FpedCohortAnalysis,
+    };
+  }
+}
+
+// ===========================================================================
+// FPID-1 (2026-05-28) — ingredient-level food-group attribution + reconstruction QC.
+// POST /api/fpid/breakdown/ : for one composite food, which ingredients contribute
+// which food groups (from its US FNDDS recipe analog, USDA FPID 2017-18).
+// ===========================================================================
+
+export interface FpidGroupSource {
+  sr_description: string;
+  amount: number;
+  pct: number;
+}
+
+export interface FpidGroupAttribution {
+  component: string;
+  label: string;
+  unit: string;
+  amount: number;
+  sources: FpidGroupSource[];
+}
+
+export interface FpidIngredientRow {
+  sr_description: string;
+  gram_weight: number;
+  share_of_recipe: number;
+  has_fpid: boolean;
+}
+
+export interface FpidCoverage {
+  n_ingredients: number;
+  n_with_fpid: number;
+  unmapped_pct: number;
+}
+
+export interface FpidBreakdown {
+  available: boolean;
+  food_id: number;
+  fdc_id: number;
+  food_code: number;
+  bridge_confidence: number;
+  mass_g: number;
+  by_group: FpidGroupAttribution[];
+  ingredients: FpidIngredientRow[];
+  coverage: FpidCoverage;
+  note: string;
+}
+
+export interface FpidReconstruction {
+  available: boolean;
+  food_id: number;
+  cosine: number | null;
+  plausible: boolean;
+  cosine_floor: number;
+  coverage: FpidCoverage;
+  top_divergences: Array<{
+    component: string;
+    unit: string;
+    twin_per_100g: number;
+    reconstructed_per_100g: number;
+    delta: number;
+  }>;
+  note: string;
+}
+
+export interface FpidBreakdownResponse {
+  food_id: number;
+  mass_g: number;
+  breakdown: FpidBreakdown | null;
+  reconstruction: FpidReconstruction | null;
+  note: string | null;
+}
+
+export class FpidApiService {
+  static async breakdown(foodId: number, massG = 100): Promise<FpidBreakdownResponse> {
+    const response = await api.post('/fpid/breakdown/', { food_id: foodId, mass_g: massG });
+    return response.data as FpidBreakdownResponse;
   }
 }
 
