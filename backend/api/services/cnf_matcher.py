@@ -681,7 +681,7 @@ def get_default_matcher() -> CNFMatcher:
     food_name_csv = Path(_s.CNF_FOLDER) / 'FOOD_NAME.csv'
     if food_name_csv.exists():
         from .etl.build_cnf_corpus_embeddings import _sha256_of_file
-        actual = _sha256_of_file(food_name_csv)
+        actual = _sha256_of_file(food_name_csv, normalize_newlines=True)
         expected = corpus.provenance.get('source_file_sha256')
         if expected and actual != expected:
             raise RuntimeError(

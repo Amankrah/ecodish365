@@ -54,11 +54,25 @@ EMBEDDING_MODEL = 'text-embedding-3-small'   # 1536-dim
 EMBED_BATCH_SIZE = 256
 
 
-def _sha256_of_file(path: Path) -> str:
+def _sha256_of_file(path: Path, normalize_newlines: bool = False) -> str:
+    """SHA-256 of a file's bytes.
+
+    With ``normalize_newlines`` the content is canonicalised to LF before
+    hashing, so the digest is identical for CRLF (Windows) and LF (Linux)
+    checkouts of the same text file. Use it for text source files such as
+    FOOD_NAME.csv, whose line endings get rewritten by git's autocrlf and
+    would otherwise make the provenance hash platform-dependent. Leave it
+    off for binary files (e.g. the WAFCT .xlsx), where altering bytes would
+    corrupt the digest.
+    """
     h = hashlib.sha256()
-    with open(path, 'rb') as f:
-        for chunk in iter(lambda: f.read(65536), b''):
-            h.update(chunk)
+    if normalize_newlines:
+        data = path.read_bytes().replace(b'\r\n', b'\n').replace(b'\r', b'\n')
+        h.update(data)
+    else:
+        with open(path, 'rb') as f:
+            for chunk in iter(lambda: f.read(65536), b''):
+                h.update(chunk)
     return h.hexdigest()
 
 
@@ -191,7 +205,7 @@ def build(force: bool = False) -> None:
     # will check both on init when WAFCT is present).
     from django.conf import settings
     food_name_csv = Path(settings.CNF_FOLDER) / 'FOOD_NAME.csv'
-    source_sha256 = _sha256_of_file(food_name_csv)
+    source_sha256 = _sha256_of_file(food_name_csv, normalize_newlines=True)
     wafct_path = Path(settings.BASE_DIR) / 'raw_wafct' / 'WAFCT_2019.xlsx'
     wafct_sha256 = _sha256_of_file(wafct_path) if wafct_path.exists() else None
 
