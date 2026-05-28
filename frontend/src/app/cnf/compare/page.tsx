@@ -14,7 +14,7 @@ import {
   SparklesIcon,
   BeakerIcon,
 } from '@heroicons/react/24/outline';
-import { CNFApiService, FoodComparison, Food, SearchResult, NutrientValue } from '@/lib/api';
+import { CNFApiService, FoodComparison, FoodComparisonNutrientCell, Food, SearchResult, NutrientValue } from '@/lib/api';
 import toast from 'react-hot-toast';
 // WAFCT-EXTEND (2026-05-24): dual-source food search inside the compare modal.
 import { SourceFilter, type SourceChoice } from '@/components/shared/SourceFilter';
@@ -41,6 +41,47 @@ const NUTRIENT_CATEGORIES = {
   'Vitamins': ['RETINOL', 'RETINOL ACTIVITY EQUIVALENTS', 'BETA CAROTENE', 'ALPHA-TOCOPHEROL', 'VITAMIN D (INTERNATIONAL UNITS)', 'VITAMIN C', 'THIAMIN', 'RIBOFLAVIN', 'NIACIN', 'TOTAL FOLACIN', 'VITAMIN B-12', 'VITAMIN K'],
   'Fatty Acids': ['FATTY ACIDS, SATURATED, TOTAL', 'FATTY ACIDS, MONOUNSATURATED, TOTAL', 'FATTY ACIDS, POLYUNSATURATED, TOTAL', 'FATTY ACIDS, TRANS, TOTAL', 'CHOLESTEROL'],
 };
+
+/** Resolve a row key to the compare API nutrient entry — exact CNF NutrientName only. */
+function findComparisonNutrientEntry(
+  comparison: FoodComparison | null,
+  nutrientKey: string,
+): {
+  key: string;
+  nutrient_id: number;
+  unit: string;
+  values: Record<string, number>;
+  by_food_id: Record<string, FoodComparisonNutrientCell>;
+} | null {
+  if (!comparison) return null;
+  const direct = comparison.nutrients[nutrientKey];
+  if (direct) return { key: nutrientKey, ...direct };
+  const hit = Object.entries(comparison.nutrients).find(
+    ([key]) => key.toLowerCase() === nutrientKey.toLowerCase(),
+  );
+  if (!hit) return null;
+  return { key: hit[0], ...hit[1] };
+}
+
+/** Lens tab: map short patterns (ENERGY, SODIUM, …) to full compare API keys. */
+function resolveLensNutrientKeys(comparison: FoodComparison): string[] {
+  const patterns = [
+    ...LENS_NUTRIENT_PANELS.hsr.patterns,
+    ...LENS_NUTRIENT_PANELS.fcs.patterns,
+  ];
+  const keys: string[] = [];
+  const seen = new Set<string>();
+  for (const pat of patterns) {
+    const hit = Object.keys(comparison.nutrients).find(k =>
+      k.toUpperCase().includes(pat.toUpperCase()),
+    );
+    if (hit && !seen.has(hit)) {
+      seen.add(hit);
+      keys.push(hit);
+    }
+  }
+  return keys;
+}
 
 function CNFComparePageContent() {
   const searchParams = useSearchParams();
@@ -374,67 +415,14 @@ function CNFComparePageContent() {
     return csv;
   };
 
-  const getNutrientValue = (foodId: number, nutrientName: string): number | null => {
-    if (!comparisonData.comparison) return null;
-    
-    // Get the food name for this food ID
-    const food = comparisonData.foods.find(f => f.FoodID === foodId);
-    if (!food) return null;
-    
-    // Find the nutrient data by matching nutrient names
-    const nutrientData = Object.entries(comparisonData.comparison.nutrients).find(
-      ([key]) => {
-        const keyLower = key.toLowerCase();
-        const nutrientLower = nutrientName.toLowerCase();
-        
-        // Direct match or partial match for common nutrient names
-        if (keyLower === nutrientLower || 
-            keyLower.includes(nutrientLower) || 
-            nutrientLower.includes(keyLower)) {
-          return true;
-        }
-        
-        // Special mapping for common nutrients
-        const mappings: Record<string, string[]> = {
-          'energy': ['energy', 'kilocalories', 'kcal', 'calories'],
-          'protein': ['protein', 'prot'],
-          'fat': ['fat', 'lipids', 'total lipids'],
-          'carbohydrate': ['carbohydrate', 'carb', 'total'],
-          'fibre': ['fibre', 'fiber', 'dietary'],
-          'calcium': ['calcium', 'ca'],
-          'iron': ['iron', 'fe'],
-          'magnesium': ['magnesium', 'mg'],
-          'phosphorus': ['phosphorus', 'p'],
-          'potassium': ['potassium', 'k'],
-          'sodium': ['sodium', 'na'],
-          'zinc': ['zinc', 'zn'],
-          'vitamin a': ['vitamin a', 'retinol', 'retinol activity'],
-          'vitamin c': ['vitamin c', 'vitc'],
-          'vitamin d': ['vitamin d', 'vitd'],
-          'vitamin e': ['vitamin e', 'tocopherol', 'alpha-tocopherol'],
-          'vitamin k': ['vitamin k', 'vitk'],
-          'thiamine': ['thiamine', 'thiamin', 'thia'],
-          'riboflavin': ['riboflavin', 'ribo'],
-          'niacin': ['niacin', 'nicotinic acid'],
-          'folate': ['folate', 'folic acid', 'folacin'],
-          'vitamin b12': ['vitamin b12', 'vitamin b-12', 'b12'],
-          'saturated fat': ['saturated', 'fatty acids, saturated'],
-          'monounsaturated fat': ['monounsaturated', 'fatty acids, monounsaturated'],
-          'polyunsaturated fat': ['polyunsaturated', 'fatty acids, polyunsaturated'],
-          'trans fat': ['trans', 'fatty acids, trans'],
-          'cholesterol': ['cholesterol', 'chol'],
-        };
-        
-        const searchTerms = mappings[nutrientLower] || [nutrientLower];
-        return searchTerms.some(term => keyLower.includes(term));
-      }
-    );
-    
-    if (!nutrientData) return null;
-    
-    // Access by food name (FoodDescription), not food ID
-    return nutrientData[1].values[food.FoodDescription] || null;
+  const getNutrientCell = (foodId: number, nutrientKey: string): FoodComparisonNutrientCell | null => {
+    const entry = findComparisonNutrientEntry(comparisonData.comparison, nutrientKey);
+    if (!entry?.by_food_id) return null;
+    return entry.by_food_id[String(foodId)] ?? null;
   };
+
+  const getNutrientValue = (foodId: number, nutrientKey: string): number | null =>
+    getNutrientCell(foodId, nutrientKey)?.value ?? null;
 
   const getHighestValue = (nutrientName: string): number => {
     if (!comparisonData.comparison) return 0;
@@ -469,11 +457,8 @@ function CNFComparePageContent() {
 
   const getCategoryNutrients = (category: string): string[] => {
     if (category === 'Lens highlights (HSR/FCS)') {
-      const patterns = [
-        ...LENS_NUTRIENT_PANELS.hsr.patterns,
-        ...LENS_NUTRIENT_PANELS.fcs.patterns,
-      ];
-      return [...new Set(patterns)];
+      if (!comparisonData.comparison) return [];
+      return resolveLensNutrientKeys(comparisonData.comparison);
     }
     return NUTRIENT_CATEGORIES[category as keyof typeof NUTRIENT_CATEGORIES] ?? [];
   };
@@ -625,7 +610,7 @@ function CNFComparePageContent() {
                 <div className="flex items-center space-x-2">
                   <InformationCircleIcon className="w-4 h-4 text-gray-400" />
                   <span className="text-xs text-gray-500">
-                    Values per 100g • Green bars indicate highest values
+                    Values per 100 g (units shown) • Green bars indicate highest values
                   </span>
                 </div>
               </div>
@@ -667,15 +652,11 @@ function CNFComparePageContent() {
                 <tbody className="divide-y divide-gray-200">
                   {(() => {
                     const categoryNutrients = getCategoryNutrients(selectedCategory);
-                    const availableNutrients = categoryNutrients.filter((nutrientName) => {
-                      const hasData = comparisonData.foods.some(food => 
-                        getNutrientValue(food.FoodID, nutrientName) !== null
-                      );
-                      if (!hasData) {
-                        console.log(`No data found for nutrient: ${nutrientName}`);
-                      }
-                      return hasData;
-                    });
+                    const availableNutrients = categoryNutrients.filter((nutrientKey) =>
+                      comparisonData.foods.some(food =>
+                        getNutrientValue(food.FoodID, nutrientKey) !== null,
+                      ),
+                    );
 
                     if (availableNutrients.length === 0) {
                       return (
@@ -693,29 +674,47 @@ function CNFComparePageContent() {
                       );
                     }
 
-                    return availableNutrients.map((nutrientName) => {
-                      const maxValue = getHighestValue(nutrientName);
+                    return availableNutrients.map((nutrientKey) => {
+                      const entry = findComparisonNutrientEntry(comparisonData.comparison, nutrientKey);
+                      const maxValue = getHighestValue(nutrientKey);
+                      const rowLabel = entry?.key ?? nutrientKey;
+                      const rowUnit = entry?.unit;
 
                       return (
-                        <tr key={nutrientName} className="hover:bg-gray-50">
+                        <tr key={nutrientKey} className="hover:bg-gray-50">
                           <td className="px-6 py-4 text-sm text-gray-900 font-medium">
-                            {nutrientName}
+                            <div>{rowLabel}</div>
+                            {rowUnit && (
+                              <div className="text-xs font-normal text-gray-500 mt-0.5">
+                                per 100 g · {rowUnit}
+                              </div>
+                            )}
                           </td>
                           {comparisonData.foods.map((food) => {
-                            const value = getNutrientValue(food.FoodID, nutrientName);
+                            const cell = getNutrientCell(food.FoodID, nutrientKey);
+                            const value = cell?.value ?? null;
+                            const unit = cell?.unit;
                             const percentage = getValuePercentage(value, maxValue);
                             const isHighest = value === maxValue && value !== null && value > 0;
+                            const sourceTitle = cell?.nutrient_source
+                              ? `${cell.database?.toUpperCase() ?? 'CNF'} · ${cell.nutrient_source}`
+                              : undefined;
 
                             return (
                               <td key={food.FoodID} className="px-4 py-4">
                                 {value !== null ? (
-                                  <div className="space-y-1">
-                                    <div className="flex items-center justify-between">
-                                      <span className={`text-sm font-medium ${isHighest ? 'text-green-700' : 'text-gray-900'}`}>
+                                  <div className="space-y-1" title={sourceTitle}>
+                                    <div className="flex items-center justify-between gap-2">
+                                      <span className={`text-sm font-medium tabular-nums ${isHighest ? 'text-green-700' : 'text-gray-900'}`}>
                                         {value.toFixed(2)}
+                                        {unit && (
+                                          <span className="text-xs font-normal text-gray-500 ml-1">
+                                            {unit}
+                                          </span>
+                                        )}
                                       </span>
                                       {isHighest && (
-                                        <CheckCircleIcon className="w-4 h-4 text-green-500" />
+                                        <CheckCircleIcon className="w-4 h-4 text-green-500 shrink-0" />
                                       )}
                                     </div>
                                     <div className="w-full bg-gray-200 rounded-full h-2">

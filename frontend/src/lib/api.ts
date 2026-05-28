@@ -142,6 +142,17 @@ export interface SearchCriteria {
   limit: number;
 }
 
+export interface FoodComparisonNutrientCell {
+  value: number;
+  /** From NUTRIENT_NAME.csv via the compare API — canonical CNF unit for this NutrientID. */
+  unit: string;
+  nutrient_source_id?: number;
+  /** Analytical / bibliographic source for this food–nutrient row (NUTRIENT_SOURCE.csv). */
+  nutrient_source?: string;
+  /** Food catalogue provenance: `cnf` (Health Canada) or `wafct` (FAO/INFOODS WAFCT 2019). */
+  database?: 'cnf' | 'wafct' | string;
+}
+
 export interface FoodComparison {
   foods: {
     FoodID: number;
@@ -152,6 +163,7 @@ export interface FoodComparison {
     nutrient_id: number;
     unit: string;
     values: Record<string, number>;
+    by_food_id: Record<string, FoodComparisonNutrientCell>;
   }>;
   comparison_date: string;
 }
