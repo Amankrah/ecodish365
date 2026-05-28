@@ -375,20 +375,34 @@ class CNFRecipeDecomposer:
             self._cache_put(key, result)
             return result
 
-        # --- Catalog preference (fix 3): if the dish name strongly matches a CNF
-        # food that has its own measured nutrients, use that food directly (most
-        # accurate + cheapest). `force_decompose` skips this for the harnesses.
-        cm = None if force_decompose else self._catalog_match(dish_name, source)
+        # The harness path skips catalog preference and just decomposes.
+        if force_decompose:
+            return self._decompose_via_llm(dish_name, ndn, total_mass_g, source, t0, key)
+
+        # --- Catalog preference (fix 2/3): match the dish name to a catalog food
+        # WHILE the LLM decomposition runs concurrently, so the extra match call is
+        # hidden under the decompose latency instead of adding to it. Both are OpenAI
+        # HTTP calls (the GIL is released during the network wait), so they truly
+        # overlap. The speculative decompose is launched with key=None so it never
+        # writes the shared cache — decompose() caches the single chosen result.
+        ex = ThreadPoolExecutor(max_workers=2, thread_name_prefix='cnf-decompose-stage0')
+        cm_future = ex.submit(self._catalog_match, dish_name, source)
+        decomp_future = ex.submit(
+            self._decompose_via_llm, dish_name, ndn, total_mass_g, source, t0, None)
+        cm = cm_future.result()
+
+        # If the dish strongly matches a catalog food with measured nutrients, return
+        # it directly (most accurate + cheapest); the speculative decompose finishes
+        # in the background and is discarded.
         if (cm is not None and cm.matched and cm.food_id is not None
                 and cm.confidence >= CATALOG_SHORTCIRCUIT_CONF
                 and self._has_nutrients(int(cm.food_id))):
-            result = self._catalog_recipe(cm, dish_name, ndn, total_mass_g,
-                                          reason='catalog_direct_match', t0=t0)
-            self._cache_put(key, result)
-            return result
+            ex.shutdown(wait=False)
+            return self._cache_and_return(key, self._catalog_recipe(
+                cm, dish_name, ndn, total_mass_g, reason='catalog_direct_match', t0=t0))
 
-        # LLM decomposition (Stage 1 + Stage 2 + the 7 gates).
-        decomp = self._decompose_via_llm(dish_name, ndn, total_mass_g, source, t0, key)
+        decomp = decomp_future.result()
+        ex.shutdown(wait=False)
 
         # --- Reconstruction-gated catalog override (fix 2): for a weaker catalog
         # match, replace a decomposition whose reconstructed nutrients diverge from
@@ -414,12 +428,10 @@ class CNFRecipeDecomposer:
                     detail = f'decomp_failed:{decomp.fallback_reason}'
                 else:
                     detail = 'recon_unavailable'
-                result = self._catalog_recipe(cm, dish_name, ndn, total_mass_g,
-                                              reason=f'catalog_override:{detail}', t0=t0)
-                self._cache_put(key, result)
-                return result
+                return self._cache_and_return(key, self._catalog_recipe(
+                    cm, dish_name, ndn, total_mass_g, reason=f'catalog_override:{detail}', t0=t0))
 
-        return decomp
+        return self._cache_and_return(key, decomp)
 
     def _decompose_via_llm(
         self,
@@ -772,7 +784,11 @@ class CNFRecipeDecomposer:
             self._cache_order.append(key)
             return r
 
-    def _cache_put(self, key: Tuple[str, float], value: CNFDecomposedRecipe) -> None:
+    def _cache_put(self, key, value: CNFDecomposedRecipe) -> None:
+        # key=None is used by the speculative concurrent decompose (whose result is
+        # discarded on a catalog short-circuit); it must never touch the shared cache.
+        if key is None:
+            return
         with self._cache_lock:
             if key in self._cache:
                 try:
@@ -784,6 +800,10 @@ class CNFRecipeDecomposer:
             while len(self._cache_order) > self._cache_size:
                 evict = self._cache_order.pop(0)
                 self._cache.pop(evict, None)
+
+    def _cache_and_return(self, key, value: CNFDecomposedRecipe) -> CNFDecomposedRecipe:
+        self._cache_put(key, value)
+        return value
 
 
 # --- Factory ------------------------------------------------------------

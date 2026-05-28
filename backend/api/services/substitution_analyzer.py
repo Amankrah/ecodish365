@@ -5,6 +5,7 @@ import copy
 import itertools
 import logging
 import time
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 from api.cnf_cache import get_api_cnf_pipeline, get_dish_cnf_pipeline
@@ -825,6 +826,11 @@ def analyze_substitutions(
 
     singles = sorted(best_singles.values(), key=lambda x: x['rank_score'], reverse=True)
 
+    # Score the (unchanged) baseline ONCE and reuse it for every suggestion's scorecard
+    # below. Re-scoring the baseline inside each enrich_scorecard_deltas call was the
+    # dominant redundant cost (N+1 baseline scorings for N suggestions).
+    baseline_scorecard = score_composition(rows) if include_scorecard else None
+
     multi: List[Dict[str, Any]] = []
     if parsed_constraints['max_swaps'] >= 2:
         multi_specs = _multi_swap_candidates(specs, parsed_constraints['max_swaps'])
@@ -865,19 +871,29 @@ def analyze_substitutions(
         if include_scorecard and reformulation:
             for r in reformulation:
                 mod_rows = _normalize_composition(r['modified_composition'])
-                r['scorecard'] = enrich_scorecard_deltas(rows, mod_rows)
+                r['scorecard'] = enrich_scorecard_deltas(rows, mod_rows, baseline_sc=baseline_scorecard)
 
     combined = sorted(singles + multi + reformulation, key=lambda x: x['rank_score'], reverse=True)
     suggestions = combined[:max_suggestions]
 
     pareto_frontier: List[Dict[str, Any]] = []
-    baseline_scorecard = None
 
     if include_scorecard and suggestions:
-        baseline_scorecard = score_composition(rows)
-        for s in suggestions:
+        # Each suggestion's scorecard is independent and reuses the shared baseline
+        # (computed once above), so only score_composition(modified) runs here. Compute
+        # them concurrently — same numbers as the serial loop, just off the critical path.
+        def _attach_scorecard(s: Dict[str, Any]) -> None:
             mod_rows = _normalize_composition(s['modified_composition'])
-            s['scorecard'] = enrich_scorecard_deltas(rows, mod_rows)
+            s['scorecard'] = enrich_scorecard_deltas(rows, mod_rows, baseline_sc=baseline_scorecard)
+
+        if len(suggestions) > 1:
+            with ThreadPoolExecutor(
+                    max_workers=min(6, len(suggestions)),
+                    thread_name_prefix='subst-scorecard',
+            ) as ex:
+                list(ex.map(_attach_scorecard, suggestions))
+        else:
+            _attach_scorecard(suggestions[0])
         pareto_frontier = compute_pareto_frontier(suggestions)
 
     elapsed_ms = round((time.perf_counter() - t0) * 1000, 1)

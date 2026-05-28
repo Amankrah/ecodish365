@@ -172,8 +172,16 @@ def scorecard_deltas(
 def enrich_scorecard_deltas(
     baseline_composition: List[Dict[str, Any]],
     modified_composition: List[Dict[str, Any]],
+    baseline_sc: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
-    baseline_sc = score_composition(baseline_composition)
+    """Score the modified composition and diff it against the baseline.
+
+    `baseline_sc` lets callers pass a baseline scorecard computed once and reused
+    across many suggestions, instead of re-scoring the (unchanged) baseline on every
+    call. The result is identical either way.
+    """
+    if baseline_sc is None:
+        baseline_sc = score_composition(baseline_composition)
     modified_sc = score_composition(modified_composition)
     return {
         'baseline': baseline_sc,
