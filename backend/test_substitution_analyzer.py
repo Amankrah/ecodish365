@@ -12,7 +12,14 @@ from api.services.substitution_rules import (
     RULES_BY_ID,
 )
 from api.services.substitution_constraints import replacement_allowed, parse_extended_constraints
-from api.services.substitution_culinary import culinary_swap_plausible, extreme_nutrient_swing
+from api.services.substitution_culinary import (
+    anatomical_swap_plausible,
+    culinary_swap_plausible,
+    extreme_nutrient_swing,
+)
+from api.services.substitution_quality import swap_passes_quality_gate, MIN_DISCOVERY_HEFI_DELTA
+from api.services.substitution_fped_ranking import fped_gap_fill_bonus
+from api.services.substitution_roles import infer_functional_role
 from api.services.substitution_analyzer import (
     analyze_substitutions,
     score_modified_composition,
@@ -286,6 +293,144 @@ class TestSubstitutionAnalyzer(unittest.TestCase):
     def test_empty_composition_raises(self):
         with self.assertRaises(ValueError):
             analyze_substitutions([])
+
+    def test_culinary_allows_milk_to_fortified_soy(self):
+        self.assertTrue(culinary_swap_plausible(
+            'Milk, fluid, whole, producer, 3.7% M.F.',
+            'Plant-based beverage, soy beverage, all flavours, low fat, fortified',
+            original_mass_g=380.0,
+        ))
+
+    def test_culinary_blocks_plain_yogurt_to_fruit_flavoured(self):
+        from api.services.substitution_culinary import dairy_yogurt_swap_plausible
+        plain = 'Yogourt (yogurt), fat free, 0-0.5% M.F., plain'
+        fruit = 'Yogourt (yogurt), fat free, 0-0.5% M.F., fruit flavoured'
+        self.assertFalse(dairy_yogurt_swap_plausible(plain, fruit))
+        self.assertFalse(culinary_swap_plausible(plain, fruit))
+
+    def test_discovery_quality_gate_requires_min_hefi(self):
+        ev = {
+            'hefi': {'delta': 0.1},
+            'fcs': {'delta': 0.5},
+            'nutrients': {'sat_fat_g': {'diff': 0.0}},
+        }
+        self.assertLess(0.1, MIN_DISCOVERY_HEFI_DELTA)
+        self.assertFalse(swap_passes_quality_gate(
+            ev,
+            purpose='general_health',
+            candidate_source='matcher_alternative',
+            swaps=[{'original': {'mass_g': 175.0}}],
+        ))
+        self.assertTrue(swap_passes_quality_gate(
+            ev,
+            purpose='general_health',
+            candidate_source='curated_rule',
+            swaps=[{'original': {'mass_g': 175.0}}],
+        ))
+
+    def test_quality_gate_blocks_added_sugar_fped_shift(self):
+        ev = {
+            'hefi': {'delta': 0.25},
+            'fcs': {'delta': 0.1},
+            'nutrients': {'sat_fat_g': {'diff': 0.0}},
+        }
+        fped = {'changed': [{'component': 'added_sugars_tsp', 'delta': 0.54}]}
+        self.assertFalse(swap_passes_quality_gate(
+            ev,
+            purpose='general_health',
+            candidate_source='matcher_alternative',
+            swaps=[{'original': {'mass_g': 175.0}}],
+            fped_deltas=fped,
+        ))
+
+    def test_fped_gap_fill_bonus_rewards_whole_grain_swap_on_shortfall(self):
+        baseline = [
+            {'food_id': 3732, 'mass_g': 200.0},
+            {'food_id': 1619, 'mass_g': 100.0},
+        ]
+        modified = [
+            {'food_id': 4067, 'mass_g': 200.0},
+            {'food_id': 1619, 'mass_g': 100.0},
+        ]
+        result = fped_gap_fill_bonus(baseline, modified)
+        self.assertGreater(result.get('bonus', 0.0), 0.0)
+
+    def test_anatomical_blocks_whole_egg_to_yolk(self):
+        whole = 'Egg, chicken, whole, fresh or frozen, raw'
+        yolk = 'Egg, chicken, yolk, fresh or frozen, raw'
+        self.assertFalse(anatomical_swap_plausible(whole, yolk))
+        self.assertFalse(culinary_swap_plausible(whole, yolk, original_mass_g=150.0))
+
+    def test_anatomical_blocks_lean_chicken_to_skin_on(self):
+        lean = 'Chicken, broiler, thigh, meat, cooked, rotisserie, with seasoning'
+        skin = 'Chicken, broiler, thigh, meat and skin, cooked, rotisserie'
+        self.assertFalse(anatomical_swap_plausible(lean, skin))
+        self.assertFalse(culinary_swap_plausible(lean, skin, original_mass_g=250.0))
+
+    def test_low_fat_soy_not_classified_as_fat_role(self):
+        soy = 'Plant-based beverage, soy beverage, all flavours, low fat, fortified'
+        self.assertNotEqual(infer_functional_role(soy), 'fat')
+
+    def test_quality_gate_blocks_high_sat_fat_matcher_pattern(self):
+        ev = {
+            'hefi': {'delta': 1.5},
+            'fcs': {'delta': 0.2},
+            'nutrients': {'sat_fat_g': {'diff': 10.0}},
+        }
+        swaps = [{'original': {'mass_g': 150.0}}]
+        self.assertFalse(swap_passes_quality_gate(
+            ev,
+            purpose='general_health',
+            candidate_source='matcher_alternative',
+            swaps=swaps,
+        ))
+
+    def test_quality_gate_allows_milk_to_soy_pattern(self):
+        ev = {
+            'hefi': {'delta': 0.8},
+            'fcs': {'delta': 1.2},
+            'nutrients': {'sat_fat_g': {'diff': -8.0}},
+        }
+        swaps = [{'original': {'mass_g': 380.0}}]
+        self.assertTrue(swap_passes_quality_gate(
+            ev,
+            purpose='general_health',
+            candidate_source='curated_rule',
+            swaps=swaps,
+        ))
+
+    def test_day1_recall_blocks_yolk_and_skin_swaps(self):
+        """Regression: DAY 1 24-h recall must not suggest egg→yolk or lean→skin."""
+        composition = [
+            {'food_id': 123, 'mass_g': 380.0, 'food_description': 'Milk, fluid, whole, producer, 3.7% M.F.'},
+            {'food_id': 7701, 'mass_g': 280.0, 'food_description': 'Rice, white and wild, flavoured, unprepared'},
+            {'food_id': 1619, 'mass_g': 255.0, 'food_description': 'Orange juice, raw'},
+            {'food_id': 6649, 'mass_g': 250.0, 'food_description': 'Chicken, broiler, thigh, meat, cooked, rotisserie, with seasoning'},
+            {'food_id': 125, 'mass_g': 150.0, 'food_description': 'Egg, chicken, whole, fresh or frozen, raw'},
+            {'food_id': 1464, 'mass_g': 60.0, 'food_description': 'Oats, large flakes, dry, Quaker'},
+            {'food_id': 118, 'mass_g': 15.0, 'food_description': 'Butter, regular'},
+            {'food_id': 7829, 'mass_g': 15.0, 'food_description': 'Ghee'},
+        ]
+        result = analyze_substitutions(
+            composition,
+            purpose='general_health',
+            max_suggestions=10,
+            reformulation_mode='greedy',
+            constraints={'max_swaps': 3},
+            include_scorecard=False,
+        )
+        self.assertTrue(result['success'])
+        banned_food_ids = {127, 6654}  # yolk, chicken meat+skin
+        for s in result['suggestions']:
+            for sw in (s.get('swaps') or [s]):
+                repl_id = (sw.get('replacement') or s.get('replacement', {})).get('food_id')
+                orig_desc = (sw.get('original') or s.get('original', {})).get('food_description', '').lower()
+                repl_desc = (sw.get('replacement') or s.get('replacement', {})).get('food_description', '').lower()
+                self.assertNotIn(repl_id, banned_food_ids)
+                if 'whole' in orig_desc and 'egg' in orig_desc:
+                    self.assertNotIn('yolk', repl_desc)
+                if 'meat,' in orig_desc and 'chicken' in orig_desc:
+                    self.assertNotIn('meat and skin', repl_desc)
 
 
 if __name__ == '__main__':

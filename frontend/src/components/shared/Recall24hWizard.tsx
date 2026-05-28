@@ -23,11 +23,11 @@
  */
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   CalendarClock, Coffee, Sandwich, Soup, Apple, Cookie, Pizza,
   Loader2, AlertCircle, Check, Info, Sparkles, ChevronRight, ChevronLeft,
-  Camera, Type,
+  Camera, Type, Search,
   type LucideIcon,
 } from 'lucide-react';
 import {
@@ -40,10 +40,18 @@ import {
 import { SourceFilter, type SourceChoice } from './SourceFilter';
 import { SourceBadge } from './SourceBadge';
 import { PackagedFoodOccasionEntry } from './PackagedFoodOccasionEntry';
+import { RecallIngredientPicker } from './RecallIngredientPicker';
 import {
   buildRecallMealFromPackaged,
   type PackagedOccasionState,
 } from '@/lib/recallPackagedFood';
+import {
+  aggregatedToDirect,
+  buildRecallMealFromDirect,
+  directDishName,
+  directToAggregated,
+  type RecallDirectIngredient,
+} from '@/lib/recallDirectFood';
 import type { UserType } from './AudienceToggle';
 // RECALL-HISTORY-1 (2026-05-24): opt-in localStorage save on Step 3.
 import {
@@ -106,11 +114,13 @@ const SCORE_BUTTONS: Array<{
 
 interface MealRow {
   enabled: boolean;
-  entryMode: 'text' | 'packaged';
+  entryMode: 'text' | 'packaged' | 'direct';
   dishName: string;
   totalMass: number;
   /** Set when entryMode === 'packaged' and scan+decompose succeeded. */
   packaged?: PackagedOccasionState | null;
+  /** User-picked CNF foods when entryMode === 'direct'. */
+  directIngredients?: RecallDirectIngredient[];
 }
 
 interface ApiError { status: number; message: string }
@@ -128,6 +138,9 @@ function humanWarning(code: string): string {
   if (code.startsWith('packaged_food_inferred_at_')) {
     return 'One or more occasions used scanned packaged food — composition was inferred from the label, not measured.';
   }
+  if (code.startsWith('direct_food_entry')) {
+    return 'One or more occasions used directly selected CNF foods.';
+  }
   return code;
 }
 
@@ -142,10 +155,13 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
         dishName: '',
         totalMass: o.defaultMass,
         packaged: null,
+        directIngredients: [],
       };
     }
     return out;
   });
+  const [dayIngredients, setDayIngredients] = useState<RecallDirectIngredient[]>([]);
+  const [ingredientsEdited, setIngredientsEdited] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState<ApiError | null>(null);
   const [result, setResult]   = useState<CNFRecall24hResult | null>(null);
@@ -176,10 +192,35 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
          if (row.entryMode === 'packaged') {
            return row.packaged != null && row.packaged.decomposition.decomposition_succeeded;
          }
+         if (row.entryMode === 'direct') {
+           return (row.directIngredients?.length ?? 0) > 0
+             && (row.directIngredients ?? []).every(i => i.mass_g > 0);
+         }
          return row.dishName.trim().length > 0 && row.totalMass > 0;
        }),
     [enabledOccasions, rows],
   );
+
+  const needsLlmDecompose = useMemo(
+    () => enabledOccasions.some(o => rows[o.id].entryMode === 'text'),
+    [enabledOccasions, rows],
+  );
+
+  useEffect(() => {
+    if (result) {
+      setDayIngredients(aggregatedToDirect(result.aggregated_daily_ingredients));
+      setIngredientsEdited(false);
+    }
+  }, [result]);
+
+  function effectiveAggregatedIngredients() {
+    return directToAggregated(dayIngredients);
+  }
+
+  function updateDayIngredients(next: RecallDirectIngredient[]) {
+    setDayIngredients(next);
+    setIngredientsEdited(true);
+  }
 
   const hasPackagedOccasions = useMemo(
     () => enabledOccasions.some(o => rows[o.id].entryMode === 'packaged' && rows[o.id].packaged),
@@ -202,6 +243,10 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
       const row = rows[o.id];
       if (row.entryMode === 'packaged' && row.packaged) {
         return buildRecallMealFromPackaged(o.id, row.packaged);
+      }
+      if (row.entryMode === 'direct' && row.directIngredients?.length) {
+        const dish = directDishName(o.label, row.directIngredients);
+        return buildRecallMealFromDirect(o.id, dish, row.directIngredients);
       }
       return {
         occasion: o.id,
@@ -238,7 +283,7 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
         label: saveLabel.trim(),
         user_type: userType,
         meals: result.meals,
-        aggregated_daily_ingredients: result.aggregated_daily_ingredients,
+        aggregated_daily_ingredients: effectiveAggregatedIngredients(),
         estimated_daily_kcal: result.estimated_daily_kcal,
         occasions_count: result.occasions_count,
       });
@@ -275,6 +320,14 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
             entry_type: 'packaged' as const,
           };
         }
+        if (row.entryMode === 'direct' && row.directIngredients?.length) {
+          return {
+            occasion: o.id,
+            dish_name: directDishName(o.label, row.directIngredients),
+            total_mass_g: row.directIngredients.reduce((s, i) => s + i.mass_g, 0),
+            entry_type: 'direct' as const,
+          };
+        }
         return {
           occasion: o.id,
           dish_name: row.dishName,
@@ -292,7 +345,7 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
             decomposition_confidence: rows[o.id].packaged!.decomposition.decomposition_confidence,
           })),
       } : {}),
-      aggregated_daily_ingredients: result.aggregated_daily_ingredients,
+      aggregated_daily_ingredients: effectiveAggregatedIngredients(),
       estimated_daily_kcal: result.estimated_daily_kcal,
     };
     try {
@@ -302,7 +355,7 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
       // pages still work standalone.
     }
     try {
-      saveActiveFoodList(fromRecallAggregated(result.aggregated_daily_ingredients, {
+      saveActiveFoodList(fromRecallAggregated(effectiveAggregatedIngredients(), {
         user_type: userType,
         estimated_daily_kcal: result.estimated_daily_kcal,
         meals_meta: payload.meals_meta,
@@ -405,9 +458,9 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
             <h2 className="text-lg font-semibold text-gray-900">What did you have at each occasion?</h2>
           </div>
           <p className="text-sm text-gray-600">
-            Describe each meal in free text, or <strong>scan a packaged food</strong> if you ate something
-            with a Nutrition Facts label (granola bar, yogurt, soup can, etc.). Mass estimates can be rough
-            for text meals; scanned products use net weight from the label.
+            Describe each meal in free text, <strong>pick CNF ingredients</strong> by search or AI,
+            or <strong>scan a packaged food</strong> if you ate something with a Nutrition Facts label.
+            Mass estimates can be rough for text meals; picked foods and scanned products use the grams you set.
           </p>
           <ul className="space-y-3">
             {enabledOccasions.map(o => {
@@ -420,10 +473,10 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
                   </div>
 
                   {/* Entry mode toggle */}
-                  <div className="flex gap-2 mb-3">
+                  <div className="flex flex-wrap gap-2 mb-3">
                     <button
                       type="button"
-                      onClick={() => updateRow(o.id, { entryMode: 'text', packaged: null })}
+                      onClick={() => updateRow(o.id, { entryMode: 'text', packaged: null, directIngredients: [] })}
                       className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md border ${
                         rows[o.id].entryMode === 'text'
                           ? 'border-blue-500 bg-blue-50 text-blue-800'
@@ -435,7 +488,24 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
                     </button>
                     <button
                       type="button"
-                      onClick={() => updateRow(o.id, { entryMode: 'packaged', dishName: '', packaged: null })}
+                      onClick={() => updateRow(o.id, {
+                        entryMode: 'direct',
+                        dishName: '',
+                        packaged: null,
+                        directIngredients: rows[o.id].directIngredients ?? [],
+                      })}
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md border ${
+                        rows[o.id].entryMode === 'direct'
+                          ? 'border-blue-500 bg-blue-50 text-blue-800'
+                          : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      <Search className="h-3.5 w-3.5" aria-hidden="true" />
+                      Pick ingredients
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateRow(o.id, { entryMode: 'packaged', dishName: '', packaged: null, directIngredients: [] })}
                       className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md border ${
                         rows[o.id].entryMode === 'packaged'
                           ? 'border-blue-500 bg-blue-50 text-blue-800'
@@ -483,6 +553,16 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
                       />
                     </div>
                   </div>
+                  ) : rows[o.id].entryMode === 'direct' ? (
+                    <RecallIngredientPicker
+                      userType={userType}
+                      source={source}
+                      ingredients={rows[o.id].directIngredients ?? []}
+                      onChange={ings => updateRow(o.id, { directIngredients: ings })}
+                      defaultMassG={Math.max(50, Math.round(o.defaultMass / 2))}
+                      searchPlaceholder={`Search foods for ${o.label.toLowerCase()}…`}
+                      emptyHint="Type a food name, pick from results, or use Find with AI. Set grams for each item."
+                    />
                   ) : (
                     <PackagedFoodOccasionEntry
                       occasionLabel={o.label}
@@ -532,7 +612,11 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
               {loading
                 ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                 : <Sparkles className="h-4 w-4" aria-hidden="true" />}
-              {loading ? `Decomposing ${enabledOccasions.length} meal${enabledOccasions.length === 1 ? '' : 's'}… (8-15 s)` : 'Decompose all meals'}
+              {loading
+                ? (needsLlmDecompose
+                  ? `Decomposing ${enabledOccasions.length} meal${enabledOccasions.length === 1 ? '' : 's'}… (8-15 s)`
+                  : 'Building your day…')
+                : (needsLlmDecompose ? 'Decompose all meals' : 'Build my day')}
             </button>
           </div>
         </section>
@@ -565,16 +649,50 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
             </div>
             <div className="p-3 rounded bg-blue-50 border border-blue-200">
               <div className="text-xs text-gray-600">Resolved mass</div>
-              <div className="text-lg font-semibold text-gray-900">{result.total_resolved_mass_g.toFixed(0)} g</div>
+              <div className="text-lg font-semibold text-gray-900">
+                {dayIngredients.reduce((s, i) => s + i.mass_g, 0).toFixed(0)} g
+              </div>
             </div>
             <div className="p-3 rounded bg-blue-50 border border-blue-200">
               <div className="text-xs text-gray-600">Estimated kcal</div>
-              <div className="text-lg font-semibold text-gray-900">{result.estimated_daily_kcal.toFixed(0)}</div>
+              <div className="text-lg font-semibold text-gray-900">
+                {result.estimated_daily_kcal.toFixed(0)}
+                {ingredientsEdited && (
+                  <span className="text-xs font-normal text-amber-700 ml-1" title="Kcal from decomposition; re-score to refresh after edits">
+                    *
+                  </span>
+                )}
+              </div>
             </div>
             <div className="p-3 rounded bg-blue-50 border border-blue-200">
               <div className="text-xs text-gray-600">CNF foods</div>
-              <div className="text-lg font-semibold text-gray-900">{result.aggregated_daily_ingredients.length}</div>
+              <div className="text-lg font-semibold text-gray-900">{dayIngredients.length}</div>
             </div>
+          </div>
+
+          {ingredientsEdited && (
+            <p className="text-xs text-amber-800 bg-amber-50 border-l-2 border-amber-400 px-2 py-1 rounded">
+              You edited the ingredient list below. Mass totals update immediately; estimated kcal stays from the last decomposition until you score.
+            </p>
+          )}
+
+          {/* Daily ingredients — editable for all audiences */}
+          <div className="border rounded-lg p-4 bg-white space-y-3">
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900">Daily ingredients</h3>
+              <p className="text-xs text-gray-600 mt-0.5">
+                Add, remove, or adjust grams. Search by name or use <strong>Find with AI</strong> for free-text foods.
+              </p>
+            </div>
+            <RecallIngredientPicker
+              userType={userType}
+              source={source}
+              ingredients={dayIngredients}
+              onChange={updateDayIngredients}
+              defaultMassG={100}
+              searchPlaceholder="Add a food to your day…"
+              emptyHint="No foods yet — search or use Find with AI to build your day."
+            />
           </div>
 
           {/* Sanity warnings */}
@@ -609,6 +727,11 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
                           scanned
                         </span>
                       )}
+                      {m.decomposition.fallback_reason === 'direct_food_entry' && (
+                        <span className="text-[10px] uppercase font-semibold text-blue-700 bg-blue-100 px-1 py-0.5 rounded">
+                          picked
+                        </span>
+                      )}
                       {m.decomposition.matched
                         ? <Check className="h-3.5 w-3.5 text-green-600 ml-auto" aria-hidden="true" />
                         : <AlertCircle className="h-3.5 w-3.5 text-amber-600 ml-auto" aria-hidden="true" />}
@@ -625,8 +748,8 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
             </ul>
           </details>
 
-          {/* Aggregated CNF list — researcher / policy only */}
-          {userType !== 'individual' && (
+          {/* Researcher audit: raw aggregated list with occasion attribution */}
+          {userType !== 'individual' && !ingredientsEdited && (
             <details className="border rounded-lg">
               <summary className="cursor-pointer px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50">
                 Aggregated daily CNF list ({result.aggregated_daily_ingredients.length} foods)
@@ -636,7 +759,6 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
                   <li key={i.food_id} className="px-3 py-1.5 flex items-center gap-2">
                     <span className="flex-1 truncate flex items-center gap-1.5">
                       <span className="font-medium text-gray-900 truncate">{i.food_description}</span>
-                      {/* WAFCT-EXTEND (2026-05-24): per-row provenance */}
                       <SourceBadge foodId={i.food_id} userType={userType} />
                       <span className="text-gray-500 truncate"> · FoodID {i.food_id} · {i.food_group}</span>
                     </span>

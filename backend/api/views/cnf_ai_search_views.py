@@ -522,18 +522,18 @@ def recall_24h(request):
                 'message': f'Meal at occasion {occ!r}: total_mass_g must be in (0, 5000].',
             }, status=status.HTTP_400_BAD_REQUEST)
         entry_type = str(m.get('entry_type', 'text')).strip().lower()
-        if entry_type not in ('text', 'packaged'):
+        if entry_type not in ('text', 'packaged', 'direct'):
             return Response({
                 'success': False, 'error': 'invalid_request',
-                'message': f'Meal at occasion {occ!r}: entry_type must be "text" or "packaged".',
+                'message': f'Meal at occasion {occ!r}: entry_type must be "text", "packaged", or "direct".',
             }, status=status.HTTP_400_BAD_REQUEST)
         pre_decomposed = None
-        if entry_type == 'packaged':
+        if entry_type in ('packaged', 'direct'):
             pre = m.get('pre_decomposed')
             if not isinstance(pre, dict):
                 return Response({
                     'success': False, 'error': 'invalid_request',
-                    'message': f'Packaged meal at {occ!r} requires pre_decomposed object.',
+                    'message': f'{entry_type.title()} meal at {occ!r} requires pre_decomposed object.',
                 }, status=status.HTTP_400_BAD_REQUEST)
             ings = pre.get('ingredients')
             if not isinstance(ings, list) or not ings:
@@ -562,7 +562,7 @@ def recall_24h(request):
     # Rate limit: 5¢ per text meal (LLM decompose) up to 30¢ cap. Packaged
     # meals arrive pre-decomposed from the scan flow — no per-meal LLM cost.
     text_meal_count = sum(
-        1 for m in cleaned if (m.entry_type or 'text') != 'packaged'
+        1 for m in cleaned if (m.entry_type or 'text') not in ('packaged', 'direct')
     )
     cost = min(
         _COST_RECALL_24H_PER_MEAL_CENTS * text_meal_count,

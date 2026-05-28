@@ -329,9 +329,9 @@ export interface RecallMealInput {
   occasion: RecallOccasion;
   dish_name: string;
   total_mass_g: number;
-  /** Default 'text'. 'packaged' skips LLM dish decompose — uses pre_decomposed. */
-  entry_type?: 'text' | 'packaged';
-  /** Required when entry_type === 'packaged'. From /packaged-food/decompose-ingredients/. */
+  /** Default 'text'. 'packaged' / 'direct' skip LLM dish decompose — use pre_decomposed. */
+  entry_type?: 'text' | 'packaged' | 'direct';
+  /** Required when entry_type is 'packaged' or 'direct'. */
   pre_decomposed?: RecallPackagedPreDecomposed;
 }
 

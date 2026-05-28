@@ -11,7 +11,7 @@
  */
 'use client';
 
-import { Target, FlaskConical, Trash2, Eye, Loader2, Sparkles } from 'lucide-react';
+import { Target, FlaskConical, Trash2, Eye, Loader2, Sparkles, Pencil } from 'lucide-react';
 import type { SavedRecallDay } from '@/lib/recallHistory';
 import { fromRecallAggregated, saveActiveFoodList } from '@/lib/activeFoodList';
 
@@ -20,6 +20,7 @@ interface RecallHistoryCardProps {
   selected: boolean;
   onSelectChange: (selected: boolean) => void;
   onDelete: () => void;
+  onEdit: () => void;
   /** True while this day's pattern is being (re-)classified for the timeline. */
   classifying?: boolean;
 }
@@ -88,7 +89,7 @@ function routeDayTo(
 }
 
 export function RecallHistoryCard({
-  day, selected, onSelectChange, onDelete, classifying,
+  day, selected, onSelectChange, onDelete, onEdit, classifying,
 }: RecallHistoryCardProps): JSX.Element {
   const totalMass = day.aggregated_daily_ingredients
     .reduce((s, i) => s + i.mass_g, 0);
@@ -155,6 +156,14 @@ export function RecallHistoryCard({
       </div>
 
       <div className="flex flex-wrap gap-2 pt-2 border-t text-sm">
+        <button
+          type="button"
+          onClick={onEdit}
+          className="inline-flex items-center gap-1 px-2.5 py-1 bg-white hover:bg-gray-50 text-gray-800 border border-gray-300 rounded-md text-xs font-medium"
+        >
+          <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+          Edit
+        </button>
         <button
           type="button"
           onClick={() => routeDayTo(day, 'dietary_pattern', '/dietary-pattern')}

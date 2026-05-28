@@ -1,48 +1,86 @@
 # Matcher benchmark — flagged-for-review rows
 
-- Benchmark JSON: `matcher_benchmark_e416d7d_20260522T194544Z.json`
-- Git rev: `e416d7d`
-- Sample size: 184; flagged: 76 (41.3%)
+- Benchmark JSON: `matcher_benchmark_6e2a999_20260528T165427Z.json`
+- Git rev: `6e2a999`
+- Sample size: 200; flagged: 77 (38.5%)
 
 Reviewer: for each row below, add `reviewer_verdict: "good" | "stretched" | "fallback"` and `reviewer_notes: "..."` to the per_food row in the JSON.
 
-### food_id=3310 — Peanut flour, defatted, salted
+### food_id=7243 — Refried beans, canned, reduced sodium
 
 - CNF group: `Legumes and Legume Products`
 - Matched: `True`  confidence: 0.60
-- Matched ciqual: `15001`  → "Peanut"
+- Matched ciqual: `20524`  → "Red kidney bean, canned, drained"
 - Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
-- Justification: "Peanut flour defatted salted best matches raw peanut; no exact defatted salted flour in candidates, but same commodity family."
-- Quality checks: group=True  magnitude=False  token=True
-- GW per 100g: matched=0.418  cnf_default=0.054  ratio=7.74x
-
-### food_id=4259 — Dessert, pudding, vanilla, dry mix, regular, unprepared
-
-- CNF group: `Sweets`
-- Matched: `False`  confidence: 0.40
-- Matched ciqual: `31044`  → "Sugar, vanilla flavoured"
-- Matched Agribalyse group: `produits sucrés`
-- Justification: "Vanilla-flavored sugar is closest proxy for dry vanilla pudding mix; others are chocolate or fruit-based sweets, less relevant."
-- Quality checks: group=False  magnitude=False  token=False
-
-### food_id=3077 — Fish, tilefish, raw
-
-- CNF group: `Finfish and Shellfish Products`
-- Matched: `True`  confidence: 0.60
-- Matched ciqual: `26009`  → "Atlantic halibut, raw"
-- Matched Agribalyse group: `viandes, œufs, poissons`
-- Justification: "Atlantic halibut is a large white fish, closest in type and raw state to tilefish among candidates."
+- Justification: "Canned red kidney beans are the closest canned legume match; refried beans are processed but kidney beans best represent canned legume base."
 - Quality checks: group=True  magnitude=True  token=False
-- GW per 100g: matched=0.46900000000000003  cnf_default=1.08  ratio=0.43x
+- GW per 100g: matched=0.145  cnf_default=0.054  ratio=2.69x
 
-### food_id=5290 — Tea, instant, unsweetened, powder, decaffeinated
+### food_id=2637 — Nuts, pistachio nuts, dry roasted, salt added
 
-- CNF group: `Beverages`
+- CNF group: `Nuts and Seeds`
+- Matched: `True`  confidence: 0.85
+- Matched ciqual: `15009`  → "Pistachio nut, grilled, salted"
+- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
+- Justification: "Exact nut type, dry roasted (grilled) and salted matches CNF's dry roasted, salt added pistachios closely."
+- Quality checks: group=True  magnitude=False  token=True
+- GW per 100g: matched=0.722  cnf_default=0.06  ratio=12.03x
+
+### food_id=700733 — Mopane worm, canned
+
+- CNF group: `WAFCT — Meat, poultry and their products`
 - Matched: `False`  confidence: 0.40
-- Matched ciqual: `18072`  → "Decaffeinated instant coffee, without sugar, ready-to-drink"
-- Matched Agribalyse group: `boissons`
-- Justification: "No instant tea LCI; decaf instant coffee closest in processing and form despite different raw material."
+- Matched ciqual: `10014`  → "Mussel, common, raw"
+- Matched Agribalyse group: `viandes, œufs, poissons`
+- Justification: "Mopane worm is an edible insect (animal protein); closest available animal protein is raw mussel, both aquatic protein sources, but different species and processing."
 - Quality checks: group=False  magnitude=False  token=False
+
+### food_id=700922 — Groundnut oil, fortified with vitamin A, 1100–2400 mcg/100g (Benin, Burkina Faso, Côte d’Ivoire, Guinea, Guinea-Bissau, Liberia, Mali, Niger, Senegal, Togo)
+
+- CNF group: `WAFCT — Fats and oils`
+- Matched: `True`  confidence: 0.80
+- Matched ciqual: `17040`  → "Peanut oil"
+- Matched Agribalyse group: `matières grasses`
+- Justification: "Peanut oil matches groundnut oil closely; vitamin A fortification is a minor difference; same commodity and processing type."
+- Quality checks: group=True  magnitude=True  token=False
+
+### food_id=700565 — Cashew apple, fruit, raw
+
+- CNF group: `WAFCT — Fruits and their products`
+- Matched: `False`  confidence: 0.40
+- Matched ciqual: `13620`  → "Apple, var. Golden, pulp and skin, raw"
+- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
+- Justification: "Cashew apple is a fruit; closest available is raw apple variety, though different species and composition."
+- Quality checks: group=False  magnitude=False  token=False
+
+### food_id=6045 — Beef, hip, outside (bottom) round steak, boneless, lean and fat, 0mm (0) trim, raw
+
+- CNF group: `Beef Products`
+- Matched: `True`  confidence: 0.80
+- Matched ciqual: `6206`  → "Beef, rump steak, raw"
+- Matched Agribalyse group: `viandes, œufs, poissons`
+- Justification: "Beef rump steak raw is the closest whole muscle cut to bottom round steak, both are lean beef cuts; minced steak candidates differ in form and fat content."
+- Quality checks: group=True  magnitude=False  token=True
+- GW per 100g: matched=2.8899999999999997  cnf_default=10.0  ratio=0.29x
+
+### food_id=5605 — Yeast extract spread
+
+- CNF group: `Vegetables and Vegetable Products`
+- Matched: `False`  confidence: 0.40
+- Matched ciqual: `16734`  → "Vegetable fat (margarine type), spreadable, 30-40% fat, light, lightly salted"
+- Matched Agribalyse group: `matières grasses`
+- Justification: "Vegetable fat spread is closest proxy for yeast extract spread, both are spreadable vegetable-based products, though composition and processing differ significantly."
+- Quality checks: group=False  magnitude=False  token=False
+
+### food_id=6714 — Egg, chicken, Western omelet, with peppers, onion and ham
+
+- CNF group: `Dairy and Egg Products`
+- Matched: `True`  confidence: 0.65
+- Matched ciqual: `22507`  → "Omelette, with lardoons"
+- Matched Agribalyse group: `viandes, œufs, poissons`
+- Justification: "Omelette with lardoons (bacon) is closest to Western omelet with ham and vegetables; similar protein and fat sources, though peppers and onion differ."
+- Quality checks: group=True  magnitude=True  token=False
+- GW per 100g: matched=0.371  cnf_default=1.0782265372168285  ratio=0.34x
 
 ### food_id=3094 — Crustaceans, crab, alaska king, boiled or steamed
 
@@ -50,249 +88,240 @@ Reviewer: for each row below, add `reviewer_verdict: "good" | "stretched" | "fal
 - Matched: `True`  confidence: 0.80
 - Matched ciqual: `10025`  → "Crab, boiled/cooked in water"
 - Matched Agribalyse group: `viandes, œufs, poissons`
-- Justification: "Same commodity family (crab), similar cooking method (boiled), though not specified as Alaska king crab in Agribalyse."
+- Justification: "Same commodity family (crab), boiled/cooked in water matches processing; Alaska king crab specificity not distinguished but closest match available."
 - Quality checks: group=True  magnitude=False  token=True
 - GW per 100g: matched=3.3  cnf_default=1.08  ratio=3.06x
 
-### food_id=4280 — Dessert, flan, caramel custard, dry mix, prepared with whole milk
-
-- CNF group: `Sweets`
-- Matched: `False`  confidence: 0.40
-- Matched ciqual: `31040`  → "Dulce de leche or confiture de lait"
-- Matched Agribalyse group: `produits sucrés`
-- Justification: "Dulce de leche is a milk-based sweet similar in dairy content and caramel flavor, though processing differs from flan dry mix."
-- Quality checks: group=False  magnitude=False  token=False
-
-### food_id=5644 — Emu, full rump, cooked, broiled
-
-- CNF group: `Poultry Products`
-- Matched: `True`  confidence: 0.60
-- Matched ciqual: `36203`  → "Duck, leg, meat and skin, raw"
-- Matched Agribalyse group: `viandes, œufs, poissons`
-- Justification: "Duck leg meat is closest poultry match to emu rump; both are dark poultry meat, though emu is red meat, no exact broiled cooked match available."
-- Quality checks: group=True  magnitude=True  token=False
-- GW per 100g: matched=0.46799999999999997  cnf_default=1.254  ratio=0.37x
-
-### food_id=4086 — Snacks, beef jerky, chopped and formed
-
-- CNF group: `Snacks`
-- Matched: `False`  confidence: 0.40
-- Matched ciqual: `30300`  → "Dry sausage"
-- Matched Agribalyse group: `viandes, œufs, poissons`
-- Justification: "Dry sausage is the closest processed meat snack, though jerky is dried and formed beef, not sausage; no exact beef jerky match available."
-- Quality checks: group=False  magnitude=False  token=False
-
-### food_id=6081 — Beef, rib, rib roast with bone, lean and fat, 3mm (1/8") trim, cooked, roasted
-
-- CNF group: `Beef Products`
-- Matched: `True`  confidence: 0.80
-- Matched ciqual: `6001`  → "Beef, rib, raw"
-- Matched Agribalyse group: `viandes, œufs, poissons`
-- Justification: "Same beef rib cut, raw form; closest to cooked roasted CNF entry despite raw state difference."
-- Quality checks: group=True  magnitude=False  token=True
-- GW per 100g: matched=2.91  cnf_default=10.0  ratio=0.29x
-
-### food_id=502426 — Cereal, ready-to-eat, Krave, Kellogg's
-
-- CNF group: `Breakfast cereals`
-- Matched: `True`  confidence: 0.80
-- Matched ciqual: `32115`  → "Breakfast cereals, chocolate puffed/popped wheat grain, fortified with vitamins and chemical elements"
-- Matched Agribalyse group: `produits céréaliers`
-- Justification: "Chocolate puffed/popped wheat grain cereal closely matches Krave's chocolate-flavored, puffed cereal profile and processing."
-- Quality checks: group=True  magnitude=True  token=False
-
-### food_id=4286 — Icing (frosting), white, fluffy, dry mix, prepared with water
-
-- CNF group: `Sweets`
-- Matched: `False`  confidence: 0.40
-- Matched ciqual: `31016`  → "Sugar, white"
-- Matched Agribalyse group: `produits sucrés`
-- Justification: "Icing dry mix mainly consists of sugar; closest proxy is white sugar despite missing other ingredients and processing."
-- Quality checks: group=False  magnitude=False  token=False
-
-### food_id=5694 — Deli-meat, Bologna (baloney), reduced fat
-
-- CNF group: `Sausages and Luncheon meats`
-- Matched: `True`  confidence: 0.65
-- Matched ciqual: `30791`  → "Pork and beef mortadella"
-- Matched Agribalyse group: `viandes, œufs, poissons`
-- Justification: "Mortadella is a cooked, emulsified pork and beef sausage similar to bologna; reduced fat variant not specified but closest match in type and processing."
-- Quality checks: group=True  magnitude=True  token=False
-
-### food_id=5546 — Vegetarian meat loaf or patty, meatless
+### food_id=3391 — Chili with beans, canned
 
 - CNF group: `Legumes and Legume Products`
-- Matched: `True`  confidence: 0.80
-- Matched ciqual: `25591`  → "Plant-based patty or steak from lentil, soybean and vegetables"
+- Matched: `True`  confidence: 0.75
+- Matched ciqual: `25111`  → "Chili con carne"
 - Matched Agribalyse group: `entrées et plats composés`
-- Justification: "Closest match: plant-based patty from lentil, soybean, and vegetables aligns well with vegetarian meat loaf, legume-based, minor processing differences."
+- Justification: "Chili con carne is closest canned chili variant; includes beans and similar processing, though meat presence differs from bean-only chili."
 - Quality checks: group=True  magnitude=False  token=True
-- GW per 100g: matched=0.16799999999999998  cnf_default=0.054  ratio=3.11x
+- GW per 100g: matched=1.9600000000000002  cnf_default=0.054  ratio=36.30x
 
-### food_id=3648 — Game meat, whale, raw
+### food_id=701018 — Siikam zéédo (Burkina Faso)*: groundnut sauce with vegetables, fish and fermented African locust beans
 
-- CNF group: `Lamb, Veal and Game`
+- CNF group: `WAFCT — Soups and sauces`
 - Matched: `False`  confidence: 0.40
-- Matched ciqual: `8245`  → "Game pâté"
-- Matched Agribalyse group: `viandes, œufs, poissons`
-- Justification: "Game pâté is the closest available game meat proxy, though processed; no raw whale or similar game meat present in candidates."
+- Matched ciqual: `15002`  → "Peanut, grilled, salted"
+- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
+- Justification: "Peanut is the main ingredient in groundnut sauce; closest match despite missing fish, vegetables, and fermentation."
 - Quality checks: group=False  magnitude=False  token=False
 
-### food_id=502852 — Babyfood, dinner, jarred or frozen, beef with vegetables, all stages
-
-- CNF group: `Babyfoods`
-- Matched: `True`  confidence: 0.80
-- Matched ciqual: `42606`  → "Vegetable dish for baby, w meat/fish and starch, from 18 months"
-- Matched Agribalyse group: `aliments infantiles`
-- Justification: "Matches baby food with meat/fish and starch, closest to beef with vegetables; age range 18 months is a minor difference."
-- Quality checks: group=True  magnitude=True  token=False
-
-### food_id=1711 — Fig, raw
-
-- CNF group: `Fruits and fruit juices`
-- Matched: `True`  confidence: 0.95
-- Matched ciqual: `13012`  → "Fig, raw"
-- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
-- Justification: "Exact match: raw fig in both CNF and Agribalyse, same commodity and form."
-- Quality checks: group=True  magnitude=True  token=False
-- GW per 100g: matched=0.0611  cnf_default=0.08  ratio=0.76x
-
-### food_id=2539 — Nuts, almonds, toasted, unblanched
+### food_id=2623 — Seeds, sunflower seed butter, salt added
 
 - CNF group: `Nuts and Seeds`
-- Matched: `True`  confidence: 0.75
-- Matched ciqual: `15041`  → "Almond, peeled, unpeeled or blanched"
-- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
-- Justification: "Closest match is almond, unpeeled; toasted unblanched almonds differ slightly but same commodity and similar processing."
-- Quality checks: group=True  magnitude=False  token=False
-- GW per 100g: matched=0.263  cnf_default=0.06  ratio=4.38x
-
-### food_id=4142 — Dessert, frozen, pudding pop, vanilla
-
-- CNF group: `Sweets`
 - Matched: `False`  confidence: 0.40
-- Matched ciqual: `31014`  → "Fruit jelly"
-- Matched Agribalyse group: `produits sucrés`
-- Justification: "Closest available proxy is fruit jelly; no exact frozen vanilla pudding pop match in list."
+- Matched ciqual: `15045`  → "Sunflower seed, grilled, salted"
+- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
+- Justification: "Closest match is salted sunflower seeds, but butter form differs; no exact sunflower seed butter available in candidates."
 - Quality checks: group=False  magnitude=False  token=False
 
-### food_id=627 — Chicken, broiler, wing, meat and skin, batter dipped, fried
+### food_id=25 — Cheese, cottage, creamed (4.5% M.F.)
+
+- CNF group: `Dairy and Egg Products`
+- Matched: `True`  confidence: 0.75
+- Matched ciqual: `19649`  → "Fresh cream cheese, plain, creamy, around 8% fat"
+- Matched Agribalyse group: `lait et produits laitiers`
+- Justification: "Closest fat content and fresh cream cheese form; creamed cottage cheese is similar to fresh cream cheese with moderate fat."
+- Quality checks: group=True  magnitude=False  token=True
+- GW per 100g: matched=0.23399999999999999  cnf_default=1.0782265372168285  ratio=0.22x
+
+### food_id=7702 — Salisbury steak with gravy, frozen
+
+- CNF group: `Mixed Dishes`
+- Matched: `True`  confidence: 0.60
+- Matched ciqual: `25009`  → "Shepherd's pie or cottage pie with meat"
+- Matched Agribalyse group: `entrées et plats composés`
+- Justification: "Shepherd's pie with meat is a mixed meat dish with gravy-like sauce, closest to Salisbury steak with gravy among stews and plant-based patties."
+- Quality checks: group=True  magnitude=True  token=False
+
+### food_id=700384 — Pigeon pea, cream, dry, raw
+
+- CNF group: `WAFCT — Legumes and their products`
+- Matched: `True`  confidence: 0.60
+- Matched ciqual: `20516`  → "Chick pea, dried"
+- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
+- Justification: "Pigeon pea is a legume like chickpea; both are dried pulses, making chickpea dried the closest available match despite species difference."
+- Quality checks: group=True  magnitude=True  token=False
+
+### food_id=700772 — Egg, quail, raw
+
+- CNF group: `WAFCT — Eggs and their products`
+- Matched: `True`  confidence: 0.80
+- Matched ciqual: `22000`  → "Egg, raw"
+- Matched Agribalyse group: `viandes, œufs, poissons`
+- Justification: "Raw egg matches raw egg; species differs (chicken vs quail) but same form and minimal processing."
+- Quality checks: group=True  magnitude=True  token=False
+
+### food_id=2201 — Sauerkraut, canned, solids and liquid
+
+- CNF group: `Vegetables and Vegetable Products`
+- Matched: `True`  confidence: 0.80
+- Matched ciqual: `25003`  → "Sauerkraut, with garnish"
+- Matched Agribalyse group: `entrées et plats composés`
+- Justification: "Sauerkraut with garnish closely matches canned sauerkraut; minor difference in garnish presence, same vegetable product and processing."
+- Quality checks: group=False  magnitude=True  token=True
+- GW per 100g: matched=0.22400000000000003  cnf_default=0.1  ratio=2.24x
+
+### food_id=628 — Chicken, broiler, wing, meat and skin, flour coated, fried
 
 - CNF group: `Poultry Products`
 - Matched: `True`  confidence: 0.75
 - Matched ciqual: `36027`  → "Chicken, nugget, breaded croquette"
 - Matched Agribalyse group: `viandes, œufs, poissons`
-- Justification: "Chicken nugget, breaded croquette is closest to batter dipped, fried wings in processing and coating, despite different cut; better match than roasted or raw wings."
+- Justification: "Chicken nugget, breaded croquette closely matches flour coated, fried chicken wing in processing and coating, despite different cut."
 - Quality checks: group=True  magnitude=False  token=True
 - GW per 100g: matched=0.387  cnf_default=1.254  ratio=0.31x
 
-### food_id=5609 — Beans, baked, canned, no salt added
+### food_id=700970 — Anis seed
 
-- CNF group: `Legumes and Legume Products`
-- Matched: `True`  confidence: 0.80
-- Matched ciqual: `20524`  → "Red kidney bean, canned, drained"
-- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
-- Justification: "Red kidney bean canned is the closest canned legume match; similar processing and form, though not explicitly no salt added."
-- Quality checks: group=True  magnitude=True  token=False
-- GW per 100g: matched=0.145  cnf_default=0.054  ratio=2.69x
-
-### food_id=502204 — Yogourt, plain, fresh cheese-type (quark), fat free,  no salt added
-
-- CNF group: `Dairy and Egg Products`
-- Matched: `True`  confidence: 0.80
-- Matched ciqual: `19594`  → "Yogurt, fermented milk or dairy specialty, plain, fat free"
-- Matched Agribalyse group: `lait et produits laitiers`
-- Justification: "Plain, fat free yogurt matches fat free fresh cheese-type quark closely in composition and processing, both are fermented dairy products without added fat or salt."
-- Quality checks: group=True  magnitude=False  token=False
-- GW per 100g: matched=0.189  cnf_default=1.0782265372168285  ratio=0.18x
-
-### food_id=502164 — Yogourt, fruit flavoured, low fat (0.5-1.9% M.F.)
-
-- CNF group: `Dairy and Egg Products`
-- Matched: `True`  confidence: 0.80
-- Matched ciqual: `19559`  → "Yogurt, fermented milk or dairy specialty, flavoured, with sweetener, fat free"
-- Matched Agribalyse group: `lait et produits laitiers`
-- Justification: "Flavoured yogurt with sweetener, fat free closest to low fat fruit flavoured yogurt; minor fat content difference."
-- Quality checks: group=True  magnitude=False  token=True
-- GW per 100g: matched=0.188  cnf_default=1.0782265372168285  ratio=0.17x
-
-### food_id=501810 — Yambean (jimaca), tuber, boiled, drained, with salt
-
-- CNF group: `Vegetables and Vegetable Products`
-- Matched: `True`  confidence: 0.80
-- Matched ciqual: `53503`  → "Yam or Indian potato, peeled, boiled/cooked in water"
-- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
-- Justification: "Yambean is a tuber similar to yam; boiled yam is closest match in processing and form despite botanical differences."
-- Quality checks: group=True  magnitude=True  token=False
-- GW per 100g: matched=0.0806  cnf_default=0.1  ratio=0.81x
-
-### food_id=2221 — Squash, summer, crookneck, frozen, unprepared
-
-- CNF group: `Vegetables and Vegetable Products`
-- Matched: `True`  confidence: 0.85
-- Matched ciqual: `20230`  → "Courgette or zucchini, pulp and peel, frozen, raw"
-- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
-- Justification: "Frozen courgette/zucchini is closest frozen squash type; crookneck is summer squash like zucchini; frozen state matches; minor variety difference."
-- Quality checks: group=True  magnitude=True  token=False
-- GW per 100g: matched=0.0702  cnf_default=0.1  ratio=0.70x
-
-### food_id=6285 — Beef, composite cuts, stewing beef, 0mm (0") trim, raw
-
-- CNF group: `Beef Products`
-- Matched: `True`  confidence: 0.85
-- Matched ciqual: `6231`  → "Beef, stewing meat, raw"
-- Matched Agribalyse group: `viandes, œufs, poissons`
-- Justification: "Beef stewing meat, raw matches composite cuts for stewing; both raw, similar use and cut type, minor differences in trimming likely."
-- Quality checks: group=True  magnitude=False  token=True
-- GW per 100g: matched=2.8899999999999997  cnf_default=10.0  ratio=0.29x
-
-### food_id=2696 — Beef, ground, medium, patty, pan-fried
-
-- CNF group: `Beef Products`
-- Matched: `True`  confidence: 0.75
-- Matched ciqual: `6260`  → "Burger, beef based, 15% fat, raw"
-- Matched Agribalyse group: `viandes, œufs, poissons`
-- Justification: "Beef burger patty, 15% fat, raw is closest to medium fat ground beef patty before pan-frying; cooking method differs but composition matches well."
-- Quality checks: group=True  magnitude=False  token=True
-- GW per 100g: matched=1.75  cnf_default=10.0  ratio=0.17x
-
-### food_id=5647 — Emu, outside drum, raw
-
-- CNF group: `Poultry Products`
-- Matched: `True`  confidence: 0.60
-- Matched ciqual: `36022`  → "Chicken, drumstick, raw"
-- Matched Agribalyse group: `viandes, œufs, poissons`
-- Justification: "Chicken drumstick raw is the closest poultry match to emu outside drum raw; same broad group but different species and likely different environmental impacts."
-- Quality checks: group=True  magnitude=True  token=False
-- GW per 100g: matched=0.5780000000000001  cnf_default=1.254  ratio=0.46x
-
-### food_id=5894 — Fish, pike, northern, native, liver
-
-- CNF group: `Finfish and Shellfish Products`
+- CNF group: `WAFCT — Miscellaneous`
 - Matched: `False`  confidence: 0.40
-- Matched ciqual: `26237`  → "Atlantic herring, lean, raw"
-- Matched Agribalyse group: `viandes, œufs, poissons`
-- Justification: "Both are raw oily fish from northern waters; no exact pike liver match, Atlantic herring is closest proxy in composition and processing."
+- Matched ciqual: `11066`  → "Fennel, seed"
+- Matched Agribalyse group: `aides culinaires et ingrédients divers`
+- Justification: "Fennel seed is the closest spice seed to anise seed in composition and use, though not identical; other candidates are less similar botanically or culinarily."
 - Quality checks: group=False  magnitude=False  token=False
 
-### food_id=502059 — Cereal, ready to eat, Hemp Plus Granola, Nature's Path
+### food_id=700111 — Porridge, soft, from sifted white maize meal fortified with vitamin A (Nigeria)* (without salt)
 
-- CNF group: `Breakfast cereals`
-- Matched: `True`  confidence: 0.60
-- Matched ciqual: `32123`  → "Breakfast cereals, wheat flakes with walnuts, hazelnuts or almonds, fortified with vitamins and chemical elements"
+- CNF group: `WAFCT — Cereals and their products`
+- Matched: `False`  confidence: 0.40
+- Matched ciqual: `32014`  → "Breakfast cereals, corn flakes, plain (not fortified with vitamins and chemical elements)"
 - Matched Agribalyse group: `produits céréaliers`
-- Justification: "Closest match is wheat flakes with nuts, similar granola style; lacks hemp but same breakfast cereal family and nut inclusion."
+- Justification: "Closest match is plain corn flakes; porridge from maize meal differs in processing and form, but both are maize-based breakfast cereals."
+- Quality checks: group=False  magnitude=False  token=False
+
+### food_id=5739 — Dessert, pudding, vanilla, dry mix, instant, prepared with whole milk
+
+- CNF group: `Sweets`
+- Matched: `False`  confidence: 0.40
+- Matched ciqual: `31044`  → "Sugar, vanilla flavoured"
+- Matched Agribalyse group: `produits sucrés`
+- Justification: "Closest match is vanilla-flavored sugar, but no direct pudding dry mix; composition and processing differ significantly."
+- Quality checks: group=False  magnitude=False  token=False
+
+### food_id=5392 — Candied, maraschino cherries, jar, drained
+
+- CNF group: `Sweets`
+- Matched: `True`  confidence: 0.60
+- Matched ciqual: `31038`  → "Jam, cherry"
+- Matched Agribalyse group: `produits sucrés`
+- Justification: "Candied maraschino cherries are preserved fruit like cherry jam, but differ in processing and sugar content; closest available match is cherry jam."
 - Quality checks: group=True  magnitude=True  token=False
 
-### food_id=2561 — Nuts, coconut meat, desiccated, sweetened, flaked, canned
+### food_id=63 — Milk, fluid, partly skimmed, 1% M.F.
+
+- CNF group: `Dairy and Egg Products`
+- Matched: `True`  confidence: 0.85
+- Matched ciqual: `19041`  → "Milk, semi-skimmed, UHT"
+- Matched Agribalyse group: `lait et produits laitiers`
+- Justification: "Semi-skimmed UHT milk closely matches partly skimmed 1% M.F. fluid milk in fat content and processing."
+- Quality checks: group=True  magnitude=False  token=True
+- GW per 100g: matched=0.127  cnf_default=1.0782265372168285  ratio=0.12x
+
+### food_id=6313 — Salad dressing, honey mustard, calorie-reduced
+
+- CNF group: `Fats and Oils`
+- Matched: `False`  confidence: 0.40
+- Matched ciqual: `16654`  → "Vegetable fat (margarine type), 60% fat, unsalted, sunflowerseed"
+- Matched Agribalyse group: `matières grasses`
+- Justification: "Closest match is vegetable fat margarine type; honey mustard dressing is complex, but no direct match exists, so proxy with vegetable fat margarine is used."
+- Quality checks: group=False  magnitude=False  token=False
+
+### food_id=4655 — Fast foods, side dish, hush puppies
+
+- CNF group: `Fast Foods`
+- Matched: `True`  confidence: 0.60
+- Matched ciqual: `25551`  → "Meat, poultry or fish fritters, home-made"
+- Matched Agribalyse group: `entrées et plats composés`
+- Justification: "Meat, poultry or fish fritters are closest in processing and form to hush puppies, both being fried batter-based side dishes with protein content."
+- Quality checks: group=True  magnitude=True  token=False
+
+### food_id=7182 — Alcohol, energy drink (7% alcohol by volume)
+
+- CNF group: `Beverages`
+- Matched: `False`  confidence: 0.40
+- Matched ciqual: `18352`  → "Energy drink, with sugar"
+- Matched Agribalyse group: `boissons`
+- Justification: "Closest match is energy drink with sugar; no exact alcoholic energy drink available, so this is a stretched proxy."
+- Quality checks: group=False  magnitude=False  token=False
+
+### food_id=700923 — Groundnut oil, fortified with vitamin A, 600–1000 mcg/100g (Ghana, Nigeria, Sierra Leone)
+
+- CNF group: `WAFCT — Fats and oils`
+- Matched: `True`  confidence: 0.80
+- Matched ciqual: `17040`  → "Peanut oil"
+- Matched Agribalyse group: `matières grasses`
+- Justification: "Peanut oil matches groundnut oil closely; fortification with vitamin A is a minor difference; same commodity family and oil form."
+- Quality checks: group=True  magnitude=True  token=False
+
+### food_id=1601 — Loquat, raw
+
+- CNF group: `Fruits and fruit juices`
+- Matched: `False`  confidence: 0.40
+- Matched ciqual: `13023`  → "Lychee, pulp, raw"
+- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
+- Justification: "Loquat is a tropical stone fruit; lychee pulp is the closest available tropical fruit pulp, though different species and textures."
+- Quality checks: group=False  magnitude=False  token=False
+
+### food_id=701009 — Katre nagouri vând maasse zéindo (Burkina Faso)*: fresh sicklepod leaf sauce with vegetables, shea butter, groundnut paste and fermented African locust beans
+
+- CNF group: `WAFCT — Soups and sauces`
+- Matched: `False`  confidence: 0.40
+- Matched ciqual: `58103`  → "Okra, cooked, without salt"
+- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
+- Justification: "Okra cooked is a vegetable-based cooked dish, closest proxy for fresh sicklepod leaf sauce with vegetables; other candidates are nuts or meats, less relevant."
+- Quality checks: group=False  magnitude=False  token=False
+
+### food_id=2578 — Nuts, mixed nuts, oil roasted with peanuts
 
 - CNF group: `Nuts and Seeds`
-- Matched: `True`  confidence: 0.60
-- Matched ciqual: `15007`  → "Coconut, kernel, dried"
+- Matched: `True`  confidence: 0.65
+- Matched ciqual: `15002`  → "Peanut, grilled, salted"
 - Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
-- Justification: "Closest match is dried coconut kernel; desiccated sweetened canned coconut is processed but no exact sweetened canned option available."
-- Quality checks: group=True  magnitude=False  token=True
-- GW per 100g: matched=0.242  cnf_default=0.06  ratio=4.03x
+- Justification: "Peanut, grilled, salted matches peanuts in mixed nuts, oil roasted; closest processing and nut type despite missing other nuts and oil roasting."
+- Quality checks: group=True  magnitude=False  token=False
+- GW per 100g: matched=0.418  cnf_default=0.06  ratio=6.97x
+
+### food_id=700763 — Egg, chicken, local breed, raw
+
+- CNF group: `WAFCT — Eggs and their products`
+- Matched: `True`  confidence: 0.95
+- Matched ciqual: `22000`  → "Egg, raw"
+- Matched Agribalyse group: `viandes, œufs, poissons`
+- Justification: "Exact match: raw egg, same state and commodity, despite breed difference; best available Agribalyse entry for chicken egg raw."
+- Quality checks: group=True  magnitude=True  token=False
+
+### food_id=700305 — Bambara groundnut, white, dry, raw
+
+- CNF group: `WAFCT — Legumes and their products`
+- Matched: `True`  confidence: 0.60
+- Matched ciqual: `20501`  → "Haricot bean, dry"
+- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
+- Justification: "Haricot bean dry is a legume similar in use and form to Bambara groundnut, both dry seeds; closest available legume match despite species difference."
+- Quality checks: group=True  magnitude=True  token=False
+
+### food_id=700622 — Groundnut, red, shelled, dried, raw (Benin)
+
+- CNF group: `WAFCT — Nuts, seeds and their products`
+- Matched: `True`  confidence: 0.80
+- Matched ciqual: `15001`  → "Peanut"
+- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
+- Justification: "Raw peanut matches groundnut, red, shelled, dried, raw; same commodity family, no processing differences."
+- Quality checks: group=True  magnitude=True  token=False
+
+### food_id=700787 — Atlantic cod (Northeast Atlantic), fillet, boiled* (as part of a recipe)
+
+- CNF group: `WAFCT — Fish and its products`
+- Matched: `True`  confidence: 0.60
+- Matched ciqual: `26008`  → "Haddock, steamed"
+- Matched Agribalyse group: `viandes, œufs, poissons`
+- Justification: "Haddock steamed is a white Atlantic fish, closer in processing and type to boiled Atlantic cod than other oily or smoked fish."
+- Quality checks: group=True  magnitude=True  token=False
 
 ### food_id=3251 — Beans, baked, canned, with pork and sweet sauce
 
@@ -304,250 +333,355 @@ Reviewer: for each row below, add `reviewer_verdict: "good" | "stretched" | "fal
 - Quality checks: group=True  magnitude=False  token=True
 - GW per 100g: matched=0.213  cnf_default=0.054  ratio=3.94x
 
-### food_id=5515 — Salad dressing, caesar dressing, regular
+### food_id=700402 — Soya bean, Salintuya-1 variety, dry, raw (Ghana), n=1
+
+- CNF group: `WAFCT — Legumes and their products`
+- Matched: `True`  confidence: 0.85
+- Matched ciqual: `20901`  → "Soybean, whole grain"
+- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
+- Justification: "Soybean whole grain matches dry raw soya bean closely; same commodity, minor variety difference, no processing mismatch."
+- Quality checks: group=True  magnitude=True  token=False
+
+### food_id=7045 — Salad dressing, honey mustard, regular
 
 - CNF group: `Fats and Oils`
 - Matched: `False`  confidence: 0.40
-- Matched ciqual: `16614`  → "Vegetable fat (like margarine), 80% fat, salted"
+- Matched ciqual: `16734`  → "Vegetable fat (margarine type), spreadable, 30-40% fat, light, lightly salted"
 - Matched Agribalyse group: `matières grasses`
-- Justification: "Caesar dressing is a complex mix; closest proxy is high-fat vegetable fat, though composition and processing differ significantly."
+- Justification: "No direct match for honey mustard dressing; margarine-type vegetable fat is closest in fat-based processed product category."
 - Quality checks: group=False  magnitude=False  token=False
 
-### food_id=2579 — Nuts, mixed nuts, oil roasted without peanuts
+### food_id=701006 — Groundnut sauce with fish and vegetables (Burkina Faso)*
 
-- CNF group: `Nuts and Seeds`
-- Matched: `False`  confidence: 0.40
-- Matched ciqual: `15004`  → "Hazelnut"
-- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
-- Justification: "Closest single nut match; oil roasted mixed nuts not available, so hazelnut alone is a stretched proxy for nuts group."
-- Quality checks: group=False  magnitude=False  token=False
-
-### food_id=501535 — Grains, teff, cooked
-
-- CNF group: `Cereals, Grains and Pasta`
+- CNF group: `WAFCT — Soups and sauces`
 - Matched: `True`  confidence: 0.60
-- Matched ciqual: `9330`  → "Millet, whole"
-- Matched Agribalyse group: `produits céréaliers`
-- Justification: "Millet, whole, raw is the closest cereal grain to teff; both are small grains, though teff is cooked and not millet, this is the best available proxy."
+- Matched ciqual: `15202`  → "Peanut butter or peanut paste"
+- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
+- Justification: "Peanut butter/paste best matches groundnut sauce base; fish and vegetables not separately modeled, so ingredient-equivalent but not exact."
 - Quality checks: group=True  magnitude=True  token=False
-- GW per 100g: matched=0.0674  cnf_default=0.18  ratio=0.37x
 
-### food_id=502338 — Yogourt, goat, plain
+### food_id=1598 — Loganberry, frozen
 
-- CNF group: `Dairy and Egg Products`
-- Matched: `True`  confidence: 0.95
-- Matched ciqual: `19556`  → "Yogurt, goat's milk, plain, around 5% fat"
-- Matched Agribalyse group: `lait et produits laitiers`
-- Justification: "Exact match: plain goat's milk yogurt with similar fat content, same product type and processing."
+- CNF group: `Fruits and fruit juices`
+- Matched: `True`  confidence: 0.80
+- Matched ciqual: `13136`  → "Raspberry, frozen, raw"
+- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
+- Justification: "Frozen raspberry is the closest in fruit family and frozen state to frozen loganberry, both are aggregate berries with similar processing."
+- Quality checks: group=True  magnitude=True  token=False
+- GW per 100g: matched=0.182  cnf_default=0.08  ratio=2.27x
+
+### food_id=700936 — Soya oil, fortified with vitamin A, 600–1000 mcg/100g (Ghana, Nigeria, Sierra Leone)
+
+- CNF group: `WAFCT — Fats and oils`
+- Matched: `True`  confidence: 0.80
+- Matched ciqual: `17420`  → "Soy oil"
+- Matched Agribalyse group: `matières grasses`
+- Justification: "Soy oil matches the commodity and processing; fortification with vitamin A is a minor difference, typical for edible oils."
+- Quality checks: group=True  magnitude=True  token=False
+
+### food_id=3648 — Game meat, whale, raw
+
+- CNF group: `Lamb, Veal and Game`
+- Matched: `False`  confidence: 0.40
+- Matched ciqual: `8245`  → "Game pâté"
+- Matched Agribalyse group: `viandes, œufs, poissons`
+- Justification: "Game pâté is the closest game meat proxy, though processed; no raw whale or similar game meat available in candidates."
+- Quality checks: group=False  magnitude=False  token=False
+
+### food_id=1671 — Prune, dehydrated (low moisture), cooked
+
+- CNF group: `Fruits and fruit juices`
+- Matched: `True`  confidence: 0.80
+- Matched ciqual: `13042`  → "Prune"
+- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
+- Justification: "Prune dried matches prune dehydrated; minor difference is 'cooked' state not specified in Agribalyse."
 - Quality checks: group=True  magnitude=False  token=True
-- GW per 100g: matched=0.20400000000000001  cnf_default=1.0782265372168285  ratio=0.19x
+- GW per 100g: matched=0.311  cnf_default=0.08  ratio=3.89x
 
-### food_id=5544 — Meatless, sandwich spread
+### food_id=2221 — Squash, summer, crookneck, frozen, unprepared
+
+- CNF group: `Vegetables and Vegetable Products`
+- Matched: `True`  confidence: 0.80
+- Matched ciqual: `20230`  → "Courgette or zucchini, pulp and peel, frozen, raw"
+- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
+- Justification: "Frozen courgette/zucchini pulp and peel raw closely matches frozen crookneck summer squash unprepared in form and processing."
+- Quality checks: group=True  magnitude=True  token=False
+- GW per 100g: matched=0.0702  cnf_default=0.1  ratio=0.70x
+
+### food_id=700015 — Fonio, black, whole grains, boiled* (without salt), drained
+
+- CNF group: `WAFCT — Cereals and their products`
+- Matched: `True`  confidence: 0.65
+- Matched ciqual: `9691`  → "Wheat bulgur, cooked, unsalted"
+- Matched Agribalyse group: `produits céréaliers`
+- Justification: "Wheat bulgur, cooked, unsalted is a cooked cereal grain similar to boiled fonio; both are whole grains, though different species."
+- Quality checks: group=True  magnitude=True  token=False
+
+### food_id=3328 — Soy protein isolate (prepared with sodium)
 
 - CNF group: `Legumes and Legume Products`
-- Matched: `True`  confidence: 0.65
-- Matched ciqual: `1027`  → "Plant-based spread-cheese type, with soybean, prepacked"
-- Matched Agribalyse group: `lait et produits laitiers`
-- Justification: "Closest match is plant-based spread with soybean, similar legume base and spread form, though not exactly sandwich spread."
-- Quality checks: group=False  magnitude=False  token=True
-- GW per 100g: matched=0.187  cnf_default=0.054  ratio=3.46x
+- Matched: `True`  confidence: 0.75
+- Matched ciqual: `20591`  → "Soy protein, textured, dehydrated, from soy flour"
+- Matched Agribalyse group: `viandes, œufs, poissons`
+- Justification: "Soy protein isolate closest to textured soy protein from soy flour; both are concentrated soy protein products, though isolate is purer and prepared with sodium."
+- Quality checks: group=False  magnitude=True  token=True
+- GW per 100g: matched=0.131  cnf_default=0.054  ratio=2.43x
 
-### food_id=4758 — Beef, hip, rump roast, lean and fat, 3mm (1/8") trim, broiled
+### food_id=700934 — Soya oil, unfortified
+
+- CNF group: `WAFCT — Fats and oils`
+- Matched: `True`  confidence: 0.85
+- Matched ciqual: `17420`  → "Soy oil"
+- Matched Agribalyse group: `matières grasses`
+- Justification: "Soy oil matches soya oil unfortified closely; both are oils from soybeans with minimal processing differences."
+- Quality checks: group=True  magnitude=True  token=False
+
+### food_id=6022 — Beef, flank, flank steak, boneless, lean, raw
 
 - CNF group: `Beef Products`
-- Matched: `True`  confidence: 0.75
-- Matched ciqual: `6206`  → "Beef, rump steak, raw"
+- Matched: `True`  confidence: 0.85
+- Matched ciqual: `6212`  → "Beef, flank steak, raw"
 - Matched Agribalyse group: `viandes, œufs, poissons`
-- Justification: "Beef rump steak raw is closest cut to rump roast; both are whole muscle beef, though raw vs broiled and steak vs roast differ slightly."
+- Justification: "Exact cut (flank steak), raw, matches CNF entry closely; minor differences possible in fat content or trimming."
 - Quality checks: group=True  magnitude=False  token=True
 - GW per 100g: matched=2.8899999999999997  cnf_default=10.0  ratio=0.29x
 
-### food_id=502262 — Chickpeas (garbanzo beans, bengal gram), canned, drained, rinsed
+### food_id=4252 — Dessert, pudding, tapioca, dry mix, prepared with whole milk
 
-- CNF group: `Legumes and Legume Products`
-- Matched: `True`  confidence: 0.95
-- Matched ciqual: `20532`  → "Chick pea, canned, drained"
+- CNF group: `Sweets`
+- Matched: `False`  confidence: 0.40
+- Matched ciqual: `31040`  → "Dulce de leche or confiture de lait"
+- Matched Agribalyse group: `produits sucrés`
+- Justification: "Dulce de leche is a dairy-based sweet spread, closer to pudding than chocolate bars; tapioca pudding mix with milk is a dairy dessert, but no exact match exists."
+- Quality checks: group=False  magnitude=False  token=False
+
+### food_id=700435 — Cassava, leaves, fresh, boiled* (without salt), drained
+
+- CNF group: `WAFCT — Vegetables and their products`
+- Matched: `False`  confidence: 0.40
+- Matched ciqual: `54034`  → "Cassava or manioc, roots, cooked"
 - Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
-- Justification: "Exact match: chickpeas, canned, drained, same processing and form as CNF entry."
-- Quality checks: group=True  magnitude=False  token=False
-- GW per 100g: matched=0.22000000000000003  cnf_default=0.054  ratio=4.07x
+- Justification: "Closest match is cassava root, but leaves differ significantly in composition and processing; no exact leaf match available."
+- Quality checks: group=False  magnitude=False  token=False
 
-### food_id=4588 — Fast foods, mexican, burrito with beans and cheese
+### food_id=700019 — Fonio, decorticated grains (bran removed), washed (mid wet), raw
 
-- CNF group: `Fast Foods`
-- Matched: `True`  confidence: 0.80
-- Matched ciqual: `25459`  → "Burritos"
-- Matched Agribalyse group: `entrées et plats composés`
-- Justification: "Exact match on burrito; minor differences possible in bean and cheese types or preparation, but same commodity family and form."
+- CNF group: `WAFCT — Cereals and their products`
+- Matched: `True`  confidence: 0.60
+- Matched ciqual: `9330`  → "Millet, whole"
+- Matched Agribalyse group: `produits céréaliers`
+- Justification: "Fonio is a cereal grain similar to millet; closest available whole grain cereal match in Agribalyse."
 - Quality checks: group=True  magnitude=True  token=False
 
-### food_id=4467 — Grains, hominy, canned, yellow
-
-- CNF group: `Cereals, Grains and Pasta`
-- Matched: `True`  confidence: 0.75
-- Matched ciqual: `20066`  → "Sweet corn, canned, drained"
-- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
-- Justification: "Canned sweet corn closely matches canned hominy in processing and form, both are canned maize products, though hominy is nixtamalized, a minor difference."
-- Quality checks: group=False  magnitude=True  token=False
-- GW per 100g: matched=0.13899999999999998  cnf_default=0.18  ratio=0.77x
-
-### food_id=4058 — Pie, pumpkin, commercial
+### food_id=3862 — Cracker, matzo, plain
 
 - CNF group: `Baked Products`
-- Matched: `False`  confidence: 0.40
-- Matched ciqual: `20043`  → "Pumpkin, canned, drained"
-- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
-- Justification: "Closest match is canned pumpkin, reflecting cooked and processed form in pie; raw pumpkin less representative of commercial pie ingredients."
-- Quality checks: group=False  magnitude=False  token=False
-
-### food_id=2519 — Seeds, safflower seed meal, partially defatted
-
-- CNF group: `Nuts and Seeds`
 - Matched: `True`  confidence: 0.60
-- Matched ciqual: `15011`  → "Sunflower seed"
-- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
-- Justification: "Sunflower seed is the closest seed meal proxy; safflower seed meal unavailable, similar oilseed family but different species and partial defatting not matched."
-- Quality checks: group=True  magnitude=False  token=True
-- GW per 100g: matched=0.29100000000000004  cnf_default=0.06  ratio=4.85x
-
-### food_id=1577 — Groundcherry, raw
-
-- CNF group: `Fruits and fruit juices`
-- Matched: `False`  confidence: 0.40
-- Matched ciqual: `13008`  → "Cherry, pitted, raw"
-- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
-- Justification: "Groundcherry is a small fruit like cherry; closest available raw fruit match despite botanical differences."
-- Quality checks: group=False  magnitude=False  token=False
-
-### food_id=3790 — Cake, white, regular, dry mix, unprepared
-
-- CNF group: `Baked Products`
-- Matched: `False`  confidence: 0.40
-- Matched ciqual: `23032`  → "Brownie (chocolate cake)"
+- Matched ciqual: `38402`  → "Salty snacks, crackers, plain"
 - Matched Agribalyse group: `produits céréaliers`
-- Justification: "Closest cake-type match; no dry mix option available; brownie is a processed cake product, though different from dry mix unprepared cake."
-- Quality checks: group=False  magnitude=False  token=False
+- Justification: "Plain salty crackers are closest to plain matzo crackers in processing and composition, though matzo is unleavened and simpler."
+- Quality checks: group=True  magnitude=True  token=False
 
-### food_id=2577 — Nuts, mixed nuts, dry roasted with peanuts
+### food_id=6678 — Snacks, Sunchips, Harvest Cheddar flavour
 
-- CNF group: `Nuts and Seeds`
-- Matched: `True`  confidence: 0.75
-- Matched ciqual: `15002`  → "Peanut, grilled, salted"
-- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
-- Justification: "Peanut, grilled, salted closely matches dry roasted peanuts; mixed nuts not available, so single nut with similar processing chosen."
-- Quality checks: group=True  magnitude=False  token=False
-- GW per 100g: matched=0.418  cnf_default=0.06  ratio=6.97x
+- CNF group: `Snacks`
+- Matched: `True`  confidence: 0.60
+- Matched ciqual: `38105`  → "Corn chips or tortilla chips"
+- Matched Agribalyse group: `produits céréaliers`
+- Justification: "Corn chips closest to Sunchips (corn-based, flavored snacks), though exact flavor and processing differ."
+- Quality checks: group=True  magnitude=True  token=False
 
-### food_id=2201 — Sauerkraut, canned, solids and liquid
-
-- CNF group: `Vegetables and Vegetable Products`
-- Matched: `True`  confidence: 0.80
-- Matched ciqual: `25003`  → "Sauerkraut, with garnish"
-- Matched Agribalyse group: `entrées et plats composés`
-- Justification: "Sauerkraut with garnish closely matches canned sauerkraut; minor difference in garnish presence, same vegetable and processing."
-- Quality checks: group=False  magnitude=True  token=True
-- GW per 100g: matched=0.22400000000000003  cnf_default=0.1  ratio=2.24x
-
-### food_id=4291 — Dessert, frozen, ice pop
+### food_id=5859 — Dessert, frozen, ice cream, chocolate, low fat
 
 - CNF group: `Sweets`
 - Matched: `False`  confidence: 0.20
-- Matched ciqual: `31059`  → "Hard candy and lollipop"
+- Matched ciqual: `31012`  → "Chocolate confectionery or bar, with dairy filling"
 - Matched Agribalyse group: `produits sucrés`
-- Justification: "No ice pop or frozen dessert candidate; hard candy is a poor proxy within sweets category."
+- Justification: "No ice cream or frozen dessert candidate; closest is chocolate confectionery with dairy, but form and processing differ significantly."
 - Quality checks: group=False  magnitude=False  token=False
 
-### food_id=1003 — Gravy, chicken, canned
+### food_id=3364 — Peanuts, Valencia, oil-roasted
 
-- CNF group: `Soups, Sauces and Gravies`
-- Matched: `False`  confidence: 0.40
-- Matched ciqual: `25174`  → "Chicken with curry and coconut milk sauce"
-- Matched Agribalyse group: `entrées et plats composés`
-- Justification: "Closest match is chicken with sauce, but curry and coconut milk differ from plain chicken gravy; canned form not specified."
-- Quality checks: group=False  magnitude=False  token=False
-
-### food_id=2022 — Beet greens, boiled, drained
-
-- CNF group: `Vegetables and Vegetable Products`
-- Matched: `False`  confidence: 0.40
-- Matched ciqual: `20003`  → "Beetroot, cooked"
+- CNF group: `Legumes and Legume Products`
+- Matched: `True`  confidence: 0.60
+- Matched ciqual: `15037`  → "Peanut, grilled"
 - Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
-- Justification: "Closest in commodity (beet family) and cooked state, but matches beetroot not beet greens; no exact beet greens entry available."
+- Justification: "Peanut, grilled is closest to oil-roasted peanuts; both involve dry heat and nuts, though roasting method differs (oil vs dry). Valencia variety not specified."
+- Quality checks: group=True  magnitude=False  token=False
+- GW per 100g: matched=0.418  cnf_default=0.054  ratio=7.74x
+
+### food_id=700343 — Cowpea, white, soaked, boiled in different water* (without salt), with cooking liquid
+
+- CNF group: `WAFCT — Legumes and their products`
+- Matched: `True`  confidence: 0.65
+- Matched ciqual: `20502`  → "Haricot bean, cooked"
+- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
+- Justification: "Haricot bean cooked is a legume similar to cowpea; closest in processing and food group despite species difference."
+- Quality checks: group=True  magnitude=True  token=False
+
+### food_id=700499 — Pumpkin, leaves, dried
+
+- CNF group: `WAFCT — Vegetables and their products`
+- Matched: `False`  confidence: 0.40
+- Matched ciqual: `20128`  → "Pumpkin (cucurbita moschata), pulp, raw"
+- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
+- Justification: "Closest match is raw pumpkin pulp; no dried leaves available, so this is a stretched proxy within the same plant species."
 - Quality checks: group=False  magnitude=False  token=False
+
+### food_id=2581 — Nuts, simulated product, wheat-based, unflavoured, with salt
+
+- CNF group: `Nuts and Seeds`
+- Matched: `True`  confidence: 0.60
+- Matched ciqual: `15018`  → "Mix of salted grains/nuts and raisins"
+- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
+- Justification: "Closest match with salted grains/nuts mix; includes salt and nuts, though with raisins, approximating wheat-based salted nut product."
+- Quality checks: group=True  magnitude=False  token=True
+- GW per 100g: matched=0.262  cnf_default=0.06  ratio=4.37x
+
+### food_id=6708 — Cretons
+
+- CNF group: `Sausages and Luncheon meats`
+- Matched: `True`  confidence: 0.60
+- Matched ciqual: `8214`  → "Breton pâté"
+- Matched Agribalyse group: `viandes, œufs, poissons`
+- Justification: "Breton pâté is a processed meat product similar to Cretons, both being pork-based spreads or sausages, though regional recipes differ."
+- Quality checks: group=True  magnitude=True  token=False
 
 ### food_id=3627 — Veal, pancreas, raw
 
 - CNF group: `Lamb, Veal and Game`
 - Matched: `False`  confidence: 0.40
-- Matched ciqual: `6583`  → "Veal, knuckle or shank, raw"
+- Matched ciqual: `40408`  → "Kidney, veal, sautéed/pan-fried"
 - Matched Agribalyse group: `viandes, œufs, poissons`
-- Justification: "Closest veal raw cut available; pancreas is organ meat, but no organ-specific raw pancreas entry exists."
+- Justification: "Closest organ meat match (kidney) though pancreas is not listed; same raw state and veal category, but different organ type."
 - Quality checks: group=False  magnitude=False  token=False
 
-### food_id=172 — Spices, bay leaf
+### food_id=700963 — Sap, palm, fresh (0.3% v/v alcohol)
 
-- CNF group: `Spices and Herbs`
+- CNF group: `WAFCT — Beverages`
+- Matched: `False`  confidence: 0.40
+- Matched ciqual: `5005`  → "Shandy, prepacked (<1° alcohol)"
+- Matched Agribalyse group: `boissons`
+- Justification: "Sap, palm, fresh is a low-alcohol beverage; shandy (<1° alcohol) is the closest beverage proxy despite different base ingredients."
+- Quality checks: group=False  magnitude=False  token=False
+
+### food_id=4419 — Grains, cornstarch
+
+- CNF group: `Cereals, Grains and Pasta`
 - Matched: `True`  confidence: 0.95
-- Matched ciqual: `11053`  → "Bay, leaves"
+- Matched ciqual: `9510`  → "Maize/corn starch"
+- Matched Agribalyse group: `produits céréaliers`
+- Justification: "Exact match: maize/corn starch corresponds directly to cornstarch in CNF, same commodity and processing."
+- Quality checks: group=True  magnitude=True  token=False
+- GW per 100g: matched=0.155  cnf_default=0.18  ratio=0.86x
+
+### food_id=700969 — Allspice, ground
+
+- CNF group: `WAFCT — Miscellaneous`
+- Matched: `False`  confidence: 0.40
+- Matched ciqual: `11056`  → "Mix of 4 spices"
 - Matched Agribalyse group: `aides culinaires et ingrédients divers`
-- Justification: "Exact match for bay leaf, same spice, form, and commodity; highest similarity and perfect alignment with CNF entry."
+- Justification: "No exact allspice match; mix of 4 spices is closest proxy for ground spice blend."
+- Quality checks: group=False  magnitude=False  token=False
+
+### food_id=2341 — Pickles, cucumber, sour, low sodium
+
+- CNF group: `Vegetables and Vegetable Products`
+- Matched: `False`  confidence: 0.40
+- Matched ciqual: `20210`  → "Cucumber, pulp, raw"
+- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
+- Justification: "Closest match is raw cucumber pulp; pickling and sour, low sodium processing not represented, but same vegetable base."
+- Quality checks: group=False  magnitude=False  token=False
+
+### food_id=700263 — Yam, tuber, pale, raw
+
+- CNF group: `WAFCT — Starchy roots, tubers and their products`
+- Matched: `True`  confidence: 0.80
+- Matched ciqual: `53502`  → "Yam or Indian potato, peeled, raw"
+- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
+- Justification: "Yam, peeled, raw matches pale yam tuber raw closely; same commodity family, minor peeling difference."
 - Quality checks: group=True  magnitude=True  token=False
 
-### food_id=3269 — Beans, pinto, raw
+### food_id=700383 — Pigeon pea, brown, soaked, boiled in different water* (without salt), with cooking liquid
+
+- CNF group: `WAFCT — Legumes and their products`
+- Matched: `True`  confidence: 0.75
+- Matched ciqual: `20506`  → "Split pea, cooked"
+- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
+- Justification: "Split pea cooked is the closest legume match to pigeon pea, similar processing (soaked, boiled), though different species; reasonable proxy for LCA purposes."
+- Quality checks: group=True  magnitude=True  token=False
+
+### food_id=552 — Shortening, household, unspecified vegetable oil
+
+- CNF group: `Fats and Oils`
+- Matched: `True`  confidence: 0.60
+- Matched ciqual: `16128`  → "Frying oil"
+- Matched Agribalyse group: `matières grasses`
+- Justification: "Frying oil is closest to household shortening from vegetable oil, both used as cooking fats though exact fat content and form may differ."
+- Quality checks: group=True  magnitude=True  token=False
+
+### food_id=700394 — Porridge of cowpeas, yam and potash (Burkina Faso)*
+
+- CNF group: `WAFCT — Legumes and their products`
+- Matched: `False`  confidence: 0.40
+- Matched ciqual: `53503`  → "Yam or Indian potato, peeled, boiled/cooked in water"
+- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
+- Justification: "Closest match is cooked yam, but lacks cowpeas and potash; partial proxy for porridge base ingredient only."
+- Quality checks: group=False  magnitude=False  token=False
+
+### food_id=701015 — Maân mâass zéindo (Burkina Faso)*: fresh okra sauce with fish, vegetables, red palm oil and fermented African locust beans
+
+- CNF group: `WAFCT — Soups and sauces`
+- Matched: `False`  confidence: 0.40
+- Matched ciqual: `58103`  → "Okra, cooked, without salt"
+- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
+- Justification: "Okra cooked is the main vegetable in the sauce; fish, palm oil, and locust beans missing, but no closer composite match available."
+- Quality checks: group=False  magnitude=False  token=False
+
+### food_id=7507 — Babyfood, dinner, jarred or frozen, chicken with vegetables, all stages
+
+- CNF group: `Babyfoods`
+- Matched: `True`  confidence: 0.80
+- Matched ciqual: `42606`  → "Vegetable dish for baby, w meat/fish and starch, from 18 months"
+- Matched Agribalyse group: `aliments infantiles`
+- Justification: "Matches baby food with meat/fish and starch, closest to chicken with vegetables; age range difference minor, suitable proxy for composition and processing."
+- Quality checks: group=True  magnitude=True  token=False
+
+### food_id=3312 — Peas, pigeon (red gram), mature seeds, dry
 
 - CNF group: `Legumes and Legume Products`
 - Matched: `True`  confidence: 0.75
-- Matched ciqual: `20126`  → "Lima bean, raw"
+- Matched ciqual: `20516`  → "Chick pea, dried"
 - Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
-- Justification: "Lima bean is a close legume family member, raw form matches; pinto bean not listed, so best proxy within raw legumes."
+- Justification: "Chick pea dried is the closest legume seed to pigeon pea; both are mature dry pulses with similar use, though different species."
 - Quality checks: group=True  magnitude=True  token=False
-- GW per 100g: matched=0.0817  cnf_default=0.054  ratio=1.51x
+- GW per 100g: matched=0.08990000000000001  cnf_default=0.054  ratio=1.66x
 
-### food_id=1847 — Pork, lungs, braised
+### food_id=700291 — Bambara groundnut, dry, raw
 
-- CNF group: `Pork Products`
-- Matched: `False`  confidence: 0.40
-- Matched ciqual: `40004`  → "Brain, pork, braised"
-- Matched Agribalyse group: `viandes, œufs, poissons`
-- Justification: "Both are pork offal, braised; lungs and brain differ but no closer braised pork offal match available."
-- Quality checks: group=False  magnitude=False  token=False
-
-### food_id=5139 — Cereal, ready to eat, Selects, Cranberry Almond Crunch, Post
-
-- CNF group: `Breakfast cereals`
-- Matched: `True`  confidence: 0.75
-- Matched ciqual: `32123`  → "Breakfast cereals, wheat flakes with walnuts, hazelnuts or almonds, fortified with vitamins and chemical elements"
-- Matched Agribalyse group: `produits céréaliers`
-- Justification: "Closest match: breakfast cereal with nuts, similar to cranberry almond crunch; minor differences in fruit type and fortification."
-- Quality checks: group=True  magnitude=True  token=False
-
-### food_id=2552 — Nuts, Chinese chestnuts, roasted
-
-- CNF group: `Nuts and Seeds`
+- CNF group: `WAFCT — Legumes and their products`
 - Matched: `True`  confidence: 0.60
-- Matched ciqual: `15024`  → "Chestnut, raw"
+- Matched ciqual: `20518`  → "Broad bean, dried"
 - Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
-- Justification: "Closest match is raw chestnut; roasting differs but same commodity, making it a reasonable proxy for LCA purposes."
-- Quality checks: group=True  magnitude=False  token=False
-- GW per 100g: matched=0.194  cnf_default=0.06  ratio=3.23x
-
-### food_id=6212 — Pork, cured, ham, shank, bone-in, separable lean and fat, heated, roasted
-
-- CNF group: `Pork Products`
-- Matched: `True`  confidence: 0.75
-- Matched ciqual: `28913`  → "Cooked ham, choice, rind less and fatless"
-- Matched Agribalyse group: `viandes, œufs, poissons`
-- Justification: "Cooked ham, choice, rind less and fatless is closest to cured, roasted ham shank; minor differences in rind and fat presence."
+- Justification: "Bambara groundnut is a legume similar to broad beans; both are dry, raw legumes though different species, making broad bean the closest available match."
 - Quality checks: group=True  magnitude=True  token=False
-- GW per 100g: matched=0.765  cnf_default=1.52  ratio=0.50x
 
-### food_id=544 — Shortening, industrial, for baking (cake), soybean
+### food_id=700765 — Egg, chicken, raw
 
-- CNF group: `Fats and Oils`
-- Matched: `True`  confidence: 0.80
-- Matched ciqual: `17420`  → "Soy oil"
-- Matched Agribalyse group: `matières grasses`
-- Justification: "Soy oil is the closest match to industrial soybean shortening, sharing the same commodity family despite differences in processing and form."
+- CNF group: `WAFCT — Eggs and their products`
+- Matched: `True`  confidence: 0.95
+- Matched ciqual: `22000`  → "Egg, raw"
+- Matched Agribalyse group: `viandes, œufs, poissons`
+- Justification: "Exact match: raw chicken egg, same state and commodity, near-identical for LCA purposes."
+- Quality checks: group=True  magnitude=True  token=False
+
+### food_id=7278 — Chinese dish, lo mein, vegetable, without meat, restaurant prepared
+
+- CNF group: `Mixed Dishes`
+- Matched: `True`  confidence: 0.60
+- Matched ciqual: `20273`  → "Vegetables pan-fried or stir-fried, Asian-style, frozen, raw"
+- Matched Agribalyse group: `entrées et plats composés`
+- Justification: "Vegetables pan-fried or stir-fried, Asian-style matches vegetable lo mein's main cooking method and ingredients closely."
 - Quality checks: group=True  magnitude=True  token=False
 
 ### food_id=3203 — Fish, sardine, Atlantic, canned in oil, drained solids with bone
@@ -556,173 +690,34 @@ Reviewer: for each row below, add `reviewer_verdict: "good" | "stretched" | "fal
 - Matched: `True`  confidence: 0.80
 - Matched ciqual: `26034`  → "European pilchard or sardine, in oil, canned, drained (packaging fixed)"
 - Matched Agribalyse group: `viandes, œufs, poissons`
-- Justification: "Same species (European pilchard), canned in oil, drained; closest to Atlantic sardine canned in oil with bone, minor difference in fish origin and bone presence."
+- Justification: "Same species and canned in oil, drained; slight uncertainty on oil type and presence of bones versus fillets."
 - Quality checks: group=True  magnitude=False  token=True
 - GW per 100g: matched=0.268  cnf_default=1.08  ratio=0.25x
 
-### food_id=502439 — Nuts, walnuts, glazed
+### food_id=700024 — Fonio, white, whole grains, boiled* (without salt), drained
 
-- CNF group: `Nuts and Seeds`
+- CNF group: `WAFCT — Cereals and their products`
 - Matched: `True`  confidence: 0.80
-- Matched ciqual: `15005`  → "Walnut, dried, husked"
-- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
-- Justification: "Walnut, dried, husked is the closest match to glazed walnuts, same nut type with minor processing differences."
-- Quality checks: group=True  magnitude=False  token=False
-- GW per 100g: matched=0.41100000000000003  cnf_default=0.06  ratio=6.85x
-
-### food_id=2636 — Nuts, pecans, oil roasted, salted
-
-- CNF group: `Nuts and Seeds`
-- Matched: `True`  confidence: 0.80
-- Matched ciqual: `15046`  → "Pecan nut, salted"
-- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
-- Justification: "Same nut (pecan), salted; oil roasted not specified but closest match in processing and form."
-- Quality checks: group=True  magnitude=False  token=False
-- GW per 100g: matched=0.366  cnf_default=0.06  ratio=6.10x
-
-### food_id=501754 — Salad dressing, mayonnaise, imitation, soybean
-
-- CNF group: `Fats and Oils`
-- Matched: `True`  confidence: 0.60
-- Matched ciqual: `17420`  → "Soy oil"
-- Matched Agribalyse group: `matières grasses`
-- Justification: "Soy oil is the closest single ingredient proxy for imitation soybean mayonnaise fat content and source."
+- Matched ciqual: `9331`  → "Millet, cooked, unsalted"
+- Matched Agribalyse group: `produits céréaliers`
+- Justification: "Millet, cooked, unsalted is the closest cereal grain match to boiled fonio, sharing similar processing and whole grain form."
 - Quality checks: group=True  magnitude=True  token=False
 
-### food_id=502287 — Corn dog, wiener/sausage with cornflour coating, frozen, prepared
-
-- CNF group: `Mixed Dishes`
-- Matched: `True`  confidence: 0.60
-- Matched ciqual: `25403`  → "Hot-dog"
-- Matched Agribalyse group: `entrées et plats composés`
-- Justification: "Hot-dog is the closest match to corn dog with sausage and coating, though lacks cornflour batter and frozen prepared state."
-- Quality checks: group=True  magnitude=True  token=False
-
-### food_id=5453 — Dessert, frozen, ice cream, vanilla, fat free
+### food_id=4273 — Dessert, rennin, chocolate, dry mix, unprepared
 
 - CNF group: `Sweets`
-- Matched: `False`  confidence: 0.20
-- Matched ciqual: `31044`  → "Sugar, vanilla flavoured"
-- Matched Agribalyse group: `produits sucrés`
-- Justification: "No exact ice cream or frozen dessert match; sugar vanilla flavor closest but lacks dairy and frozen fat-free characteristics."
-- Quality checks: group=False  magnitude=False  token=False
-
-### food_id=3233 — Fish, goldeye, raw
-
-- CNF group: `Finfish and Shellfish Products`
-- Matched: `True`  confidence: 0.60
-- Matched ciqual: `26210`  → "Golden redfish, raw"
-- Matched Agribalyse group: `viandes, œufs, poissons`
-- Justification: "Golden redfish is the closest species match to goldeye; both are raw finfish, though not identical species."
-- Quality checks: group=True  magnitude=True  token=False
-- GW per 100g: matched=1.2  cnf_default=1.08  ratio=1.11x
-
-### food_id=1267 — Cereal, ready to eat, Special K, Kellogg's
-
-- CNF group: `Breakfast cereals`
-- Matched: `True`  confidence: 0.80
-- Matched ciqual: `32121`  → "Breakfast cereals, corn flakes, sugar iced, fortified with vitamins and chemical elements"
-- Matched Agribalyse group: `produits céréaliers`
-- Justification: "Closest match is corn flakes, sugar iced, fortified, similar processing and fortification as Special K, a fortified wheat-based cereal with sugar coating."
-- Quality checks: group=True  magnitude=True  token=False
-
-### food_id=501992 — Meatballs, sweet and sour
-
-- CNF group: `Mixed Dishes`
-- Matched: `True`  confidence: 0.60
-- Matched ciqual: `25211`  → "Meat balls, beef, with tomato sauce"
-- Matched Agribalyse group: `entrées et plats composés`
-- Justification: "Meat balls with tomato sauce is the closest match to sweet and sour meatballs, sharing main ingredient and form despite different sauce."
-- Quality checks: group=True  magnitude=True  token=False
-
-### food_id=4126 — Snacks, rice cakes, brown rice, sesame seed
-
-- CNF group: `Snacks`
 - Matched: `False`  confidence: 0.40
-- Matched ciqual: `38402`  → "Salty snacks, crackers, plain"
-- Matched Agribalyse group: `produits céréaliers`
-- Justification: "Closest match is plain salty crackers, a processed snack like rice cakes; no exact rice cake or sesame seed snack available."
+- Matched ciqual: `31085`  → "Dark chocolate bar, more than 40% cocoa, for cooking"
+- Matched Agribalyse group: `produits sucrés`
+- Justification: "Closest match is dark chocolate for cooking, but dessert rennin chocolate dry mix differs in form and preparation."
 - Quality checks: group=False  magnitude=False  token=False
 
-### food_id=501509 — Seasoning mix, taco, dry mix
+### food_id=6312 — Seasoning mix, taco, dry mix
 
 - CNF group: `Spices and Herbs`
 - Matched: `True`  confidence: 0.60
 - Matched ciqual: `11056`  → "Mix of 4 spices"
 - Matched Agribalyse group: `aides culinaires et ingrédients divers`
-- Justification: "Mix of 4 spices best matches dry taco seasoning mix as a spice blend; others are sauces or single spices, less appropriate."
-- Quality checks: group=True  magnitude=True  token=False
-
-### food_id=4400 — Candied foods, ginger root, crystallized
-
-- CNF group: `Sweets`
-- Matched: `False`  confidence: 0.40
-- Matched ciqual: `31003`  → "Candies, all types"
-- Matched Agribalyse group: `produits sucrés`
-- Justification: "Closest generic candy category; no specific crystallized ginger entry; composition and processing differ but usable as proxy for candied sweets."
-- Quality checks: group=False  magnitude=False  token=False
-
-### food_id=5607 — Roll, pumpernickel
-
-- CNF group: `Baked Products`
-- Matched: `True`  confidence: 0.60
-- Matched ciqual: `7262`  → "Rolls for hamburger/hotdog (buns), wholemeal, prepacked"
-- Matched Agribalyse group: `produits céréaliers`
-- Justification: "Wholemeal rolls closest to pumpernickel roll; similar grain base and form, though pumpernickel is denser and darker, so not exact but best available match."
-- Quality checks: group=True  magnitude=True  token=False
-
-### food_id=501803 — Turkey pot pie, frozen
-
-- CNF group: `Mixed Dishes`
-- Matched: `True`  confidence: 0.60
-- Matched ciqual: `25009`  → "Shepherd's pie or cottage pie with meat"
-- Matched Agribalyse group: `entrées et plats composés`
-- Justification: "Shepherd's pie with meat is a similar savory meat and potato pie, close in processing and form to turkey pot pie, though different meat type."
-- Quality checks: group=True  magnitude=True  token=False
-
-### food_id=5458 — Salad dressing, creamy, made with sour cream and/or buttermilk and oil, calorie-reduced
-
-- CNF group: `Fats and Oils`
-- Matched: `False`  confidence: 0.40
-- Matched ciqual: `16746`  → "Blended fat (vegetable and animal origins), spreadable, 30-40% fat, lightly salted"
-- Matched Agribalyse group: `matières grasses`
-- Justification: "Closest match is blended fat of vegetable and animal origin, reflecting creamy dressing fat mix; no exact sour cream or reduced-calorie dressing available."
-- Quality checks: group=False  magnitude=False  token=False
-
-### food_id=501926 — Cereal, ready to eat, Life, Toasted Cinnamon, Quaker
-
-- CNF group: `Breakfast cereals`
-- Matched: `True`  confidence: 0.60
-- Matched ciqual: `32000`  → "Breakfast cereals, popped or puffed wheat grain, with honey or caramel, fortified with vitamins and chemical elements"
-- Matched Agribalyse group: `produits céréaliers`
-- Justification: "Puffed wheat cereal with sweetener closest to toasted cinnamon flavor; matches processing and cereal type broadly, though flavor specifics differ."
-- Quality checks: group=True  magnitude=True  token=False
-
-### food_id=502145 — Papaya, canned, heavy syrup pack, drained
-
-- CNF group: `Fruits and fruit juices`
-- Matched: `False`  confidence: 0.40
-- Matched ciqual: `13718`  → "Pineapple, in light syrup, canned, drained"
-- Matched Agribalyse group: `fruits, légumes, légumineuses et oléagineux`
-- Justification: "Closest canned fruit in syrup, similar processing; different fruit (pineapple vs papaya) reduces confidence."
-- Quality checks: group=False  magnitude=False  token=False
-
-### food_id=502191 — Yogourt, Greek style, plain, rich (8-12% M.F.)
-
-- CNF group: `Dairy and Egg Products`
-- Matched: `True`  confidence: 0.90
-- Matched ciqual: `19860`  → "Yogurt, Greek-style, plain"
-- Matched Agribalyse group: `lait et produits laitiers`
-- Justification: "Exact match for Greek-style plain yogurt; likely similar fat content range, best available proxy for rich (8-12% M.F.) variant."
-- Quality checks: group=True  magnitude=False  token=True
-- GW per 100g: matched=0.189  cnf_default=1.0782265372168285  ratio=0.18x
-
-### food_id=532 — Salad dressing, italian, commercial, regular
-
-- CNF group: `Fats and Oils`
-- Matched: `True`  confidence: 0.60
-- Matched ciqual: `17270`  → "Olive oil, extra virgin"
-- Matched Agribalyse group: `matières grasses`
-- Justification: "Italian salad dressing typically contains olive oil; extra virgin olive oil is the closest Agribalyse fat source despite missing other ingredients."
+- Justification: "Mix of 4 spices best matches dry seasoning mix; not taco-specific but closest in form and category among candidates."
 - Quality checks: group=True  magnitude=True  token=False
 

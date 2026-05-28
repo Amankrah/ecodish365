@@ -13,6 +13,8 @@ from api.services.substitution_constraints import (
     replacement_allowed,
 )
 from api.services.substitution_culinary import culinary_swap_plausible, extreme_nutrient_swing
+from api.services.substitution_quality import swap_passes_quality_gate
+from api.services.substitution_fped_ranking import fped_gap_fill_bonus
 from api.services.substitution_discovery import (
     discover_candidates_for_ingredient,
     sustainability_proxy_score,
@@ -296,6 +298,7 @@ def _build_suggestion(
     baseline_sustain: float,
     modified: List[Dict[str, Any]],
     purpose: str,
+    baseline_composition: Optional[List[Dict[str, Any]]] = None,
 ) -> Optional[Dict[str, Any]]:
     ev = _evaluate_modification(
         baseline_hefi=baseline_hefi,
@@ -308,6 +311,26 @@ def _build_suggestion(
     swapped_mass = swaps[0]['original']['mass_g'] if swaps else 0.0
     if extreme_nutrient_swing(ev['nutrients'], swapped_mass):
         return None
+
+    fped_deltas = None
+    try:
+        from api.services.fped_aggregator import fped_swap_delta
+        baseline_foods = [{'food_id': sw['original']['food_id'],
+                           'mass_g': sw['original']['mass_g']} for sw in swaps]
+        replacement_foods = [{'food_id': sw['replacement']['food_id'],
+                              'mass_g': sw['replacement']['mass_g']} for sw in swaps]
+        fped_deltas = fped_swap_delta(baseline_foods, replacement_foods)
+    except Exception:  # noqa: BLE001
+        fped_deltas = None
+
+    if not swap_passes_quality_gate(
+        ev,
+        purpose=purpose,
+        candidate_source=candidate_source,
+        swaps=swaps,
+        fped_deltas=fped_deltas,
+    ):
+        return None
     if ev['rank_score'] <= 0.01:
         return None
 
@@ -319,20 +342,22 @@ def _build_suggestion(
     elif candidate_source == 'matcher_alternative':
         rank_score += 5.0
 
-    # FPED-1 (2026-05-28): express the swap in food-group terms (−red meat,
-    # +legumes, …) — the DASH/Mediterranean/CFG currency the ΔHEFI/ΔFCS deltas
-    # don't convey. Aggregates all swapped-out foods vs all swapped-in foods.
-    # Wrapped so it can never break a suggestion (overlay only).
-    fped_deltas = None
-    try:
-        from api.services.fped_aggregator import fped_swap_delta
-        baseline_foods = [{'food_id': sw['original']['food_id'],
-                           'mass_g': sw['original']['mass_g']} for sw in swaps]
-        replacement_foods = [{'food_id': sw['replacement']['food_id'],
-                              'mass_g': sw['replacement']['mass_g']} for sw in swaps]
-        fped_deltas = fped_swap_delta(baseline_foods, replacement_foods)
-    except Exception:  # noqa: BLE001
-        fped_deltas = None
+    fped_gap_fill = None
+    if baseline_composition:
+        try:
+            baseline_foods_full = [
+                {'food_id': r['food_id'], 'mass_g': r['mass_g']}
+                for r in baseline_composition
+            ]
+            modified_foods_full = [
+                {'food_id': r['food_id'], 'mass_g': r['mass_g']}
+                for r in modified
+            ]
+            fped_gap_fill = fped_gap_fill_bonus(baseline_foods_full, modified_foods_full)
+            if fped_gap_fill.get('bonus', 0.0) > 0:
+                rank_score += fped_gap_fill['bonus']
+        except Exception:  # noqa: BLE001
+            fped_gap_fill = None
 
     return {
         'id': suggestion_id,
@@ -349,6 +374,7 @@ def _build_suggestion(
         **ev,
         'rank_score': rank_score,
         'fped_deltas': fped_deltas,
+        'fped_gap_fill': fped_gap_fill,
         'modified_composition': _serialize_composition(ev['modified_composition']),
     }
 
@@ -385,6 +411,12 @@ def _rule_candidates(
                 original_group_id=ing.get('food_group_id'),
                 original_description=ing['food_description'],
                 constraints=constraints,
+            ):
+                continue
+            if not culinary_swap_plausible(
+                ing['food_description'],
+                rule.target_food_description,
+                original_mass_g=ing['mass_g'],
             ):
                 continue
             modified = _apply_swap_rule(rows, idx, rule)
@@ -640,6 +672,7 @@ def _greedy_reformulation_plans(
                 baseline_sustain=baseline_sustain,
                 modified=spec['modified'],
                 purpose=purpose,
+                baseline_composition=rows,
             )
             if sug and (best is None or sug['rank_score'] > best['rank_score']):
                 best = sug
@@ -658,8 +691,49 @@ def _greedy_reformulation_plans(
     for s in step_suggestions:
         combined_swaps.extend(s.get('swaps') or [])
 
-    final = step_suggestions[-1]
+    plan_ev = _evaluate_modification(
+        baseline_hefi=baseline_hefi,
+        baseline_fcs=baseline_fcs,
+        baseline_nutrients=baseline_nutrients,
+        baseline_sustain=baseline_sustain,
+        modified=current,
+        purpose=purpose,
+    )
+    plan_fped_deltas = None
+    try:
+        from api.services.fped_aggregator import fped_swap_delta
+        plan_baseline_foods = [
+            {'food_id': sw['original']['food_id'], 'mass_g': sw['original']['mass_g']}
+            for sw in combined_swaps
+        ]
+        plan_replacement_foods = [
+            {'food_id': sw['replacement']['food_id'], 'mass_g': sw['replacement']['mass_g']}
+            for sw in combined_swaps
+        ]
+        plan_fped_deltas = fped_swap_delta(plan_baseline_foods, plan_replacement_foods)
+    except Exception:  # noqa: BLE001
+        plan_fped_deltas = None
+
+    if not swap_passes_quality_gate(
+        plan_ev,
+        purpose=purpose,
+        candidate_source='reformulation',
+        swaps=combined_swaps,
+        fped_deltas=plan_fped_deltas,
+    ):
+        return []
+
     total_rank = sum(s['rank_score'] for s in step_suggestions)
+    fped_gap_fill = None
+    try:
+        baseline_foods_full = [{'food_id': r['food_id'], 'mass_g': r['mass_g']} for r in rows]
+        modified_foods_full = [{'food_id': r['food_id'], 'mass_g': r['mass_g']} for r in current]
+        fped_gap_fill = fped_gap_fill_bonus(baseline_foods_full, modified_foods_full)
+        if fped_gap_fill.get('bonus', 0.0) > 0:
+            total_rank += fped_gap_fill['bonus']
+    except Exception:  # noqa: BLE001
+        fped_gap_fill = None
+
     return [{
         'id': f'reformulation:{len(step_suggestions)}',
         'rule_id': 'greedy_reformulation',
@@ -675,12 +749,14 @@ def _greedy_reformulation_plans(
         'swaps': combined_swaps,
         'original': step_suggestions[0]['original'],
         'replacement': step_suggestions[-1]['replacement'],
-        'modified_composition': final['modified_composition'],
-        'hefi': final['hefi'],
-        'fcs': final.get('fcs'),
-        'sustainability_proxy': final.get('sustainability_proxy'),
-        'nutrients': final['nutrients'],
+        'modified_composition': _serialize_composition(plan_ev['modified_composition']),
+        'hefi': plan_ev['hefi'],
+        'fcs': plan_ev.get('fcs'),
+        'sustainability_proxy': plan_ev.get('sustainability_proxy'),
+        'nutrients': plan_ev['nutrients'],
         'rank_score': total_rank,
+        'fped_deltas': plan_fped_deltas,
+        'fped_gap_fill': fped_gap_fill,
         'reformulation_steps': len(step_suggestions),
     }]
 
@@ -731,6 +807,7 @@ def analyze_substitutions(
             baseline_sustain=baseline_sustain,
             modified=spec['modified'],
             purpose=purpose,
+            baseline_composition=rows,
         )
         if sug:
             evaluated_singles.append(sug)
@@ -767,6 +844,7 @@ def analyze_substitutions(
                 baseline_sustain=baseline_sustain,
                 modified=spec['modified'],
                 purpose=purpose,
+                baseline_composition=rows,
             )
             if sug:
                 multi.append(sug)

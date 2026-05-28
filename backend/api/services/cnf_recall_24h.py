@@ -255,10 +255,10 @@ class CNFRecall24h:
                 )
             entry_type = getattr(m, 'entry_type', None) or 'text'
             pre_decomposed = getattr(m, 'pre_decomposed', None)
-            if entry_type == 'packaged' and not pre_decomposed:
+            if entry_type in ('packaged', 'direct') and not pre_decomposed:
                 return CNFRecall24hResult(
                     matched=False,
-                    fallback_reason=f'packaged_missing_pre_decomposed:{occ}',
+                    fallback_reason=f'{entry_type}_missing_pre_decomposed:{occ}',
                     timing_ms=(time.perf_counter() - t0) * 1000,
                 )
             cleaned.append(MealEntry(
@@ -297,8 +297,8 @@ class CNFRecall24h:
         # food database. None = both sources.
         meal_source = source if source in ('cnf', 'wafct') else None
         meal_results: List[Tuple[str, Any]] = []
-        text_meals = [m for m in cleaned if (m.entry_type or 'text') != 'packaged']
-        packaged_meals = [m for m in cleaned if (m.entry_type or 'text') == 'packaged']
+        text_meals = [m for m in cleaned if (m.entry_type or 'text') not in ('packaged', 'direct')]
+        precomposed_meals = [m for m in cleaned if (m.entry_type or 'text') in ('packaged', 'direct')]
         if parallel_meals and len(text_meals) > 1:
             max_workers = min(MAX_PARALLEL_MEALS, len(text_meals))
             with ThreadPoolExecutor(
@@ -315,12 +315,12 @@ class CNFRecall24h:
                 (m.occasion, self._decompose_meal(m, source=meal_source))
                 for m in text_meals
             ]
-        packaged_results = [
+        precomposed_results = [
             (m.occasion, self._packaged_to_decomposition(m))
-            for m in packaged_meals
+            for m in precomposed_meals
         ]
         # Preserve user occasion order for downstream attribution.
-        by_occ = {occ: dec for occ, dec in text_results + packaged_results}
+        by_occ = {occ: dec for occ, dec in text_results + precomposed_results}
         meal_results = [(m.occasion, by_occ[m.occasion]) for m in cleaned]
 
         # --- Aggregate ----------------------------------------------------
@@ -409,6 +409,13 @@ class CNFRecall24h:
             )
 
         dec_conf = float(pre.get('decomposition_confidence', 0.5) or 0.5)
+        entry_type = getattr(meal, 'entry_type', None) or 'text'
+        if entry_type == 'direct':
+            ing_rationale = 'user-selected CNF food(s)'
+            fallback = 'direct_food_entry'
+        else:
+            ing_rationale = 'packaged food label decomposition (inferred)'
+            fallback = 'packaged_food_inferred'
         ingredients: List[CNFIngredient] = []
         for ing in raw_ings:
             if not isinstance(ing, dict):
@@ -419,7 +426,7 @@ class CNFRecall24h:
                     food_description=str(ing.get('food_description') or ''),
                     food_group=str(ing.get('food_group') or ''),
                     mass_g=float(ing['mass_g']),
-                    rationale='packaged food label decomposition (inferred)',
+                    rationale=ing_rationale,
                     resolution_confidence=float(
                         ing.get('confidence', dec_conf) or dec_conf,
                     ),
@@ -455,7 +462,7 @@ class CNFRecall24h:
             unresolved_mass_g=max(0.0, meal.total_mass_g - resolved),
             unresolved_description='',
             decomposition_confidence=dec_conf,
-            fallback_reason='packaged_food_inferred',
+            fallback_reason=fallback,
             unresolved_ingredients_audit=[],
             raw_llm_response=None,
             timing_ms=0.0,

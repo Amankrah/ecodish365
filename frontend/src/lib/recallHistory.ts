@@ -208,6 +208,81 @@ export function saveDay(
   return day;
 }
 
+/** Update a saved day's ingredients, date, and label (clears cached pattern). */
+export function updateDayFromEdit(
+  id: string,
+  patch: {
+    date: string;
+    label: string;
+    ingredients: Array<{
+      food_id: number;
+      food_description: string;
+      food_group?: string;
+      mass_g: number;
+    }>;
+  },
+): SavedRecallDay | null {
+  const existing = getDay(id);
+  if (!existing) return null;
+
+  const byFood = new Map<number, CNFRecall24hAggregatedIngredient>();
+  for (const ing of patch.ingredients) {
+    if (ing.mass_g <= 0) continue;
+    const prev = byFood.get(ing.food_id);
+    if (prev) {
+      prev.mass_g += ing.mass_g;
+    } else {
+      byFood.set(ing.food_id, {
+        food_id: ing.food_id,
+        food_description: ing.food_description,
+        food_group: ing.food_group || '',
+        mass_g: ing.mass_g,
+        occasions: {},
+      });
+    }
+  }
+  const aggregated = Array.from(byFood.values()).sort((a, b) => b.mass_g - a.mass_g);
+  const totalMass = aggregated.reduce((s, i) => s + i.mass_g, 0);
+  const dishName = patch.label.trim() || `Edited recall — ${patch.date}`;
+
+  const meals: CNFRecall24hMealResult[] = [{
+    occasion: 'breakfast',
+    decomposition: {
+      dish_name: dishName,
+      normalised_dish_name: dishName.toLowerCase(),
+      total_mass_g: totalMass,
+      matched: aggregated.length > 0,
+      ingredients: aggregated.map(i => ({
+        food_id: i.food_id,
+        food_description: i.food_description,
+        food_group: i.food_group,
+        mass_g: i.mass_g,
+        rationale: 'user-edited recall day',
+        resolution_confidence: 1.0,
+      })),
+      resolved_mass_g: totalMass,
+      unresolved_mass_g: 0,
+      decomposition_confidence: 1.0,
+      fallback_reason: 'direct_food_entry',
+      cache_hit: false,
+      timing_ms: 0,
+      unresolved_ingredients_audit: [],
+    },
+  }];
+
+  return saveDay({
+    id,
+    date: patch.date,
+    label: patch.label,
+    user_type: existing.user_type,
+    meals,
+    aggregated_daily_ingredients: aggregated,
+    estimated_daily_kcal: existing.estimated_daily_kcal,
+    occasions_count: 1,
+    cached_pattern: undefined,
+  });
+}
+
 export function updateDayLabel(id: string, label: string): void {
   const history = loadHistory();
   const idx = history.days.findIndex(d => d.id === id);

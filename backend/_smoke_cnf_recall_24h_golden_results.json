@@ -11,9 +11,9 @@
     "overlap": 0.83,
     "observed_count": 6,
     "expected_count": 6,
-    "observed_resolved_mass_g": 340.5,
+    "observed_resolved_mass_g": 345.0,
     "expected_resolved_mass_g": 346.0,
-    "observed_kcal": 959.0,
+    "observed_kcal": 985.3,
     "expected_kcal": 986.1,
     "observed_food_ids": [
       118,

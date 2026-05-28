@@ -35,6 +35,7 @@ import {
 } from '@/lib/recallHistory';
 import { CNFApiService } from '@/lib/api';
 import { RecallHistoryCard } from '@/components/shared/RecallHistoryCard';
+import { RecallDayEditModal } from '@/components/shared/RecallDayEditModal';
 import { FpedCohortPanel } from '@/components/shared/FpedCohortPanel';
 
 // Number of pattern-classify requests we'll issue in parallel for the
@@ -87,8 +88,10 @@ export default function RecallHistoryPage() {
   const [importText,   setImportText]   = useState('');
   const [clearConfirm, setClearConfirm] = useState('');
   const [toast, setToast] = useState<string | null>(null);
+  const [editDayId, setEditDayId] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const editingDay = editDayId ? days.find(d => d.id === editDayId) ?? null : null;
 
   // --- hydration + cross-tab sync ------------------------------------------
 
@@ -569,6 +572,7 @@ export default function RecallHistoryPage() {
                   selected={selectedIds.has(d.id)}
                   onSelectChange={chk => toggleSelect(d.id, chk)}
                   onDelete={() => handleDelete(d.id)}
+                  onEdit={() => setEditDayId(d.id)}
                   classifying={classifying.has(d.id)}
                 />
               ))}
@@ -588,6 +592,20 @@ export default function RecallHistoryPage() {
           </aside>
         )}
       </div>
+
+      {/* Edit recall day */}
+      {editingDay && (
+        <RecallDayEditModal
+          day={editingDay}
+          onClose={() => setEditDayId(null)}
+          onSaved={() => {
+            setEditDayId(null);
+            refresh();
+            setToast('Recall day updated. View pattern to refresh your dietary pattern score.');
+            setTimeout(() => setToast(null), 5000);
+          }}
+        />
+      )}
 
       {/* Toast */}
       {toast && (

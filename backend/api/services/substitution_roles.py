@@ -23,7 +23,14 @@ _RX_PROTEIN = re.compile(
     r'\b(beef|pork|chicken|turkey|lamb|fish|eel|salmon|tuna|shrimp|prawn|'
     r'egg|tofu|lentil|bean|peanut|meat|sausage|bacon)\b', re.I,
 )
-_RX_FAT = re.compile(r'\b(oil|fat|shortening|margarine|butter|lard|palm)\b', re.I)
+_RX_FAT = re.compile(
+    r'\b(oil|shortening|margarine|butter|lard|ghee|clarified butter|palm oil)\b',
+    re.I,
+)
+_RX_LOW_FAT_FOOD = re.compile(
+    r'\b(low fat|low-fat|nonfat|non-fat|fat free|fat-free|0-0\.5%)\b',
+    re.I,
+)
 _RX_AROMATIC = re.compile(r'\b(onion|garlic|ginger|shallot|leek|chive)\b', re.I)
 _RX_SAUCE = re.compile(r'\b(tomato|paste|sauce|stock|broth|gravy)\b', re.I)
 _RX_BEVERAGE = re.compile(r'\b(water|juice|cola|soda|tea|coffee|milk|beverage)\b', re.I)
@@ -55,7 +62,7 @@ def infer_functional_role(description: str) -> str:
         return ROLE_BEVERAGE
     if _RX_SWEETENER.search(d):
         return ROLE_SWEETENER
-    if _RX_FAT.search(d):
+    if _RX_FAT.search(d) and not _RX_LOW_FAT_FOOD.search(d):
         return ROLE_FAT
     if _RX_PROTEIN.search(d):
         return ROLE_PROTEIN

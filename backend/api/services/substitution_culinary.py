@@ -31,9 +31,84 @@ _VEG_FRUIT = re.compile(
     r'carrot|celery|zucchini|courgette|garden egg|okra|baobab)\b',
     re.IGNORECASE,
 )
-_OIL = re.compile(r'\b(oil|fat|shortening|margarine|butter)\b', re.I)
+_OIL = re.compile(
+    r'\b(oil|shortening|margarine|butter|ghee|clarified butter|palm oil|lard)\b',
+    re.I,
+)
+_LOW_FAT_LABEL = re.compile(r'\b(low fat|low-fat|nonfat|non-fat|fat free|fat-free)\b', re.I)
 _FISH = re.compile(r'\b(fish|eel|salmon|tuna|cod|haddock|sardine|tilapia)\b', re.I)
 _RICE = re.compile(r'\b(rice|couscous|bulgur|quinoa|millet|maize meal)\b', re.I)
+
+_RX_EGG = re.compile(r'\begg\b', re.I)
+_RX_EGG_YOLK = re.compile(r'\byolk\b', re.I)
+_RX_EGG_WHITE = re.compile(r'\begg white\b|\bwhites,\s', re.I)
+_RX_EGG_WHOLE = re.compile(r'\bwhole\b', re.I)
+_RX_MEAT_AND_SKIN = re.compile(r'meat and skin|with skin', re.I)
+_RX_MEAT_LEAN = re.compile(r',\s*meat,\s*|,\s*meat\s+cooked', re.I)
+
+_RX_YOGURT = re.compile(r'yog(?:ourt|urt)', re.I)
+_RX_FLAVOURED_YOGURT = re.compile(
+    r'fruit flavou?red|flavou?red.*yog|yog.*flavou?red|vanilla|strawberr|peach|blueberr',
+    re.I,
+)
+_RX_PLAIN_DAIRY = re.compile(r'\bplain\b|unflavou?red|\bnatural\b', re.I)
+
+
+def dairy_yogurt_swap_plausible(original_description: str, replacement_description: str) -> bool:
+    """Plain yogurt is not swapped for sweetened/flavoured variants at equal mass."""
+    orig = original_description or ''
+    repl = replacement_description or ''
+    if not _RX_YOGURT.search(orig) or not _RX_YOGURT.search(repl):
+        return True
+    orig_plain = bool(_RX_PLAIN_DAIRY.search(orig)) and not _RX_FLAVOURED_YOGURT.search(orig)
+    repl_flavoured = bool(_RX_FLAVOURED_YOGURT.search(repl))
+    if orig_plain and repl_flavoured:
+        return False
+    return True
+
+
+def _egg_form(description: str) -> Optional[str]:
+    """whole | yolk | white | None."""
+    d = description or ''
+    if not _RX_EGG.search(d):
+        return None
+    if _RX_EGG_YOLK.search(d):
+        return 'yolk'
+    if _RX_EGG_WHITE.search(d):
+        return 'white'
+    if _RX_EGG_WHOLE.search(d):
+        return 'whole'
+    return 'whole'
+
+
+def _poultry_leanness(description: str) -> Optional[str]:
+    """lean | with_skin | None for poultry cuts."""
+    d = (description or '').lower()
+    if not re.search(r'\b(chicken|turkey|broiler|thigh|breast|poultry)\b', d):
+        return None
+    if _RX_MEAT_AND_SKIN.search(d):
+        return 'with_skin'
+    if _RX_MEAT_LEAN.search(d):
+        return 'lean'
+    return None
+
+
+def anatomical_swap_plausible(original_description: str, replacement_description: str) -> bool:
+    """Block part/cut mismatches that are not 1:1 culinary substitutes at equal mass."""
+    orig = original_description or ''
+    repl = replacement_description or ''
+
+    o_egg = _egg_form(orig)
+    r_egg = _egg_form(repl)
+    if o_egg and r_egg and o_egg != r_egg:
+        return False
+
+    o_bird = _poultry_leanness(orig)
+    r_bird = _poultry_leanness(repl)
+    if o_bird == 'lean' and r_bird == 'with_skin':
+        return False
+
+    return True
 
 
 def _is_dried(description: str) -> bool:
@@ -74,8 +149,16 @@ def culinary_swap_plausible(
 
     # Oils can swap with oils; not with non-oils (matcher handles most cases).
     if _OIL.search(orig) and not _OIL.search(repl):
-        return False
+        if not _LOW_FAT_LABEL.search(repl):
+            return False
     if _OIL.search(repl) and not _OIL.search(orig):
+        if not _LOW_FAT_LABEL.search(orig):
+            return False
+
+    if not anatomical_swap_plausible(orig, repl):
+        return False
+
+    if not dairy_yogurt_swap_plausible(orig, repl):
         return False
 
     # Fish swaps should stay in finfish/shellfish space.
