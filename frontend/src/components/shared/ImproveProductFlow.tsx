@@ -229,7 +229,7 @@ export function ImproveProductFlow(): JSX.Element {
           type="button"
           role="tab"
           id="improve-tab-scan"
-          aria-selected={mode === 'scan' ? 'true' : 'false'}
+          {...(mode === 'scan' ? { 'aria-selected': 'true' as const } : { 'aria-selected': 'false' as const })}
           aria-controls="improve-panel-scan"
           onClick={() => switchMode('scan')}
           className={tabClass(mode === 'scan')}
@@ -241,7 +241,7 @@ export function ImproveProductFlow(): JSX.Element {
           type="button"
           role="tab"
           id="improve-tab-describe"
-          aria-selected={mode === 'describe' ? 'true' : 'false'}
+          {...(mode === 'describe' ? { 'aria-selected': 'true' as const } : { 'aria-selected': 'false' as const })}
           aria-controls="improve-panel-describe"
           onClick={() => switchMode('describe')}
           className={tabClass(mode === 'describe')}
@@ -253,7 +253,7 @@ export function ImproveProductFlow(): JSX.Element {
           type="button"
           role="tab"
           id="improve-tab-recall"
-          aria-selected={mode === 'recall' ? 'true' : 'false'}
+          {...(mode === 'recall' ? { 'aria-selected': 'true' as const } : { 'aria-selected': 'false' as const })}
           aria-controls="improve-panel-recall"
           onClick={() => switchMode('recall')}
           className={tabClass(mode === 'recall')}
