@@ -17,7 +17,7 @@ from api.services.substitution_culinary import (
     culinary_swap_plausible,
     extreme_nutrient_swing,
 )
-from api.services.substitution_quality import swap_passes_quality_gate, MIN_DISCOVERY_HEFI_DELTA
+from api.services.substitution_quality import swap_passes_quality_gate, MIN_DISCOVERY_FCS_DELTA
 from api.services.substitution_fped_ranking import fped_gap_fill_bonus
 from api.services.substitution_roles import infer_functional_role
 from api.services.substitution_analyzer import (
@@ -85,7 +85,7 @@ class TestSubstitutionRuleMatching(unittest.TestCase):
 
 
 class TestSubstitutionAnalyzer(unittest.TestCase):
-    def test_beef_composition_suggests_legumes_with_hefi_gain(self):
+    def test_beef_composition_suggests_legumes_with_fcs_gain(self):
         result = analyze_substitutions(
             [{'food_id': 2683, 'mass_g': 100.0}],
             purpose='general_health',
@@ -96,8 +96,7 @@ class TestSubstitutionAnalyzer(unittest.TestCase):
         top = result['suggestions'][0]
         self.assertEqual(top['rule_id'], 'beef_to_legumes')
         self.assertEqual(top['replacement']['food_id'], 3392)
-        self.assertGreater(top['hefi']['delta'], 0)
-        self.assertIn('fcs', top)
+        self.assertGreater(top['fcs']['delta'], 0)
         self.assertEqual(result['metadata']['phase'], 4)
 
     def test_scorecard_included_on_suggestions(self):
@@ -112,7 +111,7 @@ class TestSubstitutionAnalyzer(unittest.TestCase):
         if result['suggestions']:
             self.assertIn('scorecard', result['suggestions'][0])
             self.assertIn('deltas', result['suggestions'][0]['scorecard'])
-            self.assertIn('hefi', result['suggestions'][0]['scorecard']['deltas'])
+            self.assertIn('fcs', result['suggestions'][0]['scorecard']['deltas'])
 
     def test_vegetarian_constraint_blocks_beef_replacement(self):
         constraints = parse_extended_constraints({'vegetarian': True})
@@ -128,7 +127,7 @@ class TestSubstitutionAnalyzer(unittest.TestCase):
         applied = score_modified_composition([{'food_id': 3392, 'mass_g': 100.0}])
         self.assertTrue(applied['success'])
         self.assertIn('scorecard', applied)
-        self.assertIn('hefi', applied['scorecard'])
+        self.assertIn('fcs', applied['scorecard'])
 
     def test_batch_analyze_multiple_items(self):
         batch = batch_analyze_substitutions([
@@ -139,14 +138,16 @@ class TestSubstitutionAnalyzer(unittest.TestCase):
         self.assertEqual(len(batch['results']), 2)
 
     def test_pareto_frontier_tags_suggestions(self):
+        # PARETO_AXES = ('fcs',) — the suggestion with the larger FCS delta
+        # dominates; with one axis there is exactly one frontier member.
         suggestions = [
             {
                 'id': 'a',
-                'scorecard': {'deltas': {'hefi': {'delta': 2.0}, 'fcs': {'delta': 0.0}}},
+                'scorecard': {'deltas': {'fcs': {'delta': 2.0}}},
             },
             {
                 'id': 'b',
-                'scorecard': {'deltas': {'hefi': {'delta': 0.0}, 'fcs': {'delta': 5.0}}},
+                'scorecard': {'deltas': {'fcs': {'delta': 5.0}}},
             },
         ]
         frontier = compute_pareto_frontier(suggestions)
@@ -308,13 +309,13 @@ class TestSubstitutionAnalyzer(unittest.TestCase):
         self.assertFalse(dairy_yogurt_swap_plausible(plain, fruit))
         self.assertFalse(culinary_swap_plausible(plain, fruit))
 
-    def test_discovery_quality_gate_requires_min_hefi(self):
+    def test_discovery_quality_gate_requires_min_fcs(self):
+        # FCS-only gate: discovery candidates must clear MIN_DISCOVERY_FCS_DELTA.
         ev = {
-            'hefi': {'delta': 0.1},
-            'fcs': {'delta': 0.5},
+            'fcs': {'delta': 0.1},
             'nutrients': {'sat_fat_g': {'diff': 0.0}},
         }
-        self.assertLess(0.1, MIN_DISCOVERY_HEFI_DELTA)
+        self.assertLess(0.1, MIN_DISCOVERY_FCS_DELTA)
         self.assertFalse(swap_passes_quality_gate(
             ev,
             purpose='general_health',
@@ -329,9 +330,10 @@ class TestSubstitutionAnalyzer(unittest.TestCase):
         ))
 
     def test_quality_gate_blocks_added_sugar_fped_shift(self):
+        # FCS clears the discovery bar (>= MIN_DISCOVERY_FCS_DELTA) but FPED
+        # added-sugars delta still blocks the swap on general_health.
         ev = {
-            'hefi': {'delta': 0.25},
-            'fcs': {'delta': 0.1},
+            'fcs': {'delta': 0.35},
             'nutrients': {'sat_fat_g': {'diff': 0.0}},
         }
         fped = {'changed': [{'component': 'added_sugars_tsp', 'delta': 0.54}]}
@@ -372,9 +374,10 @@ class TestSubstitutionAnalyzer(unittest.TestCase):
         self.assertNotEqual(infer_functional_role(soy), 'fat')
 
     def test_quality_gate_blocks_high_sat_fat_matcher_pattern(self):
+        # Even with a positive FCS, a +10 g sat fat shift trips the absolute
+        # cap (>2 g) on general_health regardless of candidate source.
         ev = {
-            'hefi': {'delta': 1.5},
-            'fcs': {'delta': 0.2},
+            'fcs': {'delta': 0.4},
             'nutrients': {'sat_fat_g': {'diff': 10.0}},
         }
         swaps = [{'original': {'mass_g': 150.0}}]
@@ -387,7 +390,6 @@ class TestSubstitutionAnalyzer(unittest.TestCase):
 
     def test_quality_gate_allows_milk_to_soy_pattern(self):
         ev = {
-            'hefi': {'delta': 0.8},
             'fcs': {'delta': 1.2},
             'nutrients': {'sat_fat_g': {'diff': -8.0}},
         }

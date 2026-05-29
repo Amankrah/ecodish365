@@ -8,12 +8,43 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 from api.cnf_cache import get_dish_cnf_pipeline
 from api.services.cnf_matcher import get_default_matcher
 
 logger = logging.getLogger(__name__)
+
+
+# Per-purpose nutrient search returns the same food set regardless of which
+# ingredient is being substituted, so cache the raw pipeline result. The
+# per-ingredient filtering (exclude_ids, prefer_group_id) is applied to the
+# cached list. ~6 entries (one per purpose) × ~20 foods each — tiny.
+@lru_cache(maxsize=16)
+def _cached_foods_by_nutrient(
+    nutrient_id: int,
+    min_value: Optional[float],
+    max_value: Optional[float],
+    limit: int,
+) -> Tuple[Tuple[int, str, str, Optional[int]], ...]:
+    pipeline = get_dish_cnf_pipeline()
+    foods = pipeline.search_foods_by_nutrient(
+        nutrient_id,
+        min_value=min_value,
+        max_value=max_value,
+        limit=limit,
+    )
+    # Tuple-of-tuples so the cached value is immutable + hashable-friendly.
+    return tuple(
+        (
+            int(f['FoodID']),
+            str(f.get('FoodDescription', f'Food ID {f["FoodID"]}')),
+            str(f.get('FoodGroupName', '') or ''),
+            int(f['FoodGroupID']) if f.get('FoodGroupID') is not None else None,
+        )
+        for f in foods
+    )
 
 # Matcher alternatives below this cosine are too weak to show as culinary substitutes.
 MIN_MATCHER_COSINE = 0.65
@@ -85,38 +116,35 @@ def _nutrient_discovery_candidates(
     limit: int = 5,
 ) -> List[DiscoveryCandidate]:
     query = PURPOSE_NUTRIENT_QUERIES.get(purpose) or PURPOSE_NUTRIENT_QUERIES['general_health']
-    pipeline = get_dish_cnf_pipeline()
-    foods = pipeline.search_foods_by_nutrient(
-        query['nutrient_id'],
-        min_value=query.get('min_value'),
-        max_value=query.get('max_value'),
-        limit=query.get('limit', 20),
+    foods = _cached_foods_by_nutrient(
+        int(query['nutrient_id']),
+        query.get('min_value'),
+        query.get('max_value'),
+        int(query.get('limit', 20)),
     )
 
     same_group: List[DiscoveryCandidate] = []
     other_group: List[DiscoveryCandidate] = []
 
-    for f in foods:
-        fid = int(f['FoodID'])
+    for fid, fdesc, fgroup, gid in foods:
         if fid in exclude_ids:
             continue
         if not _passes_source_filter(fid, source_filter):
             continue
-        gid = f.get('FoodGroupID')
         cand = DiscoveryCandidate(
             food_id=fid,
-            food_description=f.get('FoodDescription', f'Food ID {fid}'),
-            food_group=f.get('FoodGroupName', ''),
-            food_group_id=int(gid) if gid is not None else None,
+            food_description=fdesc,
+            food_group=fgroup,
+            food_group_id=gid,
             source=_food_source(fid),
             origin='nutrient_discovery',
-            label=f"Nutrient-targeted: {f.get('FoodDescription', '')[:60]}",
+            label=f"Nutrient-targeted: {fdesc[:60]}",
             rationale=(
                 f"Discovered via CNF nutrient search for “{purpose.replace('_', ' ')}” "
                 f"(nutrient_id {query['nutrient_id']})."
             ),
         )
-        if prefer_group_id is not None and gid is not None and int(gid) == prefer_group_id:
+        if prefer_group_id is not None and gid is not None and gid == prefer_group_id:
             same_group.append(cand)
         else:
             other_group.append(cand)
@@ -136,7 +164,15 @@ def _matcher_alternative_candidates(
 ) -> List[DiscoveryCandidate]:
     try:
         matcher = get_default_matcher()
-        result = matcher.match(food_description, top_k=10, source=source_filter)
+        # Discovery only consumes result.alternatives (pure embedding cosine).
+        # Skip the LLM rank step — it affects only result.food_id, which we
+        # discard here. Halves substitution-analyze latency under load.
+        result = matcher.match(
+            food_description,
+            top_k=10,
+            source=source_filter,
+            retrieval_only=True,
+        )
     except Exception as exc:  # noqa: BLE001
         logger.warning('matcher alternatives failed: %s', exc)
         return []

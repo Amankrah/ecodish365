@@ -4,7 +4,7 @@ import HomePageContent from '@/components/home/HomePageContent';
 export const metadata: Metadata = {
   title: 'EcoDish365 — Honest nutrition and sustainability scoring for any food',
   description:
-    'Score any food, meal, or full day against six published research measures. Plain-language results, real uncertainty, and the limits the science actually states. 6,719 foods, no invented grades, no single score pretending to settle it.',
+    'Score any food, meal, or full day against six published research measures. Plain-language results, real uncertainty, and the limits the science actually states. 7,000+ foods, no invented grades, no single score pretending to settle it.',
   openGraph: {
     title: 'EcoDish365 — Honest nutrition and sustainability scoring for any food',
     description:

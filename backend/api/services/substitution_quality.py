@@ -1,8 +1,8 @@
 """Post-scoring quality gates for SUBST-1 substitution suggestions.
 
 Candidates pass culinary plausibility first; this module rejects swaps that score
-well on HEFI/FCS blend but fail basic nutrition coherence (e.g. whole egg → yolk
-at equal mass, lean chicken → skin-on thigh).
+well on FCS but fail basic nutrition coherence (e.g. whole egg → yolk at equal
+mass, lean chicken → skin-on thigh).
 """
 from __future__ import annotations
 
@@ -21,8 +21,10 @@ _DISCOVERY_SOURCES = frozenset({
     'reformulation',
 })
 
-# Whole-day HEFI bar for matcher/discovery on general_health (curated rules exempt).
-MIN_DISCOVERY_HEFI_DELTA = 0.2
+# Minimum FCS improvement required of matcher/discovery candidates on
+# general_health (curated rules exempt). FCS is 0-100; HEFI's prior bar was
+# 0.2/80 ≈ 0.25 % of max — the FCS equivalent is ≈ 0.25 points.
+MIN_DISCOVERY_FCS_DELTA = 0.25
 
 _RX_FLAVOURED_YOGURT = re.compile(
     r'fruit flavou?red|flavou?red.*yog|yog.*flavou?red|vanilla|strawberr|peach|blueberr',
@@ -66,7 +68,6 @@ def swap_passes_quality_gate(
     nutrients = evaluation.get('nutrients') or {}
     sat_d = float(nutrients.get('sat_fat_g', {}).get('diff', 0.0))
     sodium_d = float(nutrients.get('sodium_mg', {}).get('diff', 0.0))
-    hefi_d = float((evaluation.get('hefi') or {}).get('delta', 0.0))
     fcs_d = float((evaluation.get('fcs') or {}).get('delta', 0.0))
 
     swapped_mass = sum(
@@ -90,12 +91,12 @@ def swap_passes_quality_gate(
 
     if candidate_source in _DISCOVERY_SOURCES:
         if purpose == 'general_health':
-            if hefi_d <= 0.0 and fcs_d <= 0.0:
+            if fcs_d <= 0.0:
                 return False
-            if hefi_d < MIN_DISCOVERY_HEFI_DELTA:
+            if fcs_d < MIN_DISCOVERY_FCS_DELTA:
                 return False
-            # Tiny HEFI win bought with substantial sat fat (egg→yolk pattern).
-            if sat_d > 1.0 and hefi_d < sat_d * 0.4:
+            # Tiny FCS win bought with substantial sat fat (egg→yolk pattern).
+            if sat_d > 1.0 and fcs_d < sat_d * 0.4:
                 return False
 
     if purpose in ('general_health', 'diabetes_friendly'):
@@ -106,7 +107,7 @@ def swap_passes_quality_gate(
                 return False
 
     if candidate_source == 'reformulation' and purpose == 'general_health':
-        if sat_d > 1.0 and hefi_d < 1.0:
+        if sat_d > 1.0 and fcs_d < 1.0:
             return False
 
     return True

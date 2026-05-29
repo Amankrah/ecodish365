@@ -1419,7 +1419,8 @@ export interface SubstitutionSuggestion {
     mass_g: number;
   };
   modified_composition: SubstitutionCompositionItem[];
-  hefi: { before: number; after: number; delta: number };
+  /** FCS-only ranking: substitution analyzer no longer emits HEFI per suggestion. */
+  hefi?: { before: number; after: number; delta: number };
   fcs?: { before: number; after: number; delta: number };
   sustainability_proxy?: { before: number; after: number; delta: number; note?: string };
   nutrients: Record<string, SubstitutionNutrientDelta>;
@@ -1450,7 +1451,8 @@ export interface SubstitutionAnalyzeResponse {
   baseline: {
     composition: SubstitutionCompositionItem[];
     total_mass_g: number;
-    hefi: { total_score: number; max_score: number; components: Record<string, number> };
+    /** FCS-only ranking: baseline no longer carries HEFI. */
+    hefi?: { total_score: number; max_score: number; components: Record<string, number> };
     fcs?: { total_score: number; max_score: number; nova_category?: string };
     nutrients: Record<string, number>;
     sustainability_proxy?: number;
@@ -1484,7 +1486,8 @@ export interface SubstitutionApplyResponse {
   success: boolean;
   composition: SubstitutionCompositionItem[];
   total_mass_g: number;
-  hefi: { total_score: number; max_score: number; components: Record<string, number> };
+  /** FCS-only ranking: apply endpoint no longer returns HEFI. */
+  hefi?: { total_score: number; max_score: number; components: Record<string, number> };
   fcs: { total_score: number; max_score: number; nova_category?: string };
   nutrients: Record<string, number>;
   sustainability_proxy: number;

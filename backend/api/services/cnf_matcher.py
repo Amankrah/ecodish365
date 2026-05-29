@@ -299,6 +299,7 @@ class CNFMatcher:
         query: str,
         top_k: Optional[int] = None,
         source: Optional[str] = None,
+        retrieval_only: bool = False,
     ) -> CNFMatchResult:
         """Free-text → CNF / WAFCT FoodID.
 
@@ -306,6 +307,11 @@ class CNFMatcher:
         to restrict the candidate pool to one food database. Default
         ``None`` searches both. Filtering happens AFTER embedding retrieval
         and BEFORE LLM ranking, so the LLM only sees in-scope candidates.
+
+        ``retrieval_only=True`` skips the LLM rank step and returns the
+        embedding top-1 with cosine similarity as confidence — used by call
+        sites that only consume ``result.alternatives`` (pure cosine), where
+        the LLM call is wasted work.
         """
         t0 = time.perf_counter()
         if not query or not query.strip():
@@ -318,9 +324,13 @@ class CNFMatcher:
 
         # Source-aware cache key — a 'cnf' query and a 'both' query may
         # return different top matches, so they need independent cache slots.
+        # Retrieval-only results have different confidence/justification than
+        # full-match results, so they need their own cache slot too.
         source_norm = source if source in ('cnf', 'wafct') else None
         nq = _normalise_query(query)
         cache_key = nq if source_norm is None else f'{nq}|src:{source_norm}'
+        if retrieval_only:
+            cache_key = f'{cache_key}|ro'
         cached = self._cache_get(cache_key)
         if cached is not None:
             # Return a copy with refreshed timing + cache_hit flag so the
@@ -369,16 +379,23 @@ class CNFMatcher:
         # Build the alternatives list (top-3 excluding the chosen match)
         # AFTER we pick the winner below.
 
-        if self.chat_json_client is None:
-            # Degraded mode: retrieval-only top-1, confidence = cosine sim.
+        if retrieval_only or self.chat_json_client is None:
+            # Retrieval-only top-1, confidence = cosine sim. Either an
+            # intentional skip (caller only consumes `alternatives`) or the
+            # degraded "no LLM key configured" path.
             top_idx, top_sim = candidates[0]
             matched = top_sim >= self.confidence_threshold
+            justification = (
+                'embedding-similarity-only (retrieval_only=True; LLM rank skipped)'
+                if retrieval_only else
+                'embedding-similarity-only (no LLM key configured)'
+            )
             result = self._build_result(
                 query=query, normalised_query=nq,
                 matched=matched,
                 food_idx=top_idx,
                 confidence=float(top_sim),
-                justification='embedding-similarity-only (no LLM key configured)',
+                justification=justification,
                 fallback_reason=None if matched else 'low_confidence',
                 candidates=candidates,
                 used_ai_ranking=False,
@@ -477,6 +494,59 @@ class CNFMatcher:
         return result
 
     # --- internals -------------------------------------------------------
+
+    def prewarm_embeddings(self, queries: List[str]) -> int:
+        """Batch-embed a list of free-text queries into the embedding cache.
+
+        OpenAI's embeddings endpoint accepts up to 2048 inputs per request, so
+        N queries become 1 round-trip instead of N. Returns the number of
+        queries that actually hit the network (cache hits are skipped).
+
+        Used by substitution_discovery to prewarm all ingredient queries
+        before the per-ingredient matcher.match() loop — turns N sequential
+        HTTPS round-trips into one batched call.
+        """
+        if not queries:
+            return 0
+
+        # Normalise + dedupe; filter out anything already cached.
+        wanted: List[str] = []
+        seen: set = set()
+        with self._emb_cache_lock:
+            for q in queries:
+                if not q or not q.strip():
+                    continue
+                nq = _normalise_query(q)
+                if nq in seen or nq in self._emb_cache:
+                    continue
+                seen.add(nq)
+                wanted.append(nq)
+        if not wanted:
+            return 0
+
+        if self.openai_client is None:
+            from openai import OpenAI
+            import os
+            self.openai_client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY', ''))
+
+        resp = self.openai_client.embeddings.create(
+            model=self.embedding_model,
+            input=wanted,
+        )
+        # OpenAI guarantees order matches the input array.
+        with self._emb_cache_lock:
+            for nq, item in zip(wanted, resp.data):
+                qv = np.array(item.embedding, dtype=np.float32)
+                n = np.linalg.norm(qv)
+                if n > 0:
+                    qv = qv / n
+                self._emb_cache[nq] = qv
+                self._emb_cache_order.append(nq)
+                self._emb_cache_misses += 1
+            while len(self._emb_cache_order) > self._emb_cache_size:
+                evict = self._emb_cache_order.pop(0)
+                self._emb_cache.pop(evict, None)
+        return len(wanted)
 
     def _embed_query(self, normalised_query: str) -> np.ndarray:
         """L2-normalised query vector, with LRU cache. AI-MATCH-1.x."""

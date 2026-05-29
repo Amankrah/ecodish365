@@ -150,7 +150,6 @@ export function SubstitutionSuggestionsPanel({
   const [error, setError] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<SubstitutionSuggestion[]>([]);
   const [frontierIds, setFrontierIds] = useState<Set<string>>(new Set());
-  const [baselineHefi, setBaselineHefi] = useState<number | null>(null);
   const [baselineFcs, setBaselineFcs] = useState<number | null>(null);
   const [hasRun, setHasRun] = useState(false);
   const [stale, setStale] = useState(false);
@@ -190,7 +189,6 @@ export function SubstitutionSuggestionsPanel({
         reformulation_mode: reformulationMode,
         constraints,
       });
-      setBaselineHefi(rsp.baseline.hefi.total_score);
       setBaselineFcs(rsp.baseline.fcs?.total_score ?? null);
       setSuggestions(rsp.suggestions);
       setFrontierIds(new Set((rsp.pareto_frontier ?? []).map(s => s.id ?? s.rule_id)));
@@ -383,11 +381,9 @@ export function SubstitutionSuggestionsPanel({
         </fieldset>
       </div>
 
-      {(baselineHefi !== null || baselineFcs !== null) && (
+      {baselineFcs !== null && (
         <p className="text-xs text-gray-500">
-          Current scores:{' '}
-          {baselineHefi !== null && <>HEFI {baselineHefi.toFixed(1)} out of 80</>}
-          {baselineFcs !== null && <> · FCS {baselineFcs.toFixed(0)} out of 100</>}
+          Current score: FCS {baselineFcs.toFixed(0)} out of 100
         </p>
       )}
 
@@ -505,7 +501,6 @@ export function SubstitutionSuggestionsPanel({
                 </div>
 
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <DeltaBadge value={s.hefi.delta} unit=" HEFI" />
                   {s.fcs && <DeltaBadge value={s.fcs.delta} unit=" FCS" />}
                   {s.nutrients.sodium_mg && (
                     <DeltaBadge value={s.nutrients.sodium_mg.diff} unit=" mg Na" invert />

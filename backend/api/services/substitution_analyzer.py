@@ -6,6 +6,7 @@ import itertools
 import logging
 import time
 from concurrent.futures import ThreadPoolExecutor
+from functools import lru_cache
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 from api.cnf_cache import get_api_cnf_pipeline, get_dish_cnf_pipeline
@@ -41,23 +42,18 @@ _NUTRIENT_KEYS: Tuple[Tuple[str, str], ...] = (
     ('SUGARS, TOTAL', 'total_sugars_g'),
 )
 
-_hefi_integrator = None
-
-
 def _parse_constraints(raw: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     return parse_extended_constraints(raw)
 
 
-def _get_hefi_integrator():
-    global _hefi_integrator
-    if _hefi_integrator is None:
-        from django.conf import settings
-        from hefi_calculator.hefi.cnf_integrator import HEFICNFIntegrator
-        _hefi_integrator = HEFICNFIntegrator(settings.CNF_FOLDER)
-    return _hefi_integrator
-
-
+@lru_cache(maxsize=8192)
 def _food_meta(food_id: int) -> Dict[str, Any]:
+    """Cached per (process-singleton) CNF pipeline. The hot loop calls this
+    repeatedly for the same handful of food_ids — caching turned a 7 s
+    cumulative cost into milliseconds in profiling.
+
+    Treat the returned dict as read-only; callers do not mutate it today.
+    """
     pipeline = get_dish_cnf_pipeline()
     details = pipeline.get_food_details(int(food_id))
     if not details:
@@ -66,6 +62,7 @@ def _food_meta(food_id: int) -> Dict[str, Any]:
             'food_description': f'Food ID {food_id}',
             'food_group': '',
             'food_group_id': None,
+            'source': 'cnf',
         }
     src = 'cnf'
     df = pipeline.data_loader.food_name_df
@@ -110,22 +107,6 @@ def _normalize_composition(composition: List[Dict[str, Any]]) -> List[Dict[str, 
 
 def _to_food_data(composition: List[Dict[str, Any]]) -> List[Tuple[int, float]]:
     return [(r['food_id'], r['mass_g']) for r in composition]
-
-
-def _score_hefi(composition: List[Dict[str, Any]]) -> Dict[str, Any]:
-    from hefi_calculator.hefi.models import HEFIInputs
-    from hefi_calculator.hefi.algorithm import compute_hefi
-
-    integrator = _get_hefi_integrator()
-    agg = integrator.aggregate_inputs(_to_food_data(composition))
-    result = compute_hefi(HEFIInputs(**agg))
-    return {
-        'total_score': float(result.total_score),
-        'max_score': 80.0,
-        'components': {
-            k: float(v) for k, v in (result.components or {}).items()
-        } if hasattr(result, 'components') and result.components else {},
-    }
 
 
 def _score_fcs(composition: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -175,7 +156,6 @@ def _nutrient_delta(
 
 def _purpose_score(
     purpose: str,
-    hefi_delta: float,
     fcs_delta: float,
     nutrient_delta: Dict[str, Dict[str, float]],
     sustainability_delta: float,
@@ -192,8 +172,8 @@ def _purpose_score(
         return -(nutrient_delta.get('total_sugars_g', {}).get('diff', 0.0))
     if purpose == 'sustainability':
         return -sustainability_delta
-    # general_health: blend HEFI + FCS
-    return hefi_delta * 0.6 + fcs_delta * 0.4
+    # general_health: FCS-only (HEFI dropped — see substitution_scorecard.py).
+    return fcs_delta
 
 
 def _apply_swap_at(
@@ -242,31 +222,24 @@ def _serialize_composition(composition: List[Dict[str, Any]]) -> List[Dict[str, 
 
 def _evaluate_modification(
     *,
-    baseline_hefi: Dict[str, Any],
     baseline_fcs: Dict[str, Any],
     baseline_nutrients: Dict[str, float],
     baseline_sustain: float,
     modified: List[Dict[str, Any]],
     purpose: str,
 ) -> Dict[str, Any]:
-    mod_hefi = _score_hefi(modified)
+    # FCS-only ranking — HEFI scoring removed from the per-candidate loop.
     mod_fcs = _score_fcs(modified)
     mod_nutrients = _aggregate_nutrients(modified)
     mod_sustain = sustainability_proxy_score(modified)
 
-    hefi_delta = round(mod_hefi['total_score'] - baseline_hefi['total_score'], 2)
     fcs_delta = round(mod_fcs['total_score'] - baseline_fcs['total_score'], 2)
     sustain_delta = round(mod_sustain - baseline_sustain, 3)
     nd = _nutrient_delta(baseline_nutrients, mod_nutrients)
-    rank_score = _purpose_score(purpose, hefi_delta, fcs_delta, nd, sustain_delta)
+    rank_score = _purpose_score(purpose, fcs_delta, nd, sustain_delta)
 
     return {
         'modified_composition': modified,
-        'hefi': {
-            'before': baseline_hefi['total_score'],
-            'after': mod_hefi['total_score'],
-            'delta': hefi_delta,
-        },
         'fcs': {
             'before': baseline_fcs['total_score'],
             'after': mod_fcs['total_score'],
@@ -293,7 +266,6 @@ def _build_suggestion(
     rationale: str,
     ingredient_indices: List[int],
     swaps: List[Dict[str, Any]],
-    baseline_hefi: Dict[str, Any],
     baseline_fcs: Dict[str, Any],
     baseline_nutrients: Dict[str, float],
     baseline_sustain: float,
@@ -302,7 +274,6 @@ def _build_suggestion(
     baseline_composition: Optional[List[Dict[str, Any]]] = None,
 ) -> Optional[Dict[str, Any]]:
     ev = _evaluate_modification(
-        baseline_hefi=baseline_hefi,
         baseline_fcs=baseline_fcs,
         baseline_nutrients=baseline_nutrients,
         baseline_sustain=baseline_sustain,
@@ -477,9 +448,24 @@ def _discovery_candidates(
     exclude = constraints['exclude_food_ids'] | comp_ids
     source_filter = constraints['source_filter']
 
+    # Prewarm embeddings for ALL discovery-eligible ingredient names in ONE
+    # batched OpenAI call instead of N sequential round-trips. Subsequent
+    # matcher.match(retrieval_only=True) calls inside the per-ingredient loop
+    # hit the embedding cache.
+    from api.services.substitution_roles import is_primary_seasoning
+    from api.services.cnf_matcher import get_default_matcher
+    queries = [
+        ing['food_description'] for ing in rows
+        if not is_primary_seasoning(ing.get('food_description', ''))
+    ]
+    if queries:
+        try:
+            get_default_matcher().prewarm_embeddings(queries)
+        except Exception as exc:  # noqa: BLE001
+            logger.debug('matcher prewarm failed (continuing serial): %s', exc)
+
     for idx, ing in enumerate(rows):
         # Pure seasonings (salt, spice) are not 1:1 mass food swaps — skip discovery.
-        from api.services.substitution_roles import is_primary_seasoning
         if is_primary_seasoning(ing.get('food_description', '')):
             continue
 
@@ -635,7 +621,6 @@ def _greedy_reformulation_plans(
     purpose: str,
     parsed_constraints: Dict[str, Any],
     dish_name: Optional[str],
-    baseline_hefi: Dict[str, Any],
     baseline_fcs: Dict[str, Any],
     baseline_nutrients: Dict[str, float],
     baseline_sustain: float,
@@ -667,7 +652,6 @@ def _greedy_reformulation_plans(
                 rationale=spec['rationale'],
                 ingredient_indices=spec['ingredient_indices'],
                 swaps=spec['swaps'],
-                baseline_hefi=baseline_hefi,
                 baseline_fcs=baseline_fcs,
                 baseline_nutrients=baseline_nutrients,
                 baseline_sustain=baseline_sustain,
@@ -693,7 +677,6 @@ def _greedy_reformulation_plans(
         combined_swaps.extend(s.get('swaps') or [])
 
     plan_ev = _evaluate_modification(
-        baseline_hefi=baseline_hefi,
         baseline_fcs=baseline_fcs,
         baseline_nutrients=baseline_nutrients,
         baseline_sustain=baseline_sustain,
@@ -751,7 +734,6 @@ def _greedy_reformulation_plans(
         'original': step_suggestions[0]['original'],
         'replacement': step_suggestions[-1]['replacement'],
         'modified_composition': _serialize_composition(plan_ev['modified_composition']),
-        'hefi': plan_ev['hefi'],
         'fcs': plan_ev.get('fcs'),
         'sustainability_proxy': plan_ev.get('sustainability_proxy'),
         'nutrients': plan_ev['nutrients'],
@@ -781,7 +763,7 @@ def analyze_substitutions(
     rows = _normalize_composition(composition)
     total_mass = sum(r['mass_g'] for r in rows)
 
-    baseline_hefi = _score_hefi(rows)
+    # FCS-only ranking — HEFI no longer computed for substitution.
     baseline_fcs = _score_fcs(rows)
     baseline_nutrients = _aggregate_nutrients(rows)
     baseline_sustain = sustainability_proxy_score(rows)
@@ -791,9 +773,11 @@ def analyze_substitutions(
         rows, purpose, parsed_constraints, dish_name=dish_name,
     ))
 
-    evaluated_singles: List[Dict[str, Any]] = []
-    for spec in specs:
-        sug = _build_suggestion(
+    # Each candidate's _build_suggestion is independent and FCS scoring is a
+    # stateless Rust call (GIL-released), so evaluate the spec list in
+    # parallel. With ~20+ candidates this is the largest remaining serial cost.
+    def _evaluate_spec(spec: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        return _build_suggestion(
             suggestion_id=spec['suggestion_id'],
             rule_id=spec.get('rule_id', spec['suggestion_id']),
             suggestion_type=spec['suggestion_type'],
@@ -802,7 +786,6 @@ def analyze_substitutions(
             rationale=spec['rationale'],
             ingredient_indices=spec['ingredient_indices'],
             swaps=spec['swaps'],
-            baseline_hefi=baseline_hefi,
             baseline_fcs=baseline_fcs,
             baseline_nutrients=baseline_nutrients,
             baseline_sustain=baseline_sustain,
@@ -810,6 +793,18 @@ def analyze_substitutions(
             purpose=purpose,
             baseline_composition=rows,
         )
+
+    evaluated_singles: List[Dict[str, Any]] = []
+    if len(specs) > 1:
+        with ThreadPoolExecutor(
+                max_workers=min(8, len(specs)),
+                thread_name_prefix='subst-eval',
+        ) as ex:
+            for sug in ex.map(_evaluate_spec, specs):
+                if sug:
+                    evaluated_singles.append(sug)
+    elif specs:
+        sug = _evaluate_spec(specs[0])
         if sug:
             evaluated_singles.append(sug)
 
@@ -844,7 +839,6 @@ def analyze_substitutions(
                 rationale=spec['rationale'],
                 ingredient_indices=spec['ingredient_indices'],
                 swaps=spec['swaps'],
-                baseline_hefi=baseline_hefi,
                 baseline_fcs=baseline_fcs,
                 baseline_nutrients=baseline_nutrients,
                 baseline_sustain=baseline_sustain,
@@ -862,7 +856,6 @@ def analyze_substitutions(
             purpose=purpose,
             parsed_constraints=parsed_constraints,
             dish_name=dish_name,
-            baseline_hefi=baseline_hefi,
             baseline_fcs=baseline_fcs,
             baseline_nutrients=baseline_nutrients,
             baseline_sustain=baseline_sustain,
@@ -916,7 +909,6 @@ def analyze_substitutions(
         'baseline': {
             'composition': rows,
             'total_mass_g': round(total_mass, 1),
-            'hefi': baseline_hefi,
             'fcs': baseline_fcs,
             'nutrients': baseline_nutrients,
             'sustainability_proxy': baseline_sustain,
@@ -949,7 +941,6 @@ def score_modified_composition(
         'success': True,
         'composition': _serialize_composition(rows),
         'total_mass_g': round(total_mass, 1),
-        'hefi': _score_hefi(rows),
         'fcs': _score_fcs(rows),
         'nutrients': _aggregate_nutrients(rows),
         'sustainability_proxy': sustainability_proxy_score(rows),

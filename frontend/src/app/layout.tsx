@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     template: "%s | EcoDish365",
   },
   description:
-    "Score any food, meal, or full day against six published research measures. Plain-language results, real uncertainty, and the limits the science actually states. 6,719 foods, no invented grades, no single score pretending to settle it.",
+    "Score any food, meal, or full day against six published research measures. Plain-language results, real uncertainty, and the limits the science actually states. 7,000+ foods, no invented grades, no single score pretending to settle it.",
   keywords: [
     "nutrition analysis", "Canadian Nutrient File", "CNF database", "food research", 
     "Health Star Rating", "HSR calculator", "Food Compass Score", "FCS calculator",
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     siteName: "EcoDish365",
     title: "EcoDish365 — Honest nutrition and sustainability scoring for any food",
     description:
-      "Score any food, meal, or full day against six published research measures. Plain-language results with the limits the science states. 6,719 foods.",
+      "Score any food, meal, or full day against six published research measures. Plain-language results with the limits the science states. 7,000+ foods.",
     images: [
       {
         url: `${SITE_URL}/og-image.png`,

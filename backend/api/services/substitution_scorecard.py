@@ -8,9 +8,12 @@ from api.services.substitution_discovery import sustainability_proxy_score
 
 logger = logging.getLogger(__name__)
 
-SCORECARD_METRICS = (
-    'hefi', 'heni', 'hsr', 'fcs', 'environmental', 'dietary_pattern',
-)
+# Substitution scoring is FCS-only: the per-candidate hot loop dominated
+# wall-clock at ~145 s/request (nginx 504s). HEFI/HENI/HSR/LCA/dietary_pattern
+# scorers were retained in this module (still callable via _SCORERS_FULL) but
+# the substitution path no longer invokes them. To re-enable for substitution,
+# add the keys back to SCORECARD_METRICS and _SCORERS.
+SCORECARD_METRICS = ('fcs',)
 
 
 def _composition_foods(composition: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -124,7 +127,9 @@ def _score_dietary_pattern(composition: List[Dict[str, Any]]) -> Dict[str, Any]:
     }
 
 
-_SCORERS = {
+# Full scorer registry — preserved so a future caller can opt back in by
+# referencing _SCORERS_FULL instead of _SCORERS.
+_SCORERS_FULL = {
     'hefi': _score_hefi,
     'fcs': _score_fcs,
     'heni': _score_heni,
@@ -132,6 +137,9 @@ _SCORERS = {
     'environmental': _score_environmental,
     'dietary_pattern': _score_dietary_pattern,
 }
+
+# Active scorers for substitution. Must match SCORECARD_METRICS.
+_SCORERS = {'fcs': _score_fcs}
 
 
 def score_composition(composition: List[Dict[str, Any]]) -> Dict[str, Any]:

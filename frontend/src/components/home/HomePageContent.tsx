@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { CNFApiService } from '@/lib/api';
 import {
   BeakerIcon,
   UserGroupIcon,
@@ -106,7 +107,7 @@ const tools = [
   {
     emoji: '🔍',
     name: 'CNF + WAFCT explorer',
-    description: 'Search the full food catalogue of 6,719 foods. Smart search understands synonyms, French, and compound queries.',
+    description: 'Search the full food catalogue. Smart search understands synonyms, French, and compound queries.',
     href: '/cnf',
   },
   {
@@ -135,14 +136,34 @@ const audiences = [
   },
 ];
 
-const stats = [
-  { value: '6,719', label: 'Foods in catalogue', sub: 'Canadian Nutrient File plus the West African Food Composition Table' },
+const staticStats = [
   { value: '6', label: 'Scoring lenses', sub: 'HEFI, HENI, HSR, FCS, Environmental, Dietary pattern' },
   { value: '2,425', label: 'Environmental inventory entries', sub: 'AGRIBALYSE 3.2, ADEME 2024' },
   { value: '3', label: 'Ways to read every score', sub: 'Individual, Researcher, Policy' },
 ];
 
+const formatNumber = (num: number) => new Intl.NumberFormat().format(num);
+
 export default function HomePageContent() {
+  const [foodCount, setFoodCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    CNFApiService.getDatabaseStatistics()
+      .then((data) => setFoodCount(data.food_count))
+      .catch((error) => {
+        console.error('Failed to load catalogue food count:', error);
+      });
+  }, []);
+
+  const stats = [
+    {
+      value: foodCount != null ? formatNumber(foodCount) : '—',
+      label: 'Foods in catalogue',
+      sub: 'Canadian Nutrient File plus the West African Food Composition Table',
+    },
+    ...staticStats,
+  ];
+
   return (
     <div className="min-h-screen">
       {/* Hero */}

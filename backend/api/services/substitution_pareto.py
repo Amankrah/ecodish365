@@ -3,8 +3,10 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Tuple
 
-# Metrics to maximize (delta). Environmental uses invert in scorecard.
-PARETO_AXES = ('hefi', 'fcs', 'hsr', 'heni', 'environmental', 'dietary_pattern')
+# Metrics to maximize (delta). Substitution is FCS-only (see
+# substitution_scorecard.SCORECARD_METRICS); other axes left as keys so
+# re-enabling them later just requires re-listing here.
+PARETO_AXES = ('fcs',)
 
 
 def _axis_value(suggestion: Dict[str, Any], metric: str) -> float | None:
