@@ -63,6 +63,16 @@ def test_unknown_food_is_none():
     assert is_mixed(_UNKNOWN) is None
 
 
+def test_wafct_foods_are_covered_when_present():
+    # WAFCT foods (FoodID >= 700000) are labeled too, so the override gate can fire on
+    # West African composite dishes. Skips where the WAFCT workbook wasn't ingested.
+    rec = get_food_type(700000)  # "Baling béinré ... porridge" -> a composite local dish
+    if rec is None:
+        pytest.skip('WAFCT not ingested / not labeled in this environment')
+    assert rec['food_type'] in ('single', 'mixed')
+    assert is_mixed(700000) is (rec['food_type'] == 'mixed')
+
+
 def test_record_shape():
     _require_labels()
     rec = get_food_type(_APPLE)

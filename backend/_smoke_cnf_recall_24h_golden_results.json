@@ -4,16 +4,16 @@
   "pin_model": "gpt-4.1-mini @ temperature=0",
   "pin_name": "breakfast_lunch_dinner_canonical_350g",
   "totals": {
-    "pass": 1,
+    "pass": 0,
     "total": 1
   },
   "result": {
     "overlap": 1.0,
     "observed_count": 6,
     "expected_count": 6,
-    "observed_resolved_mass_g": 342.0,
+    "observed_resolved_mass_g": 347.0,
     "expected_resolved_mass_g": 342.0,
-    "observed_kcal": 986.0,
+    "observed_kcal": 957.7,
     "expected_kcal": 986.0,
     "observed_food_ids": [
       118,
@@ -36,10 +36,10 @@
       "g2_overlap": true,
       "g3_count": true,
       "g4_total_mass": true,
-      "g5_per_food_mass": true,
+      "g5_per_food_mass": false,
       "g6_kcal_drift": true
     },
-    "overall_pass": true,
-    "detail": "ok"
+    "overall_pass": false,
+    "detail": "per-food mass drift exceeds 15.0g"
   }
 }

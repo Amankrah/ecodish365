@@ -1,11 +1,11 @@
 {
-  "git_rev": "f16d78d",
-  "generated_at_utc": "2026-05-29T10:43:12.885606+00:00",
+  "git_rev": "0ea6558",
+  "generated_at_utc": "2026-05-29T11:15:29.708917+00:00",
   "sample_size": 20,
   "summary": {
     "total": 20,
-    "pass": 14,
-    "review": 4,
+    "pass": 13,
+    "review": 5,
     "flagged": 2,
     "matched_rate": 0.95,
     "compound_gate_correct": 20,
@@ -32,7 +32,7 @@
       "compound_detected": true,
       "compound_expected": true,
       "n_ingredients": 1,
-      "decomposition_confidence": 0.75,
+      "decomposition_confidence": 0.7,
       "resolved_mass_g": 100.0,
       "unresolved_mass_g": 300.0,
       "unresolved_description": "",
@@ -63,7 +63,7 @@
       ],
       "note": "The headline regression case: catalog preference must NOT collapse this onto one food and drop the juice.",
       "cache_hit": false,
-      "latency_seconds": 6.66
+      "latency_seconds": 7.35
     },
     {
       "dish": "chicken soup",
@@ -72,7 +72,7 @@
       "flag_reasons": [],
       "review_reasons": [],
       "matched": true,
-      "fallback_reason": "catalog_override:kcal_err=0.318",
+      "fallback_reason": "catalog_override:kcal_err=0.047",
       "behavior": "catalog_override",
       "expect_behavior": "catalog_override",
       "compound_detected": false,
@@ -107,7 +107,7 @@
       ],
       "note": "A dilute single mixed dish. The reconstruction gate should override a too-dense decomposition onto a MEASURED (mixed) soup food.",
       "cache_hit": false,
-      "latency_seconds": 8.7
+      "latency_seconds": 8.92
     },
     {
       "dish": "spaghetti bolognese",
@@ -194,13 +194,13 @@
           "desc": "Olive oil",
           "group": "WAFCT — Fats and oils",
           "mass_g": 5.0,
-          "food_type": null,
+          "food_type": "single",
           "resolution_confidence": 0.95
         }
       ],
       "note": "",
       "cache_hit": false,
-      "latency_seconds": 9.44
+      "latency_seconds": 10.55
     },
     {
       "dish": "grilled cheese with a side of fries",
@@ -215,12 +215,12 @@
       "compound_detected": true,
       "compound_expected": true,
       "n_ingredients": 4,
-      "decomposition_confidence": 0.75,
+      "decomposition_confidence": 0.85,
       "resolved_mass_g": 240.0,
       "unresolved_mass_g": 10.0,
-      "unresolved_description": "salt and minor seasonings on fries and sandwich",
+      "unresolved_description": "salt, pepper, and minor cooking oil residue on fries",
       "dish_as_ingredient_count": 2,
-      "energy_density_kcal_100g": 236.2,
+      "energy_density_kcal_100g": 260.2,
       "energy_density_band": [
         220,
         410
@@ -248,7 +248,7 @@
           "group": "Dairy and Egg Products",
           "mass_g": 50.0,
           "food_type": "mixed",
-          "resolution_confidence": 0.85
+          "resolution_confidence": 0.8
         },
         {
           "food_id": 118,
@@ -256,11 +256,11 @@
           "group": "Dairy and Egg Products",
           "mass_g": 10.0,
           "food_type": "single",
-          "resolution_confidence": 0.85
+          "resolution_confidence": 0.9
         },
         {
-          "food_id": 2435,
-          "desc": "Potato, french-fried, frozen, all types, salt added in processing, home-prepared, heated in oven",
+          "food_id": 6518,
+          "desc": "Potato, french-fried, frozen, partially fried, cottage cut, heated in oven, with salt",
           "group": "Vegetables and Vegetable Products",
           "mass_g": 100.0,
           "food_type": "single",
@@ -269,7 +269,7 @@
       ],
       "note": "A main plus a separate side; the fries must survive.",
       "cache_hit": false,
-      "latency_seconds": 8.02
+      "latency_seconds": 7.9
     },
     {
       "dish": "burger and a coke",
@@ -283,13 +283,13 @@
       "expect_behavior": "decompose",
       "compound_detected": true,
       "compound_expected": true,
-      "n_ingredients": 9,
+      "n_ingredients": 8,
       "decomposition_confidence": 0.75,
       "resolved_mass_g": 550.0,
-      "unresolved_mass_g": 20.0,
-      "unresolved_description": "minor cooking oils, salt, pepper, and other condiments",
-      "dish_as_ingredient_count": 5,
-      "energy_density_kcal_100g": 148.0,
+      "unresolved_mass_g": 0.0,
+      "unresolved_description": "",
+      "dish_as_ingredient_count": 4,
+      "energy_density_kcal_100g": 147.1,
       "energy_density_band": [
         70,
         200
@@ -309,7 +309,7 @@
           "group": "Beef Products",
           "mass_g": 120.0,
           "food_type": "single",
-          "resolution_confidence": 0.85
+          "resolution_confidence": 0.8
         },
         {
           "food_id": 3985,
@@ -324,16 +324,16 @@
           "desc": "Lettuce, raw",
           "group": "WAFCT — Vegetables and their products",
           "mass_g": 15.0,
-          "food_type": null,
+          "food_type": "single",
           "resolution_confidence": 0.85
         },
         {
-          "food_id": 2460,
-          "desc": "Tomato, red, ripe, raw, year round average",
-          "group": "Vegetables and Vegetable Products",
+          "food_id": 700530,
+          "desc": "Tomato, red, ripe, raw",
+          "group": "WAFCT — Vegetables and their products",
           "mass_g": 20.0,
           "food_type": "single",
-          "resolution_confidence": 0.9
+          "resolution_confidence": 0.95
         },
         {
           "food_id": 7005,
@@ -349,36 +349,28 @@
           "group": "Fats and Oils",
           "mass_g": 15.0,
           "food_type": "mixed",
-          "resolution_confidence": 0.9
-        },
-        {
-          "food_id": 2494,
-          "desc": "Tomato ketchup (catsup)",
-          "group": "Vegetables and Vegetable Products",
-          "mass_g": 10.0,
-          "food_type": "mixed",
           "resolution_confidence": 0.95
         },
         {
-          "food_id": 2338,
-          "desc": "Pickles, cucumber, sour",
+          "food_id": 2495,
+          "desc": "Pickles, cucumber, dill (includes Kosher and Polish)",
           "group": "Vegetables and Vegetable Products",
           "mass_g": 10.0,
           "food_type": "mixed",
-          "resolution_confidence": 0.85
+          "resolution_confidence": 0.8
         },
         {
           "food_id": 5288,
           "desc": "Carbonated drinks, cola",
           "group": "Beverages",
-          "mass_g": 270.0,
+          "mass_g": 280.0,
           "food_type": "single",
           "resolution_confidence": 0.85
         }
       ],
       "note": "A main plus a separate sugary drink; the cola must survive.",
       "cache_hit": false,
-      "latency_seconds": 13.52
+      "latency_seconds": 10.4
     },
     {
       "dish": "chicken caesar salad",
@@ -386,16 +378,16 @@
       "verdict": "review",
       "flag_reasons": [],
       "review_reasons": [
-        "behavior:catalog_override_expected_decompose"
+        "behavior:catalog_short_circuit_expected_decompose"
       ],
       "matched": true,
-      "fallback_reason": "catalog_override:kcal_err=0.257",
-      "behavior": "catalog_override",
+      "fallback_reason": "catalog_direct_match",
+      "behavior": "catalog_short_circuit",
       "expect_behavior": "decompose",
       "compound_detected": false,
       "compound_expected": false,
       "n_ingredients": 1,
-      "decomposition_confidence": 0.85,
+      "decomposition_confidence": 0.9,
       "resolved_mass_g": 250.0,
       "unresolved_mass_g": 0.0,
       "unresolved_description": "",
@@ -420,12 +412,12 @@
           "group": "Mixed Dishes",
           "mass_g": 250.0,
           "food_type": "mixed",
-          "resolution_confidence": 0.85
+          "resolution_confidence": 0.9
         }
       ],
       "note": "",
       "cache_hit": false,
-      "latency_seconds": 5.62
+      "latency_seconds": 1.17
     },
     {
       "dish": "beef stew",
@@ -436,7 +428,7 @@
         "behavior:catalog_override_expected_decompose"
       ],
       "matched": true,
-      "fallback_reason": "catalog_override:kcal_err=1.197",
+      "fallback_reason": "catalog_override:kcal_err=1.065",
       "behavior": "catalog_override",
       "expect_behavior": "decompose",
       "compound_detected": false,
@@ -472,7 +464,7 @@
       ],
       "note": "Key new-gate case: must NOT be collapsed onto a SINGLE ingredient (e.g. 'Beef, ground'). Should decompose, or at worst override onto a measured beef-STEW (mixed) food.",
       "cache_hit": false,
-      "latency_seconds": 14.99
+      "latency_seconds": 10.31
     },
     {
       "dish": "macaroni and cheese",
@@ -481,7 +473,7 @@
       "flag_reasons": [],
       "review_reasons": [],
       "matched": true,
-      "fallback_reason": "catalog_override:kcal_err=0.197",
+      "fallback_reason": "catalog_override:kcal_err=0.168",
       "behavior": "catalog_override",
       "expect_behavior": "catalog_override",
       "compound_detected": false,
@@ -517,7 +509,7 @@
       ],
       "note": "Single dish using 'and' as a recipe descriptor — must keep catalog preference (not treated as compound).",
       "cache_hit": false,
-      "latency_seconds": 5.94
+      "latency_seconds": 7.17
     },
     {
       "dish": "fish and chips",
@@ -530,7 +522,7 @@
         "behavior:catalog_override_expected_decompose"
       ],
       "matched": true,
-      "fallback_reason": "catalog_override:kcal_err=0.439",
+      "fallback_reason": "catalog_override:kcal_err=0.418",
       "behavior": "catalog_override",
       "expect_behavior": "decompose",
       "compound_detected": false,
@@ -567,7 +559,7 @@
       ],
       "note": "Single dish using 'and' as a recipe descriptor — not compound.",
       "cache_hit": false,
-      "latency_seconds": 4.07
+      "latency_seconds": 8.21
     },
     {
       "dish": "vegetable stir fry with rice",
@@ -578,7 +570,7 @@
         "behavior:catalog_override_expected_decompose"
       ],
       "matched": true,
-      "fallback_reason": "catalog_override:kcal_err=0.047",
+      "fallback_reason": "catalog_override:kcal_err=0.041",
       "behavior": "catalog_override",
       "expect_behavior": "decompose",
       "compound_detected": false,
@@ -614,7 +606,7 @@
       ],
       "note": "",
       "cache_hit": false,
-      "latency_seconds": 7.32
+      "latency_seconds": 10.25
     },
     {
       "dish": "pepperoni pizza",
@@ -660,7 +652,7 @@
       ],
       "note": "A measured mixed dish in CNF — expect a confident catalog name match (short-circuit) or override onto the measured pizza.",
       "cache_hit": false,
-      "latency_seconds": 8.08
+      "latency_seconds": 5.95
     },
     {
       "dish": "oatmeal with berries and a glass of milk",
@@ -715,13 +707,13 @@
           "desc": "Milk, cow, reduced fat, 1.5–2% fat",
           "group": "WAFCT — Milk and its products",
           "mass_g": 200.0,
-          "food_type": null,
+          "food_type": "single",
           "resolution_confidence": 0.85
         }
       ],
       "note": "Cooked/hydrated dish plus a separate glass of milk; the milk must survive and the energy density must reflect the cooked (diluted) form.",
       "cache_hit": false,
-      "latency_seconds": 4.56
+      "latency_seconds": 5.6
     },
     {
       "dish": "chicken curry with naan",
@@ -730,18 +722,18 @@
       "flag_reasons": [],
       "review_reasons": [],
       "matched": true,
-      "fallback_reason": "partial_resolution:0.60_of_mass_resolved",
+      "fallback_reason": "partial_resolution:0.63_of_mass_resolved",
       "behavior": "decompose",
       "expect_behavior": "decompose",
       "compound_detected": false,
       "compound_expected": false,
       "n_ingredients": 2,
       "decomposition_confidence": 0.75,
-      "resolved_mass_g": 210.0,
-      "unresolved_mass_g": 140.0,
+      "resolved_mass_g": 220.0,
+      "unresolved_mass_g": 130.0,
       "unresolved_description": "cooking oil and minor seasonings in curry and naan",
       "dish_as_ingredient_count": 1,
-      "energy_density_kcal_100g": 152.6,
+      "energy_density_kcal_100g": 160.8,
       "energy_density_band": [
         140,
         300
@@ -767,14 +759,14 @@
           "food_id": 6606,
           "desc": "Indian, bread, naan",
           "group": "Baked Products",
-          "mass_g": 70.0,
+          "mass_g": 80.0,
           "food_type": "mixed",
           "resolution_confidence": 0.95
         }
       ],
       "note": "",
       "cache_hit": false,
-      "latency_seconds": 4.36
+      "latency_seconds": 6.6
     },
     {
       "dish": "lasagna",
@@ -783,7 +775,7 @@
       "flag_reasons": [],
       "review_reasons": [],
       "matched": true,
-      "fallback_reason": "catalog_override:kcal_err=0.169",
+      "fallback_reason": "catalog_override:kcal_err=0.072",
       "behavior": "catalog_override",
       "expect_behavior": "catalog_override",
       "compound_detected": false,
@@ -819,7 +811,7 @@
       ],
       "note": "A measured mixed dish — expect catalog short-circuit or override onto the measured lasagna.",
       "cache_hit": false,
-      "latency_seconds": 6.06
+      "latency_seconds": 9.51
     },
     {
       "dish": "peanut butter and jelly sandwich",
@@ -837,7 +829,7 @@
       "decomposition_confidence": 0.85,
       "resolved_mass_g": 80.0,
       "unresolved_mass_g": 20.0,
-      "unresolved_description": "small amounts of butter or margarine, and minor residual moisture",
+      "unresolved_description": "minor amounts of butter or margarine, and small residual moisture",
       "dish_as_ingredient_count": 2,
       "energy_density_kcal_100g": 309.9,
       "energy_density_band": [
@@ -872,7 +864,7 @@
       ],
       "note": "Single sandwich using 'and' as a recipe descriptor — not compound.",
       "cache_hit": false,
-      "latency_seconds": 8.36
+      "latency_seconds": 6.16
     },
     {
       "dish": "tomato soup and a grilled cheese",
@@ -888,11 +880,11 @@
       "compound_expected": true,
       "n_ingredients": 4,
       "decomposition_confidence": 0.85,
-      "resolved_mass_g": 365.0,
-      "unresolved_mass_g": 5.0,
-      "unresolved_description": "minor seasonings and cooking residues in soup and sandwich",
+      "resolved_mass_g": 370.0,
+      "unresolved_mass_g": 0.0,
+      "unresolved_description": "",
       "dish_as_ingredient_count": 3,
-      "energy_density_kcal_100g": 154.7,
+      "energy_density_kcal_100g": 164.4,
       "energy_density_band": [
         70,
         240
@@ -928,20 +920,20 @@
           "group": "Dairy and Egg Products",
           "mass_g": 50.0,
           "food_type": "mixed",
-          "resolution_confidence": 0.85
+          "resolution_confidence": 0.8
         },
         {
           "food_id": 118,
           "desc": "Butter, regular",
           "group": "Dairy and Egg Products",
-          "mass_g": 15.0,
+          "mass_g": 20.0,
           "food_type": "single",
           "resolution_confidence": 0.85
         }
       ],
       "note": "Two component dishes; both must survive (a legitimate all-mixed decomposition, NOT a degenerate one).",
       "cache_hit": false,
-      "latency_seconds": 4.25
+      "latency_seconds": 5.71
     },
     {
       "dish": "scrambled eggs, bacon and toast",
@@ -955,13 +947,13 @@
       "expect_behavior": "decompose",
       "compound_detected": false,
       "compound_expected": false,
-      "n_ingredients": 3,
-      "decomposition_confidence": 0.75,
-      "resolved_mass_g": 190.0,
-      "unresolved_mass_g": 10.0,
-      "unresolved_description": "butter or oil used for cooking eggs and bacon, plus minor salt and pepper seasonings",
+      "n_ingredients": 4,
+      "decomposition_confidence": 0.85,
+      "resolved_mass_g": 200.0,
+      "unresolved_mass_g": 0.0,
+      "unresolved_description": "",
       "dish_as_ingredient_count": 2,
-      "energy_density_kcal_100g": 251.1,
+      "energy_density_kcal_100g": 276.2,
       "energy_density_band": [
         150,
         350
@@ -996,14 +988,22 @@
           "food_id": 3732,
           "desc": "Bread, white, commercial, toasted",
           "group": "Baked Products",
-          "mass_g": 40.0,
+          "mass_g": 45.0,
           "food_type": "mixed",
+          "resolution_confidence": 0.85
+        },
+        {
+          "food_id": 118,
+          "desc": "Butter, regular",
+          "group": "Dairy and Egg Products",
+          "mass_g": 5.0,
+          "food_type": "single",
           "resolution_confidence": 0.85
         }
       ],
       "note": "Comma-list compound the gate does NOT detect (compound=false documents the limitation) — but all three components must still survive a decomposition.",
       "cache_hit": false,
-      "latency_seconds": 5.14
+      "latency_seconds": 6.03
     },
     {
       "dish": "jollof rice with chicken",
@@ -1021,9 +1021,9 @@
       "decomposition_confidence": 0.75,
       "resolved_mass_g": 347.0,
       "unresolved_mass_g": 3.0,
-      "unresolved_description": "salt, spices, and minor herbs typical in jollof seasoning",
-      "dish_as_ingredient_count": 0,
-      "energy_density_kcal_100g": 151.9,
+      "unresolved_description": "salt, spices, and minor herbs typical in jollof rice seasoning",
+      "dish_as_ingredient_count": 1,
+      "energy_density_kcal_100g": 152.2,
       "energy_density_band": [
         130,
         250
@@ -1042,7 +1042,7 @@
           "desc": "Rice, white, polished, boiled* (without salt), drained",
           "group": "WAFCT — Cereals and their products",
           "mass_g": 200.0,
-          "food_type": null,
+          "food_type": "single",
           "resolution_confidence": 0.85
         },
         {
@@ -1054,12 +1054,12 @@
           "resolution_confidence": 0.85
         },
         {
-          "food_id": 2461,
-          "desc": "Tomato, red, ripe, boiled",
+          "food_id": 5557,
+          "desc": "Tomato sauce, unsalted",
           "group": "Vegetables and Vegetable Products",
-          "mass_g": 20.0,
-          "food_type": "single",
-          "resolution_confidence": 0.85
+          "mass_g": 25.0,
+          "food_type": "mixed",
+          "resolution_confidence": 0.8
         },
         {
           "food_id": 2402,
@@ -1073,7 +1073,7 @@
           "food_id": 2486,
           "desc": "Pepper, sweet, red, boiled, drained",
           "group": "Vegetables and Vegetable Products",
-          "mass_g": 10.0,
+          "mass_g": 5.0,
           "food_type": "single",
           "resolution_confidence": 0.85
         },
@@ -1083,12 +1083,12 @@
           "group": "Fats and Oils",
           "mass_g": 7.0,
           "food_type": "single",
-          "resolution_confidence": 0.8
+          "resolution_confidence": 0.6
         }
       ],
       "note": "",
       "cache_hit": false,
-      "latency_seconds": 7.34
+      "latency_seconds": 7.52
     },
     {
       "dish": "caesar salad with a glass of white wine",
@@ -1108,7 +1108,7 @@
       "unresolved_mass_g": 0.0,
       "unresolved_description": "",
       "dish_as_ingredient_count": 2,
-      "energy_density_kcal_100g": 198.0,
+      "energy_density_kcal_100g": 202.3,
       "energy_density_band": [
         80,
         230
@@ -1139,53 +1139,55 @@
           "resolution_confidence": 0.85
         },
         {
+          "food_id": 3885,
+          "desc": "Croutons, plain",
+          "group": "Baked Products",
+          "mass_g": 40.0,
+          "food_type": "mixed",
+          "resolution_confidence": 0.85
+        },
+        {
           "food_id": 93,
           "desc": "Cheese, parmesan, shredded",
           "group": "Dairy and Egg Products",
           "mass_g": 20.0,
           "food_type": "single",
-          "resolution_confidence": 0.85
-        },
-        {
-          "food_id": 3886,
-          "desc": "Croutons, seasoned",
-          "group": "Baked Products",
-          "mass_g": 30.0,
-          "food_type": "mixed",
-          "resolution_confidence": 0.85
+          "resolution_confidence": 0.8
         },
         {
           "food_id": 2852,
           "desc": "Alcohol, table wine, white (11.5% alcohol by volume)",
           "group": "Beverages",
-          "mass_g": 80.0,
+          "mass_g": 70.0,
           "food_type": "single",
           "resolution_confidence": 0.85
         }
       ],
       "note": "A dish plus a separate alcoholic drink; the wine must survive.",
       "cache_hit": false,
-      "latency_seconds": 8.39
+      "latency_seconds": 6.33
     },
     {
       "dish": "apple pie",
       "total_mass_g": 125.0,
-      "verdict": "pass",
+      "verdict": "review",
       "flag_reasons": [],
-      "review_reasons": [],
+      "review_reasons": [
+        "behavior:decompose_expected_catalog_short_circuit"
+      ],
       "matched": true,
-      "fallback_reason": "catalog_direct_match",
-      "behavior": "catalog_short_circuit",
+      "fallback_reason": null,
+      "behavior": "decompose",
       "expect_behavior": "catalog_short_circuit",
       "compound_detected": false,
       "compound_expected": false,
-      "n_ingredients": 1,
-      "decomposition_confidence": 0.9,
-      "resolved_mass_g": 125.0,
-      "unresolved_mass_g": 0.0,
-      "unresolved_description": "",
-      "dish_as_ingredient_count": 0,
-      "energy_density_kcal_100g": 265.0,
+      "n_ingredients": 5,
+      "decomposition_confidence": 0.75,
+      "resolved_mass_g": 121.0,
+      "unresolved_mass_g": 4.0,
+      "unresolved_description": "minor amounts of water, salt, and other spices in crust and filling",
+      "dish_as_ingredient_count": 1,
+      "energy_density_kcal_100g": 238.6,
       "energy_density_band": [
         190,
         320
@@ -1197,20 +1199,52 @@
       ],
       "must_keep_dropped": [],
       "collapsed_onto_single": false,
-      "collapsed_food_type": "mixed",
+      "collapsed_food_type": null,
       "ingredients": [
         {
-          "food_id": 3942,
-          "desc": "Pie, apple, homemade, 2 crust",
+          "food_id": 1696,
+          "desc": "Apple, raw, with skin",
+          "group": "Fruits and fruit juices",
+          "mass_g": 70.0,
+          "food_type": "single",
+          "resolution_confidence": 0.95
+        },
+        {
+          "food_id": 3972,
+          "desc": "Pie crust, standard type, homemade, baked",
           "group": "Baked Products",
-          "mass_g": 125.0,
+          "mass_g": 40.0,
           "food_type": "mixed",
-          "resolution_confidence": 0.9
+          "resolution_confidence": 0.85
+        },
+        {
+          "food_id": 4318,
+          "desc": "Sweets, sugars, granulated (white)",
+          "group": "Sweets",
+          "mass_g": 7.0,
+          "food_type": "single",
+          "resolution_confidence": 0.95
+        },
+        {
+          "food_id": 178,
+          "desc": "Spices, cinnamon, ground",
+          "group": "Spices and Herbs",
+          "mass_g": 1.0,
+          "food_type": "single",
+          "resolution_confidence": 0.85
+        },
+        {
+          "food_id": 118,
+          "desc": "Butter, regular",
+          "group": "Dairy and Egg Products",
+          "mass_g": 3.0,
+          "food_type": "single",
+          "resolution_confidence": 0.85
         }
       ],
       "note": "A measured mixed dish — expect catalog short-circuit or override onto the measured apple pie.",
       "cache_hit": false,
-      "latency_seconds": 1.16
+      "latency_seconds": 7.49
     }
   ]
 }

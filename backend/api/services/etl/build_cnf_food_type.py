@@ -89,6 +89,23 @@ _GROUP_LEAN: Dict[str, str] = {
     'Breakfast cereals': 'usually mixed (processed)',
     'Babyfoods': 'mixed dinners vs single purees — judge per item',
     'Snacks': 'usually mixed',
+    # WAFCT 2019 groups (West African foods, FoodID >= 700000). Many entries in the
+    # ingredient-named groups are actually composite local dishes (porridges, balls,
+    # stews), so several leans are "judge per item" — the description is the real signal.
+    'WAFCT — Cereals and their products': 'raw grains single; porridges/local cereal dishes mixed — judge per item',
+    'WAFCT — Legumes and their products': 'plain legumes single; bean dishes mixed — judge per item',
+    'WAFCT — Vegetables and their products': 'plain vegetables single; vegetable dishes mixed — judge per item',
+    'WAFCT — Meat, poultry and their products': 'plain cuts single; meat dishes/stews mixed — judge per item',
+    'WAFCT — Fish and its products': 'plain fish single; fish dishes mixed — judge per item',
+    'WAFCT — Starchy roots, tubers and their products': 'plain roots/tubers single; tuber dishes mixed — judge per item',
+    'WAFCT — Fruits and their products': 'usually single',
+    'WAFCT — Fats and oils': 'usually single',
+    'WAFCT — Nuts, seeds and their products': 'usually single',
+    'WAFCT — Soups and sauces': 'usually mixed',
+    'WAFCT — Milk and its products': 'plain milk single; milk-based dishes mixed — judge per item',
+    'WAFCT — Beverages': 'usually single',
+    'WAFCT — Eggs and their products': 'plain eggs single; egg dishes mixed — judge per item',
+    'WAFCT — Miscellaneous': 'judge per item',
 }
 
 # Pricing snapshot (USD per 1M tokens) for the cost projection. Update with rate changes.
@@ -262,8 +279,8 @@ def _save(labels: Dict[str, Dict], failed: List[int], cnf_total: int) -> None:
                 'food_type is "single" (one ingredient as eaten, incl. cooked/minimally '
                 'processed) or "mixed" (composite dish / multi-ingredient product). '
                 'Consumed by api.services.cnf_food_type and the recipe decomposer to gate '
-                'the catalog-override onto measured mixed dishes only. WAFCT foods '
-                '(FoodID >= 700000) are not labeled here.'
+                'the catalog-override onto measured mixed dishes only. Covers both CNF and '
+                'WAFCT (FoodID >= 700000) foods unless built with --cnf-only.'
             ),
         },
         'labels': labels,
@@ -284,7 +301,8 @@ def _save(labels: Dict[str, Dict], failed: List[int], cnf_total: int) -> None:
 
 def main(limit: Optional[int] = None,
          food_ids: Optional[List[int]] = None,
-         workers: int = 8) -> int:
+         workers: int = 8,
+         cnf_only: bool = False) -> int:
     _here = Path(__file__).resolve()
     backend_dir = _here.parents[3]  # api/services/etl -> backend
     if str(backend_dir) not in sys.path:
@@ -299,10 +317,13 @@ def main(limit: Optional[int] = None,
     client = OpenAI(api_key=api_key)
 
     cnf_foods = _load_cnf_foods()
-    # CNF only — WAFCT foods (FoodID >= 700000) stay unlabeled (override won't fire
-    # for them, which is safe). Keeps the pass to ~6k foods and avoids paying for
-    # region-specific dishes the gate doesn't need.
-    cnf_foods = [c for c in cnf_foods if c['food_id'] < 700000]
+    # By default label BOTH CNF and WAFCT (FoodID >= 700000): West African composite
+    # dishes (porridges, stews, sauces) are exactly the foods the catalog-override gate
+    # should be allowed to fire on, so they need labels too. --cnf-only restores the
+    # original CNF-only pass (leaving WAFCT unlabeled -> override never fires on them).
+    if cnf_only:
+        cnf_foods = [c for c in cnf_foods if c['food_id'] < 700000]
+        logger.info('cnf-only: WAFCT foods (>=700000) excluded')
     if food_ids:
         wanted = set(food_ids)
         cnf_foods = [c for c in cnf_foods if c['food_id'] in wanted]
@@ -357,8 +378,12 @@ if __name__ == '__main__':
                    help='Classify only these CNF FoodIDs (comma-separated)')
     p.add_argument('--workers', type=int, default=8,
                    help='Concurrent OpenAI workers (default 8; calls release the GIL)')
+    p.add_argument('--cnf-only', action='store_true',
+                   help='Label only CNF foods, leaving WAFCT (>=700000) unlabeled '
+                        '(default labels both)')
     args = p.parse_args()
     fids = None
     if args.food_ids:
         fids = [int(x.strip()) for x in args.food_ids.split(',') if x.strip()]
-    sys.exit(main(limit=args.limit, food_ids=fids, workers=args.workers))
+    sys.exit(main(limit=args.limit, food_ids=fids, workers=args.workers,
+                  cnf_only=args.cnf_only))

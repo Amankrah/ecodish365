@@ -122,9 +122,9 @@ def _should_override_with_catalog(
 def _catalog_food_is_overridable(food_id: int) -> bool:
     """Food-type guard on the catalog override: only collapse a dish onto a catalog
     food that is itself a MIXED dish (so "chicken soup" -> a measured soup is allowed,
-    but "beef stew" -> "Beef, ground" is not). Unlabeled (None, e.g. WAFCT) -> not
-    overridable, which keeps the decomposition. Pure (no I/O beyond the cached label
-    lookup) so the gate is unit-testable."""
+    but "beef stew" -> "Beef, ground" is not). Unlabeled (None) -> not overridable,
+    which keeps the decomposition. Pure (no I/O beyond the cached label lookup) so the
+    gate is unit-testable."""
     return is_mixed(int(food_id)) is True
 
 
@@ -304,7 +304,17 @@ class CNFRecipeDecomposer:
         "CNF entry. A 100 g serving of soup is mostly water (~20-40 kcal), a "
         "cooked grain has absorbed 2-3x its dry weight in water; if you list dry/"
         "raw ingredients at the cooked total mass you will overstate calories ~2x. "
-        "Make the explicit water/cooked-form choice so the energy density is right.\n\n"
+        "Make the explicit water/cooked-form choice so the energy density is right.\n"
+        "DRY-DISH EXCLUSION: do NOT add free water to dry or cold-assembled foods — "
+        "sandwiches, wraps, toast, bread, crackers, dry snacks, granola, cookies, "
+        "salads, cheese-and-crackers, and the like. Their ingredients' own moisture is "
+        "already in the CNF profile, so adding tap water there wrongly dilutes the "
+        "nutrition. Water-as-an-ingredient is ONLY for dishes that are genuinely "
+        "simmered, boiled, steeped, reconstituted, or diluted.\n"
+        "NEVER use water (or unresolved_mass) merely to pad up to a large stated total "
+        "mass. If the named dish is smaller than the stated mass (e.g. a 350 g "
+        "\"sandwich\"), SCALE THE REAL INGREDIENTS UP proportionally to fill the mass — "
+        "do not invent filler water.\n\n"
         "CONFIDENCE CALIBRATION: `decomposition_confidence` = P(a "
         "nutrition curator would call this list LCA-equivalent to the dish). "
         "If you ran this 10 times with different proportions within plausible "
@@ -461,7 +471,7 @@ class CNFRecipeDecomposer:
         # itself a MIXED dish. This keeps the correct "chicken soup -> measured
         # chicken-noodle soup" behaviour (a mixed dish) while preventing a dish from
         # being collapsed onto a single ingredient ("beef stew" -> "Beef, ground").
-        # Unlabeled (None, e.g. WAFCT) -> do not override; keep the decomposition.
+        # Unlabeled (None) -> do not override; keep the decomposition.
         if (cm is not None and cm.matched and cm.food_id is not None
                 and cm.confidence >= CATALOG_OVERRIDE_CONF
                 and _catalog_food_is_overridable(int(cm.food_id))

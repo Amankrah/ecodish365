@@ -12,10 +12,10 @@ a free-text dish is only ever collapsed onto a food that is itself a measured
 *mixed* dish, never onto a single ingredient ("chicken soup" -> a measured
 chicken-noodle soup is fine; "beef stew" -> "Beef, ground" is not).
 
-`is_mixed(food_id)` returns None when a food has no label — an unknown id, or a
-WAFCT food (FoodID >= 700000) that the CNF-only classification pass never covered.
-Callers must treat None as "don't know" (the override simply does not fire), which
-is the safe default.
+`is_mixed(food_id)` returns None when a food has no label — e.g. an unknown id. The
+classification pass covers both CNF and WAFCT (FoodID >= 700000) foods; callers must
+still treat None as "don't know" (the override simply does not fire), which is the
+safe default for anything unlabeled.
 """
 from __future__ import annotations
 
@@ -74,8 +74,8 @@ def _ensure_loaded() -> None:
 def get_food_type(food_id: int) -> Optional[Dict]:
     """Return {food_type, confidence, rationale} for a labeled food, or None.
 
-    None means the food has no label (unknown id, or a WAFCT food not covered by
-    the CNF-only classification pass).
+    None means the food has no label (e.g. an unknown id). Both CNF and WAFCT foods
+    are covered by the classification pass.
     """
     _ensure_loaded()
     assert _cache is not None

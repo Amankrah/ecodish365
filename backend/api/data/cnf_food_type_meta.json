@@ -1,9 +1,9 @@
 {
-  "date_utc": "2026-05-29T10:25:24Z",
-  "content_sha256_16": "b7f78e49d54ef67b",
-  "labeled": 5993,
-  "single": 3375,
-  "mixed": 2618,
+  "date_utc": "2026-05-29T11:12:41Z",
+  "content_sha256_16": "53dbdc81719cf26f",
+  "labeled": 7021,
+  "single": 4263,
+  "mixed": 2758,
   "low_confidence": 0,
   "failed": 0
 }
