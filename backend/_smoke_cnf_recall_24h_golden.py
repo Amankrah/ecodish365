@@ -26,6 +26,9 @@ GATES (at the recall / aggregate level):
   G3 aggregated ingredient-count drift   |observed - baseline| ≤ 2
   G4 aggregated resolved-mass drift       |observed - baseline| ≤ 15 g
   G5 per-FoodID mass drift                |observed - baseline| ≤ 15 g per overlapping FoodID
+                                          (after collapsing mass-equivalent food forms,
+                                           e.g. toasted/untoasted white bread — see
+                                           _MASS_EQUIV_GROUPS)
   G6 estimated_daily_kcal drift           |observed - baseline| / baseline ≤ 15 %
 
 If this fails after an LLM model update, the appropriate response is to
@@ -94,9 +97,12 @@ GOLDEN: GoldenRecall = GoldenRecall(
     # Re-baselined 2026-05-28 after the cooked-form prompt + force_decompose: the
     # cooked-form rule now resolves scrambled eggs to the COOKED entry (133, was raw
     # 125), and peanut butter to 3399 (was 3414). Food-id set + kcal are stable;
-    # the toasted-vs-untoasted bread mass split (3732 / 4066) is mildly LLM-noisy.
+    # the toasted-vs-untoasted bread mass split (3732 / 4066) is mildly LLM-noisy, so G5
+    # gates the COMBINED white-bread mass (3732 + 4066 = 170 g), not each variant — the
+    # LLM legitimately calls grilled-cheese bread "toasted" on one run and "plain" the
+    # next, with the same total + kcal (see _MASS_EQUIV_GROUPS).
     expected_aggregate={
-        3732:   120.0,   # Bread, white, commercial, toasted
+        3732:   120.0,   # Bread, white, commercial, toasted   (3732+4066 combined = 170 g)
         133:     90.0,   # Egg, chicken, whole, cooked, scrambled or omelet
         4066:    50.0,   # Bread, white, commercial
         7005:    40.0,   # Cheese, processed product, cheddar, slices
@@ -115,6 +121,28 @@ COUNT_DRIFT_MAX         = 2       # G3: ±2 ingredients (looser than per-dish)
 TOTAL_MASS_DRIFT_G_MAX  = 15.0    # G4: ±15 g total resolved (looser than per-dish ±10)
 PER_FOOD_MASS_DRIFT_G   = 15.0    # G5: ±15 g per overlapping FoodID
 KCAL_DRIFT_FRAC_MAX     = 0.15    # G6: ±15 % of baseline kcal
+
+# G5 mass-equivalence groups: sets of CNF FoodIDs that are the SAME food in
+# interchangeable forms, so the per-food mass gate should not split them. The LLM
+# legitimately varies whether a sandwich's bread is "toasted" (3732) vs plain white
+# (4066) — same commercial white bread, near-identical nutrients — which made g5 flake
+# even though total bread mass + kcal were stable. We collapse each group onto a
+# canonical id (its min) before the per-food check, so the GROUP total is still gated
+# (±15 g) but the toasted/untoasted attribution no longer matters. Add a group here
+# only for foods that are genuinely the same food in a different form.
+_MASS_EQUIV_GROUPS = [
+    {4066, 3732},   # Bread, white, commercial — plain (4066) vs toasted (3732)
+]
+_EQUIV_CANON = {fid: min(g) for g in _MASS_EQUIV_GROUPS for fid in g}
+
+
+def _collapse_equiv(aggregate: Dict[int, float]) -> Dict[int, float]:
+    """Sum mass-equivalent FoodIDs onto their canonical id (others pass through)."""
+    out: Dict[int, float] = {}
+    for fid, mass in aggregate.items():
+        canon = _EQUIV_CANON.get(int(fid), int(fid))
+        out[canon] = out.get(canon, 0.0) + float(mass)
+    return out
 
 
 # --- Runner ---------------------------------------------------------------
@@ -170,11 +198,15 @@ def run_golden(orchestrator) -> GoldenCheck:
     g2 = overlap >= INGREDIENT_OVERLAP_MIN
     g3 = abs(len(obs_aggregate) - len(GOLDEN.expected_aggregate)) <= COUNT_DRIFT_MAX
     g4 = abs(r.total_resolved_mass_g - GOLDEN.expected_resolved_mass_g) <= TOTAL_MASS_DRIFT_G_MAX
-    overlaps = exp_ids & obs_ids
-    g5 = all(
-        abs(obs_aggregate[fid] - GOLDEN.expected_aggregate[fid]) <= PER_FOOD_MASS_DRIFT_G
-        for fid in overlaps
-    ) if overlaps else False
+    # G5 on mass-equivalence-collapsed aggregates so the toasted/untoasted bread split
+    # (and any future same-food-different-form pair) is gated by GROUP total, not by the
+    # noisy per-variant attribution.
+    obs_collapsed = _collapse_equiv(obs_aggregate)
+    exp_collapsed = _collapse_equiv(GOLDEN.expected_aggregate)
+    collapsed_overlaps = set(exp_collapsed) & set(obs_collapsed)
+    g5_drifts = {fid: abs(obs_collapsed[fid] - exp_collapsed[fid]) for fid in collapsed_overlaps}
+    g5 = (all(d <= PER_FOOD_MASS_DRIFT_G for d in g5_drifts.values())
+          if collapsed_overlaps else False)
     kcal_drift = (
         abs(r.estimated_daily_kcal - GOLDEN.expected_daily_kcal)
         / GOLDEN.expected_daily_kcal
@@ -188,7 +220,10 @@ def run_golden(orchestrator) -> GoldenCheck:
     if not g2: details.append(f'overlap={overlap:.2f}<{INGREDIENT_OVERLAP_MIN}')
     if not g3: details.append(f'count drift {abs(len(obs_aggregate)-len(GOLDEN.expected_aggregate))}>{COUNT_DRIFT_MAX}')
     if not g4: details.append(f'mass drift {abs(r.total_resolved_mass_g - GOLDEN.expected_resolved_mass_g):.1f}g>{TOTAL_MASS_DRIFT_G_MAX}g')
-    if not g5: details.append(f'per-food mass drift exceeds {PER_FOOD_MASS_DRIFT_G}g')
+    if not g5:
+        worst = max(g5_drifts.items(), key=lambda kv: kv[1])
+        details.append(f'per-food mass drift exceeds {PER_FOOD_MASS_DRIFT_G}g '
+                       f'(worst: FoodID {worst[0]} off by {worst[1]:.1f}g, after bread-form collapse)')
     if not g6: details.append(f'kcal drift {kcal_drift:.1%}>{KCAL_DRIFT_FRAC_MAX:.0%}')
     if not details: details.append('ok')
 

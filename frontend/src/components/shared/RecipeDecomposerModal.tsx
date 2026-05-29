@@ -76,6 +76,11 @@ export function RecipeDecomposerModal({
   // Which ingredient row is in "swap" mode (showing AIEnhancedSearch)
   const [swappingIdx, setSwappingIdx] = useState<number | null>(null);
   const [swapQuery, setSwapQuery]     = useState('');
+  // "Add ingredient" panel: a free-text query resolved via the same AI search the
+  // decomposer + swap use, plus the portion to add (defaults to the unresolved remainder).
+  const [adding, setAdding]       = useState(false);
+  const [addQuery, setAddQuery]   = useState('');
+  const [addMass, setAddMass]     = useState(0);
   // WAFCT-EXTEND (2026-05-24): food-database scope for the decompose call
   // AND for the per-row swap matcher.
   const [source, setSource]       = useState<SourceChoice>(initialSource);
@@ -90,6 +95,9 @@ export function RecipeDecomposerModal({
       setEditIngs([]);
       setSwappingIdx(null);
       setSwapQuery('');
+      setAdding(false);
+      setAddQuery('');
+      setAddMass(0);
       setSource(initialSource);
     }
   }, [open, defaultMassG, initialSource]);
@@ -101,6 +109,8 @@ export function RecipeDecomposerModal({
     setResult(null);
     setEditIngs([]);
     setSwappingIdx(null);
+    setAdding(false);
+    setAddQuery('');
     try {
       const r = await CNFApiService.decomposeRecipe(dishName, totalMass, { userType, source });
       setResult(r);
@@ -137,6 +147,19 @@ export function RecipeDecomposerModal({
       } : ing));
     setSwappingIdx(null);
     setSwapQuery('');
+  }
+  function addIng(picked: { food_id: number; food_description: string; food_group?: string }) {
+    setEditIngs(prev => [...prev, {
+      food_id:               picked.food_id,
+      food_description:      picked.food_description,
+      food_group:            picked.food_group || '',
+      mass_g:                addMass > 0 ? addMass : 0,
+      rationale:             'user-added',
+      resolution_confidence: null,   // unknown — user-picked, not Stage-2 resolved
+    }]);
+    setAdding(false);
+    setAddQuery('');
+    setAddMass(0);
   }
 
   function handleApply() {
@@ -349,6 +372,61 @@ export function RecipeDecomposerModal({
                   </li>
                 ))}
               </ul>
+
+              {/* Add ingredient — same AI-backed search as Swap/decompose */}
+              {adding ? (
+                <div className="bg-white rounded border p-2 space-y-2">
+                  <div className="text-xs text-gray-600">Add an ingredient:</div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      autoFocus
+                      value={addQuery}
+                      onChange={e => setAddQuery(e.target.value)}
+                      placeholder="Type an ingredient to add (e.g. egg noodles, rice)…"
+                      className="flex-1 min-w-0 px-2 py-1.5 text-sm border border-gray-300 rounded"
+                    />
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={addMass}
+                      onChange={e => setAddMass(Math.max(0, parseFloat(e.target.value) || 0))}
+                      className="w-20 px-2 py-1 text-sm border border-gray-300 rounded text-right"
+                      aria-label="Mass of the ingredient to add"
+                    />
+                    <span className="text-xs text-gray-500">g</span>
+                  </div>
+                  <AIEnhancedSearch
+                    query={addQuery}
+                    userType={userType}
+                    accent={accent}
+                    source={source}
+                    onSelect={picked => addIng(picked)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => { setAdding(false); setAddQuery(''); setAddMass(0); }}
+                    className="text-xs text-gray-500 hover:text-gray-700"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAdding(true);
+                    setAddQuery('');
+                    setAddMass(Math.max(0, Math.round(editedUnresolved)));
+                  }}
+                  className="inline-flex items-center gap-1 text-xs px-2 py-1 text-gray-700
+                             hover:text-gray-900 hover:bg-gray-100 rounded border border-dashed border-gray-300"
+                >
+                  <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+                  Add ingredient
+                </button>
+              )}
 
               {/* Running totals */}
               <div className="text-xs text-gray-600 pt-2 border-t flex items-center justify-between">
