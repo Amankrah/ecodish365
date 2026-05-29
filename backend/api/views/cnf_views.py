@@ -252,6 +252,96 @@ def search_foods_by_nutrient(request):
         }
     })
 
+@api_view(['POST'])
+@permission_classes([AllowAny])
+@handle_exceptions
+def discover_foods(request):
+    """Multi-criteria nutrient discovery for the research workbench.
+
+    Body (JSON):
+      criteria: [{nutrient_id, min?, max?}, ...]  (AND; thresholds in the chosen basis)
+      basis: 'per_100g' | 'per_100kcal'
+      food_group_id: int (optional scope)
+      source: 'cnf' | 'wafct' (optional; default both)
+      ratio: {numerator_id, denominator_id} (optional; reported + sortable)
+      dv_threshold: {nutrient_id, min_pct?, max_pct?} (optional; %DV on per-100 g amount)
+      sort: {key, direction}   key = NutrientID | 'ratio' | 'energy'; direction 'asc'|'desc'
+      limit: int (<= 200)
+    """
+    body = request.data or {}
+
+    raw_criteria = body.get('criteria', [])
+    if not isinstance(raw_criteria, list):
+        return Response({"error": "criteria must be a list"}, status=status.HTTP_400_BAD_REQUEST)
+    criteria = []
+    for c in raw_criteria:
+        try:
+            item = {'nutrient_id': int(c['nutrient_id'])}
+        except (KeyError, TypeError, ValueError):
+            return Response({"error": "each criterion needs an integer nutrient_id"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        try:
+            for k in ('min', 'max'):
+                if c.get(k) is not None:
+                    item[k] = float(c[k])
+        except (TypeError, ValueError):
+            return Response({"error": "criterion min/max must be numbers"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        criteria.append(item)
+
+    basis = body.get('basis', 'per_100g')
+    if basis not in ('per_100g', 'per_100kcal'):
+        basis = 'per_100g'
+
+    food_group_id = body.get('food_group_id')
+    try:
+        food_group_id = int(food_group_id) if food_group_id not in (None, '') else None
+    except (TypeError, ValueError):
+        food_group_id = None
+
+    source = body.get('source')
+    if source not in ('cnf', 'wafct'):
+        source = None
+
+    ratio = body.get('ratio')
+    if ratio:
+        try:
+            ratio = {'numerator_id': int(ratio['numerator_id']),
+                     'denominator_id': int(ratio['denominator_id'])}
+        except (KeyError, TypeError, ValueError):
+            return Response({"error": "ratio needs integer numerator_id and denominator_id"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+    dv_threshold = body.get('dv_threshold')
+    if dv_threshold:
+        try:
+            dvt = {'nutrient_id': int(dv_threshold['nutrient_id'])}
+            for k in ('min_pct', 'max_pct'):
+                if dv_threshold.get(k) is not None:
+                    dvt[k] = float(dv_threshold[k])
+            dv_threshold = dvt
+        except (KeyError, TypeError, ValueError):
+            return Response({"error": "dv_threshold needs an integer nutrient_id and numeric pct"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+    sort = body.get('sort') if isinstance(body.get('sort'), dict) else None
+
+    try:
+        limit = int(body.get('limit', 100))
+    except (TypeError, ValueError):
+        limit = 100
+
+    if not criteria and not ratio and not dv_threshold:
+        return Response(
+            {"error": "Provide at least one criterion, a ratio, or a %DV threshold"},
+            status=status.HTTP_400_BAD_REQUEST)
+
+    result = get_cnf_pipeline().discover_foods(
+        criteria=criteria, basis=basis, food_group_id=food_group_id, source=source,
+        ratio=ratio, dv_threshold=dv_threshold, sort=sort, limit=limit)
+    return Response({"success": True, "data": result})
+
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 @handle_exceptions

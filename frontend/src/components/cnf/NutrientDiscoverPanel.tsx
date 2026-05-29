@@ -8,6 +8,8 @@ import { CNFApiService, type Food, type Nutrient } from '@/lib/api';
 import { SourceBadge } from '@/components/shared/SourceBadge';
 import type { UserType } from '@/components/shared/AudienceToggle';
 import { NUTRIENT_DISCOVER_PRESETS } from '@/lib/cnfNutrientDiscover';
+import { groupNutrients } from '@/lib/cnfNutrientGroups';
+import { CNF_DAILY_VALUES, percentDV } from '@/lib/cnfDailyValues';
 
 interface NutrientDiscoverPanelProps {
   userType: UserType;
@@ -49,9 +51,10 @@ export function NutrientDiscoverPanel({
 
   const filteredNutrients = useMemo(() => {
     const q = nutrientQuery.trim().toLowerCase();
-    if (!q) return nutrients.slice(0, compact ? 40 : 80);
-    return nutrients.filter(n => n.NutrientName.toLowerCase().includes(q)).slice(0, compact ? 40 : 80);
-  }, [nutrients, nutrientQuery, compact]);
+    if (!q) return nutrients;
+    return nutrients.filter(n => n.NutrientName.toLowerCase().includes(q));
+  }, [nutrients, nutrientQuery]);
+  const groupedNutrients = useMemo(() => groupNutrients(filteredNutrients), [filteredNutrients]);
 
   const selectedNutrient = nutrients.find(n => n.NutrientID === selectedNutrientId);
 
@@ -104,8 +107,6 @@ export function NutrientDiscoverPanel({
     runSearch(preset.nutrientId, preset.minValue, preset.maxValue, preset.label);
   };
 
-  const selectSize = compact ? Math.min(4, Math.max(3, filteredNutrients.length)) : Math.min(6, Math.max(3, filteredNutrients.length));
-
   return (
     <div className={compact ? 'space-y-3' : 'space-y-4'}>
       <div>
@@ -147,14 +148,17 @@ export function NutrientDiscoverPanel({
             id={compact ? 'modal-nutrient-select' : 'nutrient-select'}
             value={selectedNutrientId ?? ''}
             onChange={(e) => setSelectedNutrientId(e.target.value ? Number(e.target.value) : null)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-            size={selectSize}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white"
           >
             <option value="">Select a nutrient…</option>
-            {filteredNutrients.map(n => (
-              <option key={n.NutrientID} value={n.NutrientID}>
-                {n.NutrientName}{n.NutrientUnit ? ` (${n.NutrientUnit})` : ''}
-              </option>
+            {groupedNutrients.map(({ group, nutrients: ns }) => (
+              <optgroup key={group.key} label={group.label}>
+                {ns.map(n => (
+                  <option key={n.NutrientID} value={n.NutrientID}>
+                    {n.NutrientName}{n.NutrientUnit ? ` (${n.NutrientUnit})` : ''}{CNF_DAILY_VALUES[n.NutrientID] ? ' · %DV' : ''}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
         </div>
@@ -229,7 +233,15 @@ export function NutrientDiscoverPanel({
                           <span>{resolveGroupName(food.FoodGroupID, food.FoodGroupName)}</span>
                           {food.queried_nutrient_value != null && (
                             <span className="font-medium text-emerald-700">
-                              {food.queried_nutrient_value.toFixed(2)} / 100 g
+                              {food.queried_nutrient_value.toFixed(2)}{selectedNutrient?.NutrientUnit ? ` ${selectedNutrient.NutrientUnit}` : ''} / 100 g
+                              {selectedNutrientId != null && CNF_DAILY_VALUES[selectedNutrientId] && (() => {
+                                const dv = percentDV(
+                                  selectedNutrientId,
+                                  food.queried_nutrient_value,
+                                  (other) => food.NutrientValues?.find(nv => nv.NutrientID === other)?.NutrientValue ?? null,
+                                );
+                                return dv != null ? <span className="ml-1 text-[10px] text-emerald-600">({dv.toFixed(0)}% DV)</span> : null;
+                              })()}
                             </span>
                           )}
                         </div>

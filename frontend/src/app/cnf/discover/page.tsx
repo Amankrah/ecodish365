@@ -1,33 +1,24 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { CNFApiService, type Food } from '@/lib/api';
-import { useCnfExplorer } from '@/components/cnf/CnfExplorerContext';
-import { FoodDetailDrawer } from '@/components/cnf/FoodProfileContent';
-import { NutrientDiscoverPanel } from '@/components/cnf/NutrientDiscoverPanel';
+import { NutrientWorkbench } from '@/components/cnf/NutrientWorkbench';
 
 export default function CNFNutrientDiscoverPage() {
-  const { userType, resolveGroupName } = useCnfExplorer();
-  const [selectedFood, setSelectedFood] = useState<Food | null>(null);
-
   return (
     <div className="min-h-screen bg-gray-50 py-6">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Discover by nutrient</h1>
           <p className="text-gray-600">
-            Find foods in the catalogue by nutrient content per 100 g. Results sort highest value first.
-            Open any food for lens panels, environmental preview, and Scorecard handoff.
+            A research workbench over the CNF + WAFCT catalogue. Combine nutrient bounds, rank by
+            density per 100 kcal or by clinical ratios, threshold on % Daily Value, scope to a food
+            group, and export the result set. Open any food for its lens panels and Scorecard handoff.
           </p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-          <NutrientDiscoverPanel
-            userType={userType}
-            resolveGroupName={resolveGroupName}
-            onQuickView={setSelectedFood}
-          />
+          <NutrientWorkbench />
         </div>
 
         <p className="mt-4 text-sm text-gray-500">
@@ -36,15 +27,6 @@ export default function CNFNutrientDiscoverPage() {
           {' '}and switch to Discover by nutrient in the add-food dialog.
         </p>
       </div>
-
-      {selectedFood && (
-        <FoodDetailDrawer
-          food={selectedFood}
-          userType={userType}
-          groupLabel={resolveGroupName(selectedFood.FoodGroupID, selectedFood.FoodGroupName)}
-          onClose={() => setSelectedFood(null)}
-        />
-      )}
     </div>
   );
 }

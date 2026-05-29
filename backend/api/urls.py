@@ -15,7 +15,7 @@ from .views.cnf_views import (
     add_food_to_cnf, add_foods_batch, manage_cnf_food,
     
     # Search and Exploration
-    search_cnf_foods, search_foods_by_nutrient, get_foods_by_group, compare_foods,
+    search_cnf_foods, search_foods_by_nutrient, discover_foods, get_foods_by_group, compare_foods,
     
     # Reference Data
     get_food_groups_view, get_food_sources_view, get_nutrient_sources_view,
@@ -77,6 +77,7 @@ urlpatterns = [
     # additive — the basic fuzzy search above is unchanged).
     path('cnf/search/ai-enhanced/', cnf_ai_search_views.cnf_ai_enhanced_search, name='cnf_ai_enhanced_search'),
     path('cnf/search/by-nutrient/', search_foods_by_nutrient, name='search_foods_by_nutrient'),
+    path('cnf/discover/', discover_foods, name='discover_foods'),
     path('cnf/groups/<int:food_group_id>/foods/', get_foods_by_group, name='get_foods_by_group'),
     path('cnf/compare/', compare_foods, name='compare_foods'),
     

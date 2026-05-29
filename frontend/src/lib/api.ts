@@ -120,6 +120,44 @@ export interface Nutrient {
   NutrientUnit?: string;
 }
 
+// --- Multi-criteria nutrient discovery (research workbench) ---
+export type DiscoverBasis = 'per_100g' | 'per_100kcal';
+export interface DiscoverCriterion { nutrient_id: number; min?: number; max?: number; }
+export interface DiscoverRatio { numerator_id: number; denominator_id: number; }
+export interface DiscoverDvThreshold { nutrient_id: number; min_pct?: number; max_pct?: number; }
+export interface DiscoverSort { key: number | 'ratio' | 'energy'; direction?: 'asc' | 'desc'; }
+export interface DiscoverRequest {
+  criteria: DiscoverCriterion[];
+  basis?: DiscoverBasis;
+  food_group_id?: number | null;
+  source?: 'cnf' | 'wafct' | 'both';
+  ratio?: DiscoverRatio | null;
+  dv_threshold?: DiscoverDvThreshold | null;
+  sort?: DiscoverSort | null;
+  limit?: number;
+}
+export interface DiscoverFood {
+  FoodID: number;
+  FoodCode: string;
+  FoodDescription: string;
+  FoodGroupID: number | null;
+  FoodGroupName: string;
+  source: string;
+  energy_kcal: number | null;
+  /** per-100 g value for each involved NutrientID (keys are stringified ids). */
+  nutrient_values: Record<string, number>;
+  /** per-100 kcal value per nutrient when basis === 'per_100kcal' (else empty). */
+  basis_values: Record<string, number>;
+  ratio_value: number | null;
+  sort_value: number | null;
+}
+export interface DiscoverResult {
+  foods: DiscoverFood[];
+  involved_nutrient_ids: number[];
+  basis: DiscoverBasis;
+  count: number;
+}
+
 export interface FoodSource {
   FoodSourceID: number;
   FoodSourceDescription: string;
@@ -668,6 +706,22 @@ export class CNFApiService {
     if (maxValue !== undefined) params.max_value = maxValue;
 
     const response = await api.get(`/cnf/search/by-nutrient/`, { params });
+    return response.data.data;
+  }
+
+  /** Multi-criteria nutrient discovery (research workbench). */
+  static async discoverFoods(req: DiscoverRequest): Promise<DiscoverResult> {
+    const body: Record<string, unknown> = {
+      criteria: req.criteria ?? [],
+      basis: req.basis ?? 'per_100g',
+      limit: req.limit ?? 100,
+    };
+    if (req.food_group_id != null) body.food_group_id = req.food_group_id;
+    if (req.source && req.source !== 'both') body.source = req.source;
+    if (req.ratio) body.ratio = req.ratio;
+    if (req.dv_threshold) body.dv_threshold = req.dv_threshold;
+    if (req.sort) body.sort = req.sort;
+    const response = await api.post(`/cnf/discover/`, body);
     return response.data.data;
   }
 

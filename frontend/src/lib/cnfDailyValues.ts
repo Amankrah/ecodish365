@@ -1,30 +1,28 @@
 /**
  * Health Canada % Daily Value (%DV) reference, keyed by CNF NutrientID.
  *
+ * The values now live in a single committed data file, cnfDailyValues.data.json,
+ * which is byte-mirrored by backend/api/data/cnf_daily_values.json so the frontend
+ * %DV display and the backend %DV-threshold filtering can never drift. A backend
+ * parity test pins the two `values` maps equal.
+ *
  * Source: Health Canada — "Nutrition labelling: Table of daily values" (canada.ca),
- * published 2022-10-20. This is the in-force table: the previous 2016-12-14 version
- * sunset on 2025-12-31. We use the adult / general-population column — Part 1
- * "Column 3" for macronutrients + sodium, and Part 2 "Column 4" ("any other case")
- * for vitamins and minerals.
+ * published 2022-10-20. In-force table (the 2016-12-14 version sunset 2025-12-31).
+ * Adult / general-population column: Part 1 "Column 3" for macronutrients + sodium,
+ * Part 2 "Column 4" ("any other case") for vitamins and minerals. Vitamin forms follow
+ * Food and Drug Regulations D.01.003 (Vitamin A = RAE 320, Vitamin D = D2 + D3 µg 328,
+ * Vitamin E = α-tocopherol 323, Niacin = NE 409, Folate = DFE 435).
  *
- * Per the table, calculations for vitamins follow Food and Drug Regulations D.01.003,
- * which fixes the form each DV is expressed in. The CNF NutrientID we map to therefore
- * matches that form: Vitamin A = Retinol Activity Equivalents (320), Vitamin D =
- * D2 + D3 in µg (328, not the IU entry 324), Vitamin E = α-tocopherol (323), Niacin =
- * niacin equivalents (409), Folate = Dietary Folate Equivalents (435, not total folacin).
- *
- * Deliberately NOT included:
- *  - Cholesterol (601): the table lists a 300 mg DV, but Canadian Nutrition Facts
- *    tables show cholesterol as an amount only, with no %DV. We follow the label.
- *  - Protein and total carbohydrate: Canada assigns no %DV to either (a carbohydrate
- *    DV exists only in the US system).
- *  - Iodide, chromium, molybdenum, chloride: the CNF does not carry these nutrients,
- *    so there is nothing to compute a %DV against.
+ * Deliberately NOT included: cholesterol (601, no %DV on Canadian labels), protein and
+ * total carbohydrate (no Canadian %DV), iodide / chromium / molybdenum / chloride
+ * (absent from CNF). See the data file's _provenance for the full note.
  *
  * %DV is computed against the per-100 g value (or per serving, if scaled upstream):
  *   %DV = nutrient_amount / daily_value × 100
  * The NutrientID fixes the unit, so the amount and the DV are always in the same unit.
  */
+import dvData from './cnfDailyValues.data.json';
+
 export interface CnfDailyValue {
   /** Daily Value amount, in `unit`. */
   dv: number;
@@ -39,38 +37,24 @@ export interface CnfDailyValue {
   sumWithNutrientId?: number;
 }
 
-export const CNF_DAILY_VALUES: Record<number, CnfDailyValue> = {
-  // Part 1 — macronutrients + sodium (Column 3, adults)
-  204: { dv: 75, unit: 'g', label: 'Fat' },
-  606: { dv: 20, unit: 'g', label: 'Saturated + trans fat', sumWithNutrientId: 605 },
-  291: { dv: 28, unit: 'g', label: 'Fibre' },
-  269: { dv: 100, unit: 'g', label: 'Sugars' },
-  307: { dv: 2300, unit: 'mg', label: 'Sodium' },
-  // Part 2 — vitamins + minerals (Column 4, "any other case")
-  306: { dv: 3400, unit: 'mg', label: 'Potassium' },
-  301: { dv: 1300, unit: 'mg', label: 'Calcium' },
-  303: { dv: 18, unit: 'mg', label: 'Iron' },
-  320: { dv: 900, unit: 'µg', label: 'Vitamin A (RAE)' },
-  401: { dv: 90, unit: 'mg', label: 'Vitamin C' },
-  328: { dv: 20, unit: 'µg', label: 'Vitamin D' },
-  323: { dv: 15, unit: 'mg', label: 'Vitamin E (α-tocopherol)' },
-  430: { dv: 120, unit: 'µg', label: 'Vitamin K' },
-  404: { dv: 1.2, unit: 'mg', label: 'Thiamin' },
-  405: { dv: 1.3, unit: 'mg', label: 'Riboflavin' },
-  409: { dv: 16, unit: 'mg', label: 'Niacin (NE)' },
-  415: { dv: 1.7, unit: 'mg', label: 'Vitamin B6' },
-  435: { dv: 400, unit: 'µg', label: 'Folate (DFE)' },
-  418: { dv: 2.4, unit: 'µg', label: 'Vitamin B12' },
-  421: { dv: 550, unit: 'mg', label: 'Choline' },
-  416: { dv: 30, unit: 'µg', label: 'Biotin' },
-  410: { dv: 5, unit: 'mg', label: 'Pantothenic acid' },
-  305: { dv: 1250, unit: 'mg', label: 'Phosphorus' },
-  304: { dv: 420, unit: 'mg', label: 'Magnesium' },
-  309: { dv: 11, unit: 'mg', label: 'Zinc' },
-  317: { dv: 55, unit: 'µg', label: 'Selenium' },
-  312: { dv: 0.9, unit: 'mg', label: 'Copper' },
-  315: { dv: 2.3, unit: 'mg', label: 'Manganese' },
-};
+interface RawDailyValue {
+  dv: number;
+  unit: string;
+  label: string;
+  sum_with_nutrient_id?: number;
+}
+
+export const CNF_DAILY_VALUES: Record<number, CnfDailyValue> = Object.fromEntries(
+  Object.entries(dvData.values as Record<string, RawDailyValue>).map(([id, v]) => [
+    Number(id),
+    {
+      dv: v.dv,
+      unit: v.unit as CnfDailyValue['unit'],
+      label: v.label,
+      ...(v.sum_with_nutrient_id != null ? { sumWithNutrientId: v.sum_with_nutrient_id } : {}),
+    },
+  ]),
+);
 
 /**
  * Compute %DV for one nutrient amount, or null when the nutrient has no Health Canada DV.

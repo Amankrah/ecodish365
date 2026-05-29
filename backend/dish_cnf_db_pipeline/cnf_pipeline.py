@@ -253,6 +253,198 @@ class CNFDataPipeline:
             logger.error(f"Error searching foods by nutrient: {str(e)}")
             raise
 
+    def discover_foods(
+        self,
+        criteria: List[Dict],
+        basis: str = 'per_100g',
+        food_group_id: Optional[int] = None,
+        source: Optional[str] = None,
+        ratio: Optional[Dict] = None,
+        dv_threshold: Optional[Dict] = None,
+        sort: Optional[Dict] = None,
+        limit: int = 100,
+    ) -> Dict:
+        """Multi-criteria nutrient discovery for the research workbench.
+
+        Every food in the catalogue must verifiably satisfy ALL criteria (AND logic);
+        a food missing a measurement for a criterion nutrient is excluded, mirroring the
+        single-nutrient search (we only return verified matches).
+
+        Args:
+            criteria: list of {nutrient_id, min?, max?}. Thresholds are interpreted in
+                      the chosen `basis`.
+            basis: 'per_100g' (raw CNF values) or 'per_100kcal' (energy-adjusted density;
+                   value_per_100kcal = value_per_100g / energy_per_100g * 100).
+            food_group_id: optional CNF FoodGroupID scope.
+            source: 'cnf' | 'wafct' | None (both).
+            ratio: optional {numerator_id, denominator_id}; reported + sortable. Basis-
+                   invariant (numerator and denominator scale together).
+            dv_threshold: optional {nutrient_id, min_pct?, max_pct?}; %DV is always computed
+                   on the per-100 g amount (Health Canada table), independent of `basis`.
+            sort: optional {key, direction}; key is a NutrientID (int/str), 'ratio', or
+                  'energy'. Default: first criterion (or ratio, or energy), descending.
+            limit: max rows (capped at 200).
+
+        Returns dict: {foods: [...], involved_nutrient_ids: [...], basis, count}.
+        """
+        import numpy as np
+        from api.services.cnf_daily_values import get_daily_value
+
+        nl = self.data_loader
+        na = nl.nutrient_amount_df
+        fn = nl.food_name_df
+        limit = max(1, min(int(limit), 200))
+        criteria = criteria or []
+        ENERGY_ID = 208
+
+        # --- Collect every nutrient id we must read ---
+        needed = {ENERGY_ID}
+        for c in criteria:
+            needed.add(int(c['nutrient_id']))
+        if ratio:
+            needed.add(int(ratio['numerator_id']))
+            needed.add(int(ratio['denominator_id']))
+        dv_nid = int(dv_threshold['nutrient_id']) if dv_threshold else None
+        if dv_nid is not None:
+            needed.add(dv_nid)
+            dv_entry = get_daily_value(dv_nid)
+            if dv_entry and dv_entry.get('sum_with_nutrient_id') is not None:
+                needed.add(int(dv_entry['sum_with_nutrient_id']))
+        sort_key = (sort or {}).get('key')
+        sort_nid = None
+        if isinstance(sort_key, (int, float)) or (isinstance(sort_key, str) and sort_key.isdigit()):
+            sort_nid = int(sort_key)
+            needed.add(sort_nid)
+
+        # --- Wide per-food nutrient frame (FoodID x NutrientID), values per 100 g ---
+        sub = na[na['NutrientID'].isin(needed)][['FoodID', 'NutrientID', 'NutrientValue']]
+        if sub.empty:
+            return {'foods': [], 'involved_nutrient_ids': sorted(needed), 'basis': basis, 'count': 0}
+        wide = sub.pivot_table(index='FoodID', columns='NutrientID',
+                               values='NutrientValue', aggfunc='first')
+        wide.index = wide.index.astype('int64')
+
+        def col(nid):
+            return wide[nid] if nid in wide.columns else pd.Series(np.nan, index=wide.index)
+
+        # Energy-adjusted basis factor (100 / energy_per_100g), NaN where energy <= 0.
+        if basis == 'per_100kcal':
+            e = col(ENERGY_ID)
+            basis_factor = (100.0 / e).where(e > 0)
+        else:
+            basis_factor = None
+
+        def basis_val(nid):
+            v = col(nid)
+            return v * basis_factor if basis_factor is not None else v
+
+        # --- AND criteria mask (NaN comparisons -> False -> excluded) ---
+        mask = pd.Series(True, index=wide.index)
+        for c in criteria:
+            val = basis_val(int(c['nutrient_id']))
+            if c.get('min') is not None:
+                mask &= (val >= float(c['min']))
+            if c.get('max') is not None:
+                mask &= (val <= float(c['max']))
+
+        # --- %DV threshold (on per-100 g amount; sums trans into saturated for 606) ---
+        if dv_nid is not None:
+            entry = get_daily_value(dv_nid)
+            if entry and entry.get('dv', 0) > 0:
+                num = col(dv_nid).copy()
+                other_id = entry.get('sum_with_nutrient_id')
+                if other_id is not None:
+                    num = num.add(col(int(other_id)), fill_value=0)
+                pct = num / float(entry['dv']) * 100.0
+                if dv_threshold.get('min_pct') is not None:
+                    mask &= (pct >= float(dv_threshold['min_pct']))
+                if dv_threshold.get('max_pct') is not None:
+                    mask &= (pct <= float(dv_threshold['max_pct']))
+
+        # --- ratio (basis-invariant), NaN where denominator <= 0 ---
+        ratio_series = None
+        if ratio:
+            denc = col(int(ratio['denominator_id']))
+            ratio_series = (col(int(ratio['numerator_id'])) / denc).where(denc > 0)
+
+        # --- food-group + source scope ---
+        allowed = fn
+        if food_group_id is not None:
+            allowed = allowed[allowed['FoodGroupID'] == int(food_group_id)]
+        if source in ('cnf', 'wafct') and 'source' in allowed.columns:
+            allowed = allowed[allowed['source'] == source]
+        allowed_ids = set(int(x) for x in allowed['FoodID'].dropna().tolist())
+        mask &= wide.index.to_series().isin(allowed_ids)
+
+        # --- choose the ranking series ---
+        if sort_nid is not None:
+            sort_vals = basis_val(sort_nid)
+        elif sort_key == 'ratio' and ratio_series is not None:
+            sort_vals = ratio_series
+        elif sort_key == 'energy':
+            sort_vals = col(ENERGY_ID)
+        elif criteria:
+            sort_vals = basis_val(int(criteria[0]['nutrient_id']))
+        elif ratio_series is not None:
+            sort_vals = ratio_series
+        else:
+            sort_vals = col(ENERGY_ID)
+        ascending = (sort or {}).get('direction') == 'asc'
+
+        ordered_index = (sort_vals[mask]
+                         .sort_values(ascending=ascending, na_position='last')
+                         .head(limit).index.tolist())
+
+        # --- assemble rows (vectorised lookups, no per-food get_food_details) ---
+        fg = getattr(nl, 'food_group_df', None)
+        group_names = {}
+        if fg is not None and 'FoodGroupID' in fg.columns and 'FoodGroupName' in fg.columns:
+            group_names = dict(zip(fg['FoodGroupID'], fg['FoodGroupName']))
+        fn_idx = fn.set_index('FoodID')
+        has_source = 'source' in fn.columns
+        involved = sorted(n for n in needed if n != ENERGY_ID)
+
+        foods = []
+        for fid in ordered_index:
+            try:
+                row = fn_idx.loc[fid]
+            except KeyError:
+                continue
+            gid = row.get('FoodGroupID')
+            e_val = col(ENERGY_ID).get(fid)
+            nutrient_values = {}
+            basis_values = {}
+            for nid in involved:
+                v = col(nid).get(fid)
+                if v is not None and pd.notna(v):
+                    nutrient_values[nid] = round(float(v), 4)
+                if basis_factor is not None:
+                    bv = basis_val(nid).get(fid)
+                    if bv is not None and pd.notna(bv):
+                        basis_values[nid] = round(float(bv), 4)
+            rv = ratio_series.get(fid) if ratio_series is not None else None
+            sv = sort_vals.get(fid)
+            foods.append({
+                'FoodID': int(fid),
+                'FoodCode': str(row.get('FoodCode', '')),
+                'FoodDescription': str(row.get('FoodDescription', '')),
+                'FoodGroupID': int(gid) if pd.notna(gid) else None,
+                'FoodGroupName': str(group_names.get(gid, 'Unknown')),
+                'source': (str(row.get('source')) if has_source and pd.notna(row.get('source')) else 'cnf'),
+                'energy_kcal': (round(float(e_val), 2) if e_val is not None and pd.notna(e_val) else None),
+                'nutrient_values': {str(k): v for k, v in nutrient_values.items()},
+                'basis_values': {str(k): v for k, v in basis_values.items()},
+                'ratio_value': (round(float(rv), 4) if rv is not None and pd.notna(rv) else None),
+                'sort_value': (round(float(sv), 4) if sv is not None and pd.notna(sv) else None),
+            })
+
+        return {
+            'foods': foods,
+            'involved_nutrient_ids': involved,
+            'basis': basis,
+            'count': len(foods),
+        }
+
     def get_foods_by_group(self, food_group_id: int, limit: int = 100) -> List[Dict]:
         """Get all foods in a specific food group."""
         try:
