@@ -77,31 +77,36 @@ MEALS = [
 
 
 def main() -> int:
-    print(f'{"meal":<60} {"ings":>4} {"cands":>5} {"suggs":>5} {"wall ms":>10}  top swap')
-    print('-' * 130)
+    print(f'{"meal":<60} {"mode":>8} {"ings":>4} {"cands":>5} {"suggs":>5} {"wall ms":>10}  top swap')
+    print('-' * 140)
     total_ms = 0.0
-    for meal in MEALS:
-        t0 = time.perf_counter()
-        result = analyze_substitutions(
-            meal['composition'],
-            purpose='general_health',
-            max_suggestions=3,
-            include_scorecard=True,
-            dish_name=meal['dish_name'],
-        )
-        wall_ms = (time.perf_counter() - t0) * 1000
-        total_ms += wall_ms
-        n_ings = len(meal['composition'])
-        n_cands = result['metadata']['candidates_found']
-        n_sug = len(result['suggestions'])
-        top = result['suggestions'][0] if result['suggestions'] else None
-        top_desc = ''
-        if top:
-            o = top['original']['food_description'][:24]
-            r = top['replacement']['food_description'][:24]
-            fcs_d = top.get('fcs', {}).get('delta', 0)
-            top_desc = f'[{o} → {r}] ΔFCS={fcs_d:+.2f}'
-        print(f'{meal["label"][:60]:<60} {n_ings:>4} {n_cands:>5} {n_sug:>5} {wall_ms:>10.1f}  {top_desc}')
+    # Run each meal in BOTH modes — singles (default) and greedy (multi-step
+    # plan, the slow path matching the production "Multi-step plan" UI).
+    for mode in ('singles', 'greedy'):
+        for meal in MEALS:
+            t0 = time.perf_counter()
+            result = analyze_substitutions(
+                meal['composition'],
+                purpose='general_health',
+                max_suggestions=3,
+                include_scorecard=True,
+                dish_name=meal['dish_name'],
+                reformulation_mode=mode,
+                constraints={'max_swaps': 3 if mode == 'greedy' else 1},
+            )
+            wall_ms = (time.perf_counter() - t0) * 1000
+            total_ms += wall_ms
+            n_ings = len(meal['composition'])
+            n_cands = result['metadata']['candidates_found']
+            n_sug = len(result['suggestions'])
+            top = result['suggestions'][0] if result['suggestions'] else None
+            top_desc = ''
+            if top:
+                o = top['original']['food_description'][:24]
+                r = top['replacement']['food_description'][:24]
+                fcs_d = top.get('fcs', {}).get('delta', 0)
+                top_desc = f'[{o} → {r}] ΔFCS={fcs_d:+.2f}'
+            print(f'{meal["label"][:60]:<60} {mode:>8} {n_ings:>4} {n_cands:>5} {n_sug:>5} {wall_ms:>10.1f}  {top_desc}')
 
     print('-' * 130)
     print(f'{"TOTAL":<60} {"":>4} {"":>5} {"":>5} {total_ms:>10.1f}')

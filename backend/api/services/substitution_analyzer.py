@@ -641,9 +641,8 @@ def _greedy_reformulation_plans(
         ))
         specs = [s for s in specs if s['ingredient_indices'][0] not in used_indices]
 
-        best: Optional[Dict[str, Any]] = None
-        for spec in specs:
-            sug = _build_suggestion(
+        def _eval_greedy_spec(spec: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+            return _build_suggestion(
                 suggestion_id=spec['suggestion_id'],
                 rule_id=spec.get('rule_id', spec['suggestion_id']),
                 suggestion_type=spec['suggestion_type'],
@@ -659,6 +658,18 @@ def _greedy_reformulation_plans(
                 purpose=purpose,
                 baseline_composition=rows,
             )
+
+        best: Optional[Dict[str, Any]] = None
+        if len(specs) > 1:
+            with ThreadPoolExecutor(
+                    max_workers=min(8, len(specs)),
+                    thread_name_prefix='subst-greedy',
+            ) as ex:
+                for sug in ex.map(_eval_greedy_spec, specs):
+                    if sug and (best is None or sug['rank_score'] > best['rank_score']):
+                        best = sug
+        elif specs:
+            sug = _eval_greedy_spec(specs[0])
             if sug and (best is None or sug['rank_score'] > best['rank_score']):
                 best = sug
 
