@@ -44,6 +44,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from .cnf_food_type import get_food_type, is_mixed
+
 logger = logging.getLogger(__name__)
 
 
@@ -117,6 +119,38 @@ def _should_override_with_catalog(
             or (macro is not None and macro > macro_thresh))
 
 
+def _catalog_food_is_overridable(food_id: int) -> bool:
+    """Food-type guard on the catalog override: only collapse a dish onto a catalog
+    food that is itself a MIXED dish (so "chicken soup" -> a measured soup is allowed,
+    but "beef stew" -> "Beef, ground" is not). Unlabeled (None, e.g. WAFCT) -> not
+    overridable, which keeps the decomposition. Pure (no I/O beyond the cached label
+    lookup) so the gate is unit-testable."""
+    return is_mixed(int(food_id)) is True
+
+
+# A dish whose name names MULTIPLE eaten items — a main plus a separate drink or side
+# ("beef patty with a glass of orange juice", "burger and a coke") — must be decomposed,
+# never collapsed onto a single catalog food (which would silently drop the second item).
+# We target explicit second-item signals (portioned beverages/sides, "and a/an/some",
+# "plus", "&", "+"), NOT bare "with"/"and" — so single dishes that merely use those words
+# as recipe descriptors ("split pea soup with ham", "macaroni and cheese", "fish and
+# chips", "chicken with rice") keep the catalog-preference accuracy benefit.
+_COMPOUND_MEAL_RE = re.compile(
+    r'\b(?:glass|cup|mug|bottle|can|bowl|plate|side|serving|order|scoop|slice|piece)\s+of\b'
+    r'|\band\s+(?:a|an|some)\b'
+    r'|\bwith\s+(?:a|an)\s+(?:glass|cup|mug|bottle|can|side|drink|soda|pop|juice|coffee|'
+    r'tea|smoothie|shake|water|beer|wine|milk)\b'
+    r'|\bplus\b'
+    r'|\s[&+]\s',
+    re.IGNORECASE,
+)
+
+
+def _is_compound_meal(dish_name: str) -> bool:
+    """True when the dish name denotes multiple eaten items (main + drink/side)."""
+    return bool(_COMPOUND_MEAL_RE.search(dish_name or ''))
+
+
 # --- Result payloads ------------------------------------------------------
 
 @dataclass
@@ -129,6 +163,12 @@ class CNFIngredient:
     # Stage-2 (CNFMatcher) per-ingredient confidence — researcher / policy
     # mode surfaces this; individual mode hides it.
     resolution_confidence: float = 0.0
+    # 'single' | 'mixed' | None: whether this resolved CNF food is itself a single
+    # ingredient or a mixed dish (None when unlabeled, e.g. WAFCT). A resolved
+    # ingredient that is itself a mixed dish means Stage-1 handed back a dish rather
+    # than an ingredient — surfaced via the recipe's dish_as_ingredient_count so the
+    # lab can see that failure mode instead of it being silent.
+    food_type: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -138,6 +178,7 @@ class CNFIngredient:
             'mass_g': round(self.mass_g, 2),
             'rationale': self.rationale,
             'resolution_confidence': round(self.resolution_confidence, 3),
+            'food_type': self.food_type,
         }
 
 
@@ -165,6 +206,10 @@ class CNFDecomposedRecipe:
     # defensibility.
     unresolved_ingredients_audit: List[Dict[str, Any]] = field(default_factory=list)
     raw_llm_response: Optional[str] = None
+    # Count of resolved ingredients that are themselves mixed dishes (Stage-1 handed
+    # back a dish, not an ingredient). Informational — does not change matched/
+    # confidence; surfaced so the compound-meal lab can flag degenerate decompositions.
+    dish_as_ingredient_count: int = 0
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -181,6 +226,7 @@ class CNFDecomposedRecipe:
             'cache_hit': self.cache_hit,
             'timing_ms': round(self.timing_ms, 1),
             'unresolved_ingredients_audit': self.unresolved_ingredients_audit,
+            'dish_as_ingredient_count': self.dish_as_ingredient_count,
         }
 
 
@@ -375,8 +421,11 @@ class CNFRecipeDecomposer:
             self._cache_put(key, result)
             return result
 
-        # The harness path skips catalog preference and just decomposes.
-        if force_decompose:
+        # Skip catalog preference and just decompose when (a) a harness forces it, or
+        # (b) the dish names multiple eaten items (a main plus a separate drink/side):
+        # collapsing a compound meal onto one catalog food would silently drop the
+        # second item (e.g. "... with a glass of orange juice" losing the juice).
+        if force_decompose or _is_compound_meal(dish_name):
             return self._decompose_via_llm(dish_name, ndn, total_mass_g, source, t0, key)
 
         # --- Catalog preference (fix 2/3): match the dish name to a catalog food
@@ -407,8 +456,15 @@ class CNFRecipeDecomposer:
         # --- Reconstruction-gated catalog override (fix 2): for a weaker catalog
         # match, replace a decomposition whose reconstructed nutrients diverge from
         # the catalog food's own measured profile (or that failed outright).
+        #
+        # GATED ON FOOD TYPE (2026-05-29): only override onto a catalog food that is
+        # itself a MIXED dish. This keeps the correct "chicken soup -> measured
+        # chicken-noodle soup" behaviour (a mixed dish) while preventing a dish from
+        # being collapsed onto a single ingredient ("beef stew" -> "Beef, ground").
+        # Unlabeled (None, e.g. WAFCT) -> do not override; keep the decomposition.
         if (cm is not None and cm.matched and cm.food_id is not None
                 and cm.confidence >= CATALOG_OVERRIDE_CONF
+                and _catalog_food_is_overridable(int(cm.food_id))
                 and self._has_nutrients(int(cm.food_id))):
             recon = None
             if decomp.matched and decomp.ingredients:
@@ -670,6 +726,7 @@ class CNFRecipeDecomposer:
     def _catalog_recipe(self, cm, dish_name: str, ndn: str, total_mass_g: float,
                         reason: str, t0: float) -> CNFDecomposedRecipe:
         """Build a single-ingredient recipe = the matched catalog food at full mass."""
+        ft = get_food_type(int(cm.food_id))
         ing = CNFIngredient(
             food_id=int(cm.food_id),
             food_description=cm.food_description or '',
@@ -677,6 +734,7 @@ class CNFRecipeDecomposer:
             mass_g=total_mass_g,
             rationale='Dish matched a CNF catalog food directly; using its measured profile.',
             resolution_confidence=float(cm.confidence),
+            food_type=(ft['food_type'] if ft else None),
         )
         return CNFDecomposedRecipe(
             dish_name=dish_name, normalised_dish_name=ndn,
@@ -735,6 +793,7 @@ class CNFRecipeDecomposer:
                            f'{self.ingredient_resolution_floor:.2f}'
                            if m.matched else (m.fallback_reason or 'matcher_no_match')),
             }, mass_f
+        ft = get_food_type(int(m.food_id))
         return CNFIngredient(
             food_id=int(m.food_id),
             food_description=m.food_description or '',
@@ -742,6 +801,7 @@ class CNFRecipeDecomposer:
             mass_g=mass_f,
             rationale=str(raw_ing.get('rationale', '')).strip()[:240],
             resolution_confidence=m.confidence,
+            food_type=(ft['food_type'] if ft else None),
         ), None, 0.0
 
     # --- Stage 1 ---------------------------------------------------------
@@ -789,6 +849,16 @@ class CNFRecipeDecomposer:
         # discarded on a catalog short-circuit); it must never touch the shared cache.
         if key is None:
             return
+        # Informational stamp (single point every real-key return path flows through):
+        # how many resolved DECOMPOSITION ingredients are themselves mixed dishes — i.e.
+        # Stage-1 handed back a dish rather than an ingredient. Derived from per-ingredient
+        # food_type labels; idempotent, no effect on matched/confidence. Skipped for catalog
+        # recipes (a direct catalog match is one food == the whole dish, not a decomposition).
+        if str(value.fallback_reason or '').startswith('catalog_'):
+            value.dish_as_ingredient_count = 0
+        else:
+            value.dish_as_ingredient_count = sum(
+                1 for i in value.ingredients if i.food_type == 'mixed')
         with self._cache_lock:
             if key in self._cache:
                 try:

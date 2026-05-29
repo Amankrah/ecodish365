@@ -104,6 +104,34 @@ def test_catalog_recipe_and_has_nutrients():
     assert r.fallback_reason == 'catalog_direct_match'
 
 
+def test_compound_meal_detector():
+    # Catalog preference must NOT collapse a multi-item meal onto one food, but must
+    # still apply to single dishes that merely use "with"/"and" as recipe descriptors.
+    from api.services.cnf_recipe_decomposer import _is_compound_meal
+    # Compound (a main + a separate drink/side) -> must decompose.
+    for d in [
+        'beef puddy with a glass of orange juice',
+        'burger and a coke',
+        'cheeseburger with a side of fries',
+        'pancakes plus bacon',
+        'sandwich + chips',
+        'coffee and a donut',
+        'steak with a glass of wine',
+    ]:
+        assert _is_compound_meal(d), d
+    # Single dishes (recipe descriptors) -> keep catalog preference.
+    for d in [
+        'split pea soup with ham',
+        'macaroni and cheese',
+        'fish and chips',
+        'chicken with rice',
+        'spaghetti bolognese',
+        'tea with milk and sugar',
+        'beef patty',
+    ]:
+        assert not _is_compound_meal(d), d
+
+
 def test_benchmark_artifact_schema_if_present():
     # Mirror test_matcher_benchmark: pin the artifact shape when one exists; skip otherwise.
     files = sorted(glob.glob(os.path.join(_BACKEND, 'decomposer_benchmark_*.json')))
@@ -118,3 +146,53 @@ def test_benchmark_artifact_schema_if_present():
         for k in ('food_id', 'cnf_group', 'matched', 'automated_verdict'):
             assert k in row, f'missing per_food key {k}'
         assert row['automated_verdict'] in ('pass', 'borderline', 'flagged', 'no_truth')
+
+
+def test_override_gate_respects_food_type():
+    # The reconstruction-gated catalog override only fires onto a catalog food that is
+    # itself a MIXED dish. _catalog_food_is_overridable is the pure food-type guard.
+    from api.services.cnf_recipe_decomposer import _catalog_food_is_overridable as ov
+    from api.services.cnf_food_type import get_food_type, reset_for_test as ft_reset
+    ft_reset()
+    if not get_food_type(_APPLE) and not get_food_type(_PIZZA):
+        return  # labels not built yet (one-time LLM ETL); skip the data-dependent half
+    assert ov(_PIZZA) is True             # mixed dish -> override allowed
+    assert ov(_APPLE) is False            # single ingredient -> never override onto it
+    assert ov(99999999) is False          # unlabeled -> not overridable (keep decomposition)
+
+
+def test_should_override_combines_with_food_type_guard():
+    # The full decompose() gate is `_should_override_with_catalog(...) AND
+    # _catalog_food_is_overridable(cm.food_id)`. Verify the two compose as intended:
+    # a divergent reconstruction onto a SINGLE food must NOT override.
+    from api.services.cnf_recipe_decomposer import (
+        _should_override_with_catalog as so,
+        _catalog_food_is_overridable as ov,
+    )
+    from api.services.cnf_food_type import get_food_type, reset_for_test as ft_reset
+    ft_reset()
+    if not get_food_type(_APPLE) and not get_food_type(_PIZZA):
+        return
+    bad_recon = {'kcal_rel_error': 0.50, 'macro_mean_abs_rel_error': 0.10}  # diverges
+    # Divergent recon WOULD override on its own, but the single-food guard blocks it.
+    assert so(bad_recon, True) is True
+    assert (so(bad_recon, True) and ov(_APPLE)) is False    # single food -> blocked
+    assert (so(bad_recon, True) and ov(_PIZZA)) is True      # mixed dish -> overrides
+
+
+def test_decomposer_lab_artifact_schema_if_present():
+    # Pin the compound-meal lab artifact shape when one exists; skip otherwise.
+    files = sorted(glob.glob(os.path.join(_BACKEND, 'decomposer_lab_*.json')))
+    if not files:
+        return
+    b = json.loads(open(files[-1], encoding='utf-8').read())
+    for k in ('git_rev', 'sample_size', 'summary', 'per_scenario'):
+        assert k in b, f'missing top-level key {k}'
+    for k in ('total', 'pass', 'review', 'flagged', 'collapsed_onto_single'):
+        assert k in b['summary'], f'missing summary key {k}'
+    if b['per_scenario']:
+        row = b['per_scenario'][0]
+        for k in ('dish', 'verdict', 'behavior', 'compound_detected',
+                  'must_keep_dropped', 'collapsed_onto_single', 'ingredients'):
+            assert k in row, f'missing per_scenario key {k}'
+        assert row['verdict'] in ('pass', 'review', 'flagged')

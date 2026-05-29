@@ -1,0 +1,239 @@
+{
+  "_about": "Curated free-text compound-meal scenarios for the recipe-decomposer lab (_smoke_decomposer_lab.py). Each runs the FULL decompose() pipeline (catalog preference + reconstruction-gated override + compound-meal gate all active) and is checked on: compound-gate detection, survival of must_keep components, plausible per-100 g energy density, the path that fired vs expected, and that no dish was collapsed onto a SINGLE-ingredient catalog food. Bands are generous — the lab flags outliers for human review, it is not a brittle CI gate. compound = the EXPECTED output of _is_compound_meal (documents the gate's actual reach, incl. its comma-list limitation). must_keep[*].any_of = a component survives if ANY synonym matches an ingredient's description or food group.",
+  "scenarios": [
+    {
+      "dish": "beef puddy with a glass of orange juice",
+      "total_mass_g": 400,
+      "compound": true,
+      "expect_behavior": "decompose",
+      "energy_density_kcal_100g": [80, 230],
+      "must_keep": [
+        {"label": "beef patty/pie", "any_of": ["beef", "patty", "pie", "pudding", "meat"]},
+        {"label": "orange juice", "any_of": ["juice", "orange"]}
+      ],
+      "note": "The headline regression case: catalog preference must NOT collapse this onto one food and drop the juice."
+    },
+    {
+      "dish": "chicken soup",
+      "total_mass_g": 300,
+      "compound": false,
+      "expect_behavior": "catalog_override",
+      "energy_density_kcal_100g": [20, 95],
+      "must_keep": [
+        {"label": "chicken", "any_of": ["chicken"]}
+      ],
+      "note": "A dilute single mixed dish. The reconstruction gate should override a too-dense decomposition onto a MEASURED (mixed) soup food."
+    },
+    {
+      "dish": "spaghetti bolognese",
+      "total_mass_g": 350,
+      "compound": false,
+      "expect_behavior": "decompose",
+      "energy_density_kcal_100g": [95, 200],
+      "must_keep": [
+        {"label": "pasta", "any_of": ["spaghetti", "pasta", "noodle", "macaroni"]},
+        {"label": "tomato/meat sauce", "any_of": ["tomato", "beef", "meat", "sauce"]}
+      ]
+    },
+    {
+      "dish": "grilled cheese with a side of fries",
+      "total_mass_g": 250,
+      "compound": true,
+      "expect_behavior": "decompose",
+      "energy_density_kcal_100g": [220, 410],
+      "must_keep": [
+        {"label": "cheese", "any_of": ["cheese"]},
+        {"label": "fries", "any_of": ["fries", "french frie", "potato", "chip"]}
+      ],
+      "note": "A main plus a separate side; the fries must survive."
+    },
+    {
+      "dish": "burger and a coke",
+      "total_mass_g": 550,
+      "compound": true,
+      "expect_behavior": "decompose",
+      "energy_density_kcal_100g": [70, 200],
+      "must_keep": [
+        {"label": "burger", "any_of": ["burger", "hamburger", "beef", "bun", "patty"]},
+        {"label": "cola", "any_of": ["cola", "coke", "soft drink", "carbonated", "soda"]}
+      ],
+      "note": "A main plus a separate sugary drink; the cola must survive."
+    },
+    {
+      "dish": "chicken caesar salad",
+      "total_mass_g": 250,
+      "compound": false,
+      "expect_behavior": "decompose",
+      "energy_density_kcal_100g": [110, 260],
+      "must_keep": [
+        {"label": "chicken", "any_of": ["chicken"]},
+        {"label": "lettuce", "any_of": ["lettuce", "romaine", "salad", "greens"]}
+      ]
+    },
+    {
+      "dish": "beef stew",
+      "total_mass_g": 300,
+      "compound": false,
+      "expect_behavior": "decompose",
+      "energy_density_kcal_100g": [60, 170],
+      "must_keep": [
+        {"label": "beef", "any_of": ["beef"]},
+        {"label": "vegetable", "any_of": ["potato", "carrot", "vegetable", "onion"]}
+      ],
+      "note": "Key new-gate case: must NOT be collapsed onto a SINGLE ingredient (e.g. 'Beef, ground'). Should decompose, or at worst override onto a measured beef-STEW (mixed) food."
+    },
+    {
+      "dish": "macaroni and cheese",
+      "total_mass_g": 250,
+      "compound": false,
+      "expect_behavior": "catalog_override",
+      "energy_density_kcal_100g": [130, 240],
+      "must_keep": [
+        {"label": "macaroni", "any_of": ["macaroni", "pasta", "noodle"]},
+        {"label": "cheese", "any_of": ["cheese"]}
+      ],
+      "note": "Single dish using 'and' as a recipe descriptor — must keep catalog preference (not treated as compound)."
+    },
+    {
+      "dish": "fish and chips",
+      "total_mass_g": 300,
+      "compound": false,
+      "expect_behavior": "decompose",
+      "energy_density_kcal_100g": [170, 330],
+      "must_keep": [
+        {"label": "fish", "any_of": ["fish", "cod", "haddock", "pollock", "halibut"]},
+        {"label": "chips/fries", "any_of": ["potato", "fries", "french frie", "chip"]}
+      ],
+      "note": "Single dish using 'and' as a recipe descriptor — not compound."
+    },
+    {
+      "dish": "vegetable stir fry with rice",
+      "total_mass_g": 350,
+      "compound": false,
+      "expect_behavior": "decompose",
+      "energy_density_kcal_100g": [90, 200],
+      "must_keep": [
+        {"label": "vegetable", "any_of": ["vegetable", "broccoli", "pepper", "carrot", "mixed", "snap", "pea"]},
+        {"label": "rice", "any_of": ["rice"]}
+      ]
+    },
+    {
+      "dish": "pepperoni pizza",
+      "total_mass_g": 200,
+      "compound": false,
+      "expect_behavior": "catalog_short_circuit",
+      "energy_density_kcal_100g": [220, 330],
+      "must_keep": [
+        {"label": "pizza", "any_of": ["pizza", "pepperoni", "cheese", "crust"]}
+      ],
+      "note": "A measured mixed dish in CNF — expect a confident catalog name match (short-circuit) or override onto the measured pizza."
+    },
+    {
+      "dish": "oatmeal with berries and a glass of milk",
+      "total_mass_g": 500,
+      "compound": true,
+      "expect_behavior": "decompose",
+      "energy_density_kcal_100g": [40, 115],
+      "must_keep": [
+        {"label": "oatmeal", "any_of": ["oatmeal", "oat", "porridge"]},
+        {"label": "milk", "any_of": ["milk"]}
+      ],
+      "note": "Cooked/hydrated dish plus a separate glass of milk; the milk must survive and the energy density must reflect the cooked (diluted) form."
+    },
+    {
+      "dish": "chicken curry with naan",
+      "total_mass_g": 350,
+      "compound": false,
+      "expect_behavior": "decompose",
+      "energy_density_kcal_100g": [140, 300],
+      "must_keep": [
+        {"label": "chicken", "any_of": ["chicken"]},
+        {"label": "naan/bread", "any_of": ["naan", "bread", "flatbread", "roti"]}
+      ]
+    },
+    {
+      "dish": "lasagna",
+      "total_mass_g": 300,
+      "compound": false,
+      "expect_behavior": "catalog_override",
+      "energy_density_kcal_100g": [105, 210],
+      "must_keep": [
+        {"label": "lasagna/pasta", "any_of": ["lasagna", "pasta", "noodle"]},
+        {"label": "cheese/meat", "any_of": ["cheese", "beef", "meat", "tomato"]}
+      ],
+      "note": "A measured mixed dish — expect catalog short-circuit or override onto the measured lasagna."
+    },
+    {
+      "dish": "peanut butter and jelly sandwich",
+      "total_mass_g": 100,
+      "compound": false,
+      "expect_behavior": "decompose",
+      "energy_density_kcal_100g": [240, 390],
+      "must_keep": [
+        {"label": "peanut butter", "any_of": ["peanut"]},
+        {"label": "bread", "any_of": ["bread"]}
+      ],
+      "note": "Single sandwich using 'and' as a recipe descriptor — not compound."
+    },
+    {
+      "dish": "tomato soup and a grilled cheese",
+      "total_mass_g": 370,
+      "compound": true,
+      "expect_behavior": "decompose",
+      "energy_density_kcal_100g": [70, 240],
+      "must_keep": [
+        {"label": "tomato soup", "any_of": ["tomato", "soup"]},
+        {"label": "grilled cheese", "any_of": ["cheese", "bread"]}
+      ],
+      "note": "Two component dishes; both must survive (a legitimate all-mixed decomposition, NOT a degenerate one)."
+    },
+    {
+      "dish": "scrambled eggs, bacon and toast",
+      "total_mass_g": 200,
+      "compound": false,
+      "expect_behavior": "decompose",
+      "energy_density_kcal_100g": [150, 350],
+      "must_keep": [
+        {"label": "egg", "any_of": ["egg"]},
+        {"label": "bacon", "any_of": ["bacon", "pork"]},
+        {"label": "toast/bread", "any_of": ["bread", "toast"]}
+      ],
+      "note": "Comma-list compound the gate does NOT detect (compound=false documents the limitation) — but all three components must still survive a decomposition."
+    },
+    {
+      "dish": "jollof rice with chicken",
+      "total_mass_g": 350,
+      "compound": false,
+      "expect_behavior": "decompose",
+      "energy_density_kcal_100g": [130, 250],
+      "must_keep": [
+        {"label": "rice", "any_of": ["rice"]},
+        {"label": "chicken", "any_of": ["chicken"]}
+      ]
+    },
+    {
+      "dish": "caesar salad with a glass of white wine",
+      "total_mass_g": 350,
+      "compound": true,
+      "expect_behavior": "decompose",
+      "energy_density_kcal_100g": [80, 230],
+      "must_keep": [
+        {"label": "salad", "any_of": ["lettuce", "romaine", "salad", "greens"]},
+        {"label": "wine", "any_of": ["wine"]}
+      ],
+      "note": "A dish plus a separate alcoholic drink; the wine must survive."
+    },
+    {
+      "dish": "apple pie",
+      "total_mass_g": 125,
+      "compound": false,
+      "expect_behavior": "catalog_short_circuit",
+      "energy_density_kcal_100g": [190, 320],
+      "must_keep": [
+        {"label": "apple", "any_of": ["apple"]},
+        {"label": "crust", "any_of": ["pie", "pastry", "crust", "flour", "dough"]}
+      ],
+      "note": "A measured mixed dish — expect catalog short-circuit or override onto the measured apple pie."
+    }
+  ]
+}
