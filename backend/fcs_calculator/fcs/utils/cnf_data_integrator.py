@@ -6,9 +6,11 @@ Avoids redundancy by reusing established data loading patterns
 import sys
 import os
 import pandas as pd
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Tuple
 import logging
 from collections import defaultdict
+from functools import lru_cache
+from typing import NamedTuple
 
 # Use the single process-wide CNF pipeline. See backend/api/cnf_cache.py.
 backend_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -25,6 +27,21 @@ def get_shared_cnf_pipeline(cnf_data_dir: str) -> CNFDataPipeline:
     return get_api_cnf_pipeline()
 
 logger = logging.getLogger(__name__)
+
+
+class _FoodFacts(NamedTuple):
+    """Per-food-id facts cached by EnhancedCNFDataIntegrator. All fields are
+    pure functions of food_id given the static CNF pipeline DataFrames."""
+    food_desc_orig: str        # FoodDescription as stored
+    food_desc_upper: str       # .upper() for keyword matching
+    group_name_orig: str       # FoodGroupName as stored (may be 'nan' if missing)
+    group_name_upper: str      # .upper() for matching
+    food_group_id: int         # FoodGroupID (0 if missing)
+    nova_level: int            # Rule-based NOVA level (LLM-off path)
+    nova_confidence: float
+    nova_rationale: str
+    found: bool                # False = food_id not in pipeline → caller uses defaults
+
 
 class EnhancedCNFDataIntegrator:
     """
@@ -121,7 +138,11 @@ class EnhancedCNFDataIntegrator:
             return [100.0] * len(food_ids)
         return [max(0.1, float(a)) for a in amounts_g]
 
+    @lru_cache(maxsize=8192)
     def _energy_kcal_per_100g(self, food_id: int) -> float:
+        """Cached: pure function of food_id; CNF DataFrames are loaded once
+        per process and never mutate. Eliminates the 700-call pandas hot
+        path on substitution requests."""
         food_nutrients = self.cnf_pipeline.nutrient_amount_df[
             self.cnf_pipeline.nutrient_amount_df['FoodID'] == food_id
         ]
@@ -145,6 +166,120 @@ class EnhancedCNFDataIntegrator:
     def _portion_energy_kcal(self, food_id: int, amount_g: float) -> float:
         return self._energy_kcal_per_100g(food_id) * amount_g / 100.0
 
+    @lru_cache(maxsize=8192)
+    def _nutrient_attrs_per_100g(
+        self, food_id: int,
+    ) -> Optional[Tuple[Tuple[Tuple[str, float], ...], float]]:
+        """Cached: pre-merged per-100g {fcs_attribute → value} for this food.
+
+        Returns (attr_pairs, kcal_per_100g_sum), or None if the food has no
+        nutrient rows (the original raised ValueError on that condition;
+        `_accumulate_portion_nutrients` now raises on None).
+
+        - attr_pairs preserves the original overwrite-by-last-row semantics:
+          when multiple CNF nutrient names map to the same FCS attribute, the
+          last-iterated row wins (same as the inline dict assignment in the
+          pre-cache version of _accumulate_portion_nutrients).
+        - kcal_per_100g_sum sums every KILOCALORIES row (matches the original
+          `portion_energy += nutrient_value * scale` accumulation).
+        """
+        food_nutrients = self.cnf_pipeline.nutrient_amount_df[
+            self.cnf_pipeline.nutrient_amount_df['FoodID'] == int(food_id)
+        ]
+        merged = pd.merge(
+            food_nutrients,
+            self.cnf_pipeline.nutrient_name_df,
+            on='NutrientID',
+        )
+        if merged.empty:
+            return None
+
+        by_attr: Dict[str, float] = {}
+        kcal_sum = 0.0
+        for _, row in merged.iterrows():
+            nutrient_name = str(row['NutrientName'])
+            nutrient_value = float(row['NutrientValue'])
+            upper = nutrient_name.upper()
+            if 'KILOCALORIES' in upper:
+                kcal_sum += nutrient_value
+                continue
+            if 'ENERGY' in upper:
+                continue
+            fcs_attribute = self._map_cnf_nutrient_to_fcs(nutrient_name)
+            if fcs_attribute:
+                by_attr[fcs_attribute] = nutrient_value
+        return (tuple(by_attr.items()), kcal_sum)
+
+    @lru_cache(maxsize=8192)
+    def _food_categorization_facts(self, food_id: int) -> _FoodFacts:
+        """Cached: per-food-id facts that _categorize_food_ingredients needs
+        per food (description, group, rule-based NOVA level).
+
+        IMPORTANT: NOVA classification is the rule-based path
+        (enable_llm=False). When ``self.enable_nova_llm`` is True at runtime,
+        callers MUST bypass this cache and run the original inline path so
+        the LLM result is not bypassed.
+        """
+        from .nova_classifier import classify as nova_classify
+
+        fn = self.cnf_pipeline.food_name_df
+        rows = fn[fn['FoodID'] == int(food_id)]
+        if rows.empty:
+            # Mirrors the "rows.empty → NOVA level 1, processing_levels.append(1)"
+            # branch in the original loop.
+            return _FoodFacts(
+                food_desc_orig='', food_desc_upper='',
+                group_name_orig='', group_name_upper='',
+                food_group_id=0,
+                nova_level=1, nova_confidence=0.0, nova_rationale='no food row',
+                found=False,
+            )
+
+        row = rows.iloc[0]
+        food_desc_orig = str(row.get('FoodDescription', ''))
+        # Match the original (`int(row.get('FoodGroupID', 0) or 0)`) None/NaN
+        # handling — pandas may surface NaN as float('nan'); `or 0` collapses
+        # it to 0.
+        raw_group_id = row.get('FoodGroupID', 0)
+        if pd.isna(raw_group_id):
+            food_group_id = 0
+        else:
+            food_group_id = int(raw_group_id or 0)
+
+        # Group name lookup — replicate the left-merge behaviour of the
+        # original `food_with_groups`. If no matching group row exists, the
+        # left-merged NaN got turned into the string 'nan' by `str(row.get(...))`,
+        # so we do the same here for bit-exact parity with the pre-cache code.
+        fg = self.cnf_pipeline.food_group_df
+        fg_col = 'FoodGroupName' if 'FoodGroupName' in fg.columns else 'FoodGroup'
+        fg_rows = fg[fg['FoodGroupID'] == food_group_id]
+        if fg_rows.empty:
+            group_name_orig = ''
+        else:
+            gn = fg_rows.iloc[0].get(fg_col)
+            group_name_orig = str(gn) if pd.notna(gn) else 'nan'
+
+        nova_result = nova_classify(
+            food_id=int(food_id),
+            food_description=food_desc_orig,
+            food_group_name=group_name_orig,
+            food_group_id=food_group_id,
+            chat_json_client=None,
+            enable_llm=False,
+        )
+
+        return _FoodFacts(
+            food_desc_orig=food_desc_orig,
+            food_desc_upper=food_desc_orig.upper(),
+            group_name_orig=group_name_orig,
+            group_name_upper=group_name_orig.upper(),
+            food_group_id=food_group_id,
+            nova_level=int(nova_result.level),
+            nova_confidence=float(nova_result.confidence),
+            nova_rationale=str(nova_result.rationale),
+            found=True,
+        )
+
     def _map_cnf_nutrient_to_fcs(self, nutrient_name: str) -> Optional[str]:
         upper = nutrient_name.upper()
         for cnf_name, fcs_name in self.nutrient_mapping.items():
@@ -158,37 +293,22 @@ class EnhancedCNFDataIntegrator:
         amount_g: float,
         meal_totals: Dict[str, float],
     ) -> float:
-        """Sum absolute nutrient amounts for one portion into *meal_totals*."""
-        scale = amount_g / 100.0
-        food_nutrients = self.cnf_pipeline.nutrient_amount_df[
-            self.cnf_pipeline.nutrient_amount_df['FoodID'] == food_id
-        ]
-        merged = pd.merge(
-            food_nutrients,
-            self.cnf_pipeline.nutrient_name_df,
-            on='NutrientID',
-        )
-        if merged.empty:
+        """Sum absolute nutrient amounts for one portion into *meal_totals*.
+
+        Uses the cached per-100g attribute map (`_nutrient_attrs_per_100g`)
+        so the pandas filter + merge runs ONCE per food_id per process
+        instead of once per FCS scoring.
+        """
+        result = self._nutrient_attrs_per_100g(int(food_id))
+        if result is None:
             raise ValueError(f"No nutrient data found for food ID: {food_id}")
+        attrs_per_100g, kcal_per_100g = result
 
-        portion_energy = 0.0
-        portion_by_attr: Dict[str, float] = {}
-        for _, row in merged.iterrows():
-            nutrient_name = str(row['NutrientName'])
-            nutrient_value = float(row['NutrientValue'])
-            if 'KILOCALORIES' in nutrient_name.upper():
-                portion_energy += nutrient_value * scale
-                continue
-            if 'ENERGY' in nutrient_name.upper():
-                continue
-            fcs_attribute = self._map_cnf_nutrient_to_fcs(nutrient_name)
-            if fcs_attribute:
-                scaled = nutrient_value * scale
-                portion_by_attr[fcs_attribute] = scaled
+        scale = amount_g / 100.0
+        for attr, per100g in attrs_per_100g:
+            meal_totals[attr] += per100g * scale
 
-        for attr, val in portion_by_attr.items():
-            meal_totals[attr] += val
-
+        portion_energy = kcal_per_100g * scale
         if portion_energy <= 0:
             portion_energy = self._portion_energy_kcal(food_id, amount_g)
         return portion_energy
@@ -332,22 +452,56 @@ class EnhancedCNFDataIntegrator:
 
             detected_processing_levels: List[int] = []
             nova_by_id: Dict[int, int] = {}
+            # When LLM-augmented NOVA is enabled, bypass the cache. Otherwise
+            # use the cached per-food facts (Cache 3 — eliminates per-call
+            # pandas filtering and repeated rule-based nova_classify work).
+            use_nova_llm = bool(getattr(self, 'enable_nova_llm', False))
 
             for food_id_int, amount_g in zip(food_ids, amounts):
                 food_id_int = int(food_id_int)
-                rows = food_with_groups[food_with_groups['FoodID'] == food_id_int]
-                if rows.empty:
-                    detected_processing_levels.append(1)
-                    nova_by_id[food_id_int] = 1
-                    continue
-
-                row = rows.iloc[0]
-                food_desc = str(row.get('FoodDescription', '')).upper()
-                food_desc_orig = str(row.get('FoodDescription', ''))
-                group_name = str(row.get('FoodGroupName', '')).upper() if 'FoodGroupName' in row else ''
-                group_name_orig = str(row.get('FoodGroupName', '')) if 'FoodGroupName' in row else ''
-                food_group_id = int(row.get('FoodGroupID', 0) or 0)
                 ew = energy_weight_by_id.get(food_id_int, 1.0 / len(food_ids))
+
+                if use_nova_llm:
+                    # LLM-on path: keep the original inline lookup so the
+                    # LLM call is exercised (cache returns rule-based only).
+                    rows = food_with_groups[food_with_groups['FoodID'] == food_id_int]
+                    if rows.empty:
+                        detected_processing_levels.append(1)
+                        nova_by_id[food_id_int] = 1
+                        continue
+                    row = rows.iloc[0]
+                    food_desc_orig = str(row.get('FoodDescription', ''))
+                    food_desc = food_desc_orig.upper()
+                    group_name_orig = (
+                        str(row.get('FoodGroupName', ''))
+                        if 'FoodGroupName' in row else ''
+                    )
+                    group_name = group_name_orig.upper()
+                    food_group_id = int(row.get('FoodGroupID', 0) or 0)
+                    from .nova_classifier import classify as nova_classify
+                    nova_result = nova_classify(
+                        food_id=food_id_int,
+                        food_description=food_desc_orig,
+                        food_group_name=group_name_orig,
+                        food_group_id=food_group_id,
+                        chat_json_client=getattr(self, 'nova_llm_client', None),
+                        enable_llm=True,
+                    )
+                    current_processing_level = nova_result.level
+                else:
+                    facts = self._food_categorization_facts(food_id_int)
+                    if not facts.found:
+                        detected_processing_levels.append(1)
+                        nova_by_id[food_id_int] = 1
+                        continue
+                    food_desc_orig = facts.food_desc_orig
+                    food_desc = facts.food_desc_upper
+                    group_name_orig = facts.group_name_orig
+                    group_name = facts.group_name_upper
+                    food_group_id = facts.food_group_id
+                    current_processing_level = facts.nova_level
+
+                nova_by_id[food_id_int] = current_processing_level
 
                 def flag(domain: str, attr: str) -> None:
                     self._set_weighted_flag(food_item, domain, attr, ew)
@@ -373,20 +527,9 @@ class EnhancedCNFDataIntegrator:
                     if 'YOGURT' in food_desc or 'YOGHURT' in food_desc or 'YOGOURT' in food_desc:
                         flag('food_ingredients', 'yogurt')
 
-                from .nova_classifier import classify as nova_classify
-                nova_result = nova_classify(
-                    food_id=food_id_int,
-                    food_description=food_desc_orig,
-                    food_group_name=group_name_orig,
-                    food_group_id=food_group_id,
-                    chat_json_client=getattr(self, 'nova_llm_client', None),
-                    enable_llm=getattr(self, 'enable_nova_llm', False),
-                )
-                current_processing_level = nova_result.level
-                nova_by_id[food_id_int] = current_processing_level
                 logger.debug(
-                    f" NOVA classifier: food_id={food_id_int} level={nova_result.level} "
-                    f"conf={nova_result.confidence:.2f} reason={nova_result.rationale}"
+                    f" NOVA classifier: food_id={food_id_int} "
+                    f"level={current_processing_level}"
                 )
 
                 if current_processing_level == 4:

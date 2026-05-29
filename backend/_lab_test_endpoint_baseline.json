@@ -1,0 +1,834 @@
+{
+  "D1 AGGREGATED :: greedy": {
+    "baseline_fcs_nova": "MIXED_PROCESSING_LEVELS",
+    "baseline_fcs_total": 23.68,
+    "candidates_found": 17,
+    "reformulation_plans": 0,
+    "suggestions": [
+      {
+        "candidate_source": "curated_rule",
+        "fcs_after": 23.78,
+        "fcs_before": 23.68,
+        "fcs_delta": 0.1,
+        "ingredient_index": 5,
+        "ingredient_indices": [
+          5
+        ],
+        "original_food_id": 61,
+        "rank_score": 10.1,
+        "replacement_food_id": 6331,
+        "rule_id": "milk_to_soy",
+        "suggestion_type": "single_swap"
+      },
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 28.03,
+        "fcs_before": 23.68,
+        "fcs_delta": 4.35,
+        "ingredient_index": 3,
+        "ingredient_indices": [
+          3
+        ],
+        "original_food_id": 133,
+        "rank_score": 9.35,
+        "replacement_food_id": 130,
+        "rule_id": "matcher_alternative_130",
+        "suggestion_type": "single_swap"
+      },
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 27.83,
+        "fcs_before": 23.68,
+        "fcs_delta": 4.15,
+        "ingredient_index": 3,
+        "ingredient_indices": [
+          3
+        ],
+        "original_food_id": 133,
+        "rank_score": 9.15,
+        "replacement_food_id": 132,
+        "rule_id": "matcher_alternative_132",
+        "suggestion_type": "single_swap"
+      }
+    ]
+  },
+  "D1 AGGREGATED :: singles": {
+    "baseline_fcs_nova": "MIXED_PROCESSING_LEVELS",
+    "baseline_fcs_total": 23.68,
+    "candidates_found": 17,
+    "reformulation_plans": 0,
+    "suggestions": [
+      {
+        "candidate_source": "curated_rule",
+        "fcs_after": 23.78,
+        "fcs_before": 23.68,
+        "fcs_delta": 0.1,
+        "ingredient_index": 5,
+        "ingredient_indices": [
+          5
+        ],
+        "original_food_id": 61,
+        "rank_score": 10.1,
+        "replacement_food_id": 6331,
+        "rule_id": "milk_to_soy",
+        "suggestion_type": "single_swap"
+      },
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 28.03,
+        "fcs_before": 23.68,
+        "fcs_delta": 4.35,
+        "ingredient_index": 3,
+        "ingredient_indices": [
+          3
+        ],
+        "original_food_id": 133,
+        "rank_score": 9.35,
+        "replacement_food_id": 130,
+        "rule_id": "matcher_alternative_130",
+        "suggestion_type": "single_swap"
+      },
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 27.83,
+        "fcs_before": 23.68,
+        "fcs_delta": 4.15,
+        "ingredient_index": 3,
+        "ingredient_indices": [
+          3
+        ],
+        "original_food_id": 133,
+        "rank_score": 9.15,
+        "replacement_food_id": 132,
+        "rule_id": "matcher_alternative_132",
+        "suggestion_type": "single_swap"
+      }
+    ]
+  },
+  "D1 breakfast \u2014 scrambled egg + OJ :: greedy": {
+    "baseline_fcs_nova": "MIXED_PROCESSING_LEVELS",
+    "baseline_fcs_total": 52.35,
+    "candidates_found": 8,
+    "reformulation_plans": 1,
+    "suggestions": [
+      {
+        "candidate_source": "reformulation",
+        "fcs_after": 60.41,
+        "fcs_before": 52.35,
+        "fcs_delta": 8.06,
+        "ingredient_index": 0,
+        "ingredient_indices": [
+          0,
+          3
+        ],
+        "original_food_id": 133,
+        "rank_score": 23.85,
+        "replacement_food_id": 6203,
+        "rule_id": "greedy_reformulation",
+        "suggestion_type": "reformulation_plan"
+      },
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 58.14,
+        "fcs_before": 52.35,
+        "fcs_delta": 5.79,
+        "ingredient_index": 0,
+        "ingredient_indices": [
+          0
+        ],
+        "original_food_id": 133,
+        "rank_score": 10.79,
+        "replacement_food_id": 130,
+        "rule_id": "matcher_alternative_130",
+        "suggestion_type": "single_swap"
+      },
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 57.0,
+        "fcs_before": 52.35,
+        "fcs_delta": 4.65,
+        "ingredient_index": 0,
+        "ingredient_indices": [
+          0
+        ],
+        "original_food_id": 133,
+        "rank_score": 9.65,
+        "replacement_food_id": 132,
+        "rule_id": "matcher_alternative_132",
+        "suggestion_type": "single_swap"
+      }
+    ]
+  },
+  "D1 breakfast \u2014 scrambled egg + OJ :: singles": {
+    "baseline_fcs_nova": "MIXED_PROCESSING_LEVELS",
+    "baseline_fcs_total": 52.35,
+    "candidates_found": 8,
+    "reformulation_plans": 0,
+    "suggestions": [
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 58.14,
+        "fcs_before": 52.35,
+        "fcs_delta": 5.79,
+        "ingredient_index": 0,
+        "ingredient_indices": [
+          0
+        ],
+        "original_food_id": 133,
+        "rank_score": 10.79,
+        "replacement_food_id": 130,
+        "rule_id": "matcher_alternative_130",
+        "suggestion_type": "single_swap"
+      },
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 57.0,
+        "fcs_before": 52.35,
+        "fcs_delta": 4.65,
+        "ingredient_index": 0,
+        "ingredient_indices": [
+          0
+        ],
+        "original_food_id": 133,
+        "rank_score": 9.65,
+        "replacement_food_id": 132,
+        "rule_id": "matcher_alternative_132",
+        "suggestion_type": "single_swap"
+      },
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 55.06,
+        "fcs_before": 52.35,
+        "fcs_delta": 2.71,
+        "ingredient_index": 3,
+        "ingredient_indices": [
+          3
+        ],
+        "original_food_id": 1620,
+        "rank_score": 7.71,
+        "replacement_food_id": 6203,
+        "rule_id": "matcher_alternative_6203",
+        "suggestion_type": "single_swap"
+      }
+    ]
+  },
+  "D1 dinner \u2014 oat porridge :: greedy": {
+    "baseline_fcs_nova": "MIXED_PROCESSING_LEVELS",
+    "baseline_fcs_total": 28.27,
+    "candidates_found": 6,
+    "reformulation_plans": 0,
+    "suggestions": [
+      {
+        "candidate_source": "curated_rule",
+        "fcs_after": 41.35,
+        "fcs_before": 28.27,
+        "fcs_delta": 13.08,
+        "ingredient_index": 1,
+        "ingredient_indices": [
+          1
+        ],
+        "original_food_id": 61,
+        "rank_score": 23.08,
+        "replacement_food_id": 6331,
+        "rule_id": "milk_to_soy",
+        "suggestion_type": "single_swap"
+      },
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 31.03,
+        "fcs_before": 28.27,
+        "fcs_delta": 2.76,
+        "ingredient_index": 1,
+        "ingredient_indices": [
+          1
+        ],
+        "original_food_id": 61,
+        "rank_score": 7.76,
+        "replacement_food_id": 63,
+        "rule_id": "matcher_alternative_63",
+        "suggestion_type": "single_swap"
+      },
+      {
+        "candidate_source": "combined",
+        "fcs_after": 30.32,
+        "fcs_before": 28.27,
+        "fcs_delta": 2.05,
+        "ingredient_index": 0,
+        "ingredient_indices": [
+          0,
+          1
+        ],
+        "original_food_id": 1465,
+        "rank_score": 2.05,
+        "replacement_food_id": 1464,
+        "rule_id": "multi_swap",
+        "suggestion_type": "multi_swap"
+      }
+    ]
+  },
+  "D1 dinner \u2014 oat porridge :: singles": {
+    "baseline_fcs_nova": "MIXED_PROCESSING_LEVELS",
+    "baseline_fcs_total": 28.27,
+    "candidates_found": 6,
+    "reformulation_plans": 0,
+    "suggestions": [
+      {
+        "candidate_source": "curated_rule",
+        "fcs_after": 41.35,
+        "fcs_before": 28.27,
+        "fcs_delta": 13.08,
+        "ingredient_index": 1,
+        "ingredient_indices": [
+          1
+        ],
+        "original_food_id": 61,
+        "rank_score": 23.08,
+        "replacement_food_id": 6331,
+        "rule_id": "milk_to_soy",
+        "suggestion_type": "single_swap"
+      },
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 31.03,
+        "fcs_before": 28.27,
+        "fcs_delta": 2.76,
+        "ingredient_index": 1,
+        "ingredient_indices": [
+          1
+        ],
+        "original_food_id": 61,
+        "rank_score": 7.76,
+        "replacement_food_id": 63,
+        "rule_id": "matcher_alternative_63",
+        "suggestion_type": "single_swap"
+      }
+    ]
+  },
+  "D1 lunch \u2014 chicken biryani :: greedy": {
+    "baseline_fcs_nova": "MIXED_PROCESSING_LEVELS",
+    "baseline_fcs_total": 35.89,
+    "candidates_found": 7,
+    "reformulation_plans": 1,
+    "suggestions": [
+      {
+        "candidate_source": "reformulation",
+        "fcs_after": 36.4,
+        "fcs_before": 35.89,
+        "fcs_delta": 0.51,
+        "ingredient_index": 1,
+        "ingredient_indices": [
+          1,
+          3,
+          5
+        ],
+        "original_food_id": 851,
+        "rank_score": 20.99,
+        "replacement_food_id": 700488,
+        "rule_id": "greedy_reformulation",
+        "suggestion_type": "reformulation_plan"
+      },
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 37.39,
+        "fcs_before": 35.89,
+        "fcs_delta": 1.5,
+        "ingredient_index": 1,
+        "ingredient_indices": [
+          1
+        ],
+        "original_food_id": 851,
+        "rank_score": 6.5,
+        "replacement_food_id": 7330,
+        "rule_id": "matcher_alternative_7330",
+        "suggestion_type": "single_swap"
+      },
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 36.19,
+        "fcs_before": 35.89,
+        "fcs_delta": 0.3,
+        "ingredient_index": 1,
+        "ingredient_indices": [
+          1
+        ],
+        "original_food_id": 851,
+        "rank_score": 5.3,
+        "replacement_food_id": 610,
+        "rule_id": "matcher_alternative_610",
+        "suggestion_type": "single_swap"
+      }
+    ]
+  },
+  "D1 lunch \u2014 chicken biryani :: singles": {
+    "baseline_fcs_nova": "MIXED_PROCESSING_LEVELS",
+    "baseline_fcs_total": 35.89,
+    "candidates_found": 7,
+    "reformulation_plans": 0,
+    "suggestions": [
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 37.39,
+        "fcs_before": 35.89,
+        "fcs_delta": 1.5,
+        "ingredient_index": 1,
+        "ingredient_indices": [
+          1
+        ],
+        "original_food_id": 851,
+        "rank_score": 6.5,
+        "replacement_food_id": 7330,
+        "rule_id": "matcher_alternative_7330",
+        "suggestion_type": "single_swap"
+      },
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 36.19,
+        "fcs_before": 35.89,
+        "fcs_delta": 0.3,
+        "ingredient_index": 1,
+        "ingredient_indices": [
+          1
+        ],
+        "original_food_id": 851,
+        "rank_score": 5.3,
+        "replacement_food_id": 610,
+        "rule_id": "matcher_alternative_610",
+        "suggestion_type": "single_swap"
+      }
+    ]
+  },
+  "D2 AGGREGATED :: greedy": {
+    "baseline_fcs_nova": "MIXED_PROCESSING_LEVELS",
+    "baseline_fcs_total": 40.97,
+    "candidates_found": 20,
+    "reformulation_plans": 1,
+    "suggestions": [
+      {
+        "candidate_source": "reformulation",
+        "fcs_after": 52.88,
+        "fcs_before": 40.97,
+        "fcs_delta": 11.91,
+        "ingredient_index": 0,
+        "ingredient_indices": [
+          0,
+          1,
+          3
+        ],
+        "original_food_id": 6205,
+        "rank_score": 46.52,
+        "replacement_food_id": 700197,
+        "rule_id": "greedy_reformulation",
+        "suggestion_type": "reformulation_plan"
+      },
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 49.32,
+        "fcs_before": 40.97,
+        "fcs_delta": 8.35,
+        "ingredient_index": 0,
+        "ingredient_indices": [
+          0
+        ],
+        "original_food_id": 6205,
+        "rank_score": 13.35,
+        "replacement_food_id": 700961,
+        "rule_id": "matcher_alternative_700961",
+        "suggestion_type": "single_swap"
+      },
+      {
+        "candidate_source": "combined",
+        "fcs_after": 52.23,
+        "fcs_before": 40.97,
+        "fcs_delta": 11.26,
+        "ingredient_index": 0,
+        "ingredient_indices": [
+          0,
+          3
+        ],
+        "original_food_id": 6205,
+        "rank_score": 11.26,
+        "replacement_food_id": 700961,
+        "rule_id": "multi_swap",
+        "suggestion_type": "multi_swap"
+      }
+    ]
+  },
+  "D2 AGGREGATED :: singles": {
+    "baseline_fcs_nova": "MIXED_PROCESSING_LEVELS",
+    "baseline_fcs_total": 40.97,
+    "candidates_found": 20,
+    "reformulation_plans": 0,
+    "suggestions": [
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 49.32,
+        "fcs_before": 40.97,
+        "fcs_delta": 8.35,
+        "ingredient_index": 0,
+        "ingredient_indices": [
+          0
+        ],
+        "original_food_id": 6205,
+        "rank_score": 13.35,
+        "replacement_food_id": 700961,
+        "rule_id": "matcher_alternative_700961",
+        "suggestion_type": "single_swap"
+      },
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 43.79,
+        "fcs_before": 40.97,
+        "fcs_delta": 2.82,
+        "ingredient_index": 3,
+        "ingredient_indices": [
+          3
+        ],
+        "original_food_id": 133,
+        "rank_score": 7.82,
+        "replacement_food_id": 130,
+        "rule_id": "matcher_alternative_130",
+        "suggestion_type": "single_swap"
+      },
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 43.6,
+        "fcs_before": 40.97,
+        "fcs_delta": 2.63,
+        "ingredient_index": 3,
+        "ingredient_indices": [
+          3
+        ],
+        "original_food_id": 133,
+        "rank_score": 7.63,
+        "replacement_food_id": 132,
+        "rule_id": "matcher_alternative_132",
+        "suggestion_type": "single_swap"
+      }
+    ]
+  },
+  "D2 breakfast \u2014 scrambled egg + mango :: greedy": {
+    "baseline_fcs_nova": "MIXED_PROCESSING_LEVELS",
+    "baseline_fcs_total": 13.5,
+    "candidates_found": 4,
+    "reformulation_plans": 1,
+    "suggestions": [
+      {
+        "candidate_source": "reformulation",
+        "fcs_after": 37.12,
+        "fcs_before": 13.5,
+        "fcs_delta": 23.62,
+        "ingredient_index": 2,
+        "ingredient_indices": [
+          0,
+          2
+        ],
+        "original_food_id": 6205,
+        "rank_score": 54.46,
+        "replacement_food_id": 129,
+        "rule_id": "greedy_reformulation",
+        "suggestion_type": "reformulation_plan"
+      },
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 34.34,
+        "fcs_before": 13.5,
+        "fcs_delta": 20.84,
+        "ingredient_index": 2,
+        "ingredient_indices": [
+          2
+        ],
+        "original_food_id": 6205,
+        "rank_score": 25.84,
+        "replacement_food_id": 700961,
+        "rule_id": "matcher_alternative_700961",
+        "suggestion_type": "single_swap"
+      },
+      {
+        "candidate_source": "combined",
+        "fcs_after": 37.12,
+        "fcs_before": 13.5,
+        "fcs_delta": 23.62,
+        "ingredient_index": 0,
+        "ingredient_indices": [
+          0,
+          2
+        ],
+        "original_food_id": 133,
+        "rank_score": 23.62,
+        "replacement_food_id": 129,
+        "rule_id": "multi_swap",
+        "suggestion_type": "multi_swap"
+      }
+    ]
+  },
+  "D2 breakfast \u2014 scrambled egg + mango :: singles": {
+    "baseline_fcs_nova": "MIXED_PROCESSING_LEVELS",
+    "baseline_fcs_total": 13.5,
+    "candidates_found": 4,
+    "reformulation_plans": 0,
+    "suggestions": [
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 34.34,
+        "fcs_before": 13.5,
+        "fcs_delta": 20.84,
+        "ingredient_index": 2,
+        "ingredient_indices": [
+          2
+        ],
+        "original_food_id": 6205,
+        "rank_score": 25.84,
+        "replacement_food_id": 700961,
+        "rule_id": "matcher_alternative_700961",
+        "suggestion_type": "single_swap"
+      },
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 16.01,
+        "fcs_before": 13.5,
+        "fcs_delta": 2.51,
+        "ingredient_index": 0,
+        "ingredient_indices": [
+          0
+        ],
+        "original_food_id": 133,
+        "rank_score": 7.51,
+        "replacement_food_id": 130,
+        "rule_id": "matcher_alternative_130",
+        "suggestion_type": "single_swap"
+      },
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 15.38,
+        "fcs_before": 13.5,
+        "fcs_delta": 1.88,
+        "ingredient_index": 0,
+        "ingredient_indices": [
+          0
+        ],
+        "original_food_id": 133,
+        "rank_score": 6.88,
+        "replacement_food_id": 129,
+        "rule_id": "matcher_alternative_129",
+        "suggestion_type": "single_swap"
+      }
+    ]
+  },
+  "D2 dinner \u2014 fufu + groundnut soup :: greedy": {
+    "baseline_fcs_nova": "MIXED_PROCESSING_LEVELS",
+    "baseline_fcs_total": 62.6,
+    "candidates_found": 23,
+    "reformulation_plans": 1,
+    "suggestions": [
+      {
+        "candidate_source": "reformulation",
+        "fcs_after": 70.28,
+        "fcs_before": 62.6,
+        "fcs_delta": 7.68,
+        "ingredient_index": 0,
+        "ingredient_indices": [
+          0,
+          2,
+          4
+        ],
+        "original_food_id": 700194,
+        "rank_score": 38.16,
+        "replacement_food_id": 646,
+        "rule_id": "greedy_reformulation",
+        "suggestion_type": "reformulation_plan"
+      },
+      {
+        "candidate_source": "wafct_recipe",
+        "fcs_after": 68.32,
+        "fcs_before": 62.6,
+        "fcs_delta": 5.72,
+        "ingredient_index": 0,
+        "ingredient_indices": [
+          0
+        ],
+        "original_food_id": 700194,
+        "rank_score": 12.72,
+        "replacement_food_id": 700229,
+        "rule_id": "wafct_recipe_700229",
+        "suggestion_type": "single_swap"
+      },
+      {
+        "candidate_source": "combined",
+        "fcs_after": 75.16,
+        "fcs_before": 62.6,
+        "fcs_delta": 12.56,
+        "ingredient_index": 0,
+        "ingredient_indices": [
+          0,
+          3
+        ],
+        "original_food_id": 700194,
+        "rank_score": 12.56,
+        "replacement_food_id": 700198,
+        "rule_id": "multi_swap",
+        "suggestion_type": "multi_swap"
+      }
+    ]
+  },
+  "D2 dinner \u2014 fufu + groundnut soup :: singles": {
+    "baseline_fcs_nova": "MIXED_PROCESSING_LEVELS",
+    "baseline_fcs_total": 62.6,
+    "candidates_found": 23,
+    "reformulation_plans": 0,
+    "suggestions": [
+      {
+        "candidate_source": "wafct_recipe",
+        "fcs_after": 68.32,
+        "fcs_before": 62.6,
+        "fcs_delta": 5.72,
+        "ingredient_index": 0,
+        "ingredient_indices": [
+          0
+        ],
+        "original_food_id": 700194,
+        "rank_score": 12.72,
+        "replacement_food_id": 700229,
+        "rule_id": "wafct_recipe_700229",
+        "suggestion_type": "single_swap"
+      },
+      {
+        "candidate_source": "wafct_recipe",
+        "fcs_after": 67.0,
+        "fcs_before": 62.6,
+        "fcs_delta": 4.4,
+        "ingredient_index": 7,
+        "ingredient_indices": [
+          7
+        ],
+        "original_food_id": 423,
+        "rank_score": 11.4,
+        "replacement_food_id": 700942,
+        "rule_id": "wafct_recipe_700942",
+        "suggestion_type": "single_swap"
+      },
+      {
+        "candidate_source": "wafct_recipe",
+        "fcs_after": 64.07,
+        "fcs_before": 62.6,
+        "fcs_delta": 1.47,
+        "ingredient_index": 0,
+        "ingredient_indices": [
+          0
+        ],
+        "original_food_id": 700194,
+        "rank_score": 8.47,
+        "replacement_food_id": 700217,
+        "rule_id": "wafct_recipe_700217",
+        "suggestion_type": "single_swap"
+      }
+    ]
+  },
+  "D2 lunch \u2014 chicken biryani (partial) :: greedy": {
+    "baseline_fcs_nova": "MIXED_PROCESSING_LEVELS",
+    "baseline_fcs_total": 58.25,
+    "candidates_found": 5,
+    "reformulation_plans": 1,
+    "suggestions": [
+      {
+        "candidate_source": "reformulation",
+        "fcs_after": 60.62,
+        "fcs_before": 58.25,
+        "fcs_delta": 2.37,
+        "ingredient_index": 0,
+        "ingredient_indices": [
+          0,
+          1,
+          3
+        ],
+        "original_food_id": 851,
+        "rank_score": 25.46,
+        "replacement_food_id": 700488,
+        "rule_id": "greedy_reformulation",
+        "suggestion_type": "reformulation_plan"
+      },
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 60.73,
+        "fcs_before": 58.25,
+        "fcs_delta": 2.48,
+        "ingredient_index": 0,
+        "ingredient_indices": [
+          0
+        ],
+        "original_food_id": 851,
+        "rank_score": 7.48,
+        "replacement_food_id": 610,
+        "rule_id": "matcher_alternative_610",
+        "suggestion_type": "single_swap"
+      },
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 58.85,
+        "fcs_before": 58.25,
+        "fcs_delta": 0.6,
+        "ingredient_index": 0,
+        "ingredient_indices": [
+          0
+        ],
+        "original_food_id": 851,
+        "rank_score": 5.6,
+        "replacement_food_id": 7330,
+        "rule_id": "matcher_alternative_7330",
+        "suggestion_type": "single_swap"
+      }
+    ]
+  },
+  "D2 lunch \u2014 chicken biryani (partial) :: singles": {
+    "baseline_fcs_nova": "MIXED_PROCESSING_LEVELS",
+    "baseline_fcs_total": 58.25,
+    "candidates_found": 5,
+    "reformulation_plans": 0,
+    "suggestions": [
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 60.73,
+        "fcs_before": 58.25,
+        "fcs_delta": 2.48,
+        "ingredient_index": 0,
+        "ingredient_indices": [
+          0
+        ],
+        "original_food_id": 851,
+        "rank_score": 7.48,
+        "replacement_food_id": 610,
+        "rule_id": "matcher_alternative_610",
+        "suggestion_type": "single_swap"
+      },
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 58.85,
+        "fcs_before": 58.25,
+        "fcs_delta": 0.6,
+        "ingredient_index": 0,
+        "ingredient_indices": [
+          0
+        ],
+        "original_food_id": 851,
+        "rank_score": 5.6,
+        "replacement_food_id": 7330,
+        "rule_id": "matcher_alternative_7330",
+        "suggestion_type": "single_swap"
+      },
+      {
+        "candidate_source": "matcher_alternative",
+        "fcs_after": 58.72,
+        "fcs_before": 58.25,
+        "fcs_delta": 0.47,
+        "ingredient_index": 3,
+        "ingredient_indices": [
+          3
+        ],
+        "original_food_id": 2460,
+        "rank_score": 5.47,
+        "replacement_food_id": 700530,
+        "rule_id": "matcher_alternative_700530",
+        "suggestion_type": "single_swap"
+      }
+    ]
+  }
+}

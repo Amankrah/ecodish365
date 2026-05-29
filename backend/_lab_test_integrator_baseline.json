@@ -1,0 +1,4168 @@
+{
+  "118": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 0,
+        "fruit": 0,
+        "nuts": 0,
+        "plant_oils": 100.0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 0,
+        "nova_processing": -5,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 717.0,
+    "nova_processing_level": 2,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.315,
+      "calcium": 24.0,
+      "cholesterol": 215.0,
+      "choline": 18.8,
+      "copper": 0.0,
+      "epa_dha": 0.0,
+      "fiber": 0.0,
+      "iron": 0.02,
+      "linoleic_acid": 2.728,
+      "magnesium": 2.0,
+      "manganese": 0.0,
+      "monounsaturated_fat": 21.021,
+      "oleic_acid": 19.961,
+      "phosphorus": 24.0,
+      "polyunsaturated_fat": 3.043,
+      "potassium": 24.0,
+      "protein": 0.85,
+      "saturated_fat": 51.368,
+      "selenium": 1.0,
+      "sodium": 643.0,
+      "total_carbohydrate": 0.06,
+      "total_carotenoids": 0.0,
+      "total_fat": 81.11,
+      "total_sugars": 0.06,
+      "transfat": 4.639,
+      "vitamin_a": 684.0,
+      "vitamin_b1": 0.005,
+      "vitamin_b12": 0.17,
+      "vitamin_b2": 0.034,
+      "vitamin_b3": 0.242,
+      "vitamin_b6": 0.003,
+      "vitamin_b9": 3.0,
+      "vitamin_c": 0.0,
+      "vitamin_d": 0.593,
+      "vitamin_e": 2.32,
+      "vitamin_k": 7.0,
+      "zinc": 0.09
+    },
+    "portion_energy_100g": 717.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 717.0,
+          "energy_weight": 1.0,
+          "food_id": 118,
+          "nova_category": "PROCESSED_CULINARY_INGREDIENTS",
+          "nova_level": 2
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "133": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 0,
+        "fruit": 0,
+        "nuts": 0,
+        "plant_oils": 0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 100.0,
+        "nova_processing": 0,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 153.0,
+    "nova_processing_level": 1,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.228,
+      "betaine": 0.3,
+      "calcium": 71.643,
+      "cholesterol": 292.95,
+      "choline": 221.0,
+      "copper": 0.048,
+      "epa_dha": 0.001,
+      "fiber": 0.0,
+      "iron": 1.113,
+      "linoleic_acid": 1.648,
+      "magnesium": 10.318,
+      "manganese": 0.04,
+      "monounsaturated_fat": 4.802,
+      "oleic_acid": 4.285,
+      "phosphorus": 128.857,
+      "polyunsaturated_fat": 2.118,
+      "potassium": 136.877,
+      "protein": 10.388,
+      "saturated_fat": 3.312,
+      "selenium": 27.964,
+      "sodium": 369.155,
+      "total_carbohydrate": 3.047,
+      "total_carotenoids": 263.0,
+      "total_fat": 11.394,
+      "total_sugars": 1.39,
+      "transfat": 0.467,
+      "vitamin_a": 206.258,
+      "vitamin_b1": 0.059,
+      "vitamin_b12": 0.0,
+      "vitamin_b2": 0.43,
+      "vitamin_b3": 2.52483,
+      "vitamin_b6": 0.065,
+      "vitamin_b9": 44.376,
+      "vitamin_c": 0.056,
+      "vitamin_d": 1.807,
+      "vitamin_e": 0.0,
+      "vitamin_k": 3.549,
+      "zinc": 1.052
+    },
+    "portion_energy_100g": 153.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 153.0,
+          "energy_weight": 1.0,
+          "food_id": 133,
+          "nova_category": "MINIMALLY_PROCESSED",
+          "nova_level": 1
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "1465": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 100.0,
+        "beans": 0,
+        "fruit": 0,
+        "nuts": 0,
+        "plant_oils": 0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 0,
+        "nova_processing": -10,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 83.0,
+    "nova_processing_level": 4,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.016,
+      "calcium": 11.18,
+      "cholesterol": 0.0,
+      "copper": 0.0664,
+      "epa_dha": 0.0,
+      "fiber": 1.9995,
+      "iron": 0.817,
+      "linoleic_acid": 0.35,
+      "magnesium": 29.025,
+      "manganese": 0.9224,
+      "monounsaturated_fat": 0.5556,
+      "oleic_acid": 0.314,
+      "phosphorus": 98.685,
+      "polyunsaturated_fat": 0.459,
+      "potassium": 82.345,
+      "protein": 2.8509,
+      "saturated_fat": 0.2875,
+      "sodium": 0.645,
+      "total_carbohydrate": 14.3341,
+      "total_carotenoids": 0.0,
+      "total_fat": 1.5416,
+      "total_sugars": 0.215,
+      "transfat": 0.0,
+      "vitamin_a": 0.0,
+      "vitamin_b1": 0.1202,
+      "vitamin_b12": 0.0,
+      "vitamin_b2": 0.028,
+      "vitamin_b3": 0.66993,
+      "vitamin_b6": 0.0215,
+      "vitamin_b9": 10.535,
+      "vitamin_c": 0.0,
+      "vitamin_d": 0.0,
+      "zinc": 0.6607
+    },
+    "portion_energy_100g": 83.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 83.0,
+          "energy_weight": 1.0,
+          "food_id": 1465,
+          "nova_category": "ULTRA_PROCESSED_FOODS",
+          "nova_level": 4
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "1620": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 0,
+        "fruit": 100.0,
+        "nuts": 0,
+        "plant_oils": 0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 100.0,
+        "nova_processing": 0,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 49.0,
+    "nova_processing_level": 1,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.014,
+      "calcium": 11.0,
+      "cholesterol": 0.0,
+      "choline": 6.2,
+      "copper": 0.042,
+      "epa_dha": 0.0,
+      "fiber": 0.3,
+      "iron": 0.13,
+      "linoleic_acid": 0.023,
+      "magnesium": 11.0,
+      "manganese": 0.023,
+      "monounsaturated_fat": 0.022,
+      "oleic_acid": 0.018,
+      "phosphorus": 17.0,
+      "polyunsaturated_fat": 0.032,
+      "potassium": 178.0,
+      "protein": 0.68,
+      "saturated_fat": 0.014,
+      "selenium": 0.1,
+      "sodium": 2.0,
+      "total_carbohydrate": 11.54,
+      "total_carotenoids": 27.0,
+      "total_fat": 0.12,
+      "total_sugars": 8.31,
+      "transfat": 0.0,
+      "vitamin_a": 2.0,
+      "vitamin_b1": 0.046,
+      "vitamin_b12": 0.0,
+      "vitamin_b2": 0.039,
+      "vitamin_b3": 0.31333,
+      "vitamin_b6": 0.076,
+      "vitamin_b9": 19.0,
+      "vitamin_c": 33.6,
+      "vitamin_d": 0.0,
+      "vitamin_e": 0.2,
+      "vitamin_k": 0.0,
+      "zinc": 0.07
+    },
+    "portion_energy_100g": 49.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 49.0,
+          "energy_weight": 1.0,
+          "food_id": 1620,
+          "nova_category": "MINIMALLY_PROCESSED",
+          "nova_level": 1
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "1662": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 0,
+        "fruit": 100.0,
+        "nuts": 0,
+        "plant_oils": 0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 100.0,
+        "nova_processing": 0,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 116.0,
+    "nova_processing_level": 1,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.012,
+      "calcium": 2.0,
+      "cholesterol": 0.0,
+      "choline": 12.7,
+      "copper": 0.066,
+      "epa_dha": 0.0,
+      "fiber": 2.3,
+      "iron": 0.58,
+      "linoleic_acid": 0.021,
+      "magnesium": 32.0,
+      "monounsaturated_fat": 0.015,
+      "oleic_acid": 0.01,
+      "phosphorus": 28.0,
+      "polyunsaturated_fat": 0.033,
+      "potassium": 465.0,
+      "protein": 0.79,
+      "saturated_fat": 0.069,
+      "selenium": 1.4,
+      "sodium": 5.0,
+      "total_carbohydrate": 31.15,
+      "total_carotenoids": 28.0,
+      "total_fat": 0.18,
+      "total_sugars": 14.0,
+      "transfat": 0.0,
+      "vitamin_a": 45.0,
+      "vitamin_b1": 0.046,
+      "vitamin_b12": 0.0,
+      "vitamin_b2": 0.052,
+      "vitamin_b3": 0.906,
+      "vitamin_b6": 0.24,
+      "vitamin_b9": 26.0,
+      "vitamin_c": 10.9,
+      "vitamin_d": 0.0,
+      "vitamin_e": 0.13,
+      "vitamin_k": 0.7,
+      "zinc": 0.13
+    },
+    "portion_energy_100g": 116.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 116.0,
+          "energy_weight": 1.0,
+          "food_id": 1662,
+          "nova_category": "MINIMALLY_PROCESSED",
+          "nova_level": 1
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "1704": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 0,
+        "fruit": 100.0,
+        "nuts": 0,
+        "plant_oils": 0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 100.0,
+        "nova_processing": 0,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 89.0,
+    "nova_processing_level": 1,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.027,
+      "betaine": 0.1,
+      "calcium": 5.0,
+      "cholesterol": 0.0,
+      "choline": 9.8,
+      "copper": 0.078,
+      "epa_dha": 0.0,
+      "fiber": 1.74,
+      "iron": 0.26,
+      "linoleic_acid": 0.046,
+      "magnesium": 27.0,
+      "manganese": 0.27,
+      "monounsaturated_fat": 0.032,
+      "oleic_acid": 0.022,
+      "phosphorus": 22.0,
+      "polyunsaturated_fat": 0.073,
+      "potassium": 358.0,
+      "protein": 1.09,
+      "saturated_fat": 0.112,
+      "selenium": 1.0,
+      "sodium": 1.0,
+      "total_carbohydrate": 22.84,
+      "total_carotenoids": 22.0,
+      "total_fat": 0.33,
+      "total_sugars": 12.23,
+      "transfat": 0.0,
+      "vitamin_a": 3.0,
+      "vitamin_b1": 0.031,
+      "vitamin_b12": 0.0,
+      "vitamin_b2": 0.073,
+      "vitamin_b3": 0.815,
+      "vitamin_b6": 0.367,
+      "vitamin_b9": 20.0,
+      "vitamin_c": 8.7,
+      "vitamin_d": 0.0,
+      "vitamin_e": 0.1,
+      "vitamin_k": 0.5,
+      "zinc": 0.15
+    },
+    "portion_energy_100g": 89.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 89.0,
+          "energy_weight": 1.0,
+          "food_id": 1704,
+          "nova_category": "MINIMALLY_PROCESSED",
+          "nova_level": 1
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "2091": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 0,
+        "fruit": 0,
+        "nuts": 0,
+        "plant_oils": 0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 100.0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 100.0,
+        "nova_processing": 0,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 80.0,
+    "nova_processing_level": 1,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.034,
+      "calcium": 16.0,
+      "cholesterol": 0.0,
+      "choline": 28.8,
+      "copper": 0.226,
+      "epa_dha": 0.0,
+      "fiber": 2.0,
+      "iron": 0.6,
+      "linoleic_acid": 0.12,
+      "magnesium": 43.0,
+      "manganese": 0.229,
+      "monounsaturated_fat": 0.154,
+      "oleic_acid": 0.119,
+      "phosphorus": 34.0,
+      "polyunsaturated_fat": 0.154,
+      "potassium": 415.0,
+      "protein": 1.82,
+      "saturated_fat": 0.203,
+      "selenium": 0.7,
+      "sodium": 13.0,
+      "total_carbohydrate": 17.77,
+      "total_carotenoids": 0.0,
+      "total_fat": 0.75,
+      "total_sugars": 1.7,
+      "transfat": 0.0,
+      "vitamin_a": 0.0,
+      "vitamin_b1": 0.025,
+      "vitamin_b12": 0.0,
+      "vitamin_b2": 0.034,
+      "vitamin_b3": 0.95,
+      "vitamin_b6": 0.16,
+      "vitamin_b9": 11.0,
+      "vitamin_c": 5.0,
+      "vitamin_d": 0.0,
+      "vitamin_e": 0.26,
+      "vitamin_k": 0.1,
+      "zinc": 0.34
+    },
+    "portion_energy_100g": 80.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 80.0,
+          "energy_weight": 1.0,
+          "food_id": 2091,
+          "nova_category": "MINIMALLY_PROCESSED",
+          "nova_level": 1
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "2394": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 0,
+        "fruit": 0,
+        "nuts": 0,
+        "plant_oils": 0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 100.0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 100.0,
+        "nova_processing": 0,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 149.0,
+    "nova_processing_level": 1,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.02,
+      "calcium": 181.0,
+      "cholesterol": 0.0,
+      "choline": 23.2,
+      "copper": 0.299,
+      "epa_dha": 0.0,
+      "fiber": 2.1,
+      "iron": 1.7,
+      "linoleic_acid": 0.229,
+      "magnesium": 25.0,
+      "manganese": 1.672,
+      "monounsaturated_fat": 0.011,
+      "oleic_acid": 0.011,
+      "phosphorus": 153.0,
+      "polyunsaturated_fat": 0.249,
+      "potassium": 401.0,
+      "protein": 6.36,
+      "saturated_fat": 0.089,
+      "selenium": 14.2,
+      "sodium": 17.0,
+      "total_carbohydrate": 33.06,
+      "total_carotenoids": 16.0,
+      "total_fat": 0.5,
+      "total_sugars": 1.0,
+      "transfat": 0.0,
+      "vitamin_a": 0.0,
+      "vitamin_b1": 0.2,
+      "vitamin_b12": 0.0,
+      "vitamin_b2": 0.11,
+      "vitamin_b3": 1.8,
+      "vitamin_b6": 1.235,
+      "vitamin_b9": 3.0,
+      "vitamin_c": 31.2,
+      "vitamin_d": 0.0,
+      "vitamin_e": 0.08,
+      "vitamin_k": 1.7,
+      "zinc": 1.16
+    },
+    "portion_energy_100g": 149.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 149.0,
+          "energy_weight": 1.0,
+          "food_id": 2394,
+          "nova_category": "MINIMALLY_PROCESSED",
+          "nova_level": 1
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "2401": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 0,
+        "fruit": 0,
+        "nuts": 0,
+        "plant_oils": 0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 100.0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 100.0,
+        "nova_processing": 0,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 40.0,
+    "nova_processing_level": 1,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.002,
+      "betaine": 0.1,
+      "calcium": 23.0,
+      "cholesterol": 0.0,
+      "choline": 60.1,
+      "copper": 0.039,
+      "epa_dha": 0.0,
+      "fiber": 1.7,
+      "iron": 0.21,
+      "linoleic_acid": 0.013,
+      "magnesium": 10.0,
+      "manganese": 0.129,
+      "monounsaturated_fat": 0.013,
+      "oleic_acid": 0.013,
+      "phosphorus": 29.0,
+      "polyunsaturated_fat": 0.017,
+      "potassium": 146.0,
+      "protein": 1.1,
+      "saturated_fat": 0.042,
+      "selenium": 0.5,
+      "sodium": 4.0,
+      "total_carbohydrate": 9.34,
+      "total_carotenoids": 4.0,
+      "total_fat": 0.1,
+      "total_sugars": 4.24,
+      "transfat": 0.0,
+      "vitamin_a": 0.0,
+      "vitamin_b1": 0.046,
+      "vitamin_b12": 0.0,
+      "vitamin_b2": 0.027,
+      "vitamin_b3": 0.34933,
+      "vitamin_b6": 0.12,
+      "vitamin_b9": 19.0,
+      "vitamin_c": 7.4,
+      "vitamin_d": 0.0,
+      "vitamin_e": 0.02,
+      "vitamin_k": 0.4,
+      "zinc": 0.17
+    },
+    "portion_energy_100g": 40.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 40.0,
+          "energy_weight": 1.0,
+          "food_id": 2401,
+          "nova_category": "MINIMALLY_PROCESSED",
+          "nova_level": 1
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "2460": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 0,
+        "fruit": 0,
+        "nuts": 0,
+        "plant_oils": 0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 100.0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 100.0,
+        "nova_processing": 0,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 18.0,
+    "nova_processing_level": 1,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.003,
+      "betaine": 0.1,
+      "calcium": 10.0,
+      "cholesterol": 0.0,
+      "choline": 6.7,
+      "copper": 0.059,
+      "epa_dha": 0.0,
+      "fiber": 1.21,
+      "iron": 0.27,
+      "linoleic_acid": 0.08,
+      "magnesium": 11.0,
+      "manganese": 0.114,
+      "monounsaturated_fat": 0.031,
+      "oleic_acid": 0.03,
+      "phosphorus": 24.0,
+      "polyunsaturated_fat": 0.083,
+      "potassium": 237.0,
+      "protein": 0.88,
+      "saturated_fat": 0.028,
+      "selenium": 0.0,
+      "sodium": 5.0,
+      "total_carbohydrate": 3.89,
+      "total_carotenoids": 123.0,
+      "total_fat": 0.2,
+      "total_sugars": 2.63,
+      "transfat": 0.0,
+      "vitamin_a": 42.0,
+      "vitamin_b1": 0.037,
+      "vitamin_b12": 0.0,
+      "vitamin_b2": 0.019,
+      "vitamin_b3": 0.694,
+      "vitamin_b6": 0.08,
+      "vitamin_b9": 15.0,
+      "vitamin_c": 13.7,
+      "vitamin_d": 0.0,
+      "vitamin_e": 0.54,
+      "vitamin_k": 7.9,
+      "zinc": 0.17
+    },
+    "portion_energy_100g": 18.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 18.0,
+          "energy_weight": 1.0,
+          "food_id": 2460,
+          "nova_category": "MINIMALLY_PROCESSED",
+          "nova_level": 1
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "2683": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 0,
+        "fruit": 0,
+        "nuts": 0,
+        "plant_oils": 0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 100.0,
+        "nova_processing": 0,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 207.0,
+    "nova_processing_level": 1,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.055,
+      "betaine": 8.2,
+      "calcium": 10.2,
+      "cholesterol": 59.825,
+      "choline": 56.4,
+      "copper": 0.0825,
+      "epa_dha": 0.0,
+      "fiber": 0.0,
+      "iron": 1.8,
+      "linoleic_acid": 0.2475,
+      "magnesium": 19.425,
+      "manganese": 0.01,
+      "monounsaturated_fat": 6.1225,
+      "oleic_acid": 5.1175,
+      "phosphorus": 160.75,
+      "polyunsaturated_fat": 0.36,
+      "potassium": 270.75,
+      "protein": 19.575,
+      "saturated_fat": 5.4625,
+      "selenium": 15.0,
+      "sodium": 63.475,
+      "total_carbohydrate": 0.0,
+      "total_carotenoids": 0.0,
+      "total_fat": 13.675,
+      "total_sugars": 0.0,
+      "transfat": 0.4625,
+      "vitamin_a": 4.0,
+      "vitamin_b1": 0.1075,
+      "vitamin_b12": 2.35,
+      "vitamin_b2": 0.2275,
+      "vitamin_b3": 9.44167,
+      "vitamin_b6": 0.2375,
+      "vitamin_b9": 8.0,
+      "vitamin_c": 0.0,
+      "vitamin_d": 0.1,
+      "vitamin_e": 0.17,
+      "vitamin_k": 1.8,
+      "zinc": 4.575
+    },
+    "portion_energy_100g": 207.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 207.0,
+          "energy_weight": 1.0,
+          "food_id": 2683,
+          "nova_category": "MINIMALLY_PROCESSED",
+          "nova_level": 1
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "29": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 0,
+        "fruit": 0,
+        "nuts": 0,
+        "plant_oils": 0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 0,
+        "nova_processing": -7,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 305.0,
+    "nova_processing_level": 3,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.0,
+      "calcium": 715.0,
+      "cholesterol": 88.0,
+      "choline": 15.4,
+      "copper": 0.067,
+      "epa_dha": 0.0,
+      "fiber": 0.0,
+      "iron": 0.82,
+      "linoleic_acid": 0.651,
+      "magnesium": 28.0,
+      "manganese": 0.018,
+      "monounsaturated_fat": 5.854,
+      "oleic_acid": 5.126,
+      "phosphorus": 440.0,
+      "polyunsaturated_fat": 0.931,
+      "potassium": 74.0,
+      "protein": 23.02,
+      "saturated_fat": 14.109,
+      "selenium": 11.3,
+      "sodium": 735.0,
+      "total_carbohydrate": 3.09,
+      "total_carotenoids": 0.0,
+      "total_fat": 22.117,
+      "total_sugars": 0.0,
+      "transfat": 0.444,
+      "vitamin_a": 243.0,
+      "vitamin_b1": 0.026,
+      "vitamin_b12": 0.0,
+      "vitamin_b2": 0.247,
+      "vitamin_b3": 3.395333333,
+      "vitamin_b6": 0.018,
+      "vitamin_b9": 8.0,
+      "vitamin_c": 0.0,
+      "vitamin_d": 0.154,
+      "vitamin_e": 0.0,
+      "vitamin_k": 2.3,
+      "zinc": 3.14
+    },
+    "portion_energy_100g": 305.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 305.0,
+          "energy_weight": 1.0,
+          "food_id": 29,
+          "nova_category": "PROCESSED_FOODS",
+          "nova_level": 3
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "2933": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 0,
+        "fruit": 0,
+        "nuts": 0,
+        "plant_oils": 0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 0,
+        "nova_processing": 0,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 0.0,
+    "nova_processing_level": 1,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.0,
+      "betaine": 0.0,
+      "calcium": 3.0,
+      "cholesterol": 0.0,
+      "choline": 0.0,
+      "copper": 0.009,
+      "epa_dha": 0.0,
+      "fiber": 0.0,
+      "iron": 0.0,
+      "linoleic_acid": 0.0,
+      "magnesium": 1.0,
+      "manganese": 0.0,
+      "monounsaturated_fat": 0.0,
+      "oleic_acid": 0.0,
+      "phosphorus": 0.0,
+      "polyunsaturated_fat": 0.0,
+      "potassium": 1.0,
+      "protein": 0.0,
+      "saturated_fat": 0.0,
+      "selenium": 0.0,
+      "sodium": 3.0,
+      "total_carbohydrate": 0.0,
+      "total_carotenoids": 0.0,
+      "total_fat": 0.0,
+      "total_sugars": 0.0,
+      "transfat": 0.0,
+      "vitamin_a": 0.0,
+      "vitamin_b1": 0.0,
+      "vitamin_b12": 0.0,
+      "vitamin_b2": 0.0,
+      "vitamin_b3": 0.0,
+      "vitamin_b6": 0.0,
+      "vitamin_b9": 0.0,
+      "vitamin_c": 0.0,
+      "vitamin_d": 0.0,
+      "vitamin_e": 0.0,
+      "vitamin_k": 0.0,
+      "zinc": 0.0
+    },
+    "portion_energy_100g": 0.0,
+    "processing_details": {
+      "energy_weights": [
+        0.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 0.0,
+          "energy_weight": 0.0,
+          "food_id": 2933,
+          "nova_category": "MINIMALLY_PROCESSED",
+          "nova_level": 1
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "3392": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 100.0,
+        "fruit": 0,
+        "nuts": 0,
+        "plant_oils": 0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 100.0,
+        "nova_processing": 0,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 352.0,
+    "nova_processing_level": 1,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.096,
+      "calcium": 35.0,
+      "cholesterol": 0.0,
+      "choline": 96.4,
+      "copper": 0.754,
+      "epa_dha": 0.0,
+      "fiber": 10.66,
+      "iron": 6.51,
+      "linoleic_acid": 0.414,
+      "magnesium": 47.0,
+      "manganese": 1.393,
+      "monounsaturated_fat": 0.193,
+      "oleic_acid": 0.184,
+      "phosphorus": 281.0,
+      "polyunsaturated_fat": 0.526,
+      "potassium": 677.0,
+      "protein": 24.63,
+      "saturated_fat": 0.154,
+      "selenium": 0.1,
+      "sodium": 6.0,
+      "total_carbohydrate": 63.35,
+      "total_carotenoids": 0.0,
+      "total_fat": 1.06,
+      "total_sugars": 2.03,
+      "transfat": 0.0,
+      "vitamin_a": 2.0,
+      "vitamin_b1": 0.873,
+      "vitamin_b12": 0.0,
+      "vitamin_b2": 0.211,
+      "vitamin_b3": 6.28833,
+      "vitamin_b6": 0.54,
+      "vitamin_b9": 479.0,
+      "vitamin_c": 4.5,
+      "vitamin_d": 0.0,
+      "vitamin_e": 0.49,
+      "vitamin_k": 5.0,
+      "zinc": 3.27
+    },
+    "portion_energy_100g": 352.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 352.0,
+          "energy_weight": 1.0,
+          "food_id": 3392,
+          "nova_category": "MINIMALLY_PROCESSED",
+          "nova_level": 1
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "3399": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 100.0,
+        "fruit": 0,
+        "nuts": 0,
+        "plant_oils": 0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 100.0,
+        "nova_processing": 0,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 598.0,
+    "nova_processing_level": 1,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.027,
+      "betaine": 0.8,
+      "calcium": 49.0,
+      "cholesterol": 0.0,
+      "choline": 63.0,
+      "copper": 0.422,
+      "epa_dha": 0.0,
+      "fiber": 5.6,
+      "iron": 1.74,
+      "linoleic_acid": 12.264,
+      "magnesium": 168.0,
+      "manganese": 1.665,
+      "monounsaturated_fat": 25.941,
+      "oleic_acid": 24.812,
+      "phosphorus": 335.0,
+      "polyunsaturated_fat": 12.535,
+      "potassium": 558.0,
+      "protein": 22.21,
+      "saturated_fat": 10.325,
+      "selenium": 4.1,
+      "sodium": 426.0,
+      "total_carbohydrate": 22.31,
+      "total_carotenoids": 0.0,
+      "total_fat": 51.36,
+      "total_sugars": 10.49,
+      "transfat": 0.075,
+      "vitamin_a": 0.0,
+      "vitamin_b1": 0.15,
+      "vitamin_b12": 0.0,
+      "vitamin_b2": 0.192,
+      "vitamin_b3": 16.962,
+      "vitamin_b6": 0.441,
+      "vitamin_b9": 87.0,
+      "vitamin_c": 0.0,
+      "vitamin_d": 0.0,
+      "vitamin_e": 9.1,
+      "vitamin_k": 0.3,
+      "zinc": 2.51
+    },
+    "portion_energy_100g": 598.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 598.0,
+          "energy_weight": 1.0,
+          "food_id": 3399,
+          "nova_category": "MINIMALLY_PROCESSED",
+          "nova_level": 1
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "3732": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 100.0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 0,
+        "fruit": 0,
+        "nuts": 0,
+        "plant_oils": 0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 100.0,
+        "seafood": 0,
+        "vegetable": 0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 0,
+        "nova_processing": -7,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 288.0,
+    "nova_processing_level": 3,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.157,
+      "calcium": 87.0,
+      "cholesterol": 0.0,
+      "choline": 16.0,
+      "copper": 0.138,
+      "epa_dha": 0.0,
+      "fiber": 3.7,
+      "iron": 4.0,
+      "linoleic_acid": 1.266,
+      "magnesium": 43.0,
+      "manganese": 0.443,
+      "monounsaturated_fat": 0.647,
+      "oleic_acid": 0.636,
+      "phosphorus": 120.0,
+      "polyunsaturated_fat": 1.454,
+      "potassium": 121.0,
+      "protein": 10.08,
+      "saturated_fat": 0.707,
+      "selenium": 34.1,
+      "sodium": 566.0,
+      "total_carbohydrate": 54.28,
+      "total_carotenoids": 49.0,
+      "total_fat": 2.93,
+      "total_sugars": 8.4,
+      "transfat": 0.013,
+      "vitamin_a": 0.0,
+      "vitamin_b1": 0.405,
+      "vitamin_b12": 0.05,
+      "vitamin_b2": 0.371,
+      "vitamin_b3": 6.646,
+      "vitamin_b6": 0.054,
+      "vitamin_b9": 167.0,
+      "vitamin_c": 0.0,
+      "vitamin_d": 0.364,
+      "vitamin_e": 0.164,
+      "vitamin_k": 0.2,
+      "zinc": 0.95
+    },
+    "portion_energy_100g": 288.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 288.0,
+          "energy_weight": 1.0,
+          "food_id": 3732,
+          "nova_category": "PROCESSED_FOODS",
+          "nova_level": 3
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "423": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 0,
+        "fruit": 0,
+        "nuts": 0,
+        "plant_oils": 100.0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 0,
+        "nova_processing": -5,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 885.0,
+    "nova_processing_level": 2,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.2,
+      "calcium": 0.0,
+      "cholesterol": 0.0,
+      "choline": 0.3,
+      "copper": 0.0,
+      "epa_dha": 0.0,
+      "fiber": 0.0,
+      "iron": 0.01,
+      "linoleic_acid": 9.1,
+      "magnesium": 0.0,
+      "monounsaturated_fat": 37.0,
+      "oleic_acid": 36.6,
+      "phosphorus": 0.0,
+      "polyunsaturated_fat": 9.3,
+      "potassium": 0.0,
+      "protein": 0.0,
+      "saturated_fat": 49.3,
+      "selenium": 0.0,
+      "sodium": 0.0,
+      "total_carbohydrate": 0.0,
+      "total_carotenoids": 0.0,
+      "total_fat": 100.0,
+      "total_sugars": 0.0,
+      "vitamin_a": 0.0,
+      "vitamin_b1": 0.0,
+      "vitamin_b12": 0.0,
+      "vitamin_b2": 0.0,
+      "vitamin_b3": 0.0,
+      "vitamin_b6": 0.0,
+      "vitamin_b9": 0.0,
+      "vitamin_c": 0.0,
+      "vitamin_d": 0.0,
+      "vitamin_e": 15.94,
+      "vitamin_k": 8.0,
+      "zinc": 0.0
+    },
+    "portion_energy_100g": 885.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 885.0,
+          "energy_weight": 1.0,
+          "food_id": 423,
+          "nova_category": "PROCESSED_CULINARY_INGREDIENTS",
+          "nova_level": 2
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "4473": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 0,
+        "fruit": 0,
+        "nuts": 0,
+        "plant_oils": 0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 100.0,
+        "seafood": 0,
+        "vegetable": 0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 100.0,
+        "nova_processing": 0,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 123.0,
+    "nova_processing_level": 1,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.01,
+      "calcium": 19.0,
+      "cholesterol": 0.0,
+      "copper": 0.07,
+      "epa_dha": 0.0,
+      "fiber": 0.9,
+      "iron": 0.24,
+      "linoleic_acid": 0.074,
+      "magnesium": 9.0,
+      "manganese": 0.354,
+      "monounsaturated_fat": 0.074,
+      "oleic_acid": 0.074,
+      "phosphorus": 55.0,
+      "polyunsaturated_fat": 0.091,
+      "potassium": 56.0,
+      "protein": 2.91,
+      "saturated_fat": 0.074,
+      "selenium": 9.3,
+      "sodium": 2.0,
+      "total_carbohydrate": 26.05,
+      "total_carotenoids": 0.0,
+      "total_fat": 0.37,
+      "total_sugars": 0.11,
+      "transfat": 0.0,
+      "vitamin_a": 0.0,
+      "vitamin_b1": 0.074,
+      "vitamin_b12": 0.0,
+      "vitamin_b2": 0.019,
+      "vitamin_b3": 2.959,
+      "vitamin_b6": 0.156,
+      "vitamin_b9": 3.0,
+      "vitamin_c": 0.0,
+      "vitamin_d": 0.0,
+      "vitamin_e": 0.01,
+      "zinc": 0.37
+    },
+    "portion_energy_100g": 123.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 123.0,
+          "energy_weight": 1.0,
+          "food_id": 4473,
+          "nova_category": "MINIMALLY_PROCESSED",
+          "nova_level": 1
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "5960": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 0,
+        "fruit": 0,
+        "nuts": 0,
+        "plant_oils": 0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 100.0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 100.0,
+        "nova_processing": 0,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 123.0,
+    "nova_processing_level": 1,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.66,
+      "betaine": 0.1,
+      "calcium": 20.0,
+      "choline": 6.5,
+      "copper": 0.017,
+      "epa_dha": 0.0,
+      "fiber": 1.7,
+      "iron": 0.27,
+      "linoleic_acid": 4.81,
+      "magnesium": 9.0,
+      "manganese": 0.102,
+      "monounsaturated_fat": 2.185,
+      "oleic_acid": 2.155,
+      "phosphorus": 33.0,
+      "polyunsaturated_fat": 5.47,
+      "potassium": 133.0,
+      "protein": 0.95,
+      "saturated_fat": 1.477,
+      "sodium": 12.0,
+      "total_carbohydrate": 7.86,
+      "total_fat": 10.8,
+      "total_sugars": 4.39,
+      "transfat": 0.0,
+      "vitamin_b1": 0.049,
+      "vitamin_b12": 0.0,
+      "vitamin_b2": 0.041,
+      "vitamin_b3": 0.27033,
+      "vitamin_b6": 0.207,
+      "vitamin_b9": 2.0,
+      "vitamin_c": 1.8,
+      "vitamin_d": 0.0,
+      "vitamin_e": 0.68,
+      "vitamin_k": 21.6,
+      "zinc": 0.21
+    },
+    "portion_energy_100g": 123.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 123.0,
+          "energy_weight": 1.0,
+          "food_id": 5960,
+          "nova_category": "MINIMALLY_PROCESSED",
+          "nova_level": 1
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "61": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 0,
+        "fruit": 0,
+        "nuts": 0,
+        "plant_oils": 0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 100.0,
+        "nova_processing": 0,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 47.0,
+    "nova_processing_level": 1,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.007,
+      "betaine": 0.9,
+      "calcium": 120.0,
+      "cholesterol": 8.14,
+      "choline": 16.4,
+      "copper": 0.001,
+      "epa_dha": 0.0,
+      "fiber": 0.0,
+      "iron": 0.15,
+      "linoleic_acid": 0.047,
+      "magnesium": 11.4,
+      "manganese": 0.002,
+      "monounsaturated_fat": 0.464,
+      "oleic_acid": 0.419,
+      "phosphorus": 94.3,
+      "polyunsaturated_fat": 0.059,
+      "potassium": 163.0,
+      "protein": 3.31,
+      "saturated_fat": 1.221,
+      "selenium": 3.705,
+      "sodium": 54.2,
+      "total_carbohydrate": 4.38,
+      "total_carotenoids": 0.0,
+      "total_fat": 1.839,
+      "total_sugars": 4.24,
+      "transfat": 0.067,
+      "vitamin_a": 63.15763,
+      "vitamin_b1": 0.029,
+      "vitamin_b12": 0.0,
+      "vitamin_b2": 0.171,
+      "vitamin_b3": 0.59933,
+      "vitamin_b6": 0.034,
+      "vitamin_b9": 5.0,
+      "vitamin_c": 0.2,
+      "vitamin_d": 1.939337522,
+      "vitamin_e": 0.0,
+      "vitamin_k": 0.2,
+      "zinc": 0.347
+    },
+    "portion_energy_100g": 47.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 47.0,
+          "energy_weight": 1.0,
+          "food_id": 61,
+          "nova_category": "MINIMALLY_PROCESSED",
+          "nova_level": 1
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "6205": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 100.0,
+        "beans": 0,
+        "fruit": 100.0,
+        "nuts": 0,
+        "plant_oils": 0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 100.0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 0,
+        "nova_processing": -10,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 51.0,
+    "nova_processing_level": 4,
+    "nutrient_attrs_per_100g": {
+      "betaine": 0.0,
+      "calcium": 17.0,
+      "cholesterol": 0.0,
+      "choline": 1.5,
+      "copper": 0.015,
+      "epa_dha": 0.0,
+      "fiber": 0.3,
+      "iron": 0.36,
+      "magnesium": 3.0,
+      "manganese": 0.028,
+      "phosphorus": 2.0,
+      "potassium": 24.0,
+      "protein": 0.11,
+      "saturated_fat": 0.0,
+      "sodium": 5.0,
+      "total_carbohydrate": 13.12,
+      "total_carotenoids": 0.0,
+      "total_fat": 0.06,
+      "total_sugars": 12.45,
+      "transfat": 0.0,
+      "vitamin_a": 35.0,
+      "vitamin_b1": 0.003,
+      "vitamin_b12": 0.0,
+      "vitamin_b2": 0.003,
+      "vitamin_b3": 0.10017,
+      "vitamin_b6": 0.015,
+      "vitamin_b9": 7.0,
+      "vitamin_c": 15.2,
+      "vitamin_d": 0.0,
+      "vitamin_e": 0.21,
+      "vitamin_k": 0.8,
+      "zinc": 0.02
+    },
+    "portion_energy_100g": 51.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 51.0,
+          "energy_weight": 1.0,
+          "food_id": 6205,
+          "nova_category": "ULTRA_PROCESSED_FOODS",
+          "nova_level": 4
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "648": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 0,
+        "fruit": 0,
+        "nuts": 0,
+        "plant_oils": 0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 100.0,
+        "nova_processing": 0,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 285.0,
+    "nova_processing_level": 1,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.16,
+      "calcium": 13.0,
+      "cholesterol": 79.0,
+      "copper": 0.1,
+      "epa_dha": 0.02,
+      "fiber": 0.0,
+      "iron": 1.37,
+      "linoleic_acid": 3.53,
+      "magnesium": 20.0,
+      "manganese": 0.021,
+      "monounsaturated_fat": 7.19,
+      "oleic_acid": 5.92,
+      "phosphorus": 180.0,
+      "polyunsaturated_fat": 4.23,
+      "potassium": 182.0,
+      "protein": 26.88,
+      "saturated_fat": 5.11,
+      "selenium": 19.7,
+      "sodium": 73.0,
+      "total_carbohydrate": 0.0,
+      "total_carotenoids": 0.9009,
+      "total_fat": 18.87,
+      "total_sugars": 0.0,
+      "transfat": 0.451,
+      "vitamin_a": 39.0,
+      "vitamin_b1": 0.094,
+      "vitamin_b12": 0.23,
+      "vitamin_b2": 0.235,
+      "vitamin_b3": 10.81467,
+      "vitamin_b6": 0.25,
+      "vitamin_b9": 5.0,
+      "vitamin_c": 0.0,
+      "vitamin_d": 0.27,
+      "zinc": 1.77
+    },
+    "portion_energy_100g": 285.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 285.0,
+          "energy_weight": 1.0,
+          "food_id": 648,
+          "nova_category": "MINIMALLY_PROCESSED",
+          "nova_level": 1
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "6961": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 0,
+        "fruit": 0,
+        "nuts": 0,
+        "plant_oils": 0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 0,
+        "whole_grains": 0,
+        "yogurt": 100.0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 100.0,
+        "nova_processing": 0,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 50.0,
+    "nova_processing_level": 1,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.0,
+      "calcium": 147.0,
+      "cholesterol": 10.0,
+      "choline": 15.2,
+      "copper": 0.009,
+      "epa_dha": 0.0,
+      "fiber": 0.0,
+      "iron": 0.12,
+      "linoleic_acid": 0.062,
+      "magnesium": 11.0,
+      "manganese": 0.003,
+      "monounsaturated_fat": 0.514,
+      "oleic_acid": 0.468,
+      "phosphorus": 117.0,
+      "polyunsaturated_fat": 0.062,
+      "potassium": 174.0,
+      "protein": 4.6,
+      "saturated_fat": 1.307,
+      "selenium": 4.0,
+      "sodium": 40.0,
+      "total_carbohydrate": 3.4,
+      "total_carotenoids": 0.0,
+      "total_fat": 1.98,
+      "total_sugars": 3.45,
+      "transfat": 0.043,
+      "vitamin_a": 14.0,
+      "vitamin_b1": 0.026,
+      "vitamin_b12": 0.24,
+      "vitamin_b2": 0.18,
+      "vitamin_b3": 1.14167,
+      "vitamin_b6": 0.032,
+      "vitamin_b9": 5.0,
+      "vitamin_c": 0.5,
+      "vitamin_d": 0.0,
+      "vitamin_e": 0.06,
+      "vitamin_k": 0.2,
+      "zinc": 0.52
+    },
+    "portion_energy_100g": 50.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 50.0,
+          "energy_weight": 1.0,
+          "food_id": 6961,
+          "nova_category": "MINIMALLY_PROCESSED",
+          "nova_level": 1
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "6971": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 0,
+        "fruit": 0,
+        "nuts": 0,
+        "plant_oils": 0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 0,
+        "whole_grains": 0,
+        "yogurt": 100.0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 100.0,
+        "nova_processing": 0,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 71.0,
+    "nova_processing_level": 1,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.013,
+      "calcium": 106.0,
+      "cholesterol": 18.0,
+      "choline": 15.2,
+      "copper": 0.011,
+      "epa_dha": 0.0,
+      "fiber": 0.0,
+      "iron": 0.06,
+      "linoleic_acid": 0.143,
+      "magnesium": 10.0,
+      "manganese": 0.002,
+      "monounsaturated_fat": 1.217,
+      "oleic_acid": 1.074,
+      "phosphorus": 116.0,
+      "polyunsaturated_fat": 0.162,
+      "potassium": 147.0,
+      "protein": 3.15,
+      "saturated_fat": 3.065,
+      "selenium": 2.84,
+      "sodium": 36.0,
+      "total_carbohydrate": 4.37,
+      "total_carotenoids": 0.0,
+      "total_fat": 4.667,
+      "total_sugars": 3.2,
+      "transfat": 0.096,
+      "vitamin_a": 14.0,
+      "vitamin_b1": 0.026,
+      "vitamin_b12": 0.215,
+      "vitamin_b2": 0.158,
+      "vitamin_b3": 0.875,
+      "vitamin_b6": 0.032,
+      "vitamin_b9": 5.0,
+      "vitamin_c": 0.5,
+      "vitamin_d": 0.0,
+      "vitamin_e": 0.06,
+      "vitamin_k": 0.2,
+      "zinc": 0.42
+    },
+    "portion_energy_100g": 71.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 71.0,
+          "energy_weight": 1.0,
+          "food_id": 6971,
+          "nova_category": "MINIMALLY_PROCESSED",
+          "nova_level": 1
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "700194": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 0,
+        "fruit": 0,
+        "nuts": 0,
+        "plant_oils": 100.0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 0,
+        "nova_processing": -5,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 121.0,
+    "nova_processing_level": 2,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.02,
+      "calcium": 30.0,
+      "cholesterol": 0.0,
+      "copper": 0.03,
+      "fiber": 3.2,
+      "iron": 1.2,
+      "magnesium": 10.0,
+      "monounsaturated_fat": 0.01,
+      "phosphorus": 40.0,
+      "polyunsaturated_fat": 0.11,
+      "potassium": 114.0,
+      "protein": 1.1,
+      "saturated_fat": 0.07,
+      "sodium": 1.0,
+      "total_carbohydrate": 27.0,
+      "total_carotenoids": 20.0,
+      "total_fat": 0.3,
+      "vitamin_b1": 0.03,
+      "vitamin_b12": 0.0,
+      "vitamin_b2": 0.02,
+      "vitamin_b3": 0.4,
+      "vitamin_b6": 0.05,
+      "vitamin_b9": 13.0,
+      "vitamin_c": 18.0,
+      "vitamin_e": 0.16,
+      "zinc": 1.58
+    },
+    "portion_energy_100g": 121.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 121.0,
+          "energy_weight": 1.0,
+          "food_id": 700194,
+          "nova_category": "PROCESSED_CULINARY_INGREDIENTS",
+          "nova_level": 2
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "7829": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 0,
+        "fruit": 0,
+        "nuts": 0,
+        "plant_oils": 100.0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 0,
+        "nova_processing": -5,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 900.0,
+    "nova_processing_level": 2,
+    "nutrient_attrs_per_100g": {
+      "calcium": 0.0,
+      "cholesterol": 300.0,
+      "fiber": 0.0,
+      "iron": 0.0,
+      "polyunsaturated_fat": 4.0,
+      "protein": 0.0,
+      "saturated_fat": 60.0,
+      "sodium": 0.0,
+      "total_carbohydrate": 0.0,
+      "total_fat": 100.0,
+      "total_sugars": 0.0,
+      "transfat": 0.0,
+      "vitamin_c": 0.0
+    },
+    "portion_energy_100g": 900.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 900.0,
+          "energy_weight": 1.0,
+          "food_id": 7829,
+          "nova_category": "PROCESSED_CULINARY_INGREDIENTS",
+          "nova_level": 2
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  },
+  "851": {
+    "attributes": {
+      "additives": {
+        "artificial_colors": 0,
+        "artificial_sweeteners": 0,
+        "high_fructose_corn_syrup": 0,
+        "hydrogenated_oils": 0,
+        "monosodium_glutamate": 0,
+        "nitrites": 0,
+        "partially_hydrated_oils": 0,
+        "preservatives": 0
+      },
+      "fiber_protein": {
+        "amino_acid_score": 0,
+        "fiber": 0,
+        "protein": 0,
+        "total_carbohydrate": 0,
+        "total_sugars": 0
+      },
+      "food_ingredients": {
+        "added_sugar": 0,
+        "beans": 0,
+        "fruit": 0,
+        "nuts": 0,
+        "plant_oils": 0,
+        "red_or_processed_meat": 0,
+        "refined_grains": 0,
+        "seafood": 0,
+        "vegetable": 0,
+        "whole_grains": 0,
+        "yogurt": 0
+      },
+      "minerals": {
+        "calcium": 0,
+        "chromium": 0,
+        "copper": 0,
+        "iron": 0,
+        "magnesium": 0,
+        "manganese": 0,
+        "molybdenum": 0,
+        "phosphorus": 0,
+        "potassium": 0,
+        "selenium": 0,
+        "sodium": 0,
+        "zinc": 0
+      },
+      "nutrient_ratios": {
+        "fiber_to_carbohydrate": 0,
+        "potassium_to_sodium": 0,
+        "unsaturated_to_saturated_fat": 0
+      },
+      "phytochemicals": {
+        "anthocyanins": 0,
+        "betaine": 0,
+        "choline": 0,
+        "isoflavones": 0,
+        "lignans": 0,
+        "proanthocyanidins": 0,
+        "total_carotenoids": 0,
+        "total_flavonoids": 0
+      },
+      "processing": {
+        "canning": 0,
+        "fermentation": 0,
+        "frying": 0,
+        "minimal_processing": 100.0,
+        "nova_processing": 0,
+        "pasteurization": 0,
+        "smoking": 0
+      },
+      "specific_lipids": {
+        "alpha_linolenic_acid": 0,
+        "cholesterol": 0,
+        "epa_dha": 0,
+        "linoleic_acid": 0,
+        "mcfas": 0,
+        "monounsaturated_fat": 0,
+        "oleic_acid": 0,
+        "polyunsaturated_fat": 0,
+        "saturated_fat": 0,
+        "total_fat": 0,
+        "transfat": 0
+      },
+      "vitamins": {
+        "vitamin_a": 0,
+        "vitamin_b1": 0,
+        "vitamin_b12": 0,
+        "vitamin_b2": 0,
+        "vitamin_b3": 0,
+        "vitamin_b6": 0,
+        "vitamin_b9": 0,
+        "vitamin_c": 0,
+        "vitamin_d": 0,
+        "vitamin_e": 0,
+        "vitamin_k": 0
+      }
+    },
+    "energy_per_100g": 232.0,
+    "nova_processing_level": 1,
+    "nutrient_attrs_per_100g": {
+      "alpha_linolenic_acid": 0.12,
+      "betaine": 6.9,
+      "calcium": 9.0,
+      "cholesterol": 133.0,
+      "choline": 67.6,
+      "copper": 0.063,
+      "epa_dha": 0.006,
+      "fiber": 0.0,
+      "iron": 1.08,
+      "linoleic_acid": 2.669,
+      "magnesium": 22.0,
+      "manganese": 0.017,
+      "monounsaturated_fat": 6.257,
+      "oleic_acid": 5.223,
+      "phosphorus": 216.0,
+      "polyunsaturated_fat": 2.993,
+      "potassium": 253.0,
+      "protein": 23.26,
+      "saturated_fat": 4.111,
+      "selenium": 25.3,
+      "sodium": 102.0,
+      "total_carbohydrate": 0.0,
+      "total_carotenoids": 17.0,
+      "total_fat": 14.71,
+      "total_sugars": 0.0,
+      "transfat": 0.081,
+      "vitamin_a": 16.0,
+      "vitamin_b1": 0.088,
+      "vitamin_b12": 0.44,
+      "vitamin_b2": 0.19,
+      "vitamin_b3": 9.839,
+      "vitamin_b6": 0.414,
+      "vitamin_b9": 4.0,
+      "vitamin_c": 0.0,
+      "vitamin_d": 0.2,
+      "vitamin_e": 0.19,
+      "vitamin_k": 3.3,
+      "zinc": 1.73
+    },
+    "portion_energy_100g": 232.0,
+    "processing_details": {
+      "energy_weights": [
+        1.0
+      ],
+      "final_processing_level": null,
+      "individual_foods": [
+        {
+          "energy_kcal": 232.0,
+          "energy_weight": 1.0,
+          "food_id": 851,
+          "nova_category": "MINIMALLY_PROCESSED",
+          "nova_level": 1
+        }
+      ],
+      "is_mixed_dish": false
+    }
+  }
+}
