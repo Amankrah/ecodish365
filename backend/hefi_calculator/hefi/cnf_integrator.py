@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+from functools import lru_cache
 from typing import Dict, FrozenSet, List, Tuple
 import pandas as pd
 
@@ -350,9 +351,15 @@ class HEFICNFIntegrator:
             'default': 100,  # Default 100g when no specific category matches
         })
 
+    @lru_cache(maxsize=8192)
     def _get_best_conversion_factor(self, food_id: int) -> float:
         """Get the most appropriate conversion factor for a food item.
-        
+
+        Cached: pure function of food_id given the static (process-lifetime)
+        CNF DataFrames. Eliminates the per-food pandas filter + per-row
+        measure-name lookup on substitution / scorecard / recipe-decomposer
+        hot paths.
+
         Priority order:
         1. Standard serving sizes (slice, fillet, etc.)
         2. Food guide portions
@@ -423,8 +430,15 @@ class HEFICNFIntegrator:
             
         return 1.0
     
+    @lru_cache(maxsize=8192)
     def get_measure_description(self, food_id: int, conversion_factor: float) -> str:
-        """Get the measure description for a specific food and conversion factor."""
+        """Get the measure description for a specific food and conversion factor.
+
+        Cached: pure function of (food_id, conversion_factor) given the
+        static CNF DataFrames. Returns an immutable str. The hefi_calculate
+        endpoint pairs every call here with `_get_best_conversion_factor`,
+        so the cache hit rate matches.
+        """
         if self.conversion_factors_df.empty or self.measure_names_df.empty:
             return "Unknown measure"
             

@@ -1,0 +1,1040 @@
+{
+  "D1 AGGREGATED (14 foods)": {
+    "data": {
+      "components": {
+        "C10_SODIUM": {
+          "max_points": 10,
+          "score": 10.0
+        },
+        "C1_VF": {
+          "max_points": 20,
+          "score": 8.5484
+        },
+        "C2_WHOLEGR": {
+          "max_points": 5,
+          "score": 0.0
+        },
+        "C3_GRRATIO": {
+          "max_points": 5,
+          "score": 0.0
+        },
+        "C4_PROFOODS": {
+          "max_points": 5,
+          "score": 5.0
+        },
+        "C5_PLANTPRO": {
+          "max_points": 5,
+          "score": 0.0
+        },
+        "C6_BEVERAGES": {
+          "max_points": 10,
+          "score": 0.0
+        },
+        "C7_FATTYACID": {
+          "max_points": 5,
+          "score": 2.014439
+        },
+        "C8_SFAT": {
+          "max_points": 5,
+          "score": 0.881547
+        },
+        "C9_FREESUGARS": {
+          "max_points": 10,
+          "score": 10.0
+        }
+      },
+      "food_breakdown": [
+        {
+          "amount_g": 320.0,
+          "calculated_ra": 2.286,
+          "conversion_factor": 0.73964,
+          "food_id": 4473,
+          "group_id": 20,
+          "ra_amount_g": 140.0,
+          "ra_category": "rice_grains_cooked"
+        },
+        {
+          "amount_g": 273.0,
+          "calculated_ra": 1.092,
+          "conversion_factor": 1.05241,
+          "food_id": 1620,
+          "group_id": 9,
+          "ra_amount_g": 250.0,
+          "ra_category": "fruit_juice"
+        },
+        {
+          "amount_g": 250.0,
+          "calculated_ra": 2.5,
+          "conversion_factor": 2.47253,
+          "food_id": 1465,
+          "group_id": 8,
+          "ra_amount_g": 100.0,
+          "ra_category": "default"
+        },
+        {
+          "amount_g": 200.0,
+          "calculated_ra": 1.818,
+          "conversion_factor": 0.48,
+          "food_id": 133,
+          "group_id": 1,
+          "ra_amount_g": 110.0,
+          "ra_category": "egg_mixtures"
+        },
+        {
+          "amount_g": 200.0,
+          "calculated_ra": 2.0,
+          "conversion_factor": 0.75,
+          "food_id": 851,
+          "group_id": 5,
+          "ra_amount_g": 100.0,
+          "ra_category": "meat_poultry_cooked"
+        },
+        {
+          "amount_g": 145.0,
+          "calculated_ra": 0.58,
+          "conversion_factor": 1.03128,
+          "food_id": 61,
+          "group_id": 1,
+          "ra_amount_g": 250.0,
+          "ra_category": "milk"
+        },
+        {
+          "amount_g": 65.0,
+          "calculated_ra": 0.464,
+          "conversion_factor": 0.63401,
+          "food_id": 1704,
+          "group_id": 9,
+          "ra_amount_g": 140.0,
+          "ra_category": "fruit_fresh"
+        },
+        {
+          "amount_g": 50.0,
+          "calculated_ra": 0.286,
+          "conversion_factor": 1.0299,
+          "food_id": 6971,
+          "group_id": 1,
+          "ra_amount_g": 175.0,
+          "ra_category": "yogurt"
+        },
+        {
+          "amount_g": 50.0,
+          "calculated_ra": 0.588,
+          "conversion_factor": 0.36771,
+          "food_id": 5960,
+          "group_id": 11,
+          "ra_amount_g": 85.0,
+          "ra_category": "vegetables_fresh"
+        },
+        {
+          "amount_g": 30.0,
+          "calculated_ra": 0.12,
+          "conversion_factor": 1.0,
+          "food_id": 7829,
+          "group_id": 1,
+          "ra_amount_g": 250.0,
+          "ra_category": "milk"
+        },
+        {
+          "amount_g": 25.0,
+          "calculated_ra": 0.294,
+          "conversion_factor": 0.76078,
+          "food_id": 2460,
+          "group_id": 11,
+          "ra_amount_g": 85.0,
+          "ra_category": "vegetables_fresh"
+        },
+        {
+          "amount_g": 8.0,
+          "calculated_ra": 0.032,
+          "conversion_factor": 0.14392,
+          "food_id": 118,
+          "group_id": 1,
+          "ra_amount_g": 250.0,
+          "ra_category": "milk"
+        },
+        {
+          "amount_g": 8.0,
+          "calculated_ra": 0.094,
+          "conversion_factor": 0.03,
+          "food_id": 2394,
+          "group_id": 11,
+          "ra_amount_g": 85.0,
+          "ra_category": "vegetables_fresh"
+        },
+        {
+          "amount_g": 7.0,
+          "calculated_ra": 0.082,
+          "conversion_factor": 0.40575,
+          "food_id": 2091,
+          "group_id": 11,
+          "ra_amount_g": 85.0,
+          "ra_category": "vegetables_fresh"
+        }
+      ],
+      "food_ids": [
+        4473,
+        1620,
+        1465,
+        133,
+        851,
+        61,
+        1704,
+        6971,
+        5960,
+        7829,
+        2460,
+        118,
+        2394,
+        2091
+      ],
+      "hefi_interpretation": {
+        "category": "Below the Canadian median",
+        "population_benchmarks": {
+          "mean": 43.1,
+          "percentile_1": 22.1,
+          "percentile_99": 62.9
+        },
+        "score": 36.444386,
+        "ui_color": "yellow"
+      },
+      "inputs": {
+        "energy_kcal": 2077.25,
+        "free_sugars_g": 45.1096,
+        "mufa_g": 27.89955,
+        "plant_protein_foods_ra": 0.0,
+        "protein_foods_ra": 4.835896,
+        "pufa_g": 16.19195,
+        "recommended_beverages_g": 0.0,
+        "sfa_g": 42.09179,
+        "sodium_mg": 1113.9825,
+        "total_beverages_g": 0.0,
+        "total_foods_ra": 12.23672,
+        "total_grains_ra": 2.285714,
+        "vf_ra": 2.615109,
+        "whole_grains_ra": 0.0
+      },
+      "max_total_score": 80,
+      "percentage": 45.555483,
+      "ratios": {
+        "RATIO_BEV": 0.0,
+        "RATIO_PLANT": 0.0,
+        "RATIO_PRO": 0.395195,
+        "RATIO_UNSFAT": 1.047508,
+        "RATIO_VF": 0.21371,
+        "RATIO_WGGR": 0.0,
+        "RATIO_WGTOT": 0.0,
+        "SFA_PERC": 18.236905,
+        "SODDEN": 0.536278,
+        "SUG_PERC": 8.686408
+      },
+      "total_score": 36.444386,
+      "user_type": "individual"
+    },
+    "success": true
+  },
+  "D1 breakfast \u2014 scrambled egg + OJ": {
+    "data": {
+      "components": {
+        "C10_SODIUM": {
+          "max_points": 10,
+          "score": 3.696732
+        },
+        "C1_VF": {
+          "max_points": 20,
+          "score": 14.549419
+        },
+        "C2_WHOLEGR": {
+          "max_points": 5,
+          "score": 0.0
+        },
+        "C3_GRRATIO": {
+          "max_points": 5,
+          "score": 0.0
+        },
+        "C4_PROFOODS": {
+          "max_points": 5,
+          "score": 5.0
+        },
+        "C5_PLANTPRO": {
+          "max_points": 5,
+          "score": 0.0
+        },
+        "C6_BEVERAGES": {
+          "max_points": 10,
+          "score": 0.0
+        },
+        "C7_FATTYACID": {
+          "max_points": 5,
+          "score": 2.80716
+        },
+        "C8_SFAT": {
+          "max_points": 5,
+          "score": 0.222412
+        },
+        "C9_FREESUGARS": {
+          "max_points": 10,
+          "score": 0.0
+        }
+      },
+      "food_breakdown": [
+        {
+          "amount_g": 200.0,
+          "calculated_ra": 1.818,
+          "conversion_factor": 0.48,
+          "food_id": 133,
+          "group_id": 1,
+          "ra_amount_g": 110.0,
+          "ra_category": "egg_mixtures"
+        },
+        {
+          "amount_g": 8.0,
+          "calculated_ra": 0.032,
+          "conversion_factor": 0.14392,
+          "food_id": 118,
+          "group_id": 1,
+          "ra_amount_g": 250.0,
+          "ra_category": "milk"
+        },
+        {
+          "amount_g": 15.0,
+          "calculated_ra": 0.06,
+          "conversion_factor": 1.03128,
+          "food_id": 61,
+          "group_id": 1,
+          "ra_amount_g": 250.0,
+          "ra_category": "milk"
+        },
+        {
+          "amount_g": 273.0,
+          "calculated_ra": 1.092,
+          "conversion_factor": 1.05241,
+          "food_id": 1620,
+          "group_id": 9,
+          "ra_amount_g": 250.0,
+          "ra_category": "fruit_juice"
+        }
+      ],
+      "food_ids": [
+        133,
+        118,
+        61,
+        1620
+      ],
+      "hefi_interpretation": {
+        "category": "Bottom quartile of Canadians",
+        "population_benchmarks": {
+          "mean": 43.1,
+          "percentile_1": 22.1,
+          "percentile_99": 62.9
+        },
+        "score": 26.275722,
+        "ui_color": "red"
+      },
+      "inputs": {
+        "energy_kcal": 504.18,
+        "free_sugars_g": 26.1071,
+        "mufa_g": 11.41534,
+        "plant_protein_foods_ra": 0.0,
+        "protein_foods_ra": 1.910182,
+        "pufa_g": 4.57565,
+        "recommended_beverages_g": 0.0,
+        "sfa_g": 10.95481,
+        "sodium_mg": 803.34,
+        "total_beverages_g": 0.0,
+        "total_foods_ra": 3.002182,
+        "total_grains_ra": 0.0,
+        "vf_ra": 1.092,
+        "whole_grains_ra": 0.0
+      },
+      "max_total_score": 80,
+      "percentage": 32.844652,
+      "ratios": {
+        "RATIO_BEV": 0.0,
+        "RATIO_PLANT": 0.0,
+        "RATIO_PRO": 0.636265,
+        "RATIO_UNSFAT": 1.459723,
+        "RATIO_VF": 0.363735,
+        "RATIO_WGGR": 0.0,
+        "RATIO_WGTOT": 0.0,
+        "SFA_PERC": 19.555177,
+        "SODDEN": 1.59336,
+        "SUG_PERC": 20.712523
+      },
+      "total_score": 26.275722,
+      "user_type": "individual"
+    },
+    "success": true
+  },
+  "D1 dinner \u2014 oat porridge": {
+    "data": {
+      "components": {
+        "C10_SODIUM": {
+          "max_points": 10,
+          "score": 10.0
+        },
+        "C1_VF": {
+          "max_points": 20,
+          "score": 5.330053
+        },
+        "C2_WHOLEGR": {
+          "max_points": 5,
+          "score": 0.0
+        },
+        "C3_GRRATIO": {
+          "max_points": 5,
+          "score": 0.0
+        },
+        "C4_PROFOODS": {
+          "max_points": 5,
+          "score": 2.98483
+        },
+        "C5_PLANTPRO": {
+          "max_points": 5,
+          "score": 0.0
+        },
+        "C6_BEVERAGES": {
+          "max_points": 10,
+          "score": 0.0
+        },
+        "C7_FATTYACID": {
+          "max_points": 5,
+          "score": 2.655331
+        },
+        "C8_SFAT": {
+          "max_points": 5,
+          "score": 5.0
+        },
+        "C9_FREESUGARS": {
+          "max_points": 10,
+          "score": 2.84699
+        }
+      },
+      "food_breakdown": [
+        {
+          "amount_g": 250.0,
+          "calculated_ra": 2.5,
+          "conversion_factor": 2.47253,
+          "food_id": 1465,
+          "group_id": 8,
+          "ra_amount_g": 100.0,
+          "ra_category": "default"
+        },
+        {
+          "amount_g": 130.0,
+          "calculated_ra": 0.52,
+          "conversion_factor": 1.03128,
+          "food_id": 61,
+          "group_id": 1,
+          "ra_amount_g": 250.0,
+          "ra_category": "milk"
+        },
+        {
+          "amount_g": 65.0,
+          "calculated_ra": 0.464,
+          "conversion_factor": 0.63401,
+          "food_id": 1704,
+          "group_id": 9,
+          "ra_amount_g": 140.0,
+          "ra_category": "fruit_fresh"
+        }
+      ],
+      "food_ids": [
+        1465,
+        61,
+        1704
+      ],
+      "hefi_interpretation": {
+        "category": "Bottom quartile of Canadians",
+        "population_benchmarks": {
+          "mean": 43.1,
+          "percentile_1": 22.1,
+          "percentile_99": 62.9
+        },
+        "score": 28.817205,
+        "ui_color": "red"
+      },
+      "inputs": {
+        "energy_kcal": 326.45,
+        "free_sugars_g": 13.999,
+        "mufa_g": 2.013,
+        "plant_protein_foods_ra": 0.0,
+        "protein_foods_ra": 0.52,
+        "pufa_g": 1.27165,
+        "recommended_beverages_g": 0.0,
+        "sfa_g": 2.37885,
+        "sodium_mg": 72.7225,
+        "total_beverages_g": 0.0,
+        "total_foods_ra": 3.484286,
+        "total_grains_ra": 0.0,
+        "vf_ra": 0.464286,
+        "whole_grains_ra": 0.0
+      },
+      "max_total_score": 80,
+      "percentage": 36.021506,
+      "ratios": {
+        "RATIO_BEV": 0.0,
+        "RATIO_PLANT": 0.0,
+        "RATIO_PRO": 0.149241,
+        "RATIO_UNSFAT": 1.380772,
+        "RATIO_VF": 0.133251,
+        "RATIO_WGGR": 0.0,
+        "RATIO_WGTOT": 0.0,
+        "SFA_PERC": 6.558324,
+        "SODDEN": 0.222768,
+        "SUG_PERC": 17.15301
+      },
+      "total_score": 28.817205,
+      "user_type": "individual"
+    },
+    "success": true
+  },
+  "D1 lunch \u2014 chicken biryani": {
+    "data": {
+      "components": {
+        "C10_SODIUM": {
+          "max_points": 10,
+          "score": 10.0
+        },
+        "C1_VF": {
+          "max_points": 20,
+          "score": 7.365406
+        },
+        "C2_WHOLEGR": {
+          "max_points": 5,
+          "score": 0.0
+        },
+        "C3_GRRATIO": {
+          "max_points": 5,
+          "score": 0.0
+        },
+        "C4_PROFOODS": {
+          "max_points": 5,
+          "score": 5.0
+        },
+        "C5_PLANTPRO": {
+          "max_points": 5,
+          "score": 0.0
+        },
+        "C6_BEVERAGES": {
+          "max_points": 10,
+          "score": 0.0
+        },
+        "C7_FATTYACID": {
+          "max_points": 5,
+          "score": 1.659454
+        },
+        "C8_SFAT": {
+          "max_points": 5,
+          "score": 0.0
+        },
+        "C9_FREESUGARS": {
+          "max_points": 10,
+          "score": 10.0
+        }
+      },
+      "food_breakdown": [
+        {
+          "amount_g": 320.0,
+          "calculated_ra": 2.286,
+          "conversion_factor": 0.73964,
+          "food_id": 4473,
+          "group_id": 20,
+          "ra_amount_g": 140.0,
+          "ra_category": "rice_grains_cooked"
+        },
+        {
+          "amount_g": 200.0,
+          "calculated_ra": 2.0,
+          "conversion_factor": 0.75,
+          "food_id": 851,
+          "group_id": 5,
+          "ra_amount_g": 100.0,
+          "ra_category": "meat_poultry_cooked"
+        },
+        {
+          "amount_g": 50.0,
+          "calculated_ra": 0.286,
+          "conversion_factor": 1.0299,
+          "food_id": 6971,
+          "group_id": 1,
+          "ra_amount_g": 175.0,
+          "ra_category": "yogurt"
+        },
+        {
+          "amount_g": 50.0,
+          "calculated_ra": 0.588,
+          "conversion_factor": 0.36771,
+          "food_id": 5960,
+          "group_id": 11,
+          "ra_amount_g": 85.0,
+          "ra_category": "vegetables_fresh"
+        },
+        {
+          "amount_g": 30.0,
+          "calculated_ra": 0.12,
+          "conversion_factor": 1.0,
+          "food_id": 7829,
+          "group_id": 1,
+          "ra_amount_g": 250.0,
+          "ra_category": "milk"
+        },
+        {
+          "amount_g": 25.0,
+          "calculated_ra": 0.294,
+          "conversion_factor": 0.76078,
+          "food_id": 2460,
+          "group_id": 11,
+          "ra_amount_g": 85.0,
+          "ra_category": "vegetables_fresh"
+        },
+        {
+          "amount_g": 8.0,
+          "calculated_ra": 0.094,
+          "conversion_factor": 0.03,
+          "food_id": 2394,
+          "group_id": 11,
+          "ra_amount_g": 85.0,
+          "ra_category": "vegetables_fresh"
+        },
+        {
+          "amount_g": 7.0,
+          "calculated_ra": 0.082,
+          "conversion_factor": 0.40575,
+          "food_id": 2091,
+          "group_id": 11,
+          "ra_amount_g": 85.0,
+          "ra_category": "vegetables_fresh"
+        }
+      ],
+      "food_ids": [
+        4473,
+        851,
+        6971,
+        5960,
+        7829,
+        2460,
+        2394,
+        2091
+      ],
+      "hefi_interpretation": {
+        "category": "Bottom quartile of Canadians",
+        "population_benchmarks": {
+          "mean": 43.1,
+          "percentile_1": 22.1,
+          "percentile_99": 62.9
+        },
+        "score": 34.02486,
+        "ui_color": "red"
+      },
+      "inputs": {
+        "energy_kcal": 1246.62,
+        "free_sugars_g": 5.0035,
+        "mufa_g": 14.47121,
+        "plant_protein_foods_ra": 0.0,
+        "protein_foods_ra": 2.405714,
+        "pufa_g": 10.34465,
+        "recommended_beverages_g": 0.0,
+        "sfa_g": 28.75813,
+        "sodium_mg": 237.92,
+        "total_beverages_g": 0.0,
+        "total_foods_ra": 5.750252,
+        "total_grains_ra": 2.285714,
+        "vf_ra": 1.058824,
+        "whole_grains_ra": 0.0
+      },
+      "max_total_score": 80,
+      "percentage": 42.531076,
+      "ratios": {
+        "RATIO_BEV": 0.0,
+        "RATIO_PLANT": 0.0,
+        "RATIO_PRO": 0.418367,
+        "RATIO_UNSFAT": 0.862916,
+        "RATIO_VF": 0.184135,
+        "RATIO_WGGR": 0.0,
+        "RATIO_WGTOT": 0.0,
+        "SFA_PERC": 20.761994,
+        "SODDEN": 0.190852,
+        "SUG_PERC": 1.605461
+      },
+      "total_score": 34.02486,
+      "user_type": "individual"
+    },
+    "success": true
+  },
+  "D2 AGGREGATED (11 foods)": {
+    "data": {
+      "components": {
+        "C10_SODIUM": {
+          "max_points": 10,
+          "score": 10.0
+        },
+        "C1_VF": {
+          "max_points": 20,
+          "score": 12.768441
+        },
+        "C2_WHOLEGR": {
+          "max_points": 5,
+          "score": 0.0
+        },
+        "C3_GRRATIO": {
+          "max_points": 5,
+          "score": 0.0
+        },
+        "C4_PROFOODS": {
+          "max_points": 5,
+          "score": 5.0
+        },
+        "C5_PLANTPRO": {
+          "max_points": 5,
+          "score": 0.0
+        },
+        "C6_BEVERAGES": {
+          "max_points": 10,
+          "score": 10.0
+        },
+        "C7_FATTYACID": {
+          "max_points": 5,
+          "score": 3.852949
+        },
+        "C8_SFAT": {
+          "max_points": 5,
+          "score": 1.953905
+        },
+        "C9_FREESUGARS": {
+          "max_points": 10,
+          "score": 6.703267
+        }
+      },
+      "food_breakdown": [
+        {
+          "amount_g": 240.0,
+          "calculated_ra": 1.437,
+          "conversion_factor": 2.65215,
+          "food_id": 6205,
+          "group_id": 9,
+          "ra_amount_g": 167.0,
+          "ra_category": "fruit_canned"
+        },
+        {
+          "amount_g": 200.0,
+          "calculated_ra": 2.0,
+          "conversion_factor": 1.0,
+          "food_id": 700194,
+          "group_id": 51,
+          "ra_amount_g": 100.0,
+          "ra_category": "default"
+        },
+        {
+          "amount_g": 160.0,
+          "calculated_ra": 0.427,
+          "conversion_factor": 1.00186,
+          "food_id": 2933,
+          "group_id": 14,
+          "ra_amount_g": 375.0,
+          "ra_category": "beverages"
+        },
+        {
+          "amount_g": 150.0,
+          "calculated_ra": 1.364,
+          "conversion_factor": 0.48,
+          "food_id": 133,
+          "group_id": 1,
+          "ra_amount_g": 110.0,
+          "ra_category": "egg_mixtures"
+        },
+        {
+          "amount_g": 120.0,
+          "calculated_ra": 1.2,
+          "conversion_factor": 0.75,
+          "food_id": 648,
+          "group_id": 5,
+          "ra_amount_g": 100.0,
+          "ra_category": "meat_poultry_cooked"
+        },
+        {
+          "amount_g": 100.0,
+          "calculated_ra": 0.714,
+          "conversion_factor": 0.65089,
+          "food_id": 1662,
+          "group_id": 9,
+          "ra_amount_g": 140.0,
+          "ra_category": "fruit_fresh"
+        },
+        {
+          "amount_g": 70.0,
+          "calculated_ra": 2.0,
+          "conversion_factor": 1.09045,
+          "food_id": 3399,
+          "group_id": 16,
+          "ra_amount_g": 35.0,
+          "ra_category": "legumes_dry"
+        },
+        {
+          "amount_g": 50.0,
+          "calculated_ra": 0.588,
+          "conversion_factor": 0.76078,
+          "food_id": 2460,
+          "group_id": 11,
+          "ra_amount_g": 85.0,
+          "ra_category": "vegetables_fresh"
+        },
+        {
+          "amount_g": 30.0,
+          "calculated_ra": 0.353,
+          "conversion_factor": 0.48605,
+          "food_id": 2401,
+          "group_id": 11,
+          "ra_amount_g": 85.0,
+          "ra_category": "vegetables_fresh"
+        },
+        {
+          "amount_g": 15.0,
+          "calculated_ra": 0.15,
+          "conversion_factor": 0.91293,
+          "food_id": 423,
+          "group_id": 4,
+          "ra_amount_g": 100.0,
+          "ra_category": "default"
+        },
+        {
+          "amount_g": 8.0,
+          "calculated_ra": 0.032,
+          "conversion_factor": 0.14392,
+          "food_id": 118,
+          "group_id": 1,
+          "ra_amount_g": 250.0,
+          "ra_category": "milk"
+        }
+      ],
+      "food_ids": [
+        6205,
+        700194,
+        2933,
+        133,
+        648,
+        1662,
+        3399,
+        2460,
+        2401,
+        423,
+        118
+      ],
+      "hefi_interpretation": {
+        "category": "Above the Canadian median",
+        "population_benchmarks": {
+          "mean": 43.1,
+          "percentile_1": 22.1,
+          "percentile_99": 62.9
+        },
+        "score": 50.278561,
+        "ui_color": "green"
+      },
+      "inputs": {
+        "energy_kcal": 1681.61,
+        "free_sugars_g": 55.8998,
+        "mufa_g": 41.27578,
+        "plant_protein_foods_ra": 0.0,
+        "protein_foods_ra": 4.595636,
+        "pufa_g": 18.96554,
+        "recommended_beverages_g": 160.0,
+        "sfa_g": 30.06754,
+        "sodium_mg": 1018.4725,
+        "total_beverages_g": 160.0,
+        "total_foods_ra": 9.688224,
+        "total_grains_ra": 0.0,
+        "vf_ra": 3.092588,
+        "whole_grains_ra": 0.0
+      },
+      "max_total_score": 80,
+      "percentage": 62.848202,
+      "ratios": {
+        "RATIO_BEV": 1.0,
+        "RATIO_PLANT": 0.0,
+        "RATIO_PRO": 0.474353,
+        "RATIO_UNSFAT": 2.003533,
+        "RATIO_VF": 0.319211,
+        "RATIO_WGGR": 0.0,
+        "RATIO_WGTOT": 0.0,
+        "SFA_PERC": 16.092189,
+        "SODDEN": 0.605653,
+        "SUG_PERC": 13.296733
+      },
+      "total_score": 50.278561,
+      "user_type": "individual"
+    },
+    "success": true
+  },
+  "D2 dinner \u2014 fufu + groundnut soup": {
+    "data": {
+      "components": {
+        "C10_SODIUM": {
+          "max_points": 10,
+          "score": 10.0
+        },
+        "C1_VF": {
+          "max_points": 20,
+          "score": 9.65923
+        },
+        "C2_WHOLEGR": {
+          "max_points": 5,
+          "score": 0.0
+        },
+        "C3_GRRATIO": {
+          "max_points": 5,
+          "score": 0.0
+        },
+        "C4_PROFOODS": {
+          "max_points": 5,
+          "score": 5.0
+        },
+        "C5_PLANTPRO": {
+          "max_points": 5,
+          "score": 0.0
+        },
+        "C6_BEVERAGES": {
+          "max_points": 10,
+          "score": 10.0
+        },
+        "C7_FATTYACID": {
+          "max_points": 5,
+          "score": 4.391832
+        },
+        "C8_SFAT": {
+          "max_points": 5,
+          "score": 2.5763
+        },
+        "C9_FREESUGARS": {
+          "max_points": 10,
+          "score": 10.0
+        }
+      },
+      "food_breakdown": [
+        {
+          "amount_g": 200.0,
+          "calculated_ra": 2.0,
+          "conversion_factor": 1.0,
+          "food_id": 700194,
+          "group_id": 51,
+          "ra_amount_g": 100.0,
+          "ra_category": "default"
+        },
+        {
+          "amount_g": 100.0,
+          "calculated_ra": 0.714,
+          "conversion_factor": 0.65089,
+          "food_id": 1662,
+          "group_id": 9,
+          "ra_amount_g": 140.0,
+          "ra_category": "fruit_fresh"
+        },
+        {
+          "amount_g": 160.0,
+          "calculated_ra": 0.427,
+          "conversion_factor": 1.00186,
+          "food_id": 2933,
+          "group_id": 14,
+          "ra_amount_g": 375.0,
+          "ra_category": "beverages"
+        },
+        {
+          "amount_g": 70.0,
+          "calculated_ra": 2.0,
+          "conversion_factor": 1.09045,
+          "food_id": 3399,
+          "group_id": 16,
+          "ra_amount_g": 35.0,
+          "ra_category": "legumes_dry"
+        },
+        {
+          "amount_g": 120.0,
+          "calculated_ra": 1.2,
+          "conversion_factor": 0.75,
+          "food_id": 648,
+          "group_id": 5,
+          "ra_amount_g": 100.0,
+          "ra_category": "meat_poultry_cooked"
+        },
+        {
+          "amount_g": 50.0,
+          "calculated_ra": 0.588,
+          "conversion_factor": 0.76078,
+          "food_id": 2460,
+          "group_id": 11,
+          "ra_amount_g": 85.0,
+          "ra_category": "vegetables_fresh"
+        },
+        {
+          "amount_g": 30.0,
+          "calculated_ra": 0.353,
+          "conversion_factor": 0.48605,
+          "food_id": 2401,
+          "group_id": 11,
+          "ra_amount_g": 85.0,
+          "ra_category": "vegetables_fresh"
+        },
+        {
+          "amount_g": 15.0,
+          "calculated_ra": 0.15,
+          "conversion_factor": 0.91293,
+          "food_id": 423,
+          "group_id": 4,
+          "ra_amount_g": 100.0,
+          "ra_category": "default"
+        }
+      ],
+      "food_ids": [
+        700194,
+        1662,
+        2933,
+        3399,
+        648,
+        2460,
+        2401,
+        423
+      ],
+      "hefi_interpretation": {
+        "category": "Top quartile of Canadians",
+        "population_benchmarks": {
+          "mean": 43.1,
+          "percentile_1": 22.1,
+          "percentile_99": 62.9
+        },
+        "score": 51.627362,
+        "ui_color": "green"
+      },
+      "inputs": {
+        "energy_kcal": 1272.35,
+        "free_sugars_g": 23.93,
+        "mufa_g": 32.3911,
+        "plant_protein_foods_ra": 0.0,
+        "protein_foods_ra": 3.2,
+        "pufa_g": 15.5451,
+        "recommended_beverages_g": 160.0,
+        "sfa_g": 20.9901,
+        "sodium_mg": 401.3,
+        "total_beverages_g": 160.0,
+        "total_foods_ra": 6.855462,
+        "total_grains_ra": 0.0,
+        "vf_ra": 1.655462,
+        "whole_grains_ra": 0.0
+      },
+      "max_total_score": 80,
+      "percentage": 64.534203,
+      "ratios": {
+        "RATIO_BEV": 1.0,
+        "RATIO_PLANT": 0.0,
+        "RATIO_PRO": 0.466781,
+        "RATIO_UNSFAT": 2.283753,
+        "RATIO_VF": 0.241481,
+        "RATIO_WGGR": 0.0,
+        "RATIO_WGTOT": 0.0,
+        "SFA_PERC": 14.8474,
+        "SODDEN": 0.315401,
+        "SUG_PERC": 7.523087
+      },
+      "total_score": 51.627362,
+      "user_type": "individual"
+    },
+    "success": true
+  }
+}

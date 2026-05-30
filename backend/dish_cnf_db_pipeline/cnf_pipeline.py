@@ -708,6 +708,14 @@ class CNFDataPipeline:
                 'foods_by_group': {},
                 'top_nutrients': {}
             }
+
+            food_df = self.data_loader.food_name_df
+            if 'source' in food_df.columns:
+                stats['cnf_food_count'] = int((food_df['source'] == 'cnf').sum())
+                stats['wafct_food_count'] = int((food_df['source'] == 'wafct').sum())
+            else:
+                stats['cnf_food_count'] = len(food_df)
+                stats['wafct_food_count'] = 0
             
             # Foods by group
             foods_by_group = self.data_loader.food_name_df.groupby('FoodGroupID').size()

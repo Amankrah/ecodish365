@@ -219,6 +219,8 @@ export interface IntegrityCheck {
 export interface DatabaseStats {
   timestamp: string;
   food_count: number;
+  cnf_food_count?: number;
+  wafct_food_count?: number;
   nutrient_records: number;
   conversion_records: number;
   food_groups: number;

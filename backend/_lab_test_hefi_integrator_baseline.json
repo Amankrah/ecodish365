@@ -1,0 +1,542 @@
+{
+  "118": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 717.0,
+      "free_sugars_g": 0.06,
+      "mufa_g": 21.021,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 0.4,
+      "pufa_g": 3.043,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 51.368,
+      "sodium_mg": 643.0,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 0.4,
+      "total_grains_ra": 0.0,
+      "vf_ra": 0.0,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 0.14392,
+    "measure_description": "15 ml"
+  },
+  "133": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 153.0,
+      "free_sugars_g": 1.39,
+      "mufa_g": 4.802,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 0.9090909090909091,
+      "pufa_g": 2.118,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 3.312,
+      "sodium_mg": 369.155,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 0.9090909090909091,
+      "total_grains_ra": 0.0,
+      "vf_ra": 0.0,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 0.48,
+    "measure_description": "1 small egg"
+  },
+  "1465": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 83.0,
+      "free_sugars_g": 0.215,
+      "mufa_g": 0.5556,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 0.0,
+      "pufa_g": 0.459,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 0.2875,
+      "sodium_mg": 0.645,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 1.0,
+      "total_grains_ra": 0.0,
+      "vf_ra": 0.0,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 2.47253,
+    "measure_description": "250 ml"
+  },
+  "1620": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 49.0,
+      "free_sugars_g": 8.31,
+      "mufa_g": 0.022,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 0.0,
+      "pufa_g": 0.032,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 0.014,
+      "sodium_mg": 2.0,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 0.4,
+      "total_grains_ra": 0.0,
+      "vf_ra": 0.4,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 1.05241,
+    "measure_description": "100 ml"
+  },
+  "1662": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 116.0,
+      "free_sugars_g": 14.0,
+      "mufa_g": 0.015,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 0.0,
+      "pufa_g": 0.033,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 0.069,
+      "sodium_mg": 5.0,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 0.7142857142857143,
+      "total_grains_ra": 0.0,
+      "vf_ra": 0.7142857142857143,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 0.65089,
+    "measure_description": "100 ml slices"
+  },
+  "1704": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 89.0,
+      "free_sugars_g": 12.23,
+      "mufa_g": 0.032,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 0.0,
+      "pufa_g": 0.073,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 0.112,
+      "sodium_mg": 1.0,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 0.7142857142857143,
+      "total_grains_ra": 0.0,
+      "vf_ra": 0.7142857142857143,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 0.6340100000000001,
+    "measure_description": "100 ml slices"
+  },
+  "2091": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 80.0,
+      "free_sugars_g": 1.7,
+      "mufa_g": 0.154,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 0.0,
+      "pufa_g": 0.154,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 0.203,
+      "sodium_mg": 13.0,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 1.1764705882352942,
+      "total_grains_ra": 0.0,
+      "vf_ra": 1.1764705882352942,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 0.40575,
+    "measure_description": "100 ml slices"
+  },
+  "2394": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 149.0,
+      "free_sugars_g": 1.0,
+      "mufa_g": 0.011,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 0.0,
+      "pufa_g": 0.249,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 0.089,
+      "sodium_mg": 17.0,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 1.1764705882352942,
+      "total_grains_ra": 0.0,
+      "vf_ra": 1.1764705882352942,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 0.03,
+    "measure_description": "1 clove"
+  },
+  "2401": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 40.0,
+      "free_sugars_g": 4.24,
+      "mufa_g": 0.013,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 0.0,
+      "pufa_g": 0.017,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 0.042,
+      "sodium_mg": 4.0,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 1.1764705882352942,
+      "total_grains_ra": 0.0,
+      "vf_ra": 1.1764705882352942,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 0.48605,
+    "measure_description": "100 ml slices"
+  },
+  "2460": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 18.0,
+      "free_sugars_g": 2.63,
+      "mufa_g": 0.031,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 0.0,
+      "pufa_g": 0.083,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 0.028,
+      "sodium_mg": 5.0,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 1.1764705882352942,
+      "total_grains_ra": 0.0,
+      "vf_ra": 1.1764705882352942,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 0.76078,
+    "measure_description": "100 ml chopped or sliced"
+  },
+  "2683": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 207.0,
+      "free_sugars_g": 0.0,
+      "mufa_g": 6.1225,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 1.0,
+      "pufa_g": 0.36,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 5.4625,
+      "sodium_mg": 63.475,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 1.0,
+      "total_grains_ra": 0.0,
+      "vf_ra": 0.0,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 0.9,
+    "measure_description": "1 food guide serving = 90g"
+  },
+  "29": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 305.0,
+      "free_sugars_g": 0.0,
+      "mufa_g": 5.854,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 3.3333333333333335,
+      "pufa_g": 0.931,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 14.109,
+      "sodium_mg": 735.0,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 3.3333333333333335,
+      "total_grains_ra": 0.0,
+      "vf_ra": 0.0,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 0.5579,
+    "measure_description": "100 ml diced"
+  },
+  "2933": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 0.0,
+      "free_sugars_g": 0.0,
+      "mufa_g": 0.0,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 0.0,
+      "pufa_g": 0.0,
+      "recommended_beverages_g": 100.0,
+      "sfa_g": 0.0,
+      "sodium_mg": 3.0,
+      "total_beverages_g": 100.0,
+      "total_foods_ra": 0.0,
+      "total_grains_ra": 0.0,
+      "vf_ra": 0.0,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 1.00186,
+    "measure_description": "100 ml"
+  },
+  "3392": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 352.0,
+      "free_sugars_g": 2.03,
+      "mufa_g": 0.193,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 2.857142857142857,
+      "pufa_g": 0.526,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 0.154,
+      "sodium_mg": 6.0,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 2.857142857142857,
+      "total_grains_ra": 0.0,
+      "vf_ra": 0.0,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 0.8115000000000001,
+    "measure_description": "100 ml"
+  },
+  "3399": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 598.0,
+      "free_sugars_g": 10.49,
+      "mufa_g": 25.941,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 2.857142857142857,
+      "pufa_g": 12.535,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 10.325,
+      "sodium_mg": 426.0,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 2.857142857142857,
+      "total_grains_ra": 0.0,
+      "vf_ra": 0.0,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 1.09045,
+    "measure_description": "100 ml"
+  },
+  "3732": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 288.0,
+      "free_sugars_g": 8.4,
+      "mufa_g": 0.647,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 0.0,
+      "pufa_g": 1.454,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 0.707,
+      "sodium_mg": 566.0,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 1.3333333333333333,
+      "total_grains_ra": 1.3333333333333333,
+      "vf_ra": 0.0,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 0.33,
+    "measure_description": "1 slice"
+  },
+  "423": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 885.0,
+      "free_sugars_g": 0.0,
+      "mufa_g": 37.0,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 0.0,
+      "pufa_g": 9.3,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 49.3,
+      "sodium_mg": 0.0,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 0.0,
+      "total_grains_ra": 0.0,
+      "vf_ra": 0.0,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 0.91293,
+    "measure_description": "100 ml"
+  },
+  "4473": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 123.0,
+      "free_sugars_g": 0.11,
+      "mufa_g": 0.074,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 0.0,
+      "pufa_g": 0.091,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 0.074,
+      "sodium_mg": 2.0,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 0.7142857142857143,
+      "total_grains_ra": 0.7142857142857143,
+      "vf_ra": 0.0,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 0.73964,
+    "measure_description": "100 ml"
+  },
+  "5960": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 123.0,
+      "free_sugars_g": 4.39,
+      "mufa_g": 2.185,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 0.0,
+      "pufa_g": 5.47,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 1.477,
+      "sodium_mg": 12.0,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 1.1764705882352942,
+      "total_grains_ra": 0.0,
+      "vf_ra": 1.1764705882352942,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 0.36771,
+    "measure_description": "100 ml chopped"
+  },
+  "61": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 47.0,
+      "free_sugars_g": 4.24,
+      "mufa_g": 0.464,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 0.4,
+      "pufa_g": 0.059,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 1.221,
+      "sodium_mg": 54.2,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 0.4,
+      "total_grains_ra": 0.0,
+      "vf_ra": 0.0,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 1.03128,
+    "measure_description": "100 ml"
+  },
+  "6205": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 51.0,
+      "free_sugars_g": 12.45,
+      "mufa_g": 0.0,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 0.0,
+      "pufa_g": 0.0,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 0.0,
+      "sodium_mg": 5.0,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 0.5988023952095808,
+      "total_grains_ra": 0.0,
+      "vf_ra": 0.5988023952095808,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 2.65215,
+    "measure_description": "250 ml"
+  },
+  "648": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 285.0,
+      "free_sugars_g": 0.0,
+      "mufa_g": 7.19,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 1.0,
+      "pufa_g": 4.23,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 5.11,
+      "sodium_mg": 73.0,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 1.0,
+      "total_grains_ra": 0.0,
+      "vf_ra": 0.0,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 0.75,
+    "measure_description": "1 food guide serving = 75g"
+  },
+  "6961": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 50.0,
+      "free_sugars_g": 3.45,
+      "mufa_g": 0.514,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 0.5714285714285714,
+      "pufa_g": 0.062,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 1.307,
+      "sodium_mg": 40.0,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 0.5714285714285714,
+      "total_grains_ra": 0.0,
+      "vf_ra": 0.0,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 1.0581,
+    "measure_description": "100 ml"
+  },
+  "6971": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 71.0,
+      "free_sugars_g": 3.2,
+      "mufa_g": 1.217,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 0.5714285714285714,
+      "pufa_g": 0.162,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 3.065,
+      "sodium_mg": 36.0,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 0.5714285714285714,
+      "total_grains_ra": 0.0,
+      "vf_ra": 0.0,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 1.0299,
+    "measure_description": "100 ml"
+  },
+  "700194": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 121.0,
+      "free_sugars_g": 0.0,
+      "mufa_g": 0.01,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 0.0,
+      "pufa_g": 0.11,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 0.07,
+      "sodium_mg": 1.0,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 1.0,
+      "total_grains_ra": 0.0,
+      "vf_ra": 0.0,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 1.0,
+    "measure_description": "Unknown measure"
+  },
+  "7829": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 900.0,
+      "free_sugars_g": 0.0,
+      "mufa_g": 0.0,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 0.4,
+      "pufa_g": 4.0,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 60.0,
+      "sodium_mg": 0.0,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 0.4,
+      "total_grains_ra": 0.0,
+      "vf_ra": 0.0,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 1.0,
+    "measure_description": "Unknown measure"
+  },
+  "851": {
+    "aggregate_inputs_at_100g": {
+      "energy_kcal": 232.0,
+      "free_sugars_g": 0.0,
+      "mufa_g": 6.257,
+      "plant_protein_foods_ra": 0.0,
+      "protein_foods_ra": 1.0,
+      "pufa_g": 2.993,
+      "recommended_beverages_g": 0.0,
+      "sfa_g": 4.111,
+      "sodium_mg": 102.0,
+      "total_beverages_g": 0.0,
+      "total_foods_ra": 1.0,
+      "total_grains_ra": 0.0,
+      "vf_ra": 0.0,
+      "whole_grains_ra": 0.0
+    },
+    "conversion_factor": 0.75,
+    "measure_description": "1 food guide serving = 75g"
+  }
+}

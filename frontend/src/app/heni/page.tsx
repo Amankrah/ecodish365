@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { CNFApiService, DatabaseStats } from '@/lib/api';
 import {
   Calculator,
   LayoutGrid,
@@ -32,7 +33,43 @@ const colorClasses: Record<string, string> = {
   green: 'border-green-200 bg-green-50 text-green-900',
 };
 
+const formatNumber = (num: number) => new Intl.NumberFormat().format(num);
+
 export default function HENIHomePage() {
+  const [catalogueStats, setCatalogueStats] = useState<Pick<
+    DatabaseStats,
+    'food_count' | 'cnf_food_count' | 'wafct_food_count'
+  > | null>(null);
+
+  useEffect(() => {
+    CNFApiService.getDatabaseStatistics()
+      .then((data) =>
+        setCatalogueStats({
+          food_count: data.food_count,
+          cnf_food_count: data.cnf_food_count,
+          wafct_food_count: data.wafct_food_count,
+        }),
+      )
+      .catch((error) => {
+        console.error('Failed to load catalogue stats:', error);
+      });
+  }, []);
+
+  const foodCountLabel =
+    catalogueStats != null ? formatNumber(catalogueStats.food_count) : '—';
+  const cnfCountLabel =
+    catalogueStats?.cnf_food_count != null
+      ? formatNumber(catalogueStats.cnf_food_count)
+      : null;
+  const wafctCountLabel =
+    catalogueStats?.wafct_food_count != null
+      ? formatNumber(catalogueStats.wafct_food_count)
+      : null;
+  const catalogueBreakdown =
+    cnfCountLabel != null && wafctCountLabel != null
+      ? `${cnfCountLabel} Canadian foods plus ${wafctCountLabel} West African foods.`
+      : 'Canadian Nutrient File plus the West African Food Composition Table.';
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="relative py-12 max-w-7xl mx-auto px-6">
@@ -194,10 +231,10 @@ export default function HENIHomePage() {
               </div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-green-600 mb-1">6,719</div>
+              <div className="text-3xl font-bold text-green-600 mb-1">{foodCountLabel}</div>
               <div className="text-sm text-gray-700 font-medium">Foods in the catalogue</div>
               <div className="text-xs text-gray-500 mt-1">
-                5,691 Canadian foods plus 1,028 West African foods.
+                {catalogueBreakdown}
               </div>
             </div>
             <div className="text-center">
@@ -231,12 +268,20 @@ export default function HENIHomePage() {
             <div className="border border-gray-100 rounded-lg p-3">
               <div className="text-xs font-semibold text-blue-700 uppercase tracking-wide">Home base</div>
               <div className="text-sm font-medium text-gray-900 mt-1">Canadian Nutrient File</div>
-              <div className="text-xs text-gray-600 mt-0.5">5,691 foods from Health Canada.</div>
+              <div className="text-xs text-gray-600 mt-0.5">
+                {cnfCountLabel != null
+                  ? `${cnfCountLabel} foods from Health Canada.`
+                  : 'Foods from Health Canada.'}
+              </div>
             </div>
             <div className="border border-gray-100 rounded-lg p-3">
               <div className="text-xs font-semibold text-blue-700 uppercase tracking-wide">Extension</div>
               <div className="text-sm font-medium text-gray-900 mt-1">FAO/INFOODS WAFCT 2019</div>
-              <div className="text-xs text-gray-600 mt-0.5">1,028 West African foods.</div>
+              <div className="text-xs text-gray-600 mt-0.5">
+                {wafctCountLabel != null
+                  ? `${wafctCountLabel} West African foods.`
+                  : 'West African foods.'}
+              </div>
             </div>
             <div className="border border-dashed border-gray-300 rounded-lg p-3 text-gray-500">
               <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Planned</div>
