@@ -18,22 +18,6 @@
       "suggestion_index": 0
     },
     {
-      "crosses_any_axis": true,
-      "crosses_preservation_axis": false,
-      "crosses_thermal_axis": true,
-      "meal_label": "raw_carrot_apple_snack",
-      "original_description": "Carrot, raw",
-      "original_food_id": 2380,
-      "original_preservation_state": "fresh",
-      "original_thermal_state": "raw",
-      "purpose": "lower_sodium",
-      "replacement_description": "Carrot, boiled* (as part of a recipe)",
-      "replacement_food_id": 700431,
-      "replacement_preservation_state": "fresh",
-      "replacement_thermal_state": "boiled",
-      "suggestion_index": 1
-    },
-    {
       "crosses_any_axis": false,
       "crosses_preservation_axis": false,
       "crosses_thermal_axis": false,
@@ -47,7 +31,7 @@
       "replacement_food_id": 1697,
       "replacement_preservation_state": "fresh",
       "replacement_thermal_state": "raw",
-      "suggestion_index": 2
+      "suggestion_index": 1
     },
     {
       "crosses_any_axis": false,
@@ -64,22 +48,6 @@
       "replacement_preservation_state": "unknown",
       "replacement_thermal_state": "unknown",
       "suggestion_index": 0
-    },
-    {
-      "crosses_any_axis": true,
-      "crosses_preservation_axis": true,
-      "crosses_thermal_axis": false,
-      "meal_label": "boiled_egg_breakfast",
-      "original_description": "Egg, chicken, whole, cooked, boiled in shell, hard-cooked",
-      "original_food_id": 130,
-      "original_preservation_state": "fresh",
-      "original_thermal_state": "boiled",
-      "purpose": "lower_sodium",
-      "replacement_description": "Milk, evaporated, partly skimmed, canned, undiluted, 2% M.F.",
-      "replacement_food_id": 7585,
-      "replacement_preservation_state": "canned",
-      "replacement_thermal_state": "unknown",
-      "suggestion_index": 1
     },
     {
       "crosses_any_axis": false,
@@ -146,22 +114,6 @@
       "suggestion_index": 0
     },
     {
-      "crosses_any_axis": true,
-      "crosses_preservation_axis": false,
-      "crosses_thermal_axis": true,
-      "meal_label": "fried_chicken_meal",
-      "original_description": "Chicken, broiler, meat and skin, batter dipped, fried",
-      "original_food_id": 561,
-      "original_preservation_state": "fresh",
-      "original_thermal_state": "fried",
-      "purpose": "lower_sat_fat",
-      "replacement_description": "Turkey, broiler, wing, meat and skin, raw",
-      "replacement_food_id": 748,
-      "replacement_preservation_state": "fresh",
-      "replacement_thermal_state": "raw",
-      "suggestion_index": 1
-    },
-    {
       "crosses_any_axis": false,
       "crosses_preservation_axis": false,
       "crosses_thermal_axis": false,
@@ -175,7 +127,7 @@
       "replacement_food_id": 621,
       "replacement_preservation_state": "fresh",
       "replacement_thermal_state": "fried",
-      "suggestion_index": 2
+      "suggestion_index": 1
     },
     {
       "crosses_any_axis": false,
@@ -194,22 +146,6 @@
       "suggestion_index": 0
     },
     {
-      "crosses_any_axis": true,
-      "crosses_preservation_axis": true,
-      "crosses_thermal_axis": false,
-      "meal_label": "canned_tomato_pasta",
-      "original_description": "Carrot, canned, drained solids",
-      "original_food_id": 2382,
-      "original_preservation_state": "canned",
-      "original_thermal_state": "unknown",
-      "purpose": "lower_sodium",
-      "replacement_description": "Celeriac, raw",
-      "replacement_food_id": 2049,
-      "replacement_preservation_state": "fresh",
-      "replacement_thermal_state": "raw",
-      "suggestion_index": 1
-    },
-    {
       "crosses_any_axis": false,
       "crosses_preservation_axis": false,
       "crosses_thermal_axis": false,
@@ -222,6 +158,22 @@
       "replacement_description": "Bread, white with raisins, commercial",
       "replacement_food_id": 3714,
       "replacement_preservation_state": "unknown",
+      "replacement_thermal_state": "unknown",
+      "suggestion_index": 1
+    },
+    {
+      "crosses_any_axis": false,
+      "crosses_preservation_axis": false,
+      "crosses_thermal_axis": false,
+      "meal_label": "canned_tomato_pasta",
+      "original_description": "Carrot, canned, drained solids",
+      "original_food_id": 2382,
+      "original_preservation_state": "canned",
+      "original_thermal_state": "unknown",
+      "purpose": "lower_sodium",
+      "replacement_description": "Carrot, canned, solids and liquid",
+      "replacement_food_id": 2044,
+      "replacement_preservation_state": "canned",
       "replacement_thermal_state": "unknown",
       "suggestion_index": 2
     },
@@ -290,36 +242,20 @@
       "suggestion_index": 0
     },
     {
-      "crosses_any_axis": true,
+      "crosses_any_axis": false,
       "crosses_preservation_axis": false,
-      "crosses_thermal_axis": true,
+      "crosses_thermal_axis": false,
       "meal_label": "frozen_broccoli_stirfry",
-      "original_description": "Broccoli, frozen, spears, unprepared",
-      "original_food_id": 2025,
-      "original_preservation_state": "frozen",
+      "original_description": "Chicken, broiler, meat and skin, raw",
+      "original_food_id": 560,
+      "original_preservation_state": "fresh",
       "original_thermal_state": "raw",
       "purpose": "lower_sat_fat",
-      "replacement_description": "Broccoli, frozen, spears, boiled, drained",
-      "replacement_food_id": 2026,
-      "replacement_preservation_state": "frozen",
-      "replacement_thermal_state": "boiled",
+      "replacement_description": "Turkey, broiler, wing, meat and skin, raw",
+      "replacement_food_id": 748,
+      "replacement_preservation_state": "fresh",
+      "replacement_thermal_state": "raw",
       "suggestion_index": 1
-    },
-    {
-      "crosses_any_axis": true,
-      "crosses_preservation_axis": false,
-      "crosses_thermal_axis": true,
-      "meal_label": "frozen_broccoli_stirfry",
-      "original_description": "Broccoli, frozen, spears, unprepared",
-      "original_food_id": 2025,
-      "original_preservation_state": "frozen",
-      "original_thermal_state": "raw",
-      "purpose": "lower_sat_fat",
-      "replacement_description": "Broccoli, frozen, spears, boiled, drained, with salt",
-      "replacement_food_id": 2331,
-      "replacement_preservation_state": "frozen",
-      "replacement_thermal_state": "boiled",
-      "suggestion_index": 2
     },
     {
       "crosses_any_axis": true,
@@ -338,22 +274,6 @@
       "suggestion_index": 0
     },
     {
-      "crosses_any_axis": true,
-      "crosses_preservation_axis": true,
-      "crosses_thermal_axis": true,
-      "meal_label": "dried_apricot_snack",
-      "original_description": "Apricot, dried, sulphured, uncooked",
-      "original_food_id": 1507,
-      "original_preservation_state": "dried",
-      "original_thermal_state": "raw",
-      "purpose": "diabetes_friendly",
-      "replacement_description": "Apricot, dehydrated (low moisture), sulphured, cooked",
-      "replacement_food_id": 1703,
-      "replacement_preservation_state": "dehydrated",
-      "replacement_thermal_state": "cooked",
-      "suggestion_index": 1
-    },
-    {
       "crosses_any_axis": false,
       "crosses_preservation_axis": false,
       "crosses_thermal_axis": false,
@@ -370,22 +290,6 @@
       "suggestion_index": 0
     },
     {
-      "crosses_any_axis": true,
-      "crosses_preservation_axis": false,
-      "crosses_thermal_axis": true,
-      "meal_label": "raw_plantain_meal",
-      "original_description": "Plantain, yellow raw",
-      "original_food_id": 1661,
-      "original_preservation_state": "fresh",
-      "original_thermal_state": "raw",
-      "purpose": "lower_sat_fat",
-      "replacement_description": "Plantain, yellow cooked",
-      "replacement_food_id": 1662,
-      "replacement_preservation_state": "fresh",
-      "replacement_thermal_state": "cooked",
-      "suggestion_index": 1
-    },
-    {
       "crosses_any_axis": false,
       "crosses_preservation_axis": false,
       "crosses_thermal_axis": false,
@@ -397,6 +301,22 @@
       "purpose": "lower_sat_fat",
       "replacement_description": "Plantain, green, raw",
       "replacement_food_id": 7824,
+      "replacement_preservation_state": "fresh",
+      "replacement_thermal_state": "raw",
+      "suggestion_index": 1
+    },
+    {
+      "crosses_any_axis": false,
+      "crosses_preservation_axis": false,
+      "crosses_thermal_axis": false,
+      "meal_label": "raw_plantain_meal",
+      "original_description": "Chicken, broiler, meat and skin, raw",
+      "original_food_id": 560,
+      "original_preservation_state": "fresh",
+      "original_thermal_state": "raw",
+      "purpose": "lower_sat_fat",
+      "replacement_description": "Turkey, broiler, wing, meat and skin, raw",
+      "replacement_food_id": 748,
       "replacement_preservation_state": "fresh",
       "replacement_thermal_state": "raw",
       "suggestion_index": 2
@@ -418,22 +338,6 @@
       "suggestion_index": 0
     },
     {
-      "crosses_any_axis": true,
-      "crosses_preservation_axis": false,
-      "crosses_thermal_axis": true,
-      "meal_label": "cooked_plantain_meal",
-      "original_description": "Chicken, broiler, meat and skin, batter dipped, fried",
-      "original_food_id": 561,
-      "original_preservation_state": "fresh",
-      "original_thermal_state": "fried",
-      "purpose": "lower_sat_fat",
-      "replacement_description": "Turkey, broiler, wing, meat and skin, raw",
-      "replacement_food_id": 748,
-      "replacement_preservation_state": "fresh",
-      "replacement_thermal_state": "raw",
-      "suggestion_index": 1
-    },
-    {
       "crosses_any_axis": false,
       "crosses_preservation_axis": false,
       "crosses_thermal_axis": false,
@@ -447,7 +351,7 @@
       "replacement_food_id": 621,
       "replacement_preservation_state": "fresh",
       "replacement_thermal_state": "fried",
-      "suggestion_index": 2
+      "suggestion_index": 1
     },
     {
       "crosses_any_axis": false,
@@ -456,12 +360,12 @@
       "meal_label": "corn_flakes_milk",
       "original_description": "Cereal, ready to eat, Corn Flakes, President's Choice",
       "original_food_id": 1301,
-      "original_preservation_state": "unknown",
+      "original_preservation_state": "ready_to_eat",
       "original_thermal_state": "unknown",
       "purpose": "higher_fibre",
       "replacement_description": "Cereal, ready to eat, Bran Flakes, too good to be true, President's Choice",
       "replacement_food_id": 5168,
-      "replacement_preservation_state": "unknown",
+      "replacement_preservation_state": "ready_to_eat",
       "replacement_thermal_state": "unknown",
       "suggestion_index": 0
     },
@@ -472,12 +376,12 @@
       "meal_label": "corn_flakes_milk",
       "original_description": "Cereal, ready to eat, Corn Flakes, President's Choice",
       "original_food_id": 1301,
-      "original_preservation_state": "unknown",
+      "original_preservation_state": "ready_to_eat",
       "original_thermal_state": "unknown",
       "purpose": "lower_sodium",
       "replacement_description": "Cereal, ready to eat, Bran Flakes, too good to be true, President's Choice",
       "replacement_food_id": 5168,
-      "replacement_preservation_state": "unknown",
+      "replacement_preservation_state": "ready_to_eat",
       "replacement_thermal_state": "unknown",
       "suggestion_index": 0
     },
@@ -598,62 +502,14 @@
       "crosses_preservation_axis": false,
       "crosses_thermal_axis": false,
       "meal_label": "evaporated_milk_dessert",
-      "original_description": "Milk, evaporated, whole, canned, undiluted, 7.8% M.F.",
-      "original_food_id": 140,
-      "original_preservation_state": "canned",
-      "original_thermal_state": "unknown",
-      "purpose": "lower_sodium",
-      "replacement_description": "Milk, fluid, whole, producer, 3.7% M.F.",
-      "replacement_food_id": 123,
-      "replacement_preservation_state": "unknown",
-      "replacement_thermal_state": "unknown",
-      "suggestion_index": 0
-    },
-    {
-      "crosses_any_axis": false,
-      "crosses_preservation_axis": false,
-      "crosses_thermal_axis": false,
-      "meal_label": "evaporated_milk_dessert",
       "original_description": "Milk, condensed, sweetened, canned",
       "original_food_id": 68,
-      "original_preservation_state": "canned",
+      "original_preservation_state": "condensed",
       "original_thermal_state": "unknown",
       "purpose": "lower_sodium",
       "replacement_description": "Milk, cow, canned, evaporated",
       "replacement_food_id": 700896,
-      "replacement_preservation_state": "canned",
-      "replacement_thermal_state": "unknown",
-      "suggestion_index": 1
-    },
-    {
-      "crosses_any_axis": false,
-      "crosses_preservation_axis": false,
-      "crosses_thermal_axis": false,
-      "meal_label": "evaporated_milk_dessert",
-      "original_description": "Milk, condensed, sweetened, canned",
-      "original_food_id": 68,
-      "original_preservation_state": "canned",
-      "original_thermal_state": "unknown",
-      "purpose": "lower_sodium",
-      "replacement_description": "Milk, evaporated, partly skimmed, canned, undiluted, 2% M.F.",
-      "replacement_food_id": 7585,
-      "replacement_preservation_state": "canned",
-      "replacement_thermal_state": "unknown",
-      "suggestion_index": 2
-    },
-    {
-      "crosses_any_axis": false,
-      "crosses_preservation_axis": false,
-      "crosses_thermal_axis": false,
-      "meal_label": "evaporated_milk_dessert",
-      "original_description": "Milk, evaporated, whole, canned, undiluted, 7.8% M.F.",
-      "original_food_id": 140,
-      "original_preservation_state": "canned",
-      "original_thermal_state": "unknown",
-      "purpose": "lower_sat_fat",
-      "replacement_description": "Plant-based beverage, soy beverage, all flavours, low fat, fortified",
-      "replacement_food_id": 6331,
-      "replacement_preservation_state": "unknown",
+      "replacement_preservation_state": "condensed",
       "replacement_thermal_state": "unknown",
       "suggestion_index": 0
     },
@@ -664,12 +520,12 @@
       "meal_label": "evaporated_milk_dessert",
       "original_description": "Milk, condensed, sweetened, canned",
       "original_food_id": 68,
-      "original_preservation_state": "canned",
+      "original_preservation_state": "condensed",
       "original_thermal_state": "unknown",
-      "purpose": "lower_sat_fat",
-      "replacement_description": "Plant-based beverage, soy beverage, all flavours, low fat, fortified",
-      "replacement_food_id": 6331,
-      "replacement_preservation_state": "unknown",
+      "purpose": "lower_sodium",
+      "replacement_description": "Milk, evaporated, partly skimmed, canned, undiluted, 2% M.F.",
+      "replacement_food_id": 7585,
+      "replacement_preservation_state": "condensed",
       "replacement_thermal_state": "unknown",
       "suggestion_index": 1
     },
@@ -680,14 +536,46 @@
       "meal_label": "evaporated_milk_dessert",
       "original_description": "Milk, evaporated, whole, canned, undiluted, 7.8% M.F.",
       "original_food_id": 140,
-      "original_preservation_state": "canned",
+      "original_preservation_state": "condensed",
+      "original_thermal_state": "unknown",
+      "purpose": "lower_sodium",
+      "replacement_description": "Milk, evaporated, partly skimmed, canned, undiluted, 2% M.F.",
+      "replacement_food_id": 7585,
+      "replacement_preservation_state": "condensed",
+      "replacement_thermal_state": "unknown",
+      "suggestion_index": 2
+    },
+    {
+      "crosses_any_axis": false,
+      "crosses_preservation_axis": false,
+      "crosses_thermal_axis": false,
+      "meal_label": "evaporated_milk_dessert",
+      "original_description": "Milk, evaporated, whole, canned, undiluted, 7.8% M.F.",
+      "original_food_id": 140,
+      "original_preservation_state": "condensed",
       "original_thermal_state": "unknown",
       "purpose": "lower_sat_fat",
       "replacement_description": "Milk, evaporated, skim, canned, undiluted, 0.2% M.F.",
       "replacement_food_id": 112,
-      "replacement_preservation_state": "canned",
+      "replacement_preservation_state": "condensed",
       "replacement_thermal_state": "unknown",
-      "suggestion_index": 2
+      "suggestion_index": 0
+    },
+    {
+      "crosses_any_axis": false,
+      "crosses_preservation_axis": false,
+      "crosses_thermal_axis": false,
+      "meal_label": "evaporated_milk_dessert",
+      "original_description": "Milk, evaporated, whole, canned, undiluted, 7.8% M.F.",
+      "original_food_id": 140,
+      "original_preservation_state": "condensed",
+      "original_thermal_state": "unknown",
+      "purpose": "lower_sat_fat",
+      "replacement_description": "Milk, evaporated, partly skimmed, canned, undiluted, 2% M.F.",
+      "replacement_food_id": 7585,
+      "replacement_preservation_state": "condensed",
+      "replacement_thermal_state": "unknown",
+      "suggestion_index": 1
     },
     {
       "crosses_any_axis": false,
@@ -739,46 +627,16 @@
     }
   ],
   "summary": {
-    "any_axis_cross_rate": 0.217,
-    "n_swaps": 46,
-    "preservation_cross_rate": 0.087,
-    "thermal_cross_rate": 0.152,
+    "any_axis_cross_rate": 0.026,
+    "n_swaps": 39,
+    "preservation_cross_rate": 0.026,
+    "thermal_cross_rate": 0.0,
     "transitions": [
       {
-        "axis": "thermal",
-        "count": 3,
-        "from": "raw",
-        "to": "boiled"
-      },
-      {
-        "axis": "thermal",
-        "count": 2,
-        "from": "fried",
-        "to": "raw"
-      },
-      {
         "axis": "preservation",
-        "count": 2,
+        "count": 1,
         "from": "dried",
         "to": "dehydrated"
-      },
-      {
-        "axis": "thermal",
-        "count": 2,
-        "from": "raw",
-        "to": "cooked"
-      },
-      {
-        "axis": "preservation",
-        "count": 1,
-        "from": "fresh",
-        "to": "canned"
-      },
-      {
-        "axis": "preservation",
-        "count": 1,
-        "from": "canned",
-        "to": "fresh"
       }
     ]
   }

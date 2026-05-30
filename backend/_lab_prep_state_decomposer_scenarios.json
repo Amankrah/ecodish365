@@ -108,7 +108,66 @@
       "prep_state_checks": [
         {"ingredient_keyword": "broccoli", "expected_thermal_state": "cooked", "expected_preservation_state": "frozen"}
       ],
-      "rationale": "Frozen broccoli used in stir-fry — should resolve to FoodID 2026 (frozen+boiled) not 2025 (frozen unprep)."
+      "rationale": "Frozen broccoli used in stir-fry — should resolve to FoodID 2026 (frozen+boiled) not 2025 (frozen unprep).",
+      "category": "whole_food"
+    },
+
+    {
+      "dish": "bowl of corn flakes with cold milk",
+      "total_mass_g": 250.0,
+      "prep_state_checks": [
+        {"ingredient_keyword": "corn flakes", "expected_thermal_state": "unknown", "expected_preservation_state": "ready_to_eat"},
+        {"ingredient_keyword": "milk", "expected_thermal_state": "unknown", "expected_preservation_state": "fresh"}
+      ],
+      "rationale": "Packaged RTE cereal + pasteurized milk. Decomposer should NOT add a cooking verb; both components are eaten as-is.",
+      "category": "packaged_food"
+    },
+    {
+      "dish": "microwaved frozen lasagna entree",
+      "total_mass_g": 350.0,
+      "prep_state_checks": [
+        {"ingredient_keyword": "lasagna", "expected_thermal_state": "cooked", "expected_preservation_state": "frozen"}
+      ],
+      "rationale": "Heated frozen entree → cooked thermal, frozen preservation. Decomposer should pick a frozen-entree CNF row, not a fresh-prepared lasagna recipe.",
+      "category": "packaged_food"
+    },
+    {
+      "dish": "ramen instant noodle cup, dry pack",
+      "total_mass_g": 80.0,
+      "prep_state_checks": [
+        {"ingredient_keyword": "noodle", "expected_thermal_state": "unknown", "expected_preservation_state": "dried"}
+      ],
+      "rationale": "Instant noodles are precooked-then-dried (preservation=dried per Phase 1.6 extractor). Picking a fresh-cooked noodle row would inflate water content.",
+      "category": "packaged_food"
+    },
+    {
+      "dish": "canned tuna salad sandwich on white bread",
+      "total_mass_g": 280.0,
+      "prep_state_checks": [
+        {"ingredient_keyword": "tuna", "expected_thermal_state": "unknown", "expected_preservation_state": "canned"},
+        {"ingredient_keyword": "bread", "expected_thermal_state": "unknown", "expected_preservation_state": "unknown"}
+      ],
+      "rationale": "Canned tuna + commercial bread. Canned tuna ≠ fresh tuna (different Na, different oil content).",
+      "category": "packaged_food"
+    },
+    {
+      "dish": "instant oatmeal packet, prepared with hot water",
+      "total_mass_g": 240.0,
+      "prep_state_checks": [
+        {"ingredient_keyword": "oat", "expected_thermal_state": "cooked", "expected_preservation_state": "unknown"}
+      ],
+      "rationale": "Instant oatmeal: dehydrated oats reconstituted with water → end state is cooked. Decomposer should pick a cooked-oatmeal row, not raw oats.",
+      "category": "packaged_food"
+    },
+    {
+      "dish": "fruit-flavored yogurt cup with granola topping",
+      "total_mass_g": 200.0,
+      "prep_state_checks": [
+        {"ingredient_keyword": "yogurt", "expected_thermal_state": "unknown", "expected_preservation_state": "fermented"},
+        {"ingredient_keyword": "granola", "expected_thermal_state": "unknown", "expected_preservation_state": "ready_to_eat"}
+      ],
+      "rationale": "Fermented dairy + RTE granola. Phase 1.6 extractor maps yogurt→fermented. Granola is RTE.",
+      "category": "packaged_food"
     }
   ]
 }

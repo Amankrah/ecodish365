@@ -1,0 +1,13 @@
+{
+  "date_utc": "2026-05-30T17:25:22Z",
+  "content_sha256_16": "aa7a89762f862465",
+  "labeled": 7006,
+  "by_source": {
+    "regex": 3592,
+    "llm": 3376,
+    "llm_overrode_regex": 38
+  },
+  "both_axes_known": 5149,
+  "low_confidence": 69,
+  "failed": 15
+}

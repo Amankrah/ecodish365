@@ -75,6 +75,7 @@ class CheckOutcome:
     thermal_correct: bool
     preservation_correct: bool
     both_correct: bool
+    category: str = 'whole_food'
 
     def as_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -134,6 +135,7 @@ def _run_one(decomposer, scenario: Dict[str, Any]) -> ScenarioOutcome:
         for i in recipe.ingredients
     ]
 
+    scenario_category = scenario.get('category', 'whole_food')
     checks: List[CheckOutcome] = []
     for check in scenario.get('prep_state_checks', []):
         kw = (check.get('ingredient_keyword') or '').lower().strip()
@@ -159,6 +161,7 @@ def _run_one(decomposer, scenario: Dict[str, Any]) -> ScenarioOutcome:
                 thermal_correct=False,
                 preservation_correct=False,
                 both_correct=False,
+                category=scenario_category,
             ))
             continue
 
@@ -179,6 +182,7 @@ def _run_one(decomposer, scenario: Dict[str, Any]) -> ScenarioOutcome:
             thermal_correct=t_ok,
             preservation_correct=p_ok,
             both_correct=t_ok and p_ok,
+            category=scenario_category,
         ))
 
     return ScenarioOutcome(
@@ -216,6 +220,18 @@ def _summarise(outcomes: List[ScenarioOutcome]) -> Dict[str, Any]:
         key=lambda r: -r['count'],
     )
 
+    by_category: Dict[str, Dict[str, Any]] = {}
+    for cat in sorted({c.category for c in all_checks}):
+        rows = [c for c in all_checks if c.category == cat]
+        cn = len(rows)
+        by_category[cat] = {
+            'n': cn,
+            'ingredient_found_rate': round(sum(c.matched_ingredient_found for c in rows) / cn, 3),
+            'thermal_acc': round(sum(c.thermal_correct for c in rows) / cn, 3),
+            'preservation_acc': round(sum(c.preservation_correct for c in rows) / cn, 3),
+            'both_acc': round(sum(c.both_correct for c in rows) / cn, 3),
+        }
+
     return {
         'n_scenarios': len(outcomes),
         'n_checks': n,
@@ -224,6 +240,7 @@ def _summarise(outcomes: List[ScenarioOutcome]) -> Dict[str, Any]:
         'preservation_acc': round(pres_ok / n, 3),
         'both_acc': round(both_ok / n, 3),
         'thermal_confusion': confusion_list,
+        'by_category': by_category,
     }
 
 
@@ -237,6 +254,16 @@ def _print_scorecard(outcomes: List[ScenarioOutcome], summary: Dict[str, Any]) -
           f'preservation={summary["preservation_acc"]*100:5.1f}%   '
           f'both={summary["both_acc"]*100:5.1f}%')
     print('-' * 100)
+    by_cat = summary.get('by_category') or {}
+    if by_cat:
+        print('By category:')
+        for cat, s in by_cat.items():
+            print(f'  {cat:<16} n={s["n"]:<3}  '
+                  f'found={s["ingredient_found_rate"]*100:5.1f}%  '
+                  f'thermal={s["thermal_acc"]*100:5.1f}%  '
+                  f'preservation={s["preservation_acc"]*100:5.1f}%  '
+                  f'both={s["both_acc"]*100:5.1f}%')
+        print('-' * 100)
     print('Thermal confusion (expected → got):')
     for row in summary['thermal_confusion'][:20]:
         mark = '  ' if row['expected'] == row['got'] else 'XX'

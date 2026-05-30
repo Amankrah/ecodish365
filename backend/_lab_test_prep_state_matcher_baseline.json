@@ -1,5 +1,5 @@
 {
-  "groundtruth_version": "2026-05-30",
+  "groundtruth_version": "2026-05-30-phase1.6",
   "per_probe": [
     {
       "category": "single_raw",
@@ -635,7 +635,7 @@
       "fallback_reason": null,
       "food_id_correct": true,
       "label": "boiled_cardoon",
-      "matched_confidence": 0.95,
+      "matched_confidence": 0.85,
       "matched_food_description": "Cardoon, boiled, drained",
       "matched_food_id": 2043,
       "nutrient_delta": null,
@@ -1117,8 +1117,8 @@
       "expected_preservation_state": "frozen",
       "expected_thermal_state": "raw",
       "extracted_preservation_state": "frozen",
-      "extracted_thermal_state": "unknown",
-      "extractor_confidence": 0.7,
+      "extracted_thermal_state": "raw",
+      "extractor_confidence": 1.0,
       "fallback_reason": null,
       "food_id_correct": false,
       "label": "frozen_blueberry",
@@ -1159,10 +1159,10 @@
           "returned_per_100g": 2.5
         }
       },
-      "prep_state_both_correct": false,
+      "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "frozen blueberries",
-      "thermal_state_correct": false,
+      "thermal_state_correct": true,
       "used_ai_ranking": true
     },
     {
@@ -1181,7 +1181,7 @@
       "fallback_reason": null,
       "food_id_correct": false,
       "label": "carrots_in_chicken_soup",
-      "matched_confidence": 0.75,
+      "matched_confidence": 0.65,
       "matched_food_description": "Carrot, boiled* (as part of a recipe)",
       "matched_food_id": 700431,
       "nutrient_delta": {
@@ -1238,7 +1238,7 @@
       "fallback_reason": null,
       "food_id_correct": true,
       "label": "raw_carrot_sticks",
-      "matched_confidence": 0.9,
+      "matched_confidence": 0.95,
       "matched_food_description": "Carrot, raw",
       "matched_food_id": 2380,
       "nutrient_delta": null,
@@ -1723,7 +1723,7 @@
       ],
       "expected_preservation_state": "fresh",
       "expected_thermal_state": "raw",
-      "extracted_preservation_state": "fresh",
+      "extracted_preservation_state": "dried",
       "extracted_thermal_state": "raw",
       "extractor_confidence": 1.0,
       "fallback_reason": null,
@@ -1766,8 +1766,8 @@
           "returned_per_100g": 0.0
         }
       },
-      "prep_state_both_correct": true,
-      "preservation_correct": true,
+      "prep_state_both_correct": false,
+      "preservation_correct": false,
       "query": "raw fonio grain",
       "thermal_state_correct": true,
       "used_ai_ranking": true
@@ -2115,7 +2115,7 @@
       "fallback_reason": null,
       "food_id_correct": true,
       "label": "wafct_fried_rice_cake",
-      "matched_confidence": 0.8,
+      "matched_confidence": 0.85,
       "matched_food_description": "Rice cakes, fried in unfortified vegetable oil*",
       "matched_food_id": 700136,
       "nutrient_delta": null,
@@ -2157,11 +2157,11 @@
         "thermal_acc": 1.0
       },
       "frozen": {
-        "both_acc": 0.75,
+        "both_acc": 1.0,
         "food_id_acc": 0.75,
         "n": 4,
         "preservation_acc": 1.0,
-        "thermal_acc": 0.75
+        "thermal_acc": 1.0
       },
       "single_cooked": {
         "both_acc": 1.0,
@@ -2178,10 +2178,10 @@
         "thermal_acc": 1.0
       },
       "wafct": {
-        "both_acc": 0.9,
+        "both_acc": 0.8,
         "food_id_acc": 0.6,
         "n": 10,
-        "preservation_acc": 1.0,
+        "preservation_acc": 0.9,
         "thermal_acc": 0.9
       }
     },
@@ -2222,12 +2222,12 @@
     "overall": {
       "both_acc": 0.9,
       "food_id_acc": 0.717,
-      "preservation_acc": 0.967,
-      "thermal_acc": 0.9
+      "preservation_acc": 0.95,
+      "thermal_acc": 0.917
     },
     "thermal_confusion": [
       {
-        "count": 20,
+        "count": 21,
         "expected": "raw",
         "got": "raw"
       },
@@ -2250,11 +2250,6 @@
         "count": 3,
         "expected": "stewed",
         "got": "stewed"
-      },
-      {
-        "count": 2,
-        "expected": "raw",
-        "got": "unknown"
       },
       {
         "count": 2,
@@ -2289,6 +2284,11 @@
       {
         "count": 1,
         "expected": "roasted",
+        "got": "unknown"
+      },
+      {
+        "count": 1,
+        "expected": "raw",
         "got": "unknown"
       }
     ]

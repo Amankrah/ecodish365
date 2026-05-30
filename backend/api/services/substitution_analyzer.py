@@ -389,6 +389,8 @@ def _rule_candidates(
                 ing['food_description'],
                 rule.target_food_description,
                 original_mass_g=ing['mass_g'],
+                original_food_id=ing.get('food_id'),
+                replacement_food_id=rule.target_food_id,
             ):
                 continue
             modified = _apply_swap_rule(rows, idx, rule)
@@ -493,6 +495,8 @@ def _discovery_candidates(
                 ing['food_description'],
                 cand.food_description,
                 original_mass_g=ing['mass_g'],
+                original_food_id=ing.get('food_id'),
+                replacement_food_id=cand.food_id,
             ):
                 continue
             modified = _apply_swap_at(rows, idx, cand.food_id, cand.food_description)
@@ -544,6 +548,8 @@ def _discovery_candidates(
                     ing['food_description'],
                     wafct['food_description'],
                     original_mass_g=ing['mass_g'],
+                    original_food_id=ing.get('food_id'),
+                    replacement_food_id=fid,
                 ):
                     continue
                 modified = _apply_swap_at(rows, idx, fid, wafct['food_description'])

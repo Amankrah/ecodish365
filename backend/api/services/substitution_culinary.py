@@ -119,15 +119,102 @@ def _is_fresh_prep(description: str) -> bool:
     return bool(_FRESH_PREP.search(description or ''))
 
 
+# Strategy D — structured prep-state gate. Thermal classes for the raw↔cooked
+# block; preservation pairs that count as a hard cross.
+_RAW_THERMAL = frozenset({'raw'})
+_COOKED_THERMAL = frozenset({
+    'boiled', 'fried', 'baked', 'roasted', 'stewed', 'grilled',
+    'steamed', 'poached', 'scrambled', 'heated', 'cooked',
+    'braised', 'toasted', 'sauteed', 'microwaved', 'blanched',
+    'barbecued', 'stir_fried', 'broiled', 'reheated',
+})
+# Preservation pairs that are NOT 1:1 culinary substitutes at equal mass
+# (the existing dried↔fresh regex covers some of these; the structured
+# tag also catches cases where the regex misses, e.g. "Sweets, pie
+# fillings, canned apple").
+_PRESERVATION_HARD_CROSSES = frozenset({
+    ('fresh', 'canned'), ('canned', 'fresh'),
+    ('fresh', 'dried'), ('dried', 'fresh'),
+    ('fresh', 'dehydrated'), ('dehydrated', 'fresh'),
+    ('fresh', 'condensed'), ('condensed', 'fresh'),
+    ('fresh', 'fermented'), ('fermented', 'fresh'),
+})
+
+
+def _prep_state_swap_plausible(
+    original_food_id: Optional[int],
+    replacement_food_id: Optional[int],
+) -> bool:
+    """Structured prep-state gate (Strategy D).
+
+    Returns True (= "swap is allowed") when:
+      - either id is missing (caller has no FoodID context),
+      - either id is unlabeled (the tagger hasn't classified it — don't
+        block; let the existing regex gates decide),
+      - the structured tag shows no cross-axis conflict.
+
+    Returns False ONLY when both FoodIDs are labeled AND the tags show a
+    raw↔cooked or fresh↔(canned/dried/dehydrated/condensed/fermented) cross.
+    """
+    if original_food_id is None or replacement_food_id is None:
+        return True
+    # Lazy import — cnf_prep_state requires Django setup; guard against
+    # import-time crashes in lightweight contexts (e.g. unit tests that
+    # don't load Django).
+    try:
+        from api.services.cnf_prep_state import prep_state_of
+    except Exception:  # noqa: BLE001
+        return True
+
+    orig_tag = prep_state_of(int(original_food_id))
+    repl_tag = prep_state_of(int(replacement_food_id))
+    if orig_tag is None or repl_tag is None:
+        return True
+
+    # Thermal-axis cross: raw ↔ any cooked verb.
+    if (orig_tag.thermal_state in _RAW_THERMAL and repl_tag.thermal_state in _COOKED_THERMAL) \
+            or (orig_tag.thermal_state in _COOKED_THERMAL and repl_tag.thermal_state in _RAW_THERMAL):
+        return False
+
+    # Preservation-axis hard crosses.
+    if (orig_tag.preservation_state, repl_tag.preservation_state) in _PRESERVATION_HARD_CROSSES:
+        return False
+
+    return True
+
+
 def culinary_swap_plausible(
     original_description: str,
     replacement_description: str,
     *,
     original_mass_g: Optional[float] = None,
+    original_food_id: Optional[int] = None,
+    replacement_food_id: Optional[int] = None,
 ) -> bool:
-    """Return False when a swap is clearly not a realistic culinary substitute."""
+    """Return False when a swap is clearly not a realistic culinary substitute.
+
+    Strategy D (2026-05-30): when ``original_food_id`` and ``replacement_food_id``
+    are provided AND both have a structured prep-state tag from
+    ``api.services.cnf_prep_state``, additionally reject crosses on the
+    thermal and preservation axes that the existing regex-on-description
+    gate doesn't catch:
+      - raw thermal swapped against any cooked verb → BLOCKED (food safety:
+        the Phase 1 substitution probe surfaced fried-chicken → raw-chicken
+        as a real production behaviour).
+      - fresh ↔ canned/dried/dehydrated/condensed → BLOCKED (mass density
+        and Na/sugar profiles diverge; "lower_sodium" purpose for canned
+        carrot → raw celeriac is a real defect).
+      - fermented ↔ non-fermented → BLOCKED (yogurt ≠ unfermented milk).
+    Falls back to the existing regex behaviour when either id is missing or
+    unlabeled.
+    """
     orig = original_description or ''
     repl = replacement_description or ''
+
+    # Strategy D: structured prep-state gate (uses the tagger output when
+    # both foods have FoodIDs that the tagger has labeled).
+    if not _prep_state_swap_plausible(original_food_id, replacement_food_id):
+        return False
 
     # Dried ↔ fresh/boiled is almost never a 1:1 mass swap.
     orig_dried = _is_dried(orig)
