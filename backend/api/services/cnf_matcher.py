@@ -216,11 +216,23 @@ _NORMALISE_RE = re.compile(r'\s+')
 # ingredient as part of a dish ("carrots in chicken soup", "boiled egg on
 # salad", "fried plantain chips", "apple filling in apple pie"), the LLM
 # should prefer single-ingredient candidates over composite-dish rows.
+#
+# The "in <dish>" and "on <dish>" branches allow up to three modifier words
+# between the preposition and the dish noun (e.g. "in chicken soup", "in a
+# hearty beef stew", "on a sliced bagel sandwich") so queries that name the
+# dish with adjectives still trip the rule. Without this, "carrots in chicken
+# soup" would not match "in soup" and the dish-context advisory would never
+# fire for queries that include a dish modifier.
+_DISH_NOUN = (
+    r'(?:soup|stew|sauce|salad|pie|sandwich|porridge|chowder|casserole'
+    r'|stir[- ]?fry|wrap|burrito|taco|roll|cake|burger)'
+)
+_DISH_TOP_NOUN = r'(?:salad|sandwich|toast|bread|pizza|burger|cracker)'
 _DISH_CONTEXT_RE = re.compile(
     r'\b(?:'
-    r'in\s+(?:a\s+)?(?:soup|stew|sauce|salad|pie|sandwich|porridge|chowder|casserole|stir[- ]?fry|wrap|burrito|taco|roll|cake|burger)'
-    r'|on\s+(?:a\s+)?(?:salad|sandwich|toast|bread|pizza|burger|cracker)'
-    r'|(?:chips|sandwich|filling|topping)'
+    r'in\s+(?:[\w-]+\s+){0,3}' + _DISH_NOUN
+    + r'|on\s+(?:[\w-]+\s+){0,3}' + _DISH_TOP_NOUN
+    + r'|(?:chips|filling|topping)'
     r'|side\s+(?:of|dish)'
     r')\b',
     re.IGNORECASE,

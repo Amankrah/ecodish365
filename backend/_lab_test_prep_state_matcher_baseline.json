@@ -1194,18 +1194,18 @@
       "extracted_thermal_state": "boiled",
       "extractor_confidence": 1.0,
       "fallback_reason": null,
-      "food_id_correct": false,
+      "food_id_correct": true,
       "label": "carrots_in_chicken_soup",
-      "matched_confidence": 0.65,
-      "matched_food_description": "Carrot, boiled* (as part of a recipe)",
-      "matched_food_id": 700431,
+      "matched_confidence": 0.8,
+      "matched_food_description": "Carrot, boiled, drained, with salt",
+      "matched_food_id": 6396,
       "nutrient_delta": {
         "expected_food_id": 2381,
         "fibre_g": {
-          "delta_abs": 0.6999999999999997,
-          "delta_pct": 0.25925925925925913,
+          "delta_abs": 0.2999999999999998,
+          "delta_pct": 0.11111111111111104,
           "expected_per_100g": 2.7,
-          "returned_per_100g": 3.4
+          "returned_per_100g": 3.0
         },
         "kcal": {
           "delta_abs": 0.0,
@@ -1213,7 +1213,7 @@
           "expected_per_100g": 35.0,
           "returned_per_100g": 35.0
         },
-        "returned_food_id": 700431,
+        "returned_food_id": 6396,
         "sat_fat_g": {
           "delta_abs": 0.0,
           "delta_pct": 0.0,
@@ -1221,16 +1221,16 @@
           "returned_per_100g": 0.03
         },
         "sodium_mg": {
-          "delta_abs": -22.0,
-          "delta_pct": -0.3793103448275862,
+          "delta_abs": 244.0,
+          "delta_pct": 4.206896551724138,
           "expected_per_100g": 58.0,
-          "returned_per_100g": 36.0
+          "returned_per_100g": 302.0
         },
         "vitamin_c_mg": {
-          "delta_abs": 2.4,
-          "delta_pct": 0.6666666666666666,
+          "delta_abs": 0.0,
+          "delta_pct": 0.0,
           "expected_per_100g": 3.6,
-          "returned_per_100g": 6.0
+          "returned_per_100g": 3.6
         }
       },
       "prep_state_both_correct": true,
@@ -1481,8 +1481,8 @@
       "food_id_correct": true,
       "label": "chicken_in_chicken_stew",
       "matched_confidence": 0.8,
-      "matched_food_description": "Chicken, stewing, meat and skin, stewed",
-      "matched_food_id": 648,
+      "matched_food_description": "Chicken, stewing, meat, skin, giblets and neck, stewed",
+      "matched_food_id": 646,
       "nutrient_delta": {
         "expected_food_id": 559,
         "fibre_g": {
@@ -1492,29 +1492,29 @@
           "returned_per_100g": 0.0
         },
         "kcal": {
-          "delta_abs": 69.0,
-          "delta_pct": 0.3194444444444444,
+          "delta_abs": -2.0,
+          "delta_pct": -0.009259259259259259,
           "expected_per_100g": 216.0,
-          "returned_per_100g": 285.0
+          "returned_per_100g": 214.0
         },
-        "returned_food_id": 648,
+        "returned_food_id": 646,
         "sat_fat_g": {
-          "delta_abs": 1.6600000000000001,
-          "delta_pct": 0.4811594202898551,
+          "delta_abs": -0.12600000000000033,
+          "delta_pct": -0.036521739130434876,
           "expected_per_100g": 3.45,
-          "returned_per_100g": 5.11
+          "returned_per_100g": 3.324
         },
         "sodium_mg": {
-          "delta_abs": 7.0,
-          "delta_pct": 0.10606060606060606,
+          "delta_abs": 1.0,
+          "delta_pct": 0.015151515151515152,
           "expected_per_100g": 66.0,
-          "returned_per_100g": 73.0
+          "returned_per_100g": 67.0
         },
         "vitamin_c_mg": {
-          "delta_abs": -0.5,
-          "delta_pct": -1.0,
+          "delta_abs": 0.5,
+          "delta_pct": 1.0,
           "expected_per_100g": 0.5,
-          "returned_per_100g": 0.0
+          "returned_per_100g": 1.0
         }
       },
       "prep_state_both_correct": true,
@@ -1621,7 +1621,7 @@
       "fallback_reason": null,
       "food_id_correct": true,
       "label": "whole_milk_control",
-      "matched_confidence": 0.9,
+      "matched_confidence": 0.95,
       "matched_food_description": "Milk, fluid, whole, pasteurized, homogenized, 3.25% M.F.",
       "matched_food_id": 113,
       "nutrient_delta": null,
@@ -2076,7 +2076,7 @@
       },
       "dish_context": {
         "both_acc": 0.75,
-        "food_id_acc": 0.625,
+        "food_id_acc": 0.75,
         "n": 8,
         "preservation_acc": 1.0,
         "thermal_acc": 0.75
@@ -2120,40 +2120,40 @@
     "n": 60,
     "nutrient_distortion": {
       "fibre_g": {
-        "mean_abs_delta": 1.45,
-        "mean_abs_pct_delta": 41.7,
+        "mean_abs_delta": 1.43,
+        "mean_abs_pct_delta": 40.0,
         "n_abs": 17,
         "n_pct": 9
       },
       "kcal": {
-        "mean_abs_delta": 39.95,
-        "mean_abs_pct_delta": 31.7,
+        "mean_abs_delta": 36.01,
+        "mean_abs_pct_delta": 29.9,
         "n_abs": 17,
         "n_pct": 17
       },
       "n": 17,
       "sat_fat_g": {
-        "mean_abs_delta": 0.88,
-        "mean_abs_pct_delta": 745.2,
+        "mean_abs_delta": 0.78,
+        "mean_abs_pct_delta": 742.6,
         "n_abs": 17,
         "n_pct": 17
       },
       "sodium_mg": {
-        "mean_abs_delta": 35.97,
-        "mean_abs_pct_delta": 519.5,
+        "mean_abs_delta": 48.68,
+        "mean_abs_pct_delta": 541.5,
         "n_abs": 17,
         "n_pct": 17
       },
       "vitamin_c_mg": {
-        "mean_abs_delta": 1.72,
-        "mean_abs_pct_delta": 99.7,
+        "mean_abs_delta": 1.58,
+        "mean_abs_pct_delta": 94.6,
         "n_abs": 17,
         "n_pct": 13
       }
     },
     "overall": {
       "both_acc": 0.967,
-      "food_id_acc": 0.95,
+      "food_id_acc": 0.967,
       "preservation_acc": 1.0,
       "thermal_acc": 0.967
     },
