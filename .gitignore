@@ -69,8 +69,10 @@ backend/raw_nhanes/
 backend/api/data/nhanes_2017_day_pool.json
 backend/api/data/nhanes_2017_meal_pool.json
 backend/api/data/s4_panel_meals.json
-backend/_smoke_s4_panel_results.json
 results/S4/
+
+# Local smoke / ad-hoc validation scripts and artefacts (keep locally only)
+**/_smoke*
 
 # Ignore Django migration files in apps (keep package file)
 **/migrations/*
