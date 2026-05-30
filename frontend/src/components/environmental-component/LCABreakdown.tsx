@@ -22,12 +22,48 @@ import {
 } from 'lucide-react';
 import type {
   EnvironmentalImpactResult, LCAResults, LCABands, EndpointImpacts, EndpointBands,
+  EnvironmentalFactorConfidence, EnvironmentalDataQuality,
 } from '../../lib/api';
 import { UncertaintyBandBar } from './UncertaintyBandBar';
+import { LCADataQualityReport } from './LCADataQualityReport';
+import type { UserType } from '../shared/AudienceToggle';
 
 interface LCABreakdownProps {
   results: EnvironmentalImpactResult;
+  /** Audience-aware rendering. Defaults to 'individual' so existing call
+   *  sites that don't pass the prop keep their original (minimal) UI. */
+  userType?: UserType;
 }
+
+// CODE-5 confidence badge — small inline pill rendered beside the category
+// title. Visible in all audience modes; the `basis` text is shown on hover
+// only for researcher / policy.
+const CONFIDENCE_BADGE_CLASSES: Record<string, string> = {
+  high:   'bg-emerald-100 text-emerald-800 ring-1 ring-emerald-300',
+  medium: 'bg-amber-100   text-amber-800   ring-1 ring-amber-300',
+  low:    'bg-rose-100    text-rose-800    ring-1 ring-rose-300',
+};
+
+const ConfidenceBadge: React.FC<{
+  confidence?: EnvironmentalFactorConfidence;
+  userType: UserType;
+}> = ({ confidence, userType }) => {
+  if (!confidence?.level) return null;
+  const level = String(confidence.level).toLowerCase();
+  const cls = CONFIDENCE_BADGE_CLASSES[level] || 'bg-gray-100 text-gray-700 ring-1 ring-gray-300';
+  const showRationaleHover = userType !== 'individual' && confidence.rationale;
+  const titleAttr = showRationaleHover
+    ? `Confidence: ${level} — ${confidence.rationale}`
+    : `Confidence: ${level}`;
+  return (
+    <span
+      className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide ${cls}`}
+      title={titleAttr}
+    >
+      {level} conf.
+    </span>
+  );
+};
 
 // Literature anchors per category. Per-100-kcal would require knowing the
 // meal's kcal, so we anchor on the per-serving / per-kg published values
@@ -110,7 +146,10 @@ const ZoneBadge: React.FC<{ zone?: string }> = ({ zone }) => {
   );
 };
 
-export const LCABreakdown: React.FC<LCABreakdownProps> = ({ results }) => {
+export const LCABreakdown: React.FC<LCABreakdownProps> = ({
+  results,
+  userType = 'individual',
+}) => {
   const [showMethodology, setShowMethodology] = useState(false);
   const [showEndpoints, setShowEndpoints] = useState(false);
   const analysis = (results?.data?.meal_analysis || {}) as Partial<
@@ -125,6 +164,17 @@ export const LCABreakdown: React.FC<LCABreakdownProps> = ({ results }) => {
   const categoryZones: Record<string, string> = (
     analysis?.sustainability_score?.category_zones || {}
   ) as Record<string, string>;
+  // CODE-5: per-category confidence rating (additive). Backend emits this
+  // either at `meal_analysis.factor_confidence_by_category` (analyze path) or
+  // under a `lca_quality` sub-block (profile / batch paths) — accept both.
+  const factorConfidence: Record<string, EnvironmentalFactorConfidence> = (
+    analysis?.factor_confidence_by_category
+      || analysis?.lca_quality?.factor_confidence_by_category
+      || {}
+  ) as Record<string, EnvironmentalFactorConfidence>;
+  // CODE-5 data-quality report. Same shape choice as above.
+  const dataQuality: EnvironmentalDataQuality | undefined =
+    analysis?.data_quality || analysis?.lca_quality?.data_quality;
 
   // Methodology pack metadata exposed by the backend's data.metadata block.
   // Shows the active perspective / country / consumer-perspective so reviewers
@@ -261,9 +311,13 @@ export const LCABreakdown: React.FC<LCABreakdownProps> = ({ results }) => {
                 <Icon className={`h-5 w-5 ${palette.accent} mt-0.5`} />
                 <div className="flex-1">
                   <div className="flex items-baseline justify-between gap-2">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <h3 className={`font-semibold ${palette.text}`}>{cat.name}</h3>
                       <ZoneBadge zone={categoryZones[cat.key]} />
+                      <ConfidenceBadge
+                        confidence={factorConfidence[cat.key]}
+                        userType={userType}
+                      />
                     </div>
                     <span className="text-xs text-gray-500">per 100 kcal of meal</span>
                   </div>
@@ -369,6 +423,18 @@ export const LCABreakdown: React.FC<LCABreakdownProps> = ({ results }) => {
           </div>
         )}
       </div>
+
+      {/* CODE-5 data-quality report (additive). Researcher / policy mode
+          shows full known-issues + recommendations list expanded by default;
+          individual mode collapses by default and only surfaces the leading
+          caveat as a tooltip. Component handles the audience gating
+          internally. */}
+      {dataQuality && (
+        <LCADataQualityReport
+          dataQuality={dataQuality}
+          userType={userType}
+        />
+      )}
 
       {/* Methodology summary footer */}
       <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200">

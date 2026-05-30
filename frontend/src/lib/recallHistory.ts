@@ -516,6 +516,16 @@ export function recallDayToIngredientRows(
   }));
 }
 
+/** Minimal recall-export blob for POST /api/substitution/improve-plan/. */
+export function buildImprovePlanRecallExport(days: SavedRecallDay[]): RecallHistoryV1 {
+  return {
+    version: RECALL_HISTORY_SCHEMA_VERSION,
+    exported_from: 'ecodish365',
+    exported_at: new Date().toISOString(),
+    days,
+  };
+}
+
 // --- Browser download helper --------------------------------------------
 
 /** Trigger a download of `content` as `filename` with the given MIME type.

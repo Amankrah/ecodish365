@@ -71,9 +71,60 @@ These were explicitly logged as v1 simplifications during HENI-CODE-1 implementa
 
 ### Out-of-scope
 
-- **Frontend** UI rendering of the new additive API keys (`factor_confidence_by_category`, `value_sources`, `data_quality`, HENI `disease_breakdown.methodology`, per-field `metadata.units` dict, HEFI `c9_imputation_note`). Backend is complete; UI integration is a separate task.
+- *(empty — the prior "Frontend UI rendering of new additive API keys" item moved to Done on 2026-05-30; see PROVENANCE-UI-1.)*
 
 ## Done
+
+### 2026-05-30 — PROVENANCE-UI-1 SHIPPED (frontend integration of additive provenance / data-quality keys)
+
+**Why this matters.** Six additive provenance / data-quality keys had been shipped on the API surface across CODE-4 / CODE-5 / AUDIENCE-CODE-1 / HEFI-CODE-1C / HENI-CODE-1.x but **the UI never picked them up**. Policy mode promised "evidence-based assessments" but did not actually render the CE Delft / ECCC source attribution. Researcher mode displayed disease μDALYs but not the methodology paragraph that documents the equal-share-per-outcome attribution. HEFI whole-fruit / milk / plain-yogurt meals scored worse than intended (C9 over-counts free sugars via the SUGARS, TOTAL proxy) with **zero on-screen disclosure**. The UI was understating what the backend was already honest about.
+
+This shipment closes the gap end-to-end, including two latent defects discovered during live verification that had to be fixed for any user-facing output to appear at all.
+
+**Files modified (backend, defect fix):**
+- [`backend/api/views/hefi_views.py`](backend/api/views/hefi_views.py) — `_format_hefi_response` was discarding `result.c9_imputation_note` even though the algorithm set it. One-line addition (`'c9_imputation_note': getattr(result, 'c9_imputation_note', '') or ''`) into the response dict, after the deprecated `hefi_interpretation` block.
+
+**Files modified (frontend types / normaliser):**
+- [`frontend/src/lib/api.ts`](frontend/src/lib/api.ts)
+  - Added `c9_imputation_note?: string` to `HEFIResult.data`, `HEFIFoodProfile.data`, and `HEFIComparison.data.foods[]`.
+  - Added new interfaces: `EnvironmentalValueSource`, `EnvironmentalFactorConfidence` (`{level, rationale}` — matching the actual backend shape from `life_cycle_assessment.py:69` `LCA_FACTOR_CONFIDENCE`, NOT the documentation's `{confidence, basis}` guess), `EnvironmentalDataQuality`.
+  - Threaded these into `EnvironmentalMonetization.value_sources?` and `EnvironmentalImpactResult.data.meal_analysis.{factor_confidence_by_category?, data_quality?, lca_quality?}`.
+  - Updated `normalizeEnvironmentalImpactResponse` (which was dropping all three additive blocks on the way from `response.data.data.environmental_impacts` / `monetization.results` to the typed `meal_analysis` surface): now passes `factor_confidence_by_category`, `data_quality`, and `monetization.value_sources` through verbatim.
+
+**Files modified (frontend UI):**
+- [`frontend/src/app/hefi/calculate/page.tsx`](frontend/src/app/hefi/calculate/page.tsx) — amber "C9 (free sugars) methodology note" block inside `HEFIScoreDisplay`, after the Component Scores card. The component is already gated to `userType !== 'individual'`, so technical disclosure is only shown to researcher / policy.
+- [`frontend/src/app/hefi/food-profile/page.tsx`](frontend/src/app/hefi/food-profile/page.tsx) — same amber disclosure after Component Scores on the per-food profile.
+- [`frontend/src/app/hefi/compare/page.tsx`](frontend/src/app/hefi/compare/page.tsx) — single shared disclosure block at the bottom of the per-food card grid (all foods carry identical text; no point repeating per card).
+- [`frontend/src/components/heni-component/DiseaseImpactChart.tsx`](frontend/src/components/heni-component/DiseaseImpactChart.tsx) — `<Alert>` with `Info` icon + bold "Methodology:" label at the top of the chart; surfaces `disease_burden_analysis.methodology` verbatim. Visible to all audiences (single-sentence disclosure).
+- [`frontend/src/components/environmental-component/LCABreakdown.tsx`](frontend/src/components/environmental-component/LCABreakdown.tsx) — new `ConfidenceBadge` rendered inline beside `ZoneBadge` in each of the 3 consumed-category cards (Global warming / Land use / Water consumption). Compact pill in all modes; the `rationale` text shows in the hover-title only for researcher / policy. Also wires in the new `<LCADataQualityReport>` accordion before the methodology footer.
+- [`frontend/src/components/environmental-component/MonetizationBreakdown.tsx`](frontend/src/components/environmental-component/MonetizationBreakdown.tsx) — new `ValueSourceInfo` popover with an `Info` icon next to every impact-name row, in both the expanded-category and complete-breakdown views. All audiences see `source / currency_year / last_verified / status`. Researcher / policy additionally see `page_anchor / sensitivity_range_2026 / methodological_note`.
+- [`frontend/src/components/environmental-component/EnvironmentalCalculator.tsx`](frontend/src/components/environmental-component/EnvironmentalCalculator.tsx) — threads `userType` into the two display components above.
+
+**Files added (frontend):**
+- [`frontend/src/components/environmental-component/LCADataQualityReport.tsx`](frontend/src/components/environmental-component/LCADataQualityReport.tsx) — collapsible accordion at the bottom of `LCABreakdown`. Researcher / policy: open by default, full sources + known_issues + recommendations + raw `methodology_provenance` JSON dump. Individual: collapsed by default; only `known_issues[0]` surfaces inline as a single-line amber caveat strip so the headline limitation still shows when closed.
+
+**Schema mismatch discovered.** The original plan assumed `factor_confidence_by_category` rows shaped as `{confidence, basis}` (informed by code action item shorthand). The actual backend shape is `{level, rationale}` per [`backend/environmental_impact_model/src/life_cycle_assessment.py:69`](backend/environmental_impact_model/src/life_cycle_assessment.py#L69). Caught during live verification and corrected in both the `EnvironmentalFactorConfidence` interface and the `ConfidenceBadge` component. Net result: no false UI behaviour ever reached production.
+
+**Audience policy implemented.**
+- *Small visible signal for everyone* — confidence pill on each LCA category, monetary-source info icon, methodology disclosure Alert on the HENI disease chart.
+- *Expand-only detail for researcher / policy* — confidence rationale tooltip, page anchors, sensitivity ranges, methodological notes, raw provenance JSON dump.
+- *Individual mode*: collapsed data-quality accordion shows the leading `known_issues[0]` as a single-line tooltip so users still see the headline limitation without scrolling through pack metadata.
+
+**Out of scope of this PR.**
+- `metadata.units` — already rendered by [`frontend/src/components/shared/ExplanationsPanel.tsx:78-79`](frontend/src/components/shared/ExplanationsPanel.tsx#L78-L79); dropped from scope during recon.
+- Page-accurate monetary value updates — `value_sources` entries still pinned to either `status='verified'` or `status='pending_page_citation'`; this PR only DISPLAYS the existing pinned status. Updating the underlying values is the blocked `CODE-4 page-accurate` follow-up.
+
+**Verification (2026-05-30).**
+- `npx tsc --noEmit` — exit 0 (clean) twice: after the initial implementation and after the schema-shape correction.
+- Live probes via `manage.py runserver` + curl POST against each endpoint:
+  - `POST /api/hefi/calculate/` for `user_type ∈ {individual, researcher, policy}` → `data.c9_imputation_note` **PRESENT** in all three.
+  - `POST /api/heni/calculate/` with a 3-food meal (beef + butter + rice, researcher mode) → `disease_burden_analysis.methodology` **PRESENT**.
+  - `POST /api/environmental-impact/` researcher mode → `environmental_impacts.factor_confidence_by_category` **PRESENT** (with `{level, rationale}` shape), `environmental_impacts.data_quality` **PRESENT**, `monetization.results.value_sources` **PRESENT**.
+- All field reads on the UI side are optional-chained, so components gracefully render nothing when a future backend deploy omits one of these blocks (no React errors, no empty boxes). Backwards-compatible by construction.
+
+---
+
+
 
 ### 2026-05-26 — S4-lite 25-day cross-indicator panel (Scenario S4 fallback) SHIPPED
 

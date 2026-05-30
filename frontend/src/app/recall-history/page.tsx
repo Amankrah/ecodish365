@@ -26,7 +26,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   BookOpen, Download, Upload, Trash2, Sparkles, RefreshCw,
-  AlertTriangle, X, ChevronRight, Loader2,
+  AlertTriangle, X, ChevronRight, Loader2, Target,
 } from 'lucide-react';
 import {
   listSavedDays, deleteDay, clearAllHistory, combineDays,
@@ -37,6 +37,7 @@ import { CNFApiService } from '@/lib/api';
 import { RecallHistoryCard } from '@/components/shared/RecallHistoryCard';
 import { RecallDayEditModal } from '@/components/shared/RecallDayEditModal';
 import { FpedCohortPanel } from '@/components/shared/FpedCohortPanel';
+import { RecallImprovePlanPanel } from '@/components/shared/RecallImprovePlanPanel';
 
 // Number of pattern-classify requests we'll issue in parallel for the
 // per-day timeline refresh. Picked to stay well under the per-IP 50/hr rate
@@ -89,6 +90,7 @@ export default function RecallHistoryPage() {
   const [clearConfirm, setClearConfirm] = useState('');
   const [toast, setToast] = useState<string | null>(null);
   const [editDayId, setEditDayId] = useState<string | null>(null);
+  const [improvePlanOpen, setImprovePlanOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editingDay = editDayId ? days.find(d => d.id === editDayId) ?? null : null;
@@ -129,6 +131,8 @@ export default function RecallHistoryPage() {
     [cohortTargetDays],
   );
   const cohortUserType = cohortTargetDays[0]?.user_type ?? 'individual';
+
+  const improvePlanDays = selectedDays.length > 0 ? selectedDays : days;
 
   const totalKcal = useMemo(
     () => days.reduce((s, d) => s + d.estimated_daily_kcal, 0),
@@ -520,6 +524,21 @@ export default function RecallHistoryPage() {
                 </button>
                 <button
                   type="button"
+                  onClick={() => setImprovePlanOpen(v => !v)}
+                  className={`inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-md ${
+                    improvePlanOpen
+                      ? 'bg-violet-700 text-white'
+                      : 'bg-violet-600 hover:bg-violet-700 text-white'
+                  }`}
+                >
+                  <Target className="h-4 w-4" aria-hidden="true" />
+                  {improvePlanOpen ? 'Hide plan' : 'Improve eating plan'}
+                  {selectedDays.length > 0 && !improvePlanOpen && (
+                    <span className="text-violet-200 text-xs">({selectedDays.length} selected)</span>
+                  )}
+                </button>
+                <button
+                  type="button"
                   onClick={handleExportJSON}
                   className="inline-flex items-center gap-1 px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-800 text-sm font-medium border border-gray-300 rounded-md"
                 >
@@ -557,8 +576,17 @@ export default function RecallHistoryPage() {
                 Tip: select 2+ days then click <strong>Score N-day average</strong>{' '}
                 to see the combined pattern across those days, with a softened
                 multi-day caveat in place of the single-day disclaimer.
+                {' '}Use <strong>Improve eating plan</strong> for ranked swap suggestions
+                with full six-metric before/after deltas.
               </p>
             </section>
+
+            {improvePlanOpen && improvePlanDays.length > 0 && (
+              <RecallImprovePlanPanel
+                days={improvePlanDays}
+                onClose={() => setImprovePlanOpen(false)}
+              />
+            )}
 
             {/* Food-group exposure across days (FPED cohort) */}
             <FpedCohortPanel recalls={cohortRecalls} userType={cohortUserType} />

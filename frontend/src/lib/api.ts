@@ -1167,6 +1167,90 @@ export class SubstitutionApiService {
   }
 }
 
+/** Improve-plan orchestration — recall → baseline scorecard → ranked swaps. */
+export interface ImprovePlanPriorityTarget {
+  ingredient_index: number;
+  food_id: number;
+  food_description: string;
+  food_group: string;
+  mass_g: number;
+  mass_pct: number;
+  swap_rule_id: string | null;
+  flags: string[];
+  priority_score: number;
+}
+
+export interface ImprovePlanPopulationContext {
+  hefi?: {
+    value: number;
+    max: number;
+    band: string;
+    band_phrase: string;
+    canadian_population: Record<string, number>;
+    caveat: string;
+  };
+}
+
+export interface ImprovePlanSuggestion extends SubstitutionSuggestion {
+  scorecard_full?: SubstitutionScorecard;
+}
+
+export interface ImprovePlanResponse {
+  success: boolean;
+  purpose: SubstitutionPurpose;
+  input: {
+    source: string;
+    days_used: string[];
+    day_count?: number;
+    export_version?: number;
+  };
+  baseline: {
+    composition: SubstitutionCompositionItem[];
+    total_mass_g: number;
+    ingredient_count: number;
+    scorecard: Record<string, SubstitutionScorecardMetric>;
+    population_context: ImprovePlanPopulationContext | null;
+  };
+  priority_targets: ImprovePlanPriorityTarget[];
+  suggestions: ImprovePlanSuggestion[];
+  pareto_frontier?: ImprovePlanSuggestion[];
+  summary: string;
+  metadata: {
+    endpoint: string;
+    scorecard_metrics: string[];
+    pareto_axes: string[];
+    reformulation_mode: string;
+    constraints: { max_swaps: number };
+    substitution_metadata?: SubstitutionAnalyzeResponse['metadata'];
+    elapsed_ms: number;
+  };
+}
+
+export class ImprovePlanApiService {
+  static async improvePlan(request: {
+    composition?: SubstitutionCompositionItem[];
+    recall_export?: {
+      version: number;
+      exported_from?: string;
+      exported_at?: string;
+      days: Array<{
+        id: string;
+        aggregated_daily_ingredients: SubstitutionCompositionItem[];
+      }>;
+    };
+    day_ids?: string[];
+    purpose?: SubstitutionPurpose;
+    max_suggestions?: number;
+    max_swaps?: number;
+    reformulation_mode?: SubstitutionReformulationMode;
+    include_population_benchmark?: boolean;
+    dish_name?: string;
+  }): Promise<ImprovePlanResponse> {
+    const response = await api.post('/substitution/improve-plan/', request);
+    return response.data as ImprovePlanResponse;
+  }
+}
+
 // --- PKG-IMG-1 Phase 1 types (mirror backend Pydantic schema) ----------
 
 export type HSRCategoryCode = '1' | '1D' | '2' | '2D' | '3' | '3D';
@@ -2170,6 +2254,10 @@ export interface HEFIResult {
     };
     inputs: HEFIInputs;
     hefi_interpretation?: HEFIInterpretation;
+    /** HEFI-CODE-1C disclosure (additive): C9 free sugars currently use CNF
+     *  SUGARS, TOTAL as a proxy until the Rana et al. 2021 free-sugars
+     *  supplement is integrated. Present whenever the backend returns it. */
+    c9_imputation_note?: string;
   };
 }
 
@@ -2196,6 +2284,8 @@ export interface HEFIFoodProfile {
       measure_id?: number;
     };
     hefi_interpretation: HEFIInterpretation;
+    /** HEFI-CODE-1C disclosure (additive); see HEFIResult.data. */
+    c9_imputation_note?: string;
   };
 }
 
@@ -2218,6 +2308,8 @@ export interface HEFIComparison {
       };
       inputs?: HEFIInputs;
       hefi_interpretation?: HEFIInterpretation;
+      /** HEFI-CODE-1C disclosure (additive); see HEFIResult.data. */
+      c9_imputation_note?: string;
       error?: string;
     }>;
     comparison_insights: {
@@ -2695,6 +2787,22 @@ export interface EndpointBands {
   // Resources intentionally omitted in v1 (None at the scalar level).
 }
 
+/** CODE-4 per-category source attribution. Pinned at
+ *  `backend/environmental_impact_model/src/monetization.py:159-211`.
+ *  Status `'verified'` means the value was reconciled against the cited
+ *  page; `'pending_page_citation'` means the source family is known
+ *  (CE Delft, True Price) but the exact figure has not yet been pinned. */
+export interface EnvironmentalValueSource {
+  source: string;
+  currency_year: string;
+  status: 'verified' | 'pending_page_citation' | string;
+  last_verified: string;
+  page_anchor?: string;
+  sensitivity_range_2026?: string;
+  methodological_note?: string;
+  override_env?: string;
+}
+
 export interface EnvironmentalMonetization {
   monetized_impacts: Record<string, number>;
   total_cost: number;
@@ -2711,6 +2819,39 @@ export interface EnvironmentalMonetization {
     cost: number;
     percentage_of_total: number;
   }>;
+  /** CODE-4 per-category source attribution (additive). Visible whenever
+   *  the backend includes it (every analyze + batch + profile path does). */
+  value_sources?: Record<string, EnvironmentalValueSource>;
+}
+
+/** CODE-5 per-category factor confidence. Keys mirror the consumed
+ *  midpoint categories (Global warming / Land use / Water consumption).
+ *  Backend shape: `{level, rationale}` (see
+ *  `backend/environmental_impact_model/src/life_cycle_assessment.py:69` —
+ *  `LCA_FACTOR_CONFIDENCE`). */
+export interface EnvironmentalFactorConfidence {
+  level: 'high' | 'medium' | 'low' | string;
+  rationale: string;
+}
+
+/** CODE-5 data-quality report. Emitted at
+ *  `backend/environmental_impact_model/src/life_cycle_assessment.py:767-799`. */
+export interface EnvironmentalDataQuality {
+  methodology_version: string;
+  perspective?: string;
+  country?: string | null;
+  consumer_perspective?: string;
+  methodology_provenance?: Record<string, unknown>;
+  sources: string[];
+  confidence_summary?: {
+    high_confidence: number;
+    medium_confidence: number;
+    low_confidence: number;
+  };
+  confidence_by_category?: Record<string, EnvironmentalFactorConfidence>;
+  endpoint_factor_sources?: Record<string, string>;
+  known_issues: string[];
+  recommendations: string[];
 }
 
 export interface SustainabilityScore {
@@ -2862,6 +3003,17 @@ export interface EnvironmentalImpactResult {
       /** PLANETARY-1: audience-aware explanation pack for the planetary
        *  overlay (Individual / Researcher / Policy). */
       planetary_explanations?: PlanetaryBoundaryExplanations;
+      /** CODE-5 per-category confidence rating (additive). */
+      factor_confidence_by_category?: Record<string, EnvironmentalFactorConfidence>;
+      /** CODE-5 data-quality report (additive). May appear here or under
+       *  `lca_quality` depending on endpoint; both shapes share the same
+       *  inner type. */
+      data_quality?: EnvironmentalDataQuality;
+      /** CODE-5 sibling slot used by the env profile / batch paths. */
+      lca_quality?: {
+        factor_confidence_by_category?: Record<string, EnvironmentalFactorConfidence>;
+        data_quality?: EnvironmentalDataQuality;
+      };
     };
     user_explanation: UserExplanation;
     comparison_to_references: {
@@ -3020,7 +3172,12 @@ export class EnvironmentalImpactApiService {
             cost_per_calorie: monetData.results?.cost_per_calorie?.value || 0,
             cost_per_protein: monetData.results?.cost_per_protein?.value || 0,
             cost_breakdown_by_category: monetData.results?.cost_breakdown || {},
-            top_cost_drivers: monetData.results?.top_cost_drivers || []
+            top_cost_drivers: monetData.results?.top_cost_drivers || [],
+            // CODE-4 per-category source attribution (additive). Backend
+            // emits at `monetization.results.value_sources` — pass through
+            // verbatim; `undefined` when the backend doesn't ship it.
+            value_sources: (monetData.results?.value_sources as
+              EnvironmentalImpactResult['data']['meal_analysis']['monetization']['value_sources']) || undefined,
           },
           sustainability_score: {
             // Prefer backend-provided sustainability block; fall back conservatively if missing
@@ -3066,6 +3223,13 @@ export class EnvironmentalImpactApiService {
             typeof envImpacts.reporting_basis === 'string'
               ? envImpacts.reporting_basis
               : 'per_100_kcal',
+          // CODE-5 per-category factor confidence + data-quality report
+          // (additive). Backend emits both inside `environmental_impacts`;
+          // pass through verbatim. `undefined` when backend doesn't ship them.
+          factor_confidence_by_category: (envImpacts.factor_confidence_by_category as
+            EnvironmentalImpactResult['data']['meal_analysis']['factor_confidence_by_category']) || undefined,
+          data_quality: (envImpacts.data_quality as
+            EnvironmentalImpactResult['data']['meal_analysis']['data_quality']) || undefined,
           // PLANETARY-1: pass through E28 Table 2 boundary shares + audience-
           // aware explanations. Backward-compatible: undefined when an older
           // backend deploy doesn't emit them, in which case the UI hides the card.

@@ -220,6 +220,9 @@ urlpatterns = [
     path('substitution/batch/',
          substitution_views.substitution_batch,
          name='substitution_batch'),
+    path('substitution/improve-plan/',
+         substitution_views.substitution_improve_plan,
+         name='substitution_improve_plan'),
 
     # =============================================================================
     # User Management & Social Features

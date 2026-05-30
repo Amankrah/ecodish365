@@ -121,7 +121,7 @@ const HEFIProfileDisplay = ({ profile }: { profile: HEFIFoodProfile }) => {
                   </div>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div 
+                  <div
                     className={`h-3 rounded-full transition-all duration-300 ${getComponentColor(percentage)}`}
                     style={{ width: `${Math.min(percentage, 100)}%` }}
                   />
@@ -133,6 +133,12 @@ const HEFIProfileDisplay = ({ profile }: { profile: HEFIFoodProfile }) => {
             );
           })}
         </div>
+        {data.c9_imputation_note && (
+          <div className="mt-6 text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-md p-3">
+            <div className="font-semibold mb-1">C9 (free sugars) methodology note</div>
+            <p className="italic">{data.c9_imputation_note}</p>
+          </div>
+        )}
       </div>
 
       {/* Ratios */}

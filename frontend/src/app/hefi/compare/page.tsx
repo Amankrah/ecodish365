@@ -150,6 +150,17 @@ const HEFIComparisonDisplay = ({ result }: { result: HEFIComparison }) => {
             );
           })}
         </div>
+        {/* HEFI-CODE-1C disclosure (additive). All foods share the same C9
+            note text; surface it once below the per-food cards rather than
+            repeating it on every card. */}
+        {foods.some(f => f.c9_imputation_note) && (
+          <div className="mt-6 text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-md p-3">
+            <div className="font-semibold mb-1">C9 (free sugars) methodology note</div>
+            <p className="italic">
+              {foods.find(f => f.c9_imputation_note)?.c9_imputation_note}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Component Analysis */}

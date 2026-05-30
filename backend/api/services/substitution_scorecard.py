@@ -141,17 +141,33 @@ _SCORERS_FULL = {
 # Active scorers for substitution. Must match SCORECARD_METRICS.
 _SCORERS = {'fcs': _score_fcs}
 
+SCORECARD_METRICS_FULL = tuple(_SCORERS_FULL.keys())
 
-def score_composition(composition: List[Dict[str, Any]]) -> Dict[str, Any]:
-    """Score all six metrics for a composition. Partial failures are captured per metric."""
+
+def score_composition(
+    composition: List[Dict[str, Any]],
+    *,
+    full: bool = False,
+) -> Dict[str, Any]:
+    """Score metrics for a composition. Partial failures are captured per metric.
+
+    ``full=True`` runs all six scorers (for improve-plan orchestration).
+    Default uses the FCS-only fast path for substitution ranking.
+    """
+    scorers = _SCORERS_FULL if full else _SCORERS
     out: Dict[str, Any] = {}
-    for key, fn in _SCORERS.items():
+    for key, fn in scorers.items():
         try:
             out[key] = fn(composition)
         except Exception as exc:  # noqa: BLE001
             logger.warning('Scorecard metric %s failed: %s', key, exc)
             out[key] = {'value': None, 'error': str(exc)}
     return out
+
+
+def _score_composition_legacy(composition: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Backward-compatible alias — FCS-only."""
+    return score_composition(composition, full=False)
 
 
 def _metric_delta(before: Dict[str, Any], after: Dict[str, Any]) -> Dict[str, Any]:
@@ -170,9 +186,12 @@ def _metric_delta(before: Dict[str, Any], after: Dict[str, Any]) -> Dict[str, An
 def scorecard_deltas(
     baseline: Dict[str, Any],
     modified: Dict[str, Any],
+    *,
+    metrics: Optional[tuple] = None,
 ) -> Dict[str, Dict[str, Any]]:
+    keys = metrics or SCORECARD_METRICS
     deltas = {}
-    for key in SCORECARD_METRICS:
+    for key in keys:
         deltas[key] = _metric_delta(baseline.get(key, {}), modified.get(key, {}))
     return deltas
 
@@ -181,18 +200,23 @@ def enrich_scorecard_deltas(
     baseline_composition: List[Dict[str, Any]],
     modified_composition: List[Dict[str, Any]],
     baseline_sc: Optional[Dict[str, Any]] = None,
+    *,
+    full: bool = False,
 ) -> Dict[str, Any]:
     """Score the modified composition and diff it against the baseline.
 
     `baseline_sc` lets callers pass a baseline scorecard computed once and reused
     across many suggestions, instead of re-scoring the (unchanged) baseline on every
     call. The result is identical either way.
+
+    ``full=True`` scores all six metrics (improve-plan orchestration).
     """
     if baseline_sc is None:
-        baseline_sc = score_composition(baseline_composition)
-    modified_sc = score_composition(modified_composition)
+        baseline_sc = score_composition(baseline_composition, full=full)
+    modified_sc = score_composition(modified_composition, full=full)
+    metrics = SCORECARD_METRICS_FULL if full else SCORECARD_METRICS
     return {
         'baseline': baseline_sc,
         'modified': modified_sc,
-        'deltas': scorecard_deltas(baseline_sc, modified_sc),
+        'deltas': scorecard_deltas(baseline_sc, modified_sc, metrics=metrics),
     }

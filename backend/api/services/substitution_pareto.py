@@ -33,15 +33,20 @@ def _dominates(a: Dict[str, float], b: Dict[str, float]) -> bool:
     return ge_all and gt_one
 
 
-def compute_pareto_frontier(suggestions: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def compute_pareto_frontier(
+    suggestions: List[Dict[str, Any]],
+    *,
+    axes: Optional[tuple] = None,
+) -> List[Dict[str, Any]]:
     """Return non-dominated suggestions with trade-off tags."""
+    pareto_axes = axes or PARETO_AXES
     if not suggestions:
         return []
 
     vectors: List[Tuple[int, Dict[str, float]]] = []
     for i, s in enumerate(suggestions):
         vec = {}
-        for m in PARETO_AXES:
+        for m in pareto_axes:
             v = _axis_value(s, m)
             if v is not None:
                 vec[m] = v
@@ -62,7 +67,7 @@ def compute_pareto_frontier(suggestions: List[Dict[str, Any]]) -> List[Dict[str,
     for idx in frontier_indices:
         s = suggestions[idx]
         wins = []
-        for m in PARETO_AXES:
+        for m in pareto_axes:
             v = _axis_value(s, m)
             if v is not None and v > 0.01:
                 wins.append(m)

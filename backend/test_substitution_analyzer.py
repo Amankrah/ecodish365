@@ -435,5 +435,32 @@ class TestSubstitutionAnalyzer(unittest.TestCase):
                     self.assertNotIn('meat and skin', repl_desc)
 
 
+class TestImprovePlanOrchestration(unittest.TestCase):
+    def test_combine_recall_days_sums_mass(self):
+        days = [
+            {
+                'id': 'a',
+                'aggregated_daily_ingredients': [
+                    {'food_id': 133, 'mass_g': 200, 'food_description': 'Egg'},
+                    {'food_id': 61, 'mass_g': 100, 'food_description': 'Milk'},
+                ],
+            },
+            {
+                'id': 'b',
+                'aggregated_daily_ingredients': [
+                    {'food_id': 133, 'mass_g': 150, 'food_description': 'Egg'},
+                    {'food_id': 6205, 'mass_g': 240, 'food_description': 'Mango nectar'},
+                ],
+            },
+        ]
+        from api.services.substitution_improve_plan import combine_recall_days
+
+        combined = combine_recall_days(days)
+        by_id = {r['food_id']: r['mass_g'] for r in combined}
+        self.assertEqual(by_id[133], 350)
+        self.assertEqual(by_id[61], 100)
+        self.assertEqual(by_id[6205], 240)
+
+
 if __name__ == '__main__':
     unittest.main()

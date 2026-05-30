@@ -22,20 +22,100 @@ import {
   Factory,
   Wind,
 } from 'lucide-react';
-import type { EnvironmentalImpactResult, EnvironmentalMonetization, MealComposition as EMealComposition } from '../../lib/api';
+import type {
+  EnvironmentalImpactResult, EnvironmentalMonetization,
+  EnvironmentalValueSource, MealComposition as EMealComposition,
+} from '../../lib/api';
+import type { UserType } from '../shared/AudienceToggle';
 
 interface MonetizationBreakdownProps {
   results: EnvironmentalImpactResult;
+  /** Audience-aware rendering. Defaults to 'individual'. */
+  userType?: UserType;
 }
 
-export const MonetizationBreakdown: React.FC<MonetizationBreakdownProps> = ({ results }) => {
+// CODE-4 source attribution popover. Icon-only trigger; on click reveals the
+// page-anchored source citation. Researcher / policy also see the page anchor
+// + sensitivity range + methodological note + last-verified date.
+const ValueSourceInfo: React.FC<{
+  source?: EnvironmentalValueSource;
+  userType: UserType;
+}> = ({ source, userType }) => {
+  const [open, setOpen] = useState<boolean>(false);
+  if (!source) return null;
+  return (
+    <span className="relative inline-flex items-center">
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        className="ml-1 inline-flex items-center text-gray-400 hover:text-indigo-600 focus:outline-none"
+        aria-label="Show monetary value source"
+        title={source.source}
+      >
+        <Info className="h-3.5 w-3.5" />
+      </button>
+      {open && (
+        <div
+          className="absolute right-0 top-5 z-20 w-72 p-3 bg-white border border-gray-200 rounded-md shadow-lg text-[11px] text-gray-700 space-y-1"
+          role="dialog"
+        >
+          <div className="font-semibold text-gray-900 text-xs">Source</div>
+          <p>{source.source}</p>
+          <div className="flex flex-wrap gap-2 text-[10px] text-gray-500">
+            {source.currency_year && <span>currency: {source.currency_year}</span>}
+            {source.last_verified && <span>last verified: {source.last_verified}</span>}
+            {source.status === 'pending_page_citation' && (
+              <Badge variant="outline" className="text-[10px]">pending page citation</Badge>
+            )}
+          </div>
+          {userType !== 'individual' && (
+            <>
+              {source.page_anchor && (
+                <div className="text-[10px] text-gray-600">
+                  <span className="font-semibold">Anchor: </span>{source.page_anchor}
+                </div>
+              )}
+              {source.sensitivity_range_2026 && (
+                <div className="text-[10px] text-gray-600">
+                  <span className="font-semibold">Sensitivity: </span>{source.sensitivity_range_2026}
+                </div>
+              )}
+              {source.methodological_note && (
+                <p className="text-[10px] italic text-gray-600 pt-1 border-t border-gray-100">
+                  {source.methodological_note}
+                </p>
+              )}
+            </>
+          )}
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="text-[10px] text-indigo-600 hover:text-indigo-800 underline pt-1"
+          >
+            Close
+          </button>
+        </div>
+      )}
+    </span>
+  );
+};
+
+export const MonetizationBreakdown: React.FC<MonetizationBreakdownProps> = ({
+  results,
+  userType = 'individual',
+}) => {
   const [viewMode, setViewMode] = useState<'category' | 'individual'>('category');
   const [expandedCategory, setExpandedCategory] = useState<string | null>('Climate & Energy');
-  
+
   type MealAnalysis = Required<EnvironmentalImpactResult>['data']['meal_analysis'];
   const analysis = (results?.data?.meal_analysis || {}) as Partial<MealAnalysis>;
   const monetization = (analysis?.monetization || {}) as Partial<EnvironmentalMonetization>;
   const composition = (analysis?.meal_composition || {}) as Partial<EMealComposition>;
+  // CODE-4: per-category source attribution. Maps a midpoint category name
+  // to its monetary value source dict.
+  const valueSources: Record<string, EnvironmentalValueSource> = (
+    monetization.value_sources || {}
+  ) as Record<string, EnvironmentalValueSource>;
 
   // UI config for categories
   type CategoryColor = 'red' | 'orange' | 'green' | 'blue';
@@ -202,7 +282,13 @@ export const MonetizationBreakdown: React.FC<MonetizationBreakdownProps> = ({ re
                     {Object.entries(categoryInfo.individual_impacts || {}).map(([impactName, cost]) => (
                       <div key={impactName} className="bg-white p-3 rounded-lg border border-gray-100">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium text-gray-900">{impactName}</span>
+                          <span className="font-medium text-gray-900 flex items-center">
+                            {impactName}
+                            <ValueSourceInfo
+                              source={valueSources[impactName]}
+                              userType={userType}
+                            />
+                          </span>
                           <span className="font-bold text-gray-900">
                             {formatCurrency((cost as number) || 0)}
                           </span>
@@ -309,8 +395,12 @@ export const MonetizationBreakdown: React.FC<MonetizationBreakdownProps> = ({ re
             return (
               <div key={impact} className="bg-white p-3 rounded-lg border border-gray-200">
                 <div className="flex justify-between items-start mb-1">
-                  <span className="text-gray-700 text-xs font-medium leading-tight">
-                    {impact}
+                  <span className="text-gray-700 text-xs font-medium leading-tight flex items-start">
+                    <span>{impact}</span>
+                    <ValueSourceInfo
+                      source={valueSources[impact]}
+                      userType={userType}
+                    />
                   </span>
                   <span className="text-gray-900 font-bold text-xs">
                     {formatCurrency(costValue)}

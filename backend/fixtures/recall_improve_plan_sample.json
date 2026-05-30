@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "exported_from": "ecodish365",
+  "exported_at": "2026-05-29T20:56:37.060Z",
+  "days": [
+    {
+      "id": "72abc95d-26e1-4dc1-80db-b698f688bd10",
+      "saved_at": "2026-05-28T20:43:32.199Z",
+      "date": "2026-05-28",
+      "label": "day 1",
+      "user_type": "individual",
+      "aggregated_daily_ingredients": [
+        {"food_id": 4473, "food_description": "Grains, rice, white, long-grain, parboiled, cooked", "food_group": "Cereals, Grains and Pasta", "mass_g": 320},
+        {"food_id": 1620, "food_description": "Orange juice, chilled, includes from concentrate", "food_group": "Fruits and fruit juices", "mass_g": 273},
+        {"food_id": 1465, "food_description": "Cereal, hot, oats (oatmeal), large flakes, prepared, Quaker", "food_group": "Breakfast cereals", "mass_g": 250},
+        {"food_id": 133, "food_description": "Egg, chicken, whole, cooked, scrambled or omelet", "food_group": "Dairy and Egg Products", "mass_g": 200},
+        {"food_id": 851, "food_description": "Chicken, broiler, thigh, meat and skin, roasted", "food_group": "Poultry Products", "mass_g": 200},
+        {"food_id": 61, "food_description": "Milk, fluid, partly skimmed, 2% M.F.", "food_group": "Dairy and Egg Products", "mass_g": 145},
+        {"food_id": 1704, "food_description": "Banana, raw", "food_group": "Fruits and fruit juices", "mass_g": 65},
+        {"food_id": 6971, "food_description": "Yogourt (yogurt), Balkan style, 4-6% M.F., plain", "food_group": "Dairy and Egg Products", "mass_g": 50},
+        {"food_id": 5960, "food_description": "Onion, yellow, sauteed", "food_group": "Vegetables and Vegetable Products", "mass_g": 50},
+        {"food_id": 7829, "food_description": "Butter, Clarified butter (ghee)", "food_group": "Dairy and Egg Products", "mass_g": 30},
+        {"food_id": 2460, "food_description": "Tomato, red, ripe, raw, year round average", "food_group": "Vegetables and Vegetable Products", "mass_g": 25},
+        {"food_id": 118, "food_description": "Butter, regular", "food_group": "Dairy and Egg Products", "mass_g": 8},
+        {"food_id": 2394, "food_description": "Garlic, raw", "food_group": "Vegetables and Vegetable Products", "mass_g": 8},
+        {"food_id": 2091, "food_description": "Ginger root, raw", "food_group": "Vegetables and Vegetable Products", "mass_g": 7}
+      ]
+    },
+    {
+      "id": "bbdc31b7-1707-4850-a0e8-f031a5424584",
+      "saved_at": "2026-05-29T19:02:17.269Z",
+      "date": "2026-05-29",
+      "label": "day2",
+      "user_type": "individual",
+      "aggregated_daily_ingredients": [
+        {"food_id": 6205, "food_description": "Mango, nectar, canned", "food_group": "Fruits and fruit juices", "mass_g": 240},
+        {"food_id": 700194, "food_description": "Cassava, tuber, white flesh, boiled* (without salt), drained", "food_group": "WAFCT — Starchy roots, tubers and their products", "mass_g": 200},
+        {"food_id": 2933, "food_description": "Water, municipal", "food_group": "Beverages", "mass_g": 160},
+        {"food_id": 133, "food_description": "Egg, chicken, whole, cooked, scrambled or omelet", "food_group": "Dairy and Egg Products", "mass_g": 150},
+        {"food_id": 648, "food_description": "Chicken, stewing, meat and skin, stewed", "food_group": "Poultry Products", "mass_g": 120},
+        {"food_id": 1662, "food_description": "Plantain, yellow cooked", "food_group": "Fruits and fruit juices", "mass_g": 100},
+        {"food_id": 3399, "food_description": "Peanut butter, smooth type, fat, sugar and salt added", "food_group": "Legumes and Legume Products", "mass_g": 70},
+        {"food_id": 2460, "food_description": "Tomato, red, ripe, raw, year round average", "food_group": "Vegetables and Vegetable Products", "mass_g": 50},
+        {"food_id": 2401, "food_description": "Onion, raw", "food_group": "Vegetables and Vegetable Products", "mass_g": 30},
+        {"food_id": 423, "food_description": "Vegetable oil, palm", "food_group": "Fats and Oils", "mass_g": 15},
+        {"food_id": 118, "food_description": "Butter, regular", "food_group": "Dairy and Egg Products", "mass_g": 8}
+      ]
+    }
+  ]
+}

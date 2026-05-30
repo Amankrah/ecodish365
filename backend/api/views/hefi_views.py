@@ -152,6 +152,11 @@ def _format_hefi_response(result, food_ids=None, food_name=None, integrator=None
             'sodium_mg': result.inputs.sodium_mg,
         },
         'hefi_interpretation': _interpret_hefi(result.total_score),  # DEPRECATED — kept for backward-compat
+        # HEFI-CODE-1C disclosure: forward the algorithm's C9 free-sugars
+        # imputation note to the API surface. Empty string when no
+        # disclosure applies; consumers should treat empty/missing as
+        # "no disclosure to surface".
+        'c9_imputation_note': getattr(result, 'c9_imputation_note', '') or '',
         'explanations': {
             **get_hefi_explanations(
                 total_score=float(result.total_score), user_type=user_type,

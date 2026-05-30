@@ -234,8 +234,24 @@ export const DiseaseImpactChart: React.FC<DiseaseImpactChartProps> = ({ results 
     return { level: 'Poor', color: 'red', icon: AlertTriangle };
   };
 
+  const methodologyNote =
+    analysis.disease_burden_analysis?.methodology;
+
   return (
     <div className="space-y-6">
+      {/* HENI-CODE-1.x disclosure (additive). Backend emits a paragraph
+          explaining the equal-share-per-outcome disease attribution; surface
+          it here so users understand how the per-disease μDALY breakdown
+          below is apportioned. */}
+      {methodologyNote && (
+        <Alert>
+          <Info className="h-4 w-4" />
+          <AlertDescription className="text-xs text-gray-700">
+            <span className="font-semibold mr-1">Methodology:</span>
+            {methodologyNote}
+          </AlertDescription>
+        </Alert>
+      )}
       {/* Chart Type Toggle */}
       <div className="flex gap-2 mb-4">
         <Button

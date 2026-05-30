@@ -185,6 +185,12 @@ interface SearchResult {
             );
           })}
         </div>
+        {data.c9_imputation_note && (
+          <div className="mt-6 text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-md p-3">
+            <div className="font-semibold mb-1">C9 (free sugars) methodology note</div>
+            <p className="italic">{data.c9_imputation_note}</p>
+          </div>
+        )}
       </div>
 
       {/* Ratios — labels from RATIO_LABELS map (fix #2) */}
