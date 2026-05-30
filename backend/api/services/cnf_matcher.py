@@ -611,7 +611,35 @@ class CNFMatcher:
         query: str,
         candidates: List['tuple[int, float]'],
     ) -> Dict[str, Any]:
-        """Build prompt + call ChatJSONClient + return parsed dict."""
+        """Build prompt + call ChatJSONClient + return parsed dict.
+
+        Strategy A (2026-05-30) — when the query carries a regex-extractable
+        preparation state ("boiled egg on salad", "fried plantain chips"), we
+        pass it to the LLM as an extra weighting signal. The hint is advisory
+        rather than a hard filter, so a strongly semantically matched candidate
+        with a different prep state can still win. The lab simulator showed
+        this lifts joint prep-state accuracy by 5 pp and fixes the dish-context
+        failures (boiled-egg-on-salad, roasted-chicken-in-sandwich).
+        """
+        # Strategy A — extract a preparation-state hint from the query and
+        # attach it to the prompt when at least one axis is specific. Lazy
+        # import keeps this module decoupled from the prep-state extractor
+        # under static analysis.
+        prep_hint_line = ''
+        try:
+            from api.services.prep_state_extract import extract_prep_state
+            q_ps = extract_prep_state(query)
+            if q_ps.thermal_state != 'unknown' or q_ps.preservation_state != 'unknown':
+                prep_hint_line = (
+                    f'Preparation hint extracted from the query: '
+                    f'thermal={q_ps.thermal_state}, preservation={q_ps.preservation_state}. '
+                    f'Weight this alongside semantic similarity — when two candidates '
+                    f'are close on the description, prefer the one whose CNF '
+                    f'description matches this preparation state.'
+                )
+        except Exception:  # noqa: BLE001
+            pass
+
         lines = [f'User query: {query}', '']
         lines.append('Candidates (ranked by embedding similarity):')
         for idx, sim in candidates:
@@ -622,6 +650,9 @@ class CNFMatcher:
                 f'  food_id={food_id}: {desc} [group: {group}] (sim={sim:.3f})'
             )
         lines.append('')
+        if prep_hint_line:
+            lines.append(prep_hint_line)
+            lines.append('')
         lines.append(
             'Respond with JSON: {"food_id": <one of the above integer FoodIDs exactly>, '
             '"confidence": <float 0-1>, "justification": "<≤40 words>"}'

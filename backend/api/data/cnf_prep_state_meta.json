@@ -1,13 +1,13 @@
 {
-  "date_utc": "2026-05-30T17:25:22Z",
-  "content_sha256_16": "aa7a89762f862465",
-  "labeled": 7006,
+  "date_utc": "2026-05-30T18:12:18Z",
+  "content_sha256_16": "aaa91ca3872d963f",
+  "labeled": 7021,
   "by_source": {
-    "regex": 3592,
-    "llm": 3376,
-    "llm_overrode_regex": 38
+    "regex": 3594,
+    "llm": 3387,
+    "llm_overrode_regex": 40
   },
-  "both_axes_known": 5149,
-  "low_confidence": 69,
-  "failed": 15
+  "both_axes_known": 5155,
+  "low_confidence": 74,
+  "failed": 0
 }

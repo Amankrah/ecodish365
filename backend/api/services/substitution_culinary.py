@@ -138,6 +138,10 @@ _PRESERVATION_HARD_CROSSES = frozenset({
     ('fresh', 'dehydrated'), ('dehydrated', 'fresh'),
     ('fresh', 'condensed'), ('condensed', 'fresh'),
     ('fresh', 'fermented'), ('fermented', 'fresh'),
+    # Phase 4 additions — candied fruit and aged blubber/meat are not
+    # interchangeable with their fresh forms (mass density, sugar/salt content).
+    ('fresh', 'candied'), ('candied', 'fresh'),
+    ('fresh', 'aged'), ('aged', 'fresh'),
 })
 
 

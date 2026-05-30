@@ -195,6 +195,16 @@ def _classify_with_llm(client, food: Dict, regex_thermal: str, regex_preservatio
         parsed = json.loads(resp.choices[0].message.content)
         t = str(parsed.get('thermal_state', '')).strip().lower()
         p = str(parsed.get('preservation_state', '')).strip().lower()
+        # Synonym remap for common LLM near-misses on the enum lists. Keeps the
+        # tagger robust to model variance without bloating the canonical enums.
+        _THERMAL_SYNONYMS = {'puffed': 'popped', 'infused': 'brewed'}
+        _PRESERVATION_SYNONYMS = {
+            'dry': 'dried', 'powdered': 'dried', 'powder': 'dried',
+            'raw': 'fresh',           # raw is thermal, not preservation
+            'aged_cured': 'aged',
+        }
+        t = _THERMAL_SYNONYMS.get(t, t)
+        p = _PRESERVATION_SYNONYMS.get(p, p)
         if t not in THERMAL_STATES:
             logger.warning('food_id=%d invalid thermal_state=%r', food['food_id'], t)
             return None

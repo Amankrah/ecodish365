@@ -1,0 +1,62 @@
+PREP-STATE Phase 4 polish + EF 3.1 architecture + manuscript update
+
+PREP-STATE Phase 4 — sweep up tagger failures and ship Strategy A.
+
+  Extractor enums extended: thermal gains 'popped' / 'brewed', preservation
+  gains 'candied' / 'aged'. _COOKED_CLASS, _FRESH_DEFAULT_THERMAL, and
+  Strategy D _PRESERVATION_HARD_CROSSES updated accordingly.
+
+  Tagger ETL gains a small synonym remap layer ('dry' -> 'dried',
+  'raw' -> 'fresh' when surfaced as a preservation guess). After the
+  re-run, 7,021 / 7,021 CNF + WAFCT foods are labelled (was 7,006 / 15
+  failed). Tagger eval still 60/60 on the GT panel.
+
+  Strategy A shipped at the matcher's LLM rerank prompt: when the query
+  carries a regex-extractable preparation hint, the prompt passes it to
+  the model as an advisory weighting signal. Matcher probe deltas:
+    both_acc       90.0% -> 91.7%  (+1.7 pp)
+    thermal_acc    91.7% -> 93.3%  (+1.6 pp)
+    preservation   95.0% -> 96.7%  (+1.7 pp)
+    food_id_acc    71.7% -> 68.3%  (-3.4 pp; equivalent-but-different
+                                    sub-variants picked when cosine close,
+                                    same outcome class)
+
+EF 3.1 methodology pack — architecture registered, ETL pending.
+
+  methodology_factors.py now recognises 'ef31' alongside 'recipe2016' via
+  a sibling EF31MethodologyPack class. ef31_methodology.json catalogues
+  the 16 EF 3.1 indicators (French canonical names matching AGRIBALYSE
+  keys, English aliases, units, category IDs) with the JRC source URL.
+  Per-food midpoint values already flow per AGRIBALYSE v32 catalogue row
+  in 'ef31_indicators_per_100g'; the precomputed Score unique EF 3.1 is
+  also surfaced per row.
+
+  Per-indicator normalisation_per_person_per_year and weighting_pct
+  ship as null pending workbook ETL. An attempt to populate them from
+  memory failed the verification harness (_smoke_ef31_pack_verify.py)
+  at mean 9.94 % / worst 52 % relative error against AGRIBALYSE's
+  stored single scores, confirming the right path is a fresh extraction
+  from the JRC EF 3.1 reference package. The harness gates any future
+  workbook ETL at mean <= 5 % and worst <= 20 %.
+
+  list_available_methodologies() now returns ['ef31', 'recipe2016'].
+  EF31MethodologyPack.has_full_factors() returns False until the
+  workbook ETL populates the pack.
+
+Manuscript update.
+
+  manuscript_call1.md picks up §3.8.10 (methods) and §4.8 (results) for
+  the prep-state work, plus a new bullet in Highlights and entry #13
+  in §1.3 Contributions. Confidence formula and Strategy A scoring
+  formula are documented inline; Tables 4.8a (matcher accuracy by
+  category) and 4.8b (substitution cross-axis rate before/after
+  Strategy D) capture the numerical headlines.
+
+Housekeeping.
+
+  code_action_items.md: 'Energy-relative TMRELs' moved from Pending to
+  Done (was already SHIPPED 2026-05-23 but stuck in the wrong section);
+  new Done entries for PREP-STATE-LAB Phase 1 -> 4 and for the EF 3.1
+  architecture registration.
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>

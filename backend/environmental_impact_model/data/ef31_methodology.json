@@ -1,0 +1,145 @@
+{
+  "_schema_version": "1.0",
+  "_methodology": "ef31",
+  "_status": "ARCHITECTURE_REGISTERED_AWAITING_JRC_WORKBOOK_INGEST",
+  "methodology_version": "EF 3.1",
+  "_source": {
+    "name": "JRC Environmental Footprint reference package 3.1",
+    "publisher": "European Commission Joint Research Centre",
+    "primary_url": "https://eplca.jrc.ec.europa.eu/permalink/EF_3_1.zip",
+    "reference_publications": [
+      {
+        "title": "PEFCR Guidance document, version 6.3, December 2017",
+        "publisher": "European Commission",
+        "url": "https://ec.europa.eu/environment/eussd/smgp/pdf/PEFCR_guidance_v6.3.pdf"
+      },
+      {
+        "title": "Suggestions for updating the Environmental Footprint method (JRC Technical Reports 2018, EUR 29495 EN)",
+        "publisher": "European Commission JRC",
+        "doi": "10.2760/27674"
+      }
+    ],
+    "note": "The architecture for EF 3.1 as a cross-method sensitivity methodology is registered here. Per-food midpoint indicator values are already carried per AGRIBALYSE v32 catalogue row in the field 'ef31_indicators_per_100g' (16 midpoints plus the precomputed 'Score unique EF 3.1'). What remains is the ETL of the JRC published normalisation factors (per 1 person x 1 year) and weighting factors (sum = 100 %) into this pack so the platform can recompute single scores from the per-food midpoints at runtime. The verification harness (_smoke_ef31_pack_verify.py) is in place and will gate any candidate set of factors against the AGRIBALYSE-stored single scores at mean relative error <= 5 %, worst-case <= 20 %; an attempt at populating these factors from memory failed the gate at mean 9.94 % / worst 52 %, confirming the workbook ETL is the right path rather than a hand-transcribed table."
+  },
+  "indicators": {
+    "Changement climatique": {
+      "name_en": "Climate change",
+      "unit": "kg CO2 eq",
+      "category_id": "climate_change",
+      "normalisation_per_person_per_year": null,
+      "weighting_pct": null
+    },
+    "Appauvrissement de la couche d'ozone": {
+      "name_en": "Ozone depletion",
+      "unit": "kg CFC-11 eq",
+      "category_id": "ozone_depletion",
+      "normalisation_per_person_per_year": null,
+      "weighting_pct": null
+    },
+    "Rayonnements ionisants": {
+      "name_en": "Ionising radiation",
+      "unit": "kBq U-235 eq",
+      "category_id": "ionising_radiation",
+      "normalisation_per_person_per_year": null,
+      "weighting_pct": null
+    },
+    "Formation photochimique d'ozone": {
+      "name_en": "Photochemical ozone formation",
+      "unit": "kg NMVOC eq",
+      "category_id": "photochemical_ozone_formation",
+      "normalisation_per_person_per_year": null,
+      "weighting_pct": null
+    },
+    "Particules fines": {
+      "name_en": "Particulate matter",
+      "unit": "disease incidence",
+      "category_id": "particulate_matter",
+      "normalisation_per_person_per_year": null,
+      "weighting_pct": null
+    },
+    "Effets toxicologiques sur la santé humaine : substances non-cancérogènes": {
+      "name_en": "Human toxicity non-cancer",
+      "unit": "CTUh",
+      "category_id": "human_toxicity_non_cancer",
+      "normalisation_per_person_per_year": null,
+      "weighting_pct": null
+    },
+    "Effets toxicologiques sur la santé humaine : substances cancérogènes": {
+      "name_en": "Human toxicity cancer",
+      "unit": "CTUh",
+      "category_id": "human_toxicity_cancer",
+      "normalisation_per_person_per_year": null,
+      "weighting_pct": null
+    },
+    "Acidification terrestre et eaux douces": {
+      "name_en": "Acidification (terrestrial and freshwater)",
+      "unit": "mol H+ eq",
+      "category_id": "acidification",
+      "normalisation_per_person_per_year": null,
+      "weighting_pct": null
+    },
+    "Eutrophisation eaux douces": {
+      "name_en": "Eutrophication freshwater",
+      "unit": "kg P eq",
+      "category_id": "eutrophication_freshwater",
+      "normalisation_per_person_per_year": null,
+      "weighting_pct": null
+    },
+    "Eutrophisation marine": {
+      "name_en": "Eutrophication marine",
+      "unit": "kg N eq",
+      "category_id": "eutrophication_marine",
+      "normalisation_per_person_per_year": null,
+      "weighting_pct": null
+    },
+    "Eutrophisation terrestre": {
+      "name_en": "Eutrophication terrestrial",
+      "unit": "mol N eq",
+      "category_id": "eutrophication_terrestrial",
+      "normalisation_per_person_per_year": null,
+      "weighting_pct": null
+    },
+    "Écotoxicité pour écosystèmes aquatiques d'eau douce": {
+      "name_en": "Ecotoxicity freshwater",
+      "unit": "CTUe",
+      "category_id": "ecotoxicity_freshwater",
+      "normalisation_per_person_per_year": null,
+      "weighting_pct": null
+    },
+    "Utilisation du sol": {
+      "name_en": "Land use",
+      "unit": "Pt",
+      "category_id": "land_use",
+      "normalisation_per_person_per_year": null,
+      "weighting_pct": null
+    },
+    "Épuisement des ressources eau": {
+      "name_en": "Water use",
+      "unit": "m3 depriv.",
+      "category_id": "water_use",
+      "normalisation_per_person_per_year": null,
+      "weighting_pct": null
+    },
+    "Épuisement des ressources énergétiques": {
+      "name_en": "Resource use - fossils",
+      "unit": "MJ",
+      "category_id": "resource_use_fossils",
+      "normalisation_per_person_per_year": null,
+      "weighting_pct": null
+    },
+    "Épuisement des ressources minéraux": {
+      "name_en": "Resource use - minerals and metals",
+      "unit": "kg Sb eq",
+      "category_id": "resource_use_minerals_metals",
+      "normalisation_per_person_per_year": null,
+      "weighting_pct": null
+    }
+  },
+  "single_score_indicator": {
+    "name_fr": "Score unique EF 3.1",
+    "name_en": "Single score EF 3.1",
+    "unit": "mPt",
+    "formula": "single_score (Pt) = sum_i( midpoint_i * weighting_i / normalisation_i ); reported in mPt = single_score * 1000",
+    "current_passthrough_path": "Use the precomputed AGRIBALYSE v32 catalogue value at ef31_indicators_per_100g['Score unique EF 3.1'] until the JRC workbook ETL populates this pack's normalisation_per_person_per_year and weighting_pct fields."
+  }
+}

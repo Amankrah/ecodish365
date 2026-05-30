@@ -369,4 +369,127 @@ def reset_methodology_cache() -> None:
 
 
 def list_available_methodologies() -> List[str]:
-    return sorted(_PACK_FILES_BY_METHODOLOGY.keys())
+    """All registered LCA methodologies, including ones using simplified packs."""
+    out = set(_PACK_FILES_BY_METHODOLOGY.keys())
+    for m in _SIMPLE_PACK_FILES_BY_METHODOLOGY:
+        out.add(m)
+    return sorted(out)
+
+
+# ---------------------------------------------------------------------------
+# Simplified-pack methodologies
+# ---------------------------------------------------------------------------
+#
+# Some methodologies do not need the full ReCiPe-shaped endpoint x perspective x
+# country pack triple. EF 3.1 is the canonical example: it has 16 fixed
+# midpoint indicators with a single-score weighting formula, no cultural
+# perspectives, no per-country CFs. For these we register a single metadata
+# JSON file and expose it through ``EF31MethodologyPack``-style accessors.
+
+_SIMPLE_PACK_FILES_BY_METHODOLOGY: Dict[str, str] = {
+    "ef31": "ef31_methodology.json",
+}
+
+
+class EF31MethodologyPack:
+    """In-memory bundle of EF 3.1 indicator metadata + (when populated) the
+    JRC normalisation and weighting factors.
+
+    Per-food midpoint values are NOT stored here: they live alongside each
+    AGRIBALYSE v32 catalogue entry under ``ef31_indicators_per_100g``. This
+    pack exposes only methodology-level information (indicator names, units,
+    weighting factors when present, JRC source citation), so a caller can
+    iterate the 16 indicators consistently across foods.
+
+    The pack ships with normalisation_per_person_per_year and weighting_pct
+    set to ``null`` until the JRC EF 3.1 workbook ETL populates them. The
+    verification harness ``_smoke_ef31_pack_verify.py`` gates any candidate
+    set of factors against AGRIBALYSE's stored single scores; until that
+    smoke test passes the precomputed catalogue value should be used directly.
+    """
+
+    def __init__(self, methodology: str = "ef31", data_dir: str = _DATA_DIR):
+        self.methodology = methodology
+        self._data_dir = data_dir
+        fname = _SIMPLE_PACK_FILES_BY_METHODOLOGY.get(methodology)
+        if fname is None:
+            raise ValueError(
+                f"Unknown simple-pack methodology {methodology!r}. Known: "
+                f"{sorted(_SIMPLE_PACK_FILES_BY_METHODOLOGY)}"
+            )
+        path = os.path.join(data_dir, fname)
+        if not os.path.exists(path):
+            raise FileNotFoundError(
+                f"EF31 methodology pack missing: {path}."
+            )
+        with open(path, "r", encoding="utf-8") as fh:
+            self._pack: Dict[str, Any] = json.load(fh)
+        if self._pack.get("_schema_version") != "1.0":
+            raise ValueError(
+                f"{methodology} pack schema_version is "
+                f"{self._pack.get('_schema_version')!r}, expected '1.0'."
+            )
+        if self._pack.get("_methodology") != methodology:
+            raise ValueError(
+                f"{methodology} pack methodology is "
+                f"{self._pack.get('_methodology')!r}, expected {methodology!r}."
+            )
+
+    def list_indicator_names_fr(self) -> List[str]:
+        """Canonical French indicator names (the AGRIBALYSE catalogue keys)."""
+        return list(self._pack["indicators"].keys())
+
+    def indicator_spec(self, name_fr: str) -> Optional[Dict[str, Any]]:
+        return self._pack["indicators"].get(name_fr)
+
+    def normalisation_for(self, name_fr: str) -> Optional[float]:
+        spec = self._pack["indicators"].get(name_fr) or {}
+        return spec.get("normalisation_per_person_per_year")
+
+    def weighting_pct_for(self, name_fr: str) -> Optional[float]:
+        spec = self._pack["indicators"].get(name_fr) or {}
+        return spec.get("weighting_pct")
+
+    def has_full_factors(self) -> bool:
+        """True iff every indicator has both normalisation and weighting populated."""
+        for spec in self._pack["indicators"].values():
+            if spec.get("normalisation_per_person_per_year") is None:
+                return False
+            if spec.get("weighting_pct") is None:
+                return False
+        return True
+
+    def single_score_indicator_name(self) -> str:
+        return self._pack["single_score_indicator"]["name_fr"]
+
+    def methodology_provenance(self) -> Dict[str, Any]:
+        return {
+            "methodology": self.methodology,
+            "methodology_version": self._pack.get("methodology_version"),
+            "schema_version": self._pack.get("_schema_version"),
+            "status": self._pack.get("_status"),
+            "source": self._pack.get("_source"),
+            "has_full_factors": self.has_full_factors(),
+        }
+
+
+_ef31_pack_cache: Optional[EF31MethodologyPack] = None
+_ef31_pack_lock = threading.Lock()
+
+
+def get_ef31_pack() -> EF31MethodologyPack:
+    """Process-wide singleton accessor for the EF 3.1 methodology pack."""
+    global _ef31_pack_cache
+    if _ef31_pack_cache is not None:
+        return _ef31_pack_cache
+    with _ef31_pack_lock:
+        if _ef31_pack_cache is None:
+            _ef31_pack_cache = EF31MethodologyPack()
+        return _ef31_pack_cache
+
+
+def reset_ef31_cache() -> None:
+    """Test hook."""
+    global _ef31_pack_cache
+    with _ef31_pack_lock:
+        _ef31_pack_cache = None

@@ -65,6 +65,9 @@ THERMAL_STATES = (
     'stir_fried',
     'broiled',
     'reheated',
+    # Phase 4 additions (2026-05-30) — sweep up the 15 unlabelled foods
+    'popped',         # popcorn, puffed cereals
+    'brewed',         # coffee, tea, infusions
     'unknown',
 )
 
@@ -83,6 +86,9 @@ PRESERVATION_STATES = (
     'condensed',
     # Phase 1.6
     'ready_to_eat',
+    # Phase 4 additions (2026-05-30) — sweep up the 15 unlabelled foods
+    'candied',        # candied fruit peels, glaced fruit (sugar-preserved)
+    'aged',           # aged blubber, aged meat
     'unknown',
 )
 
@@ -132,6 +138,9 @@ _THERMAL_PATTERNS = (
     ('microwaved', re.compile(r'\bmicrowaved?\b|\bmicro[- ]ondes\b', re.IGNORECASE)),
     ('reheated',   re.compile(r'\breheated\b|\br[eé]chauff[eé]' + _FR_PART + r'\b', re.IGNORECASE)),
     ('broiled',    re.compile(r'\bbroiled\b', re.IGNORECASE)),  # \b prevents 'broiler' from matching
+    # Phase 4 additions
+    ('popped',     re.compile(r'\bpopped\b|\bair[- ]popped\b|\bpuffed\b', re.IGNORECASE)),
+    ('brewed',     re.compile(r'\bbrewed\b|\binfused\b|\binfus[eé]' + _FR_PART + r'\b', re.IGNORECASE)),
     # Original verbs
     ('scrambled',  re.compile(r'\bscramb|\bbrouill', re.IGNORECASE)),
     ('poached',    re.compile(r'\bpoach|\bpoch[eé]', re.IGNORECASE)),
@@ -206,6 +215,9 @@ _PRESERVATION_PATTERNS = (
     ('smoked',      re.compile(r'\bsmoked\b|\bfum[eé]\b|\bfum[eé]e\b', re.IGNORECASE)),
     ('cured',       re.compile(r'\bcured\b', re.IGNORECASE)),
     ('pickled',     re.compile(r'\bpickled\b|\bmarin[eé]\b|\bmarin[eé]e\b', re.IGNORECASE)),
+    # Phase 4 additions
+    ('candied',     re.compile(r'\bcandied\b|\bglac[eé]' + _FR_PART + r'\s+(?:fruit|peel|cherries)\b|\bconfit\b', re.IGNORECASE)),
+    ('aged',        re.compile(r'\baged\b|\bvieilli' + _FR_PART + r'\b', re.IGNORECASE)),
 )
 
 
@@ -218,6 +230,8 @@ _FRESH_DEFAULT_THERMAL = frozenset({
     # Phase 1.5 additions
     'braised', 'toasted', 'sauteed', 'microwaved', 'blanched',
     'barbecued', 'stir_fried', 'broiled', 'reheated',
+    # Phase 4 additions
+    'popped', 'brewed',
 })
 
 
@@ -231,6 +245,9 @@ _COOKED_CLASS = frozenset({
     # Phase 1.5 additions — all also cooking verbs
     'braised', 'toasted', 'sauteed', 'microwaved', 'blanched',
     'barbecued', 'stir_fried', 'broiled', 'reheated',
+    # Phase 4 additions — popcorn-popped and tea/coffee-brewed are both
+    # heat-driven transformations from raw kernel / leaf / bean
+    'popped', 'brewed',
 })
 
 

@@ -1,18 +1,18 @@
 {
   "_provenance": {
-    "date_utc": "2026-05-30T17:25:22Z",
+    "date_utc": "2026-05-30T18:12:18Z",
     "classify_model": "gpt-4.1-mini",
     "temperature": 0.0,
-    "cnf_total": 7021,
-    "labeled": 7006,
+    "cnf_total": 3,
+    "labeled": 7021,
     "by_source": {
-      "regex": 3592,
-      "llm": 3376,
-      "llm_overrode_regex": 38
+      "regex": 3594,
+      "llm": 3387,
+      "llm_overrode_regex": 40
     },
-    "both_axes_known": 5149,
-    "low_confidence": 69,
-    "failed": 15,
+    "both_axes_known": 5155,
+    "low_confidence": 74,
+    "failed": 0,
     "note": "Two-axis preparation-state tag per CNF/WAFCT FoodID. Hybrid classification: regex prior at confidence 1.0 takes precedence; gpt-4.1-mini LLM handles the rest (with regex partial as a hint). Consumed by api.services.cnf_prep_state and the substitution culinary gate (Strategy D)."
   },
   "labels": {
@@ -4578,7 +4578,7 @@
       "preservation_state": "smoked",
       "confidence": 0.85,
       "source": "llm",
-      "rationale": "The term 'smokie' and 'fumée' indicate smoking preservation, and sausages are typically cooked before sale."
+      "rationale": "The term 'smokie' and 'fumÃƒÂ©e' indicate smoking preservation, and sausages are typically cooked before sale."
     },
     "1139": {
       "thermal_state": "unknown",
@@ -4620,7 +4620,7 @@
       "preservation_state": "canned",
       "confidence": 0.97,
       "source": "llm",
-      "rationale": "Pâté is a cooked composite meat product and is explicitly labeled as canned."
+      "rationale": "PÃƒÂ¢tÃƒÂ© is a cooked composite meat product and is explicitly labeled as canned."
     },
     "1175": {
       "thermal_state": "cooked",
@@ -4655,7 +4655,7 @@
       "preservation_state": "canned",
       "confidence": 0.97,
       "source": "llm",
-      "rationale": "Pâté is a cooked composite meat product and is explicitly canned."
+      "rationale": "PÃƒÂ¢tÃƒÂ© is a cooked composite meat product and is explicitly canned."
     },
     "1166": {
       "thermal_state": "unknown",
@@ -4774,7 +4774,7 @@
       "preservation_state": "smoked",
       "confidence": 0.85,
       "source": "llm",
-      "rationale": "The term 'saucisse fumée' indicates the sausage is smoked, but the cooking method is not specified."
+      "rationale": "The term 'saucisse fumÃƒÂ©e' indicates the sausage is smoked, but the cooking method is not specified."
     },
     "1225": {
       "thermal_state": "cooked",
@@ -4802,7 +4802,7 @@
       "preservation_state": "smoked",
       "confidence": 0.85,
       "source": "llm",
-      "rationale": "The term 'Wiener (frankfurter), chicken' and French 'Saucisse fumée' indicate a smoked sausage, but the cooking method is not specified."
+      "rationale": "The term 'Wiener (frankfurter), chicken' and French 'Saucisse fumÃƒÂ©e' indicate a smoked sausage, but the cooking method is not specified."
     },
     "1212": {
       "thermal_state": "cooked",
@@ -11165,7 +11165,7 @@
       "preservation_state": "fresh",
       "confidence": 0.85,
       "source": "llm",
-      "rationale": "Soufflé is a cooked dish typically made fresh, so thermal is cooked and preservation is fresh."
+      "rationale": "SoufflÃƒÂ© is a cooked dish typically made fresh, so thermal is cooked and preservation is fresh."
     },
     "2323": {
       "thermal_state": "fried",
@@ -25452,7 +25452,7 @@
       "preservation_state": "smoked",
       "confidence": 0.85,
       "source": "llm",
-      "rationale": "The French name 'Saucisse fumée' indicates the sausage is smoked, but the cooking method is not specified."
+      "rationale": "The French name 'Saucisse fumÃƒÂ©e' indicates the sausage is smoked, but the cooking method is not specified."
     },
     "7152": {
       "thermal_state": "cooked",
@@ -32837,7 +32837,7 @@
       "preservation_state": "canned",
       "confidence": 0.95,
       "source": "llm",
-      "rationale": "The description explicitly states 'sautés' (sauteed) and 'canned', indicating cooked by sautéing and preserved in a can."
+      "rationale": "The description explicitly states 'sautÃƒÂ©s' (sauteed) and 'canned', indicating cooked by sautÃƒÂ©ing and preserved in a can."
     },
     "3319": {
       "thermal_state": "unknown",
@@ -38143,7 +38143,7 @@
       "preservation_state": "smoked",
       "confidence": 0.85,
       "source": "llm",
-      "rationale": "The term 'Wiener' and 'saucisse fumée' indicate a smoked sausage, but the exact cooking method is not specified."
+      "rationale": "The term 'Wiener' and 'saucisse fumÃƒÂ©e' indicate a smoked sausage, but the exact cooking method is not specified."
     },
     "5377": {
       "thermal_state": "cooked",
@@ -38738,7 +38738,7 @@
       "preservation_state": "smoked",
       "confidence": 0.85,
       "source": "llm",
-      "rationale": "The term 'fumée' indicates smoking preservation, but no cooking method is specified for this meatless frankfurter."
+      "rationale": "The term 'fumÃƒÂ©e' indicates smoking preservation, but no cooking method is specified for this meatless frankfurter."
     },
     "5540": {
       "thermal_state": "unknown",
@@ -41293,7 +41293,7 @@
       "preservation_state": "canned",
       "confidence": 0.9,
       "source": "llm",
-      "rationale": "The term 'refried' and 'sautés' indicates the beans are cooked by frying, and 'canned' confirms preservation state."
+      "rationale": "The term 'refried' and 'sautÃƒÂ©s' indicates the beans are cooked by frying, and 'canned' confirms preservation state."
     },
     "6668": {
       "thermal_state": "baked",
@@ -41685,7 +41685,7 @@
       "preservation_state": "fresh",
       "confidence": 0.85,
       "source": "llm",
-      "rationale": "Pad thaï with chicken is a cooked mixed dish typically prepared fresh, so thermal_state is cooked and preservation_state is fresh."
+      "rationale": "Pad thaÃƒÂ¯ with chicken is a cooked mixed dish typically prepared fresh, so thermal_state is cooked and preservation_state is fresh."
     },
     "6764": {
       "thermal_state": "unknown",
@@ -43064,7 +43064,7 @@
       "preservation_state": "smoked",
       "confidence": 0.85,
       "source": "llm",
-      "rationale": "The French name 'Saucisse fumée' indicates the sausage is smoked, but the thermal state is not specified explicitly."
+      "rationale": "The French name 'Saucisse fumÃƒÂ©e' indicates the sausage is smoked, but the thermal state is not specified explicitly."
     },
     "7147": {
       "thermal_state": "unknown",
@@ -43092,7 +43092,7 @@
       "preservation_state": "smoked",
       "confidence": 0.85,
       "source": "llm",
-      "rationale": "The term 'Wiener (frankfurter), Bavarian' and French 'Saucisse fumée' indicate a smoked sausage, but the cooking method is not specified."
+      "rationale": "The term 'Wiener (frankfurter), Bavarian' and French 'Saucisse fumÃƒÂ©e' indicate a smoked sausage, but the cooking method is not specified."
     },
     "7154": {
       "thermal_state": "unknown",
@@ -43183,21 +43183,21 @@
       "preservation_state": "fresh",
       "confidence": 0.85,
       "source": "llm",
-      "rationale": "Pâté is a cooked meat product typically fresh rather than preserved by canning or drying."
+      "rationale": "PÃƒÂ¢tÃƒÂ© is a cooked meat product typically fresh rather than preserved by canning or drying."
     },
     "7168": {
       "thermal_state": "unknown",
       "preservation_state": "unknown",
       "confidence": 0.5,
       "source": "llm",
-      "rationale": "The description 'Pâté, country style herb, glazed' does not specify cooking method or preservation type, making classification ambiguous."
+      "rationale": "The description 'PÃƒÂ¢tÃƒÂ©, country style herb, glazed' does not specify cooking method or preservation type, making classification ambiguous."
     },
     "7169": {
       "thermal_state": "unknown",
       "preservation_state": "unknown",
       "confidence": 0.5,
       "source": "llm",
-      "rationale": "The description 'pâté, country style peppercorn, glazed' does not specify cooking method or preservation type, making the classification ambiguous."
+      "rationale": "The description 'pÃƒÂ¢tÃƒÂ©, country style peppercorn, glazed' does not specify cooking method or preservation type, making the classification ambiguous."
     },
     "7171": {
       "thermal_state": "cooked",
@@ -43547,7 +43547,7 @@
       "preservation_state": "ready_to_eat",
       "confidence": 0.85,
       "source": "llm",
-      "rationale": "Pâté is a processed meat product typically ready to eat without further cooking, but the exact preparation method is not specified."
+      "rationale": "PÃƒÂ¢tÃƒÂ© is a processed meat product typically ready to eat without further cooking, but the exact preparation method is not specified."
     },
     "7241": {
       "thermal_state": "cooked",
@@ -43575,7 +43575,7 @@
       "preservation_state": "canned",
       "confidence": 0.97,
       "source": "llm",
-      "rationale": "The description explicitly states 'sautés' (sauteed) and 'conserve' (canned), indicating cooked by sautéing and preserved by canning."
+      "rationale": "The description explicitly states 'sautÃƒÂ©s' (sauteed) and 'conserve' (canned), indicating cooked by sautÃƒÂ©ing and preserved by canning."
     },
     "7244": {
       "thermal_state": "unknown",
@@ -45794,14 +45794,14 @@
       "preservation_state": "fresh",
       "confidence": 0.85,
       "source": "llm",
-      "rationale": "The name 'cake' and 'pouding chômeur' indicate a baked dessert, typically fresh rather than preserved."
+      "rationale": "The name 'cake' and 'pouding chÃƒÂ´meur' indicate a baked dessert, typically fresh rather than preserved."
     },
     "7731": {
       "thermal_state": "baked",
       "preservation_state": "fresh",
       "confidence": 0.85,
       "source": "llm",
-      "rationale": "Crêpes are typically cooked on a griddle or pan, which aligns best with baked, and they are usually fresh when homemade."
+      "rationale": "CrÃƒÂªpes are typically cooked on a griddle or pan, which aligns best with baked, and they are usually fresh when homemade."
     },
     "7732": {
       "thermal_state": "unknown",
@@ -47131,7 +47131,7 @@
       "preservation_state": "fresh",
       "confidence": 0.85,
       "source": "llm",
-      "rationale": "Tô is a cooked porridge made from pearl millet, indicating cooking but no specific method or preservation mentioned."
+      "rationale": "TÃƒÂ´ is a cooked porridge made from pearl millet, indicating cooking but no specific method or preservation mentioned."
     },
     "700034": {
       "thermal_state": "cooked",
@@ -47145,14 +47145,14 @@
       "preservation_state": "fresh",
       "confidence": 0.85,
       "source": "llm",
-      "rationale": "Tô is a porridge, which implies cooking, and no preservation method is indicated beyond fresh ingredients."
+      "rationale": "TÃƒÂ´ is a porridge, which implies cooking, and no preservation method is indicated beyond fresh ingredients."
     },
     "700038": {
       "thermal_state": "cooked",
       "preservation_state": "fresh",
       "confidence": 0.85,
       "source": "llm",
-      "rationale": "Tô is a porridge, which implies cooking, and no preservation method is indicated, so fresh is assumed."
+      "rationale": "TÃƒÂ´ is a porridge, which implies cooking, and no preservation method is indicated, so fresh is assumed."
     },
     "700055": {
       "thermal_state": "unknown",
@@ -47418,7 +47418,7 @@
       "preservation_state": "fresh",
       "confidence": 0.85,
       "source": "llm",
-      "rationale": "Porridge (tô) is a cooked cereal dish typically prepared fresh from maize flour without preservation indicated."
+      "rationale": "Porridge (tÃƒÂ´) is a cooked cereal dish typically prepared fresh from maize flour without preservation indicated."
     },
     "700129": {
       "thermal_state": "cooked",
@@ -47733,7 +47733,7 @@
       "preservation_state": "fresh",
       "confidence": 0.85,
       "source": "llm",
-      "rationale": "Porridge and tô are typically cooked dishes made from gari and tomato paste, which are fresh ingredients, so cooked and fresh are appropriate labels."
+      "rationale": "Porridge and tÃƒÂ´ are typically cooked dishes made from gari and tomato paste, which are fresh ingredients, so cooked and fresh are appropriate labels."
     },
     "700254": {
       "thermal_state": "unknown",
@@ -47775,7 +47775,7 @@
       "preservation_state": "fresh",
       "confidence": 0.85,
       "source": "llm",
-      "rationale": "Tô is a porridge, implying cooking, and no preservation method is indicated, so fresh is assumed."
+      "rationale": "TÃƒÂ´ is a porridge, implying cooking, and no preservation method is indicated, so fresh is assumed."
     },
     "700350": {
       "thermal_state": "cooked",
@@ -49057,23 +49057,112 @@
       "confidence": 0.85,
       "source": "llm_overrode_regex",
       "rationale": "The dish is a sauce (implying cooking) containing fermented African locust beans, indicating cooked thermal state and fermented preservation."
+    },
+    "2873": {
+      "thermal_state": "brewed",
+      "preservation_state": "fresh",
+      "confidence": 1.0,
+      "source": "regex",
+      "rationale": "regex:brewed,p:fresh(default)"
+    },
+    "4382": {
+      "thermal_state": "popped",
+      "preservation_state": "fresh",
+      "confidence": 1.0,
+      "source": "regex",
+      "rationale": "regex:popped,p:fresh(default)"
+    },
+    "4114": {
+      "thermal_state": "popped",
+      "preservation_state": "ready_to_eat",
+      "confidence": 0.65,
+      "source": "llm",
+      "rationale": "Popcorn is heated (popped) and caramel-coated snacks are typically ready-to-eat packaged foods."
+    },
+    "4397": {
+      "thermal_state": "unknown",
+      "preservation_state": "candied",
+      "confidence": 0.65,
+      "source": "llm",
+      "rationale": "Candied cherries are preserved by candying, which is a form of preservation not in the standard list, so preservation_state is best approximated as 'candied' with moderate confidence."
+    },
+    "4398": {
+      "thermal_state": "unknown",
+      "preservation_state": "candied",
+      "confidence": 0.65,
+      "source": "llm",
+      "rationale": "Candied citron is preserved by candying, which is a form of preservation not in the standard list, so 'candied' is used as given but thermal state is unknown due to lack of cooking method."
+    },
+    "4402": {
+      "thermal_state": "unknown",
+      "preservation_state": "candied",
+      "confidence": 0.5,
+      "source": "llm",
+      "rationale": "Candied lemon peel is preserved by candying, which is not a standard preservation_state category, so 'candied' is not valid; thermal state is unknown as no cooking method is specified."
+    },
+    "4401": {
+      "thermal_state": "unknown",
+      "preservation_state": "candied",
+      "confidence": 0.65,
+      "source": "llm",
+      "rationale": "Candied grapefruit peel is preserved by candying (sugaring), which is not a standard preservation_state but closest to candied; thermal state is unknown as no cooking method is specified."
+    },
+    "4403": {
+      "thermal_state": "unknown",
+      "preservation_state": "candied",
+      "confidence": 0.65,
+      "source": "llm",
+      "rationale": "Candied orange peel is preserved by candying, which is a form of preservation not listed, so 'candied' is used as preservation_state with moderate confidence; thermal state is unknown as no cooking method is specified."
+    },
+    "5444": {
+      "thermal_state": "popped",
+      "preservation_state": "fresh",
+      "confidence": 0.5,
+      "source": "llm",
+      "rationale": "Popcorn is typically popped (heated), but 'popped' is not an allowed thermal_state; closest is unknown; no preservation indicated."
+    },
+    "5773": {
+      "thermal_state": "unknown",
+      "preservation_state": "unknown",
+      "confidence": 0.5,
+      "source": "llm_overrode_regex",
+      "rationale": "The term 'aged' is not a recognized preservation state in the given list, and no cooking method is specified, so both states are unknown."
+    },
+    "4405": {
+      "thermal_state": "unknown",
+      "preservation_state": "candied",
+      "confidence": 0.65,
+      "source": "llm",
+      "rationale": "Candied pineapple is preserved by sugar coating, not by cooking method, so thermal state is unknown and preservation is candied, a specialized form not in the standard list but inferred from context."
+    },
+    "5780": {
+      "thermal_state": "raw",
+      "preservation_state": "unknown",
+      "confidence": 0.6,
+      "source": "llm_overrode_regex",
+      "rationale": "Aged blubber suggests preservation but 'aged' is not a defined preservation state; no cooking method indicated, so raw thermal state is most appropriate."
+    },
+    "4266": {
+      "thermal_state": "unknown",
+      "preservation_state": "unknown",
+      "confidence": 0.5,
+      "source": "llm",
+      "rationale": "The description is of a dry mix dessert prepared with milk, with no clear cooking or preservation method specified."
+    },
+    "4316": {
+      "thermal_state": "cooked",
+      "preservation_state": "dried",
+      "confidence": 0.65,
+      "source": "llm",
+      "rationale": "The dessert is a dry mix prepared with ingredients and likely cooked, but the exact cooking method is unspecified; the mix is dry before preparation."
+    },
+    "6817": {
+      "thermal_state": "raw",
+      "preservation_state": "fresh",
+      "confidence": 0.5,
+      "source": "llm",
+      "rationale": "Turbinado sugar is raw sugar that is minimally processed but not cooked or preserved by heat or other means."
     }
   },
-  "failed": [
-    2873,
-    4114,
-    4266,
-    4316,
-    4382,
-    4397,
-    4398,
-    4401,
-    4402,
-    4403,
-    4405,
-    5444,
-    5773,
-    5780,
-    6817
-  ]
+  "failed": []
 }
