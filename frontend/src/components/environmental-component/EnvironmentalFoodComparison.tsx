@@ -162,7 +162,7 @@ const EnvironmentalFoodComparison = () => {
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Compare the environmental impacts of different foods using comprehensive LCA methodology
             with Canadian-specific factors. For all six metrics at once on the same list see{' '}
-            <a href="/scorecard" className="text-green-700 underline">Scorecard</a>.
+            <a href="/scorecard" className="text-green-700 underline">all scores</a>.
           </p>
           
           {/* User Type Selector */}

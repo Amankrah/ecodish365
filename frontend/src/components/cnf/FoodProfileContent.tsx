@@ -26,9 +26,9 @@ import {
 import { EnvironmentalTeaser } from './EnvironmentalTeaser';
 
 const SCORER_LINKS: { label: string; href: string; lens: LensPanelKey }[] = [
-  { label: 'HEFI-2019', href: '/hefi/calculate', lens: 'hefi' },
-  { label: 'HENI', href: '/heni/calculate', lens: 'heni' },
-  { label: 'HSR', href: '/hsr/calculate', lens: 'hsr' },
+  { label: 'Healthy eating', href: '/hefi/calculate', lens: 'hefi' },
+  { label: 'Health impact', href: '/heni/calculate', lens: 'heni' },
+  { label: 'Star rating', href: '/hsr/calculate', lens: 'hsr' },
   { label: 'Food Compass', href: '/fcs/calculate', lens: 'fcs' },
 ];
 

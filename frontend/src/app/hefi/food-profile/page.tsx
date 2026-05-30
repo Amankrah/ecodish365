@@ -343,15 +343,15 @@ export default function HEFIFoodProfilePage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">HEFI Food Profile</h1>
-          <p className="text-lg text-gray-600">Educational HEFI-2019 profile estimate for a food or meal component. For valid HEFI use, evaluate complete daily intakes (24-hour recalls).</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Healthy eating food profile</h1>
+          <p className="text-lg text-gray-600">Educational healthy eating estimate for a food or meal component. For the most useful result, score a complete daily intake (food diary day).</p>
           <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <div className="flex">
               <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600 mr-2 flex-shrink-0" />
               <div className="text-sm text-yellow-800">
-                <p className="font-semibold">Important: HEFI-2019 is intended for full-day dietary patterns</p>
+                <p className="font-semibold">Important: healthy eating scores are built for full days</p>
                 <ul className="list-disc list-inside mt-1 space-y-1">
-                  <li>Use HEFI-2019 with complete meals or 24-hour dietary recalls.</li>
+                  <li>Use healthy eating scores with complete meals or a full food diary day.</li>
                   <li>Single-food profiles are approximate and should be interpreted cautiously.</li>
                 </ul>
               </div>
@@ -620,7 +620,7 @@ export default function HEFIFoodProfilePage() {
             <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
               <h3 className="text-lg font-semibold text-purple-900 mb-2 flex items-center">
                 <CheckCircleIcon className="w-5 h-5 mr-2" />
-                HEFI-2019 Algorithm Highlights
+                How the score works
               </h3>
               <div className="text-sm text-purple-800 space-y-1">
                 <p>• 10 components measuring adequacy and moderation</p>

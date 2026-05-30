@@ -4,12 +4,12 @@ import type { NutrientValue } from './api';
  *  to surface what each published measure reads from composition data. */
 export const LENS_NUTRIENT_PANELS = {
   hefi: {
-    label: 'HEFI-2019 inputs',
+    label: 'Healthy eating inputs',
     hint: 'Day-level adherence uses these components from Canada\'s Food Guide.',
     patterns: ['ENERGY', 'PROTEIN', 'FAT', 'CARBOHYDRATE', 'FIBRE', 'SODIUM', 'SUGARS', 'SATURATED'],
   },
   hsr: {
-    label: 'HSR label inputs',
+    label: 'Star rating inputs',
     hint: 'Packaged-product star rating draws on energy, risk nutrients, and positive nutrients.',
     patterns: ['ENERGY', 'PROTEIN', 'FIBRE', 'SODIUM', 'SUGARS', 'SATURATED', 'CALCIUM'],
   },
@@ -19,7 +19,7 @@ export const LENS_NUTRIENT_PANELS = {
     patterns: ['ENERGY', 'PROTEIN', 'FIBRE', 'SODIUM', 'SUGARS', 'SATURATED', 'POTASSIUM', 'MAGNESIUM'],
   },
   heni: {
-    label: 'HENI drivers',
+    label: 'Health impact drivers',
     hint: 'Healthy-life minutes translate diet-related risks; energy and macro profile matter.',
     patterns: ['ENERGY', 'PROTEIN', 'FAT', 'CARBOHYDRATE', 'FIBRE', 'SODIUM', 'SUGARS', 'SATURATED'],
   },

@@ -300,7 +300,7 @@ export default function RecallHistoryPage() {
             <div className="flex-1">
               <h1 className="text-2xl font-bold text-gray-900">Saved days</h1>
               <p className="text-sm text-gray-600 mt-1">
-                Your 24-hour recall days, stored only in this browser.
+                Your food diary days, stored only in this browser.
                 Select days to analyze patterns and swaps, or export for research.
               </p>
               <p className="text-xs text-gray-500 mt-2">
@@ -315,11 +315,11 @@ export default function RecallHistoryPage() {
         {/* Empty state */}
         {days.length === 0 && (
           <div className="bg-white rounded-lg border p-6 shadow-sm text-sm text-gray-700 space-y-3">
-            <p className="font-medium text-gray-900">No recall days saved yet.</p>
+            <p className="font-medium text-gray-900">No saved days yet.</p>
             <ol className="list-decimal list-inside space-y-1 text-gray-600">
-              <li>Go to the <a href="/recall-24h" className="text-blue-700 underline">24-h dietary recall wizard</a>.</li>
-              <li>Log your day occasion-by-occasion.</li>
-              <li>On Step 3 (Review), open <span className="font-medium">&ldquo;💾 Save this day&rdquo;</span> and click Save.</li>
+              <li>Go to the <a href="/recall-24h" className="text-blue-700 underline">food diary</a>.</li>
+              <li>Log your day meal by meal.</li>
+              <li>On the review step, click <span className="font-medium">&ldquo;💾 Save to history&rdquo;</span>.</li>
               <li>Come back here to view, average, or export.</li>
             </ol>
             <div className="pt-2">
@@ -327,7 +327,7 @@ export default function RecallHistoryPage() {
                 href="/recall-24h"
                 className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md"
               >
-                Start a recall <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                Start a food diary day <ChevronRight className="h-4 w-4" aria-hidden="true" />
               </a>
             </div>
             {/* Import-only path: a returning user with a previously exported

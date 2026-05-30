@@ -16,9 +16,9 @@ import {
 
 const features = [
   {
-    name: 'Build a 24-hour recall',
+    name: 'Log a food diary day',
     description:
-      "Walk through your day one meal at a time. The wizard turns each meal into the foods that make it up, then sends them here for scoring. This is the way HEFI was meant to be used, and it gives you the most useful number.",
+      "Walk through your day one meal at a time. The wizard turns each meal into the foods that make it up, then sends them here for scoring. This is the way healthy eating scores were meant to be used, and it gives you the most useful number.",
     icon: CalendarDaysIcon,
     href: '/recall-24h?then=hefi',
     color: 'bg-blue-500',
@@ -132,12 +132,15 @@ export default function HEFIPage() {
       {/* Hero */}
       <section className="text-center">
         <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
-          Healthy Eating Food Index <span className="text-purple-600">(HEFI-2019)</span>
+          Healthy Eating Food Index
         </h1>
         <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-4 leading-relaxed">
           A score for how closely a day of eating lines up with <strong>Canada&apos;s Food
           Guide</strong>. Six things the Guide encourages add to your score, four nutrients
           worth moderating can pull it down. The total runs from 0 to 80.
+        </p>
+        <p className="text-sm text-gray-500 max-w-2xl mx-auto mb-4">
+          Researchers may know this measure as HEFI-2019 (Brassard et al. 2022).
         </p>
         <div className="inline-flex items-start gap-2 max-w-2xl mx-auto bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 mb-6 text-sm text-amber-900">
           <ExclamationTriangleIcon className="w-4 h-4 flex-shrink-0 mt-0.5" />
@@ -153,14 +156,14 @@ export default function HEFIPage() {
             className="inline-flex items-center justify-center px-6 py-3 bg-purple-600 text-white text-base font-medium rounded-lg hover:bg-purple-700"
           >
             <CalendarDaysIcon className="mr-2 w-5 h-5" />
-            Build a 24-hour recall
+            Log a food diary day
           </Link>
           <Link
             href="/scorecard"
             className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50"
           >
             <SparklesIcon className="mr-2 w-5 h-5" />
-            See HEFI next to five other lenses
+            See all six scores at once
           </Link>
         </div>
       </section>
@@ -398,7 +401,7 @@ export default function HEFIPage() {
         <div className="flex items-start mb-3">
           <InformationCircleIcon className="w-6 h-6 text-blue-600 mr-3 mt-1 flex-shrink-0" />
           <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">About HEFI-2019</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">About healthy eating scores</h2>
             <p className="text-sm text-gray-700">
               The Healthy Eating Food Index is the score Health Canada uses to measure how
               closely the way Canadians eat lines up with the 2019 Food Guide. It works best

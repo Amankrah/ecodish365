@@ -671,7 +671,7 @@ export default function HEFICalculatePage() {
               className="w-full mt-4 inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
             >
               <CalculatorIcon className="mr-2 w-5 h-5" />
-              {isLoading ? 'Calculating...' : 'Calculate HEFI Score'}
+              {isLoading ? 'Calculating...' : userType === 'individual' ? 'Calculate healthy eating score' : 'Calculate HEFI Score'}
             </button>
           </div>
 
@@ -713,7 +713,7 @@ export default function HEFICalculatePage() {
                 <InformationCircleIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No Results Yet</h3>
                 <p className="text-gray-600">
-                  Add foods on the left and click &quot;Calculate HEFI Score&quot; to see your results here.
+                  Add foods on the left and click &quot;{userType === 'individual' ? 'Calculate healthy eating score' : 'Calculate HEFI Score'}&quot; to see your results here.
                 </p>
               </div>
             )}
@@ -722,7 +722,7 @@ export default function HEFICalculatePage() {
             <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
               <h3 className="text-lg font-semibold text-purple-900 mb-2 flex items-center">
                 <CheckCircleIcon className="w-5 h-5 mr-2" />
-                HEFI-2019 Algorithm Highlights
+                {userType === 'individual' ? 'How the score works' : 'HEFI-2019 Algorithm Highlights'}
               </h3>
               <div className="text-sm text-purple-800 space-y-1">
                 <p>• 10 components covering adequacy and moderation</p>

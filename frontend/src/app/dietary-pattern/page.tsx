@@ -185,12 +185,12 @@ function DietaryPatternPageInner() {
         {foodsInput.length === 0 && !loading && (
           <div className="bg-white rounded-lg border p-6 shadow-sm text-sm text-gray-600 space-y-2">
             <p className="font-medium text-gray-900">
-              How to score a dietary pattern
+              How to score an eating style
             </p>
             <ol className="list-decimal list-inside space-y-1">
-              <li>Go to the <a href="/recall-24h" className="text-blue-700 underline">24-h dietary recall wizard</a>.</li>
-              <li>Log your day occasion-by-occasion.</li>
-              <li>On Step 4 (Score), click <span className="font-medium">🎯 Score Dietary Pattern</span>.</li>
+              <li>Go to the <a href="/recall-24h" className="text-blue-700 underline">food diary</a>.</li>
+              <li>Log your day meal by meal.</li>
+              <li>On the score step, click <span className="font-medium">🎯 Eating style</span>.</li>
             </ol>
             <p className="text-xs text-gray-500 pt-2 border-t">
               The resemblance is computed against curated prototype days from

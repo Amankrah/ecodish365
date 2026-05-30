@@ -393,7 +393,7 @@ export default function HSRCalculate() {
                       <span className="ml-2 text-sm text-gray-700">
                         Include healthier alternatives
                         {cameFromRecall && (
-                          <span className="text-gray-500"> (off for 24-h recall loads)</span>
+                          <span className="text-gray-500"> (off for food diary loads)</span>
                         )}
                       </span>
                     </label>

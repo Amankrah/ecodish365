@@ -81,7 +81,7 @@ export default function HSRCompare() {
           <p className="text-lg text-gray-600">
             Compare Health Star Ratings across similar products at the same serving size.
             For all six metrics at once on the same list see{' '}
-            <a href="/scorecard" className="text-amber-700 underline">Scorecard</a>.
+            <a href="/scorecard" className="text-amber-700 underline">all scores</a>.
           </p>
           <p className="mt-2 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
             HSR only compares foods within the same category — use this to pick between similar products, not unlike items.

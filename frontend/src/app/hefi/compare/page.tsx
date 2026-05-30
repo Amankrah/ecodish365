@@ -247,16 +247,16 @@ export default function HEFIComparePage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">HEFI Comparison</h1>
-          <p className="text-lg text-gray-600">Create meal groups or day-level combinations and compare their HEFI-2019 alignment. Single-food comparisons are educational only.</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Compare healthy eating scores</h1>
+          <p className="text-lg text-gray-600">Create meal groups or day-level combinations and compare how closely they match Canada&apos;s Food Guide. Single-food comparisons are educational only.</p>
           <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <div className="flex">
               <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600 mr-2 flex-shrink-0" />
               <div className="text-sm text-yellow-800">
-                <p className="font-semibold">Important: HEFI-2019 measures dietary patterns</p>
+                <p className="font-semibold">Important: healthy eating scores work best for full days</p>
                 <ul className="list-disc list-inside mt-1 space-y-1">
-                  <li>For valid interpretation, combine foods to represent a complete daily intake (24-hour recall).</li>
-                  <li>Single-food results should not be considered a HEFI-2019 assessment.</li>
+                  <li>For valid interpretation, combine foods to represent a complete daily intake (food diary day).</li>
+                  <li>Single-food results should not be treated as a full-day healthy eating assessment.</li>
                 </ul>
               </div>
             </div>
@@ -270,7 +270,7 @@ export default function HEFIComparePage() {
               <h2 className="text-lg font-semibold text-gray-900 mb-2">Build a meal</h2>
               <p className="text-xs text-gray-600 mb-4">
                 Add foods, save as a named meal, then compare 2+ meals. For a full day use{' '}
-                <a href="/hefi/calculate" className="text-purple-700 underline">Calculate HEFI</a>.
+                <a href="/hefi/calculate" className="text-purple-700 underline">Calculate healthy eating</a>.
               </p>
               <ScorerFoodInput
                 mode="pool"

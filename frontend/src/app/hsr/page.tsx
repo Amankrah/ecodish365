@@ -60,9 +60,9 @@ const hsrFeatures = [
     ],
   },
   {
-    name: 'Scorecard (all metrics)',
+    name: 'All scores',
     description:
-      'See the star rating next to all five other lenses for the same foods: FCS, HEFI, HENI, environmental impact, and dietary pattern, in one clear summary.',
+      'See the star rating next to all five other measures for the same foods: Food Compass, healthy eating, health impact, environment, and eating style, in one clear summary.',
     icon: ChartBarIcon,
     href: '/scorecard',
     color: 'primary',
@@ -90,7 +90,7 @@ const hsrBenefits = [
   {
     title: 'Per-product, not per-day',
     description:
-      'A 5-star product is not a healthy diet. For full-day diet quality, use HEFI-2019 or FCS. For population-level health impact, use HENI.',
+      'A 5-star product is not a healthy diet. For full-day diet quality, use healthy eating or Food Compass. For population-level health impact, use health impact scores.',
     icon: LightBulbIcon,
   },
   {
@@ -167,10 +167,10 @@ export default function HSRDashboard() {
               <span>
                 <strong>Per-product, not per-day.</strong> A 5-star product is not a healthy diet.
                 For full-day diet quality see{' '}
-                <Link href="/hefi" className="underline">HEFI-2019</Link> or{' '}
-                <Link href="/fcs" className="underline">FCS</Link>.
-                For all metrics at once, use the{' '}
-                <Link href="/scorecard" className="underline font-medium">Scorecard</Link>.
+                <Link href="/hefi" className="underline">healthy eating</Link> or{' '}
+                <Link href="/fcs" className="underline">Food Compass</Link>.
+                For all metrics at once, use{' '}
+                <Link href="/scorecard" className="underline font-medium">all scores</Link>.
               </span>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

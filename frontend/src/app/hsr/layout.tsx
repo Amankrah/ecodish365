@@ -70,7 +70,7 @@ export default function HSRLayout({
       'Packaged product label scan',
       'Catalogue food scoring',
       'Compare products side by side',
-      'Scorecard across all metrics',
+      'All scores across every measure',
     ],
     offers: {
       '@type': 'Offer',

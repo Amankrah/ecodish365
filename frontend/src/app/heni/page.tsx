@@ -93,8 +93,8 @@ export default function HENIHomePage() {
               The minutes are a population estimate, not a personal forecast. HENI assumes
               each food adds or subtracts a small, independent effect on top of a typical
               eating pattern, and it draws on US data, so the picture for any one person
-              will differ. For Food Guide adherence on a full day of eating, try{' '}
-              <Link href="/hefi" className="underline">HEFI-2019</Link>.
+              For Food Guide adherence on a full day of eating, try{' '}
+              <Link href="/hefi" className="underline">healthy eating scores</Link>.
             </span>
           </div>
         </div>
@@ -124,12 +124,12 @@ export default function HENIHomePage() {
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">See it next to other lenses</h3>
               <p className="text-gray-600 leading-relaxed text-sm">
-                The Scorecard runs HENI alongside HEFI, Food Compass, HSR, environmental
-                impact, and dietary pattern, on the same list of foods. Different questions,
+                All scores runs health impact alongside healthy eating, Food Compass, star ratings, environment,
+                and eating style on the same list of foods. Different questions,
                 one page.
               </p>
               <div className="mt-3 text-purple-700 font-medium group-hover:text-purple-800 text-sm">
-                Open Scorecard →
+                Open all scores →
               </div>
             </div>
           </Link>
@@ -143,7 +143,7 @@ export default function HENIHomePage() {
           >
             <CalendarClock className="h-6 w-6 text-blue-700 flex-shrink-0" />
             <div className="flex-1">
-              <div className="text-sm font-semibold text-gray-900">Build a 24-hour recall</div>
+              <div className="text-sm font-semibold text-gray-900">Log a food diary day</div>
               <div className="text-xs text-gray-600">
                 Log a full day one meal at a time, then read the total minutes across the day.
               </div>
@@ -213,7 +213,7 @@ export default function HENIHomePage() {
             <li>
               <strong className="text-gray-900">Add up across your foods.</strong> Each
               food contributes its own slice, plus or minus. The total is what shows in
-              the result. The 24-hour recall is the cleanest input because it lets you
+              the result. A full food diary day is the cleanest input because it lets you
               see the day as a whole.
             </li>
           </ol>
@@ -347,7 +347,7 @@ export default function HENIHomePage() {
               HENI answers &ldquo;how many minutes?&rdquo;. HEFI answers &ldquo;does this
               line up with Canada&apos;s Food Guide?&rdquo;. HSR answers &ldquo;is this
               product better than the others next to it on the shelf?&rdquo;. The{' '}
-              <Link href="/scorecard" className="text-blue-700 underline">Scorecard</Link>{' '}
+              <Link href="/scorecard" className="text-blue-700 underline">all scores page</Link>{' '}
               runs all six in one go.
             </p>
           </div>

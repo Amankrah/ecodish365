@@ -190,7 +190,7 @@ export default function CNFDashboard() {
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Learn a food, then score it</h2>
           <p className="text-gray-600 mb-6 max-w-3xl">
             Use Researcher mode in the toolbar on any explorer page. Open a food profile to see which
-            nutrients each published lens reads, then add it to the Scorecard at your chosen portion size.
+            nutrients each published measure reads, then add it to all scores at your chosen portion size.
           </p>
           <ol className="grid md:grid-cols-4 gap-4 text-sm">
             <li className="border border-gray-100 rounded-lg p-4">
@@ -199,7 +199,7 @@ export default function CNFDashboard() {
             </li>
             <li className="border border-gray-100 rounded-lg p-4">
               <div className="font-semibold text-gray-900 mb-1">2. Open the profile</div>
-              <p className="text-gray-600">Lens nutrient panels show what HEFI, HSR, FCS, and HENI draw from the catalogue.</p>
+              <p className="text-gray-600">Lens nutrient panels show what healthy eating, star ratings, Food Compass, and health impact draw from the catalogue.</p>
             </li>
             <li className="border border-gray-100 rounded-lg p-4">
               <div className="font-semibold text-gray-900 mb-1">3. Compare alternatives</div>
@@ -207,7 +207,7 @@ export default function CNFDashboard() {
             </li>
             <li className="border border-gray-100 rounded-lg p-4">
               <div className="font-semibold text-gray-900 mb-1">4. Score all six lenses</div>
-              <p className="text-gray-600">Send foods to the Scorecard for HEFI, HENI, HSR, FCS, environmental, and dietary pattern.</p>
+              <p className="text-gray-600">Send foods to all scores for healthy eating, health impact, star ratings, Food Compass, environment, and eating style.</p>
             </li>
           </ol>
           <div className="mt-6 flex flex-wrap gap-3">
@@ -216,7 +216,7 @@ export default function CNFDashboard() {
               <MagnifyingGlassIcon className="ml-2 w-4 h-4" />
             </Link>
             <Link href="/scorecard" className="btn-outline inline-flex items-center">
-              Open Scorecard
+              Open all scores
             </Link>
           </div>
         </div>

@@ -95,9 +95,9 @@ export default function FCSCompare() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Compare Foods</h1>
           <p className="text-lg text-gray-600">
-            Rank products by Food Compass Score — works across all food types.
-            For all six metrics at once on the same list see{' '}
-            <a href="/scorecard" className="text-violet-700 underline">Scorecard</a>.
+            Rank products by Food Compass Score. Works across all food types.
+            For all six measures at once on the same list see{' '}
+            <a href="/scorecard" className="text-violet-700 underline">all scores</a>.
           </p>
         </div>
 

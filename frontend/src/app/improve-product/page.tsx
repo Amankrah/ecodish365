@@ -16,7 +16,7 @@ export default function ImproveProductPage(): JSX.Element {
               <h1 className="text-2xl font-bold text-gray-900">Improve a product or meal</h1>
               <p className="text-sm text-gray-600 mt-2">
                 Start with something you actually eat: a packaged product from your pantry, a
-                homemade dish you cook often, or a full day from your 24-h recall. We break it
+                homemade dish you cook often, or a full day from your food diary. We break it
                 into ingredients, suggest realistic swaps, and show how the nutrition scores
                 would change if you made them.
               </p>

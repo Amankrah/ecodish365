@@ -127,7 +127,7 @@ export default function EnvironmentalMainPage() {
                 </p>
                 <Link href="/recall-24h?then=environmental">
                   <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white" size="sm">
-                    Build a recall
+                    Build a food diary
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
@@ -143,13 +143,13 @@ export default function EnvironmentalMainPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-gray-600 mb-3 leading-snug">
-                  The Scorecard lines up environmental impact next to HEFI, HENI,
-                  Food Compass, HSR, and dietary pattern. One food list, six different
+                  All scores lines up environmental impact next to healthy eating, health impact,
+                  Food Compass, star ratings, and eating style. One food list, six different
                   questions, all in one place.
                 </p>
                 <Link href="/scorecard">
                   <Button className="w-full bg-amber-600 hover:bg-amber-700 text-white" size="sm">
-                    Open Scorecard
+                    Open all scores
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
@@ -503,15 +503,15 @@ export default function EnvironmentalMainPage() {
               </CardHeader>
               <CardContent className="text-sm text-gray-700">
                 <p>
-                  Environmental impact is one of six lenses on the{' '}
-                  <Link href="/scorecard" className="text-emerald-700 underline">Scorecard</Link>.
+                  Environmental impact is one of six measures on{' '}
+                  <Link href="/scorecard" className="text-emerald-700 underline">all scores</Link>.
                   Sustainability decisions rarely live alone. Diet quality, healthy-life
                   minutes, product-level ratings, and a Food Guide read travel with the
                   environmental view on the same panel.
                 </p>
                 <Link href="/scorecard">
                   <Button variant="outline" size="sm" className="mt-3">
-                    Open Scorecard →
+                    Open all scores →
                   </Button>
                 </Link>
               </CardContent>

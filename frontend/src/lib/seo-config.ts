@@ -153,14 +153,14 @@ export const seoConfig = {
       description: 'Calculate Food Compass Scores using the scientifically validated algorithm with 54 nutritional attributes across 9 domains.',
     },
     hefi: {
-      title: 'Healthy Eating Food Index (HEFI) Calculator - HEFI-2019 Scoring',
+      title: 'Healthy Eating Score Calculator (HEFI)',
       description:
-        "Assess diet quality using Canada's Healthy Eating Food Index (HEFI-2019). Evaluate nutritional quality across 10 components with professional insights.",
+        "See how closely a day of eating matches Canada's Food Guide. Ten components, plain-language results, score from 0 to 80.",
     },
     heni: {
-      title: 'HENI Calculator - Health Impact in micro-DALYs (μDALYs)',
+      title: 'Health Impact Calculator (HENI)',
       description:
-        'Evaluate food health impacts using the HEalth Nutritional Index (HENI). Evidence-based methodology maps dietary risk factors to micro-DALYs using GBD research.',
+        'Estimate minutes of healthy life foods may add or subtract, based on population research.',
     },
     environmental: {
       title: 'Environmental Impact Calculator - Carbon, Water, and Land Use',

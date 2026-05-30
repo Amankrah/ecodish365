@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import { ScaleIcon } from '@heroicons/react/24/outline';
 
 export const metadata: Metadata = {
-  title: 'Healthy Eating Food Index (HEFI) Calculator',
+  title: 'Healthy Eating Score Calculator',
   description:
-    "Assess diet quality using Canada's Healthy Eating Food Index (HEFI-2019). Evaluate nutritional quality across 10 components and get comprehensive dietary analysis.",
+    "See how closely a day of eating matches Canada's Food Guide. Ten components, plain-language results, and a score from 0 to 80.",
   keywords: [
     'HEFI',
     'Healthy Eating Food Index',
@@ -18,9 +18,9 @@ export const metadata: Metadata = {
     'diet scoring tool',
   ],
   openGraph: {
-    title: 'Healthy Eating Food Index (HEFI) Calculator - EcoDish365',
+    title: 'Healthy Eating Score Calculator - EcoDish365',
     description:
-      "Assess diet quality using Canada's Healthy Eating Food Index (HEFI-2019). Evaluate nutritional quality across 10 components and get comprehensive dietary analysis.",
+      "See how closely a day of eating matches Canada's Food Guide. Ten components and a score from 0 to 80.",
     type: 'website',
     url: 'https://ecodish365.com/hefi',
     images: [
@@ -28,15 +28,15 @@ export const metadata: Metadata = {
         url: '/og-hefi.png',
         width: 1200,
         height: 630,
-        alt: 'HEFI Calculator',
+        alt: 'Healthy eating score calculator',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Healthy Eating Food Index (HEFI) Calculator',
+    title: 'Healthy Eating Score Calculator',
     description:
-      "Assess diet quality using Canada's Healthy Eating Food Index (HEFI-2019). Evaluate nutritional quality across 10 components and get comprehensive dietary analysis.",
+      "See how closely a day of eating matches Canada's Food Guide.",
     images: ['/twitter-hefi.png'],
   },
   alternates: {
@@ -52,9 +52,9 @@ export default function HEFILayout({
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'Healthy Eating Food Index (HEFI) Calculator',
+    name: 'Healthy Eating Score Calculator',
     description:
-      "Advanced diet quality assessment using the HEFI-2019 algorithm with 10 components aligned to Canada's Food Guide.",
+      "Diet quality assessment aligned with Canada's Food Guide across 10 components.",
     url: 'https://ecodish365.com/hefi',
     applicationCategory: 'HealthApplication',
     operatingSystem: 'Web Browser',
@@ -64,12 +64,12 @@ export default function HEFILayout({
       url: 'https://ecodish365.com',
     },
     featureList: [
-      '10 component HEFI-2019 scoring',
+      '10 component healthy eating scoring',
       'Adequacy and moderation components',
-      'Food and meal HEFI calculation',
+      'Food and meal scoring',
       'Comparison and insights',
-      'HEFI interpretation and grades',
-      'Professional reporting',
+      'Plain-language interpretation',
+      'Food diary workflow',
       'Research-grade accuracy',
     ],
     offers: {
@@ -89,7 +89,7 @@ export default function HEFILayout({
         bestRating: '5',
       },
       reviewBody:
-        'Accurate implementation of the HEFI-2019 scoring system with comprehensive dietary analysis features.',
+        'Implementation of the HEFI-2019 scoring system with comprehensive dietary analysis features.',
     },
   };
 
@@ -103,10 +103,10 @@ export default function HEFILayout({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
             <ScaleIcon className="mx-auto h-16 w-16 mb-4 opacity-80" />
-            <h1 className="text-4xl font-bold mb-4">Healthy Eating Food Index (HEFI)</h1>
+            <h1 className="text-4xl font-bold mb-4">Healthy eating scores</h1>
             <p className="text-xl text-purple-100 max-w-3xl mx-auto">
-              Assess diet quality using Canada&apos;s Healthy Eating Food Index. Evaluate nutritional
-              quality across 10 components for comprehensive dietary analysis.
+              See how closely a day of eating matches Canada&apos;s Food Guide across ten
+              components, with plain-language results.
             </p>
           </div>
         </div>

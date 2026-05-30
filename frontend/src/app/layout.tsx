@@ -16,7 +16,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "EcoDish365 — Honest nutrition and sustainability scoring for any food",
+    default: "EcoDish365: Honest nutrition and sustainability scoring for any food",
     template: "%s | EcoDish365",
   },
   description:
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: SITE_URL,
     siteName: "EcoDish365",
-    title: "EcoDish365 — Honest nutrition and sustainability scoring for any food",
+    title: "EcoDish365: Honest nutrition and sustainability scoring for any food",
     description:
       "Score any food, meal, or full day against six published research measures. Plain-language results with the limits the science states. 7,000+ foods.",
     images: [
@@ -60,14 +60,14 @@ export const metadata: Metadata = {
         url: `${SITE_URL}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: "EcoDish365 — Honest nutrition and sustainability scoring",
+        alt: "EcoDish365: Honest nutrition and sustainability scoring",
         type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "EcoDish365 — Honest nutrition and sustainability scoring for any food",
+    title: "EcoDish365: Honest nutrition and sustainability scoring for any food",
     description:
       "Six published lenses. Plain-language results. No single composite score.",
     images: [`${SITE_URL}/og-image.png`],

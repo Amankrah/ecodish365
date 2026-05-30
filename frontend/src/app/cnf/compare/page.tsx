@@ -458,7 +458,11 @@ function CNFComparePageContent() {
         userType,
       );
     }
-    toast.success(`Added ${comparisonData.foods.length} food(s) to Scorecard at 100 g each`);
+    toast.success(
+      userType === 'individual'
+        ? `Added ${comparisonData.foods.length} food(s) to all scores at 100 g each`
+        : `Added ${comparisonData.foods.length} food(s) to Scorecard at 100 g each`,
+    );
   };
 
   const categoryOptions = useMemo(() => {
@@ -517,7 +521,7 @@ function CNFComparePageContent() {
                 Food Comparison
               </h1>
               <p className="text-gray-600">
-                Compare up to six foods side by side, then send the set to the Scorecard for all six published lenses.
+                Compare up to six foods side by side, then send the set to all scores for every published measure.
               </p>
             </div>
                               <div className="flex items-center flex-wrap gap-3">
@@ -536,7 +540,7 @@ function CNFComparePageContent() {
                           className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg text-emerald-800 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100"
                         >
                           <SparklesIcon className="w-4 h-4 mr-2" />
-                          Send to Scorecard
+                          {userType === 'individual' ? 'Send to all scores' : 'Send to Scorecard'}
                         </button>
                         <button
                           onClick={() => setShowExportModal(true)}

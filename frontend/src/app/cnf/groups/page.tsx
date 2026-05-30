@@ -184,7 +184,7 @@ function CNFGroupsPageContent() {
               </h1>
               <p className="text-gray-600">
                 Explore foods by category. Select a group to see its foods, open a profile for lens-relevant
-                nutrients, or send items to compare or the Scorecard.
+                nutrients, or send items to compare or all scores.
               </p>
             </div>
             {selectedFoods.length > 0 && (

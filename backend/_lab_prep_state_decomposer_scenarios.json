@@ -1,0 +1,114 @@
+{
+  "version": "2026-05-30",
+  "description": "Prep-state-sensitive decomposer scenarios. Each scenario is a free-text dish + the prep-state assertions a curator would make on the resolved CNF ingredients. The probe walks recipe.ingredients, finds the first ingredient whose food_description contains the keyword (case-insensitive), and scores its extracted prep state against the assertion. Pattern mirrors backend/_decomposer_lab_scenarios.json but the metric is prep-state correctness, not energy density.",
+  "schema": {
+    "dish": "free-text dish name fed to decomposer.decompose()",
+    "total_mass_g": "as-served total mass",
+    "prep_state_checks": [
+      {
+        "ingredient_keyword": "case-insensitive substring matched against ingredient.food_description",
+        "expected_thermal_state": "one of raw|cooked|boiled|fried|baked|roasted|stewed|grilled|steamed|poached|scrambled|heated|unknown (unknown = no assertion)",
+        "expected_preservation_state": "one of fresh|canned|dried|frozen|salted|smoked|cured|pickled|unknown"
+      }
+    ],
+    "rationale": "why this check matters — feeds the report"
+  },
+  "scenarios": [
+    {
+      "dish": "carrot soup",
+      "total_mass_g": 250.0,
+      "prep_state_checks": [
+        {"ingredient_keyword": "carrot", "expected_thermal_state": "cooked", "expected_preservation_state": "unknown"}
+      ],
+      "rationale": "Soup means cooked. Picking raw carrot here would underestimate Na (carrot raw 69 mg vs boiled+salt 302 mg per 100 g)."
+    },
+    {
+      "dish": "raw carrot salad with vinaigrette",
+      "total_mass_g": 150.0,
+      "prep_state_checks": [
+        {"ingredient_keyword": "carrot", "expected_thermal_state": "raw", "expected_preservation_state": "fresh"}
+      ],
+      "rationale": "Explicit 'raw' in dish name. Should pick FoodID 2380."
+    },
+    {
+      "dish": "fried yellow plantain side",
+      "total_mass_g": 150.0,
+      "prep_state_checks": [
+        {"ingredient_keyword": "plantain", "expected_thermal_state": "cooked", "expected_preservation_state": "unknown"}
+      ],
+      "rationale": "Fried plantain side — must resolve to cooked plantain (FoodID 1662), not raw 1661. Vit C raw 18.4 mg vs cooked 10.9 mg per 100 g; fat raw 0.37 g vs cooked 0.18 g."
+    },
+    {
+      "dish": "yellow plantain porridge",
+      "total_mass_g": 300.0,
+      "prep_state_checks": [
+        {"ingredient_keyword": "plantain", "expected_thermal_state": "cooked", "expected_preservation_state": "unknown"}
+      ],
+      "rationale": "Porridge means cooked. WAFCT plantain porridge is a primary West African meal."
+    },
+    {
+      "dish": "scrambled eggs and white toast breakfast",
+      "total_mass_g": 200.0,
+      "prep_state_checks": [
+        {"ingredient_keyword": "egg", "expected_thermal_state": "cooked", "expected_preservation_state": "fresh"}
+      ],
+      "rationale": "Egg in scrambled context — must be cooked (FoodID 133 scrambled or any cooked variant). Picking raw egg 125 is a contamination error."
+    },
+    {
+      "dish": "grilled chicken breast salad",
+      "total_mass_g": 250.0,
+      "prep_state_checks": [
+        {"ingredient_keyword": "chicken", "expected_thermal_state": "cooked", "expected_preservation_state": "fresh"}
+      ],
+      "rationale": "Grilled / roasted / cooked chicken — raw chicken 560 is wrong by ~30 kcal/100 g and clinically wrong (food safety)."
+    },
+    {
+      "dish": "fresh apple slices with peanut butter",
+      "total_mass_g": 150.0,
+      "prep_state_checks": [
+        {"ingredient_keyword": "apple", "expected_thermal_state": "raw", "expected_preservation_state": "fresh"}
+      ],
+      "rationale": "Snack context — raw apple (1696). Picking baked/canned/dried apple would change sugar profile."
+    },
+    {
+      "dish": "apple pie slice",
+      "total_mass_g": 150.0,
+      "prep_state_checks": [
+        {"ingredient_keyword": "apple", "expected_thermal_state": "cooked", "expected_preservation_state": "unknown"}
+      ],
+      "rationale": "Pie filling is cooked — could be canned-heated (1487), boiled (1698), or microwaved (1486). All acceptable."
+    },
+    {
+      "dish": "canned tomato pasta sauce over spaghetti",
+      "total_mass_g": 350.0,
+      "prep_state_checks": [
+        {"ingredient_keyword": "tomato", "expected_thermal_state": "unknown", "expected_preservation_state": "canned"}
+      ],
+      "rationale": "Sauce is canned. Picking fresh tomato underestimates Na (canned tomato has added salt)."
+    },
+    {
+      "dish": "raw vegetable garden salad",
+      "total_mass_g": 200.0,
+      "prep_state_checks": [
+        {"ingredient_keyword": "lettuce", "expected_thermal_state": "raw", "expected_preservation_state": "fresh"}
+      ],
+      "rationale": "Garden salad — all components raw. Picking cooked greens would wreck Vit C."
+    },
+    {
+      "dish": "stewed beef with vegetables",
+      "total_mass_g": 350.0,
+      "prep_state_checks": [
+        {"ingredient_keyword": "beef", "expected_thermal_state": "cooked", "expected_preservation_state": "fresh"}
+      ],
+      "rationale": "Stew means cooked beef. Raw beef is a food-safety error."
+    },
+    {
+      "dish": "frozen broccoli stir fry",
+      "total_mass_g": 250.0,
+      "prep_state_checks": [
+        {"ingredient_keyword": "broccoli", "expected_thermal_state": "cooked", "expected_preservation_state": "frozen"}
+      ],
+      "rationale": "Frozen broccoli used in stir-fry — should resolve to FoodID 2026 (frozen+boiled) not 2025 (frozen unprep)."
+    }
+  ]
+}

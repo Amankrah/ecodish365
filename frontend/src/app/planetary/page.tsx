@@ -167,7 +167,7 @@ export default function PlanetaryBoundaryPage(): JSX.Element {
               <Link href="/recall-24h?then=planetary" className="flex items-start gap-2 p-3 rounded-md border border-gray-200 hover:bg-gray-50">
                 <CalendarClock className="h-4 w-4 text-green-700 flex-shrink-0 mt-0.5" aria-hidden="true" />
                 <span className="flex-1">
-                  <span className="block text-sm font-medium text-gray-900">Log a 24-h recall</span>
+                  <span className="block text-sm font-medium text-gray-900">Log a food diary day</span>
                   <span className="block text-xs text-gray-600">Build a full day, then return here.</span>
                 </span>
               </Link>
@@ -182,7 +182,7 @@ export default function PlanetaryBoundaryPage(): JSX.Element {
                 <Search className="h-4 w-4 text-blue-700 flex-shrink-0 mt-0.5" aria-hidden="true" />
                 <span className="flex-1">
                   <span className="block text-sm font-medium text-gray-900">Search foods</span>
-                  <span className="block text-xs text-gray-600">CNF + WAFCT catalog.</span>
+                  <span className="block text-xs text-gray-600">Canadian and West African food catalogue.</span>
                 </span>
               </Link>
               <Link href="/recall-history" className="flex items-start gap-2 p-3 rounded-md border border-gray-200 hover:bg-gray-50">
@@ -239,10 +239,10 @@ export default function PlanetaryBoundaryPage(): JSX.Element {
         {!scoring && shares && (
           <div className="bg-white rounded-lg border border-gray-200 p-4 text-sm text-gray-700">
             <p>
-              The planetary share is one lens. Pair it with{' '}
-              <Link href="/scorecard" className="text-emerald-700 underline">the Scorecard</Link>{' '}
-              to see HEFI, HENI, HSR, FCS, environmental impact, and dietary-pattern resemblance
-              on the same list of foods — different questions about the same eating.
+              The planetary share is one measure. Pair it with{' '}
+              <Link href="/scorecard" className="text-emerald-700 underline">all scores</Link>{' '}
+              to see healthy eating, health impact, star ratings, Food Compass, environment, and eating style
+              on the same list of foods. Different questions about the same eating.
             </p>
           </div>
         )}

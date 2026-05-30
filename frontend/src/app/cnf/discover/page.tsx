@@ -13,7 +13,7 @@ export default function CNFNutrientDiscoverPage() {
           <p className="text-gray-600">
             A research workbench over the CNF + WAFCT catalogue. Combine nutrient bounds, rank by
             density per 100 kcal or by clinical ratios, threshold on % Daily Value, scope to a food
-            group, and export the result set. Open any food for its lens panels and Scorecard handoff.
+            group, and export the result set. Open any food for its scoring panels and all-scores handoff.
           </p>
         </div>
 
