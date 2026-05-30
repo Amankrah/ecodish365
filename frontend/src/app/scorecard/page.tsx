@@ -13,7 +13,7 @@
  */
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Loader2, RefreshCw, Sparkles, AlertCircle, Info, Download } from 'lucide-react';
 import {
@@ -62,7 +62,7 @@ const METRIC_LABELS: Record<MetricKey, { emoji: string; title: string }> = {
   dietary_pattern: { emoji: '🎯', title: 'Eating style' },
 };
 
-export default function ScorecardPage(): JSX.Element {
+function ScorecardPageInner(): JSX.Element {
   const searchParams = useSearchParams();
   const [userType, setUserType] = useState<UserType>('individual');
   const [list, setList] = useState<ActiveFoodList | null>(null);
@@ -615,5 +615,14 @@ export default function ScorecardPage(): JSX.Element {
         disabled={nFoods === 0}
       />
     </main>
+  );
+}
+
+export default function ScorecardPage(): JSX.Element {
+  // useSearchParams requires Suspense in the Next.js App Router.
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50" />}>
+      <ScorecardPageInner />
+    </Suspense>
   );
 }
