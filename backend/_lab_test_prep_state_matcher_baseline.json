@@ -18,6 +18,7 @@
       "matched_confidence": 0.95,
       "matched_food_description": "Carrot, raw",
       "matched_food_id": 2380,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "raw carrot",
@@ -41,6 +42,7 @@
       "matched_confidence": 0.85,
       "matched_food_description": "Carrot, raw",
       "matched_food_id": 2380,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "fresh carrot",
@@ -64,6 +66,7 @@
       "matched_confidence": 0.85,
       "matched_food_description": "Apple, raw, with skin",
       "matched_food_id": 1696,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "raw apple with skin",
@@ -87,6 +90,7 @@
       "matched_confidence": 0.95,
       "matched_food_description": "Apricot, raw",
       "matched_food_id": 1498,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "raw apricot",
@@ -112,6 +116,7 @@
       "matched_confidence": 0.85,
       "matched_food_description": "Avocado, raw, all commercial varieties",
       "matched_food_id": 1511,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "raw avocado",
@@ -135,6 +140,7 @@
       "matched_confidence": 0.95,
       "matched_food_description": "Collards, raw",
       "matched_food_id": 2063,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "raw collard greens",
@@ -158,6 +164,7 @@
       "matched_confidence": 0.95,
       "matched_food_description": "Egg, chicken, whole, fresh or frozen, raw",
       "matched_food_id": 125,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "raw chicken egg",
@@ -182,6 +189,40 @@
       "matched_confidence": 0.8,
       "matched_food_description": "Chicken, broiler, meat and skin, raw",
       "matched_food_id": 560,
+      "nutrient_delta": {
+        "expected_food_id": 555,
+        "fibre_g": {
+          "delta_abs": 0.0,
+          "delta_pct": null,
+          "expected_per_100g": 0.0,
+          "returned_per_100g": 0.0
+        },
+        "kcal": {
+          "delta_abs": 2.0,
+          "delta_pct": 0.009389671361502348,
+          "expected_per_100g": 213.0,
+          "returned_per_100g": 215.0
+        },
+        "returned_food_id": 560,
+        "sat_fat_g": {
+          "delta_abs": 0.0699999999999994,
+          "delta_pct": 0.01650943396226401,
+          "expected_per_100g": 4.24,
+          "returned_per_100g": 4.31
+        },
+        "sodium_mg": {
+          "delta_abs": 0.0,
+          "delta_pct": 0.0,
+          "expected_per_100g": 70.0,
+          "returned_per_100g": 70.0
+        },
+        "vitamin_c_mg": {
+          "delta_abs": -1.0,
+          "delta_pct": -0.3846153846153846,
+          "expected_per_100g": 2.6,
+          "returned_per_100g": 1.6
+        }
+      },
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "raw chicken with skin",
@@ -205,6 +246,7 @@
       "matched_confidence": 0.85,
       "matched_food_description": "Plantain, yellow raw",
       "matched_food_id": 1661,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "raw yellow plantain",
@@ -225,9 +267,10 @@
       "fallback_reason": null,
       "food_id_correct": true,
       "label": "sweet_corn_raw",
-      "matched_confidence": 0.95,
+      "matched_confidence": 0.85,
       "matched_food_description": "Corn, sweet, yellow, raw",
       "matched_food_id": 2388,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "raw sweet corn",
@@ -251,6 +294,7 @@
       "matched_confidence": 0.95,
       "matched_food_description": "Carrot, boiled, drained",
       "matched_food_id": 2381,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "boiled carrot",
@@ -274,6 +318,7 @@
       "matched_confidence": 0.85,
       "matched_food_description": "Apple, raw, without skin, sliced, cooked, boiled",
       "matched_food_id": 1698,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "boiled apple",
@@ -298,6 +343,40 @@
       "matched_confidence": 0.85,
       "matched_food_description": "Chicken, roasting, meat and skin, roasted",
       "matched_food_id": 638,
+      "nutrient_delta": {
+        "expected_food_id": 558,
+        "fibre_g": {
+          "delta_abs": 0.0,
+          "delta_pct": null,
+          "expected_per_100g": 0.0,
+          "returned_per_100g": 0.0
+        },
+        "kcal": {
+          "delta_abs": -11.0,
+          "delta_pct": -0.04700854700854701,
+          "expected_per_100g": 234.0,
+          "returned_per_100g": 223.0
+        },
+        "returned_food_id": 638,
+        "sat_fat_g": {
+          "delta_abs": 0.040000000000000036,
+          "delta_pct": 0.01081081081081082,
+          "expected_per_100g": 3.7,
+          "returned_per_100g": 3.74
+        },
+        "sodium_mg": {
+          "delta_abs": -6.0,
+          "delta_pct": -0.0759493670886076,
+          "expected_per_100g": 79.0,
+          "returned_per_100g": 73.0
+        },
+        "vitamin_c_mg": {
+          "delta_abs": -0.5,
+          "delta_pct": -1.0,
+          "expected_per_100g": 0.5,
+          "returned_per_100g": 0.0
+        }
+      },
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "roasted chicken with skin",
@@ -324,6 +403,40 @@
       "matched_confidence": 0.8,
       "matched_food_description": "Chicken, broiler, meat and skin, batter dipped, fried",
       "matched_food_id": 561,
+      "nutrient_delta": {
+        "expected_food_id": 556,
+        "fibre_g": {
+          "delta_abs": 0.3,
+          "delta_pct": null,
+          "expected_per_100g": 0.0,
+          "returned_per_100g": 0.3
+        },
+        "kcal": {
+          "delta_abs": -2.0,
+          "delta_pct": -0.006872852233676976,
+          "expected_per_100g": 291.0,
+          "returned_per_100g": 289.0
+        },
+        "returned_food_id": 561,
+        "sat_fat_g": {
+          "delta_abs": -0.05999999999999961,
+          "delta_pct": -0.012847965738757947,
+          "expected_per_100g": 4.67,
+          "returned_per_100g": 4.61
+        },
+        "sodium_mg": {
+          "delta_abs": 8.0,
+          "delta_pct": 0.028169014084507043,
+          "expected_per_100g": 284.0,
+          "returned_per_100g": 292.0
+        },
+        "vitamin_c_mg": {
+          "delta_abs": -0.4,
+          "delta_pct": -1.0,
+          "expected_per_100g": 0.4,
+          "returned_per_100g": 0.0
+        }
+      },
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "fried chicken",
@@ -348,6 +461,40 @@
       "matched_confidence": 0.85,
       "matched_food_description": "Chicken, stewing, meat and skin, stewed",
       "matched_food_id": 648,
+      "nutrient_delta": {
+        "expected_food_id": 559,
+        "fibre_g": {
+          "delta_abs": 0.0,
+          "delta_pct": null,
+          "expected_per_100g": 0.0,
+          "returned_per_100g": 0.0
+        },
+        "kcal": {
+          "delta_abs": 69.0,
+          "delta_pct": 0.3194444444444444,
+          "expected_per_100g": 216.0,
+          "returned_per_100g": 285.0
+        },
+        "returned_food_id": 648,
+        "sat_fat_g": {
+          "delta_abs": 1.6600000000000001,
+          "delta_pct": 0.4811594202898551,
+          "expected_per_100g": 3.45,
+          "returned_per_100g": 5.11
+        },
+        "sodium_mg": {
+          "delta_abs": 7.0,
+          "delta_pct": 0.10606060606060606,
+          "expected_per_100g": 66.0,
+          "returned_per_100g": 73.0
+        },
+        "vitamin_c_mg": {
+          "delta_abs": -0.5,
+          "delta_pct": -1.0,
+          "expected_per_100g": 0.5,
+          "returned_per_100g": 0.0
+        }
+      },
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "stewed chicken",
@@ -371,6 +518,7 @@
       "matched_confidence": 0.95,
       "matched_food_description": "Egg, chicken, whole, cooked, boiled in shell, hard-cooked",
       "matched_food_id": 130,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "hard boiled egg",
@@ -394,6 +542,7 @@
       "matched_confidence": 0.95,
       "matched_food_description": "Egg, chicken, whole, cooked, fried",
       "matched_food_id": 129,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "fried egg",
@@ -417,6 +566,7 @@
       "matched_confidence": 0.85,
       "matched_food_description": "Egg, chicken, whole, cooked, scrambled or omelet",
       "matched_food_id": 133,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "scrambled egg",
@@ -440,6 +590,7 @@
       "matched_confidence": 0.95,
       "matched_food_description": "Plantain, yellow cooked",
       "matched_food_id": 1662,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "cooked yellow plantain",
@@ -463,6 +614,7 @@
       "matched_confidence": 0.85,
       "matched_food_description": "Collards, boiled, drained",
       "matched_food_id": 2064,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "boiled collard greens",
@@ -486,6 +638,7 @@
       "matched_confidence": 0.95,
       "matched_food_description": "Cardoon, boiled, drained",
       "matched_food_id": 2043,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "boiled cardoon",
@@ -509,6 +662,7 @@
       "matched_confidence": 0.95,
       "matched_food_description": "Celeriac, boiled, drained",
       "matched_food_id": 2050,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "boiled celeriac",
@@ -533,6 +687,40 @@
       "matched_confidence": 0.85,
       "matched_food_description": "Carrot, canned, drained solids, unsalted",
       "matched_food_id": 6398,
+      "nutrient_delta": {
+        "expected_food_id": 2382,
+        "fibre_g": {
+          "delta_abs": -0.050000000000000044,
+          "delta_pct": -0.03225806451612906,
+          "expected_per_100g": 1.55,
+          "returned_per_100g": 1.5
+        },
+        "kcal": {
+          "delta_abs": 0.0,
+          "delta_pct": 0.0,
+          "expected_per_100g": 25.0,
+          "returned_per_100g": 25.0
+        },
+        "returned_food_id": 6398,
+        "sat_fat_g": {
+          "delta_abs": -0.005999999999999998,
+          "delta_pct": -0.16666666666666663,
+          "expected_per_100g": 0.036,
+          "returned_per_100g": 0.03
+        },
+        "sodium_mg": {
+          "delta_abs": -200.0,
+          "delta_pct": -0.8264462809917356,
+          "expected_per_100g": 242.0,
+          "returned_per_100g": 42.0
+        },
+        "vitamin_c_mg": {
+          "delta_abs": 0.0,
+          "delta_pct": 0.0,
+          "expected_per_100g": 2.7,
+          "returned_per_100g": 2.7
+        }
+      },
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "canned carrots",
@@ -556,6 +744,7 @@
       "matched_confidence": 0.85,
       "matched_food_description": "Apple, canned, sweetened, sliced, heated",
       "matched_food_id": 1487,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "canned sweetened apple",
@@ -579,6 +768,40 @@
       "matched_confidence": 0.85,
       "matched_food_description": "Apricot, canned halves with skin, water pack, solids and liquid",
       "matched_food_id": 1499,
+      "nutrient_delta": {
+        "expected_food_id": 1500,
+        "fibre_g": {
+          "delta_abs": 0.5,
+          "delta_pct": 0.45454545454545453,
+          "expected_per_100g": 1.1,
+          "returned_per_100g": 1.6
+        },
+        "kcal": {
+          "delta_abs": 5.0,
+          "delta_pct": 0.22727272727272727,
+          "expected_per_100g": 22.0,
+          "returned_per_100g": 27.0
+        },
+        "returned_food_id": 1499,
+        "sat_fat_g": {
+          "delta_abs": 0.009,
+          "delta_pct": 4.5,
+          "expected_per_100g": 0.002,
+          "returned_per_100g": 0.011
+        },
+        "sodium_mg": {
+          "delta_abs": -8.0,
+          "delta_pct": -0.7272727272727273,
+          "expected_per_100g": 11.0,
+          "returned_per_100g": 3.0
+        },
+        "vitamin_c_mg": {
+          "delta_abs": 1.5999999999999999,
+          "delta_pct": 0.8888888888888888,
+          "expected_per_100g": 1.8,
+          "returned_per_100g": 3.4
+        }
+      },
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "canned apricot in water",
@@ -603,6 +826,40 @@
       "matched_confidence": 0.85,
       "matched_food_description": "Apricot, canned, heavy syrup pack, drained",
       "matched_food_id": 5395,
+      "nutrient_delta": {
+        "expected_food_id": 1505,
+        "fibre_g": {
+          "delta_abs": 1.1,
+          "delta_pct": 0.6875,
+          "expected_per_100g": 1.6,
+          "returned_per_100g": 2.7
+        },
+        "kcal": {
+          "delta_abs": 0.0,
+          "delta_pct": 0.0,
+          "expected_per_100g": 83.0,
+          "returned_per_100g": 83.0
+        },
+        "returned_food_id": 5395,
+        "sat_fat_g": {
+          "delta_abs": 0.001,
+          "delta_pct": 0.16666666666666666,
+          "expected_per_100g": 0.006,
+          "returned_per_100g": 0.007
+        },
+        "sodium_mg": {
+          "delta_abs": -7.0,
+          "delta_pct": -0.6363636363636364,
+          "expected_per_100g": 11.0,
+          "returned_per_100g": 4.0
+        },
+        "vitamin_c_mg": {
+          "delta_abs": 0.30000000000000027,
+          "delta_pct": 0.10714285714285725,
+          "expected_per_100g": 2.8,
+          "returned_per_100g": 3.1
+        }
+      },
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "canned apricot in heavy syrup",
@@ -626,6 +883,7 @@
       "matched_confidence": 0.8,
       "matched_food_description": "Butterbur (fuki), canned",
       "matched_food_id": 2033,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "canned butterbur",
@@ -649,6 +907,7 @@
       "matched_confidence": 0.85,
       "matched_food_description": "Apple, dried, sulphured, uncooked",
       "matched_food_id": 1490,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "dried apple",
@@ -669,9 +928,10 @@
       "fallback_reason": null,
       "food_id_correct": true,
       "label": "dried_apricot_uncooked",
-      "matched_confidence": 0.85,
+      "matched_confidence": 0.8,
       "matched_food_description": "Apricot, dried, sulphured, uncooked",
       "matched_food_id": 1507,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "dried apricot",
@@ -695,6 +955,7 @@
       "matched_confidence": 0.9,
       "matched_food_description": "Apple, dried, sulphured, stewed, no added sugar",
       "matched_food_id": 1491,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "stewed dried apple no sugar",
@@ -719,6 +980,7 @@
       "matched_confidence": 0.85,
       "matched_food_description": "Apricot, dried, sulphured, cooked, no added sugar",
       "matched_food_id": 1508,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "stewed dried apricot",
@@ -742,6 +1004,7 @@
       "matched_confidence": 0.95,
       "matched_food_description": "Spices, basil, dried",
       "matched_food_id": 171,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "dried basil",
@@ -766,6 +1029,7 @@
       "matched_confidence": 0.9,
       "matched_food_description": "Egg, chicken, dried, whole",
       "matched_food_id": 83,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "dried whole egg powder",
@@ -789,6 +1053,7 @@
       "matched_confidence": 0.85,
       "matched_food_description": "Broccoli, frozen, spears, unprepared",
       "matched_food_id": 2025,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "frozen broccoli",
@@ -809,9 +1074,10 @@
       "fallback_reason": null,
       "food_id_correct": true,
       "label": "frozen_carrot_raw",
-      "matched_confidence": 0.95,
+      "matched_confidence": 0.85,
       "matched_food_description": "Carrot, frozen, unprepared",
       "matched_food_id": 2383,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "frozen carrots",
@@ -835,6 +1101,7 @@
       "matched_confidence": 0.85,
       "matched_food_description": "Carrot, frozen, boiled, drained",
       "matched_food_id": 2384,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "frozen carrots, boiled",
@@ -858,6 +1125,40 @@
       "matched_confidence": 0.9,
       "matched_food_description": "Blueberry, frozen, unsweetened",
       "matched_food_id": 1706,
+      "nutrient_delta": {
+        "expected_food_id": 1519,
+        "fibre_g": {
+          "delta_abs": 1.02,
+          "delta_pct": 0.4636363636363636,
+          "expected_per_100g": 2.2,
+          "returned_per_100g": 3.22
+        },
+        "kcal": {
+          "delta_abs": -34.0,
+          "delta_pct": -0.4,
+          "expected_per_100g": 85.0,
+          "returned_per_100g": 51.0
+        },
+        "returned_food_id": 1706,
+        "sat_fat_g": {
+          "delta_abs": 0.041999999999999996,
+          "delta_pct": 3.818181818181818,
+          "expected_per_100g": 0.011,
+          "returned_per_100g": 0.053
+        },
+        "sodium_mg": {
+          "delta_abs": 0.0,
+          "delta_pct": 0.0,
+          "expected_per_100g": 1.0,
+          "returned_per_100g": 1.0
+        },
+        "vitamin_c_mg": {
+          "delta_abs": 1.5,
+          "delta_pct": 1.5,
+          "expected_per_100g": 1.0,
+          "returned_per_100g": 2.5
+        }
+      },
       "prep_state_both_correct": false,
       "preservation_correct": true,
       "query": "frozen blueberries",
@@ -880,9 +1181,43 @@
       "fallback_reason": null,
       "food_id_correct": false,
       "label": "carrots_in_chicken_soup",
-      "matched_confidence": 0.65,
+      "matched_confidence": 0.75,
       "matched_food_description": "Carrot, boiled* (as part of a recipe)",
       "matched_food_id": 700431,
+      "nutrient_delta": {
+        "expected_food_id": 2381,
+        "fibre_g": {
+          "delta_abs": 0.6999999999999997,
+          "delta_pct": 0.25925925925925913,
+          "expected_per_100g": 2.7,
+          "returned_per_100g": 3.4
+        },
+        "kcal": {
+          "delta_abs": 0.0,
+          "delta_pct": 0.0,
+          "expected_per_100g": 35.0,
+          "returned_per_100g": 35.0
+        },
+        "returned_food_id": 700431,
+        "sat_fat_g": {
+          "delta_abs": 0.0,
+          "delta_pct": 0.0,
+          "expected_per_100g": 0.03,
+          "returned_per_100g": 0.03
+        },
+        "sodium_mg": {
+          "delta_abs": -22.0,
+          "delta_pct": -0.3793103448275862,
+          "expected_per_100g": 58.0,
+          "returned_per_100g": 36.0
+        },
+        "vitamin_c_mg": {
+          "delta_abs": 2.4,
+          "delta_pct": 0.6666666666666666,
+          "expected_per_100g": 3.6,
+          "returned_per_100g": 6.0
+        }
+      },
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "carrots in chicken soup",
@@ -906,6 +1241,7 @@
       "matched_confidence": 0.9,
       "matched_food_description": "Carrot, raw",
       "matched_food_id": 2380,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "raw carrot sticks",
@@ -929,6 +1265,7 @@
       "matched_confidence": 0.85,
       "matched_food_description": "Plantain, yellow cooked",
       "matched_food_id": 1662,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "yellow plantain in plantain porridge",
@@ -952,6 +1289,40 @@
       "matched_confidence": 0.85,
       "matched_food_description": "Snacks, plantain chips",
       "matched_food_id": 6679,
+      "nutrient_delta": {
+        "expected_food_id": 1662,
+        "fibre_g": {
+          "delta_abs": 1.2000000000000002,
+          "delta_pct": 0.5217391304347827,
+          "expected_per_100g": 2.3,
+          "returned_per_100g": 3.5
+        },
+        "kcal": {
+          "delta_abs": 415.0,
+          "delta_pct": 3.5775862068965516,
+          "expected_per_100g": 116.0,
+          "returned_per_100g": 531.0
+        },
+        "returned_food_id": 6679,
+        "sat_fat_g": {
+          "delta_abs": 8.267999999999999,
+          "delta_pct": 119.8260869565217,
+          "expected_per_100g": 0.069,
+          "returned_per_100g": 8.337
+        },
+        "sodium_mg": {
+          "delta_abs": 197.0,
+          "delta_pct": 39.4,
+          "expected_per_100g": 5.0,
+          "returned_per_100g": 202.0
+        },
+        "vitamin_c_mg": {
+          "delta_abs": 21.200000000000003,
+          "delta_pct": 1.944954128440367,
+          "expected_per_100g": 10.9,
+          "returned_per_100g": 32.1
+        }
+      },
       "prep_state_both_correct": false,
       "preservation_correct": true,
       "query": "fried plantain chips",
@@ -977,6 +1348,40 @@
       "matched_confidence": 0.85,
       "matched_food_description": "Sweets, pie fillings, canned apple",
       "matched_food_id": 4303,
+      "nutrient_delta": {
+        "expected_food_id": 1486,
+        "fibre_g": {
+          "delta_abs": -1.7999999999999998,
+          "delta_pct": -0.6428571428571428,
+          "expected_per_100g": 2.8,
+          "returned_per_100g": 1.0
+        },
+        "kcal": {
+          "delta_abs": 44.0,
+          "delta_pct": 0.7857142857142857,
+          "expected_per_100g": 56.0,
+          "returned_per_100g": 100.0
+        },
+        "returned_food_id": 4303,
+        "sat_fat_g": {
+          "delta_abs": -0.068,
+          "delta_pct": -1.0,
+          "expected_per_100g": 0.068,
+          "returned_per_100g": 0.0
+        },
+        "sodium_mg": {
+          "delta_abs": 46.0,
+          "delta_pct": 46.0,
+          "expected_per_100g": 1.0,
+          "returned_per_100g": 47.0
+        },
+        "vitamin_c_mg": {
+          "delta_abs": 1.4,
+          "delta_pct": 4.666666666666667,
+          "expected_per_100g": 0.3,
+          "returned_per_100g": 1.7
+        }
+      },
       "prep_state_both_correct": false,
       "preservation_correct": true,
       "query": "apple filling in apple pie",
@@ -997,9 +1402,43 @@
       "fallback_reason": null,
       "food_id_correct": false,
       "label": "boiled_egg_on_salad",
-      "matched_confidence": 0.6,
+      "matched_confidence": 0.65,
       "matched_food_description": "Potato salad with egg",
       "matched_food_id": 7097,
+      "nutrient_delta": {
+        "expected_food_id": 130,
+        "fibre_g": {
+          "delta_abs": 1.3,
+          "delta_pct": null,
+          "expected_per_100g": 0.0,
+          "returned_per_100g": 1.3
+        },
+        "kcal": {
+          "delta_abs": 16.0,
+          "delta_pct": 0.11347517730496454,
+          "expected_per_100g": 141.0,
+          "returned_per_100g": 157.0
+        },
+        "returned_food_id": 7097,
+        "sat_fat_g": {
+          "delta_abs": -1.606,
+          "delta_pct": -0.527768649359185,
+          "expected_per_100g": 3.043,
+          "returned_per_100g": 1.437
+        },
+        "sodium_mg": {
+          "delta_abs": 203.54399999999998,
+          "delta_pct": 1.6224333630914423,
+          "expected_per_100g": 125.456,
+          "returned_per_100g": 329.0
+        },
+        "vitamin_c_mg": {
+          "delta_abs": 0.8,
+          "delta_pct": null,
+          "expected_per_100g": 0.0,
+          "returned_per_100g": 0.8
+        }
+      },
       "prep_state_both_correct": false,
       "preservation_correct": false,
       "query": "boiled egg slices on salad",
@@ -1024,6 +1463,40 @@
       "matched_confidence": 0.85,
       "matched_food_description": "Chicken, stewing, meat, skin, giblets and neck, stewed",
       "matched_food_id": 646,
+      "nutrient_delta": {
+        "expected_food_id": 559,
+        "fibre_g": {
+          "delta_abs": 0.0,
+          "delta_pct": null,
+          "expected_per_100g": 0.0,
+          "returned_per_100g": 0.0
+        },
+        "kcal": {
+          "delta_abs": -2.0,
+          "delta_pct": -0.009259259259259259,
+          "expected_per_100g": 216.0,
+          "returned_per_100g": 214.0
+        },
+        "returned_food_id": 646,
+        "sat_fat_g": {
+          "delta_abs": -0.12600000000000033,
+          "delta_pct": -0.036521739130434876,
+          "expected_per_100g": 3.45,
+          "returned_per_100g": 3.324
+        },
+        "sodium_mg": {
+          "delta_abs": 1.0,
+          "delta_pct": 0.015151515151515152,
+          "expected_per_100g": 66.0,
+          "returned_per_100g": 67.0
+        },
+        "vitamin_c_mg": {
+          "delta_abs": 0.5,
+          "delta_pct": 1.0,
+          "expected_per_100g": 0.5,
+          "returned_per_100g": 1.0
+        }
+      },
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "chicken pieces in chicken stew",
@@ -1048,6 +1521,40 @@
       "matched_confidence": 0.8,
       "matched_food_description": "Sandwich, hot chicken",
       "matched_food_id": 6752,
+      "nutrient_delta": {
+        "expected_food_id": 558,
+        "fibre_g": {
+          "delta_abs": 0.592,
+          "delta_pct": null,
+          "expected_per_100g": 0.0,
+          "returned_per_100g": 0.592
+        },
+        "kcal": {
+          "delta_abs": -78.0,
+          "delta_pct": -0.3333333333333333,
+          "expected_per_100g": 234.0,
+          "returned_per_100g": 156.0
+        },
+        "returned_food_id": 6752,
+        "sat_fat_g": {
+          "delta_abs": -2.1630000000000003,
+          "delta_pct": -0.5845945945945946,
+          "expected_per_100g": 3.7,
+          "returned_per_100g": 1.537
+        },
+        "sodium_mg": {
+          "delta_abs": 400.582,
+          "delta_pct": 5.070658227848101,
+          "expected_per_100g": 79.0,
+          "returned_per_100g": 479.582
+        },
+        "vitamin_c_mg": {
+          "delta_abs": -0.5,
+          "delta_pct": -1.0,
+          "expected_per_100g": 0.5,
+          "returned_per_100g": 0.0
+        }
+      },
       "prep_state_both_correct": false,
       "preservation_correct": false,
       "query": "roasted chicken in a sandwich",
@@ -1071,6 +1578,7 @@
       "matched_confidence": 0.85,
       "matched_food_description": "Bread, white, commercial",
       "matched_food_id": 4066,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "white bread",
@@ -1085,15 +1593,16 @@
       ],
       "expected_preservation_state": "unknown",
       "expected_thermal_state": "unknown",
-      "extracted_preservation_state": "unknown",
+      "extracted_preservation_state": "fresh",
       "extracted_thermal_state": "unknown",
-      "extractor_confidence": 0.5,
+      "extractor_confidence": 0.7,
       "fallback_reason": null,
       "food_id_correct": true,
       "label": "whole_milk_control",
-      "matched_confidence": 0.9,
+      "matched_confidence": 0.95,
       "matched_food_description": "Milk, fluid, whole, pasteurized, homogenized, 3.25% M.F.",
       "matched_food_id": 113,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "whole milk",
@@ -1117,6 +1626,40 @@
       "matched_confidence": 0.85,
       "matched_food_description": "Cassava, tuber, white flesh, raw",
       "matched_food_id": 700192,
+      "nutrient_delta": {
+        "expected_food_id": 2045,
+        "fibre_g": {
+          "delta_abs": 1.9000000000000001,
+          "delta_pct": 1.0555555555555556,
+          "expected_per_100g": 1.8,
+          "returned_per_100g": 3.7
+        },
+        "kcal": {
+          "delta_abs": -17.0,
+          "delta_pct": -0.1069182389937107,
+          "expected_per_100g": 159.0,
+          "returned_per_100g": 142.0
+        },
+        "returned_food_id": 700192,
+        "sat_fat_g": {
+          "delta_abs": 0.016,
+          "delta_pct": 0.21621621621621623,
+          "expected_per_100g": 0.074,
+          "returned_per_100g": 0.09
+        },
+        "sodium_mg": {
+          "delta_abs": -12.0,
+          "delta_pct": -0.8571428571428571,
+          "expected_per_100g": 14.0,
+          "returned_per_100g": 2.0
+        },
+        "vitamin_c_mg": {
+          "delta_abs": 9.399999999999999,
+          "delta_pct": 0.4563106796116504,
+          "expected_per_100g": 20.6,
+          "returned_per_100g": 30.0
+        }
+      },
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "cassava root",
@@ -1140,6 +1683,7 @@
       "matched_confidence": 0.85,
       "matched_food_description": "Breadfruit, raw",
       "matched_food_id": 1522,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "breadfruit",
@@ -1163,9 +1707,421 @@
       "matched_confidence": 0.95,
       "matched_food_description": "Eggplant, pickled",
       "matched_food_id": 5550,
+      "nutrient_delta": null,
       "prep_state_both_correct": true,
       "preservation_correct": true,
       "query": "pickled eggplant",
+      "thermal_state_correct": true,
+      "used_ai_ranking": true
+    },
+    {
+      "category": "wafct",
+      "error": null,
+      "expected_food_ids": [
+        700013,
+        700022
+      ],
+      "expected_preservation_state": "fresh",
+      "expected_thermal_state": "raw",
+      "extracted_preservation_state": "fresh",
+      "extracted_thermal_state": "raw",
+      "extractor_confidence": 1.0,
+      "fallback_reason": null,
+      "food_id_correct": false,
+      "label": "wafct_fonio_raw",
+      "matched_confidence": 0.85,
+      "matched_food_description": "Fonio, decorticated grains (bran removed), dry, raw",
+      "matched_food_id": 700016,
+      "nutrient_delta": {
+        "expected_food_id": 700013,
+        "fibre_g": {
+          "delta_abs": -14.2,
+          "delta_pct": -0.8658536585365854,
+          "expected_per_100g": 16.4,
+          "returned_per_100g": 2.2
+        },
+        "kcal": {
+          "delta_abs": 24.0,
+          "delta_pct": 0.07228915662650602,
+          "expected_per_100g": 332.0,
+          "returned_per_100g": 356.0
+        },
+        "returned_food_id": 700016,
+        "sat_fat_g": {
+          "delta_abs": -0.21999999999999997,
+          "delta_pct": -0.4680851063829787,
+          "expected_per_100g": 0.47,
+          "returned_per_100g": 0.25
+        },
+        "sodium_mg": {
+          "delta_abs": -3.0,
+          "delta_pct": -0.375,
+          "expected_per_100g": 8.0,
+          "returned_per_100g": 5.0
+        },
+        "vitamin_c_mg": {
+          "delta_abs": 0.0,
+          "delta_pct": null,
+          "expected_per_100g": 0.0,
+          "returned_per_100g": 0.0
+        }
+      },
+      "prep_state_both_correct": true,
+      "preservation_correct": true,
+      "query": "raw fonio grain",
+      "thermal_state_correct": true,
+      "used_ai_ranking": true
+    },
+    {
+      "category": "wafct",
+      "error": null,
+      "expected_food_ids": [
+        700014,
+        700015,
+        700017,
+        700018
+      ],
+      "expected_preservation_state": "fresh",
+      "expected_thermal_state": "boiled",
+      "extracted_preservation_state": "fresh",
+      "extracted_thermal_state": "boiled",
+      "extractor_confidence": 1.0,
+      "fallback_reason": null,
+      "food_id_correct": false,
+      "label": "wafct_fonio_boiled",
+      "matched_confidence": 0.85,
+      "matched_food_description": "Fonio, white, whole grains, boiled* (as part of a recipe)",
+      "matched_food_id": 700023,
+      "nutrient_delta": {
+        "expected_food_id": 700014,
+        "fibre_g": {
+          "delta_abs": 0.0,
+          "delta_pct": 0.0,
+          "expected_per_100g": 6.9,
+          "returned_per_100g": 6.9
+        },
+        "kcal": {
+          "delta_abs": 1.0,
+          "delta_pct": 0.007246376811594203,
+          "expected_per_100g": 138.0,
+          "returned_per_100g": 139.0
+        },
+        "returned_food_id": 700023,
+        "sat_fat_g": {
+          "delta_abs": 0.04999999999999999,
+          "delta_pct": 0.24999999999999994,
+          "expected_per_100g": 0.2,
+          "returned_per_100g": 0.25
+        },
+        "sodium_mg": {
+          "delta_abs": 0.0,
+          "delta_pct": 0.0,
+          "expected_per_100g": 3.0,
+          "returned_per_100g": 3.0
+        },
+        "vitamin_c_mg": {
+          "delta_abs": 0.0,
+          "delta_pct": null,
+          "expected_per_100g": 0.0,
+          "returned_per_100g": 0.0
+        }
+      },
+      "prep_state_both_correct": true,
+      "preservation_correct": true,
+      "query": "boiled fonio for porridge",
+      "thermal_state_correct": true,
+      "used_ai_ranking": true
+    },
+    {
+      "category": "wafct",
+      "error": null,
+      "expected_food_ids": [
+        700192
+      ],
+      "expected_preservation_state": "fresh",
+      "expected_thermal_state": "raw",
+      "extracted_preservation_state": "fresh",
+      "extracted_thermal_state": "raw",
+      "extractor_confidence": 1.0,
+      "fallback_reason": null,
+      "food_id_correct": true,
+      "label": "wafct_cassava_raw",
+      "matched_confidence": 0.95,
+      "matched_food_description": "Cassava, tuber, white flesh, raw",
+      "matched_food_id": 700192,
+      "nutrient_delta": null,
+      "prep_state_both_correct": true,
+      "preservation_correct": true,
+      "query": "raw cassava root white flesh",
+      "thermal_state_correct": true,
+      "used_ai_ranking": true
+    },
+    {
+      "category": "wafct",
+      "error": null,
+      "expected_food_ids": [
+        700186,
+        700195
+      ],
+      "expected_preservation_state": "dried",
+      "expected_thermal_state": "unknown",
+      "extracted_preservation_state": "dried",
+      "extracted_thermal_state": "unknown",
+      "extractor_confidence": 0.7,
+      "fallback_reason": null,
+      "food_id_correct": true,
+      "label": "wafct_cassava_dried",
+      "matched_confidence": 0.85,
+      "matched_food_description": "Cassava, tuber, white flesh, dried",
+      "matched_food_id": 700195,
+      "nutrient_delta": {
+        "expected_food_id": 700186,
+        "fibre_g": {
+          "delta_abs": -3.5,
+          "delta_pct": -0.38461538461538464,
+          "expected_per_100g": 9.1,
+          "returned_per_100g": 5.6
+        },
+        "kcal": {
+          "delta_abs": -4.0,
+          "delta_pct": -0.011494252873563218,
+          "expected_per_100g": 348.0,
+          "returned_per_100g": 344.0
+        },
+        "returned_food_id": 700195,
+        "sat_fat_g": {
+          "delta_abs": 0.14,
+          "delta_pct": 1.0,
+          "expected_per_100g": 0.14,
+          "returned_per_100g": 0.28
+        },
+        "sodium_mg": {
+          "delta_abs": 0.0,
+          "delta_pct": 0.0,
+          "expected_per_100g": 5.0,
+          "returned_per_100g": 5.0
+        },
+        "vitamin_c_mg": {
+          "delta_abs": 0.0,
+          "delta_pct": 0.0,
+          "expected_per_100g": 7.0,
+          "returned_per_100g": 7.0
+        }
+      },
+      "prep_state_both_correct": true,
+      "preservation_correct": true,
+      "query": "dried cassava root",
+      "thermal_state_correct": true,
+      "used_ai_ranking": true
+    },
+    {
+      "category": "wafct",
+      "error": null,
+      "expected_food_ids": [
+        700416
+      ],
+      "expected_preservation_state": "fresh",
+      "expected_thermal_state": "raw",
+      "extracted_preservation_state": "fresh",
+      "extracted_thermal_state": "unknown",
+      "extractor_confidence": 0.7,
+      "fallback_reason": null,
+      "food_id_correct": false,
+      "label": "wafct_amaranth_leaves_raw",
+      "matched_confidence": 0.95,
+      "matched_food_description": "Amaranth leaves, fresh",
+      "matched_food_id": 1984,
+      "nutrient_delta": {
+        "expected_food_id": 700416,
+        "fibre_g": {
+          "delta_abs": null,
+          "delta_pct": null,
+          "expected_per_100g": 3.8,
+          "returned_per_100g": null
+        },
+        "kcal": {
+          "delta_abs": -17.0,
+          "delta_pct": -0.425,
+          "expected_per_100g": 40.0,
+          "returned_per_100g": 23.0
+        },
+        "returned_food_id": 1984,
+        "sat_fat_g": {
+          "delta_abs": -0.019000000000000003,
+          "delta_pct": -0.17272727272727276,
+          "expected_per_100g": 0.11,
+          "returned_per_100g": 0.091
+        },
+        "sodium_mg": {
+          "delta_abs": 13.0,
+          "delta_pct": 1.8571428571428572,
+          "expected_per_100g": 7.0,
+          "returned_per_100g": 20.0
+        },
+        "vitamin_c_mg": {
+          "delta_abs": -23.700000000000003,
+          "delta_pct": -0.35373134328358213,
+          "expected_per_100g": 67.0,
+          "returned_per_100g": 43.3
+        }
+      },
+      "prep_state_both_correct": false,
+      "preservation_correct": true,
+      "query": "fresh amaranth leaves",
+      "thermal_state_correct": false,
+      "used_ai_ranking": true
+    },
+    {
+      "category": "wafct",
+      "error": null,
+      "expected_food_ids": [
+        700417,
+        700418
+      ],
+      "expected_preservation_state": "fresh",
+      "expected_thermal_state": "boiled",
+      "extracted_preservation_state": "fresh",
+      "extracted_thermal_state": "boiled",
+      "extractor_confidence": 1.0,
+      "fallback_reason": null,
+      "food_id_correct": false,
+      "label": "wafct_amaranth_leaves_boiled",
+      "matched_confidence": 0.95,
+      "matched_food_description": "Amaranth leaves, boiled, drained",
+      "matched_food_id": 1985,
+      "nutrient_delta": {
+        "expected_food_id": 700417,
+        "fibre_g": {
+          "delta_abs": null,
+          "delta_pct": null,
+          "expected_per_100g": 4.1,
+          "returned_per_100g": null
+        },
+        "kcal": {
+          "delta_abs": -21.0,
+          "delta_pct": -0.5,
+          "expected_per_100g": 42.0,
+          "returned_per_100g": 21.0
+        },
+        "returned_food_id": 1985,
+        "sat_fat_g": {
+          "delta_abs": -0.06999999999999999,
+          "delta_pct": -0.5833333333333333,
+          "expected_per_100g": 0.12,
+          "returned_per_100g": 0.05
+        },
+        "sodium_mg": {
+          "delta_abs": 14.0,
+          "delta_pct": 2.0,
+          "expected_per_100g": 7.0,
+          "returned_per_100g": 21.0
+        },
+        "vitamin_c_mg": {
+          "delta_abs": -1.8999999999999986,
+          "delta_pct": -0.04418604651162787,
+          "expected_per_100g": 43.0,
+          "returned_per_100g": 41.1
+        }
+      },
+      "prep_state_both_correct": true,
+      "preservation_correct": true,
+      "query": "boiled amaranth leaves",
+      "thermal_state_correct": true,
+      "used_ai_ranking": true
+    },
+    {
+      "category": "wafct",
+      "error": null,
+      "expected_food_ids": [
+        700456
+      ],
+      "expected_preservation_state": "fresh",
+      "expected_thermal_state": "raw",
+      "extracted_preservation_state": "fresh",
+      "extracted_thermal_state": "raw",
+      "extractor_confidence": 1.0,
+      "fallback_reason": null,
+      "food_id_correct": true,
+      "label": "wafct_green_leafy_raw",
+      "matched_confidence": 0.85,
+      "matched_food_description": "Green leafy vegetable, average, fresh, raw",
+      "matched_food_id": 700456,
+      "nutrient_delta": null,
+      "prep_state_both_correct": true,
+      "preservation_correct": true,
+      "query": "raw green leafy vegetable",
+      "thermal_state_correct": true,
+      "used_ai_ranking": true
+    },
+    {
+      "category": "wafct",
+      "error": null,
+      "expected_food_ids": [
+        700043
+      ],
+      "expected_preservation_state": "fermented",
+      "expected_thermal_state": "cooked",
+      "extracted_preservation_state": "fermented",
+      "extracted_thermal_state": "cooked",
+      "extractor_confidence": 1.0,
+      "fallback_reason": null,
+      "food_id_correct": true,
+      "label": "wafct_fermented_ogi",
+      "matched_confidence": 0.95,
+      "matched_food_description": "Maize porridge, fermented (ogi), from decorticated white maize only, cooked",
+      "matched_food_id": 700043,
+      "nutrient_delta": null,
+      "prep_state_both_correct": true,
+      "preservation_correct": true,
+      "query": "fermented maize porridge ogi",
+      "thermal_state_correct": true,
+      "used_ai_ranking": true
+    },
+    {
+      "category": "wafct",
+      "error": null,
+      "expected_food_ids": [
+        700187
+      ],
+      "expected_preservation_state": "fermented",
+      "expected_thermal_state": "unknown",
+      "extracted_preservation_state": "fermented",
+      "extracted_thermal_state": "unknown",
+      "extractor_confidence": 0.7,
+      "fallback_reason": null,
+      "food_id_correct": true,
+      "label": "wafct_fufu_paste",
+      "matched_confidence": 0.95,
+      "matched_food_description": "Cassava, fermented paste from white cassava flour (wet fufu)",
+      "matched_food_id": 700187,
+      "nutrient_delta": null,
+      "prep_state_both_correct": true,
+      "preservation_correct": true,
+      "query": "fermented cassava paste wet fufu",
+      "thermal_state_correct": true,
+      "used_ai_ranking": true
+    },
+    {
+      "category": "wafct",
+      "error": null,
+      "expected_food_ids": [
+        700136
+      ],
+      "expected_preservation_state": "fresh",
+      "expected_thermal_state": "fried",
+      "extracted_preservation_state": "fresh",
+      "extracted_thermal_state": "fried",
+      "extractor_confidence": 1.0,
+      "fallback_reason": null,
+      "food_id_correct": true,
+      "label": "wafct_fried_rice_cake",
+      "matched_confidence": 0.8,
+      "matched_food_description": "Rice cakes, fried in unfortified vegetable oil*",
+      "matched_food_id": 700136,
+      "nutrient_delta": null,
+      "prep_state_both_correct": true,
+      "preservation_correct": true,
+      "query": "fried rice cakes",
       "thermal_state_correct": true,
       "used_ai_ranking": true
     }
@@ -1220,25 +2176,75 @@
         "n": 10,
         "preservation_acc": 1.0,
         "thermal_acc": 1.0
+      },
+      "wafct": {
+        "both_acc": 0.9,
+        "food_id_acc": 0.6,
+        "n": 10,
+        "preservation_acc": 1.0,
+        "thermal_acc": 0.9
       }
     },
-    "n": 50,
+    "n": 60,
+    "nutrient_distortion": {
+      "fibre_g": {
+        "mean_abs_delta": 1.56,
+        "mean_abs_pct_delta": 48.8,
+        "n_abs": 18,
+        "n_pct": 11
+      },
+      "kcal": {
+        "mean_abs_delta": 38.1,
+        "mean_abs_pct_delta": 34.8,
+        "n_abs": 20,
+        "n_pct": 20
+      },
+      "n": 20,
+      "sat_fat_g": {
+        "mean_abs_delta": 0.73,
+        "mean_abs_pct_delta": 669.2,
+        "n_abs": 20,
+        "n_pct": 20
+      },
+      "sodium_mg": {
+        "mean_abs_delta": 57.41,
+        "mean_abs_pct_delta": 499.9,
+        "n_abs": 20,
+        "n_pct": 20
+      },
+      "vitamin_c_mg": {
+        "mean_abs_delta": 3.38,
+        "mean_abs_pct_delta": 94.2,
+        "n_abs": 20,
+        "n_pct": 17
+      }
+    },
     "overall": {
       "both_acc": 0.9,
-      "food_id_acc": 0.74,
-      "preservation_acc": 0.96,
+      "food_id_acc": 0.717,
+      "preservation_acc": 0.967,
       "thermal_acc": 0.9
     },
     "thermal_confusion": [
       {
-        "count": 17,
+        "count": 20,
         "expected": "raw",
         "got": "raw"
       },
       {
-        "count": 7,
+        "count": 9,
         "expected": "boiled",
         "got": "boiled"
+      },
+      {
+        "count": 4,
+        "expected": "cooked",
+        "got": "cooked"
+      },
+      {
+        "count": 3,
+        "expected": "fried",
+        "got": "fried"
       },
       {
         "count": 3,
@@ -1246,14 +2252,9 @@
         "got": "stewed"
       },
       {
-        "count": 3,
-        "expected": "cooked",
-        "got": "cooked"
-      },
-      {
         "count": 2,
-        "expected": "fried",
-        "got": "fried"
+        "expected": "raw",
+        "got": "unknown"
       },
       {
         "count": 2,
@@ -1274,11 +2275,6 @@
         "count": 1,
         "expected": "heated",
         "got": "heated"
-      },
-      {
-        "count": 1,
-        "expected": "raw",
-        "got": "unknown"
       },
       {
         "count": 1,

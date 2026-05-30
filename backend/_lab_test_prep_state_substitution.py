@@ -114,6 +114,39 @@ PANEL: List[Dict[str, Any]] = [
         ],
         'purposes': ['sustainability', 'lower_sat_fat'],
     },
+    # Phase 1.5: packaged-food meals — these come through the decomposer
+    # first, so any cross-prep error compounds.
+    {
+        'label': 'corn_flakes_milk',
+        'composition': [
+            {'food_id': 1301, 'mass_g': 30.0, 'description': "Cereal, ready to eat, Corn Flakes, President's Choice"},
+            {'food_id': 113, 'mass_g': 200.0, 'description': 'Milk, fluid, whole, pasteurized, homogenized, 3.25% M.F.'},
+        ],
+        'purposes': ['higher_fibre', 'lower_sodium'],
+    },
+    {
+        'label': 'frozen_entree_heated',
+        'composition': [
+            {'food_id': 8, 'mass_g': 300.0, 'description': 'Frozen entree, fried chicken with mashed potatoes and vegetables, heated'},
+        ],
+        'purposes': ['lower_sodium', 'lower_sat_fat'],
+    },
+    {
+        'label': 'evaporated_milk_dessert',
+        'composition': [
+            {'food_id': 140, 'mass_g': 100.0, 'description': 'Milk, evaporated, whole, canned, undiluted, 7.8% M.F.'},
+            {'food_id': 68, 'mass_g': 50.0, 'description': 'Milk, condensed, sweetened, canned'},
+        ],
+        'purposes': ['lower_sodium', 'lower_sat_fat'],
+    },
+    {
+        'label': 'dried_egg_powder_recipe',
+        'composition': [
+            {'food_id': 83, 'mass_g': 25.0, 'description': 'Egg, chicken, dried, whole'},
+            {'food_id': 4066, 'mass_g': 60.0, 'description': 'Bread, white, commercial'},
+        ],
+        'purposes': ['higher_fibre', 'sustainability'],
+    },
 ]
 
 

@@ -61,6 +61,10 @@ from api.services.prep_state_extract import (  # noqa: E402
     thermal_states_equivalent,
     preservation_states_equivalent,
 )
+from api.services.prep_state_nutrient_delta import (  # noqa: E402
+    compute_nutrient_delta,
+    summarise_distortion,
+)
 
 
 GROUNDTRUTH_PATH = os.path.join(_HERE, '_lab_prep_state_groundtruth.json')
@@ -90,6 +94,9 @@ class ProbeOutcome:
     thermal_state_correct: bool
     preservation_correct: bool
     prep_state_both_correct: bool
+    # Nutrient distortion vs the first expected FoodID (per-100 g). None if either food
+    # has no nutrient data or matched_food_id equals expected_food_ids[0].
+    nutrient_delta: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
 
     def as_dict(self) -> Dict[str, Any]:
@@ -135,6 +142,18 @@ def _run_one(matcher, probe: Dict[str, Any]) -> ProbeOutcome:
     )
     both_ok = thermal_ok and preservation_ok
 
+    # Nutrient distortion vs the FIRST acceptable expected FoodID — only
+    # meaningful when the matcher returned a different ID. None when same.
+    nutrient_delta_dict: Optional[Dict[str, Any]] = None
+    if (expected_ids and result.food_id is not None
+            and result.food_id != expected_ids[0]):
+        try:
+            nd = compute_nutrient_delta(expected_ids[0], int(result.food_id))
+            if nd is not None:
+                nutrient_delta_dict = nd.as_dict()
+        except Exception:  # noqa: BLE001
+            nutrient_delta_dict = None
+
     return ProbeOutcome(
         label=probe['label'],
         query=probe['query'],
@@ -154,6 +173,7 @@ def _run_one(matcher, probe: Dict[str, Any]) -> ProbeOutcome:
         thermal_state_correct=thermal_ok,
         preservation_correct=preservation_ok,
         prep_state_both_correct=both_ok,
+        nutrient_delta=nutrient_delta_dict,
         error=None,
     )
 
@@ -192,6 +212,11 @@ def _summarise(outcomes: List[ProbeOutcome]) -> Dict[str, Any]:
         key=lambda r: -r['count'],
     )
 
+    # Nutrient distortion aggregate — only across probes where the matcher
+    # returned a DIFFERENT food_id than expected_food_ids[0] AND we got a
+    # nutrient_delta record back. Mean absolute Δ and Δ% per nutrient.
+    distortion = _summarise_nutrient_distortion(outcomes)
+
     return {
         'n': n,
         'overall': {
@@ -202,7 +227,38 @@ def _summarise(outcomes: List[ProbeOutcome]) -> Dict[str, Any]:
         },
         'by_category': by_category,
         'thermal_confusion': confusion_list,
+        'nutrient_distortion': distortion,
     }
+
+
+def _summarise_nutrient_distortion(outcomes: List[ProbeOutcome]) -> Dict[str, Any]:
+    """Aggregate absolute / percent distortion across all probes that returned
+    a nutrient_delta record."""
+    rows = [o.nutrient_delta for o in outcomes if o.nutrient_delta is not None]
+    if not rows:
+        return {'n': 0}
+    keys = ('kcal', 'sodium_mg', 'vitamin_c_mg', 'sat_fat_g', 'fibre_g')
+    out: Dict[str, Any] = {'n': len(rows)}
+    for k in keys:
+        abs_sum, abs_count = 0.0, 0
+        pct_sum, pct_count = 0.0, 0
+        for r in rows:
+            point = r.get(k) or {}
+            d_abs = point.get('delta_abs')
+            d_pct = point.get('delta_pct')
+            if d_abs is not None:
+                abs_sum += abs(d_abs)
+                abs_count += 1
+            if d_pct is not None:
+                pct_sum += abs(d_pct)
+                pct_count += 1
+        out[k] = {
+            'mean_abs_delta': round(abs_sum / abs_count, 2) if abs_count else None,
+            'mean_abs_pct_delta': round(pct_sum / pct_count * 100, 1) if pct_count else None,
+            'n_abs': abs_count,
+            'n_pct': pct_count,
+        }
+    return out
 
 
 def _print_scorecard(outcomes: List[ProbeOutcome], summary: Dict[str, Any]) -> None:
@@ -228,6 +284,17 @@ def _print_scorecard(outcomes: List[ProbeOutcome], summary: Dict[str, Any]) -> N
         mark = '  ' if row['expected'] == row['got'] else 'XX'
         print(f'  {mark}  {row["expected"]:<10} -> {row["got"]:<10} x{row["count"]}')
     print('-' * 100)
+    distortion = summary.get('nutrient_distortion') or {}
+    if distortion.get('n'):
+        print(f'Nutrient distortion vs expected_food_ids[0] '
+              f'(n={distortion["n"]} mis-matched probes):')
+        for k in ('kcal', 'sodium_mg', 'vitamin_c_mg', 'sat_fat_g', 'fibre_g'):
+            p = distortion.get(k) or {}
+            mad = p.get('mean_abs_delta')
+            mpd = p.get('mean_abs_pct_delta')
+            print(f'  {k:<16}  mean|Δ|={mad}  mean|Δ%|={mpd}%  '
+                  f'(n_abs={p.get("n_abs")}, n_pct={p.get("n_pct")})')
+        print('-' * 100)
     print('Per-probe results:')
     for o in outcomes:
         marks = ''.join([

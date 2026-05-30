@@ -14,7 +14,7 @@
           "matched_food_id": 2381,
           "matched_ingredient_found": true,
           "matched_mass_g": 100.0,
-          "matched_resolution_confidence": 0.95,
+          "matched_resolution_confidence": 0.85,
           "preservation_correct": true,
           "thermal_correct": true
         }
@@ -29,7 +29,7 @@
           "food_id": 2381,
           "food_type": "single",
           "mass_g": 100.0,
-          "resolution_confidence": 0.95
+          "resolution_confidence": 0.85
         },
         {
           "food_description": "Water, tap",
@@ -72,7 +72,7 @@
           "resolution_confidence": 0.95
         }
       ],
-      "latency_seconds": 6.63,
+      "latency_seconds": 4.71,
       "matched": true,
       "n_ingredients": 6,
       "total_mass_g": 250.0
@@ -131,11 +131,35 @@
           "food_type": "mixed",
           "mass_g": 2.0,
           "resolution_confidence": 0.85
+        },
+        {
+          "food_description": "Sweets, sugars, granulated (white)",
+          "food_group": "Sweets",
+          "food_id": 4318,
+          "food_type": "single",
+          "mass_g": 1.0,
+          "resolution_confidence": 0.85
+        },
+        {
+          "food_description": "Salt, table",
+          "food_group": "Spices and Herbs",
+          "food_id": 214,
+          "food_type": "single",
+          "mass_g": 1.0,
+          "resolution_confidence": 0.95
+        },
+        {
+          "food_description": "Spices, pepper, black",
+          "food_group": "Spices and Herbs",
+          "food_id": 198,
+          "food_type": "single",
+          "mass_g": 0.5,
+          "resolution_confidence": 0.95
         }
       ],
-      "latency_seconds": 5.25,
+      "latency_seconds": 5.91,
       "matched": true,
-      "n_ingredients": 4,
+      "n_ingredients": 7,
       "total_mass_g": 150.0
     },
     {
@@ -148,8 +172,8 @@
           "extracted_preservation_state": "fresh",
           "extracted_thermal_state": "raw",
           "keyword": "plantain",
-          "matched_food_description": "Plantain, green, raw",
-          "matched_food_id": 7824,
+          "matched_food_description": "Plantain, yellow raw",
+          "matched_food_id": 1661,
           "matched_ingredient_found": true,
           "matched_mass_g": 120.0,
           "matched_resolution_confidence": 0.85,
@@ -162,9 +186,9 @@
       "fallback_reason": null,
       "ingredient_list": [
         {
-          "food_description": "Plantain, green, raw",
+          "food_description": "Plantain, yellow raw",
           "food_group": "Fruits and fruit juices",
-          "food_id": 7824,
+          "food_id": 1661,
           "food_type": "single",
           "mass_g": 120.0,
           "resolution_confidence": 0.85
@@ -178,7 +202,7 @@
           "resolution_confidence": 0.8
         }
       ],
-      "latency_seconds": 3.49,
+      "latency_seconds": 3.03,
       "matched": true,
       "n_ingredients": 2,
       "total_mass_g": 150.0
@@ -196,7 +220,7 @@
           "matched_food_description": "Plantain, yellow cooked",
           "matched_food_id": 1662,
           "matched_ingredient_found": true,
-          "matched_mass_g": 180.0,
+          "matched_mass_g": 210.0,
           "matched_resolution_confidence": 0.9,
           "preservation_correct": true,
           "thermal_correct": true
@@ -211,7 +235,7 @@
           "food_group": "Fruits and fruit juices",
           "food_id": 1662,
           "food_type": "single",
-          "mass_g": 180.0,
+          "mass_g": 210.0,
           "resolution_confidence": 0.9
         },
         {
@@ -219,16 +243,8 @@
           "food_group": "WAFCT — Beverages",
           "food_id": 700966,
           "food_type": "single",
-          "mass_g": 100.0,
+          "mass_g": 75.0,
           "resolution_confidence": 0.95
-        },
-        {
-          "food_description": "Sweets, sugars, granulated (white)",
-          "food_group": "Sweets",
-          "food_id": 4318,
-          "food_type": "single",
-          "mass_g": 10.0,
-          "resolution_confidence": 0.85
         },
         {
           "food_description": "Milk, fluid, whole, pasteurized, homogenized, 3.25% M.F.",
@@ -236,10 +252,18 @@
           "food_id": 113,
           "food_type": "single",
           "mass_g": 10.0,
-          "resolution_confidence": 0.9
+          "resolution_confidence": 0.95
+        },
+        {
+          "food_description": "Sweets, sugars, granulated (white)",
+          "food_group": "Sweets",
+          "food_id": 4318,
+          "food_type": "single",
+          "mass_g": 5.0,
+          "resolution_confidence": 0.85
         }
       ],
-      "latency_seconds": 4.56,
+      "latency_seconds": 3.58,
       "matched": true,
       "n_ingredients": 4,
       "total_mass_g": 300.0
@@ -265,7 +289,7 @@
       ],
       "decomposition_confidence": 0.8,
       "dish": "scrambled eggs and white toast breakfast",
-      "fallback_reason": "catalog_override:kcal_err=0.259",
+      "fallback_reason": "catalog_override:kcal_err=0.446",
       "ingredient_list": [
         {
           "food_description": "Egg, chicken, whole, cooked, scrambled or omelet",
@@ -276,7 +300,7 @@
           "resolution_confidence": 0.8
         }
       ],
-      "latency_seconds": 3.92,
+      "latency_seconds": 2.92,
       "matched": true,
       "n_ingredients": 1,
       "total_mass_g": 200.0
@@ -302,7 +326,7 @@
       ],
       "decomposition_confidence": 0.75,
       "dish": "grilled chicken breast salad",
-      "fallback_reason": "catalog_override:kcal_err=0.39",
+      "fallback_reason": "catalog_override:kcal_err=0.471",
       "ingredient_list": [
         {
           "food_description": "Club sandwich with grilled chicken, bacon, tomato, cheese, lettuce and mayonnaise",
@@ -313,7 +337,7 @@
           "resolution_confidence": 0.75
         }
       ],
-      "latency_seconds": 5.74,
+      "latency_seconds": 5.14,
       "matched": true,
       "n_ingredients": 1,
       "total_mass_g": 250.0
@@ -358,7 +382,7 @@
           "resolution_confidence": 0.85
         }
       ],
-      "latency_seconds": 3.0,
+      "latency_seconds": 2.85,
       "matched": true,
       "n_ingredients": 2,
       "total_mass_g": 150.0
@@ -382,7 +406,7 @@
           "thermal_correct": false
         }
       ],
-      "decomposition_confidence": 0.75,
+      "decomposition_confidence": 0.85,
       "dish": "apple pie slice",
       "fallback_reason": null,
       "ingredient_list": [
@@ -395,11 +419,19 @@
           "resolution_confidence": 0.95
         },
         {
-          "food_description": "Pie crust, standard type, homemade, baked",
-          "food_group": "Baked Products",
-          "food_id": 3972,
-          "food_type": "mixed",
-          "mass_g": 55.0,
+          "food_description": "Grains, wheat flour, white, all purpose, enriched, calcium fortified",
+          "food_group": "Cereals, Grains and Pasta",
+          "food_id": 4484,
+          "food_type": "single",
+          "mass_g": 35.0,
+          "resolution_confidence": 0.9
+        },
+        {
+          "food_description": "Butter, regular",
+          "food_group": "Dairy and Egg Products",
+          "food_id": 118,
+          "food_type": "single",
+          "mass_g": 15.0,
           "resolution_confidence": 0.85
         },
         {
@@ -407,29 +439,45 @@
           "food_group": "Sweets",
           "food_id": 4318,
           "food_type": "single",
-          "mass_g": 10.0,
+          "mass_g": 12.0,
           "resolution_confidence": 0.85
+        },
+        {
+          "food_description": "Water, tap",
+          "food_group": "WAFCT — Beverages",
+          "food_id": 700966,
+          "food_type": "single",
+          "mass_g": 8.0,
+          "resolution_confidence": 0.95
         },
         {
           "food_description": "Spices, cinnamon, ground",
           "food_group": "Spices and Herbs",
           "food_id": 178,
           "food_type": "single",
-          "mass_g": 1.0,
+          "mass_g": 2.0,
           "resolution_confidence": 0.85
         },
         {
-          "food_description": "Butter, regular",
-          "food_group": "Dairy and Egg Products",
-          "food_id": 118,
+          "food_description": "Salt, table",
+          "food_group": "Spices and Herbs",
+          "food_id": 214,
           "food_type": "single",
-          "mass_g": 5.0,
-          "resolution_confidence": 0.85
+          "mass_g": 1.0,
+          "resolution_confidence": 0.95
+        },
+        {
+          "food_description": "Lemon juice, raw",
+          "food_group": "Fruits and fruit juices",
+          "food_id": 1589,
+          "food_type": "single",
+          "mass_g": 2.0,
+          "resolution_confidence": 0.95
         }
       ],
-      "latency_seconds": 5.16,
+      "latency_seconds": 5.57,
       "matched": true,
-      "n_ingredients": 5,
+      "n_ingredients": 8,
       "total_mass_g": 150.0
     },
     {
@@ -464,7 +512,7 @@
           "resolution_confidence": 0.75
         }
       ],
-      "latency_seconds": 3.37,
+      "latency_seconds": 2.73,
       "matched": true,
       "n_ingredients": 1,
       "total_mass_g": 350.0
@@ -472,38 +520,70 @@
     {
       "checks": [
         {
-          "both_correct": false,
+          "both_correct": true,
           "dish": "raw vegetable garden salad",
           "expected_preservation_state": "fresh",
           "expected_thermal_state": "raw",
-          "extracted_preservation_state": "unknown",
-          "extracted_thermal_state": "unknown",
+          "extracted_preservation_state": "fresh",
+          "extracted_thermal_state": "raw",
           "keyword": "lettuce",
-          "matched_food_description": "",
-          "matched_food_id": null,
-          "matched_ingredient_found": false,
-          "matched_mass_g": null,
-          "matched_resolution_confidence": null,
-          "preservation_correct": false,
-          "thermal_correct": false
+          "matched_food_description": "Lettuce, raw",
+          "matched_food_id": 700469,
+          "matched_ingredient_found": true,
+          "matched_mass_g": 80.0,
+          "matched_resolution_confidence": 0.85,
+          "preservation_correct": true,
+          "thermal_correct": true
         }
       ],
-      "decomposition_confidence": 0.75,
+      "decomposition_confidence": 0.7,
       "dish": "raw vegetable garden salad",
-      "fallback_reason": "catalog_override:kcal_err=0.644",
+      "fallback_reason": null,
       "ingredient_list": [
         {
-          "food_description": "Salad, garden, with Italian dressing, homemade",
-          "food_group": "Mixed Dishes",
-          "food_id": 6737,
-          "food_type": "mixed",
-          "mass_g": 200.0,
-          "resolution_confidence": 0.75
+          "food_description": "Lettuce, raw",
+          "food_group": "WAFCT — Vegetables and their products",
+          "food_id": 700469,
+          "food_type": "single",
+          "mass_g": 80.0,
+          "resolution_confidence": 0.85
+        },
+        {
+          "food_description": "Tomato, red, ripe, raw, year round average",
+          "food_group": "Vegetables and Vegetable Products",
+          "food_id": 2460,
+          "food_type": "single",
+          "mass_g": 50.0,
+          "resolution_confidence": 0.95
+        },
+        {
+          "food_description": "Cucumber, raw",
+          "food_group": "Vegetables and Vegetable Products",
+          "food_id": 2363,
+          "food_type": "single",
+          "mass_g": 30.0,
+          "resolution_confidence": 0.95
+        },
+        {
+          "food_description": "Carrot, raw",
+          "food_group": "Vegetables and Vegetable Products",
+          "food_id": 2380,
+          "food_type": "single",
+          "mass_g": 20.0,
+          "resolution_confidence": 0.95
+        },
+        {
+          "food_description": "Pepper, sweet, green, raw",
+          "food_group": "Vegetables and Vegetable Products",
+          "food_id": 2413,
+          "food_type": "single",
+          "mass_g": 15.0,
+          "resolution_confidence": 0.95
         }
       ],
-      "latency_seconds": 5.34,
+      "latency_seconds": 4.12,
       "matched": true,
-      "n_ingredients": 1,
+      "n_ingredients": 5,
       "total_mass_g": 200.0
     },
     {
@@ -527,7 +607,7 @@
       ],
       "decomposition_confidence": 0.8,
       "dish": "stewed beef with vegetables",
-      "fallback_reason": "catalog_override:kcal_err=1.902",
+      "fallback_reason": "catalog_override:kcal_err=1.515",
       "ingredient_list": [
         {
           "food_description": "Beef stew with potatoes and vegetables",
@@ -538,7 +618,7 @@
           "resolution_confidence": 0.8
         }
       ],
-      "latency_seconds": 6.48,
+      "latency_seconds": 5.43,
       "matched": true,
       "n_ingredients": 1,
       "total_mass_g": 350.0
@@ -583,6 +663,14 @@
           "resolution_confidence": 0.85
         },
         {
+          "food_description": "Pepper, sweet, red, boiled, drained",
+          "food_group": "Vegetables and Vegetable Products",
+          "food_id": 2486,
+          "food_type": "single",
+          "mass_g": 20.0,
+          "resolution_confidence": 0.85
+        },
+        {
           "food_description": "Onion, boiled, drained",
           "food_group": "Vegetables and Vegetable Products",
           "food_id": 2402,
@@ -595,7 +683,7 @@
           "food_group": "Soups, Sauces and Gravies",
           "food_id": 3329,
           "food_type": "single",
-          "mass_g": 15.0,
+          "mass_g": 10.0,
           "resolution_confidence": 0.85
         },
         {
@@ -603,34 +691,34 @@
           "food_group": "Fats and Oils",
           "food_id": 419,
           "food_type": "single",
-          "mass_g": 15.0,
+          "mass_g": 10.0,
           "resolution_confidence": 0.8
         }
       ],
-      "latency_seconds": 4.88,
+      "latency_seconds": 4.16,
       "matched": true,
-      "n_ingredients": 5,
+      "n_ingredients": 6,
       "total_mass_g": 250.0
     }
   ],
   "scenarios_version": "2026-05-30",
   "summary": {
-    "both_acc": 0.583,
-    "ingredient_found_rate": 0.833,
+    "both_acc": 0.667,
+    "ingredient_found_rate": 0.917,
     "n_checks": 12,
     "n_scenarios": 12,
-    "preservation_acc": 0.75,
-    "thermal_acc": 0.583,
+    "preservation_acc": 0.833,
+    "thermal_acc": 0.667,
     "thermal_confusion": [
+      {
+        "count": 3,
+        "expected": "raw",
+        "got": "raw"
+      },
       {
         "count": 2,
         "expected": "cooked",
         "got": "boiled"
-      },
-      {
-        "count": 2,
-        "expected": "raw",
-        "got": "raw"
       },
       {
         "count": 2,
@@ -651,11 +739,6 @@
         "count": 1,
         "expected": "cooked",
         "got": "grilled"
-      },
-      {
-        "count": 1,
-        "expected": "raw",
-        "got": "unknown"
       },
       {
         "count": 1,

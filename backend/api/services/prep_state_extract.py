@@ -2,9 +2,12 @@
 
 Returns a two-axis tag aligned with the prep-state lab plan:
   - thermal_state: raw | boiled | fried | baked | roasted | stewed | grilled |
-                   steamed | poached | scrambled | heated | cooked | unknown
+                   steamed | poached | scrambled | heated | cooked | braised |
+                   toasted | sauteed | microwaved | blanched | barbecued |
+                   stir_fried | broiled | reheated | unknown
   - preservation_state: fresh | canned | dried | dehydrated | frozen | salted |
-                        smoked | cured | pickled | unknown
+                        smoked | cured | pickled | fermented | condensed |
+                        unknown
 
 Anchored on CNF's controlled vocabulary as observed in
 ``backend/raw_cnf/FOOD_NAME.csv``. Both EN and FR variants are accepted so the
@@ -19,6 +22,14 @@ and (b) measure how often the substitution pipeline crosses prep states.
 Treat ``thermal_state='unknown'`` / ``preservation_state='unknown'`` as
 "insufficient regex evidence" — NOT "no prep state". Single-ingredient rows
 like "Chickpea" or "Salt" legitimately have no thermal verb in the description.
+
+Phase 1.5 (2026-05-30): extended thermal coverage with braised / toasted /
+sauteed / microwaved / blanched / barbecued / stir_fried / broiled / reheated
+after corpus audit found 113 braised + 72 toasted + 58 sauteed rows tagging
+as unknown/unknown. Preservation extended with fermented (WAFCT-critical) and
+condensed/concentrated/evaporated. 'pasteurized' / 'UHT' fold into 'fresh'
+(default state of fluid dairy — substitution semantics treat pasteurized milk
+as fresh milk, not a separate preservation class).
 """
 from __future__ import annotations
 
@@ -40,6 +51,16 @@ THERMAL_STATES = (
     'scrambled',
     'heated',
     'cooked',
+    # Phase 1.5 additions
+    'braised',
+    'toasted',
+    'sauteed',
+    'microwaved',
+    'blanched',
+    'barbecued',
+    'stir_fried',
+    'broiled',
+    'reheated',
     'unknown',
 )
 
@@ -53,6 +74,9 @@ PRESERVATION_STATES = (
     'smoked',
     'cured',
     'pickled',
+    # Phase 1.5 additions
+    'fermented',
+    'condensed',
     'unknown',
 )
 
@@ -79,7 +103,21 @@ class PrepState:
 # boiled" → thermal=boiled, not raw — because the apple ends up boiled). The
 # 'raw' regex still wins for "uncooked" / "unheated" because \b prevents
 # `\bcooked\b` from matching 'uncooked'.
+#
+# Phase 1.5 ordering: compound terms first (stir-fried before fried, hard-cooked
+# already absorbed into boiled). Specific cooking methods before generic 'cooked'.
 _THERMAL_PATTERNS = (
+    # Compound / specific cooking methods (must precede their family generics)
+    ('stir_fried', re.compile(r'\bstir[- ]fried\b|\bstir[- ]fry\b|\bstir[- ]frying\b', re.IGNORECASE)),
+    ('barbecued',  re.compile(r'\bbarbecued?\b|\bbarbecue\b|\bBBQ\b|\bbarbec', re.IGNORECASE)),
+    ('blanched',   re.compile(r'\bblanched\b|\bblanchi\b|\bblanchie\b', re.IGNORECASE)),
+    ('braised',    re.compile(r'\bbraised\b|\bbrais[eé]\b|\bbrais[eé]e\b', re.IGNORECASE)),
+    ('sauteed',    re.compile(r'\bsaut[eé]ed?\b|\bsaut[eé]\b|\bsaut[eé]e\b|\bsaut[eé]es\b', re.IGNORECASE)),
+    ('toasted',    re.compile(r'\btoasted\b|\btoast[eé]\b', re.IGNORECASE)),
+    ('microwaved', re.compile(r'\bmicrowaved?\b|\bmicro[- ]ondes\b', re.IGNORECASE)),
+    ('reheated',   re.compile(r'\breheated\b', re.IGNORECASE)),
+    ('broiled',    re.compile(r'\bbroiled\b', re.IGNORECASE)),  # \b prevents 'broiler' from matching
+    # Original verbs
     ('scrambled',  re.compile(r'\bscramb|\bbrouill', re.IGNORECASE)),
     ('poached',    re.compile(r'\bpoach|\bpoch[eé]', re.IGNORECASE)),
     ('boiled',     re.compile(
@@ -89,7 +127,7 @@ _THERMAL_PATTERNS = (
         r'\bsteamed\b|cuit\s+[aà]\s+la\s+vapeur',
         re.IGNORECASE)),
     ('grilled',    re.compile(r'\bgrilled\b|\bgrill[eé]\b', re.IGNORECASE)),
-    ('fried',      re.compile(r'\bfried\b|\bfrit\b|\bfrite\b|\bfrits\b|\bfrites\b', re.IGNORECASE)),
+    ('fried',      re.compile(r'\bfried\b|\bpan[- ]fried\b|\bdeep[- ]fried\b|\bfrit\b|\bfrite\b|\bfrits\b|\bfrites\b', re.IGNORECASE)),
     ('roasted',    re.compile(r'\broasted\b|\br[oô]ti\b|\br[oô]tis\b|\br[oô]tie\b', re.IGNORECASE)),
     ('baked',      re.compile(r'\bbaked\b|cuit\s+au\s+four', re.IGNORECASE)),
     ('stewed',     re.compile(
@@ -106,11 +144,23 @@ _THERMAL_PATTERNS = (
 # Order matters here too. 'fresh' is checked FIRST so phrases like
 # "fresh or frozen" (common for animal-product raw rows) tag as fresh — the
 # more general state — rather than restricting to frozen.
+#
+# Phase 1.5 additions:
+# - 'pasteurized' / 'UHT' fold into 'fresh' (default fluid-dairy state).
+# - 'fermented' is its own preservation class (substitution semantics: yogurt
+#   is fermented milk; fermented vs unfermented matters for substitution).
+# - 'condensed' / 'concentrated' / 'evaporated' fold into 'condensed' (these
+#   collapse mass by water removal; substituting condensed for fresh inflates
+#   sugar/protein per gram).
 _PRESERVATION_PATTERNS = (
-    ('fresh',       re.compile(r'\bfresh\b|\bfra[iî]s\b|\bfra[iî]che\b', re.IGNORECASE)),
-    ('canned',      re.compile(
-        r'\bcanned\b|\bconserve\b|\bin\s+(?:water|juice|syrup)\s+pack\b|\bwater\s+pack\b|\bsyrup\s+pack\b',
+    ('fresh',       re.compile(
+        r'\bfresh\b|\bfra[iî]s\b|\bfra[iî]che\b|\bpasteurized\b|\bpasteuris[ée]\b|\bUHT\b',
         re.IGNORECASE)),
+    ('canned',      re.compile(
+        r'\bcanned\b|\bconserve\b|\bin\s+(?:water|juice|syrup|oil|brine)\s+pack\b|\bwater\s+pack\b|\bsyrup\s+pack\b',
+        re.IGNORECASE)),
+    ('fermented',   re.compile(r'\bfermented\b|\bferment[eé]\b|\bferment[eé]e\b|\bcultured\b', re.IGNORECASE)),
+    ('condensed',   re.compile(r'\bcondensed\b|\bconcentrated\b|\bevaporated\b|\bconcentr[ée]e?\b', re.IGNORECASE)),
     ('dried',       re.compile(r'\bdried\b|\bs[eé]ch[eé]\b|\bs[eé]ch[eé]e\b', re.IGNORECASE)),
     ('dehydrated',  re.compile(r'\bdehydrated\b|\bd[eé]shydrat[eé]\b|\bd[eé]shydrat[eé]e\b', re.IGNORECASE)),
     ('frozen',      re.compile(r'\bfrozen\b|\bcong[eé]l[eé]\b|\bcong[eé]l[eé]e\b', re.IGNORECASE)),
@@ -119,6 +169,31 @@ _PRESERVATION_PATTERNS = (
     ('cured',       re.compile(r'\bcured\b', re.IGNORECASE)),
     ('pickled',     re.compile(r'\bpickled\b|\bmarin[eé]\b|\bmarin[eé]e\b', re.IGNORECASE)),
 )
+
+
+# Thermal states whose presence implies the food is in 'fresh' preservation by
+# default (used by the default-fresh heuristic). All cooking verbs that imply
+# the food was processed from a fresh starting state belong here.
+_FRESH_DEFAULT_THERMAL = frozenset({
+    'raw', 'boiled', 'fried', 'baked', 'roasted', 'stewed',
+    'grilled', 'steamed', 'poached', 'scrambled', 'cooked', 'heated',
+    # Phase 1.5 additions
+    'braised', 'toasted', 'sauteed', 'microwaved', 'blanched',
+    'barbecued', 'stir_fried', 'broiled', 'reheated',
+})
+
+
+# Cooking-verb equivalence class used by ``thermal_states_equivalent``. Any
+# thermal state in this set is considered equivalent to any other in the set
+# (and to the generic 'cooked' tag). 'raw' is in its own class.
+_COOKED_CLASS = frozenset({
+    'boiled', 'fried', 'baked', 'roasted', 'stewed',
+    'grilled', 'steamed', 'poached', 'scrambled',
+    'heated', 'cooked',
+    # Phase 1.5 additions — all also cooking verbs
+    'braised', 'toasted', 'sauteed', 'microwaved', 'blanched',
+    'barbecued', 'stir_fried', 'broiled', 'reheated',
+})
 
 
 def _compute_confidence(thermal: str, preservation: str) -> float:
@@ -166,10 +241,7 @@ def extract_prep_state(description: str) -> PrepState:
     # (raw or a cooking verb) but no preservation are by convention 'fresh'.
     # "Carrot, raw" → no 'fresh' word but it IS fresh. "Egg, fried" → fried
     # FROM fresh. Only override when no preservation regex fired.
-    if preservation == 'unknown' and thermal in (
-        'raw', 'boiled', 'fried', 'baked', 'roasted', 'stewed',
-        'grilled', 'steamed', 'poached', 'scrambled', 'cooked', 'heated',
-    ):
+    if preservation == 'unknown' and thermal in _FRESH_DEFAULT_THERMAL:
         preservation = 'fresh'
         matched.append('p:fresh(default)')
 
@@ -191,9 +263,10 @@ def thermal_states_equivalent(extracted: str, expected: str) -> bool:
         (the matcher likely picked a composite-dish row that hides the prep
         state in unstructured text). Honest under-confidence beats false PASS.
       - Within the cooked-verb family (boiled/fried/baked/roasted/stewed/
-        grilled/steamed/poached/scrambled/heated/cooked), any-vs-any counts
-        as equivalent so "carrot soup → boiled carrot" passes when the GT
-        only specifies thermal_state='cooked'.
+        grilled/steamed/poached/scrambled/heated/cooked/braised/toasted/
+        sauteed/microwaved/blanched/barbecued/stir_fried/broiled/reheated),
+        any-vs-any counts as equivalent so "carrot soup → braised carrot"
+        passes when the GT only specifies thermal_state='cooked'.
       - 'raw' is its own equivalence class.
     """
     if expected == 'unknown':
@@ -202,10 +275,7 @@ def thermal_states_equivalent(extracted: str, expected: str) -> bool:
         return False
     if extracted == expected:
         return True
-    cooked_class = {'boiled', 'fried', 'baked', 'roasted', 'stewed',
-                    'grilled', 'steamed', 'poached', 'scrambled',
-                    'heated', 'cooked'}
-    return extracted in cooked_class and expected in cooked_class
+    return extracted in _COOKED_CLASS and expected in _COOKED_CLASS
 
 
 def preservation_states_equivalent(extracted: str, expected: str) -> bool:
