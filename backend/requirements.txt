@@ -40,6 +40,10 @@ pandas==2.2.3; python_version < "3.11"
 # fails to import on Python 3.12+ (removed `distutils`).
 scikit-learn>=1.4.0
 scipy>=1.10.0
+# Scenario S3 (TODO-CODE-LCA-3, 2026-05-30): Sobol global sensitivity analysis
+# over the per-food, per-category LCA characterisation factors. Used by the
+# offline _smoke_lca_sobol_sensitivity.py harness; runtime API does not import.
+SALib>=1.5.0
 pillow==11.3.0
 # PKG-IMG-1 (2026-05-26): packaged-food image upload accepts user-supplied
 # product photos. iOS-default HEIC and modern AVIF (web-optimised) aren't

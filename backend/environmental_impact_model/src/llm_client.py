@@ -52,6 +52,65 @@ _PROVIDER_DEFAULT_MODELS = {
 }
 
 
+# --- Token usage telemetry (AI footprint audit §5.5) ------------------------
+#
+# A process-local registry of (input_tokens, output_tokens, n_calls) keyed by
+# (provider, model). Populated by every chat.completion call this module
+# dispatches, so that downstream harnesses (per-meal AI footprint, Scenario S8)
+# can sum token usage across a meal-scoring pass without instrumenting each
+# call site individually. See `get_token_usage()` and `reset_token_usage()`.
+#
+# Telemetry is opt-out per LLM_TELEMETRY env var; default on. The registry is
+# explicitly *not* thread-safe across processes (no cross-Gunicorn-worker
+# aggregation) by design: per-request token accounting belongs to the
+# request-bound harness that reads `reset_token_usage()` before a scoring
+# pass and `get_token_usage()` after.
+_TOKEN_USAGE: "dict[tuple[str, str], dict[str, int]]" = {}
+
+
+def _telemetry_enabled() -> bool:
+    return (os.environ.get("LLM_TELEMETRY", "1") or "1") != "0"
+
+
+def _record_usage(provider: str, model: str,
+                  input_tokens: int, output_tokens: int) -> None:
+    if not _telemetry_enabled():
+        return
+    key = (provider, model)
+    entry = _TOKEN_USAGE.setdefault(
+        key, {"input_tokens": 0, "output_tokens": 0, "n_calls": 0},
+    )
+    entry["input_tokens"] += int(input_tokens or 0)
+    entry["output_tokens"] += int(output_tokens or 0)
+    entry["n_calls"] += 1
+
+
+def get_token_usage() -> "dict[str, dict]":
+    """Snapshot of accumulated token usage by (provider, model).
+
+    Returns a serialisable dict keyed by 'provider/model' with per-key totals
+    plus an aggregate 'total' entry. Safe to call any time; resets only on
+    explicit `reset_token_usage()`.
+    """
+    out: dict[str, dict] = {}
+    agg_in = agg_out = agg_n = 0
+    for (provider, model), entry in _TOKEN_USAGE.items():
+        out[f"{provider}/{model}"] = dict(entry)
+        agg_in += entry["input_tokens"]
+        agg_out += entry["output_tokens"]
+        agg_n += entry["n_calls"]
+    out["total"] = {
+        "input_tokens": agg_in,
+        "output_tokens": agg_out,
+        "n_calls": agg_n,
+    }
+    return out
+
+
+def reset_token_usage() -> None:
+    _TOKEN_USAGE.clear()
+
+
 def _env_provider() -> str:
     return (os.environ.get("LLM_PROVIDER") or "openai").lower()
 
@@ -125,6 +184,16 @@ class OpenAIChatJSONClient:
             kwargs["max_tokens"] = max_tokens
         rsp = self._client.chat.completions.create(**kwargs)
         content = rsp.choices[0].message.content or "{}"
+        try:
+            usage = getattr(rsp, "usage", None)
+            if usage is not None:
+                _record_usage(
+                    self.provider, self.model,
+                    int(getattr(usage, "prompt_tokens", 0) or 0),
+                    int(getattr(usage, "completion_tokens", 0) or 0),
+                )
+        except Exception:  # noqa: BLE001 — telemetry never breaks scoring
+            pass
         return _parse_json_permissive(content)
 
 
@@ -169,6 +238,16 @@ class AnthropicChatJSONClient:
                 rsp = self._client.messages.create(**kwargs)
                 text = rsp.content[0].text if rsp.content else ""
                 raw = ("{" + text) if use_prefill else text
+                try:
+                    usage = getattr(rsp, "usage", None)
+                    if usage is not None:
+                        _record_usage(
+                            self.provider, self.model,
+                            int(getattr(usage, "input_tokens", 0) or 0),
+                            int(getattr(usage, "output_tokens", 0) or 0),
+                        )
+                except Exception:  # noqa: BLE001 — telemetry never breaks scoring
+                    pass
                 return _parse_json_permissive(raw)
             except Exception as exc:  # noqa: BLE001 — probe model capabilities
                 last_exc = exc
