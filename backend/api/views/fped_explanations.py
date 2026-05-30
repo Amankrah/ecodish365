@@ -93,6 +93,20 @@ def _consumer_groups(agg: FpedAggregate):
     return eat_more, eat_less
 
 
+def _single_food_contributions(agg: FpedAggregate) -> tuple[list[str], list[str]]:
+    """For one food at portion-scaled targets: what it adds vs what to ease up on."""
+    strengths: list[str] = []
+    eat_less: list[str] = []
+    for g in agg.gaps:
+        label_enc = _CONSUMER_ENCOURAGE.get(g.component)
+        label_lim = _CONSUMER_LIMIT.get(g.component)
+        if label_enc and g.intake > 0 and g.myplate_status == 'met':
+            strengths.append(label_enc)
+        elif label_lim and g.myplate_status == 'over':
+            eat_less.append(label_lim)
+    return strengths, eat_less
+
+
 # Components used as pattern-driver candidates (the food groups that distinguish
 # dietary patterns most). Ordered for stable tie-breaking.
 _DRIVER_COMPONENTS = [
@@ -253,8 +267,20 @@ def build_fped_explanations(agg: FpedAggregate, user_type: str = 'individual') -
     # individual / clinician — plain-language, grouped, jargon-free.
     eat_more, eat_less = _consumer_groups(agg)
     partial = float(cov.get('coverage_pct_by_mass', 100.0)) < _PARTIAL_COVERAGE_THRESHOLD
+    energy_scaled = bool(cov.get('targets_energy_scaled'))
+    ref_kcal = cov.get('reference_kcal')
+    n_foods = int(cov.get('n_foods', 0))
+    single_food_mode = (
+        n_foods == 1 and energy_scaled and not partial
+        and float(cov.get('coverage_pct_by_mass', 0)) >= _PARTIAL_COVERAGE_THRESHOLD
+    )
 
-    if partial:
+    strengths: list[str] = []
+    if single_food_mode:
+        strengths, eat_less = _single_food_contributions(agg)
+        eat_more = []
+        partial_note = ''
+    elif partial:
         # Unmatched foods understate groups, so "light on X" claims may be artifacts.
         # Keep only the conservative "heavy on" claims; lead with the limitation.
         eat_more = []
@@ -267,27 +293,76 @@ def build_fped_explanations(agg: FpedAggregate, user_type: str = 'individual') -
     else:
         partial_note = ''
 
-    if eat_more and eat_less:
-        headline = (f"Compared with a balanced plate, today was light on "
-                    f"{_natural_join(eat_more)} and heavy on {_natural_join(eat_less)}.")
-    elif eat_more:
-        headline = f"Compared with a balanced plate, today was light on {_natural_join(eat_more)}."
-    elif eat_less:
-        headline = f"Compared with a balanced plate, today was heavy on {_natural_join(eat_less)}."
-    elif partial:
-        headline = "We could only map some of your foods, so there's not enough to read the food-group balance."
+    if single_food_mode:
+        if strengths:
+            headline = (
+                f"This single food mainly contributes {_natural_join(strengths)}, "
+                f"but is heavy on {_natural_join(eat_less)} for this portion size."
+                if eat_less else
+                f"This single food mainly contributes {_natural_join(strengths)}. "
+                "Add other foods to round out a balanced plate."
+            )
+        elif eat_less:
+            headline = (
+                f"For this portion, this food is heavy on {_natural_join(eat_less)} "
+                "relative to a balanced plate at the same energy."
+            )
+        else:
+            headline = (
+                "We couldn't read meaningful food-group contributions for this food "
+                "(its US analog may be a poor match)."
+            )
     else:
-        headline = "Today's food groups line up well with a balanced plate."
+        prefix = ''
+        if energy_scaled and ref_kcal:
+            prefix = f"For this portion (~{int(ref_kcal)} kcal), compared with a balanced plate at the same energy, "
+        elif energy_scaled:
+            prefix = 'For this portion, compared with a balanced plate at the same energy, '
+
+        if eat_more and eat_less:
+            headline = (f"{prefix}you were light on "
+                        f"{_natural_join(eat_more)} and heavy on {_natural_join(eat_less)}.")
+        elif eat_more:
+            headline = f"{prefix}you were light on {_natural_join(eat_more)}."
+        elif eat_less:
+            headline = f"{prefix}you were heavy on {_natural_join(eat_less)}."
+        elif partial:
+            headline = "We could only map some of your foods, so there's not enough to read the food-group balance."
+        else:
+            headline = (
+                "This portion's food groups line up well with a balanced plate."
+                if energy_scaled
+                else "Today's food groups line up well with a balanced plate."
+            )
+
+    scaled_caveat = (
+        'Targets are scaled to the energy in your list (~'
+        f'{int(ref_kcal)} kcal), not a full ~2000-calorie day.'
+        if energy_scaled and ref_kcal else
+        'Targets are scaled to the energy in your list, not a full ~2000-calorie day.'
+        if energy_scaled else ''
+    )
+    base_caveat = (
+        'A rough food-group read for the foods we could map, against a '
+        'balanced ~2000-calorie day. Guidance, not a diagnosis.'
+    )
 
     block = {
-        'title': 'How your day compares to a balanced plate',
+        'title': (
+            'What this food contributes'
+            if single_food_mode
+            else 'How this portion compares to a balanced plate'
+            if energy_scaled
+            else 'How your day compares to a balanced plate'
+        ),
         'headline': headline,
+        'main_contributions': strengths if single_food_mode and strengths else None,
         'eat_more': eat_more,   # encouraged groups you were light on
         'eat_less': eat_less,   # groups to go easier on
-        'caveat': (
-            'A rough food-group read for the foods we could map, against a '
-            'balanced ~2000-calorie day. Guidance, not a diagnosis.'
-        ),
+        'caveat': ' '.join(x for x in (scaled_caveat, base_caveat) if x).strip(),
+        'targets_energy_scaled': energy_scaled,
+        'reference_kcal': ref_kcal,
+        'single_food_mode': single_food_mode,
     }
     if partial_note:
         block['coverage_note'] = partial_note

@@ -22,6 +22,8 @@ import type { UserType } from '@/components/shared/AudienceToggle';
 interface FpedPanelProps {
   foods: Array<{ food_id: number; mass_g: number }>;
   userType: UserType;
+  /** Energy (kcal) in the list — scales plate targets for partial-day / single-food samples. */
+  estimatedKcal?: number;
   /** Optional one-line hint shown under the panel subtitle. */
   contextHint?: string;
 }
@@ -75,7 +77,7 @@ function GapsTable({ gaps }: { gaps: FpedGap[] }) {
   );
 }
 
-export function FpedPanel({ foods, userType, contextHint }: FpedPanelProps): JSX.Element | null {
+export function FpedPanel({ foods, userType, estimatedKcal, contextHint }: FpedPanelProps): JSX.Element | null {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<FpedComponentAnalysis | null>(null);
@@ -85,14 +87,14 @@ export function FpedPanel({ foods, userType, contextHint }: FpedPanelProps): JSX
     setLoading(true);
     setError(null);
     try {
-      const rsp = await FpedApiService.analyze(foods, userType);
+      const rsp = await FpedApiService.analyze(foods, userType, { estimatedKcal });
       setAnalysis(rsp.analysis);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not compute food-group exposure.');
     } finally {
       setLoading(false);
     }
-  }, [foods, userType]);
+  }, [foods, userType, estimatedKcal]);
 
   useEffect(() => { void run(); }, [run]);
 
@@ -134,6 +136,16 @@ export function FpedPanel({ foods, userType, contextHint }: FpedPanelProps): JSX
           {/* Individual / clinician: plain-language headline + grouped chips */}
           {analysis.headline && (
             <p className="text-sm text-gray-800 leading-relaxed">{analysis.headline}</p>
+          )}
+          {analysis.main_contributions && analysis.main_contributions.length > 0 && (
+            <div className="mt-3">
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Mainly contributes</span>
+              <div className="flex flex-wrap gap-1.5 mt-1">
+                {analysis.main_contributions.map((g) => (
+                  <span key={g} className="text-xs px-2 py-0.5 rounded-full bg-teal-50 text-teal-900 border border-teal-200">{g}</span>
+                ))}
+              </div>
+            </div>
           )}
           {analysis.eat_more && analysis.eat_more.length > 0 && (
             <div className="mt-3">

@@ -1084,8 +1084,12 @@ export interface FpedComponentAnalysis {
   coverage_note?: string;
   // individual / clinician
   headline?: string;
+  main_contributions?: string[];
   eat_more?: string[];   // everyday groups the day was light on
   eat_less?: string[];   // groups to go easier on
+  targets_energy_scaled?: boolean;
+  reference_kcal?: number;
+  single_food_mode?: boolean;
   // researcher / policy
   component_totals?: Record<string, number>;
   component_units?: Record<string, string>;
@@ -1160,8 +1164,15 @@ export class FpedApiService {
   static async analyze(
     foods: Array<{ food_id: number; mass_g: number }>,
     userType: 'individual' | 'researcher' | 'policy' = 'individual',
+    options: { estimatedKcal?: number } = {},
   ): Promise<FpedAnalyzeResponse> {
-    const response = await api.post('/fped/analyze/', { foods, user_type: userType });
+    const response = await api.post('/fped/analyze/', {
+      foods,
+      user_type: userType,
+      ...(options.estimatedKcal != null && options.estimatedKcal > 0
+        ? { estimated_kcal: options.estimatedKcal }
+        : {}),
+    });
     return {
       result: response.data.result,
       analysis: response.data.explanations.fped_component_analysis as FpedComponentAnalysis,

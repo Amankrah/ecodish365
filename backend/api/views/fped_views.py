@@ -20,6 +20,7 @@ from rest_framework import status
 
 from api.services.fped_aggregator import aggregate_fped, decomposition_plausibility
 from api.services.fped_cohort import aggregate_cohort
+from api.services.profile_meta import _estimate_kcal
 from api.views.fped_explanations import build_cohort_explanations, build_fped_explanations
 
 
@@ -64,7 +65,17 @@ def fped_analyze(request):
     if user_type not in ('individual', 'researcher', 'policy'):
         user_type = 'individual'
 
-    agg = aggregate_fped(cleaned)
+    reference_kcal: float | None = None
+    raw_kcal = request.data.get('estimated_kcal')
+    if raw_kcal is not None:
+        try:
+            reference_kcal = float(raw_kcal)
+        except (TypeError, ValueError):
+            reference_kcal = None
+    if reference_kcal is None or reference_kcal <= 0:
+        reference_kcal = _estimate_kcal(cleaned) or None
+
+    agg = aggregate_fped(cleaned, reference_kcal=reference_kcal)
     explanations = build_fped_explanations(agg, user_type=user_type)
 
     body = {

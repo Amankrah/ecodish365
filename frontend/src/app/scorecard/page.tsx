@@ -598,7 +598,7 @@ export default function ScorecardPage(): JSX.Element {
         )}
 
         {!scoring && cardModels && nFoods > 0 && (
-          <FpedPanel foods={ingredients} userType={userType} />
+          <FpedPanel foods={ingredients} userType={userType} estimatedKcal={effectiveKcal} />
         )}
 
         {!scoring && cardModels && nFoods > 0 && (

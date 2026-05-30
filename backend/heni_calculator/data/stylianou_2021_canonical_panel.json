@@ -1,0 +1,88 @@
+{
+  "_provenance": {
+    "panel_name": "Stylianou 2021 HENI canonical-values panel",
+    "panel_purpose": "Substrate-controlled HENI validation. Each entry pins a published Stylianou per-food HENI value (minutes of healthy life per serving) so the FNDDS-substrate computation can be compared like-for-like to the source paper.",
+    "stylianou_source": "Stylianou et al. 2021, Nature Food 2:616-627; figures and SI tables cited per-entry.",
+    "seed_source": "Initial seven entries lifted from backend/_smoke_heni_cnf_vs_wweia_substrate.py where the published values were already cited and traceable.",
+    "minutes_per_udaly": -0.5256,
+    "minutes_per_udaly_source": "Stylianou et al. 2021 SI p. 98 (US life expectancy at birth, average 2010-2020).",
+    "fig4_population_reference": {
+      "median_food_level_min_per_serving": 0.0,
+      "iqr_food_level_min_per_serving_approx": [-50.0, 50.0],
+      "range_food_level_min_per_serving": [-74.0, 80.0],
+      "source": "Stylianou 2021 Results p. 619; n = 5853 foods scored across NHANES food supply."
+    }
+  },
+  "panel": [
+    {
+      "food_label": "Chicken broiler wing meat and skin roasted (Stylianou worked example)",
+      "cnf_food_id": 629,
+      "serving_g": 85.0,
+      "stylianou_published_min": -3.3,
+      "stylianou_ci_95_low": -3.9,
+      "stylianou_ci_95_high": -2.5,
+      "stylianou_source": "Stylianou 2021 SI Suppl S2.2 p. 13 (canonical worked example).",
+      "pinned_status": "published"
+    },
+    {
+      "food_label": "Fast foods hot dog plain (beef hotdog on bun)",
+      "cnf_food_id": 4644,
+      "serving_g": 150.0,
+      "stylianou_published_min": -36.0,
+      "stylianou_ci_95_low": -45.0,
+      "stylianou_ci_95_high": -22.0,
+      "stylianou_source": "Stylianou 2021 Fig 4.",
+      "pinned_status": "published"
+    },
+    {
+      "food_label": "Wiener (frankfurter) beef",
+      "cnf_food_id": 1185,
+      "serving_g": 60.0,
+      "stylianou_published_min": -35.0,
+      "stylianou_ci_95_low": -41.0,
+      "stylianou_ci_95_high": -31.0,
+      "stylianou_source": "Stylianou 2021 Fig 2 and Fig 4 (processed meat band).",
+      "pinned_status": "published"
+    },
+    {
+      "food_label": "Pizza pepperoni frozen cooked (composite, vegetable + processed meat)",
+      "cnf_food_id": 4962,
+      "serving_g": 150.0,
+      "stylianou_published_min": -1.4,
+      "stylianou_ci_95_low": -2.8,
+      "stylianou_ci_95_high": -0.06,
+      "stylianou_source": "Stylianou 2021 Fig 4 (composite-food band).",
+      "pinned_status": "published"
+    },
+    {
+      "food_label": "Pie apple commercial 2 crust",
+      "cnf_food_id": 3941,
+      "serving_g": 150.0,
+      "stylianou_published_min": 1.3,
+      "stylianou_ci_95_low": -0.42,
+      "stylianou_ci_95_high": 2.9,
+      "stylianou_source": "Stylianou 2021 Fig 4 (neutral dessert band).",
+      "pinned_status": "published"
+    },
+    {
+      "food_label": "Fish sardine Pacific canned in tomato sauce (omega-3 positive extremum)",
+      "cnf_food_id": 3054,
+      "serving_g": 100.0,
+      "stylianou_published_min": 82.0,
+      "stylianou_ci_95_low": 37.0,
+      "stylianou_ci_95_high": 115.0,
+      "stylianou_source": "Stylianou 2021 Fig 4 positive extremum (omega-3 dominant).",
+      "pinned_status": "published"
+    },
+    {
+      "food_label": "Beef cured corned beef canned (sodium / processed meat negative extremum)",
+      "cnf_food_id": 2791,
+      "serving_g": 150.0,
+      "stylianou_published_min": -71.0,
+      "stylianou_ci_95_low": -91.0,
+      "stylianou_ci_95_high": -38.0,
+      "stylianou_source": "Stylianou 2021 Fig 4 negative extremum (sodium + processed meat).",
+      "pinned_status": "published"
+    }
+  ]
+}

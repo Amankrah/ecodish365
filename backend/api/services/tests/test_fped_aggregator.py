@@ -66,6 +66,17 @@ def test_unmatched_food_flagged_not_dropped():
     assert agg.coverage['covered_mass_g'] == 150.0
 
 
+def test_energy_scaled_partial_portion():
+    """Single apple should not flag fruit as short when targets match portion kcal."""
+    agg = aggregate_fped([{'food_id': 1696, 'mass_g': 100.0}], reference_kcal=52.0)
+    assert agg.coverage['targets_energy_scaled'] is True
+    by_comp = {g.component: g for g in agg.gaps}
+    fruit = by_comp['fruit_total_cup']
+    assert fruit.myplate_target < 0.1
+    assert fruit.myplate_status == 'met'
+    assert by_comp['veg_total_cup'].myplate_status == 'short'
+
+
 def test_to_dict_shape():
     d = aggregate_fped([{'food_id': 1696, 'mass_g': 100.0}]).to_dict()
     assert 'component_totals' in d and 'gaps' in d and 'coverage' in d

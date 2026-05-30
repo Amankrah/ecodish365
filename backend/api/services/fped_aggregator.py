@@ -24,6 +24,10 @@ from .fped_profile_loader import (
 
 _TARGETS_PATH = Path(__file__).resolve().parent.parent / 'data' / 'food_pattern_targets.json'
 
+# Reference pattern energy (USDA ~2000 kcal/day). When actual intake is lower,
+# targets are scaled proportionally so a single food is not compared to a full day.
+FULL_DAY_REFERENCE_KCAL = 2000.0
+
 _lock = threading.Lock()
 _targets_cache: Optional[Dict] = None
 
@@ -93,11 +97,28 @@ def _status(intake: float, target: float, direction: str) -> str:
     return 'met' if intake >= 0.9 * target else 'short'
 
 
-def aggregate_fped(foods: List[Dict]) -> FpedAggregate:
+def _target_scale(reference_kcal: Optional[float]) -> tuple[float, bool]:
+    """Return (multiplier, energy_scaled) for MyPlate/CFG reference targets."""
+    if reference_kcal is None or reference_kcal <= 0:
+        return 1.0, False
+    if reference_kcal >= FULL_DAY_REFERENCE_KCAL:
+        return 1.0, False
+    return reference_kcal / FULL_DAY_REFERENCE_KCAL, True
+
+
+def aggregate_fped(
+    foods: List[Dict],
+    *,
+    reference_kcal: Optional[float] = None,
+) -> FpedAggregate:
     """Aggregate [{food_id, mass_g}, ...] into FPED component totals + dual-guideline gaps.
 
     Foods without a bridged FPED profile (no US analog, or analog with no FPED row) are
     counted in `coverage` and excluded from the totals — never silently dropped.
+
+    When `reference_kcal` is below ~2000 kcal (typical partial day / single food),
+    guideline targets are scaled to that energy so gaps reflect portion size, not a
+    full day the user did not eat.
     """
     totals: Dict[str, float] = {k: 0.0 for k in FPED_COMPONENT_UNITS}
     n_foods = len(foods)
@@ -127,16 +148,18 @@ def aggregate_fped(foods: List[Dict]) -> FpedAggregate:
         + totals.get('protein_seafood_low_omega3_oz', 0.0)
     )
 
+    scale, energy_scaled = _target_scale(reference_kcal)
     targets = _load_targets().get('targets', {})
     gaps: List[FpedGap] = []
     for comp, t in targets.items():
         intake = totals.get(comp, 0.0)
-        mp, cfg = float(t['myplate_2000kcal']), float(t['cfg2019_approx'])
+        mp = float(t['myplate_2000kcal']) * scale
+        cfg = float(t['cfg2019_approx']) * scale
         direction = t['direction']
         gaps.append(FpedGap(
             component=comp, label=t.get('label', comp), unit=t.get('unit', ''),
             intake=intake, direction=direction,
-            myplate_target=mp, cfg_target=cfg,
+            myplate_target=round(mp, 3), cfg_target=round(cfg, 3),
             myplate_pct_of_target=(round(intake / mp * 100, 0) if mp > 0 else None),
             cfg_pct_of_target=(round(intake / cfg * 100, 0) if cfg > 0 else None),
             myplate_status=_status(intake, mp, direction),
@@ -150,6 +173,9 @@ def aggregate_fped(foods: List[Dict]) -> FpedAggregate:
         'covered_mass_g': round(covered_mass, 1),
         'total_mass_g': round(total_mass, 1),
         'coverage_pct_by_mass': (round(100 * covered_mass / total_mass, 1) if total_mass > 0 else 0.0),
+        'reference_kcal': (round(float(reference_kcal), 1) if reference_kcal and reference_kcal > 0 else None),
+        'targets_energy_scaled': energy_scaled,
+        'full_day_reference_kcal': FULL_DAY_REFERENCE_KCAL,
     }
     return FpedAggregate(component_totals=totals, gaps=gaps, coverage=coverage)
 

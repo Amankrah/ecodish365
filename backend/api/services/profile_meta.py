@@ -9,11 +9,10 @@ ENERGY_NUTRIENT_ID = 208
 
 def _estimate_kcal(composition: List[Dict[str, Any]]) -> float:
     try:
-        from dish_cnf_db_pipeline.cnf_pipeline import CNFPipeline
-        from django.conf import settings
+        from api.cnf_cache import get_api_cnf_pipeline
 
-        pipeline = CNFPipeline(settings.CNF_FOLDER)
-        na = pipeline.data_loader.nutrient_amount_df
+        pipeline = get_api_cnf_pipeline()
+        na = pipeline.nutrient_amount_df
         total = 0.0
         for row in composition:
             fid = int(row['food_id'])
@@ -57,6 +56,7 @@ def compute_profile_meta(composition: List[Dict[str, Any]]) -> Dict[str, Any]:
             'fcs': {'adequate': n >= 1, 'note': 'Treats the list as one combined meal.'},
             'environmental': {'adequate': kcal >= 200 or total_mass >= 100, 'note': 'LCA normalised per 100 kcal when possible.'},
             'dietary_pattern': {'adequate': kcal >= 800 or total_mass >= 250, 'note': 'Pattern matching works best with fuller intake.'},
+            'fped': {'adequate': kcal >= 1500 or total_mass >= 400, 'note': 'Plate comparison uses full-day targets above ~1500 kcal; smaller portions are energy-scaled.'},
         },
         'drivers': drivers,
     }
