@@ -21,9 +21,10 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import {
   ChevronDown, ChevronUp, Download, Upload, Trash2, Send,
-  Package, Info, AlertCircle, Check,
+  Package, Info, AlertCircle, Check, Scale,
 } from 'lucide-react';
 import {
   type ActiveFoodList,
@@ -39,6 +40,9 @@ import {
   savePanelCollapsed,
   ACTIVE_FOOD_LIST_EVENT,
 } from '@/lib/activeFoodList';
+import { provenanceLabel } from '@/lib/scorecardProvenance';
+import { SourceBadge } from '@/components/shared/SourceBadge';
+import type { UserType } from '@/components/shared/AudienceToggle';
 
 export type ScoreTargetId =
   | 'hefi' | 'heni' | 'hsr' | 'fcs' | 'environmental' | 'dietary_pattern'
@@ -62,6 +66,8 @@ const SCORE_TARGETS: ScoreTarget[] = [
   { id: 'planetary',       label: 'Planet budget',     emoji: '🪐', path: '/planetary' },
 ];
 
+const COMPACT_TRANSFER_IDS: ScoreTargetId[] = ['hefi', 'environmental', 'hsr'];
+
 interface Props {
   /** The metric this page represents. The matching transfer button is
    *  rendered as the disabled "you're here" indicator. */
@@ -74,6 +80,12 @@ interface Props {
   selectable?: boolean;
   selectedFoodIds?: Set<number>;
   onSelectionChange?: (ids: Set<number>) => void;
+  /** Scorecard layout: richer rows + compact metric transfers. */
+  variant?: 'default' | 'scorecard';
+  userType?: UserType;
+  transferMode?: 'all' | 'compact' | 'hidden';
+  /** Per-food kcal for portion (optional enrichment). */
+  energyKcalByFoodId?: Record<number, number>;
 }
 
 export function FoodListPanel({
@@ -82,11 +94,16 @@ export function FoodListPanel({
   selectable = false,
   selectedFoodIds,
   onSelectionChange,
+  variant = 'default',
+  userType = 'individual',
+  transferMode = 'all',
+  energyKcalByFoodId,
 }: Props): JSX.Element | null {
   const [list, setList] = useState<ActiveFoodList | null>(() => null);
   const [collapsed, setCollapsed] = useState<boolean>(false);
   const [importError, setImportError] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const [showAllTransfers, setShowAllTransfers] = useState(false);
 
   // Hydrate from localStorage after mount (SSR-safe).
   useEffect(() => {
@@ -134,6 +151,19 @@ export function FoodListPanel({
     if (!selectable || !selectedFoodIds || !list) return list?.ingredients.length ?? 0;
     return list.ingredients.filter(i => selectedFoodIds.has(i.food_id)).length;
   }, [selectable, selectedFoodIds, list]);
+
+  const transferTargets = useMemo(() => {
+    if (transferMode === 'hidden') return [];
+    if (transferMode === 'compact' && !showAllTransfers) {
+      return SCORE_TARGETS.filter(t => COMPACT_TRANSFER_IDS.includes(t.id) || t.id === currentTarget);
+    }
+    return SCORE_TARGETS;
+  }, [transferMode, showAllTransfers, currentTarget]);
+
+  const compareUrl = useMemo(() => {
+    const ids = list?.ingredients.map(i => i.food_id).slice(0, 6) ?? [];
+    return ids.length > 0 ? `/cnf/compare?foods=${ids.join(',')}` : '/cnf/compare';
+  }, [list?.ingredients]);
 
   function toggleFoodSelection(food_id: number): void {
     if (!onSelectionChange || !selectedFoodIds) return;
@@ -276,15 +306,9 @@ export function FoodListPanel({
     );
   }
 
-  const isPackaged = list.source === 'packaged_food_inferred';
-  const isImported = list.source === 'imported';
-  const isMultiDay = !!list.multi_day;
-
-  const provenanceLabel =
-    isMultiDay && list.multi_day ? `${list.multi_day.n_days}-day average`
-    : isPackaged ? 'Scanned product (estimated)'
-    : isImported ? 'Imported list'
-    : 'Food diary day';
+  const isPackaged = list?.source === 'packaged_food_inferred';
+  const isMultiDay = !!list?.multi_day;
+  const provLabel = list ? provenanceLabel(list) : '';
 
   const isOpen = hydrated ? !collapsed : true;
 
@@ -314,7 +338,7 @@ export function FoodListPanel({
             {list.ingredients.length} food{list.ingredients.length === 1 ? '' : 's'} ·
             {' '}{totalMass.toFixed(0)} g total
             {list.estimated_daily_kcal ? ` · ${list.estimated_daily_kcal.toFixed(0)} kcal` : ''}
-            {' · '}<em>{provenanceLabel}</em>
+            {' · '}<em>{provLabel}</em>
           </span>
         </span>
         {isOpen
@@ -361,10 +385,12 @@ export function FoodListPanel({
           <ul className="divide-y divide-gray-200 bg-white border border-gray-200 rounded">
             {list.ingredients.map(ing => {
               const isSelected = !selectable || !selectedFoodIds || selectedFoodIds.has(ing.food_id);
+              const kcalPer100 = energyKcalByFoodId?.[ing.food_id];
+              const portionKcal = kcalPer100 != null ? (kcalPer100 * ing.mass_g) / 100 : null;
               return (
               <li
                 key={ing.food_id}
-                className={`flex items-center gap-2 px-2 py-1.5 text-xs ${!isSelected ? 'opacity-50 bg-gray-50' : ''}`}
+                className={`flex items-center gap-2 px-2 py-2 text-xs ${!isSelected ? 'opacity-50 bg-gray-50' : ''}`}
               >
                 {selectable && selectedFoodIds && onSelectionChange && (
                   <input
@@ -376,12 +402,35 @@ export function FoodListPanel({
                   />
                 )}
                 <span className="flex-1 min-w-0">
-                  <span className="text-gray-900 truncate block">{ing.food_description}</span>
-                  <span className="text-[10px] text-gray-500">
-                    Food ID {ing.food_id}{ing.food_group ? ` · ${ing.food_group}` : ''}
-                  </span>
+                  {variant === 'scorecard' ? (
+                    <>
+                      <span className="flex flex-wrap items-center gap-1.5">
+                        <Link
+                          href={`/cnf/foods/${ing.food_id}`}
+                          className="text-gray-900 font-medium hover:text-blue-700 truncate max-w-full"
+                          title={ing.food_description}
+                        >
+                          {ing.food_description}
+                        </Link>
+                        <SourceBadge foodId={ing.food_id} userType={userType} />
+                      </span>
+                      <span className="text-[10px] text-gray-500 flex flex-wrap gap-x-2">
+                        {ing.food_group && <span>{ing.food_group}</span>}
+                        {portionKcal != null && (
+                          <span className="text-emerald-700 tabular-nums">≈ {portionKcal.toFixed(0)} kcal</span>
+                        )}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-gray-900 truncate block">{ing.food_description}</span>
+                      <span className="text-[10px] text-gray-500">
+                        Food ID {ing.food_id}{ing.food_group ? ` · ${ing.food_group}` : ''}
+                      </span>
+                    </>
+                  )}
                 </span>
-                <label className="flex items-center gap-1">
+                <label className="flex items-center gap-1 shrink-0">
                   <input
                     type="number"
                     min={0}
@@ -438,6 +487,15 @@ export function FoodListPanel({
               <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
               Clear list
             </button>
+            {variant === 'scorecard' && list.ingredients.length >= 2 && list.ingredients.length <= 6 && (
+              <Link
+                href={compareUrl}
+                className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-blue-700 border border-blue-300 bg-white rounded-md hover:bg-blue-50"
+              >
+                <Scale className="h-3.5 w-3.5" aria-hidden="true" />
+                Compare in catalogue
+              </Link>
+            )}
           </div>
 
           {importError && (
@@ -447,10 +505,13 @@ export function FoodListPanel({
             </div>
           )}
 
+          {transferMode !== 'hidden' && transferTargets.length > 0 && (
           <div>
-            <p className="text-[11px] text-gray-600 mb-1">Score this list with another metric:</p>
+            <p className="text-[11px] text-gray-600 mb-1">
+              {transferMode === 'compact' ? 'Open in a dedicated scorer:' : 'Score this list with another metric:'}
+            </p>
             <div className="flex flex-wrap gap-1.5">
-              {SCORE_TARGETS.map(target => {
+              {transferTargets.map(target => {
                 const isCurrent = target.id === currentTarget;
                 return (
                   <button
@@ -475,8 +536,18 @@ export function FoodListPanel({
                   </button>
                 );
               })}
+              {transferMode === 'compact' && !showAllTransfers && (
+                <button
+                  type="button"
+                  onClick={() => setShowAllTransfers(true)}
+                  className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md border border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
+                >
+                  More metrics…
+                </button>
+              )}
             </div>
           </div>
+          )}
         </div>
     </details>
   );

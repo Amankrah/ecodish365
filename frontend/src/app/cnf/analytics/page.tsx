@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { 
+import React, { useMemo, useState, useEffect } from 'react';
+import Link from 'next/link';
+import {
   ChartBarIcon,
   CubeIcon,
   CircleStackIcon,
@@ -11,29 +12,45 @@ import {
   CheckCircleIcon,
   InformationCircleIcon,
   ArrowDownTrayIcon,
-  EyeIcon
+  EyeIcon,
+  MagnifyingGlassIcon,
+  BeakerIcon,
+  ScaleIcon,
 } from '@heroicons/react/24/outline';
 import { CNFApiService, DatabaseStats, IntegrityCheck } from '@/lib/api';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { useCnfExplorer } from '@/components/cnf/CnfExplorerContext';
+import { formatGroupDisplayName, isWafctGroup } from '@/lib/cnfGroupDisplay';
+import { CATALOGUE_NAV } from '@/lib/catalogueNav';
 
 interface AnalyticsData {
   stats: DatabaseStats | null;
   integrityCheck: IntegrityCheck | null;
 }
 
+type ChartScope = 'all' | 'cnf' | 'wafct';
+type ChartMetric = 'foodGroups' | 'topNutrients';
+
 const CHART_COLORS = [
   '#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6',
-  '#06b6d4', '#f97316', '#84cc16', '#ec4899', '#6b7280'
+  '#06b6d4', '#f97316', '#84cc16', '#ec4899', '#6b7280',
 ];
 
-export default function CNFAnalyticsPage() {
+const QUICK_LINKS = [
+  { name: 'Food Search', href: '/cnf/search', icon: MagnifyingGlassIcon },
+  { name: 'Food Groups', href: '/cnf/groups', icon: CubeIcon },
+  { name: 'Discover', href: '/cnf/discover', icon: BeakerIcon },
+  { name: 'Compare', href: '/cnf/compare', icon: ScaleIcon },
+];
+
+export default function CatalogueOverviewPage() {
   const router = useRouter();
   const { groupIdByName } = useCnfExplorer();
   const [data, setData] = useState<AnalyticsData>({ stats: null, integrityCheck: null });
   const [loading, setLoading] = useState(true);
-  const [selectedChart, setSelectedChart] = useState<'foodGroups' | 'topNutrients'>('foodGroups');
+  const [chartMetric, setChartMetric] = useState<ChartMetric>('foodGroups');
+  const [chartScope, setChartScope] = useState<ChartScope>('all');
   const [integrityLoading, setIntegrityLoading] = useState(false);
 
   useEffect(() => {
@@ -45,13 +62,11 @@ export default function CNFAnalyticsPage() {
       setLoading(true);
       const [stats, integrityCheck] = await Promise.all([
         CNFApiService.getDatabaseStatistics(),
-        CNFApiService.checkDataIntegrity().catch(() => null) // Don't fail if integrity check fails
+        CNFApiService.checkDataIntegrity().catch(() => null),
       ]);
-      
       setData({ stats, integrityCheck });
-    } catch (error) {
-      console.error('Failed to load analytics data:', error);
-      toast.error('Failed to load analytics data');
+    } catch {
+      toast.error('Failed to load catalogue statistics');
     } finally {
       setLoading(false);
     }
@@ -63,323 +78,269 @@ export default function CNFAnalyticsPage() {
       const integrityCheck = await CNFApiService.checkDataIntegrity();
       setData(prev => ({ ...prev, integrityCheck }));
       toast.success('Data integrity check completed');
-    } catch (error) {
-      console.error('Integrity check failed:', error);
+    } catch {
       toast.error('Integrity check failed');
     } finally {
       setIntegrityLoading(false);
     }
   };
 
-  const exportAnalytics = async () => {
+  const exportAnalytics = () => {
     try {
       const exportData = {
         timestamp: new Date().toISOString(),
+        catalogue: 'CNF + WAFCT',
         statistics: data.stats,
-        integrity_check: data.integrityCheck
+        integrity_check: data.integrityCheck,
       };
-
       const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `cnf-analytics-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `catalogue-overview-${new Date().toISOString().split('T')[0]}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-
-      toast.success('Analytics data exported successfully');
-    } catch (error) {
-      console.error('Export failed:', error);
+      toast.success('Overview exported');
+    } catch {
       toast.error('Export failed');
     }
   };
 
-  const formatNumber = (num: number) => {
-    return new Intl.NumberFormat().format(num);
-  };
+  const formatNumber = (num: number) => new Intl.NumberFormat().format(num);
 
-  const getChartData = () => {
+  const chartData = useMemo(() => {
     if (!data.stats) return [];
-
-    const sourceData = selectedChart === 'foodGroups' 
-      ? data.stats.foods_by_group 
+    const sourceData = chartMetric === 'foodGroups'
+      ? data.stats.foods_by_group
       : data.stats.top_nutrients;
 
     return Object.entries(sourceData)
-      .map(([name, value]) => ({ name, value }))
+      .filter(([name]) => {
+        if (chartMetric !== 'foodGroups' || chartScope === 'all') return true;
+        const id = groupIdByName.get(name);
+        if (id == null) return chartScope === 'cnf';
+        return chartScope === 'wafct' ? isWafctGroup(id) : !isWafctGroup(id);
+      })
+      .map(([name, value]) => {
+        const id = groupIdByName.get(name);
+        const label = id != null ? formatGroupDisplayName(name, id) : name;
+        return { name, label, value, groupId: id };
+      })
       .sort((a, b) => b.value - a.value)
-      .slice(0, 10);
-  };
+      .slice(0, chartScope === 'wafct' ? 14 : 10);
+  }, [data.stats, chartMetric, chartScope, groupIdByName]);
 
-  const getMaxValue = () => {
-    const chartData = getChartData();
-    return Math.max(...chartData.map(item => item.value));
-  };
+  const maxChartValue = chartData.length ? Math.max(...chartData.map(d => d.value)) : 1;
 
   const getIntegrityStatus = () => {
     if (!data.integrityCheck) return null;
-    
     const { overall_status } = data.integrityCheck;
     const statusConfig = {
-      'passed': { color: 'text-green-600', bg: 'bg-green-100', icon: CheckCircleIcon },
-      'warning': { color: 'text-yellow-600', bg: 'bg-yellow-100', icon: ExclamationTriangleIcon },
-      'failed': { color: 'text-red-600', bg: 'bg-red-100', icon: ExclamationTriangleIcon },
+      passed: { color: 'text-green-600', bg: 'bg-green-100', icon: CheckCircleIcon },
+      warning: { color: 'text-yellow-600', bg: 'bg-yellow-100', icon: ExclamationTriangleIcon },
+      failed: { color: 'text-red-600', bg: 'bg-red-100', icon: ExclamationTriangleIcon },
     };
-
     return statusConfig[overall_status] || statusConfig.failed;
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-            <div className="inline-flex items-center">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
-              <span className="ml-2 text-gray-600">Loading analytics data...</span>
-            </div>
-          </div>
+      <div className="min-h-screen bg-gray-50 py-8 flex items-center justify-center text-gray-600">
+        <div className="inline-flex items-center">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600" />
+          <span className="ml-2">Loading catalogue overview…</span>
         </div>
       </div>
     );
   }
 
+  const stats = data.stats;
+  const cnfCount = stats?.cnf_food_count ?? (stats ? stats.food_count : 0);
+  const wafctCount = stats?.wafct_food_count ?? 0;
+
   return (
     <div className="min-h-screen bg-gray-50 py-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        <div className="mb-6">
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Database Analytics
-              </h1>
-              <p className="text-gray-600">
-                Catalogue statistics for CNF + WAFCT combined. Click a food group to browse its foods.
+              <p className="text-sm text-gray-500 mb-1">{CATALOGUE_NAV.section}</p>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">{CATALOGUE_NAV.overview}</h1>
+              <p className="text-gray-600 max-w-2xl">
+                Combined statistics for Health Canada CNF and FAO/INFOODS WAFCT 2019.
+                Click a food group to browse its foods.
               </p>
+              <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                <span className="px-2 py-1 rounded border bg-gray-100 text-gray-700 font-semibold">CNF — Health Canada</span>
+                <span className="px-2 py-1 rounded border bg-amber-100 text-amber-800 font-semibold">WAFCT — FAO/INFOODS</span>
+              </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={runIntegrityCheck}
-                disabled={integrityLoading}
-                className="btn-outline inline-flex items-center"
-              >
-                {integrityLoading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-600 mr-2"></div>
-                    Running Check
-                  </>
-                ) : (
-                  <>
-                    <ExclamationTriangleIcon className="w-4 h-4 mr-2" />
-                    Run Integrity Check
-                  </>
-                )}
+            <div className="flex flex-wrap gap-2 shrink-0">
+              <button type="button" onClick={runIntegrityCheck} disabled={integrityLoading} className="btn-outline inline-flex items-center text-sm">
+                {integrityLoading ? 'Running…' : 'Run integrity check'}
               </button>
-              <button
-                onClick={exportAnalytics}
-                className="btn-primary inline-flex items-center"
-              >
+              <button type="button" onClick={exportAnalytics} className="btn-primary inline-flex items-center text-sm">
                 <ArrowDownTrayIcon className="w-4 h-4 mr-2" />
-                Export Analytics
+                Export JSON
               </button>
             </div>
           </div>
         </div>
 
-        {/* Key Metrics */}
-        {data.stats && (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="stat-card">
-              <div className="flex items-center">
-                              <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
-                <CircleStackIcon className="w-6 h-6 text-primary-600" />
-              </div>
-                <div className="ml-4">
-                  <div className="text-2xl font-bold text-gray-900">
-                    {formatNumber(data.stats.food_count)}
-                  </div>
-                  <div className="text-sm text-gray-600">Total Foods</div>
-                </div>
-              </div>
-            </div>
+        {/* Quick links */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+          {QUICK_LINKS.map(link => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="flex items-center gap-2 px-3 py-2.5 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-800 hover:border-primary-300 hover:bg-primary-50/40 transition-colors"
+            >
+              <link.icon className="w-4 h-4 text-primary-600 shrink-0" />
+              {link.name}
+            </Link>
+          ))}
+        </div>
 
-            <div className="stat-card">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <ChartBarIcon className="w-6 h-6 text-green-600" />
-                </div>
-                <div className="ml-4">
-                  <div className="text-2xl font-bold text-gray-900">
-                    {formatNumber(data.stats.nutrient_records)}
-                  </div>
-                  <div className="text-sm text-gray-600">Nutrient Records</div>
-                </div>
-              </div>
+        {stats && (
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+            <div className="stat-card col-span-2 lg:col-span-1">
+              <div className="text-2xl font-bold text-gray-900">{formatNumber(stats.food_count)}</div>
+              <div className="text-sm text-gray-600">Foods total</div>
             </div>
-
             <div className="stat-card">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <CubeIcon className="w-6 h-6 text-blue-600" />
-                </div>
-                <div className="ml-4">
-                  <div className="text-2xl font-bold text-gray-900">
-                    {formatNumber(data.stats.food_groups)}
-                  </div>
-                  <div className="text-sm text-gray-600">Food Groups</div>
-                </div>
-              </div>
+              <div className="text-2xl font-bold text-gray-900">{formatNumber(cnfCount)}</div>
+              <div className="text-sm text-gray-600">CNF foods</div>
             </div>
-
             <div className="stat-card">
-              <div className="flex items-center">
-                              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <ArrowTrendingUpIcon className="w-6 h-6 text-purple-600" />
-              </div>
-                <div className="ml-4">
-                  <div className="text-2xl font-bold text-gray-900">
-                    {formatNumber(data.stats.nutrient_types)}
-                  </div>
-                  <div className="text-sm text-gray-600">Nutrient Types</div>
-                </div>
-              </div>
+              <div className="text-2xl font-bold text-amber-800">{formatNumber(wafctCount)}</div>
+              <div className="text-sm text-gray-600">WAFCT foods</div>
+            </div>
+            <div className="stat-card">
+              <div className="text-2xl font-bold text-gray-900">{formatNumber(stats.food_groups)}</div>
+              <div className="text-sm text-gray-600">Food groups</div>
+            </div>
+            <div className="stat-card">
+              <div className="text-2xl font-bold text-gray-900">{formatNumber(stats.nutrient_types)}</div>
+              <div className="text-sm text-gray-600">Nutrient types</div>
             </div>
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          {/* Chart Section */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-gray-900">
-                  Distribution Analysis
-                </h2>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => setSelectedChart('foodGroups')}
-                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                      selectedChart === 'foodGroups'
-                        ? 'bg-primary-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    Food Groups
-                  </button>
-                  <button
-                    onClick={() => setSelectedChart('topNutrients')}
-                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                      selectedChart === 'topNutrients'
-                        ? 'bg-primary-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    Top Nutrients
-                  </button>
-                </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+              <h2 className="text-lg font-semibold text-gray-900">Distribution</h2>
+              <div className="flex flex-wrap gap-2">
+                {chartMetric === 'foodGroups' && (
+                  <>
+                    {(['all', 'cnf', 'wafct'] as ChartScope[]).map(scope => (
+                      <button
+                        key={scope}
+                        type="button"
+                        onClick={() => setChartScope(scope)}
+                        className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                          chartScope === scope ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        {scope === 'all' ? 'All' : scope.toUpperCase()}
+                      </button>
+                    ))}
+                  </>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setChartMetric('foodGroups')}
+                  className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                    chartMetric === 'foodGroups' ? 'bg-slate-800 text-white' : 'bg-gray-100 text-gray-700'
+                  }`}
+                >
+                  Food groups
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setChartMetric('topNutrients')}
+                  className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                    chartMetric === 'topNutrients' ? 'bg-slate-800 text-white' : 'bg-gray-100 text-gray-700'
+                  }`}
+                >
+                  Nutrient coverage
+                </button>
               </div>
+            </div>
 
-              {data.stats && (
-                <div className="space-y-4">
-                  {getChartData().map((item, index) => (
-                    <div key={item.name} className="flex items-center space-x-4">
-                      <div className="w-32 text-sm text-gray-700 truncate font-medium">
-                        {selectedChart === 'foodGroups' ? (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const id = groupIdByName.get(item.name);
-                              if (id != null) router.push(`/cnf/groups?group=${id}`);
-                            }}
-                            className="text-left hover:text-primary-700 hover:underline truncate w-full"
-                            title={`Browse ${item.name}`}
-                          >
-                            {item.name}
-                          </button>
-                        ) : (
-                          item.name
-                        )}
-                      </div>
-                      <div className="flex-1 relative">
-                        <div className="w-full bg-gray-200 rounded-full h-4">
-                          <div
-                            className="h-4 rounded-full transition-all duration-500"
-                            style={{
-                              width: `${(item.value / getMaxValue()) * 100}%`,
-                              backgroundColor: CHART_COLORS[index % CHART_COLORS.length]
-                            }}
-                          />
-                        </div>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-xs font-medium text-gray-700">
-                            {formatNumber(item.value)}
-                          </span>
-                        </div>
-                      </div>
+            <div className="space-y-3">
+              {chartData.map((item, index) => (
+                <div key={item.name} className="flex items-center gap-3">
+                  <div className="w-36 sm:w-44 text-sm text-gray-700 truncate font-medium shrink-0">
+                    {chartMetric === 'foodGroups' && item.groupId != null ? (
+                      <button
+                        type="button"
+                        onClick={() => router.push(`/cnf/groups?group=${item.groupId}`)}
+                        className="text-left hover:text-primary-700 hover:underline truncate w-full"
+                        title={item.name}
+                      >
+                        {item.label}
+                      </button>
+                    ) : (
+                      <span title={item.name}>{item.label}</span>
+                    )}
+                  </div>
+                  <div className="flex-1 relative min-w-0">
+                    <div className="w-full bg-gray-200 rounded-full h-3.5">
+                      <div
+                        className="h-3.5 rounded-full transition-all duration-500"
+                        style={{
+                          width: `${(item.value / maxChartValue) * 100}%`,
+                          backgroundColor: CHART_COLORS[index % CHART_COLORS.length],
+                        }}
+                      />
                     </div>
-                  ))}
+                  </div>
+                  <span className="text-xs font-medium text-gray-700 w-12 text-right tabular-nums shrink-0">
+                    {formatNumber(item.value)}
+                  </span>
                 </div>
+              ))}
+              {chartData.length === 0 && (
+                <p className="text-sm text-gray-500 py-4 text-center">No data for this view.</p>
               )}
             </div>
           </div>
 
-          {/* Data Quality Section */}
-          <div className="space-y-6">
-            {/* Integrity Check */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Data Integrity
-                </h3>
-                <button
-                  type="button"
-                  onClick={runIntegrityCheck}
-                  disabled={integrityLoading}
-                  className="p-2 text-gray-400 hover:text-primary-600 transition-colors"
-                  title="Run integrity check"
-                >
+          <div className="space-y-4">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-base font-semibold text-gray-900">Data integrity</h3>
+                <button type="button" onClick={runIntegrityCheck} disabled={integrityLoading} className="p-1.5 text-gray-400 hover:text-primary-600" title="Run integrity check">
                   <EyeIcon className="w-4 h-4" />
                 </button>
               </div>
-
-              {data.integrityCheck && (
+              {data.integrityCheck ? (
                 <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
-                    {(() => {
-                      const status = getIntegrityStatus();
-                      if (!status) return null;
-                      const Icon = status.icon;
-                      return (
-                        <>
-                          <div className={`w-8 h-8 rounded-full ${status.bg} flex items-center justify-center`}>
-                            <Icon className={`w-4 h-4 ${status.color}`} />
-                          </div>
-                          <div>
-                            <div className="font-medium text-gray-900 capitalize">
-                              {data.integrityCheck.overall_status}
-                            </div>
-                            <div className="text-sm text-gray-600">
-                              Overall Status
-                            </div>
-                          </div>
-                        </>
-                      );
-                    })()}
-                  </div>
-
-                  <div className="space-y-2">
+                  {(() => {
+                    const status = getIntegrityStatus();
+                    if (!status) return null;
+                    const Icon = status.icon;
+                    return (
+                      <div className="flex items-center gap-2">
+                        <div className={`w-8 h-8 rounded-full ${status.bg} flex items-center justify-center`}>
+                          <Icon className={`w-4 h-4 ${status.color}`} />
+                        </div>
+                        <div>
+                          <div className="font-medium text-gray-900 capitalize">{data.integrityCheck.overall_status}</div>
+                          <div className="text-xs text-gray-500">Pipeline checks</div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                  <div className="space-y-1.5">
                     {Object.entries(data.integrityCheck.checks).map(([checkName, checkData]) => (
-                      <div key={checkName} className="flex items-center justify-between text-sm">
-                        <span className="text-gray-700 capitalize">
-                          {checkName.replace(/_/g, ' ')}
-                        </span>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-gray-900 font-medium">
-                            {formatNumber(checkData.count)}
-                          </span>
+                      <div key={checkName} className="flex items-center justify-between text-xs">
+                        <span className="text-gray-600 capitalize">{checkName.replace(/_/g, ' ')}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium tabular-nums">{formatNumber(checkData.count)}</span>
                           <div className={`w-2 h-2 rounded-full ${
                             checkData.status === 'passed' ? 'bg-green-500' :
                             checkData.status === 'warning' ? 'bg-yellow-500' : 'bg-red-500'
@@ -389,114 +350,68 @@ export default function CNFAnalyticsPage() {
                     ))}
                   </div>
                 </div>
-              )}
-
-              {!data.integrityCheck && (
-                <div className="text-center py-6">
-                  <InformationCircleIcon className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                  <p className="text-sm text-gray-600">
-                    Run integrity check to see data quality metrics
-                  </p>
-                </div>
+              ) : (
+                <p className="text-xs text-gray-500">Run the integrity check to validate catalogue joins.</p>
               )}
             </div>
 
-            {/* Database Info */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Database Information
-              </h3>
-              {data.stats && (
-                <div className="space-y-3 text-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Last Updated</span>
-                    <span className="text-gray-900 font-medium">
-                      {new Date(data.stats.timestamp).toLocaleDateString()}
-                    </span>
+            {stats && (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                <h3 className="text-base font-semibold text-gray-900 mb-3">Catalogue details</h3>
+                <dl className="space-y-2 text-sm">
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-gray-600">Nutrient records</dt>
+                    <dd className="font-medium tabular-nums">{formatNumber(stats.nutrient_records)}</dd>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Food Sources</span>
-                    <span className="text-gray-900 font-medium">
-                      {formatNumber(data.stats.food_sources)}
-                    </span>
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-gray-600">Measures</dt>
+                    <dd className="font-medium tabular-nums">{formatNumber(stats.measures)}</dd>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Nutrient Sources</span>
-                    <span className="text-gray-900 font-medium">
-                      {formatNumber(data.stats.nutrient_sources)}
-                    </span>
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-gray-600">Last refreshed</dt>
+                    <dd className="font-medium">{new Date(stats.timestamp).toLocaleDateString()}</dd>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Measures</span>
-                    <span className="text-gray-900 font-medium">
-                      {formatNumber(data.stats.measures)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Conversion Records</span>
-                    <span className="text-gray-900 font-medium">
-                      {formatNumber(data.stats.conversion_records)}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
+                </dl>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Insights Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Key Insights
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-blue-50 rounded-lg p-4">
-              <div className="flex items-center mb-2">
-                <CircleStackIcon className="w-5 h-5 text-blue-600 mr-2" />
-                <h3 className="font-medium text-blue-900">Database Coverage</h3>
+        {stats && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <CircleStackIcon className="w-5 h-5 text-blue-600" />
+                <h3 className="font-medium text-blue-900">Dual-database coverage</h3>
               </div>
               <p className="text-sm text-blue-800">
-                {data.stats && (
-                  <>
-                    The database contains {formatNumber(data.stats.food_count)} foods across {data.stats.food_groups} food groups, 
-                    providing comprehensive nutritional data for Canadian foods.
-                  </>
-                )}
+                {formatNumber(cnfCount)} Canadian (CNF) and {formatNumber(wafctCount)} West African (WAFCT) foods
+                in {stats.food_groups} groups. Use the source filter on search and compare to scope either database.
               </p>
             </div>
-
-            <div className="bg-green-50 rounded-lg p-4">
-              <div className="flex items-center mb-2">
-                <ChartBarIcon className="w-5 h-5 text-green-600 mr-2" />
-                <h3 className="font-medium text-green-900">Nutrient Richness</h3>
+            <div className="bg-green-50 border border-green-100 rounded-xl p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <ChartBarIcon className="w-5 h-5 text-green-600" />
+                <h3 className="font-medium text-green-900">Nutrient depth</h3>
               </div>
               <p className="text-sm text-green-800">
-                {data.stats && (
-                  <>
-                    With {formatNumber(data.stats.nutrient_records)} nutrient records across {data.stats.nutrient_types} nutrient types, 
-                    the database offers detailed nutritional analysis capabilities.
-                  </>
-                )}
+                {formatNumber(stats.nutrient_records)} measured values across {stats.nutrient_types} nutrient types.
+                WAFCT rows use an INFOODS→CNF nutrient bridge where names differ.
               </p>
             </div>
-
-            <div className="bg-purple-50 rounded-lg p-4">
-              <div className="flex items-center mb-2">
-                <ClockIcon className="w-5 h-5 text-purple-600 mr-2" />
-                <h3 className="font-medium text-purple-900">Data Freshness</h3>
+            <div className="bg-purple-50 border border-purple-100 rounded-xl p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <ArrowTrendingUpIcon className="w-5 h-5 text-purple-600" />
+                <h3 className="font-medium text-purple-900">Research tooling</h3>
               </div>
               <p className="text-sm text-purple-800">
-                {data.stats && (
-                  <>
-                    Last updated on {new Date(data.stats.timestamp).toLocaleDateString()}, 
-                    ensuring users have access to current nutritional information.
-                  </>
-                )}
+                Browse by group for prep-state tags, screen within a group by nutrient, or export comparison tables.
+                Scoring surfaces WAFCT caveats when West African foods are included.
               </p>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
-} 
+}

@@ -16,6 +16,10 @@ interface NutrientDiscoverPanelProps {
   resolveGroupName: (groupId: number, fallback?: string) => string;
   /** Embed in compare modal: show Add buttons and call this. */
   onAddFood?: (foodId: number) => void;
+  /** Batch add selected foods (compare modal multi-select). */
+  onAddFoods?: (foodIds: number[]) => void | Promise<void>;
+  /** Remaining slots when adding to a capped list (e.g. compare max 6). */
+  maxSelections?: number;
   /** Food IDs already in the comparison list. */
   excludeFoodIds?: number[];
   /** Tighter layout for modal embedding. */
@@ -28,6 +32,8 @@ export function NutrientDiscoverPanel({
   userType,
   resolveGroupName,
   onAddFood,
+  onAddFoods,
+  maxSelections,
   excludeFoodIds = [],
   compact = false,
   onQuickView,
@@ -40,8 +46,16 @@ export function NutrientDiscoverPanel({
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<Food[]>([]);
   const [criteriaLabel, setCriteriaLabel] = useState('');
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
   const excludeSet = useMemo(() => new Set(excludeFoodIds), [excludeFoodIds]);
+  const multiSelectEnabled = Boolean(onAddFoods);
+  const selectionCap = maxSelections ?? Infinity;
+
+  const availableResults = useMemo(
+    () => results.filter(f => !excludeSet.has(f.FoodID)),
+    [results, excludeSet],
+  );
 
   useEffect(() => {
     CNFApiService.getNutrients()
@@ -66,6 +80,7 @@ export function NutrientDiscoverPanel({
   ) => {
     setLoading(true);
     setSelectedNutrientId(nutrientId);
+    setSelectedIds(new Set());
     try {
       const data = await CNFApiService.searchFoodsByNutrient(nutrientId, min, max, 50);
       setResults(data.foods);
@@ -105,6 +120,61 @@ export function NutrientDiscoverPanel({
     setMinValue(preset.minValue != null ? String(preset.minValue) : '');
     setMaxValue(preset.maxValue != null ? String(preset.maxValue) : '');
     runSearch(preset.nutrientId, preset.minValue, preset.maxValue, preset.label);
+  };
+
+  const toggleSelection = (foodId: number) => {
+    if (excludeSet.has(foodId)) return;
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(foodId)) {
+        next.delete(foodId);
+      } else if (next.size >= selectionCap) {
+        toast.error(
+          selectionCap === 1
+            ? 'Only one more food can be added'
+            : `You can only add ${selectionCap} more food(s)`,
+        );
+        return prev;
+      } else {
+        next.add(foodId);
+      }
+      return next;
+    });
+  };
+
+  const selectAllVisible = () => {
+    if (!availableResults.length) return;
+    const allSelected = availableResults.every(f => selectedIds.has(f.FoodID));
+    if (allSelected) {
+      setSelectedIds(prev => {
+        const next = new Set(prev);
+        availableResults.forEach(f => next.delete(f.FoodID));
+        return next;
+      });
+      return;
+    }
+    const next = new Set(selectedIds);
+    for (const food of availableResults) {
+      if (next.size >= selectionCap) break;
+      next.add(food.FoodID);
+    }
+    if (next.size >= selectionCap && availableResults.length > selectionCap) {
+      toast.error(`Only ${selectionCap} slot(s) remaining — selected the first ${selectionCap}`);
+    }
+    setSelectedIds(next);
+  };
+
+  const clearSelection = () => setSelectedIds(new Set());
+
+  const addSelected = async () => {
+    if (!onAddFoods) return;
+    const ids = Array.from(selectedIds);
+    if (!ids.length) {
+      toast.error('No foods selected');
+      return;
+    }
+    await onAddFoods(ids);
+    setSelectedIds(new Set());
   };
 
   return (
@@ -211,16 +281,65 @@ export function NutrientDiscoverPanel({
               {results.length} foods · {criteriaLabel}
             </p>
           </div>
+          {multiSelectEnabled && availableResults.length > 0 && (
+            <div className="flex items-center justify-between gap-2 px-3 py-2 bg-gray-50 border-b border-gray-100">
+              <div className="flex items-center gap-3 text-sm">
+                <button
+                  type="button"
+                  onClick={selectAllVisible}
+                  className="text-primary-600 hover:text-primary-700 text-xs font-medium"
+                >
+                  {availableResults.every(f => selectedIds.has(f.FoodID)) && availableResults.length > 0
+                    ? 'Deselect all'
+                    : 'Select all'}
+                </button>
+                <button
+                  type="button"
+                  onClick={clearSelection}
+                  className="text-gray-600 hover:text-gray-700 text-xs"
+                >
+                  Clear
+                </button>
+                <span className="text-xs text-gray-500">{selectedIds.size} selected</span>
+              </div>
+              {selectedIds.size > 0 && (
+                <button
+                  type="button"
+                  onClick={addSelected}
+                  className="btn-primary text-xs py-1 px-2.5"
+                >
+                  Add selected ({selectedIds.size})
+                </button>
+              )}
+            </div>
+          )}
           {results.length === 0 ? (
             <p className="p-4 text-center text-sm text-gray-500">No foods matched.</p>
           ) : (
             <ul className={`divide-y divide-gray-100 ${compact ? 'max-h-52' : 'max-h-96'} overflow-y-auto`}>
               {results.map(food => {
                 const isAdded = excludeSet.has(food.FoodID);
+                const isSelected = selectedIds.has(food.FoodID);
                 return (
-                  <li key={food.FoodID} className={`px-3 py-2.5 ${isAdded ? 'opacity-50 bg-gray-50' : 'hover:bg-gray-50'}`}>
+                  <li
+                    key={food.FoodID}
+                    className={`px-3 py-2.5 ${
+                      isAdded ? 'opacity-50 bg-gray-50' : isSelected ? 'bg-primary-50' : 'hover:bg-gray-50'
+                    }`}
+                  >
                     <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
+                      <div className="flex items-start gap-2 min-w-0 flex-1">
+                        {multiSelectEnabled && (
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => toggleSelection(food.FoodID)}
+                            disabled={isAdded}
+                            aria-label={`Select ${food.FoodDescription}`}
+                            className="mt-0.5 h-4 w-4 shrink-0 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                          />
+                        )}
+                        <div className="min-w-0">
                         {onAddFood ? (
                           <span className="text-sm font-medium text-gray-900">{food.FoodDescription}</span>
                         ) : (
@@ -244,6 +363,7 @@ export function NutrientDiscoverPanel({
                               })()}
                             </span>
                           )}
+                        </div>
                         </div>
                       </div>
                       <div className="flex shrink-0 gap-1.5">

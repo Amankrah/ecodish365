@@ -32,6 +32,14 @@ anthropic>=0.40.0
 packaging==24.2
 pandas==2.3.2; python_version >= "3.11"
 pandas==2.2.3; python_version < "3.11"
+# Scenario S4 (2026-05-30): the NHANES medoid clustering uses a pure-numpy
+# PAM implementation (build_s4_panel_medoids._pam_alternate) and sklearn
+# PCA for the §5.1 biplot. The runtime API does not depend on sklearn or
+# scipy; only the offline S4 ETL and the _smoke_s4_* scoring scripts
+# import them. scikit-learn-extra is not used because its 0.3.0 release
+# fails to import on Python 3.12+ (removed `distutils`).
+scikit-learn>=1.4.0
+scipy>=1.10.0
 pillow==11.3.0
 # PKG-IMG-1 (2026-05-26): packaged-food image upload accepts user-supplied
 # product photos. iOS-default HEIC and modern AVIF (web-optimised) aren't

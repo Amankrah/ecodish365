@@ -426,8 +426,12 @@ def compare_foods(request):
             "error": "Invalid ID format",
             "details": "All IDs must be valid integers"
         }, status=status.HTTP_400_BAD_REQUEST)
-    
-    comparison_data = get_cnf_pipeline().compare_foods(food_ids, nutrient_ids)
+
+    basis = (request.data.get('basis') or 'per_100g').strip().lower()
+    if basis not in ('per_100g', 'per_100kcal'):
+        basis = 'per_100g'
+
+    comparison_data = get_cnf_pipeline().compare_foods(food_ids, nutrient_ids, basis=basis)
     
     return Response({
         "success": True,

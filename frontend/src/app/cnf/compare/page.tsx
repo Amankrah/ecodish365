@@ -1,32 +1,36 @@
 'use client';
 
-import React, { useState, useEffect, Suspense, useMemo } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { 
-  ScaleIcon,
+import React, { useState, useEffect, Suspense, useCallback } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import {
   PlusIcon,
   XMarkIcon,
   ArrowDownTrayIcon,
   InformationCircleIcon,
   MagnifyingGlassIcon,
-  CheckCircleIcon,
-  ExclamationTriangleIcon,
   SparklesIcon,
   BeakerIcon,
+  LinkIcon,
 } from '@heroicons/react/24/outline';
-import { CNFApiService, FoodComparison, FoodComparisonNutrientCell, Food, SearchResult, NutrientValue } from '@/lib/api';
+import { CNFApiService, FoodComparison, Food, SearchResult, NutrientValue, Nutrient } from '@/lib/api';
 import toast from 'react-hot-toast';
-// WAFCT-EXTEND (2026-05-24): dual-source food search inside the compare modal.
 import { SourceFilter, type SourceChoice } from '@/components/shared/SourceFilter';
 import { SourceBadge } from '@/components/shared/SourceBadge';
 import { AIEnhancedSearch } from '@/components/shared/AIEnhancedSearch';
-import Link from 'next/link';
 import { useCnfExplorer } from '@/components/cnf/CnfExplorerContext';
 import { FoodDetailDrawer } from '@/components/cnf/FoodProfileContent';
-import { appendToActiveFoodList } from '@/lib/activeFoodList';
-import { LENS_NUTRIENT_PANELS } from '@/lib/cnfNutrientPanels';
+import { appendManyToActiveFoodList, loadActiveFoodList } from '@/lib/activeFoodList';
 import { NutrientDiscoverPanel } from '@/components/cnf/NutrientDiscoverPanel';
-import { percentDV } from '@/lib/cnfDailyValues';
+import { CompareFoodStrip } from '@/components/cnf/compare/CompareFoodStrip';
+import { CompareMixedDbBanner } from '@/components/cnf/compare/CompareMixedDbBanner';
+import { CompareNutrientTable } from '@/components/cnf/compare/CompareNutrientTable';
+import { CompareEmptyState } from '@/components/cnf/compare/CompareEmptyState';
+import {
+  hasMixedDatabases,
+  type CompareBasis,
+  cellPercentDV,
+} from '@/lib/cnfCompareHelpers';
+import { toCsv, downloadCsv } from '@/lib/csv';
 
 type AddFoodMode = 'search' | 'discover';
 
@@ -35,72 +39,53 @@ interface ComparisonData {
   comparison: FoodComparison | null;
 }
 
-const NUTRIENT_CATEGORIES = {
-  'Energy': ['ENERGY (KILOCALORIES)', 'ENERGY (KILOJOULES)'],
-  'Macronutrients': ['PROTEIN', 'FAT (TOTAL LIPIDS)', 'CARBOHYDRATE, TOTAL (BY DIFFERENCE)', 'FIBRE, TOTAL DIETARY'],
-  'Minerals': ['CALCIUM', 'IRON', 'SODIUM', 'POTASSIUM', 'MAGNESIUM', 'PHOSPHORUS', 'ZINC'],
-  'Vitamins': ['RETINOL', 'RETINOL ACTIVITY EQUIVALENTS', 'BETA CAROTENE', 'ALPHA-TOCOPHEROL', 'VITAMIN D (INTERNATIONAL UNITS)', 'VITAMIN C', 'THIAMIN', 'RIBOFLAVIN', 'NIACIN', 'TOTAL FOLACIN', 'VITAMIN B-12', 'VITAMIN K'],
-  'Fatty Acids': ['FATTY ACIDS, SATURATED, TOTAL', 'FATTY ACIDS, MONOUNSATURATED, TOTAL', 'FATTY ACIDS, POLYUNSATURATED, TOTAL', 'FATTY ACIDS, TRANS, TOTAL', 'CHOLESTEROL'],
-};
-
-/** Resolve a row key to the compare API nutrient entry — exact CNF NutrientName only. */
-function findComparisonNutrientEntry(
-  comparison: FoodComparison | null,
-  nutrientKey: string,
-): {
-  key: string;
-  nutrient_id: number;
-  unit: string;
-  values: Record<string, number>;
-  by_food_id: Record<string, FoodComparisonNutrientCell>;
-} | null {
-  if (!comparison) return null;
-  const direct = comparison.nutrients[nutrientKey];
-  if (direct) return { key: nutrientKey, ...direct };
-  const hit = Object.entries(comparison.nutrients).find(
-    ([key]) => key.toLowerCase() === nutrientKey.toLowerCase(),
-  );
-  if (!hit) return null;
-  return { key: hit[0], ...hit[1] };
-}
-
-/** Lens tab: map short patterns (ENERGY, SODIUM, …) to full compare API keys. */
-function resolveLensNutrientKeys(comparison: FoodComparison): string[] {
-  const patterns = [
-    ...LENS_NUTRIENT_PANELS.hsr.patterns,
-    ...LENS_NUTRIENT_PANELS.fcs.patterns,
-  ];
-  const keys: string[] = [];
-  const seen = new Set<string>();
-  for (const pat of patterns) {
-    const hit = Object.keys(comparison.nutrients).find(k =>
-      k.toUpperCase().includes(pat.toUpperCase()),
-    );
-    if (hit && !seen.has(hit)) {
-      seen.add(hit);
-      keys.push(hit);
-    }
-  }
-  return keys;
-}
-
 function CNFComparePageContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const { userType, resolveGroupName } = useCnfExplorer();
+  const { userType, resolveGroupName, activeFoodCount } = useCnfExplorer();
   const [comparisonData, setComparisonData] = useState<ComparisonData>({ foods: [], comparison: null });
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult | null>(null);
   const [showAddFood, setShowAddFood] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>('Energy');
   const [detailFood, setDetailFood] = useState<Food | null>(null);
   const [showExportModal, setShowExportModal] = useState(false);
-  const [exportFormat, setExportFormat] = useState<'json' | 'csv'>('json');
+  const [exportFormat, setExportFormat] = useState<'json' | 'csv' | 'compare_csv'>('compare_csv');
   const [selectedFoodIds, setSelectedFoodIds] = useState<Set<number>>(new Set());
-  // WAFCT-EXTEND (2026-05-24): food-database scope inside the add-food modal.
   const [modalSource, setModalSource] = useState<SourceChoice>('both');
   const [addFoodMode, setAddFoodMode] = useState<AddFoodMode>('search');
+  const [basis, setBasis] = useState<CompareBasis>('per_100g');
+  const [showDelta, setShowDelta] = useState(false);
+  const [diffOnly, setDiffOnly] = useState(false);
+  const [transposed, setTransposed] = useState(false);
+  const [customNutrientIds, setCustomNutrientIds] = useState<number[]>([]);
+  const [portionMass, setPortionMass] = useState<Record<number, number>>({});
+  const [allNutrients, setAllNutrients] = useState<Nutrient[]>([]);
+
+  useEffect(() => {
+    CNFApiService.getNutrients().then(setAllNutrients).catch(() => {});
+  }, []);
+
+  const syncCompareUrl = useCallback((ids: number[]) => {
+    if (ids.length === 0) router.replace('/cnf/compare', { scroll: false });
+    else router.replace(`/cnf/compare?foods=${ids.join(',')}`, { scroll: false });
+  }, [router]);
+
+  const runComparison = useCallback(async (foods: Food[], extraNutrientIds?: number[]) => {
+    const ids = foods.map(f => f.FoodID);
+    if (ids.length >= 2) {
+      const nutrientIds = extraNutrientIds ?? customNutrientIds;
+      const comparison = await CNFApiService.compareFoods(ids, {
+        basis,
+        nutrientIds: nutrientIds.length ? nutrientIds : undefined,
+      });
+      setComparisonData({ foods, comparison });
+    } else {
+      setComparisonData({ foods, comparison: null });
+    }
+    syncCompareUrl(ids);
+  }, [basis, customNutrientIds, syncCompareUrl]);
 
   useEffect(() => {
     // Load initial foods from URL parameters
@@ -126,22 +111,35 @@ function CNFComparePageContent() {
   const loadFoodsForComparison = async (foodIds: number[]) => {
     try {
       setLoading(true);
-
-      const foodPromises = foodIds.map(id => CNFApiService.getFoodDetails(id));
-      const foods = await Promise.all(foodPromises);
-
-      // Compare API requires ≥2 foods; a single ?foods= id is a valid staging state.
-      if (foods.length >= 2) {
-        const comparison = await CNFApiService.compareFoods(foodIds);
-        setComparisonData({ foods, comparison });
-      } else {
-        setComparisonData({ foods, comparison: null });
-      }
-    } catch (error) {
-      console.error('Failed to load foods for comparison:', error);
+      const foods = await Promise.all(foodIds.map(id => CNFApiService.getFoodDetails(id)));
+      setPortionMass(prev => {
+        const next = { ...prev };
+        for (const f of foods) {
+          if (next[f.FoodID] == null) next[f.FoodID] = 100;
+        }
+        return next;
+      });
+      await runComparison(foods);
+    } catch {
       toast.error('Failed to load foods for comparison');
     } finally {
       setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (comparisonData.foods.length >= 2) {
+      runComparison(comparisonData.foods).catch(() => {});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [basis]);
+
+  const addCustomNutrient = async (nutrientId: number) => {
+    if (customNutrientIds.includes(nutrientId)) return;
+    const next = [...customNutrientIds, nutrientId];
+    setCustomNutrientIds(next);
+    if (comparisonData.foods.length >= 2) {
+      await runComparison(comparisonData.foods, next);
     }
   };
 
@@ -159,23 +157,8 @@ function CNFComparePageContent() {
 
       const newFood = await CNFApiService.getFoodDetails(foodId);
       const newFoods = [...comparisonData.foods, newFood];
-
-      // Only call comparison API if we have at least 2 foods
-      if (newFoods.length >= 2) {
-        const newFoodIds = newFoods.map(f => f.FoodID);
-        const newComparison = await CNFApiService.compareFoods(newFoodIds);
-
-        setComparisonData({
-          foods: newFoods,
-          comparison: newComparison
-        });
-      } else {
-        // Just add the food without comparison data
-        setComparisonData({
-          foods: newFoods,
-          comparison: null
-        });
-      }
+      setPortionMass(prev => ({ ...prev, [foodId]: prev[foodId] ?? 100 }));
+      await runComparison(newFoods);
 
       setShowAddFood(false);
       setSearchQuery('');
@@ -188,16 +171,15 @@ function CNFComparePageContent() {
     }
   };
 
-  const addSelectedFoodsToComparison = async () => {
+  const addFoodsToComparison = async (foodIds: number[]) => {
     try {
-      if (selectedFoodIds.size === 0) {
+      if (foodIds.length === 0) {
         toast.error('No foods selected');
         return;
       }
 
-      const selectedIds = Array.from(selectedFoodIds);
-      const duplicates = selectedIds.filter(id => 
-        comparisonData.foods.find(f => f.FoodID === id)
+      const duplicates = foodIds.filter(id =>
+        comparisonData.foods.find(f => f.FoodID === id),
       );
 
       if (duplicates.length > 0) {
@@ -205,43 +187,32 @@ function CNFComparePageContent() {
         return;
       }
 
-      if (comparisonData.foods.length + selectedIds.length > 6) {
+      if (comparisonData.foods.length + foodIds.length > 6) {
         toast.error('Cannot add all selected foods. Maximum 6 foods can be compared at once');
         return;
       }
 
-      // Load all selected foods
-      const newFoodPromises = selectedIds.map(id => CNFApiService.getFoodDetails(id));
-      const newFoods = await Promise.all(newFoodPromises);
+      const newFoods = await Promise.all(foodIds.map(id => CNFApiService.getFoodDetails(id)));
       const allFoods = [...comparisonData.foods, ...newFoods];
-
-      // Only call comparison API if we have at least 2 foods
-      if (allFoods.length >= 2) {
-        const allFoodIds = allFoods.map(f => f.FoodID);
-        const newComparison = await CNFApiService.compareFoods(allFoodIds);
-
-        setComparisonData({
-          foods: allFoods,
-          comparison: newComparison
-        });
-      } else {
-        // Just add the foods without comparison data
-        setComparisonData({
-          foods: allFoods,
-          comparison: null
-        });
-      }
+      setPortionMass(prev => {
+        const next = { ...prev };
+        for (const f of newFoods) next[f.FoodID] = next[f.FoodID] ?? 100;
+        return next;
+      });
+      await runComparison(allFoods);
 
       setShowAddFood(false);
       setSearchQuery('');
       setSearchResults(null);
       setSelectedFoodIds(new Set());
-      toast.success(`${selectedIds.length} food(s) added to comparison`);
+      toast.success(`${foodIds.length} food(s) added to comparison`);
     } catch (error) {
       console.error('Failed to add selected foods to comparison:', error);
       toast.error('Failed to add selected foods to comparison');
     }
   };
+
+  const addSelectedFoodsToComparison = () => addFoodsToComparison(Array.from(selectedFoodIds));
 
   const toggleFoodSelection = (foodId: number) => {
     const newSelection = new Set(selectedFoodIds);
@@ -283,29 +254,12 @@ function CNFComparePageContent() {
   const removeFoodFromComparison = async (foodId: number) => {
     try {
       const newFoods = comparisonData.foods.filter(f => f.FoodID !== foodId);
-      
-      if (newFoods.length === 0) {
-        setComparisonData({ foods: [], comparison: null });
-        toast.success('Food removed from comparison');
-        return;
-      }
-
-      // Only call comparison API if we have at least 2 foods
-      if (newFoods.length >= 2) {
-        const newFoodIds = newFoods.map(f => f.FoodID);
-        const newComparison = await CNFApiService.compareFoods(newFoodIds);
-
-        setComparisonData({
-          foods: newFoods,
-          comparison: newComparison
-        });
-      } else {
-        // Just update foods without comparison data
-        setComparisonData({
-          foods: newFoods,
-          comparison: null
-        });
-      }
+      setPortionMass(prev => {
+        const next = { ...prev };
+        delete next[foodId];
+        return next;
+      });
+      await runComparison(newFoods);
 
       toast.success('Food removed from comparison');
     } catch (error) {
@@ -336,17 +290,47 @@ function CNFComparePageContent() {
     }
   };
 
-  const exportComparison = async (format: 'json' | 'csv') => {
+  const exportComparisonTableCsv = () => {
+    const comp = comparisonData.comparison;
+    if (!comp) return;
+    const foods = comparisonData.foods;
+    const nutrientKeys = Object.keys(comp.nutrients);
+    const headers = ['Nutrient', 'Unit', 'Basis', ...foods.map(f => f.FoodDescription), ...foods.map(f => `${f.FoodDescription} (%DV)`)];
+    const rows = nutrientKeys.map(key => {
+      const entry = comp.nutrients[key];
+      const row: unknown[] = [key, entry.unit, comp.basis ?? basis];
+      for (const food of foods) {
+        const cell = entry.by_food_id[String(food.FoodID)];
+        row.push(cell?.value ?? '');
+      }
+      for (const food of foods) {
+        const dv = cellPercentDV(comp, food.FoodID, entry.nutrient_id);
+        row.push(dv != null ? dv.toFixed(1) : '');
+      }
+      return row;
+    });
+    downloadCsv(
+      `food-comparison-table-${new Date().toISOString().split('T')[0]}.csv`,
+      toCsv(headers, rows),
+    );
+  };
+
+  const exportComparison = async (format: 'json' | 'csv' | 'compare_csv') => {
     try {
+      if (format === 'compare_csv') {
+        exportComparisonTableCsv();
+        setShowExportModal(false);
+        toast.success('Comparison table exported');
+        return;
+      }
       const foodIds = comparisonData.foods.map(f => f.FoodID);
       const exportData = await CNFApiService.exportFoodsData(foodIds, {
-        format: format,
+        format: format === 'json' ? 'json' : 'csv',
         include_nutrients: true,
-        include_conversions: true
+        include_conversions: true,
       });
 
       if (format === 'json') {
-        // Create and trigger JSON download
         const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -357,9 +341,8 @@ function CNFComparePageContent() {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
       } else {
-        // Create CSV data
         const csvData = convertToCSV(exportData);
-        const blob = new Blob([csvData], { type: 'text/csv' });
+        const blob = new Blob(['\ufeff' + csvData], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -371,9 +354,8 @@ function CNFComparePageContent() {
       }
 
       setShowExportModal(false);
-      toast.success(`Comparison data exported as ${format.toUpperCase()} successfully`);
-    } catch (error) {
-      console.error('Export failed:', error);
+      toast.success(`Exported as ${format.toUpperCase()}`);
+    } catch {
       toast.error('Export failed');
     }
   };
@@ -416,75 +398,73 @@ function CNFComparePageContent() {
     return csv;
   };
 
-  const getNutrientCell = (foodId: number, nutrientKey: string): FoodComparisonNutrientCell | null => {
-    const entry = findComparisonNutrientEntry(comparisonData.comparison, nutrientKey);
-    if (!entry?.by_food_id) return null;
-    return entry.by_food_id[String(foodId)] ?? null;
-  };
-
-  const getNutrientValue = (foodId: number, nutrientKey: string): number | null =>
-    getNutrientCell(foodId, nutrientKey)?.value ?? null;
-
-  // Look up a food's value for a specific CNF NutrientID (used to sum saturated + trans
-  // for the %DV, since Health Canada's saturated-fat DV applies to the combined total).
-  const getValueByNutrientId = (foodId: number, nutrientId: number): number | null => {
-    const comp = comparisonData.comparison;
-    if (!comp) return null;
-    for (const key of Object.keys(comp.nutrients)) {
-      if (comp.nutrients[key].nutrient_id === nutrientId) {
-        return comp.nutrients[key].by_food_id?.[String(foodId)]?.value ?? null;
-      }
-    }
-    return null;
-  };
-
-  const getHighestValue = (nutrientName: string): number => {
-    if (!comparisonData.comparison) return 0;
-    
-    const values = comparisonData.foods.map(food => getNutrientValue(food.FoodID, nutrientName) || 0);
-    return Math.max(...values);
-  };
-
   const sendAllToScorecard = () => {
     if (comparisonData.foods.length === 0) return;
+    let estKcal = 0;
     for (const food of comparisonData.foods) {
-      appendToActiveFoodList(
-        {
-          food_id: food.FoodID,
-          food_description: food.FoodDescription,
-          food_group: food.FoodGroupName ?? resolveGroupName(food.FoodGroupID),
-          mass_g: 100,
-        },
+      const mass = portionMass[food.FoodID] ?? 100;
+      const energy = food.NutrientValues?.find(n => n.NutrientID === 208)?.NutrientValue;
+      if (energy != null) estKcal += energy * mass / 100;
+    }
+    const result = appendManyToActiveFoodList(
+      comparisonData.foods.map(food => ({
+        food_id: food.FoodID,
+        food_description: food.FoodDescription,
+        food_group: food.FoodGroupName ?? resolveGroupName(food.FoodGroupID),
+        mass_g: portionMass[food.FoodID] ?? 100,
+      })),
+      {
         userType,
-      );
+        source: 'catalogue_compare',
+        list_label: `Compare set (${comparisonData.foods.length} foods)`,
+        estimated_daily_kcal: estKcal > 0 ? Math.round(estKcal) : undefined,
+        replace: true,
+      },
+    );
+    if (!result.ok) {
+      toast.error(result.error ?? 'Could not add foods to Scorecard');
+      return;
     }
     toast.success(
       userType === 'individual'
-        ? `Added ${comparisonData.foods.length} food(s) to all scores at 100 g each`
-        : `Added ${comparisonData.foods.length} food(s) to Scorecard at 100 g each`,
+        ? `Added ${result.addedCount ?? comparisonData.foods.length} food(s) to all scores`
+        : `Added ${result.addedCount ?? comparisonData.foods.length} food(s) to Scorecard`,
     );
+    router.push('/scorecard');
   };
 
-  const categoryOptions = useMemo(() => {
-    const base = Object.keys(NUTRIENT_CATEGORIES);
-    if (userType === 'researcher') {
-      return [...base, 'Lens highlights (HSR/FCS)'];
+  const importFromScorecard = () => {
+    const list = loadActiveFoodList();
+    if (!list?.ingredients.length) {
+      toast.error('No foods in Scorecard');
+      return;
     }
-    return base;
-  }, [userType]);
-
-  const getCategoryNutrients = (category: string): string[] => {
-    if (category === 'Lens highlights (HSR/FCS)') {
-      if (!comparisonData.comparison) return [];
-      return resolveLensNutrientKeys(comparisonData.comparison);
+    const ids = list.ingredients.map(i => i.food_id).slice(0, 6);
+    const masses: Record<number, number> = {};
+    for (const ing of list.ingredients.slice(0, 6)) {
+      masses[ing.food_id] = ing.mass_g;
     }
-    return NUTRIENT_CATEGORIES[category as keyof typeof NUTRIENT_CATEGORIES] ?? [];
+    setPortionMass(masses);
+    loadFoodsForComparison(ids);
   };
 
-  const getValuePercentage = (value: number | null, maxValue: number): number => {
-    if (!value || maxValue === 0) return 0;
-    return (value / maxValue) * 100;
+  const copyShareLink = async () => {
+    const ids = comparisonData.foods.map(f => f.FoodID);
+    if (!ids.length) return;
+    const url = `${window.location.origin}/cnf/compare?foods=${ids.join(',')}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success('Comparison link copied');
+    } catch {
+      toast.error('Could not copy link');
+    }
   };
+
+  const summaryFoods = comparisonData.comparison?.foods ?? [];
+  const showMixedBanner = hasMixedDatabases(
+    comparisonData.foods.map(f => f.FoodID),
+    summaryFoods.map(f => f.source ?? (f.FoodID >= 700_000 ? 'wafct' : 'cnf')),
+  );
 
   if (loading) {
     return (
@@ -536,6 +516,15 @@ function CNFComparePageContent() {
                     {comparisonData.foods.length > 0 && (
                       <>
                         <button
+                          type="button"
+                          onClick={copyShareLink}
+                          className="btn-outline inline-flex items-center text-sm"
+                        >
+                          <LinkIcon className="w-4 h-4 mr-2" />
+                          Copy link
+                        </button>
+                        <button
+                          type="button"
                           onClick={sendAllToScorecard}
                           className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg text-emerald-800 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100"
                         >
@@ -543,11 +532,12 @@ function CNFComparePageContent() {
                           {userType === 'individual' ? 'Send to all scores' : 'Send to Scorecard'}
                         </button>
                         <button
+                          type="button"
                           onClick={() => setShowExportModal(true)}
                           className="btn-outline inline-flex items-center"
                         >
                           <ArrowDownTrayIcon className="w-4 h-4 mr-2" />
-                          Export Data
+                          Export
                         </button>
                       </>
                     )}
@@ -555,259 +545,90 @@ function CNFComparePageContent() {
           </div>
         </div>
 
-        {/* Foods Overview */}
+        {showMixedBanner && <CompareMixedDbBanner />}
+
         {comparisonData.foods.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Comparing {comparisonData.foods.length} Foods
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {comparisonData.foods.map((food) => (
-                <div key={food.FoodID} className="relative bg-gray-50 rounded-lg p-4">
-                  <button
-                    type="button"
-                    onClick={() => removeFoodFromComparison(food.FoodID)}
-                    className="absolute top-2 right-2 p-1 text-gray-400 hover:text-red-500 transition-colors"
-                    title="Remove food"
-                  >
-                    <XMarkIcon className="w-4 h-4" />
-                  </button>
-                  <div className="pr-6">
-                    <h3 className="font-medium text-gray-900 text-sm mb-1">
-                      {food.FoodDescription}
-                    </h3>
-                    <p className="text-xs text-gray-500">
-                      Code: {food.FoodCode} · {resolveGroupName(food.FoodGroupID, food.FoodGroupName)}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => setDetailFood(food)}
-                      className="mt-2 text-xs font-medium text-blue-700 hover:text-blue-900"
-                    >
-                      View full profile →
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <CompareFoodStrip
+            foods={summaryFoods.length ? summaryFoods.map(s => ({
+              ...s,
+              FoodGroup: s.FoodGroup,
+            })) : comparisonData.foods.map(f => ({
+              FoodID: f.FoodID,
+              FoodDescription: f.FoodDescription,
+              FoodCode: f.FoodCode,
+              FoodGroup: f.FoodGroupName ?? resolveGroupName(f.FoodGroupID),
+              FoodGroupID: f.FoodGroupID,
+              source: f.FoodID >= 700_000 ? 'wafct' : 'cnf',
+            }))}
+            userType={userType}
+            groupLabel={food => resolveGroupName(food.FoodGroupID ?? 0, food.FoodGroup)}
+            portionMass={portionMass}
+            onPortionChange={(id, mass) => setPortionMass(prev => ({ ...prev, [id]: mass }))}
+            onRemove={removeFoodFromComparison}
+            onViewProfile={async (id) => {
+              const food = comparisonData.foods.find(f => f.FoodID === id)
+                ?? await CNFApiService.getFoodDetails(id);
+              setDetailFood(food);
+            }}
+          />
         )}
 
-        {/* Single Food Message */}
         {comparisonData.foods.length === 1 && (
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
-            <div className="flex items-center">
-              <InformationCircleIcon className="w-6 h-6 text-blue-500 mr-3" />
-              <div>
-                <h3 className="text-sm font-medium text-blue-900">
-                  Add Another Food to Start Comparison
-                </h3>
-                <p className="text-sm text-blue-700 mt-1">
-                  Add at least one more food to see nutritional comparisons side-by-side.
-                </p>
-              </div>
-              <button
-                onClick={() => setShowAddFood(true)}
-                className="btn-primary ml-auto text-sm"
-              >
-                Add Food
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Comparison Results */}
-        {comparisonData.comparison && comparisonData.foods.length > 1 && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
-            {/* Category Selector */}
-            <div className="px-6 py-4 border-b border-gray-200">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900">
-                  Nutritional Comparison
-                </h2>
-                <div className="flex items-center space-x-2">
-                  <InformationCircleIcon className="w-4 h-4 text-gray-400" />
-                  <span className="text-xs text-gray-500">
-                    Values per 100 g (units shown) • % DV vs Health Canada Daily Values • Green bars indicate highest values
-                  </span>
-                </div>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {categoryOptions.map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => setSelectedCategory(category)}
-                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                      selectedCategory === category
-                        ? 'bg-primary-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Comparison Table */}
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left px-6 py-3 text-sm font-medium text-gray-900">
-                      Food
-                    </th>
-                    {comparisonData.foods.map((food) => (
-                      <th key={food.FoodID} className="text-left px-4 py-3 text-sm font-medium text-gray-900 min-w-[120px]">
-                        {food.FoodDescription.length > 30 
-                          ? `${food.FoodDescription.substring(0, 30)}...`
-                          : food.FoodDescription
-                        }
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {(() => {
-                    const categoryNutrients = getCategoryNutrients(selectedCategory);
-                    const availableNutrients = categoryNutrients.filter((nutrientKey) =>
-                      comparisonData.foods.some(food =>
-                        getNutrientValue(food.FoodID, nutrientKey) !== null,
-                      ),
-                    );
-
-                    if (availableNutrients.length === 0) {
-                      return (
-                        <tr>
-                          <td colSpan={comparisonData.foods.length + 1} className="px-6 py-8 text-center text-gray-500">
-                            <div className="flex flex-col items-center">
-                              <ExclamationTriangleIcon className="w-8 h-8 text-gray-400 mb-2" />
-                              <p className="text-sm">No {selectedCategory.toLowerCase()} data available for the selected foods.</p>
-                              <p className="text-xs text-gray-400 mt-1">
-                                This food category may not contain detailed {selectedCategory.toLowerCase()} information.
-                              </p>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    }
-
-                    return availableNutrients.map((nutrientKey) => {
-                      const entry = findComparisonNutrientEntry(comparisonData.comparison, nutrientKey);
-                      const maxValue = getHighestValue(nutrientKey);
-                      const rowLabel = entry?.key ?? nutrientKey;
-                      const rowUnit = entry?.unit;
-
-                      return (
-                        <tr key={nutrientKey} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 text-sm text-gray-900 font-medium">
-                            <div>{rowLabel}</div>
-                            {rowUnit && (
-                              <div className="text-xs font-normal text-gray-500 mt-0.5">
-                                per 100 g · {rowUnit}
-                              </div>
-                            )}
-                          </td>
-                          {comparisonData.foods.map((food) => {
-                            const cell = getNutrientCell(food.FoodID, nutrientKey);
-                            const value = cell?.value ?? null;
-                            const unit = cell?.unit;
-                            const percentage = getValuePercentage(value, maxValue);
-                            const isHighest = value === maxValue && value !== null && value > 0;
-                            const pdv = (value !== null && entry)
-                              ? percentDV(entry.nutrient_id, value,
-                                  (otherId) => getValueByNutrientId(food.FoodID, otherId))
-                              : null;
-                            const sourceTitle = cell?.nutrient_source
-                              ? `${cell.database?.toUpperCase() ?? 'CNF'} · ${cell.nutrient_source}`
-                              : undefined;
-
-                            return (
-                              <td key={food.FoodID} className="px-4 py-4">
-                                {value !== null ? (
-                                  <div className="space-y-1" title={sourceTitle}>
-                                    <div className="flex items-center justify-between gap-2">
-                                      <span className={`text-sm font-medium tabular-nums ${isHighest ? 'text-green-700' : 'text-gray-900'}`}>
-                                        {value.toFixed(2)}
-                                        {unit && (
-                                          <span className="text-xs font-normal text-gray-500 ml-1">
-                                            {unit}
-                                          </span>
-                                        )}
-                                      </span>
-                                      {isHighest && (
-                                        <CheckCircleIcon className="w-4 h-4 text-green-500 shrink-0" />
-                                      )}
-                                    </div>
-                                    <div className="w-full bg-gray-200 rounded-full h-2">
-                                      <div
-                                        className={`h-2 rounded-full transition-all duration-300 ${
-                                          isHighest ? 'bg-green-500' : 'bg-primary-500'
-                                        }`}
-                                        style={{ width: `${percentage}%` }}
-                                      />
-                                    </div>
-                                    {pdv !== null && (
-                                      <div className="text-[11px] text-gray-500 tabular-nums" title="% of the Health Canada Daily Value">
-                                        {Math.round(pdv)}% DV
-                                      </div>
-                                    )}
-                                  </div>
-                                ) : (
-                                  <div className="flex items-center text-gray-400">
-                                    <ExclamationTriangleIcon className="w-4 h-4 mr-1" />
-                                    <span className="text-sm">N/A</span>
-                                  </div>
-                                )}
-                              </td>
-                            );
-                          })}
-                        </tr>
-                      );
-                    });
-                  })()}
-                </tbody>
-              </table>
-            </div>
-            <div className="px-6 py-3 border-t border-gray-200 text-xs text-gray-500 leading-relaxed">
-              <strong>% DV</strong> is the share of the Health Canada Daily Value contributed per 100 g
-              (adult reference; Table of Daily Values, 2022). Saturated fat is shown against the combined
-              saturated + trans limit. Cholesterol, protein, and total carbohydrate carry no %DV in Canada,
-              and iodide, chromium, molybdenum, and chloride aren&rsquo;t recorded in the CNF, so no %DV
-              appears for those.
-            </div>
-          </div>
-        )}
-
-        {/* Empty State */}
-        {comparisonData.foods.length === 0 && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-            <ScaleIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No Foods Selected for Comparison
-            </h3>
-            <p className="text-gray-600 mb-6 max-w-lg mx-auto">
-              Search the catalogue, pick up to six foods, or start from{' '}
-              <Link href="/cnf/search" className="text-blue-700 hover:underline">Advanced Search</Link>
-              {' '}or{' '}
-              <Link href="/cnf/groups" className="text-blue-700 hover:underline">Food Groups</Link>.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <button
-              onClick={() => setShowAddFood(true)}
-              className="btn-primary inline-flex items-center justify-center"
-            >
-              <PlusIcon className="w-4 h-4 mr-2" />
-              Add Your First Food
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4 flex flex-wrap items-center gap-3">
+            <InformationCircleIcon className="w-5 h-5 text-blue-500 shrink-0" />
+            <p className="text-sm text-blue-800 flex-1">Add one more food to start the comparison table.</p>
+            <button type="button" onClick={() => setShowAddFood(true)} className="btn-primary text-sm">
+              Add food
             </button>
-            <Link
-              href="/cnf/search"
-              className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
-            >
-              Browse in Search
-            </Link>
-            </div>
           </div>
+        )}
+
+        {comparisonData.comparison && comparisonData.foods.length > 1 && (
+          <>
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              <select
+                value={basis}
+                onChange={e => setBasis(e.target.value as CompareBasis)}
+                className="text-xs px-2 py-1.5 border border-gray-300 rounded-lg bg-white"
+                aria-label="Comparison basis"
+              >
+                <option value="per_100g">Per 100 g</option>
+                <option value="per_100kcal">Per 100 kcal</option>
+              </select>
+              <label className="inline-flex items-center gap-1.5 text-xs text-gray-700">
+                <input type="checkbox" checked={showDelta} onChange={e => setShowDelta(e.target.checked)} className="rounded" />
+                Delta vs first
+              </label>
+              <label className="inline-flex items-center gap-1.5 text-xs text-gray-700">
+                <input type="checkbox" checked={diffOnly} onChange={e => setDiffOnly(e.target.checked)} className="rounded" />
+                Differences only
+              </label>
+              <label className="inline-flex items-center gap-1.5 text-xs text-gray-700">
+                <input type="checkbox" checked={transposed} onChange={e => setTransposed(e.target.checked)} className="rounded" />
+                Transpose
+              </label>
+            </div>
+            <CompareNutrientTable
+              foods={comparisonData.foods}
+              comparison={comparisonData.comparison}
+              userType={userType}
+              basis={basis}
+              showDelta={showDelta}
+              diffOnly={diffOnly}
+              transposed={transposed}
+              customNutrientIds={customNutrientIds}
+              nutrients={allNutrients}
+              onAddCustomNutrient={addCustomNutrient}
+            />
+          </>
+        )}
+
+        {comparisonData.foods.length === 0 && (
+          <CompareEmptyState
+            activeFoodCount={activeFoodCount}
+            onAddFood={() => setShowAddFood(true)}
+            onImportScorecard={importFromScorecard}
+          />
         )}
 
         {/* Add Food Modal */}
@@ -875,6 +696,8 @@ function CNFComparePageContent() {
                       userType={userType}
                       resolveGroupName={resolveGroupName}
                       onAddFood={addFoodToComparison}
+                      onAddFoods={addFoodsToComparison}
+                      maxSelections={6 - comparisonData.foods.length}
                       excludeFoodIds={comparisonData.foods.map(f => f.FoodID)}
                     />
                   </div>
@@ -1072,12 +895,23 @@ function CNFComparePageContent() {
                         <input
                           type="radio"
                           name="exportFormat"
-                          value="json"
-                          checked={exportFormat === 'json'}
-                          onChange={(e) => setExportFormat(e.target.value as 'json' | 'csv')}
+                          value="compare_csv"
+                          checked={exportFormat === 'compare_csv'}
+                          onChange={() => setExportFormat('compare_csv')}
                           className="mr-2"
                         />
-                        <span className="text-sm">JSON (structured data)</span>
+                        <span className="text-sm">Comparison table CSV (current view)</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="exportFormat"
+                          value="json"
+                          checked={exportFormat === 'json'}
+                          onChange={() => setExportFormat('json')}
+                          className="mr-2"
+                        />
+                        <span className="text-sm">JSON (full food profiles)</span>
                       </label>
                       <label className="flex items-center">
                         <input
@@ -1085,19 +919,21 @@ function CNFComparePageContent() {
                           name="exportFormat"
                           value="csv"
                           checked={exportFormat === 'csv'}
-                          onChange={(e) => setExportFormat(e.target.value as 'json' | 'csv')}
+                          onChange={() => setExportFormat('csv')}
                           className="mr-2"
                         />
-                        <span className="text-sm">CSV (spreadsheet format)</span>
+                        <span className="text-sm">CSV (nutrients as columns)</span>
                       </label>
                     </div>
                   </div>
                   
                   <div className="text-sm text-gray-600">
                     <p>
-                      {exportFormat === 'json' 
-                        ? 'Exports complete food data including all nutrients and conversion factors.' 
-                        : 'Exports food data in a spreadsheet-friendly format with nutrients as columns.'}
+                      {exportFormat === 'compare_csv'
+                        ? 'Exports the side-by-side comparison table with %DV columns for the current basis.'
+                        : exportFormat === 'json'
+                          ? 'Exports complete food data including all nutrients and conversion factors.'
+                          : 'Exports food data in a spreadsheet-friendly format with nutrients as columns.'}
                     </p>
                   </div>
                 </div>
@@ -1116,7 +952,7 @@ function CNFComparePageContent() {
                   onClick={() => exportComparison(exportFormat)}
                   className="btn-primary"
                 >
-                  Export {exportFormat.toUpperCase()}
+                  Export {exportFormat === 'compare_csv' ? 'table CSV' : exportFormat.toUpperCase()}
                 </button>
               </div>
             </div>

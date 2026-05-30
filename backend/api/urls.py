@@ -9,6 +9,7 @@ from .views import (
     substitution_views,                 # SUBST-1 Phase 1 (ingredient substitution analyzer)
     fped_views,                         # FPED-1 (food-group exposure: cup/oz equivalents + guideline gaps)
     fpid_views,                         # FPID-1 (ingredient-level food-group attribution + reconstruction QC)
+    profile_views,                      # Unified profile score (all six metrics)
 )
 from .views.cnf_views import (
     # Food Management
@@ -142,6 +143,11 @@ urlpatterns = [
     # Core HENI Endpoints using evidence-based DALY methodology with 14 risk factors
     path('heni/calculate/', heni_views.heni_calculate, name='heni_calculate'),
     path('heni/food/<int:food_id>/profile/', heni_views.get_food_heni_profile, name='get_food_heni_profile'),
+
+    # =============================================================================
+    # Profile scorecard — unified six-metric fan-out
+    # =============================================================================
+    path('profile/score/', profile_views.profile_score, name='profile_score'),
 
     # =============================================================================
     # AI-MATCH-1 (2026-05-23) — Recipe decomposer

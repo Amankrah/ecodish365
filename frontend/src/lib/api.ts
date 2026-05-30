@@ -232,21 +232,31 @@ export interface SearchCriteria {
 
 export interface FoodComparisonNutrientCell {
   value: number;
-  /** From NUTRIENT_NAME.csv via the compare API — canonical CNF unit for this NutrientID. */
+  /** Raw per-100 g amount (for %DV when basis is per_100kcal). */
+  value_per_100g?: number;
   unit: string;
   nutrient_source_id?: number;
-  /** Analytical / bibliographic source for this food–nutrient row (NUTRIENT_SOURCE.csv). */
   nutrient_source?: string;
-  /** Food catalogue provenance: `cnf` (Health Canada) or `wafct` (FAO/INFOODS WAFCT 2019). */
   database?: 'cnf' | 'wafct' | string;
 }
 
+export interface CompareFoodSummary {
+  FoodID: number;
+  FoodDescription: string;
+  FoodCode?: string;
+  FoodGroup: string;
+  FoodGroupID?: number;
+  source?: 'cnf' | 'wafct' | string;
+  energy_kcal?: number | null;
+  protein_g?: number | null;
+  fibre_g?: number | null;
+  food_type?: 'single' | 'mixed' | null;
+  thermal_state?: string | null;
+  preservation_state?: string | null;
+}
+
 export interface FoodComparison {
-  foods: {
-    FoodID: number;
-    FoodDescription: string;
-    FoodGroup: string;
-  }[];
+  foods: CompareFoodSummary[];
   nutrients: Record<string, {
     nutrient_id: number;
     unit: string;
@@ -254,6 +264,12 @@ export interface FoodComparison {
     by_food_id: Record<string, FoodComparisonNutrientCell>;
   }>;
   comparison_date: string;
+  basis?: 'per_100g' | 'per_100kcal';
+}
+
+export interface CompareFoodsOptions {
+  nutrientIds?: number[];
+  basis?: 'per_100g' | 'per_100kcal';
 }
 
 export interface IntegrityCheck {
@@ -530,6 +546,31 @@ export interface CNFAIMatchResult {
 export type FoodSourceTag = 'cnf' | 'wafct';
 export type SourceFilter  = 'cnf' | 'wafct' | 'both';
 
+export interface ProfileSampleAdequacy {
+  adequate: boolean;
+  note: string;
+}
+
+export interface ProfileScoreDriver {
+  food_id: number;
+  food_description: string;
+  mass_g: number;
+  mass_share_pct: number;
+}
+
+export interface ProfileScoreMeta {
+  total_mass_g: number;
+  estimated_kcal: number;
+  food_count: number;
+  sample_adequacy: Record<string, ProfileSampleAdequacy>;
+  drivers: ProfileScoreDriver[];
+}
+
+export interface ProfileScoreResponse {
+  metrics: Record<string, { status: 'fulfilled' | 'rejected'; result?: unknown; reason?: string }>;
+  meta: ProfileScoreMeta;
+}
+
 // API Service Class
 export class CNFApiService {
   // Enhanced Search & Exploration. WAFCT-EXTEND (2026-05-24): optional
@@ -627,6 +668,29 @@ export class CNFApiService {
       result: response.data.result as PatternResemblanceResult,
       explanations: response.data.explanations as PatternExplanations,
     };
+  }
+
+  /** Unified six-metric profile score (server-side parallel fan-out). */
+  static async scoreProfile(
+    foods: Array<{ food_id: number; mass_g: number; food_description?: string }>,
+    options: {
+      userType?: 'individual' | 'researcher' | 'policy';
+      metrics?: string[];
+      decompositionProvenance?: 'packaged_food_inferred';
+      multiDayLabel?: string;
+      enableLcaMatcher?: boolean;
+    } = {},
+  ): Promise<ProfileScoreResponse> {
+    const response = await api.post('/profile/score/', {
+      foods,
+      user_type: options.userType || 'individual',
+      ...(options.metrics?.length ? { metrics: options.metrics } : {}),
+      ...(options.decompositionProvenance
+        ? { decomposition_provenance: options.decompositionProvenance } : {}),
+      ...(options.multiDayLabel ? { multi_day_label: options.multiDayLabel } : {}),
+      ...(options.enableLcaMatcher != null ? { enable_lca_matcher: options.enableLcaMatcher } : {}),
+    });
+    return response.data.data as ProfileScoreResponse;
   }
 
   // AI-MATCH-2 (2026-05-24): occasion-by-occasion 24-h dietary recall →
@@ -797,11 +861,14 @@ export class CNFApiService {
     return response.data.data;
   }
 
-  static async compareFoods(foodIds: number[], nutrientIds?: number[]): Promise<FoodComparison> {
-    const response = await api.post(`/cnf/compare/`, {
-      food_ids: foodIds,
-      nutrient_ids: nutrientIds
-    });
+  static async compareFoods(
+    foodIds: number[],
+    options: CompareFoodsOptions = {},
+  ): Promise<FoodComparison> {
+    const body: Record<string, unknown> = { food_ids: foodIds };
+    if (options.nutrientIds?.length) body.nutrient_ids = options.nutrientIds;
+    if (options.basis) body.basis = options.basis;
+    const response = await api.post(`/cnf/compare/`, body);
     return response.data.data;
   }
 

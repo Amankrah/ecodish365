@@ -24,6 +24,8 @@ import {
   type FCSResult,
   type EnvironmentalImpactResult,
   type PatternClassifyResponse,
+  type ProfileScoreMeta,
+  type ProfileScoreResponse,
 } from './api';
 import type { UserType, ExplanationsBlock } from '@/components/shared/AudienceToggle';
 
@@ -80,6 +82,13 @@ export interface ProfileResults {
   fcs: MetricOutcome<{ data: FCSResult }>;
   environmental: MetricOutcome<EnvironmentalImpactResult>;
   dietary_pattern: MetricOutcome<PatternClassifyResponse>;
+}
+
+export type { ProfileScoreMeta };
+
+export interface ProfileScoreBundle {
+  results: ProfileResults;
+  meta: ProfileScoreMeta | null;
 }
 
 // --- Caching --------------------------------------------------------------
@@ -158,6 +167,213 @@ export function clearScorecardCache(): void {
 
 // --- Orchestrator ---------------------------------------------------------
 
+function buildScorerRequests(ingredients: ScorerInput[], opts: RunOptions) {
+  const enableLca = opts.enableLcaMatcher ?? true;
+  const userType = opts.userType;
+  const decompProv = opts.decompositionProvenance;
+  return {
+    hefiReq: {
+      foods: ingredients.map(i => ({ food_id: i.food_id, amount_g: i.mass_g })),
+      user_type: userType,
+      ...(decompProv ? { decomposition_provenance: decompProv } : {}),
+    },
+    heniReq: {
+      meal: ingredients.map(i => ({ food_id: i.food_id, amount: i.mass_g, unit: 'g' })),
+      user_type: userType,
+      ...(decompProv ? { decomposition_provenance: decompProv } : {}),
+    },
+    hsrReq: {
+      food_ids: ingredients.map(i => i.food_id),
+      serving_sizes: ingredients.map(i => i.mass_g),
+      analysis_level: 'detailed' as const,
+      include_alternatives: false,
+      include_meal_insights: true,
+      from_recall24h: ingredients.length > 1,
+      user_type: userType,
+      ...(decompProv ? { decomposition_provenance: decompProv } : {}),
+    },
+    fcsReq: {
+      food_ids: ingredients.map(i => i.food_id),
+      food_names: ingredients.map(i => i.food_description),
+      serving_sizes: ingredients.map(i => i.mass_g),
+      user_type: userType,
+      ...(decompProv ? { decomposition_provenance: decompProv } : {}),
+    },
+    envReq: {
+      foods: ingredients.map(i => ({ food_id: i.food_id, quantity: i.mass_g })),
+      user_type: userType,
+      enable_lca_matcher: enableLca,
+      ...(decompProv ? { decomposition_provenance: decompProv } : {}),
+    },
+    patternFoods: ingredients.map(i => ({ food_id: i.food_id, mass_g: i.mass_g })),
+    patternOpts: {
+      userType,
+      includeNarrative: userType !== 'individual',
+      metaLabel: opts.multiDayLabel,
+      decompositionProvenance: opts.decompositionProvenance,
+    },
+  };
+}
+
+async function runSingleScorer(
+  metric: MetricKey,
+  ingredients: ScorerInput[],
+  opts: RunOptions,
+): Promise<MetricOutcome<unknown>> {
+  const req = buildScorerRequests(ingredients, opts);
+  const cachedAt = nowIso();
+  try {
+    let result: unknown;
+    switch (metric) {
+      case 'hefi':
+        result = await HEFIApiService.calculateHEFI(req.hefiReq);
+        break;
+      case 'heni':
+        result = await HENIApiService.calculateHENI(req.heniReq);
+        break;
+      case 'hsr':
+        result = await HSRApiService.calculateHSR(req.hsrReq);
+        break;
+      case 'fcs':
+        result = await FCSApiService.calculateFCS(req.fcsReq);
+        break;
+      case 'environmental':
+        result = await EnvironmentalImpactApiService.analyzeMealEnvironmentalImpact(req.envReq);
+        break;
+      case 'dietary_pattern':
+        result = await CNFApiService.classifyDietaryPattern(req.patternFoods, req.patternOpts);
+        break;
+      default:
+        throw new Error(`Unknown metric: ${metric}`);
+    }
+    return {
+      status: 'fulfilled',
+      metric,
+      result,
+      explanations: extractExplanations(result),
+      cachedAt,
+    };
+  } catch (err) {
+    return {
+      status: 'rejected',
+      metric,
+      reason: asReason(err),
+      cachedAt,
+    };
+  }
+}
+
+function profileResponseToResults(
+  metrics: ProfileScoreResponse['metrics'],
+  cachedAt: string,
+): ProfileResults {
+  function map<T>(key: MetricKey): MetricOutcome<T> {
+    const hit = metrics[key];
+    if (!hit) {
+      return { status: 'skipped', metric: key, reason: 'Not requested' };
+    }
+    if (hit.status === 'fulfilled' && hit.result != null) {
+      return {
+        status: 'fulfilled',
+        metric: key,
+        result: hit.result as T,
+        explanations: extractExplanations(hit.result),
+        cachedAt,
+      };
+    }
+    return {
+      status: 'rejected',
+      metric: key,
+      reason: hit.reason ?? 'Unknown error',
+      cachedAt,
+    };
+  }
+  return {
+    hefi: map<HEFIResult>('hefi'),
+    heni: map<HENIResult>('heni'),
+    hsr: map<HSRResult>('hsr'),
+    fcs: map<{ data: FCSResult }>('fcs'),
+    environmental: map<EnvironmentalImpactResult>('environmental'),
+    dietary_pattern: map<PatternClassifyResponse>('dietary_pattern'),
+  };
+}
+
+/** Server-side unified profile score (single round trip). */
+export async function runProfileScoreBackend(
+  ingredients: ScorerInput[],
+  opts: RunOptions,
+  { useCache = true }: { useCache?: boolean } = {},
+): Promise<ProfileScoreBundle> {
+  if (ingredients.length === 0) {
+    throw new Error('runProfileScoreBackend: ingredients array is empty');
+  }
+  const hash = hashInputs(ingredients, opts);
+  if (useCache) {
+    const cached = loadCache(hash);
+    if (cached) {
+      return { results: cached, meta: null };
+    }
+  }
+  const cachedAt = nowIso();
+  const resp = await CNFApiService.scoreProfile(
+    ingredients.map(i => ({
+      food_id: i.food_id,
+      mass_g: i.mass_g,
+      food_description: i.food_description,
+    })),
+    {
+      userType: opts.userType,
+      decompositionProvenance: opts.decompositionProvenance,
+      multiDayLabel: opts.multiDayLabel,
+      enableLcaMatcher: opts.enableLcaMatcher,
+    },
+  );
+  const results = profileResponseToResults(resp.metrics, cachedAt);
+  saveCache(hash, results);
+  return { results, meta: resp.meta };
+}
+
+/** Progressive scoring — updates UI as each metric completes. */
+export async function runAllScorersProgressive(
+  ingredients: ScorerInput[],
+  opts: RunOptions,
+  onUpdate: (partial: Partial<ProfileResults>, meta: ProfileScoreMeta | null) => void,
+  { useCache = true, preferBackend = true }: { useCache?: boolean; preferBackend?: boolean } = {},
+): Promise<ProfileScoreBundle> {
+  if (ingredients.length === 0) {
+    throw new Error('runAllScorersProgressive: ingredients array is empty');
+  }
+  const hash = hashInputs(ingredients, opts);
+  if (useCache) {
+    const cached = loadCache(hash);
+    if (cached) {
+      onUpdate(cached, null);
+      return { results: cached, meta: null };
+    }
+  }
+
+  if (preferBackend) {
+    try {
+      const bundle = await runProfileScoreBackend(ingredients, opts, { useCache: false });
+      onUpdate(bundle.results, bundle.meta);
+      return bundle;
+    } catch {
+      /* fall through to client fan-out */
+    }
+  }
+
+  const keys: MetricKey[] = ['hefi', 'heni', 'hsr', 'fcs', 'environmental', 'dietary_pattern'];
+  const partial: Partial<ProfileResults> = {};
+  await Promise.all(keys.map(async key => {
+    const outcome = await runSingleScorer(key, ingredients, opts);
+    Object.assign(partial, { [key]: outcome });
+    onUpdate({ ...partial }, null);
+  }));
+  const results = partial as ProfileResults;
+  saveCache(hash, results);
+  return { results, meta: null };
+}
+
 /** Extract the `explanations` block from a scorer response in a
  *  shape-tolerant way. Different scorers nest it slightly differently. */
 function extractExplanations(payload: unknown): ExplanationsBlock | undefined {
@@ -205,134 +421,33 @@ function asReason(err: unknown): string {
   }
 }
 
-/** Run all 6 scorers in parallel. Each promise is wrapped via
- *  `Promise.allSettled` so a single failing metric never blocks the others. */
+/** Run all 6 scorers — prefers unified backend endpoint, falls back to client fan-out. */
 export async function runAllScorers(
   ingredients: ScorerInput[],
   opts: RunOptions,
   { useCache = true }: { useCache?: boolean } = {},
 ): Promise<ProfileResults> {
-  if (ingredients.length === 0) {
-    throw new Error('runAllScorers: ingredients array is empty');
-  }
-  const hash = hashInputs(ingredients, opts);
-  if (useCache) {
-    const cached = loadCache(hash);
-    if (cached) return cached;
-  }
-
-  const enableLca = opts.enableLcaMatcher ?? true;
-  const userType = opts.userType;
-  const decompProv = opts.decompositionProvenance;
-
-  // Build per-scorer request bodies from the same canonical input shape.
-  const hefiReq = {
-    foods: ingredients.map(i => ({ food_id: i.food_id, amount_g: i.mass_g })),
-    user_type: userType,
-    ...(decompProv ? { decomposition_provenance: decompProv } : {}),
-  };
-  const heniReq = {
-    meal: ingredients.map(i => ({ food_id: i.food_id, amount: i.mass_g, unit: 'g' })),
-    user_type: userType,
-    ...(decompProv ? { decomposition_provenance: decompProv } : {}),
-  };
-  const hsrReq = {
-    food_ids: ingredients.map(i => i.food_id),
-    serving_sizes: ingredients.map(i => i.mass_g),
-    analysis_level: 'detailed' as const,
-    include_alternatives: false,
-    include_meal_insights: true,
-    from_recall24h: ingredients.length > 1,
-    user_type: userType,
-    ...(decompProv ? { decomposition_provenance: decompProv } : {}),
-  };
-  const fcsReq = {
-    food_ids: ingredients.map(i => i.food_id),
-    food_names: ingredients.map(i => i.food_description),
-    serving_sizes: ingredients.map(i => i.mass_g),
-    user_type: userType,
-    ...(decompProv ? { decomposition_provenance: decompProv } : {}),
-  };
-  const envReq = {
-    foods: ingredients.map(i => ({ food_id: i.food_id, quantity: i.mass_g })),
-    user_type: userType,
-    enable_lca_matcher: enableLca,
-    ...(decompProv ? { decomposition_provenance: decompProv } : {}),
-  };
-
-  // Dietary pattern uses CNFApiService.classifyDietaryPattern(foods, options)
-  const settled = await Promise.allSettled([
-    HEFIApiService.calculateHEFI(hefiReq),
-    HENIApiService.calculateHENI(heniReq),
-    HSRApiService.calculateHSR(hsrReq),
-    FCSApiService.calculateFCS(fcsReq),
-    EnvironmentalImpactApiService.analyzeMealEnvironmentalImpact(envReq),
-    CNFApiService.classifyDietaryPattern(
-      ingredients.map(i => ({ food_id: i.food_id, mass_g: i.mass_g })),
-      {
-        userType,
-        includeNarrative: userType !== 'individual',
-        metaLabel: opts.multiDayLabel,
-        decompositionProvenance: opts.decompositionProvenance,
-      },
-    ),
-  ]);
-
-  const cachedAt = nowIso();
-
-  function toOutcome<T>(
-    metric: MetricKey,
-    settledResult: PromiseSettledResult<T>,
-  ): MetricOutcome<T> {
-    if (settledResult.status === 'fulfilled') {
-      return {
-        status: 'fulfilled',
-        metric,
-        result: settledResult.value,
-        explanations: extractExplanations(settledResult.value),
-        cachedAt,
-      };
-    }
-    return {
-      status: 'rejected',
-      metric,
-      reason: asReason(settledResult.reason),
-      cachedAt,
-    };
-  }
-
-  const results: ProfileResults = {
-    hefi: toOutcome<HEFIResult>('hefi', settled[0] as PromiseSettledResult<HEFIResult>),
-    heni: toOutcome<HENIResult>('heni', settled[1] as PromiseSettledResult<HENIResult>),
-    hsr: toOutcome<HSRResult>('hsr', settled[2] as PromiseSettledResult<HSRResult>),
-    fcs: toOutcome<{ data: FCSResult }>(
-      'fcs', settled[3] as PromiseSettledResult<{ data: FCSResult }>,
-    ),
-    environmental: toOutcome<EnvironmentalImpactResult>(
-      'environmental',
-      settled[4] as PromiseSettledResult<EnvironmentalImpactResult>,
-    ),
-    dietary_pattern: toOutcome<PatternClassifyResponse>(
-      'dietary_pattern',
-      settled[5] as PromiseSettledResult<PatternClassifyResponse>,
-    ),
-  };
-
-  saveCache(hash, results);
-  return results;
+  const bundle = await runAllScorersProgressive(
+    ingredients,
+    opts,
+    () => {},
+    { useCache, preferBackend: true },
+  );
+  return bundle.results;
 }
 
-/** Re-run ONE metric that failed earlier. Used by the per-card retry button.
- *  Updates the cached `ProfileResults` in place if the previous run is cached. */
+/** Re-run ONE metric that failed earlier. Merges into cache when present. */
 export async function retryOneMetric(
   metric: MetricKey,
   ingredients: ScorerInput[],
   opts: RunOptions,
 ): Promise<MetricOutcome<unknown>> {
-  // Cheapest path — re-run all and pull the one out. We could be cleverer
-  // and only call the targeted endpoint, but the cache is keyed on the
-  // full input, so a partial retry would still need to merge into the
-  // cached payload. Simpler and rare enough — just re-run.
-  const all = await runAllScorers(ingredients, opts, { useCache: false });
-  return all[metric];
+  const fresh = await runSingleScorer(metric, ingredients, opts);
+  const hash = hashInputs(ingredients, opts);
+  const cached = loadCache(hash);
+  if (cached) {
+    const merged = { ...cached, [metric]: fresh } as ProfileResults;
+    saveCache(hash, merged);
+  }
+  return fresh;
 }

@@ -1,0 +1,689 @@
+{
+  "panel_description": "PCA biplot of HEFI/HENI/HSR/FCS on the 100-day S4 NHANES medoid panel.",
+  "n_rows_used": 91,
+  "n_rows_total": 100,
+  "indicators": [
+    "HEFI",
+    "HENI",
+    "HSR",
+    "FCS"
+  ],
+  "standardisation": "z-score per indicator across the panel",
+  "variance_explained_ratio": [
+    0.5569832165884977,
+    0.21344011912089678,
+    0.13440948729424815,
+    0.09516717699635743
+  ],
+  "cumulative_variance_explained": [
+    0.5569832165884977,
+    0.7704233357093945,
+    0.9048328230036427,
+    1.0
+  ],
+  "loadings": {
+    "PC1": {
+      "HEFI": 0.5752081740750203,
+      "HENI": 0.5264079757300845,
+      "HSR": 0.3303078033734112,
+      "FCS": 0.5319087840933518
+    },
+    "PC2": {
+      "HEFI": -0.127253524024705,
+      "HENI": -0.2113684979280928,
+      "HSR": 0.9397209181012185,
+      "FCS": -0.23675830458490535
+    },
+    "PC3": {
+      "HEFI": -0.05508333058561472,
+      "HENI": 0.7415135969108204,
+      "HSR": -0.009126159794601426,
+      "FCS": -0.66861059331675
+    },
+    "PC4": {
+      "HEFI": 0.8061686695674615,
+      "HENI": -0.35829539038027536,
+      "HSR": -0.087966268086344,
+      "FCS": -0.46257802057494757
+    }
+  },
+  "per_day_scores_pc1_pc2": [
+    {
+      "day_id": "S4-001",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 2,
+      "PC1": -0.1914744758921864,
+      "PC2": -0.466229564995457
+    },
+    {
+      "day_id": "S4-002",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 2,
+      "PC1": 0.39260981370700004,
+      "PC2": 0.1594646452804589
+    },
+    {
+      "day_id": "S4-003",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 2,
+      "PC1": -0.7595939850963378,
+      "PC2": 0.11392277519145154
+    },
+    {
+      "day_id": "S4-004",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 2,
+      "PC1": -1.9773512779427207,
+      "PC2": -0.945606181510621
+    },
+    {
+      "day_id": "S4-005",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 2,
+      "PC1": -1.2367536552296141,
+      "PC2": 0.09110100288352176
+    },
+    {
+      "day_id": "S4-006",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 2,
+      "PC1": -1.558786917356891,
+      "PC2": 0.5582374187020679
+    },
+    {
+      "day_id": "S4-007",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 2,
+      "PC1": -0.8490709592644656,
+      "PC2": -0.7598389198987451
+    },
+    {
+      "day_id": "S4-008",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 2,
+      "PC1": -2.222884787511361,
+      "PC2": -0.48954058374301124
+    },
+    {
+      "day_id": "S4-009",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 2,
+      "PC1": 0.15214259991699833,
+      "PC2": -1.0086071417861893
+    },
+    {
+      "day_id": "S4-011",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 5,
+      "PC1": -0.05713625728567566,
+      "PC2": 1.2928617420623192
+    },
+    {
+      "day_id": "S4-012",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 5,
+      "PC1": 0.12841460508082733,
+      "PC2": 0.15150764710871328
+    },
+    {
+      "day_id": "S4-013",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 5,
+      "PC1": -0.7806546044946951,
+      "PC2": 1.0108783574600098
+    },
+    {
+      "day_id": "S4-014",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 5,
+      "PC1": 0.10327200701214197,
+      "PC2": 2.3640487411307483
+    },
+    {
+      "day_id": "S4-015",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 5,
+      "PC1": 2.751370500879312,
+      "PC2": -1.845935970946496
+    },
+    {
+      "day_id": "S4-017",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 5,
+      "PC1": -0.014866302939339812,
+      "PC2": 0.29004022983070993
+    },
+    {
+      "day_id": "S4-018",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 5,
+      "PC1": 0.5381266398729521,
+      "PC2": 0.24566352281380568
+    },
+    {
+      "day_id": "S4-019",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 5,
+      "PC1": -0.7223102995629044,
+      "PC2": -0.12657260776172466
+    },
+    {
+      "day_id": "S4-020",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 3,
+      "PC1": -2.2526444240138708,
+      "PC2": 0.8514671047521692
+    },
+    {
+      "day_id": "S4-021",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 3,
+      "PC1": -1.9919403824095088,
+      "PC2": 0.2195680265316559
+    },
+    {
+      "day_id": "S4-022",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 3,
+      "PC1": -1.612346522013159,
+      "PC2": 0.3396138905766083
+    },
+    {
+      "day_id": "S4-023",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 3,
+      "PC1": 1.361437917321536,
+      "PC2": -0.01638577051633853
+    },
+    {
+      "day_id": "S4-024",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 3,
+      "PC1": 1.9393401973144035,
+      "PC2": 1.050597820181018
+    },
+    {
+      "day_id": "S4-025",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 3,
+      "PC1": 0.494876768144598,
+      "PC2": 0.3900413154345115
+    },
+    {
+      "day_id": "S4-026",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 2,
+      "PC1": -2.277258660109322,
+      "PC2": -0.26448800051098553
+    },
+    {
+      "day_id": "S4-027",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 2,
+      "PC1": 1.0271591006417062,
+      "PC2": 1.818659142577536
+    },
+    {
+      "day_id": "S4-028",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 2,
+      "PC1": 2.882417581262162,
+      "PC2": 1.1914278856222713
+    },
+    {
+      "day_id": "S4-029",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 2,
+      "PC1": -0.46711889448566235,
+      "PC2": 0.05634433303007521
+    },
+    {
+      "day_id": "S4-030",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 2,
+      "PC1": 0.42552432196977324,
+      "PC2": -0.5069425205902075
+    },
+    {
+      "day_id": "S4-031",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 2,
+      "PC1": 0.3083397709371758,
+      "PC2": -0.19370146946906147
+    },
+    {
+      "day_id": "S4-032",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 2,
+      "PC1": 2.5080339891579975,
+      "PC2": -1.9910786436149335
+    },
+    {
+      "day_id": "S4-033",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 2,
+      "PC1": 2.6967117781149224,
+      "PC2": -0.3487483812397274
+    },
+    {
+      "day_id": "S4-035",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 4,
+      "PC1": -0.5170956400768648,
+      "PC2": -0.520034439925182
+    },
+    {
+      "day_id": "S4-036",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 4,
+      "PC1": -1.9557150279026545,
+      "PC2": -0.7857697165191845
+    },
+    {
+      "day_id": "S4-037",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 4,
+      "PC1": 0.2371288636444097,
+      "PC2": -0.3641376658624149
+    },
+    {
+      "day_id": "S4-038",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 3,
+      "PC1": 1.0726966217729954,
+      "PC2": -0.9318508581781845
+    },
+    {
+      "day_id": "S4-039",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 3,
+      "PC1": -0.015511225299896802,
+      "PC2": -0.37765997814714236
+    },
+    {
+      "day_id": "S4-040",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 3,
+      "PC1": -1.6577600197148412,
+      "PC2": -0.20954552877081153
+    },
+    {
+      "day_id": "S4-041",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 3,
+      "PC1": -2.4724802531527073,
+      "PC2": -1.4649107908032482
+    },
+    {
+      "day_id": "S4-042",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 3,
+      "PC1": -0.0388167926740139,
+      "PC2": 1.3875079304227251
+    },
+    {
+      "day_id": "S4-044",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 1,
+      "PC1": -0.2680531384701354,
+      "PC2": 1.9162777440434664
+    },
+    {
+      "day_id": "S4-046",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 1,
+      "PC1": -1.8174428137863226,
+      "PC2": 0.8146363945565465
+    },
+    {
+      "day_id": "S4-047",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 1,
+      "PC1": 0.2356785311610944,
+      "PC2": -0.8990843930438841
+    },
+    {
+      "day_id": "S4-048",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 1,
+      "PC1": 2.5724426657715385,
+      "PC2": -1.2959020077010144
+    },
+    {
+      "day_id": "S4-049",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 5,
+      "PC1": -0.2938865378967493,
+      "PC2": -0.46655377133611137
+    },
+    {
+      "day_id": "S4-051",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 5,
+      "PC1": 0.11906296460801237,
+      "PC2": 0.7046209662804161
+    },
+    {
+      "day_id": "S4-053",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 5,
+      "PC1": 0.5652891341646235,
+      "PC2": 1.685280520576174
+    },
+    {
+      "day_id": "S4-054",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 5,
+      "PC1": -1.2346773587441309,
+      "PC2": -0.15030796961166484
+    },
+    {
+      "day_id": "S4-055",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 4,
+      "PC1": 0.45187707301697116,
+      "PC2": -1.1691769853030036
+    },
+    {
+      "day_id": "S4-056",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 4,
+      "PC1": 0.5608287246231974,
+      "PC2": 1.2667458852862632
+    },
+    {
+      "day_id": "S4-057",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 4,
+      "PC1": -0.9075609982136028,
+      "PC2": 0.9372450959851523
+    },
+    {
+      "day_id": "S4-058",
+      "agesex_group": "males_19plus",
+      "fipr_quintile": 4,
+      "PC1": 1.5511187300101046,
+      "PC2": 0.5830289234860113
+    },
+    {
+      "day_id": "S4-059",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 4,
+      "PC1": -0.15045316657394864,
+      "PC2": 1.4782136467494003
+    },
+    {
+      "day_id": "S4-060",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 4,
+      "PC1": -0.1862586844922546,
+      "PC2": -0.018058144213195522
+    },
+    {
+      "day_id": "S4-061",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 4,
+      "PC1": 3.000376087572355,
+      "PC2": 0.048354579063610965
+    },
+    {
+      "day_id": "S4-062",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 4,
+      "PC1": 2.6110010820497345,
+      "PC2": 0.1976531370904636
+    },
+    {
+      "day_id": "S4-063",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 1,
+      "PC1": 0.9831378904783763,
+      "PC2": 0.5889527595471298
+    },
+    {
+      "day_id": "S4-065",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 1,
+      "PC1": -1.1307664199786132,
+      "PC2": -1.4463461095566827
+    },
+    {
+      "day_id": "S4-066",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 1,
+      "PC1": -0.790352326064559,
+      "PC2": 1.0687158668806296
+    },
+    {
+      "day_id": "S4-067",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 1,
+      "PC1": -1.571187009968256,
+      "PC2": 0.6554141413797216
+    },
+    {
+      "day_id": "S4-068",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 1,
+      "PC1": 1.952414084935728,
+      "PC2": 1.0348861906749607
+    },
+    {
+      "day_id": "S4-069",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 1,
+      "PC1": -0.20651485775686454,
+      "PC2": 0.2772683574485851
+    },
+    {
+      "day_id": "S4-070",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 2,
+      "PC1": -0.3458040679240899,
+      "PC2": 1.6390583945916533
+    },
+    {
+      "day_id": "S4-071",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 2,
+      "PC1": 4.8372244510077085,
+      "PC2": -0.02474738258876445
+    },
+    {
+      "day_id": "S4-073",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 2,
+      "PC1": -0.70331432952855,
+      "PC2": 1.0994786890655401
+    },
+    {
+      "day_id": "S4-074",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 2,
+      "PC1": 0.33502568245122377,
+      "PC2": 0.1808235025960963
+    },
+    {
+      "day_id": "S4-075",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 2,
+      "PC1": -1.6054719976236396,
+      "PC2": -0.8956802538074983
+    },
+    {
+      "day_id": "S4-076",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 2,
+      "PC1": -0.7071036272520855,
+      "PC2": 0.46165431526095096
+    },
+    {
+      "day_id": "S4-077",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 2,
+      "PC1": -1.0073786441188848,
+      "PC2": -1.1998006045388094
+    },
+    {
+      "day_id": "S4-078",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 2,
+      "PC1": -0.914687238339337,
+      "PC2": -0.12781286726897576
+    },
+    {
+      "day_id": "S4-079",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 2,
+      "PC1": -1.7734259590153716,
+      "PC2": -0.45086628046499666
+    },
+    {
+      "day_id": "S4-080",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 5,
+      "PC1": -0.4336125782665611,
+      "PC2": -0.7213511086561641
+    },
+    {
+      "day_id": "S4-081",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 5,
+      "PC1": 3.5381918232975376,
+      "PC2": 0.12072584883288999
+    },
+    {
+      "day_id": "S4-082",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 5,
+      "PC1": -0.6825583519680135,
+      "PC2": 0.2742324227132871
+    },
+    {
+      "day_id": "S4-083",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 5,
+      "PC1": 0.7783232270844691,
+      "PC2": -1.3637173070533213
+    },
+    {
+      "day_id": "S4-084",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 5,
+      "PC1": 2.310438230238263,
+      "PC2": -1.3841906371867496
+    },
+    {
+      "day_id": "S4-085",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 5,
+      "PC1": 0.5844681777626352,
+      "PC2": -1.5182686836630352
+    },
+    {
+      "day_id": "S4-086",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 5,
+      "PC1": -0.23720470475320737,
+      "PC2": -0.6533184987119632
+    },
+    {
+      "day_id": "S4-087",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 5,
+      "PC1": 1.5293369281584799,
+      "PC2": -0.42915723991564203
+    },
+    {
+      "day_id": "S4-088",
+      "agesex_group": "females_19plus",
+      "fipr_quintile": 5,
+      "PC1": -0.7336464138387826,
+      "PC2": -0.6098084950704517
+    },
+    {
+      "day_id": "S4-089",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 1,
+      "PC1": -0.10794533380987702,
+      "PC2": -0.6699218020398818
+    },
+    {
+      "day_id": "S4-090",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 1,
+      "PC1": -0.09236660709471632,
+      "PC2": -1.363277481128487
+    },
+    {
+      "day_id": "S4-091",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 1,
+      "PC1": -0.26809049711674393,
+      "PC2": -0.7453176956905889
+    },
+    {
+      "day_id": "S4-092",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 1,
+      "PC1": -1.16465796028509,
+      "PC2": -0.24327059453011016
+    },
+    {
+      "day_id": "S4-093",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 1,
+      "PC1": -1.298801060560804,
+      "PC2": 1.3702027181663985
+    },
+    {
+      "day_id": "S4-094",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 1,
+      "PC1": 0.5320427904972712,
+      "PC2": 1.146555047663744
+    },
+    {
+      "day_id": "S4-095",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 1,
+      "PC1": -1.0896433144068347,
+      "PC2": -0.9278250877942625
+    },
+    {
+      "day_id": "S4-096",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 1,
+      "PC1": 0.17437938343227474,
+      "PC2": -0.7386815988780137
+    },
+    {
+      "day_id": "S4-097",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 3,
+      "PC1": 3.0706672364250713,
+      "PC2": 0.6642090651337776
+    },
+    {
+      "day_id": "S4-098",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 3,
+      "PC1": -1.6396464251743126,
+      "PC2": 0.438857493898781
+    },
+    {
+      "day_id": "S4-099",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 3,
+      "PC1": 0.3024557176944094,
+      "PC2": -0.44216106025353996
+    },
+    {
+      "day_id": "S4-100",
+      "agesex_group": "youth_2_18",
+      "fipr_quintile": 3,
+      "PC1": -2.6232999057409576,
+      "PC2": -0.6638564437675449
+    }
+  ]
+}

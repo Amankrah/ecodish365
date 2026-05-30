@@ -678,145 +678,171 @@ class CNFDataPipeline:
             'prep_both_known_pct': round(100.0 * both_known / total, 1) if total else 0.0,
         }
 
-    def compare_foods(self, food_ids: List[int], nutrient_ids: List[int] = None) -> Dict:
-        """
-        Compare nutritional content of multiple foods.
-        
+    def compare_foods(
+        self,
+        food_ids: List[int],
+        nutrient_ids: List[int] = None,
+        basis: str = 'per_100g',
+    ) -> Dict:
+        """Compare nutritional content of multiple foods.
+
         Args:
-            food_ids: List of food IDs to compare
-            nutrient_ids: List of specific nutrients to compare (optional)
-            
-        Returns:
-            Dictionary containing comparison data
+            food_ids: Foods to compare (2–10).
+            nutrient_ids: Optional extra NutrientIDs (merged with the default panel set).
+            basis: ``per_100g`` (raw CNF values) or ``per_100kcal`` (energy-adjusted density).
         """
+        from api.services.cnf_food_type import get_food_type
+        from api.services.cnf_prep_state import prep_state_of
+
+        ENERGY_ID = 208
+        PROTEIN_ID, FIBRE_ID = 203, 291
+        basis = 'per_100kcal' if basis == 'per_100kcal' else 'per_100g'
+
         try:
             if len(food_ids) > 10:
                 raise ValueError("Cannot compare more than 10 foods at once")
-            
+
+            default_nutrients = [
+                208, 268, 203, 204, 205, 291, 269,
+                301, 303, 304, 305, 306, 307, 309,
+                319, 320, 321, 323, 324, 401, 404, 405, 406, 417, 418, 430,
+                606, 645, 646, 605, 601,
+            ]
+            if nutrient_ids:
+                target_nutrients = sorted(set(default_nutrients) | {int(n) for n in nutrient_ids})
+            else:
+                target_nutrients = default_nutrients
+
             comparison_data = {
                 'foods': [],
                 'nutrients': {},
-                'comparison_date': datetime.now().isoformat()
+                'comparison_date': datetime.now().isoformat(),
+                'basis': basis,
             }
-            
-            # Get food details
-            for food_id in food_ids:
-                food_details = self.get_food_details(food_id)
-                if food_details:
-                    comparison_data['foods'].append({
-                        'FoodID': food_id,
-                        'FoodDescription': food_details['FoodDescription'],
-                        'FoodGroup': food_details.get('FoodGroupName', 'Unknown')
-                    })
-            
-            # Get nutrient data for comparison
-            if nutrient_ids:
-                target_nutrients = nutrient_ids
-            else:
-                # Get comprehensive nutrients if none specified
-                target_nutrients = [
-                    # Energy
-                    208,  # ENERGY (KILOCALORIES)
-                    268,  # ENERGY (KILOJOULES)
-                    
-                    # Macronutrients
-                    203,  # PROTEIN
-                    204,  # FAT (TOTAL LIPIDS)
-                    205,  # CARBOHYDRATE, TOTAL (BY DIFFERENCE)
-                    291,  # FIBRE, TOTAL DIETARY
-                    
-                    # Minerals
-                    301,  # CALCIUM
-                    303,  # IRON
-                    304,  # MAGNESIUM
-                    305,  # PHOSPHORUS
-                    306,  # POTASSIUM
-                    307,  # SODIUM
-                    309,  # ZINC
-                    
-                    # Vitamins
-                    319,  # RETINOL
-                    320,  # RETINOL ACTIVITY EQUIVALENTS (Vitamin A)
-                    321,  # BETA CAROTENE
-                    323,  # ALPHA-TOCOPHEROL (Vitamin E)
-                    324,  # VITAMIN D (INTERNATIONAL UNITS)
-                    401,  # VITAMIN C
-                    404,  # THIAMIN (Vitamin B1)
-                    405,  # RIBOFLAVIN (Vitamin B2)
-                    406,  # NIACIN (Vitamin B3)
-                    417,  # TOTAL FOLACIN (Folate)
-                    418,  # VITAMIN B-12
-                    430,  # VITAMIN K
-                    
-                    # Fatty Acids
-                    606,  # FATTY ACIDS, SATURATED, TOTAL
-                    645,  # FATTY ACIDS, MONOUNSATURATED, TOTAL
-                    646,  # FATTY ACIDS, POLYUNSATURATED, TOTAL
-                    605,  # FATTY ACIDS, TRANS, TOTAL
-                    601,  # CHOLESTEROL
-                ]
-            
-            # FoodID → database provenance (CNF vs WAFCT) for per-cell metadata.
+
             food_name_df = self.data_loader.food_name_df
             has_source_col = 'source' in food_name_df.columns
-            food_database: Dict[int, str] = {}
-            for fid in food_ids:
-                row = food_name_df[food_name_df['FoodID'] == fid]
-                if row.empty:
-                    food_database[fid] = 'cnf'
-                elif has_source_col:
-                    food_database[fid] = str(row['source'].iloc[0])
-                else:
-                    food_database[fid] = 'cnf'
+            na = self.data_loader.nutrient_amount_df
+
+            energy_by_food: Dict[int, float] = {}
+            energy_rows = na[(na['NutrientID'] == ENERGY_ID) & (na['FoodID'].isin(food_ids))]
+            for row in energy_rows.itertuples(index=False):
+                energy_by_food[int(row.FoodID)] = float(row.NutrientValue)
+
+            macro_ids = {PROTEIN_ID, FIBRE_ID, ENERGY_ID}
+            macro_sub = na[na['FoodID'].isin(food_ids) & na['NutrientID'].isin(macro_ids)]
+            macro_map: Dict[int, Dict[int, float]] = {}
+            for row in macro_sub.itertuples(index=False):
+                fid = int(row.FoodID)
+                bucket = macro_map.get(fid)
+                if bucket is None:
+                    bucket = {}
+                    macro_map[fid] = bucket
+                bucket[int(row.NutrientID)] = float(row.NutrientValue)
+
+            for food_id in food_ids:
+                food_details = self.get_food_details(food_id)
+                if not food_details:
+                    continue
+                row = food_name_df[food_name_df['FoodID'] == food_id]
+                src = 'cnf'
+                if not row.empty and has_source_col:
+                    src = str(row['source'].iloc[0])
+                fid = int(food_id)
+                nuts = macro_map.get(fid, {})
+                ft = get_food_type(fid)
+                ps = prep_state_of(fid)
+                comparison_data['foods'].append({
+                    'FoodID': fid,
+                    'FoodDescription': food_details['FoodDescription'],
+                    'FoodCode': str(food_details.get('FoodCode', '')),
+                    'FoodGroup': food_details.get('FoodGroupName', 'Unknown'),
+                    'FoodGroupID': int(food_details.get('FoodGroupID') or 0),
+                    'source': src,
+                    'energy_kcal': nuts.get(ENERGY_ID),
+                    'protein_g': nuts.get(PROTEIN_ID),
+                    'fibre_g': nuts.get(FIBRE_ID),
+                    'food_type': ft.get('food_type') if ft else None,
+                    'thermal_state': ps.thermal_state if ps else None,
+                    'preservation_state': ps.preservation_state if ps else None,
+                })
 
             nutrient_source_df = self.data_loader.nutrient_source_df
 
+            def display_value(raw: float, food_id: int) -> float:
+                if basis != 'per_100kcal':
+                    return raw
+                e = energy_by_food.get(food_id) or 0.0
+                if e <= 0:
+                    return raw
+                return raw / e * 100.0
+
             for nutrient_id in target_nutrients:
-                nutrient_data = self.data_loader.nutrient_amount_df[
-                    (self.data_loader.nutrient_amount_df['NutrientID'] == nutrient_id) &
-                    (self.data_loader.nutrient_amount_df['FoodID'].isin(food_ids))
+                nutrient_data = na[
+                    (na['NutrientID'] == nutrient_id) &
+                    (na['FoodID'].isin(food_ids))
                 ]
-                
-                if not nutrient_data.empty:
-                    # Get nutrient name
-                    nutrient_name_row = self.data_loader.nutrient_name_df[
-                        self.data_loader.nutrient_name_df['NutrientID'] == nutrient_id
-                    ]
-                    nutrient_name = nutrient_name_row['NutrientName'].iloc[0] if not nutrient_name_row.empty else f"Nutrient {nutrient_id}"
-                    nutrient_unit = nutrient_name_row['NutrientUnit'].iloc[0] if not nutrient_name_row.empty else "unit"
-                    
-                    comparison_data['nutrients'][nutrient_name] = {
-                        'nutrient_id': nutrient_id,
-                        'unit': nutrient_unit,
-                        'values': {},
-                        'by_food_id': {},
+
+                if nutrient_data.empty:
+                    continue
+
+                nutrient_name_row = self.data_loader.nutrient_name_df[
+                    self.data_loader.nutrient_name_df['NutrientID'] == nutrient_id
+                ]
+                nutrient_name = (
+                    nutrient_name_row['NutrientName'].iloc[0]
+                    if not nutrient_name_row.empty else f"Nutrient {nutrient_id}"
+                )
+                nutrient_unit = (
+                    nutrient_name_row['NutrientUnit'].iloc[0]
+                    if not nutrient_name_row.empty else "unit"
+                )
+
+                comparison_data['nutrients'][nutrient_name] = {
+                    'nutrient_id': int(nutrient_id),
+                    'unit': nutrient_unit,
+                    'values': {},
+                    'by_food_id': {},
+                }
+
+                row_src = food_name_df[food_name_df['FoodID'].isin(food_ids)]
+                food_database: Dict[int, str] = {}
+                if not row_src.empty:
+                    for rec in row_src.itertuples(index=False):
+                        fid = int(rec.FoodID)
+                        if has_source_col:
+                            food_database[fid] = str(getattr(rec, 'source', 'cnf') or 'cnf')
+                        else:
+                            food_database[fid] = 'cnf'
+
+                for _, nrow in nutrient_data.iterrows():
+                    food_id = int(nrow['FoodID'])
+                    food_name = next(
+                        (f['FoodDescription'] for f in comparison_data['foods'] if f['FoodID'] == food_id),
+                        f"Food {food_id}",
+                    )
+                    raw = float(nrow['NutrientValue'])
+                    shown = display_value(raw, food_id)
+                    comparison_data['nutrients'][nutrient_name]['values'][food_name] = shown
+
+                    ns_id = int(nrow.get('NutrientSourceID', 0) or 0)
+                    ns_row = nutrient_source_df[nutrient_source_df['NutrientSourceID'] == ns_id]
+                    nutrient_source = (
+                        str(ns_row['NutrientSourceDescription'].iloc[0])
+                        if not ns_row.empty else 'Unknown'
+                    )
+
+                    comparison_data['nutrients'][nutrient_name]['by_food_id'][str(food_id)] = {
+                        'value': shown,
+                        'value_per_100g': raw,
+                        'unit': str(nutrient_unit),
+                        'nutrient_source_id': ns_id,
+                        'nutrient_source': nutrient_source,
+                        'database': food_database.get(food_id, 'cnf'),
                     }
-                    
-                    for _, row in nutrient_data.iterrows():
-                        food_id = int(row['FoodID'])
-                        food_name = next((f['FoodDescription'] for f in comparison_data['foods'] if f['FoodID'] == food_id), f"Food {food_id}")
-                        value = float(row['NutrientValue'])
-                        comparison_data['nutrients'][nutrient_name]['values'][food_name] = value
 
-                        ns_id = int(row.get('NutrientSourceID', 0) or 0)
-                        ns_row = nutrient_source_df[
-                            nutrient_source_df['NutrientSourceID'] == ns_id
-                        ]
-                        nutrient_source = (
-                            str(ns_row['NutrientSourceDescription'].iloc[0])
-                            if not ns_row.empty else 'Unknown'
-                        )
-
-                        comparison_data['nutrients'][nutrient_name]['by_food_id'][str(food_id)] = {
-                            'value': value,
-                            'unit': str(nutrient_unit),
-                            'nutrient_source_id': ns_id,
-                            'nutrient_source': nutrient_source,
-                            'database': food_database.get(food_id, 'cnf'),
-                        }
-            
             return comparison_data
-            
+
         except Exception as e:
             logger.error(f"Error comparing foods: {str(e)}")
             raise

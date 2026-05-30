@@ -17,6 +17,7 @@ import {
 import { CNFApiService, DatabaseStats } from '@/lib/api';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import { CATALOGUE_NAV } from '@/lib/catalogueNav';
 
 const quickActions = [
   {
@@ -28,28 +29,28 @@ const quickActions = [
   },
   {
     name: 'Advanced Search',
-    description: 'Search foods with filters and relevance scoring',
+    description: 'Search CNF + WAFCT with filters and relevance scoring',
     icon: MagnifyingGlassIcon,
     href: '/cnf/search',
     color: 'from-blue-500 to-blue-600',
   },
   {
     name: 'Food Comparison',
-    description: 'Compare nutritional content of multiple foods',
+    description: 'Compare nutritional content across databases',
     icon: ScaleIcon,
     href: '/cnf/compare',
     color: 'from-green-500 to-green-600',
   },
   {
-    name: 'Database Analytics',
-    description: 'Explore database statistics and insights',
+    name: CATALOGUE_NAV.overview,
+    description: 'CNF + WAFCT counts, group distribution, data quality',
     icon: ChartBarIcon,
     href: '/cnf/analytics',
     color: 'from-purple-500 to-purple-600',
   },
   {
     name: 'Browse by Groups',
-    description: 'Explore foods organized by food groups',
+    description: 'Explore foods by CNF or WAFCT food group',
     icon: CubeIcon,
     href: '/cnf/groups',
     color: 'from-orange-500 to-orange-600',
@@ -101,7 +102,7 @@ export default function CNFDashboard() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            Food Composition Database Explorer
+            Food Catalogue
           </h1>
           <p className="text-lg text-gray-600 max-w-3xl">
             Explore <strong>two food-composition databases side by side</strong>: Health

@@ -19,6 +19,7 @@ import {
   ArrowRightOnRectangleIcon
 } from '@heroicons/react/24/outline';
 import { clsx } from 'clsx';
+import { CATALOGUE_DROPDOWN, CATALOGUE_NAV } from '@/lib/catalogueNav';
 
 type DropdownChild = { name: string; href: string };
 type DropdownItem = { name: string; href: string; children?: DropdownChild[] };
@@ -31,17 +32,11 @@ type NavItem = {
 };
 
 const navigation: NavItem[] = [
-  { 
-    name: 'CNF Explorer', 
-    href: '/cnf', 
+  {
+    name: CATALOGUE_NAV.section,
+    href: CATALOGUE_NAV.href,
     icon: ChartBarIcon,
-    dropdown: [
-      { name: 'Food Search', href: '/cnf/search' },
-      { name: 'Discover by Nutrient', href: '/cnf/discover' },
-      { name: 'Compare Foods', href: '/cnf/compare' },
-      { name: 'Food Groups', href: '/cnf/groups' },
-      { name: 'Analytics', href: '/cnf/analytics' },
-    ]
+    dropdown: [...CATALOGUE_DROPDOWN],
   },
   { 
     name: 'Nutrition Indicators', 
@@ -204,7 +199,11 @@ export default function Navigation() {
               const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
               const isDropdownOpen = activeDropdown === item.name;
               const showDropdown = Array.isArray(item.dropdown) && (
-                item.name === 'CNF Explorer' || item.name === 'Environmental Indicators' || item.name === 'Nutrition Indicators' || item.name === 'Meals' || item.name === 'Food diary'
+                item.href === CATALOGUE_NAV.href
+                || item.name === 'Environmental Indicators'
+                || item.name === 'Nutrition Indicators'
+                || item.name === 'Meals'
+                || item.name === 'Food diary'
               );
               return (
                 <div key={item.name} className="relative group">

@@ -64,7 +64,7 @@ export function FoodProfileContent({
       toast.error('Enter a portion size in grams');
       return;
     }
-    appendToActiveFoodList(
+    const saved = appendToActiveFoodList(
       {
         food_id: food.FoodID,
         food_description: food.FoodDescription,
@@ -73,6 +73,10 @@ export function FoodProfileContent({
       },
       userType,
     );
+    if (!saved) {
+      toast.error('Could not add to Scorecard — check portion size and try again');
+      return;
+    }
     toast.success(
       userType === 'individual'
         ? `Added ${food.FoodDescription} (${massG} g) to all scores`

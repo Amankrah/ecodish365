@@ -31,6 +31,7 @@ import { GroupSidebar, getFoodGroupIcon } from '@/components/cnf/foodGroups/Grou
 import { GroupSummaryCard } from '@/components/cnf/foodGroups/GroupSummaryCard';
 import { MiniDiscoverPanel } from '@/components/cnf/foodGroups/MiniDiscoverPanel';
 import { topGroupsByCount, prepStateLabel } from '@/lib/cnfGroupDisplay';
+import { CATALOGUE_NAV } from '@/lib/catalogueNav';
 import { toCsv, downloadCsv } from '@/lib/csv';
 import type { SourceChoice } from '@/components/shared/SourceFilter';
 
@@ -298,7 +299,7 @@ function CNFGroupsPageContent() {
                     <BeakerIcon className="w-4 h-4" /> Discover by nutrient
                   </Link>
                   <Link href="/cnf/analytics" className="inline-flex items-center gap-1.5 text-primary-700 hover:text-primary-900">
-                    <ChartBarIcon className="w-4 h-4" /> Database analytics
+                    <ChartBarIcon className="w-4 h-4" /> {CATALOGUE_NAV.overview}
                   </Link>
                   <Link href="/cnf/search" className="inline-flex items-center gap-1.5 text-primary-700 hover:text-primary-900">
                     <MagnifyingGlassIcon className="w-4 h-4" /> Advanced search

@@ -41,7 +41,9 @@ export type ActiveFoodListSource =
   | 'recall_24h'
   | 'packaged_food_inferred'
   | 'imported'
-  | 'manual';
+  | 'manual'
+  | 'catalogue_compare'
+  | 'catalogue';
 
 export interface ActiveFoodListIngredient {
   food_id: number;
@@ -84,6 +86,8 @@ export interface ActiveFoodList {
   schema_version: number;
   captured_at: string;
   source: ActiveFoodListSource;
+  /** Optional display label (e.g. "High-iron pair" from compare). */
+  list_label?: string;
   ingredients: ActiveFoodListIngredient[];
   estimated_daily_kcal?: number;
   user_type?: 'individual' | 'researcher' | 'policy';
@@ -132,6 +136,28 @@ function emitChange(next: ActiveFoodList | null): void {
   } catch { /* ignore */ }
 }
 
+/** Coerce one ingredient row; returns null if unusable for storage/load. */
+function coerceIngredient(raw: unknown): ActiveFoodListIngredient | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const item = raw as Record<string, unknown>;
+  const food_id = Number(item.food_id ?? item.FoodID);
+  const mass_g = Number(item.mass_g);
+  const food_description = String(item.food_description ?? item.FoodDescription ?? '').trim();
+  if (!Number.isFinite(food_id) || food_id <= 0) return null;
+  if (!Number.isFinite(mass_g) || mass_g <= 0) return null;
+  if (!food_description) return null;
+  return {
+    food_id,
+    food_description,
+    food_group: typeof item.food_group === 'string'
+      ? item.food_group
+      : typeof item.FoodGroupName === 'string'
+        ? item.FoodGroupName
+        : undefined,
+    mass_g,
+  };
+}
+
 export function loadActiveFoodList(): ActiveFoodList | null {
   const raw = safeGet();
   if (!raw) return null;
@@ -144,16 +170,15 @@ export function loadActiveFoodList(): ActiveFoodList | null {
 }
 
 export function saveActiveFoodList(list: ActiveFoodList): boolean {
+  const ingredients = list.ingredients
+    .map(i => coerceIngredient(i))
+    .filter((i): i is ActiveFoodListIngredient => i != null);
+  if (ingredients.length === 0) return false;
   const coerced: ActiveFoodList = {
     ...list,
     schema_version: ACTIVE_FOOD_LIST_SCHEMA_VERSION,
     captured_at: list.captured_at || new Date().toISOString(),
-    ingredients: list.ingredients.map(i => ({
-      food_id: Number(i.food_id),
-      food_description: String(i.food_description),
-      food_group: i.food_group,
-      mass_g: Math.max(0, Number(i.mass_g) || 0),
-    })),
+    ingredients,
   };
   const ok = safeSet(JSON.stringify(coerced));
   if (ok) emitChange(coerced);
@@ -180,15 +205,17 @@ export function updateIngredientMass(food_id: number, mass_g: number): ActiveFoo
 
 /** Append or merge one food into the active scorecard list. */
 export function appendToActiveFoodList(
-  ing: ActiveFoodListIngredient,
+  ing: ActiveFoodListIngredient | (ActiveFoodListIngredient & { FoodID?: number; FoodDescription?: string; FoodGroupName?: string }),
   userType?: ActiveFoodList['user_type'],
-): ActiveFoodList {
+): ActiveFoodList | null {
+  const normalized = coerceIngredient(ing);
+  if (!normalized) return null;
   const current = loadActiveFoodList();
   const existing = current?.ingredients ?? [];
-  const idx = existing.findIndex(i => i.food_id === ing.food_id);
+  const idx = existing.findIndex(i => i.food_id === normalized.food_id);
   const nextIngs = idx >= 0
-    ? existing.map((i, k) => k === idx ? { ...i, mass_g: i.mass_g + ing.mass_g } : i)
-    : [...existing, ing];
+    ? existing.map((i, k) => k === idx ? { ...i, mass_g: i.mass_g + normalized.mass_g } : i)
+    : [...existing, normalized];
   const next: ActiveFoodList = {
     schema_version: ACTIVE_FOOD_LIST_SCHEMA_VERSION,
     captured_at: new Date().toISOString(),
@@ -201,8 +228,69 @@ export function appendToActiveFoodList(
     packaged_food_occasions: current?.packaged_food_occasions,
     multi_day: current?.multi_day,
   };
-  saveActiveFoodList(next);
+  if (!saveActiveFoodList(next)) return null;
   return next;
+}
+
+export interface AppendManyResult {
+  ok: boolean;
+  list?: ActiveFoodList;
+  error?: string;
+  addedCount?: number;
+}
+
+export interface AppendManyOptions {
+  userType?: ActiveFoodList['user_type'];
+  source?: ActiveFoodListSource;
+  list_label?: string;
+  estimated_daily_kcal?: number;
+  /** Replace the entire list instead of merging (compare handoff). */
+  replace?: boolean;
+}
+
+/** Merge several foods into the active list in one save (compare → scorecard handoff). */
+export function appendManyToActiveFoodList(
+  ings: Array<ActiveFoodListIngredient | Record<string, unknown>>,
+  options: AppendManyOptions = {},
+): AppendManyResult {
+  const userType = options.userType;
+  const normalized = ings
+    .map(i => coerceIngredient(i))
+    .filter((i): i is ActiveFoodListIngredient => i != null);
+  if (normalized.length === 0) {
+    return { ok: false, error: 'No valid foods to add (check food id, name, and portion mass).' };
+  }
+  if (normalized.length < ings.length) {
+    return {
+      ok: false,
+      error: `${ings.length - normalized.length} food(s) had invalid id, name, or mass and were skipped.`,
+    };
+  }
+  const current = loadActiveFoodList();
+  let existing = options.replace ? [] : (current?.ingredients ?? []);
+  for (const ing of normalized) {
+    const idx = existing.findIndex(i => i.food_id === ing.food_id);
+    existing = idx >= 0
+      ? existing.map((i, k) => k === idx ? { ...i, mass_g: i.mass_g + ing.mass_g } : i)
+      : [...existing, ing];
+  }
+  const next: ActiveFoodList = {
+    schema_version: ACTIVE_FOOD_LIST_SCHEMA_VERSION,
+    captured_at: new Date().toISOString(),
+    source: options.source ?? current?.source ?? 'manual',
+    list_label: options.list_label ?? current?.list_label,
+    ingredients: existing,
+    estimated_daily_kcal: options.estimated_daily_kcal ?? current?.estimated_daily_kcal,
+    user_type: current?.user_type ?? userType,
+    meals_meta: current?.meals_meta,
+    packaged_food: current?.packaged_food,
+    packaged_food_occasions: current?.packaged_food_occasions,
+    multi_day: current?.multi_day,
+  };
+  if (!saveActiveFoodList(next)) {
+    return { ok: false, error: 'Could not save food list (storage may be unavailable).' };
+  }
+  return { ok: true, list: next, addedCount: normalized.length };
 }
 
 export function removeIngredient(food_id: number): ActiveFoodList | null {
@@ -360,24 +448,13 @@ function validateAndCoerce(parsed: unknown): ActiveFoodList | null {
 
   const ingredients: ActiveFoodListIngredient[] = [];
   for (const rawItem of ingredientsRaw) {
-    if (!rawItem || typeof rawItem !== 'object') return null;
-    const item = rawItem as Record<string, unknown>;
-    const food_id = Number(item.food_id);
-    const mass_g = Number(item.mass_g);
-    const food_description = String(item.food_description ?? '');
-    if (!Number.isFinite(food_id) || food_id <= 0) return null;
-    if (!Number.isFinite(mass_g) || mass_g < 0) return null;
-    if (!food_description.trim()) return null;
-    ingredients.push({
-      food_id,
-      food_description,
-      food_group: typeof item.food_group === 'string' ? item.food_group : undefined,
-      mass_g,
-    });
+    const coerced = coerceIngredient(rawItem);
+    if (coerced) ingredients.push(coerced);
   }
+  if (ingredients.length === 0) return null;
 
   const source = typeof obj.source === 'string'
-    && ['recall_24h', 'packaged_food_inferred', 'imported', 'manual'].includes(obj.source)
+    && ['recall_24h', 'packaged_food_inferred', 'imported', 'manual', 'catalogue_compare', 'catalogue'].includes(obj.source)
     ? (obj.source as ActiveFoodListSource)
     : 'imported';
 
@@ -385,6 +462,7 @@ function validateAndCoerce(parsed: unknown): ActiveFoodList | null {
     schema_version: ACTIVE_FOOD_LIST_SCHEMA_VERSION,
     captured_at: typeof obj.captured_at === 'string' ? obj.captured_at : new Date().toISOString(),
     source,
+    list_label: typeof obj.list_label === 'string' ? obj.list_label : undefined,
     ingredients,
     estimated_daily_kcal: typeof obj.estimated_daily_kcal === 'number'
       ? obj.estimated_daily_kcal : undefined,

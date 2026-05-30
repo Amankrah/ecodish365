@@ -10,13 +10,14 @@
  */
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import {
-  Plus, ChefHat, CalendarClock, Bookmark, Camera, X,
+  Plus, ChefHat, CalendarClock, Bookmark, Camera, X, Check,
 } from 'lucide-react';
 import { AIEnhancedSearch } from '@/components/shared/AIEnhancedSearch';
 import { RecipeDecomposerModal } from '@/components/shared/RecipeDecomposerModal';
+import { SourceFilter, type SourceChoice } from '@/components/shared/SourceFilter';
 import type { UserType } from '@/components/shared/AudienceToggle';
 import {
   loadActiveFoodList, saveActiveFoodList, fromRecallAggregated,
@@ -25,9 +26,13 @@ import {
 import {
   listSavedDays, getDay, type SavedRecallDay,
 } from '@/lib/recallHistory';
+import { CNFApiService } from '@/lib/api';
+import type { SearchResult } from '@/lib/api';
 
 interface Props {
   userType: UserType;
+  decomposerOpen?: boolean;
+  onDecomposerOpenChange?: (open: boolean) => void;
 }
 
 /** Merge a new ingredient into the active food list. If the food_id is
@@ -56,16 +61,62 @@ function mergeIngredient(
   };
 }
 
-export function ScorecardAddBar({ userType }: Props): JSX.Element {
+export function ScorecardAddBar({
+  userType,
+  decomposerOpen: decomposerOpenProp,
+  onDecomposerOpenChange,
+}: Props): JSX.Element {
   const [query, setQuery] = useState('');
   const [pendingMass, setPendingMass] = useState<number>(100);
-  const [decomposerOpen, setDecomposerOpen] = useState(false);
+  const [decomposerOpenLocal, setDecomposerOpenLocal] = useState(false);
   const [savedPickerOpen, setSavedPickerOpen] = useState(false);
+  const [searchSource, setSearchSource] = useState<SourceChoice>('both');
+  const [searchResults, setSearchResults] = useState<SearchResult | null>(null);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [selectedFoodIds, setSelectedFoodIds] = useState<Set<number>>(() => new Set());
+
+  const decomposerOpen = decomposerOpenProp ?? decomposerOpenLocal;
+  const setDecomposerOpen = onDecomposerOpenChange ?? setDecomposerOpenLocal;
 
   const savedDays: SavedRecallDay[] = useMemo(
     () => savedPickerOpen ? listSavedDays() : [],
     [savedPickerOpen],
   );
+
+  const existingFoodIds = useMemo(() => {
+    const list = loadActiveFoodList();
+    return new Set(list?.ingredients.map(i => i.food_id) ?? []);
+  }, [query, searchResults]);
+
+  const searchFoods = useCallback(async (q: string) => {
+    const trimmed = q.trim();
+    if (trimmed.length < 2) {
+      setSearchResults(null);
+      setSelectedFoodIds(new Set());
+      return;
+    }
+    setSearchLoading(true);
+    try {
+      const results = await CNFApiService.searchFoods(trimmed, 20, 0, searchSource);
+      setSearchResults(results);
+      setSelectedFoodIds(new Set());
+    } catch {
+      setSearchResults(null);
+    } finally {
+      setSearchLoading(false);
+    }
+  }, [searchSource]);
+
+  useEffect(() => {
+    const t = window.setTimeout(() => {
+      if (query.trim().length >= 2) searchFoods(query);
+      else {
+        setSearchResults(null);
+        setSelectedFoodIds(new Set());
+      }
+    }, 300);
+    return () => window.clearTimeout(t);
+  }, [query, searchFoods]);
 
   function addOneFood(food: { food_id: number; food_description: string; food_group?: string }): void {
     if (!Number.isFinite(pendingMass) || pendingMass <= 0) {
@@ -77,6 +128,45 @@ export function ScorecardAddBar({ userType }: Props): JSX.Element {
     saveActiveFoodList(next);
     setQuery('');
     setPendingMass(100);
+    setSearchResults(null);
+    setSelectedFoodIds(new Set());
+  }
+
+  function addSelectedFoods(): void {
+    if (!searchResults || selectedFoodIds.size === 0) return;
+    let current = loadActiveFoodList();
+    for (const food of searchResults.results) {
+      if (!selectedFoodIds.has(food.FoodID)) continue;
+      current = mergeIngredient(current, {
+        food_id: food.FoodID,
+        food_description: food.FoodDescription,
+        mass_g: pendingMass,
+      }, userType);
+    }
+    if (current) saveActiveFoodList(current);
+    setQuery('');
+    setSearchResults(null);
+    setSelectedFoodIds(new Set());
+  }
+
+  function toggleSelection(foodId: number): void {
+    setSelectedFoodIds(prev => {
+      const next = new Set(prev);
+      if (next.has(foodId)) next.delete(foodId);
+      else next.add(foodId);
+      return next;
+    });
+  }
+
+  function selectAllVisible(): void {
+    if (!searchResults) return;
+    const available = searchResults.results.filter(f => !existingFoodIds.has(f.FoodID));
+    const allSelected = available.every(f => selectedFoodIds.has(f.FoodID));
+    if (allSelected) {
+      setSelectedFoodIds(new Set());
+    } else {
+      setSelectedFoodIds(new Set(available.map(f => f.FoodID)));
+    }
   }
 
   function handleDecomposed(
@@ -111,7 +201,7 @@ export function ScorecardAddBar({ userType }: Props): JSX.Element {
       <div className="flex flex-wrap items-end gap-2">
         <div className="flex-1 min-w-[240px]">
           <label htmlFor="scorecard-food-search" className="block text-xs font-medium text-gray-700 mb-1">
-            Search a food
+            Search foods to add
           </label>
           <input
             id="scorecard-food-search"
@@ -124,7 +214,7 @@ export function ScorecardAddBar({ userType }: Props): JSX.Element {
         </div>
         <div>
           <label htmlFor="scorecard-mass" className="block text-xs font-medium text-gray-700 mb-1">
-            Grams
+            Grams (each)
           </label>
           <input
             id="scorecard-mass"
@@ -139,14 +229,80 @@ export function ScorecardAddBar({ userType }: Props): JSX.Element {
       </div>
 
       {query.trim().length >= 2 && (
-        <div className="border-t pt-2">
-          <p className="text-[11px] text-gray-600 mb-1">Pick a match (or use AI ranker):</p>
+        <div className="border-t pt-2 space-y-2">
+          <SourceFilter source={searchSource} onChange={setSearchSource} accent="blue" />
+          <p className="text-[11px] text-gray-600">Pick a match (or use AI ranker):</p>
           <AIEnhancedSearch
             query={query}
             userType={userType}
             accent="blue"
+            source={searchSource}
             onSelect={addOneFood}
           />
+
+          {searchLoading && (
+            <p className="text-xs text-gray-500 py-2">Searching…</p>
+          )}
+
+          {searchResults && searchResults.results.length > 0 && (
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-3 p-2 bg-gray-50 rounded-md text-xs">
+                <button type="button" onClick={selectAllVisible} className="text-blue-700 hover:underline">
+                  Select all
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedFoodIds(new Set())}
+                  className="text-gray-600 hover:underline"
+                >
+                  Clear
+                </button>
+                <span className="text-gray-600">{selectedFoodIds.size} selected</span>
+                {selectedFoodIds.size > 0 && (
+                  <button
+                    type="button"
+                    onClick={addSelectedFoods}
+                    className="ml-auto inline-flex items-center gap-1 px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    <Plus className="h-3 w-3" aria-hidden="true" />
+                    Add selected ({selectedFoodIds.size})
+                  </button>
+                )}
+              </div>
+              <ul className="max-h-48 overflow-y-auto space-y-1 border rounded-md divide-y">
+                {searchResults.results.map(food => {
+                  const alreadyInList = existingFoodIds.has(food.FoodID);
+                  const isSelected = selectedFoodIds.has(food.FoodID);
+                  return (
+                    <li key={food.FoodID}>
+                      <label
+                        className={`flex items-center gap-2 px-2 py-1.5 text-xs cursor-pointer hover:bg-gray-50 ${
+                          alreadyInList ? 'opacity-60' : ''
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          disabled={alreadyInList}
+                          onChange={() => toggleSelection(food.FoodID)}
+                          className="rounded border-gray-300"
+                        />
+                        <span className="flex-1 min-w-0">
+                          <span className="font-medium text-gray-900">{food.FoodDescription}</span>
+                        </span>
+                        {alreadyInList && (
+                          <span className="text-[10px] text-gray-500 shrink-0">In list</span>
+                        )}
+                        {isSelected && !alreadyInList && (
+                          <Check className="h-3.5 w-3.5 text-blue-600 shrink-0" aria-hidden="true" />
+                        )}
+                      </label>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
         </div>
       )}
 
