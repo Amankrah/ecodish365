@@ -1,0 +1,667 @@
+{
+  "per_scenario": [
+    {
+      "checks": [
+        {
+          "both_correct": true,
+          "dish": "carrot soup",
+          "expected_preservation_state": "unknown",
+          "expected_thermal_state": "cooked",
+          "extracted_preservation_state": "fresh",
+          "extracted_thermal_state": "boiled",
+          "keyword": "carrot",
+          "matched_food_description": "Carrot, boiled, drained",
+          "matched_food_id": 2381,
+          "matched_ingredient_found": true,
+          "matched_mass_g": 100.0,
+          "matched_resolution_confidence": 0.95,
+          "preservation_correct": true,
+          "thermal_correct": true
+        }
+      ],
+      "decomposition_confidence": 0.75,
+      "dish": "carrot soup",
+      "fallback_reason": null,
+      "ingredient_list": [
+        {
+          "food_description": "Carrot, boiled, drained",
+          "food_group": "Vegetables and Vegetable Products",
+          "food_id": 2381,
+          "food_type": "single",
+          "mass_g": 100.0,
+          "resolution_confidence": 0.95
+        },
+        {
+          "food_description": "Water, tap",
+          "food_group": "WAFCT — Beverages",
+          "food_id": 700966,
+          "food_type": "single",
+          "mass_g": 130.0,
+          "resolution_confidence": 0.95
+        },
+        {
+          "food_description": "Onion, boiled, drained",
+          "food_group": "Vegetables and Vegetable Products",
+          "food_id": 2402,
+          "food_type": "single",
+          "mass_g": 10.0,
+          "resolution_confidence": 0.85
+        },
+        {
+          "food_description": "Butter, regular",
+          "food_group": "Dairy and Egg Products",
+          "food_id": 118,
+          "food_type": "single",
+          "mass_g": 5.0,
+          "resolution_confidence": 0.85
+        },
+        {
+          "food_description": "Salt, table",
+          "food_group": "Spices and Herbs",
+          "food_id": 214,
+          "food_type": "single",
+          "mass_g": 2.0,
+          "resolution_confidence": 0.95
+        },
+        {
+          "food_description": "Spices, pepper, black",
+          "food_group": "Spices and Herbs",
+          "food_id": 198,
+          "food_type": "single",
+          "mass_g": 1.0,
+          "resolution_confidence": 0.95
+        }
+      ],
+      "latency_seconds": 6.63,
+      "matched": true,
+      "n_ingredients": 6,
+      "total_mass_g": 250.0
+    },
+    {
+      "checks": [
+        {
+          "both_correct": true,
+          "dish": "raw carrot salad with vinaigrette",
+          "expected_preservation_state": "fresh",
+          "expected_thermal_state": "raw",
+          "extracted_preservation_state": "fresh",
+          "extracted_thermal_state": "raw",
+          "keyword": "carrot",
+          "matched_food_description": "Carrot, raw",
+          "matched_food_id": 2380,
+          "matched_ingredient_found": true,
+          "matched_mass_g": 120.0,
+          "matched_resolution_confidence": 0.95,
+          "preservation_correct": true,
+          "thermal_correct": true
+        }
+      ],
+      "decomposition_confidence": 0.75,
+      "dish": "raw carrot salad with vinaigrette",
+      "fallback_reason": null,
+      "ingredient_list": [
+        {
+          "food_description": "Carrot, raw",
+          "food_group": "Vegetables and Vegetable Products",
+          "food_id": 2380,
+          "food_type": "single",
+          "mass_g": 120.0,
+          "resolution_confidence": 0.95
+        },
+        {
+          "food_description": "Olive oil",
+          "food_group": "WAFCT — Fats and oils",
+          "food_id": 700941,
+          "food_type": "single",
+          "mass_g": 15.0,
+          "resolution_confidence": 0.95
+        },
+        {
+          "food_description": "Vinegar",
+          "food_group": "WAFCT — Miscellaneous",
+          "food_id": 700991,
+          "food_type": "single",
+          "mass_g": 10.0,
+          "resolution_confidence": 0.8
+        },
+        {
+          "food_description": "Mustard, prepared, yellow",
+          "food_group": "WAFCT — Miscellaneous",
+          "food_id": 700981,
+          "food_type": "mixed",
+          "mass_g": 2.0,
+          "resolution_confidence": 0.85
+        }
+      ],
+      "latency_seconds": 5.25,
+      "matched": true,
+      "n_ingredients": 4,
+      "total_mass_g": 150.0
+    },
+    {
+      "checks": [
+        {
+          "both_correct": false,
+          "dish": "fried yellow plantain side",
+          "expected_preservation_state": "unknown",
+          "expected_thermal_state": "cooked",
+          "extracted_preservation_state": "fresh",
+          "extracted_thermal_state": "raw",
+          "keyword": "plantain",
+          "matched_food_description": "Plantain, green, raw",
+          "matched_food_id": 7824,
+          "matched_ingredient_found": true,
+          "matched_mass_g": 120.0,
+          "matched_resolution_confidence": 0.85,
+          "preservation_correct": true,
+          "thermal_correct": false
+        }
+      ],
+      "decomposition_confidence": 0.85,
+      "dish": "fried yellow plantain side",
+      "fallback_reason": null,
+      "ingredient_list": [
+        {
+          "food_description": "Plantain, green, raw",
+          "food_group": "Fruits and fruit juices",
+          "food_id": 7824,
+          "food_type": "single",
+          "mass_g": 120.0,
+          "resolution_confidence": 0.85
+        },
+        {
+          "food_description": "Vegetable oil, soybean",
+          "food_group": "Fats and Oils",
+          "food_id": 419,
+          "food_type": "single",
+          "mass_g": 25.0,
+          "resolution_confidence": 0.8
+        }
+      ],
+      "latency_seconds": 3.49,
+      "matched": true,
+      "n_ingredients": 2,
+      "total_mass_g": 150.0
+    },
+    {
+      "checks": [
+        {
+          "both_correct": true,
+          "dish": "yellow plantain porridge",
+          "expected_preservation_state": "unknown",
+          "expected_thermal_state": "cooked",
+          "extracted_preservation_state": "fresh",
+          "extracted_thermal_state": "cooked",
+          "keyword": "plantain",
+          "matched_food_description": "Plantain, yellow cooked",
+          "matched_food_id": 1662,
+          "matched_ingredient_found": true,
+          "matched_mass_g": 180.0,
+          "matched_resolution_confidence": 0.9,
+          "preservation_correct": true,
+          "thermal_correct": true
+        }
+      ],
+      "decomposition_confidence": 0.75,
+      "dish": "yellow plantain porridge",
+      "fallback_reason": null,
+      "ingredient_list": [
+        {
+          "food_description": "Plantain, yellow cooked",
+          "food_group": "Fruits and fruit juices",
+          "food_id": 1662,
+          "food_type": "single",
+          "mass_g": 180.0,
+          "resolution_confidence": 0.9
+        },
+        {
+          "food_description": "Water, tap",
+          "food_group": "WAFCT — Beverages",
+          "food_id": 700966,
+          "food_type": "single",
+          "mass_g": 100.0,
+          "resolution_confidence": 0.95
+        },
+        {
+          "food_description": "Sweets, sugars, granulated (white)",
+          "food_group": "Sweets",
+          "food_id": 4318,
+          "food_type": "single",
+          "mass_g": 10.0,
+          "resolution_confidence": 0.85
+        },
+        {
+          "food_description": "Milk, fluid, whole, pasteurized, homogenized, 3.25% M.F.",
+          "food_group": "Dairy and Egg Products",
+          "food_id": 113,
+          "food_type": "single",
+          "mass_g": 10.0,
+          "resolution_confidence": 0.9
+        }
+      ],
+      "latency_seconds": 4.56,
+      "matched": true,
+      "n_ingredients": 4,
+      "total_mass_g": 300.0
+    },
+    {
+      "checks": [
+        {
+          "both_correct": true,
+          "dish": "scrambled eggs and white toast breakfast",
+          "expected_preservation_state": "fresh",
+          "expected_thermal_state": "cooked",
+          "extracted_preservation_state": "fresh",
+          "extracted_thermal_state": "scrambled",
+          "keyword": "egg",
+          "matched_food_description": "Egg, chicken, whole, cooked, scrambled or omelet",
+          "matched_food_id": 133,
+          "matched_ingredient_found": true,
+          "matched_mass_g": 200.0,
+          "matched_resolution_confidence": 0.8,
+          "preservation_correct": true,
+          "thermal_correct": true
+        }
+      ],
+      "decomposition_confidence": 0.8,
+      "dish": "scrambled eggs and white toast breakfast",
+      "fallback_reason": "catalog_override:kcal_err=0.259",
+      "ingredient_list": [
+        {
+          "food_description": "Egg, chicken, whole, cooked, scrambled or omelet",
+          "food_group": "Dairy and Egg Products",
+          "food_id": 133,
+          "food_type": "mixed",
+          "mass_g": 200.0,
+          "resolution_confidence": 0.8
+        }
+      ],
+      "latency_seconds": 3.92,
+      "matched": true,
+      "n_ingredients": 1,
+      "total_mass_g": 200.0
+    },
+    {
+      "checks": [
+        {
+          "both_correct": true,
+          "dish": "grilled chicken breast salad",
+          "expected_preservation_state": "fresh",
+          "expected_thermal_state": "cooked",
+          "extracted_preservation_state": "fresh",
+          "extracted_thermal_state": "grilled",
+          "keyword": "chicken",
+          "matched_food_description": "Club sandwich with grilled chicken, bacon, tomato, cheese, lettuce and mayonnaise",
+          "matched_food_id": 6753,
+          "matched_ingredient_found": true,
+          "matched_mass_g": 250.0,
+          "matched_resolution_confidence": 0.75,
+          "preservation_correct": true,
+          "thermal_correct": true
+        }
+      ],
+      "decomposition_confidence": 0.75,
+      "dish": "grilled chicken breast salad",
+      "fallback_reason": "catalog_override:kcal_err=0.39",
+      "ingredient_list": [
+        {
+          "food_description": "Club sandwich with grilled chicken, bacon, tomato, cheese, lettuce and mayonnaise",
+          "food_group": "Mixed Dishes",
+          "food_id": 6753,
+          "food_type": "mixed",
+          "mass_g": 250.0,
+          "resolution_confidence": 0.75
+        }
+      ],
+      "latency_seconds": 5.74,
+      "matched": true,
+      "n_ingredients": 1,
+      "total_mass_g": 250.0
+    },
+    {
+      "checks": [
+        {
+          "both_correct": true,
+          "dish": "fresh apple slices with peanut butter",
+          "expected_preservation_state": "fresh",
+          "expected_thermal_state": "raw",
+          "extracted_preservation_state": "fresh",
+          "extracted_thermal_state": "raw",
+          "keyword": "apple",
+          "matched_food_description": "Apple, raw, with skin",
+          "matched_food_id": 1696,
+          "matched_ingredient_found": true,
+          "matched_mass_g": 100.0,
+          "matched_resolution_confidence": 0.95,
+          "preservation_correct": true,
+          "thermal_correct": true
+        }
+      ],
+      "decomposition_confidence": 0.85,
+      "dish": "fresh apple slices with peanut butter",
+      "fallback_reason": null,
+      "ingredient_list": [
+        {
+          "food_description": "Apple, raw, with skin",
+          "food_group": "Fruits and fruit juices",
+          "food_id": 1696,
+          "food_type": "single",
+          "mass_g": 100.0,
+          "resolution_confidence": 0.95
+        },
+        {
+          "food_description": "Peanut butter, smooth type, fat, sugar and salt added",
+          "food_group": "Legumes and Legume Products",
+          "food_id": 3399,
+          "food_type": "mixed",
+          "mass_g": 50.0,
+          "resolution_confidence": 0.85
+        }
+      ],
+      "latency_seconds": 3.0,
+      "matched": true,
+      "n_ingredients": 2,
+      "total_mass_g": 150.0
+    },
+    {
+      "checks": [
+        {
+          "both_correct": false,
+          "dish": "apple pie slice",
+          "expected_preservation_state": "unknown",
+          "expected_thermal_state": "cooked",
+          "extracted_preservation_state": "fresh",
+          "extracted_thermal_state": "raw",
+          "keyword": "apple",
+          "matched_food_description": "Apple, raw, with skin",
+          "matched_food_id": 1696,
+          "matched_ingredient_found": true,
+          "matched_mass_g": 75.0,
+          "matched_resolution_confidence": 0.95,
+          "preservation_correct": true,
+          "thermal_correct": false
+        }
+      ],
+      "decomposition_confidence": 0.75,
+      "dish": "apple pie slice",
+      "fallback_reason": null,
+      "ingredient_list": [
+        {
+          "food_description": "Apple, raw, with skin",
+          "food_group": "Fruits and fruit juices",
+          "food_id": 1696,
+          "food_type": "single",
+          "mass_g": 75.0,
+          "resolution_confidence": 0.95
+        },
+        {
+          "food_description": "Pie crust, standard type, homemade, baked",
+          "food_group": "Baked Products",
+          "food_id": 3972,
+          "food_type": "mixed",
+          "mass_g": 55.0,
+          "resolution_confidence": 0.85
+        },
+        {
+          "food_description": "Sweets, sugars, granulated (white)",
+          "food_group": "Sweets",
+          "food_id": 4318,
+          "food_type": "single",
+          "mass_g": 10.0,
+          "resolution_confidence": 0.85
+        },
+        {
+          "food_description": "Spices, cinnamon, ground",
+          "food_group": "Spices and Herbs",
+          "food_id": 178,
+          "food_type": "single",
+          "mass_g": 1.0,
+          "resolution_confidence": 0.85
+        },
+        {
+          "food_description": "Butter, regular",
+          "food_group": "Dairy and Egg Products",
+          "food_id": 118,
+          "food_type": "single",
+          "mass_g": 5.0,
+          "resolution_confidence": 0.85
+        }
+      ],
+      "latency_seconds": 5.16,
+      "matched": true,
+      "n_ingredients": 5,
+      "total_mass_g": 150.0
+    },
+    {
+      "checks": [
+        {
+          "both_correct": false,
+          "dish": "canned tomato pasta sauce over spaghetti",
+          "expected_preservation_state": "canned",
+          "expected_thermal_state": "unknown",
+          "extracted_preservation_state": "unknown",
+          "extracted_thermal_state": "unknown",
+          "keyword": "tomato",
+          "matched_food_description": "",
+          "matched_food_id": null,
+          "matched_ingredient_found": false,
+          "matched_mass_g": null,
+          "matched_resolution_confidence": null,
+          "preservation_correct": false,
+          "thermal_correct": false
+        }
+      ],
+      "decomposition_confidence": 0.75,
+      "dish": "canned tomato pasta sauce over spaghetti",
+      "fallback_reason": "catalog_override:kcal_err=0.47",
+      "ingredient_list": [
+        {
+          "food_description": "Spaghetti, without meat, canned",
+          "food_group": "Mixed Dishes",
+          "food_id": 5868,
+          "food_type": "mixed",
+          "mass_g": 350.0,
+          "resolution_confidence": 0.75
+        }
+      ],
+      "latency_seconds": 3.37,
+      "matched": true,
+      "n_ingredients": 1,
+      "total_mass_g": 350.0
+    },
+    {
+      "checks": [
+        {
+          "both_correct": false,
+          "dish": "raw vegetable garden salad",
+          "expected_preservation_state": "fresh",
+          "expected_thermal_state": "raw",
+          "extracted_preservation_state": "unknown",
+          "extracted_thermal_state": "unknown",
+          "keyword": "lettuce",
+          "matched_food_description": "",
+          "matched_food_id": null,
+          "matched_ingredient_found": false,
+          "matched_mass_g": null,
+          "matched_resolution_confidence": null,
+          "preservation_correct": false,
+          "thermal_correct": false
+        }
+      ],
+      "decomposition_confidence": 0.75,
+      "dish": "raw vegetable garden salad",
+      "fallback_reason": "catalog_override:kcal_err=0.644",
+      "ingredient_list": [
+        {
+          "food_description": "Salad, garden, with Italian dressing, homemade",
+          "food_group": "Mixed Dishes",
+          "food_id": 6737,
+          "food_type": "mixed",
+          "mass_g": 200.0,
+          "resolution_confidence": 0.75
+        }
+      ],
+      "latency_seconds": 5.34,
+      "matched": true,
+      "n_ingredients": 1,
+      "total_mass_g": 200.0
+    },
+    {
+      "checks": [
+        {
+          "both_correct": false,
+          "dish": "stewed beef with vegetables",
+          "expected_preservation_state": "fresh",
+          "expected_thermal_state": "cooked",
+          "extracted_preservation_state": "unknown",
+          "extracted_thermal_state": "unknown",
+          "keyword": "beef",
+          "matched_food_description": "Beef stew with potatoes and vegetables",
+          "matched_food_id": 6775,
+          "matched_ingredient_found": true,
+          "matched_mass_g": 350.0,
+          "matched_resolution_confidence": 0.8,
+          "preservation_correct": false,
+          "thermal_correct": false
+        }
+      ],
+      "decomposition_confidence": 0.8,
+      "dish": "stewed beef with vegetables",
+      "fallback_reason": "catalog_override:kcal_err=1.902",
+      "ingredient_list": [
+        {
+          "food_description": "Beef stew with potatoes and vegetables",
+          "food_group": "Mixed Dishes",
+          "food_id": 6775,
+          "food_type": "mixed",
+          "mass_g": 350.0,
+          "resolution_confidence": 0.8
+        }
+      ],
+      "latency_seconds": 6.48,
+      "matched": true,
+      "n_ingredients": 1,
+      "total_mass_g": 350.0
+    },
+    {
+      "checks": [
+        {
+          "both_correct": true,
+          "dish": "frozen broccoli stir fry",
+          "expected_preservation_state": "frozen",
+          "expected_thermal_state": "cooked",
+          "extracted_preservation_state": "frozen",
+          "extracted_thermal_state": "boiled",
+          "keyword": "broccoli",
+          "matched_food_description": "Broccoli, frozen, chopped, boiled, drained",
+          "matched_food_id": 2377,
+          "matched_ingredient_found": true,
+          "matched_mass_g": 150.0,
+          "matched_resolution_confidence": 0.85,
+          "preservation_correct": true,
+          "thermal_correct": true
+        }
+      ],
+      "decomposition_confidence": 0.75,
+      "dish": "frozen broccoli stir fry",
+      "fallback_reason": null,
+      "ingredient_list": [
+        {
+          "food_description": "Broccoli, frozen, chopped, boiled, drained",
+          "food_group": "Vegetables and Vegetable Products",
+          "food_id": 2377,
+          "food_type": "single",
+          "mass_g": 150.0,
+          "resolution_confidence": 0.85
+        },
+        {
+          "food_description": "Carrot, boiled, drained",
+          "food_group": "Vegetables and Vegetable Products",
+          "food_id": 2381,
+          "food_type": "single",
+          "mass_g": 40.0,
+          "resolution_confidence": 0.85
+        },
+        {
+          "food_description": "Onion, boiled, drained",
+          "food_group": "Vegetables and Vegetable Products",
+          "food_id": 2402,
+          "food_type": "single",
+          "mass_g": 20.0,
+          "resolution_confidence": 0.85
+        },
+        {
+          "food_description": "Soy sauce (made from soy), tamari",
+          "food_group": "Soups, Sauces and Gravies",
+          "food_id": 3329,
+          "food_type": "single",
+          "mass_g": 15.0,
+          "resolution_confidence": 0.85
+        },
+        {
+          "food_description": "Vegetable oil, soybean",
+          "food_group": "Fats and Oils",
+          "food_id": 419,
+          "food_type": "single",
+          "mass_g": 15.0,
+          "resolution_confidence": 0.8
+        }
+      ],
+      "latency_seconds": 4.88,
+      "matched": true,
+      "n_ingredients": 5,
+      "total_mass_g": 250.0
+    }
+  ],
+  "scenarios_version": "2026-05-30",
+  "summary": {
+    "both_acc": 0.583,
+    "ingredient_found_rate": 0.833,
+    "n_checks": 12,
+    "n_scenarios": 12,
+    "preservation_acc": 0.75,
+    "thermal_acc": 0.583,
+    "thermal_confusion": [
+      {
+        "count": 2,
+        "expected": "cooked",
+        "got": "boiled"
+      },
+      {
+        "count": 2,
+        "expected": "raw",
+        "got": "raw"
+      },
+      {
+        "count": 2,
+        "expected": "cooked",
+        "got": "raw"
+      },
+      {
+        "count": 1,
+        "expected": "cooked",
+        "got": "cooked"
+      },
+      {
+        "count": 1,
+        "expected": "cooked",
+        "got": "scrambled"
+      },
+      {
+        "count": 1,
+        "expected": "cooked",
+        "got": "grilled"
+      },
+      {
+        "count": 1,
+        "expected": "raw",
+        "got": "unknown"
+      },
+      {
+        "count": 1,
+        "expected": "cooked",
+        "got": "unknown"
+      }
+    ]
+  }
+}
