@@ -49,6 +49,8 @@ const navigation: NavItem[] = [
     icon: ScaleIcon,
     dropdown: [
       { name: '✨ Scorecard (all metrics)', href: '/scorecard' },
+      { name: 'Scan packaged food', href: '/scan-product' },
+      { name: 'Improve one meal', href: '/improve-product' },
       { 
         name: 'HSR', 
         href: '/hsr', 
@@ -98,19 +100,14 @@ const navigation: NavItem[] = [
   // users with saved days) can find their browser-local history without
   // having to remember the /recall-history URL.
   {
-    name: 'Dietary Recall',
+    name: 'Food diary',
     href: '/recall-24h',
     icon: ClockIcon,
     dropdown: [
-      { name: 'Log a 24-h recall', href: '/recall-24h' },
-      { name: 'My recall history', href: '/recall-history' },
+      { name: 'Log a day', href: '/recall-24h' },
+      { name: 'Saved days', href: '/recall-history' },
+      { name: 'Analyze days', href: '/recall-history/analyze' },
       { name: 'Dietary pattern', href: '/dietary-pattern' },
-      // PKG-IMG-1 Phase 1 (2026-05-26): camera-based input for users
-      // who want to score a single packaged product without going
-      // through the full recall wizard.
-      { name: 'Scan packaged food', href: '/scan-product' },
-      // SUBST-1 Phase 1 (2026-05-26): ingredient substitution suggestions.
-      { name: 'Improve product / meal', href: '/improve-product' },
     ],
   },
   {
@@ -174,6 +171,16 @@ export default function Navigation() {
       return environmental.dropdown.map((d) => ({ name: d.name, href: d.href }));
     }
 
+    // Food diary context
+    if (
+      currentPath.startsWith('/recall-24h')
+      || currentPath.startsWith('/recall-history')
+      || currentPath.startsWith('/dietary-pattern')
+    ) {
+      const foodDiary = filteredNavigation.find((n) => n.name === 'Food diary');
+      return foodDiary?.dropdown?.map((d) => ({ name: d.name, href: d.href })) ?? [];
+    }
+
     return [];
   };
 
@@ -197,7 +204,7 @@ export default function Navigation() {
               const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
               const isDropdownOpen = activeDropdown === item.name;
               const showDropdown = Array.isArray(item.dropdown) && (
-                item.name === 'CNF Explorer' || item.name === 'Environmental Indicators' || item.name === 'Nutrition Indicators' || item.name === 'Meals' || item.name === 'Dietary Recall'
+                item.name === 'CNF Explorer' || item.name === 'Environmental Indicators' || item.name === 'Nutrition Indicators' || item.name === 'Meals' || item.name === 'Food diary'
               );
               return (
                 <div key={item.name} className="relative group">
@@ -329,7 +336,7 @@ export default function Navigation() {
                         onClick={() => setUserMenuOpen(false)}
                       >
                         <ClockIcon className="w-4 h-4 mr-3" />
-                        My recall history
+                        Saved days
                       </Link>
                       <Link
                         href="/profile"

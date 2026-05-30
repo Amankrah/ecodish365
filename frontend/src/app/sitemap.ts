@@ -206,6 +206,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
+      url: `${baseUrl}/recall-history/analyze`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly' as const,
+      priority: 0.65,
+    },
+    {
       url: `${baseUrl}/dietary-pattern`,
       lastModified: currentDate,
       changeFrequency: 'weekly' as const,

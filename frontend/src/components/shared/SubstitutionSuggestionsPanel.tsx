@@ -62,6 +62,7 @@ interface Props {
   userType?: UserType;
   dishName?: string;
   autoRun?: boolean;
+  initialPurpose?: SubstitutionPurpose;
 }
 
 function DeltaBadge({ value, unit, invert }: { value: number; unit: string; invert?: boolean }): JSX.Element {
@@ -137,8 +138,9 @@ function FpedSwapDeltaBlock({
 
 export function SubstitutionSuggestionsPanel({
   composition, onApply, userType = 'individual', dishName, autoRun = false,
+  initialPurpose,
 }: Props): JSX.Element {
-  const [purpose, setPurpose] = useState<SubstitutionPurpose>('general_health');
+  const [purpose, setPurpose] = useState<SubstitutionPurpose>(initialPurpose ?? 'general_health');
   const [sourceFilter, setSourceFilter] = useState<SubstitutionSourceFilter>('both');
   const [maxSwaps, setMaxSwaps] = useState<1 | 2 | 3 | 4>(3);
   const [reformulationMode, setReformulationMode] = useState<SubstitutionReformulationMode>('greedy');
@@ -234,6 +236,10 @@ export function SubstitutionSuggestionsPanel({
     if (hasRun) setStale(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [compositionKey]);
+
+  useEffect(() => {
+    if (initialPurpose) setPurpose(initialPurpose);
+  }, [initialPurpose]);
 
   useEffect(() => {
     if (autoRun && composition.length > 0) void fetchSuggestions();

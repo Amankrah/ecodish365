@@ -25,19 +25,18 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  BookOpen, Download, Upload, Trash2, Sparkles, RefreshCw,
+  BookOpen, Download, Upload, Trash2, RefreshCw,
   AlertTriangle, X, ChevronRight, Loader2, Target,
 } from 'lucide-react';
 import {
-  listSavedDays, deleteDay, clearAllHistory, combineDays,
+  listSavedDays, deleteDay, clearAllHistory,
   exportAsJSON, exportAsCSV, importFromJSON, downloadFile,
-  updateCachedPattern, subscribe, type SavedRecallDay, type ImportResult,
+  updateCachedPattern, subscribe, stashAnalyzeDayIds,
+  type SavedRecallDay, type ImportResult,
 } from '@/lib/recallHistory';
 import { CNFApiService } from '@/lib/api';
 import { RecallHistoryCard } from '@/components/shared/RecallHistoryCard';
 import { RecallDayEditModal } from '@/components/shared/RecallDayEditModal';
-import { FpedCohortPanel } from '@/components/shared/FpedCohortPanel';
-import { RecallImprovePlanPanel } from '@/components/shared/RecallImprovePlanPanel';
 
 // Number of pattern-classify requests we'll issue in parallel for the
 // per-day timeline refresh. Picked to stay well under the per-IP 50/hr rate
@@ -57,23 +56,6 @@ function isCachedPatternFresh(d: SavedRecallDay): boolean {
   return ageMs < PATTERN_CACHE_TTL_DAYS * 24 * 60 * 60 * 1000;
 }
 
-interface RouteMultiDayPayload {
-  source: 'recall_24h';
-  user_type: SavedRecallDay['user_type'];
-  captured_at: string;
-  target: 'dietary_pattern';
-  meals_meta: Array<{ occasion: string; dish_name: string; total_mass_g: number }>;
-  aggregated_daily_ingredients: SavedRecallDay['aggregated_daily_ingredients'];
-  estimated_daily_kcal: number;
-  multi_day: {
-    n_days: number;
-    first_date: string;
-    last_date: string;
-    label: string;
-    day_ids: string[];
-  };
-}
-
 export default function RecallHistoryPage() {
   // The page is purely client-side (localStorage gates the whole experience),
   // so we ignore the server-render pass and let useEffect populate state on
@@ -90,7 +72,6 @@ export default function RecallHistoryPage() {
   const [clearConfirm, setClearConfirm] = useState('');
   const [toast, setToast] = useState<string | null>(null);
   const [editDayId, setEditDayId] = useState<string | null>(null);
-  const [improvePlanOpen, setImprovePlanOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editingDay = editDayId ? days.find(d => d.id === editDayId) ?? null : null;
@@ -121,18 +102,6 @@ export default function RecallHistoryPage() {
     () => days.filter(d => selectedIds.has(d.id)),
     [days, selectedIds],
   );
-
-  // Cohort food-group exposure operates on the selected days (or all days if none
-  // selected): one recall per day, each its aggregated daily ingredients.
-  const cohortTargetDays = selectedDays.length > 0 ? selectedDays : days;
-  const cohortRecalls = useMemo(
-    () => cohortTargetDays.map(d =>
-      d.aggregated_daily_ingredients.map(i => ({ food_id: i.food_id, mass_g: i.mass_g }))),
-    [cohortTargetDays],
-  );
-  const cohortUserType = cohortTargetDays[0]?.user_type ?? 'individual';
-
-  const improvePlanDays = selectedDays.length > 0 ? selectedDays : days;
 
   const totalKcal = useMemo(
     () => days.reduce((s, d) => s + d.estimated_daily_kcal, 0),
@@ -193,68 +162,11 @@ export default function RecallHistoryPage() {
 
   // --- bulk actions -------------------------------------------------------
 
-  function handleScoreNDayAverage() {
+  function handleGoAnalyze() {
     const target = selectedDays.length > 0 ? selectedDays : days;
     if (target.length === 0) return;
-    if (target.length === 1) {
-      // Single-day average is just the single day — route as a normal
-      // single-day classify (no multi-day badge).
-      const day = target[0];
-      const payload = {
-        source: 'recall_24h' as const,
-        user_type: day.user_type,
-        captured_at: new Date().toISOString(),
-        target: 'dietary_pattern' as const,
-        meals_meta: day.meals.map(m => ({
-          occasion: m.occasion,
-          dish_name: m.decomposition.dish_name,
-          total_mass_g: m.decomposition.total_mass_g,
-        })),
-        aggregated_daily_ingredients: day.aggregated_daily_ingredients,
-        estimated_daily_kcal: day.estimated_daily_kcal,
-      };
-      try { sessionStorage.setItem('recall_24h_payload', JSON.stringify(payload)); } catch {}
-      window.location.href = '/dietary-pattern?from=recall24h';
-      return;
-    }
-    const sortedByDate = [...target].sort((a, b) => a.date.localeCompare(b.date));
-    const first = sortedByDate[0].date;
-    const last  = sortedByDate[sortedByDate.length - 1].date;
-    const combined = combineDays(target);
-    const kcal = target.reduce((s, d) => s + d.estimated_daily_kcal, 0);
-    // Concatenate all meals across days for traceability — the
-    // /dietary-pattern page doesn't use this except for display, but
-    // preserving it round-trips cleanly if the user navigates back.
-    const meals_meta = target.flatMap(d => d.meals.map(m => ({
-      occasion: m.occasion,
-      dish_name: m.decomposition.dish_name,
-      total_mass_g: m.decomposition.total_mass_g,
-    })));
-    // Use the first day's user_type — they're typically the same; if not,
-    // the receiver page can re-toggle. Researchers using mixed audiences
-    // is an unusual case.
-    const userType = target[0].user_type;
-    const payload: RouteMultiDayPayload = {
-      source: 'recall_24h',
-      user_type: userType,
-      captured_at: new Date().toISOString(),
-      target: 'dietary_pattern',
-      meals_meta,
-      aggregated_daily_ingredients: combined,
-      estimated_daily_kcal: kcal / target.length,  // mean per-day kcal
-      multi_day: {
-        n_days: target.length,
-        first_date: first,
-        last_date: last,
-        label: `${target.length}-day average, ${first} to ${last}`,
-        day_ids: target.map(d => d.id),
-      },
-    };
-    try { sessionStorage.setItem('recall_24h_payload', JSON.stringify(payload)); } catch {
-      // sessionStorage may be unavailable; the dietary-pattern page will
-      // show its empty state — acceptable graceful degradation.
-    }
-    window.location.href = '/dietary-pattern?from=recall24h';
+    stashAnalyzeDayIds(target.map(d => d.id));
+    window.location.href = '/recall-history/analyze';
   }
 
   function handleExportJSON() {
@@ -386,11 +298,10 @@ export default function RecallHistoryPage() {
               <BookOpen className="h-8 w-8 text-amber-800" aria-hidden="true" />
             </div>
             <div className="flex-1">
-              <h1 className="text-2xl font-bold text-gray-900">Recall history</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Saved days</h1>
               <p className="text-sm text-gray-600 mt-1">
-                All your saved 24-h recall days. Stored only in this browser
-                (4 MB cap, ~1000 days). Export as JSON / CSV for offline analysis
-                or to transfer between devices.
+                Your 24-hour recall days, stored only in this browser.
+                Select days to analyze patterns and swaps, or export for research.
               </p>
               <p className="text-xs text-gray-500 mt-2">
                 Privacy: nothing leaves your browser unless you explicitly
@@ -494,10 +405,10 @@ export default function RecallHistoryPage() {
               )}
             </section>
 
-            {/* Bulk toolbar */}
-            <section className="bg-white rounded-lg border p-4 shadow-sm space-y-3">
-              <div className="flex items-center gap-3 text-sm">
-                <label className="inline-flex items-center gap-1.5">
+            {/* Selection + actions */}
+            <section className="bg-white rounded-lg border p-4 shadow-sm space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <label className="inline-flex items-center gap-1.5 text-sm">
                   <input
                     type="checkbox"
                     checked={selectedIds.size === days.length && days.length > 0}
@@ -505,91 +416,69 @@ export default function RecallHistoryPage() {
                     className="h-4 w-4"
                   />
                   Select all
+                  <span className="text-xs text-gray-500">
+                    ({selectedIds.size} of {days.length})
+                  </span>
                 </label>
-                <span className="text-xs text-gray-500">
-                  {selectedIds.size} of {days.length} selected
-                </span>
-              </div>
-
-              <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
-                  onClick={handleScoreNDayAverage}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md"
-                >
-                  <Sparkles className="h-4 w-4" aria-hidden="true" />
-                  📊 Score {selectedDays.length > 0
-                    ? `${selectedDays.length}-day average`
-                    : `${days.length}-day average (all)`}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setImprovePlanOpen(v => !v)}
-                  className={`inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-md ${
-                    improvePlanOpen
-                      ? 'bg-violet-700 text-white'
-                      : 'bg-violet-600 hover:bg-violet-700 text-white'
-                  }`}
+                  onClick={handleGoAnalyze}
+                  className="inline-flex items-center gap-1 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium rounded-md"
                 >
                   <Target className="h-4 w-4" aria-hidden="true" />
-                  {improvePlanOpen ? 'Hide plan' : 'Improve eating plan'}
-                  {selectedDays.length > 0 && !improvePlanOpen && (
-                    <span className="text-violet-200 text-xs">({selectedDays.length} selected)</span>
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleExportJSON}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-800 text-sm font-medium border border-gray-300 rounded-md"
-                >
-                  <Download className="h-4 w-4" aria-hidden="true" />
-                  Export JSON
-                </button>
-                <button
-                  type="button"
-                  onClick={handleExportCSV}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-800 text-sm font-medium border border-gray-300 rounded-md"
-                >
-                  <Download className="h-4 w-4" aria-hidden="true" />
-                  Export CSV
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setImportOpen(true)}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-800 text-sm font-medium border border-gray-300 rounded-md"
-                >
-                  <Upload className="h-4 w-4" aria-hidden="true" />
-                  Import
-                </button>
-                <span className="flex-1" />
-                <button
-                  type="button"
-                  onClick={() => setClearOpen(true)}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-300 text-sm font-medium rounded-md"
-                >
-                  <Trash2 className="h-4 w-4" aria-hidden="true" />
-                  Clear all
+                  Analyze {selectedDays.length > 0 ? selectedDays.length : days.length} day
+                  {(selectedDays.length > 0 ? selectedDays.length : days.length) === 1 ? '' : 's'}
+                  <ChevronRight className="h-4 w-4" aria-hidden="true" />
                 </button>
               </div>
 
-              <p className="text-xs text-gray-500">
-                Tip: select 2+ days then click <strong>Score N-day average</strong>{' '}
-                to see the combined pattern across those days, with a softened
-                multi-day caveat in place of the single-day disclaimer.
-                {' '}Use <strong>Improve eating plan</strong> for ranked swap suggestions
-                with full six-metric before/after deltas.
+              <p className="text-xs text-gray-500 border-t pt-3">
+                Pattern scoring, swap suggestions, and food-group analysis live on the
+                analyze page — pick days here first, then continue.
               </p>
+
+              <details className="group border-t pt-3">
+                <summary className="cursor-pointer text-sm font-medium text-gray-800 list-none flex items-center justify-between">
+                  Export &amp; import
+                  <span className="text-xs font-normal text-gray-500 group-open:hidden">Show</span>
+                </summary>
+                <div className="flex flex-wrap gap-2 pt-3">
+                  <button
+                    type="button"
+                    onClick={handleExportJSON}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-800 text-sm font-medium border border-gray-300 rounded-md"
+                  >
+                    <Download className="h-4 w-4" aria-hidden="true" />
+                    Export JSON
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleExportCSV}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-800 text-sm font-medium border border-gray-300 rounded-md"
+                  >
+                    <Download className="h-4 w-4" aria-hidden="true" />
+                    Export CSV
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setImportOpen(true)}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-800 text-sm font-medium border border-gray-300 rounded-md"
+                  >
+                    <Upload className="h-4 w-4" aria-hidden="true" />
+                    Import
+                  </button>
+                  <span className="flex-1" />
+                  <button
+                    type="button"
+                    onClick={() => setClearOpen(true)}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-300 text-sm font-medium rounded-md"
+                  >
+                    <Trash2 className="h-4 w-4" aria-hidden="true" />
+                    Clear all
+                  </button>
+                </div>
+              </details>
             </section>
-
-            {improvePlanOpen && improvePlanDays.length > 0 && (
-              <RecallImprovePlanPanel
-                days={improvePlanDays}
-                onClose={() => setImprovePlanOpen(false)}
-              />
-            )}
-
-            {/* Food-group exposure across days (FPED cohort) */}
-            <FpedCohortPanel recalls={cohortRecalls} userType={cohortUserType} />
 
             {/* Cards */}
             <section className="space-y-3">

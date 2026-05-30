@@ -3,12 +3,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
-  AlertTriangle, ArrowRight, Check, Loader2, Sparkles, Target, X,
+  AlertTriangle, ArrowRight, Loader2, Sparkles, Target, X,
 } from 'lucide-react';
 import {
   ImprovePlanApiService,
   type ImprovePlanResponse,
-  type ImprovePlanSuggestion,
   type SubstitutionCompositionItem,
   type SubstitutionPurpose,
 } from '@/lib/api';
@@ -18,7 +17,7 @@ import {
   type SavedRecallDay,
 } from '@/lib/recallHistory';
 import { fromRecallAggregated, saveActiveFoodList } from '@/lib/activeFoodList';
-import { SubstitutionScorecardDelta } from './SubstitutionScorecardDelta';
+import { stashScorecardSwapHandoff } from '@/lib/scorecardSwapHandoff';
 import type { UserType } from './AudienceToggle';
 
 const PURPOSE_OPTIONS: Array<{ id: SubstitutionPurpose; label: string }> = [
@@ -49,10 +48,11 @@ function metricVal(
   return v.toFixed(4);
 }
 
-function routeModifiedToScorecard(
+function routeCompositionToScorecard(
   modified: SubstitutionCompositionItem[],
   userType: UserType,
   planLabel: string,
+  purpose: SubstitutionPurpose,
 ): void {
   const totalMass = modified.reduce((s, i) => s + i.mass_g, 0);
   const payload = {
@@ -82,20 +82,22 @@ function routeModifiedToScorecard(
       meals_meta: payload.meals_meta,
     }));
   } catch { /* localStorage unavailable */ }
+  stashScorecardSwapHandoff(purpose);
   window.location.href = '/scorecard?from=recall24h';
 }
 
 interface Props {
   days: SavedRecallDay[];
-  onClose: () => void;
+  onClose?: () => void;
+  backHref?: string;
 }
 
-export function RecallImprovePlanPanel({ days, onClose }: Props): JSX.Element {
+export function RecallImprovePlanPanel({ days, onClose, backHref }: Props): JSX.Element {
   const [purpose, setPurpose] = useState<SubstitutionPurpose>('general_health');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [plan, setPlan] = useState<ImprovePlanResponse | null>(null);
-  const [appliedId, setAppliedId] = useState<string | null>(null);
+  const [opening, setOpening] = useState(false);
 
   const userType = days[0]?.user_type ?? 'individual';
   const dayLabel = days.length === 1
@@ -106,7 +108,6 @@ export function RecallImprovePlanPanel({ days, onClose }: Props): JSX.Element {
     if (days.length === 0) return;
     setLoading(true);
     setError(null);
-    setAppliedId(null);
     try {
       const dishName = days.length === 1
         ? recallDaySubstitutionDishName(days[0])
@@ -114,9 +115,7 @@ export function RecallImprovePlanPanel({ days, onClose }: Props): JSX.Element {
       const rsp = await ImprovePlanApiService.improvePlan({
         recall_export: buildImprovePlanRecallExport(days),
         purpose,
-        max_suggestions: 5,
-        max_swaps: 3,
-        reformulation_mode: 'greedy',
+        max_suggestions: 0,
         include_population_benchmark: true,
         dish_name: dishName,
       });
@@ -139,11 +138,11 @@ export function RecallImprovePlanPanel({ days, onClose }: Props): JSX.Element {
     void fetchPlan();
   }, [fetchPlan]);
 
-  function handleApply(suggestion: ImprovePlanSuggestion): void {
-    const modified = suggestion.modified_composition;
-    if (!modified?.length) return;
-    setAppliedId(suggestion.id ?? suggestion.rule_id);
-    routeModifiedToScorecard(modified, userType, `${dayLabel}: ${suggestion.label}`);
+  function handleOpenOnScorecard(): void {
+    const baseline = plan?.baseline.composition;
+    if (!baseline?.length) return;
+    setOpening(true);
+    routeCompositionToScorecard(baseline, userType, dayLabel, purpose);
   }
 
   const baselineSc = plan?.baseline.scorecard;
@@ -165,20 +164,29 @@ export function RecallImprovePlanPanel({ days, onClose }: Props): JSX.Element {
             {plan?.baseline.ingredient_count ?? '…'} foods
           </p>
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          className="p-1 rounded-md text-gray-500 hover:bg-white/80 hover:text-gray-800"
-          aria-label="Close improvement plan"
-        >
-          <X className="h-5 w-5" />
-        </button>
+        {backHref ? (
+          <Link
+            href={backHref}
+            className="text-xs text-violet-700 hover:text-violet-900 underline whitespace-nowrap"
+          >
+            Change days
+          </Link>
+        ) : onClose ? (
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1 rounded-md text-gray-500 hover:bg-white/80 hover:text-gray-800"
+            aria-label="Close improvement plan"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        ) : null}
       </div>
 
       <div className="p-4 space-y-4">
         <div className="flex flex-wrap items-center gap-2">
           <label htmlFor="improve-purpose" className="text-xs font-medium text-gray-700">
-            Goal
+            Swap goal (used on scorecard)
           </label>
           <select
             id="improve-purpose"
@@ -197,14 +205,14 @@ export function RecallImprovePlanPanel({ days, onClose }: Props): JSX.Element {
             disabled={loading}
             className="text-xs px-2.5 py-1 rounded-md border border-gray-300 hover:bg-gray-50 disabled:opacity-50"
           >
-            Refresh
+            Refresh scores
           </button>
         </div>
 
         {loading && (
           <div className="flex items-center gap-2 text-sm text-gray-600 py-6 justify-center">
             <Loader2 className="h-5 w-5 animate-spin text-violet-600" aria-hidden="true" />
-            Scoring your day and searching for swaps… (may take 10–20 s)
+            Scoring your day across all six metrics…
           </div>
         )}
 
@@ -267,66 +275,32 @@ export function RecallImprovePlanPanel({ days, onClose }: Props): JSX.Element {
             <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900 flex gap-2">
               <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
               <p>
-                Swaps show modelled changes, not guaranteed real-world products.
-                HENI deltas are marginal — valid for small substitutions, not wholesale diet rebuilds.
+                Swaps run on the scorecard only — this page scores your day and highlights what to
+                change first. Continue below to find and apply swaps in one place.
               </p>
             </div>
 
-            {plan.suggestions.length === 0 ? (
-              <p className="text-sm text-gray-600">
-                No ranked swaps found for this composition with the current rules and discovery settings.
-                Try a different goal or{' '}
-                <Link href="/improve-product" className="text-violet-700 underline">improve a single meal</Link>.
-              </p>
-            ) : (
-              <div className="space-y-3">
-                <h3 className="text-xs font-semibold text-gray-800">
-                  Ranked options ({plan.suggestions.length})
-                </h3>
-                {plan.suggestions.map((s, idx) => {
-                  const sid = s.id ?? s.rule_id ?? String(idx);
-                  const onFrontier = s.pareto?.on_frontier ?? plan.pareto_frontier?.some(
-                    p => (p.id ?? p.rule_id) === sid,
-                  );
-                  const deltas = s.scorecard_full?.deltas;
-                  return (
-                    <article
-                      key={sid}
-                      className={`rounded-lg border p-3 ${onFrontier ? 'border-emerald-300 bg-emerald-50/40' : 'border-gray-200'}`}
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-gray-900">{s.label}</p>
-                          <p className="text-xs text-gray-600 mt-0.5">{s.rationale}</p>
-                          {onFrontier && (
-                            <span className="inline-block mt-1 text-[10px] font-medium text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded">
-                              Pareto frontier
-                            </span>
-                          )}
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleApply(s)}
-                          disabled={appliedId === sid}
-                          className="inline-flex items-center gap-1 shrink-0 px-2.5 py-1.5 text-xs font-medium rounded-md bg-violet-600 hover:bg-violet-700 disabled:bg-violet-400 text-white"
-                        >
-                          {appliedId === sid ? (
-                            <><Check className="h-3.5 w-3.5" /> Opening…</>
-                          ) : (
-                            <>Apply <ArrowRight className="h-3.5 w-3.5" /></>
-                          )}
-                        </button>
-                      </div>
-                      {deltas && <SubstitutionScorecardDelta deltas={deltas} compact />}
-                    </article>
-                  );
-                })}
-              </div>
-            )}
+            {plan.baseline.composition?.length ? (
+              <button
+                type="button"
+                onClick={handleOpenOnScorecard}
+                disabled={opening}
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white text-sm font-medium rounded-md"
+              >
+                {opening ? (
+                  <>Opening scorecard…</>
+                ) : (
+                  <>
+                    Try swaps on scorecard
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </>
+                )}
+              </button>
+            ) : null}
 
             {plan.metadata.elapsed_ms != null && (
               <p className="text-[10px] text-gray-400 text-right">
-                Analysed in {(plan.metadata.elapsed_ms / 1000).toFixed(1)}s
+                Scored in {(plan.metadata.elapsed_ms / 1000).toFixed(1)}s
               </p>
             )}
           </>

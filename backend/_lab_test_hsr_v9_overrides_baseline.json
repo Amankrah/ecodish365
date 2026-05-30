@@ -1,0 +1,76 @@
+{
+  "panel": [
+    {
+      "baseline_fvnl_percent": 0.0,
+      "baseline_stars": 3.5,
+      "cnf_food_id": 2933,
+      "error": null,
+      "label": "Water, municipal",
+      "rule": "A",
+      "serving_g": 250.0
+    },
+    {
+      "baseline_fvnl_percent": 50.25,
+      "baseline_stars": 1.0,
+      "cnf_food_id": 1552,
+      "error": null,
+      "label": "Fruit cocktail, canned, juice pack",
+      "rule": "B",
+      "serving_g": 125.0
+    },
+    {
+      "baseline_fvnl_percent": 50.25,
+      "baseline_stars": 0.5,
+      "cnf_food_id": 1555,
+      "error": null,
+      "label": "Fruit cocktail, canned, heavy syrup",
+      "rule": "B",
+      "serving_g": 125.0
+    },
+    {
+      "baseline_fvnl_percent": 40.0,
+      "baseline_stars": 3.5,
+      "cnf_food_id": 1303,
+      "error": null,
+      "label": "Sweet-corn breakfast cereal",
+      "rule": "D",
+      "serving_g": 30.0
+    },
+    {
+      "baseline_fvnl_percent": 45.0,
+      "baseline_stars": 0.5,
+      "cnf_food_id": 1496,
+      "error": null,
+      "label": "Apple juice, frozen concentrate (Cat 1, fractional FVNL)",
+      "rule": "E",
+      "serving_g": 250.0
+    },
+    {
+      "baseline_fvnl_percent": 0.0,
+      "baseline_stars": 4.0,
+      "cnf_food_id": 113,
+      "error": null,
+      "label": "Whole milk (Cat 1D control)",
+      "rule": "control",
+      "serving_g": 250.0
+    },
+    {
+      "baseline_fvnl_percent": 0.0,
+      "baseline_stars": 3.5,
+      "cnf_food_id": 4066,
+      "error": null,
+      "label": "White bread (Cat 2 control)",
+      "rule": "control",
+      "serving_g": 30.0
+    },
+    {
+      "baseline_fvnl_percent": 100.0,
+      "baseline_stars": 4.5,
+      "cnf_food_id": 2388,
+      "error": null,
+      "label": "Sweet corn, raw (already in FVNL group 11)",
+      "rule": "control",
+      "serving_g": 100.0
+    }
+  ]
+}

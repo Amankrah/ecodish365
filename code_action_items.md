@@ -22,13 +22,9 @@ The catalogue now has ~2,425 Ciqual-keyed Agribalyse entries with full EF 3.1 in
 
 ### HSR-CODE-1.x — Deferred follow-ups from the v9 reconciliation
 
-These are the items explicitly out-of-scope for HSR-CODE-1 (logged in the v9 plan's *out-of-scope* section). None blocks any current smoke test or any §4 / §5 result; all five are name-classifier or per-food-eligibility refinements rather than threshold-table changes.
+**A + B + D + E SHIPPED 2026-05-30** as a bundle; see HSR-CODE-1.x-BUNDLE entry under Done. **C remains** as the lone deferred item (and is documented there as numerically redundant given upstream processing-derived weighting).
 
-- **HSR-CODE-1.x-A — Cat 1 "Water" / "Unsweetened Flavoured water" name override.** v9 Table 7 Cat 1 maps both products to 5.0 / 4.5 stars by name, not by score. Our Cat 1 `star_thresholds` array currently pads the top two bins with `NEG_INFINITY` (numerically unreachable), so plain water lands at 3.5 stars by score. Trivial classifier hook; affects only two specific product names.
-- **HSR-CODE-1.x-B — Cat 2 "Eligible fruits and vegetables" name override.** v9 Table 7 Cat 2 maps "fresh, frozen, canned (in juice/water), dried fruit and vegetables; sweet corn" to 5.0 stars by name. Numerically redundant for whole produce (raw fruit/vegetables with 100 % FVNL already reach ≤ −11 final score and hit 5.0 stars by computation alone), but matters for canned/dried products with added sugar or salt that would otherwise drop below the 5.0 band by score.
 - **HSR-CODE-1.x-C — Two-column FVNL with concentrated-vs-non-concentrated weighting.** v9 Table 4 has Column 1 (concentrated FVNL, awards V points faster) and Column 2 (non-concentrated, the default). Our current code uses Column 2 only because [`fvnl.rs::nuanced_fvnl_percent`](backend/rust_core/src/hsr/fvnl.rs) already applies upstream processing-derived weighting. Cleaner two-column implementation deferred.
-- **HSR-CODE-1.x-D — Sweet-corn FVNL eligibility classifier** (v8 update of 21 September 2023). A per-food classification change inside `nuanced_fvnl_percent`, not a threshold-table change. Defer.
-- **HSR-CODE-1.x-E — Cat 1 V-points exact `≥` semantics.** v9 Table 5 (Cat 1 V points) uses `≥` thresholds while the rest of v9 uses `>`. Our code approximates `≥X` via `>X−1` (e.g. `≥25` → `>24`), which is exact under integer FVNL% inputs and accurate to ≤ 1 V-point at the boundary under non-integer FVNL%.
 
 ---
 
@@ -74,6 +70,45 @@ These were explicitly logged as v1 simplifications during HENI-CODE-1 implementa
 - *(empty — the prior "Frontend UI rendering of new additive API keys" item moved to Done on 2026-05-30; see PROVENANCE-UI-1.)*
 
 ## Done
+
+### 2026-05-30 — HSR-CODE-1.x-BUNDLE SHIPPED (A + B + D + E v9 classifier refinements)
+
+**Why this matters.** Four HSRAC v9 spec compliance items were flagged as out-of-scope for HSR-CODE-1 (the original v9 reconciliation), all classified as "name-classifier or per-food-eligibility refinements rather than threshold-table changes." Three are user-visible defects:
+
+- **Plain water rendered as 3.5 stars** (Cat 1 score-based path). v9 Table 7 maps plain water to **5.0 stars by name** — our `STAR_THRESHOLDS_CAT1` array padded the top two bins with `NEG_INFINITY` (numerically unreachable) on the assumption that a name-override hook would land later.
+- **Canned fruit cocktail in juice pack rendered as 1.0 stars**; **heavy-syrup variant 0.5 stars**. v9 Table 7 maps "fresh, frozen, canned (in juice/water), dried fruit and vegetables; sweet corn" to **5.0 stars by name** even when added sugar (heavy syrup) would otherwise drop the product below the 5.0 band by score.
+- **Raw sweet corn at 4.5 stars** (Cat 2 score path). v9 Table 7 explicitly lists sweet corn as eligible for the whole-veg 5.0-star override.
+
+E (the Cat 1 V-points `≥` semantics) is a documented ≤ 1 V-point inaccuracy at non-integer-FVNL boundaries; D (the v8 Sept 2023 sweet-corn FVNL eligibility) is forward-looking insurance for non-CNF data sources (WAFCT, packaged-food decompositions) that may place sweet corn outside the FVNL-eligible food groups.
+
+**Files modified (backend, all-Python — no `rust_core` rebuild):**
+
+- [`backend/hsr_calculator/hsr/calculators/hsr_calculator.py`](backend/hsr_calculator/hsr/calculators/hsr_calculator.py)
+  - Added `_name_override_stars(food_names)` — returns 5.0 / 4.5 stars by name per v9 Table 7. Single-food meals only (v9 is per-product, not per-meal). Three regex groups: plain water (`Water, municipal|bottled|spring|tap|mineral|...` AND NOT flavoured/sweetened), unsweetened flavoured water, and eligible whole fruit/veg (whole-food noun + processing qualifier, with an explicit `^\w+\s+(juice|nectar|drink|beverage|smoothie|punch)\b` exclusion so juices and nectars don't trigger the whole-food override).
+  - Wired into `HSRCalculator.calculate_hsr()` after the score-based `convert_score_to_stars` call: override replaces both `star_rating` and `component_score.star_rating` when matched.
+  - Added FVNL flooring for Cat 1 in `_calculate_components()`: when `category_value == Category.BEVERAGE.value`, replace `fvnl_percent` with `math.floor(fvnl_percent)` before the Rust `calculate_component_scores` call. This makes the kernel's `>` comparison behave like v9 Table 5's `≥` semantics for Cat 1 specifically, without rebuilding `rust_core`. All other categories (`>` semantics per v9 standard) untouched.
+
+- [`backend/hsr_calculator/hsr/calculators/fvnl_calculator.py`](backend/hsr_calculator/hsr/calculators/fvnl_calculator.py)
+  - After the Rust `nuanced_fvnl_percent` call, when the food's group code is NOT in `{9, 11, 12, 16}` (the FVNL-eligible groups mirrored from [`fvnl.rs:6`](backend/rust_core/src/hsr/fvnl.rs#L6)) AND the food name matches the specific phrase `\b(?:sweet\s+corn|corn,\s*sweet)\b`, re-evaluate as if the food were in food group 11 (Vegetables). The override applies only when it raises the FVNL value — generic "corn" products (corn flakes, corn syrup, corn oil) are explicitly NOT triggered.
+
+**Files added (test artefacts kept as ongoing regression guards):**
+
+- [`backend/_lab_test_hsr_v9_overrides_snapshot.py`](backend/_lab_test_hsr_v9_overrides_snapshot.py) — 8-row probe panel covering all four rules + four control rows. `capture` mode pins the baseline; `verify` mode asserts the four expected changes happened and the four controls did not drift.
+- [`backend/_lab_test_hsr_v9_overrides_baseline.json`](backend/_lab_test_hsr_v9_overrides_baseline.json) — captured BEFORE the fix; the verify path reads this to confirm the deltas are exactly the four targeted defects.
+
+**Verification (2026-05-30).**
+
+- Lab test A (`_lab_test_hsr_v9_overrides_snapshot.py verify`): **8 / 8 PASS.** Star changes observed match the defect ledger above (water 3.5 → 5.0, fruit cocktail juice 1.0 → 5.0, fruit cocktail heavy syrup 0.5 → 5.0, sweet corn raw 4.5 → 5.0). Controls: corn flakes cereal (must NOT trigger D), apple juice concentrate (must NOT trigger B; E is no-op since FVNL = 45.0 is already integer), whole milk, white bread — all four held constant.
+- HSR canonical panel ([`backend/_smoke_hsr_canonical_panel.py`](backend/_smoke_hsr_canonical_panel.py)): **9 / 9 PASS** post-fix (no regression on Bacon / Whole milk / White bread / Greek yogurt / Almond beverage / Rolled oats / Chia seeds / Apple juice / Table sugar — same set as the documented HSRAC v9-grounded panel).
+- HSR categorisation smoke ([`backend/_smoke_hsr_categorization.py`](backend/_smoke_hsr_categorization.py)): **35 / 36 PASS** (Panel A 20/20, Panel B 7/8 with one PRE-EXISTING failure on "Milk shake, chocolate, thick" categorisation that pre-dates this PR and lives in the Rust `food_group_mapper.rs`, not in code touched here; Panel C 8/8).
+
+**Out of scope (explicit follow-ups).**
+
+- **HSR-CODE-1.x-C** (two-column FVNL) remains deferred — the action items file's own note flags it as numerically redundant given upstream processing-derived weighting already applied in [`fvnl.rs::nuanced_fvnl_percent`](backend/rust_core/src/hsr/fvnl.rs).
+- **Adding water back to the canonical panel.** [`_smoke_hsr_canonical_panel.py`](backend/_smoke_hsr_canonical_panel.py) explicitly excluded water with a comment pointing at HSR-CODE-1.x. Now that A is shipped, water (CNF 2933) should be added to the panel at target 5.0 stars. Trivial follow-up; not blocking.
+- **Rebuilding `rust_core`** to fix HSR-CODE-1.x-E at the source (replacing `>` thresholds with `≥` semantics and the actual v9 threshold values). Current Python-side `math.floor` fix is functionally equivalent for integer-FVNL inputs and within ≤ 1 V-point at non-integer boundaries (the same accuracy the original `>X−1` encoding was documented at). When `maturin develop --release` is run, the rust kernel can be updated for cleanliness; the Python floor will then become a no-op (since flooring an already-integer kernel-aligned value is a no-op).
+
+---
 
 ### 2026-05-30 — PROVENANCE-UI-1 SHIPPED (frontend integration of additive provenance / data-quality keys)
 

@@ -4,6 +4,8 @@ Addresses fundamental issues in the original HSR algorithm with evidence-based i
 """
 
 import logging
+import math
+import re
 from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass, field
 
@@ -11,7 +13,7 @@ from ..models.meal import Meal
 from ..models.food import Food
 from ..models.category import Category
 from ..models.hsr_result import (
-    MealHSRResult, NutrientAnalysis, 
+    MealHSRResult, NutrientAnalysis,
     HealthInsight, HSRLevel, NutrientImpact
 )
 from ..providers.threshold_provider import (
@@ -21,6 +23,96 @@ from ..providers.threshold_provider import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+# HSR-CODE-1.x-A — Cat 1 name overrides per HSRAC v9 Table 7. Plain water and
+# unsweetened flavoured water map to 5.0 / 4.5 stars BY NAME, bypassing the
+# score-based path. The Rust Cat 1 star_thresholds pad the top two bins with
+# NEG_INFINITY because they're not numerically reachable; this hook restores
+# them by name.
+_RE_PLAIN_WATER = re.compile(
+    r'(?i)^\s*water,\s*(?:municipal|bottled|spring|tap|mineral|distilled|carbonated|natural)\b',
+)
+_RE_UNSWEETENED_FLAVOURED_WATER = re.compile(
+    r'(?i)\bwater\b.*\b(?:flavou?red?|flavou?r)\b.*\bunsweetened\b'
+    r'|\bunsweetened\b.*\bflavou?red?\b.*\bwater\b',
+)
+
+# HSR-CODE-1.x-B — Cat 2 fruit/vegetable name override per HSRAC v9 Table 7.
+# Eligible foods: fresh / frozen / canned (in juice or water) / dried whole
+# fruit and vegetables, plus sweet corn. Override fires regardless of the
+# calculator's category routing — the Cat 1/Cat 2 split misclassifies
+# "Fruit cocktail, canned, juice pack" as Cat 1 because of the "juice"
+# keyword, but the v9 override still applies.
+_RE_ELIGIBLE_FRUIT_VEG = re.compile(
+    r'(?ix)'
+    # Whole-food fruit / vegetable nouns
+    r'\b(?:fruit\s+cocktail|fruit\s+salad|fruit|vegetables?|peach(?:es)?|pear(?:s)?|'
+    r'pineapple|cherry|cherries|grape(?:s)?|apricot(?:s)?|plum(?:s)?|berry|berries|'
+    r'apple(?:s)?|banana(?:s)?|orange(?:s)?|mango(?:es)?|strawberr(?:y|ies)|'
+    r'blueberr(?:y|ies)|raspberr(?:y|ies)|cranberr(?:y|ies)|raisin(?:s)?|prune(?:s)?|'
+    r'dates?|fig(?:s)?|sweet\s+corn|corn,\s*sweet|tomato(?:es)?|carrot(?:s)?|'
+    r'broccoli|spinach|kale|lettuce|cabbage|cucumber|zucchini|cauliflower|'
+    r'mushroom(?:s)?|onion(?:s)?|pepper(?:s)?|pea(?:s)?|bean(?:s)?|asparagus|'
+    r'celery|squash|pumpkin|sweet\s+potato(?:es)?|potato(?:es)?)\b'
+    r'.*?'
+    # …with a v9-eligible processing/state qualifier
+    r'\b(?:canned|frozen|dried|dehydrated|fresh|raw|cooked|boiled|steamed|'
+    r'roasted|drained|in\s+juice|juice\s+pack|water\s+pack|syrup\s+pack|'
+    r'heavy\s+syrup|light\s+syrup|extra\s+light\s+syrup|brine|kernels?)\b',
+)
+# Cat 2 v9 override is INTENTIONALLY broad on processing state — v9 keeps
+# fruit/veg at 5.0 stars even with added sugar in the syrup pack, because the
+# whole-fruit nature of the product is what the rating recognises.
+
+
+# Beverages whose PRIMARY identity is "{noun} juice|nectar|drink|beverage|smoothie".
+# Excluded from the Cat 2 fruit/veg override: v9 keeps whole fruit/veg at
+# 5.0 stars by name, but juices / nectars / drinks are NOT whole-food and are
+# already covered by Cat 1's score-based path. "Cocktail" is allowed because
+# CNF uses "Fruit cocktail" to denote canned mixed fruit (not an alcoholic
+# beverage).
+_RE_IS_BEVERAGE_FORM = re.compile(
+    r'(?ix) ^ \s* \w+ \s+ (?: juice | nectar | drink | beverage | smoothie | punch )\b',
+)
+
+# Flavoured / sweetened water disqualifier for the plain-water override.
+_RE_FLAVOURED_OR_SWEETENED = re.compile(
+    r'(?i)\bflavou?red?\b|\bsweetened\b|\bflavou?r\b',
+)
+
+
+def _name_override_stars(food_names: List[str]) -> Optional[float]:
+    """HSR-CODE-1.x-A + B. Return the v9 Table 7 name-override star rating
+    when the (single-food) meal qualifies, else None.
+
+    Multi-food meals: the override fires only on single-food meals — the v9
+    spec is per-product, not per-meal."""
+    if not food_names or len(food_names) != 1:
+        return None
+    name = (food_names[0] or '').strip()
+    if not name:
+        return None
+
+    # A: Unsweetened flavoured water → 4.5
+    if _RE_UNSWEETENED_FLAVOURED_WATER.search(name):
+        return 4.5
+
+    # A: Plain water → 5.0. Must NOT be flavoured or sweetened; the
+    # _RE_PLAIN_WATER prefix alone matches "Water, mineral" which could be
+    # part of "Water, mineral, lemon-flavored, sweetened" — gate accordingly.
+    if _RE_PLAIN_WATER.match(name) and not _RE_FLAVOURED_OR_SWEETENED.search(name):
+        return 5.0
+
+    # B: Eligible whole fruit / vegetable → 5.0. Must NOT be primarily a
+    # juice / nectar / drink / smoothie (those are processed beverages, not
+    # whole-food fruit / veg under v9).
+    if _RE_IS_BEVERAGE_FORM.match(name):
+        return None
+    if _RE_ELIGIBLE_FRUIT_VEG.search(name):
+        return 5.0
+
+    return None
 
 
 @dataclass
@@ -89,19 +181,32 @@ class HSRCalculator:
     def calculate_hsr(self) -> MealHSRResult:
         """
         Calculate HSR using official HSR algorithm.
-        
+
         Returns:
             MealHSRResult with standard HSR analysis
         """
         # Calculate component scores using official HSR methodology
         component_score = self._calculate_components()
-        
+
         # Convert to star rating using official approach
         star_rating = ThresholdProvider.convert_score_to_stars(
-            component_score.final_score, 
+            component_score.final_score,
             self.thresholds.star_thresholds
         )
-        
+
+        # HSR-CODE-1.x-A + B: HSRAC v9 Table 7 name override. Plain water /
+        # unsweetened flavoured water (Cat 1) and eligible whole fruit /
+        # vegetables incl. sweet corn (Cat 2) map to 5.0 or 4.5 stars BY NAME,
+        # regardless of the score-based path. Single-food meals only — v9 is
+        # per-product, not per-meal.
+        food_names = [
+            (getattr(f, 'food_name', '') or '') for f in self.meal.foods
+        ]
+        override = _name_override_stars(food_names)
+        if override is not None:
+            component_score.star_rating = override
+            star_rating = override
+
         # Create result
         result = MealHSRResult(
             star_rating=star_rating,
@@ -132,6 +237,16 @@ class HSRCalculator:
             if self.meal.category is not None
             else Category.FOOD.value
         )
+        # HSR-CODE-1.x-E: HSRAC v9 Table 5 (Cat 1 V points) uses ≥ semantics,
+        # while the Rust kernel encodes them as > with thresholds reduced by 1
+        # (exact under integer FVNL%; off by ≤ 1 V-point at the boundary under
+        # non-integer FVNL%). Flooring the FVNL value here BEFORE the Rust
+        # call makes the > comparison behave like ≥ for Cat 1 specifically,
+        # without rebuilding rust_core. All other categories use v9's standard
+        # > semantics, so their thresholds and inputs are left untouched.
+        fvnl_percent = float(self.meal.fvnl_percent)
+        if category_value == Category.BEVERAGE.value:
+            fvnl_percent = float(math.floor(fvnl_percent))
         d = rust.calculate_component_scores(
             category_value,
             float(self.meal.energy_kj),
@@ -140,7 +255,7 @@ class HSRCalculator:
             float(self.meal.sodium),
             float(self.meal.protein),
             float(self.meal.fibre_total_dietary),
-            float(self.meal.fvnl_percent),
+            fvnl_percent,
         )
         return HSRComponentScore(
             baseline_points=int(d["baseline_points"]),

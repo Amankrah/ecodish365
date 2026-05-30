@@ -29,6 +29,7 @@ import {
   type ActiveFoodList,
 } from '@/lib/activeFoodList';
 import type { SubstitutionCompositionItem, SubstitutionSuggestion } from '@/lib/api';
+import { readScorecardSwapHandoff } from '@/lib/scorecardSwapHandoff';
 import {
   runAllScorers, retryOneMetric, clearScorecardCache,
   type ProfileResults, type RunOptions, type MetricKey,
@@ -65,6 +66,7 @@ export default function ScorecardPage(): JSX.Element {
   const [scoredAtUserType, setScoredAtUserType] = useState<UserType | null>(null);
   const [retryingMetric, setRetryingMetric] = useState<MetricKey | null>(null);
   const [selectedFoodIds, setSelectedFoodIds] = useState<Set<number>>(() => new Set());
+  const [swapHandoff] = useState(() => readScorecardSwapHandoff());
   const prevFoodIdsRef = useRef<Set<number>>(new Set());
 
   // Hydrate from localStorage on mount + subscribe to changes.
@@ -318,6 +320,8 @@ export default function ScorecardPage(): JSX.Element {
               onApply={handleSubstitutionApply}
               userType={userType}
               dishName={dishNameForSubstitution}
+              autoRun={swapHandoff.autoRun}
+              initialPurpose={swapHandoff.purpose}
             />
           </CollapsibleSection>
         )}

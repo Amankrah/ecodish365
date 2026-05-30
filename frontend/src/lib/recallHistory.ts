@@ -516,6 +516,38 @@ export function recallDayToIngredientRows(
   }));
 }
 
+/** sessionStorage key for day IDs routed to /recall-history/analyze. */
+export const ANALYZE_DAY_IDS_KEY = 'ecodish365_analyze_day_ids';
+
+export function stashAnalyzeDayIds(dayIds: string[]): void {
+  if (!isBrowser()) return;
+  try {
+    sessionStorage.setItem(ANALYZE_DAY_IDS_KEY, JSON.stringify(dayIds));
+  } catch { /* private mode */ }
+}
+
+export function readStashedAnalyzeDayIds(): string[] | null {
+  if (!isBrowser()) return null;
+  try {
+    const raw = sessionStorage.getItem(ANALYZE_DAY_IDS_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return null;
+    return parsed.filter((id): id is string => typeof id === 'string');
+  } catch {
+    return null;
+  }
+}
+
+/** Resolve analyze targets from stashed IDs, falling back to all saved days. */
+export function resolveAnalyzeDays(allDays: SavedRecallDay[]): SavedRecallDay[] {
+  const ids = readStashedAnalyzeDayIds();
+  if (!ids?.length) return allDays;
+  const idSet = new Set(ids);
+  const matched = allDays.filter(d => idSet.has(d.id));
+  return matched.length > 0 ? matched : allDays;
+}
+
 /** Minimal recall-export blob for POST /api/substitution/improve-plan/. */
 export function buildImprovePlanRecallExport(days: SavedRecallDay[]): RecallHistoryV1 {
   return {

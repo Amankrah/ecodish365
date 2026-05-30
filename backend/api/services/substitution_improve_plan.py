@@ -232,22 +232,28 @@ def build_improve_plan(
     priority_targets = rank_priority_ingredients(rows)
 
     constraints = {'max_swaps': max(1, min(int(max_swaps), 4))}
-    analysis = analyze_substitutions(
-        rows,
-        purpose=purpose,
-        max_suggestions=max(1, min(int(max_suggestions), 10)),
-        constraints=constraints,
-        include_scorecard=False,
-        dish_name=dish_name,
-        reformulation_mode=reformulation_mode,
-    )
-
-    suggestions = analysis.get('suggestions') or []
-    _attach_full_scorecards(rows, baseline_sc, suggestions)
-    pareto_frontier = compute_pareto_frontier(
-        suggestions,
-        axes=IMPROVE_PLAN_PARETO_AXES,
-    )
+    max_suggestions = max(0, min(int(max_suggestions), 10))
+    if max_suggestions > 0:
+        analysis = analyze_substitutions(
+            rows,
+            purpose=purpose,
+            max_suggestions=max_suggestions,
+            constraints=constraints,
+            include_scorecard=False,
+            dish_name=dish_name,
+            reformulation_mode=reformulation_mode,
+        )
+        suggestions = analysis.get('suggestions') or []
+        _attach_full_scorecards(rows, baseline_sc, suggestions)
+        pareto_frontier = compute_pareto_frontier(
+            suggestions,
+            axes=IMPROVE_PLAN_PARETO_AXES,
+        )
+        substitution_metadata = analysis.get('metadata')
+    else:
+        suggestions = []
+        pareto_frontier = []
+        substitution_metadata = None
 
     population = (
         _population_context(baseline_sc)
@@ -296,7 +302,7 @@ def build_improve_plan(
             'pareto_axes': list(IMPROVE_PLAN_PARETO_AXES),
             'reformulation_mode': reformulation_mode,
             'constraints': constraints,
-            'substitution_metadata': analysis.get('metadata'),
+            'substitution_metadata': substitution_metadata,
             'elapsed_ms': elapsed_ms,
         },
     }
