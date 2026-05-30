@@ -187,8 +187,8 @@ def _population_context(baseline_scorecard: Dict[str, Any]) -> Optional[Dict[str
             'band_phrase': _band_phrase(band),
             'canadian_population': dict(_POPULATION_BENCHMARKS),
             'caveat': (
-                'Single-day HEFI is not usual intake; compare directionally only '
-                'unless you averaged multiple recall days.'
+                'This score reflects one day of eating. Log several days for a clearer picture '
+                'of your usual habits.'
             ),
         },
     }
@@ -267,13 +267,14 @@ def build_improve_plan(
     hefi_val = (baseline_sc.get('hefi') or {}).get('value')
     if hefi_val is not None and population:
         summary_lines.append(
-            f"Baseline HEFI {hefi_val:.1f}/80 — {population['hefi']['band_phrase']}.",
+            f"Your day scores {hefi_val:.1f} out of 80 for healthy eating "
+            f"({population['hefi']['band_phrase'].lower()}).",
         )
     if priority_targets:
         top = priority_targets[0]
         summary_lines.append(
-            f"Highest-priority swap target: {top['food_description']} "
-            f"({top['mass_pct']}% of total mass).",
+            f"The biggest opportunity is {top['food_description']} "
+            f"({top['mass_pct']}% of what you ate).",
         )
     if suggestions:
         summary_lines.append(

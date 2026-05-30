@@ -48,8 +48,8 @@ function recallStashTitle(
 ): string {
   const names = meals.map(m => m.dish_name?.trim()).filter(Boolean) as string[];
   if (names.length === 1) return names[0];
-  if (names.length > 1) return `${names.length} meals — 24-h recall`;
-  return '24-h recall';
+  if (names.length > 1) return `${names.length} meals · food diary day`;
+  return 'Food diary day';
 }
 
 function recallStashSubstitutionDish(
@@ -259,7 +259,7 @@ export function ImproveProductFlow(): JSX.Element {
           className={tabClass(mode === 'recall')}
         >
           <CalendarClock className="h-4 w-4" aria-hidden="true" />
-          24-h recall
+          Food diary
         </button>
       </div>
 
@@ -388,7 +388,7 @@ export function ImproveProductFlow(): JSX.Element {
               <div className="flex items-center justify-between gap-2 flex-wrap">
                 {composition.recallMeta && (
                   <p className="text-xs text-gray-500">
-                    Loaded 24-h recall
+                    Loaded food diary day
                     {composition.recallMeta.date ? ` · ${composition.recallMeta.date}` : ''}
                     {' · '}
                     {composition.recallMeta.kcal.toFixed(0)} kcal

@@ -27,32 +27,31 @@ def parse_decomposition_provenance(raw: object) -> Optional[str]:
 
 _INDIVIDUAL = {
     'hefi': (
-        'These foods came from a packaged product whose ingredient list was '
-        'AI-read from a label. Per-ingredient amounts are an INFORMED ESTIMATE '
-        '(descending order + Nutrition Facts macros), not a measured recall. '
-        'HEFI treats this like any other one-day list — interpret with the '
-        'usual single-day caution.'
+        'These foods came from a packaged product read from a nutrition label. '
+        'Ingredient amounts are estimated from the label order and nutrition '
+        'facts, not weighed. Treat the healthy eating score as a rough guide '
+        'for one day, not your usual pattern.'
     ),
     'heni': (
-        'These foods came from a packaged product whose ingredient list was '
-        'AI-read from a label. Per-ingredient masses are inferred, not weighed. '
-        'HENI minutes are marginal per-serving estimates — treat as directional '
-        'for the product composition, not a validated intake record.'
+        'These foods came from a packaged product read from a nutrition label. '
+        'Ingredient amounts are estimated, not weighed. Health impact minutes '
+        'are best used to compare similar products, not as a precise intake '
+        'record.'
     ),
     'hsr': (
-        'When several inferred packaged ingredients are listed together, each '
-        'product is still scored within its own HSR category at its portion size. '
-        'The weighted average is informational — not a daily HSR score.'
+        'When several packaged ingredients are listed together, each product '
+        'is still rated within its own category. A combined average is only a '
+        'rough snapshot, not a daily star rating.'
     ),
     'fcs': (
-        'Food Compass scores here use inferred ingredient masses from a label '
-        'decomposition (ordering + NF panel), not measured composition. NOVA and '
-        'ingredient flags may shift if the decomposition is wrong.'
+        'Food Compass scores here use estimated ingredient amounts from a '
+        'label breakdown. Processing level and ingredient flags may shift if '
+        'the breakdown is wrong.'
     ),
     'environmental': (
-        'Environmental impacts use inferred ingredient masses from a packaged-'
-        'food label decomposition. LCA factors apply to each CNF-mapped '
-        'ingredient — wrong decomposition shifts the footprint estimate.'
+        'Environmental impacts use estimated ingredient amounts from a label '
+        'breakdown. If the breakdown is off, the climate, land, and water '
+        'estimates will shift too.'
     ),
 }
 
@@ -102,7 +101,7 @@ def build_packaged_food_caveat(
     msg = _RESEARCHER[indicator] if user_type != 'individual' else _INDIVIDUAL[indicator]
     return {
         'inferred_composition_caveat': {
-            'title': 'Packaged food — inferred composition',
+            'title': 'Scanned packaged product',
             'message': msg,
         },
     }

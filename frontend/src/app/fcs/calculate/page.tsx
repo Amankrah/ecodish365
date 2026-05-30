@@ -233,6 +233,16 @@ export default function FCSCalculate() {
     return nova.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
 
+  const formatProcessingLevel = (nova: string, lvl: number | null) => {
+    const name = formatNOVAName(nova);
+    if (userType === 'individual') {
+      if (lvl !== null) return `Level ${lvl} · ${name}`;
+      return name;
+    }
+    if (lvl !== null) return `NOVA ${lvl} — ${name}`;
+    return name;
+  };
+
   // FIX (FCS audit #4): the single-food NOVA badge previously rendered just
   // the category name (e.g. "Ultra Processed Foods") with no NOVA level
   // number, whereas the mixed-dish badge correctly shows "NOVA 4". Map the
@@ -319,7 +329,7 @@ export default function FCSCalculate() {
               headerClassName="p-6"
               whenCollapsedHint={
                 <p className="px-6 pb-4 text-xs text-gray-600">
-                  Click above to search the CNF database and add or change foods.
+                  Click above to search and add foods to your list.
                 </p>
               }
             >
@@ -507,7 +517,7 @@ export default function FCSCalculate() {
                 onClick={() => setRecipeModalOpen(true)}
                 className="w-full mt-2 flex items-center justify-center gap-1.5 text-sm text-blue-700 hover:text-blue-900 hover:underline"
               >
-                🍳 Score a homemade dish (decompose into CNF ingredients)
+                🍳 Break down a homemade dish
               </button>
               {/* AI-MATCH-2 (2026-05-24): 24-h dietary recall — the diet-level
                   Food Compass score (O'Hearn 2022, Nat Comm 13:7066) is the
@@ -517,7 +527,7 @@ export default function FCSCalculate() {
                 href="/recall-24h?then=fcs"
                 className="w-full mt-1 flex items-center justify-center gap-1.5 text-sm text-blue-700 hover:text-blue-900 hover:underline"
               >
-                🍽️ Build a 24-h recall instead (six-occasion daily eating)
+                🍽️ Log a full food diary day instead
               </a>
 
               </div>
@@ -592,22 +602,18 @@ export default function FCSCalculate() {
                     </div>
                     )}
                     <div className="bg-gray-50 rounded-lg p-4">
-                      <h3 className="text-sm font-medium text-gray-700 mb-2">NOVA Category</h3>
-                      {/* FIX (FCS audit #4): prefix "NOVA N — " so the
-                          single-food badge matches the mixed-dish badge format
-                          (which already shows "NOVA 4"). */}
+                      <h3 className="text-sm font-medium text-gray-700 mb-2">
+                        {userType === 'individual' ? 'Processing level' : 'NOVA Category'}
+                      </h3>
                       <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getNOVAColor(result.nova_category)}`}>
-                        {(() => {
-                          const lvl = novaLevelOf(result.nova_category);
-                          return lvl !== null
-                            ? `NOVA ${lvl} — ${formatNOVAName(result.nova_category)}`
-                            : formatNOVAName(result.nova_category);
-                        })()}
+                        {formatProcessingLevel(result.nova_category, novaLevelOf(result.nova_category))}
                       </span>
                       <p className="text-xs text-gray-500 mt-1">
                         {result.nova_category === 'MIXED_PROCESSING_LEVELS'
                           ? 'Energy-weighted processing level for combined foods'
-                          : 'Food processing classification level (Monteiro 2019)'}
+                          : userType === 'individual'
+                            ? 'How much the food was processed before you eat it'
+                            : 'Food processing classification level (Monteiro 2019)'}
                       </p>
                     </div>
                   </div>
@@ -639,7 +645,7 @@ export default function FCSCalculate() {
                                 {food.food_name}
                               </h5>
                               <span className={`px-2 py-1 rounded text-xs font-medium ${getNOVAColor(food.nova_category)}`}>
-                                NOVA {food.nova_level}
+                                {userType === 'individual' ? `Level ${food.nova_level}` : `NOVA ${food.nova_level}`}
                               </span>
                             </div>
                             
@@ -669,7 +675,11 @@ export default function FCSCalculate() {
                         <div className="text-sm text-gray-600 space-y-1">
                           {result.processing_details.individual_foods.map((food) => (
                             <div key={food.food_id} className="flex justify-between">
-                              <span>NOVA {food.nova_level} × {(food.energy_weight * 100).toFixed(1)}%</span>
+                              <span>
+                                {userType === 'individual'
+                                  ? `Level ${food.nova_level} × ${(food.energy_weight * 100).toFixed(1)}%`
+                                  : `NOVA ${food.nova_level} × ${(food.energy_weight * 100).toFixed(1)}%`}
+                              </span>
                               <span className="font-mono">
                                 {food.nova_level} × {food.energy_weight.toFixed(3)}
                               </span>

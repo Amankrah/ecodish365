@@ -378,10 +378,11 @@ export default function RecallHistoryPage() {
                       this one-liner decodes what those bands mean so users
                       don't have to hover for the tooltip. */}
                   <p className="text-[11px] text-gray-500 mt-2">
-                    Confidence bands on each day&rsquo;s pattern pill:{' '}
-                    <span className="font-medium text-emerald-800">high</span> (top cosine ≥ 0.75, clear lead) &middot;{' '}
-                    <span className="font-medium text-amber-800">moderate</span> (top cosine 0.60–0.75, or a runner-up within 0.05) &middot;{' '}
-                    <span className="font-medium text-gray-700">low</span> (top cosine &lt; 0.60 — log more days). Hover the band for details.
+                    Pattern confidence on each day:{' '}
+                    <span className="font-medium text-emerald-800">high</span> means a clear best match,{' '}
+                    <span className="font-medium text-amber-800">moderate</span> means a close second place,{' '}
+                    <span className="font-medium text-gray-700">low</span> means the match is uncertain.
+                    Hover a day&apos;s label for details.
                   </p>
                 </div>
               )}
@@ -433,8 +434,7 @@ export default function RecallHistoryPage() {
               </div>
 
               <p className="text-xs text-gray-500 border-t pt-3">
-                Pattern scoring, swap suggestions, and food-group analysis live on the
-                analyze page — pick days here first, then continue.
+                Select days here, then continue to see scores, swap ideas, and food groups.
               </p>
 
               <details className="group border-t pt-3">

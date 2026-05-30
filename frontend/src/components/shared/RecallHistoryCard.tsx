@@ -27,11 +27,11 @@ const CONFIDENCE_PILL: Record<string, string> = {
 
 const CONFIDENCE_TOOLTIP: Record<string, string> = {
   high:
-    'High confidence: top cosine ≥ 0.75 with ≥ 0.05 gap to the runner-up pattern.',
+    'Strong match. One eating style clearly fits your day best.',
   moderate:
-    'Moderate confidence: top cosine is 0.60–0.75, OR a runner-up pattern is within 0.05 cosine. Treat as a leaning, not a finding.',
+    'Reasonable match, but another style is close. Think of this as a tendency, not a firm label.',
   low:
-    'Low confidence: top cosine < 0.60. The day didn’t resemble any prototype strongly — log more days for clarity.',
+    'Weak match. Log more days or add more foods for a clearer picture.',
 };
 
 const PATTERN_COLOR: Record<string, string> = {
@@ -157,7 +157,7 @@ export function RecallHistoryCard({
           className="inline-flex items-center gap-1 px-2.5 py-1 bg-violet-600 hover:bg-violet-700 text-white rounded-md text-xs font-medium"
         >
           <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-          Scorecard
+          All scores
         </button>
         <button
           type="button"

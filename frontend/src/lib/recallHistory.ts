@@ -243,7 +243,7 @@ export function updateDayFromEdit(
   }
   const aggregated = Array.from(byFood.values()).sort((a, b) => b.mass_g - a.mass_g);
   const totalMass = aggregated.reduce((s, i) => s + i.mass_g, 0);
-  const dishName = patch.label.trim() || `Edited recall — ${patch.date}`;
+  const dishName = patch.label.trim() || `Edited day · ${patch.date}`;
 
   const meals: CNFRecall24hMealResult[] = [{
     occasion: 'breakfast',
@@ -486,7 +486,7 @@ export function recallDayDisplayTitle(day: SavedRecallDay): string {
     .filter((n): n is string => Boolean(n));
   if (mealNames.length === 1) return mealNames[0];
   if (mealNames.length > 1) return `${day.date} · ${mealNames.length} meals`;
-  return `24-h recall — ${day.date}`;
+  return `Food diary · ${day.date}`;
 }
 
 /** Best dish name for WAFCT/substitution context (largest meal by mass). */

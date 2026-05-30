@@ -221,24 +221,25 @@ def build_planetary_explanations(
 
     if user_type == "individual":
         return {
-            "title": "Your share of the daily planet budget",
+            "title": "Your share of a daily planet budget",
             "headline": (
                 f"Climate {_format_pct(climate_pct)} · "
                 f"Land {_format_pct(land_pct)} · "
                 f"Water {_format_pct(water_pct)} "
-                "of one person's daily share."
+                "of one person's fair daily share."
             ),
             "message": (
-                "These percentages compare your meal or day against the share each "
-                "person would get if global food-system limits were divided equally. "
-                "Lower is better. A number above 100 % means a meal that, if everyone "
-                "ate this way, would push the planet past safe limits."
+                "These percentages compare your meal or day to what one person "
+                "would get if global food limits were split equally. Lower is "
+                "better. Above 100% means that if everyone ate this way every "
+                "day, we would exceed safe limits."
             ),
             "mandatory_caveat": (
-                "Dividing global limits equally across people is a way to compare, not a "
-                "fair-share rule. In real life the wealthiest third of the world drives "
-                "most of the pressure. We currently show 3 of the 9 categories the source "
-                "report tracks; the others need data we don't yet have for individual foods."
+                "Equal shares are a simple way to compare meals, not a rule "
+                "about who should eat what. In reality, wealthier countries "
+                "drive much of the pressure. We currently show 3 of 9 "
+                "environmental categories because the rest need data we do "
+                "not yet have for individual foods."
             ),
         }
 

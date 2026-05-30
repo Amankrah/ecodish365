@@ -111,7 +111,7 @@ export function ScorecardAddBar({ userType }: Props): JSX.Element {
       <div className="flex flex-wrap items-end gap-2">
         <div className="flex-1 min-w-[240px]">
           <label htmlFor="scorecard-food-search" className="block text-xs font-medium text-gray-700 mb-1">
-            Search a CNF food
+            Search a food
           </label>
           <input
             id="scorecard-food-search"
@@ -164,7 +164,7 @@ export function ScorecardAddBar({ userType }: Props): JSX.Element {
           className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-green-700 border border-green-300 bg-white rounded-md hover:bg-green-50"
         >
           <CalendarClock className="h-3.5 w-3.5" aria-hidden="true" />
-          Log a 24-h recall
+          {userType === 'individual' ? 'Log a food diary day' : 'Log a 24-h recall'}
         </Link>
         <button
           type="button"
@@ -198,7 +198,7 @@ export function ScorecardAddBar({ userType }: Props): JSX.Element {
           </div>
           {savedDays.length === 0 ? (
             <p className="text-xs text-gray-600">
-              No saved days yet. Log a recall, then click <strong>Save this day</strong> on Step 3.
+              No saved days yet. Log a food diary day, then click <strong>Save to history</strong> on the review step.
             </p>
           ) : (
             <ul className="space-y-1 max-h-56 overflow-y-auto">
@@ -211,7 +211,7 @@ export function ScorecardAddBar({ userType }: Props): JSX.Element {
                   >
                     <Plus className="h-3 w-3 text-violet-700" aria-hidden="true" />
                     <span className="font-medium text-gray-900">{day.date}</span>
-                    {day.label && <span className="text-gray-600 truncate">— {day.label}</span>}
+                    {day.label && <span className="text-gray-600 truncate"> · {day.label}</span>}
                     <span className="ml-auto text-gray-500">
                       {day.aggregated_daily_ingredients.length} foods · {day.estimated_daily_kcal.toFixed(0)} kcal
                     </span>

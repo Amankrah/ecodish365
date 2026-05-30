@@ -34,31 +34,30 @@ _LIMIT_CEILING = 30.0
 
 _NOVA_CANONICAL_DESCRIPTIONS = {
     1: ('Unprocessed or minimally processed',
-        'Edible parts of plants or animals after separation from nature; '
-        'or natural foods altered only by drying, crushing, freezing, '
-        'pasteurization, packaging — NO added salt/sugar/oil. Examples: '
-        'raw fruit, raw vegetables, plain milk, whole grains, raw eggs, '
-        'pasteurized milk.'),
+        'Edible parts of plants or animals after separation from nature, '
+        'or natural foods changed only by drying, crushing, freezing, '
+        'pasteurization, or packaging, with no added salt, sugar, or oil. '
+        'Examples include raw fruit and vegetables, plain milk, whole grains, '
+        'raw eggs, and pasteurized milk.'),
     2: ('Processed culinary ingredients',
-        'Substances derived from minimally-processed foods (or nature) by '
-        'pressing, refining, grinding, milling, used in kitchens to season '
-        'and cook. Examples: vegetable oils, butter, sugar, salt, vinegar, '
-        'flour.'),
+        'Substances taken from minimally processed foods or nature by '
+        'pressing, refining, grinding, or milling, and used in kitchens to '
+        'season and cook. Examples include vegetable oils, butter, sugar, '
+        'salt, vinegar, and flour.'),
     3: ('Processed foods',
-        'Foods made by adding NOVA 2 ingredients to NOVA 1 foods PLUS a '
-        'preservation or cooking method (canning, smoking, curing, baking, '
-        'non-alcoholic fermentation). Examples: canned vegetables, cured '
-        'meats (ham, bacon), cheeses, plain freshly-baked breads, 100% '
-        'fruit juice.'),
+        'Foods made by adding culinary ingredients to whole foods and using '
+        'a preservation or cooking method such as canning, smoking, curing, '
+        'baking, or non-alcoholic fermentation. Examples include canned '
+        'vegetables, cured meats such as ham and bacon, cheeses, plain '
+        'freshly baked breads, and 100% fruit juice.'),
     4: ('Ultra-processed foods',
-        'Industrial formulations made mostly from substances derived from '
-        'foods AND additives, with little/no intact NOVA 1 food. Signals: '
-        'ingredient isolates (protein isolates, maltodextrin, HFCS, '
-        'hydrogenated oils), industrial additives (artificial flavours/'
-        'colours, emulsifiers, non-sugar sweeteners), industrial processes '
-        '(extrusion, reconstitution). Examples: soft drinks, packaged '
-        'snacks, hot dogs and reconstituted meats, frozen pre-prepared '
-        'dishes, sweetened breakfast cereals, instant noodles.'),
+        'Industrial products made mostly from refined ingredients and '
+        'additives, with little or no intact whole food left. Common signs '
+        'include protein isolates, maltodextrin, high-fructose corn syrup, '
+        'hydrogenated oils, artificial flavours or colours, emulsifiers, and '
+        'industrial processes like extrusion. Examples include soft drinks, '
+        'packaged snacks, hot dogs, frozen ready meals, sweetened breakfast '
+        'cereals, and instant noodles.'),
 }
 
 
@@ -277,46 +276,40 @@ def get_explanations(
         }
 
     # Default: individual audience (consumer-facing)
-    # FIX (FCS audit #7): previously the title repeated the score ("Food Compass
-    # Score: 1/100") which duplicated the big numeric score rendered in the
-    # adjacent results card. Title is now a plain section header.
     return {
         'score_summary': {
-            'title': 'Food Compass Score',
+            'title': 'Food Compass score',
             'headline': (
-                f'{band_label}. This food scores {fcs:.0f} out of 100 on the '
-                f'Food Compass Score, which combines 18 nutrition and '
-                f'processing attributes.'
+                f'{band_label}. This food scores {fcs:.0f} out of 100 based '
+                f'on 18 nutrition and processing factors.'
             ),
             'units': (
-                'Foods are graded 1-100: scores at or above 70 are foods to '
-                'be encouraged, 31-69 to be consumed in moderation, and '
-                '30 or below to be minimized.'
+                'Foods are graded from 1 to 100. Scores of 70 or above are '
+                'foods to encourage, 31 to 69 are fine in moderation, and 30 '
+                'or below are best minimized.'
             ),
             'interpretation': (
-                f'The "{nova_short}" label describes how this food was '
-                f'produced. {nova_long}'
+                f'This food is classified as "{nova_short}." {nova_long}'
             ),
             'mandatory_caveat': (
-                'IMPORTANT: FCS scores foods per 100 calories. Be careful '
-                'comparing very different food categories (e.g. a 100-kcal '
-                'apple slice vs 100-kcal soda is fair; but FCS scores reflect '
-                'nutrition density, not full-meal satisfaction). The '
-                'mortality benefit of high-FCS eating is measured at the '
-                'DIET level, not from a single food.'
+                'This score is based on 100 calories of the food. That makes '
+                'fair comparisons possible across very different items, but it '
+                'does not tell you how filling a food is or how it fits a '
+                'whole meal. The health benefits of eating well show up most '
+                'clearly when you look at your overall diet, not one food '
+                'at a time.'
             ),
         },
         'nova_explainer': {
-            'title': f'Processing Level: NOVA {nova_level} — {nova_short}',
+            'title': f'Processing level: {nova_short}',
             'description': nova_long,
         },
         'action_tips': {
             'simple_guidance': (
-                f'For "{band_label}" foods like this one, aim for variety '
-                f'rather than perfection — your overall eating pattern '
-                f'matters more than any single food choice. Favour NOVA 1-3 '
-                f'foods over NOVA 4 (ultra-processed) when you have the '
-                f'choice.'
+                f'For foods in the "{band_label}" range, aim for variety '
+                'rather than perfection. Your overall pattern matters more '
+                'than any single choice. When you can, favour less processed '
+                'foods over ultra-processed ones.'
             ),
         },
     }

@@ -254,47 +254,42 @@ def get_explanations(
     # Default: individual audience (consumer-facing)
     return {
         'score_summary': {
-            'title': f'Health Star Rating: {star_rating:.1f} ★ — for {cat_label}',
+            'title': f'Health Star Rating for {cat_label}',
             'headline': (
-                f'{band_label}. This is {star_rating:.1f} out of 5 stars '
-                f'within the "{cat_label}" food category.'
+                f'{band_label}. This product earns {star_rating:.1f} out of '
+                f'5 stars in the {cat_label} category.'
             ),
             'units': (
-                'The Health Star Rating (HSR) scores packaged foods from 0.5 '
-                'to 5 stars (half-star steps). More stars means a healthier '
-                'choice within the same food category.'
+                'Health Star Ratings run from 0.5 to 5 stars in half-star '
+                'steps. More stars mean a healthier choice within the same '
+                'food category.'
             ),
             'interpretation': (
-                f'For {cat_label}, this product\'s {star_rating:.1f}-star '
-                f'rating reflects how its baseline nutrients (energy, sat '
-                f'fat, sugars, sodium) compare to its protective ones '
-                f'(fruit/veg/nuts/legumes, fibre, protein).'
+                f'For {cat_label}, this rating reflects how the product\'s '
+                f'energy, saturated fat, sugars, and sodium compare with its '
+                f'helpful nutrients such as fruit, vegetables, nuts, legumes, '
+                f'fibre, and protein.'
             ),
             'mandatory_caveat': (
-                'IMPORTANT: HSR stars only compare products WITHIN the same '
-                f'food category. A 3-star "{cat_label}" food cannot be '
-                'compared to a 3-star food in a different category — the '
-                'scoring tables differ. Always look at the category label '
-                'alongside the stars.'
+                f'Stars only compare products in the same category. A '
+                f'{star_rating:.1f}-star {cat_label} product cannot be '
+                f'compared fairly to a product in another category because '
+                f'the scoring rules differ. Always check the category label '
+                f'alongside the stars.'
             ),
         },
         'action_tips': {
             'simple_guidance': (
-                f'When shopping for "{cat_label}" products, favour higher-'
-                f'star options. Don\'t use HSR to compare across different '
-                f'product types (e.g. don\'t compare cereal stars to '
-                f'beverage stars — the systems are different).'
+                f'When shopping for {cat_label}, choose higher-star options '
+                f'within that aisle. Do not use stars to compare different '
+                f'product types, such as cereal and beverages, because they '
+                f'are scored separately.'
             ),
-            # FIX (HSR audit #12): explicit cross-link to FCS for users who
-            # need a cross-category comparison number — without this, the
-            # within-category-only caveat leaves them with no actionable
-            # alternative.
             'cross_category_tool': (
-                'Need to compare different product types (e.g. cereal vs '
-                'yogurt)? Use the Food Compass Score (FCS) calculator at '
-                '/fcs/calculate — it scores 1-100 across all food categories '
-                'and is validated against all-cause mortality at the diet '
-                'level (Mozaffarian 2021, O\'Hearn 2022).'
+                'If you want to compare different kinds of foods, try the '
+                'Food Compass score instead. It rates foods from 1 to 100 '
+                'across all categories and is linked to longer-term health '
+                'when looked at across a whole diet.'
             ),
         },
     }
@@ -349,14 +344,14 @@ def build_recall24h_caveat(
         }
     return {
         'recall_context': {
-            'title': 'Scoring a full day — informational only',
+            'title': 'Scoring a full day',
             'message': (
-                'These foods came from your 24-hour recall'
-                f'{food_note}. Health Star Ratings compare packaged products '
-                'within the same category — not whole days of eating. Treat '
-                'this combined star rating as a rough snapshot, not a '
-                'definitive measure of how healthy your day was. For daily '
-                'diet quality, try HEFI or Food Compass (FCS) instead.'
+                'These foods came from your 24-hour food diary'
+                f'{food_note}. Health Star Ratings are meant for packaged '
+                'products within the same category, not whole days of eating. '
+                'Treat this combined rating as a rough snapshot. For daily '
+                'diet quality, use the healthy eating score or Food Compass '
+                'score instead.'
             ),
         },
     }

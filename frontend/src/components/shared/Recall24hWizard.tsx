@@ -97,19 +97,15 @@ const SCORE_BUTTONS: Array<{
   note?: string;
 }> = [
   // SCORECARD-1 (2026-05-26): one-click consumer view across all six lenses.
-  { id: 'scorecard',       emoji: '✨', label: 'View Scorecard (all metrics)', path: '/scorecard',              note: 'See HEFI + HENI + HSR + FCS + Environmental + Pattern in one consumer-friendly view' },
-  { id: 'improve_product', emoji: '🔄', label: 'Try ingredient swaps',         path: '/improve-product',        note: 'Find healthier substitutes for foods in this day' },
-  { id: 'hefi',            emoji: '🥗', label: 'Score HEFI-2019',     path: '/hefi/calculate',          note: 'Natural fit (Brassard 2022b)' },
-  { id: 'heni',            emoji: '🧬', label: 'Score HENI',          path: '/heni/calculate',          note: 'Sums healthy-life-minutes across the day' },
-  { id: 'hsr',             emoji: '⭐', label: 'Score HSR',            path: '/hsr/calculate',           note: 'Informational only — HSR is per-product' },
-  { id: 'fcs',             emoji: '🧭', label: 'Score Food Compass',   path: '/fcs/calculate',           note: 'Energy-weighted score across all foods for the day' },
-  { id: 'environmental',   emoji: '🌍', label: 'Score Environmental',  path: '/environmental/calculate', note: 'Per-day environmental footprint' },
-  // DIET-PATTERN-1 (2026-05-24): descriptive resemblance vs canonical
-  // patterns. Complements the 5 scoring lenses with categorical framing.
-  { id: 'dietary_pattern', emoji: '🎯', label: 'Score Dietary Pattern', path: '/dietary-pattern',        note: 'Which canonical pattern (Mediterranean / DASH / etc.) does your day resemble?' },
-  // PLANETARY-1 (2026-05-27): EAT-Lancet 2.0 Table 2 per-capita-per-day food-
-  // system boundary share (3 of 9 boundaries in v1: climate, land, water).
-  { id: 'planetary',       emoji: '🪐', label: 'Planetary boundaries',  path: '/planetary',              note: 'EAT-Lancet 2.0 Table 2 — % of one person\'s daily food-system budget' },
+  { id: 'scorecard',       emoji: '✨', label: 'All scores',            path: '/scorecard',              note: 'Every measure in one view' },
+  { id: 'improve_product', emoji: '🔄', label: 'Try ingredient swaps',  path: '/improve-product',        note: 'Find healthier substitutes for foods in this day' },
+  { id: 'hefi',            emoji: '🥗', label: 'Healthy eating',        path: '/hefi/calculate',          note: 'How well your day matches Canada\'s Food Guide' },
+  { id: 'heni',            emoji: '🧬', label: 'Health impact',         path: '/heni/calculate',          note: 'Healthy-life minutes across the day' },
+  { id: 'hsr',             emoji: '⭐', label: 'Star rating',           path: '/hsr/calculate',           note: 'Rough snapshot only. Stars rate products, not whole days.' },
+  { id: 'fcs',             emoji: '🧭', label: 'Food Compass',          path: '/fcs/calculate',           note: 'One score from 1 to 100 for the whole day' },
+  { id: 'environmental',   emoji: '🌍', label: 'Environment',           path: '/environmental/calculate', note: 'Climate, land, and water footprint' },
+  { id: 'dietary_pattern', emoji: '🎯', label: 'Eating style',          path: '/dietary-pattern',        note: 'Which familiar pattern your day resembles' },
+  { id: 'planetary',       emoji: '🪐', label: 'Planet budget',         path: '/planetary',              note: 'Your share of a daily planet budget for food' },
 ];
 
 interface MealRow {
@@ -130,16 +126,16 @@ function humanWarning(code: string): string {
   if (code.startsWith('no_breakfast')) return 'No breakfast logged.';
   if (code.startsWith('no_lunch'))     return 'No lunch logged.';
   if (code.startsWith('no_dinner'))    return 'No dinner logged.';
-  if (code.startsWith('daily_kcal_below_')) return 'Daily calories look low — did you forget a meal?';
-  if (code.startsWith('daily_kcal_above_')) return 'Daily calories look high — possible double-counting.';
-  if (code === 'single_occasion_day_aggregation_unreliable') return 'Only one meal logged — daily aggregation is unreliable.';
+  if (code.startsWith('daily_kcal_below_')) return 'Daily calories look low. Did you forget a meal?';
+  if (code.startsWith('daily_kcal_above_')) return 'Daily calories look high. You may have counted something twice.';
+  if (code === 'single_occasion_day_aggregation_unreliable') return 'Only one meal logged, so daily totals may not be reliable.';
   if (code.includes('_resolved_only_partially')) return code.split('_')[0] + ' meal(s) resolved only partially.';
   if (code.includes('_failed_to_decompose'))     return code.split('_')[0] + ' meal(s) failed to decompose.';
   if (code.startsWith('packaged_food_inferred_at_')) {
-    return 'One or more occasions used scanned packaged food — composition was inferred from the label, not measured.';
+    return 'One or more meals came from a scanned label. Ingredient amounts were estimated, not weighed.';
   }
   if (code.startsWith('direct_food_entry')) {
-    return 'One or more occasions used directly selected CNF foods.';
+    return 'One or more meals used foods you picked directly from search.';
   }
   return code;
 }
@@ -395,7 +391,7 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
             <h2 className="text-lg font-semibold text-gray-900">Which occasions did you eat?</h2>
           </div>
           <p className="text-sm text-gray-600">
-            Toggle the meals + snacks you had over a full 24-hour day. You can leave snacks off if you skip them — the recall handles any combination.
+            Toggle the meals and snacks you had today. You can leave snacks off if you skipped them.
           </p>
           {/* WAFCT-EXTEND (2026-05-24): pick the food database upfront. The
               backend forwards this into every meal's Stage-2 ingredient
@@ -405,9 +401,9 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
             <SourceFilter source={source} onChange={setSource} accent="blue" />
             <span className="text-xs text-gray-500 ml-auto">
               {source === 'wafct'
-                ? 'WAFCT only — best for West African meals'
+                ? 'West African foods only'
                 : source === 'cnf'
-                ? 'CNF only — Health Canada'
+                ? 'Canadian foods only'
                 : 'Searching both databases'}
             </span>
           </div>
@@ -458,7 +454,7 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
             <h2 className="text-lg font-semibold text-gray-900">What did you have at each occasion?</h2>
           </div>
           <p className="text-sm text-gray-600">
-            Describe each meal in free text, <strong>pick CNF ingredients</strong> by search or AI,
+            Describe each meal in free text, <strong>pick ingredients</strong> by search or AI,
             or <strong>scan a packaged food</strong> if you ate something with a Nutrition Facts label.
             Mass estimates can be rough for text meals; picked foods and scanned products use the grams you set.
           </p>
@@ -665,7 +661,7 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
               </div>
             </div>
             <div className="p-3 rounded bg-blue-50 border border-blue-200">
-              <div className="text-xs text-gray-600">CNF foods</div>
+              <div className="text-xs text-gray-600">Foods matched</div>
               <div className="text-lg font-semibold text-gray-900">{dayIngredients.length}</div>
             </div>
           </div>
@@ -691,7 +687,7 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
               onChange={updateDayIngredients}
               defaultMassG={100}
               searchPlaceholder="Add a food to your day…"
-              emptyHint="No foods yet — search or use Find with AI to build your day."
+              emptyHint="No foods yet. Search or use Find with AI to build your day."
             />
           </div>
 
@@ -752,7 +748,7 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
           {userType !== 'individual' && !ingredientsEdited && (
             <details className="border rounded-lg">
               <summary className="cursor-pointer px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50">
-                Aggregated daily CNF list ({result.aggregated_daily_ingredients.length} foods)
+                Daily food list ({result.aggregated_daily_ingredients.length} foods)
               </summary>
               <ul className="divide-y text-xs">
                 {result.aggregated_daily_ingredients.map(i => (
@@ -782,7 +778,7 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
                 Saved days appear on the <a href="/recall-history" className="text-blue-700 underline">recall history</a> page,
                 where you can compute an N-day average pattern, export as JSON / CSV
                 for research analysis, or re-score any day individually.
-                Stored only in this browser — never uploaded unless you explicitly score it.
+                Stored only in this browser. Nothing is uploaded unless you choose to score it.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-[140px,1fr] gap-2 items-center">
                 <label htmlFor="recall-save-date" className="text-xs font-medium text-gray-700">
@@ -814,7 +810,7 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
                 disabled={!saveDate || !result}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {savedDay ? '✓ Saved — update' : '💾 Save to history'}
+                {savedDay ? '✓ Saved · update' : '💾 Save to history'}
               </button>
               {savedDay && (
                 <p className="text-xs text-blue-700">
@@ -860,7 +856,7 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
             <h2 className="text-lg font-semibold text-gray-900">Score your day</h2>
           </div>
           <p className="text-sm text-gray-600">
-            Route your aggregated 24-h ingredient list to any of the five nutrition / sustainability indices. Each opens its calculator pre-populated with this day's CNF foods.
+            Send your day to any score. Each opens with this day&apos;s foods already loaded.
           </p>
 
           {explanations?.score_routing && (
@@ -900,7 +896,7 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
                     {isHSR && (
                       <div className="text-[11px] text-amber-700 mt-1 flex items-start gap-1">
                         <AlertCircle className="h-3 w-3 mt-0.5 flex-shrink-0" aria-hidden="true" />
-                        HSRAC v9 is a per-product within-category rating. Daily HSR is informational only.
+                        Star ratings compare products within a category. A daily average is only a rough snapshot.
                       </div>
                     )}
                   </button>

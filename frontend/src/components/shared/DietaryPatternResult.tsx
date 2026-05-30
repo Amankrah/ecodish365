@@ -23,6 +23,7 @@ import type {
 } from '@/lib/api';
 import type { UserType } from './AudienceToggle';
 import { SourceBadge } from './SourceBadge';
+import { humanizeForUser } from '@/lib/humanizeCopy';
 
 interface DietaryPatternResultProps {
   data:     PatternClassifyResponse;
@@ -64,7 +65,11 @@ function ResemblanceBar({
           {(r.cosine * 100).toFixed(0)}%
         </span>
       </div>
-      <p className="text-xs text-gray-500 pl-[148px]">{r.individual_mode_blurb}</p>
+      <p className="text-xs text-gray-500 pl-[148px]">
+        {userType === 'individual'
+          ? humanizeForUser(r.individual_mode_blurb)
+          : r.individual_mode_blurb}
+      </p>
       {userType !== 'individual' && (r.literature_anchor || r.distinctive_user_foods.length > 0) && (
         <div className="pl-[148px]">
           <button
@@ -121,8 +126,14 @@ export function DietaryPatternResult({ data, userType }: DietaryPatternResultPro
               Couldn&rsquo;t score this day&rsquo;s pattern.
             </p>
             <p className="text-amber-800 mt-1">
-              {result.fallback_reason || 'No foods were resolvable in the food-composition corpus.'}
-              {result.n_foods_unresolved > 0 && (
+              {userType === 'individual'
+                ? (humanizeForUser(result.fallback_reason)
+                  || 'We could not match enough of your foods to score this day\'s eating style.')
+                : (result.fallback_reason || 'No foods were resolvable in the food-composition corpus.')}
+              {result.n_foods_unresolved > 0 && userType === 'individual' && (
+                <> {result.n_foods_unresolved} food{result.n_foods_unresolved === 1 ? '' : 's'} were not in our database.</>
+              )}
+              {result.n_foods_unresolved > 0 && userType !== 'individual' && (
                 <> {result.n_foods_unresolved} food(s) were not in the embedding corpus.</>
               )}
             </p>
@@ -168,7 +179,11 @@ export function DietaryPatternResult({ data, userType }: DietaryPatternResultPro
         {explanations.narrative && (
           <div className="flex items-start gap-2 p-3 bg-blue-50 border border-blue-100 rounded text-sm text-blue-900">
             <Sparkles className="h-4 w-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
-            <p>{explanations.narrative.message}</p>
+            <p>
+              {userType === 'individual'
+                ? humanizeForUser(explanations.narrative.message)
+                : explanations.narrative.message}
+            </p>
           </div>
         )}
 
@@ -178,26 +193,34 @@ export function DietaryPatternResult({ data, userType }: DietaryPatternResultPro
             <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" aria-hidden="true" />
             <div>
               <p className="font-semibold text-amber-900">{explanations.mandatory_caveat.title}</p>
-              <p className="text-amber-800 mt-0.5">{explanations.mandatory_caveat.message}</p>
+              <p className="text-amber-800 mt-0.5">
+                {userType === 'individual'
+                  ? humanizeForUser(explanations.mandatory_caveat.message)
+                  : explanations.mandatory_caveat.message}
+              </p>
             </div>
           </div>
         )}
 
         {/* Day summary */}
-        <div className="flex items-center gap-4 text-xs text-gray-500 pt-2 border-t">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500 pt-2 border-t">
           <span><CheckCircle className="inline h-3 w-3 mr-0.5" /> {result.n_foods} foods scored</span>
           {result.n_foods_unresolved > 0 && (
-            <span className="text-amber-700">{result.n_foods_unresolved} skipped (not in corpus)</span>
+            <span className="text-amber-700">
+              {result.n_foods_unresolved} skipped (not in database)
+            </span>
           )}
-          <span>· {result.total_mass_g.toFixed(0)} g total</span>
-          <span>· {result.timing_ms.toFixed(0)} ms</span>
+          <span>{result.total_mass_g.toFixed(0)} g total</span>
+          {userType !== 'individual' && (
+            <span>{result.timing_ms.toFixed(0)} ms</span>
+          )}
         </div>
       </div>
 
       {/* Full top-N resemblance vector */}
       <div className="bg-white rounded-lg border p-5 shadow-sm">
         <h3 className="text-sm font-semibold text-gray-900 mb-3">
-          Pattern resemblance breakdown
+          How your day compares to common eating styles
         </h3>
         <ul className="space-y-3">
           {result.resemblances.map((r, i) => (
@@ -231,7 +254,11 @@ export function DietaryPatternResult({ data, userType }: DietaryPatternResultPro
               </li>
             ))}
           </ul>
-          <p className="mt-2 text-xs text-gray-500">{explanations.fped_drivers.caveat}</p>
+          <p className="mt-2 text-xs text-gray-500">
+            {userType === 'individual'
+              ? humanizeForUser(explanations.fped_drivers.caveat)
+              : explanations.fped_drivers.caveat}
+          </p>
         </div>
       )}
 

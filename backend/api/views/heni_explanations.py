@@ -239,34 +239,33 @@ def get_explanations(
     # Default: individual audience (consumer-facing)
     return {
         'score_summary': {
-            'title': 'Health Impact (HENI)',
+            'title': 'Health impact',
             'headline': (
-                f'{band_label}: this food {sign_phrase} {abs_minutes:.1f} min '
-                f'to your healthy life per serving.'
+                f'{band_label}: eating one serving of this food '
+                f'{sign_phrase} {abs_minutes:.1f} minutes of healthy life.'
             ),
             'units': (
-                'HENI measures the estimated minutes of healthy life gained '
-                'or lost from eating one serving of this food, based on the '
-                'evidence linking 16 nutrients and food groups to long-term '
-                'disease risk.'
+                'This estimate shows the minutes of healthy life gained or '
+                'lost from one serving, based on research linking nutrients '
+                'and food groups to long-term disease risk.'
             ),
             'interpretation': (
-                'A positive number means the food adds healthy minutes; a '
-                'negative number means it subtracts. The bigger the absolute '
+                'A positive number means the food is likely to help. A '
+                'negative number means it is likely to hurt. The larger the '
                 'number, the stronger the effect per serving.'
             ),
             'mandatory_caveat': (
-                'This score applies to ADDING OR REMOVING ONE SERVING from '
-                'your current eating pattern. It is NOT a prediction of what '
-                'would happen if you radically changed your whole diet. Use '
-                'it to compare individual foods, not whole diets.'
+                'This score applies when you add or remove one serving from '
+                'your current eating pattern. It is not a prediction of what '
+                'would happen if you changed your whole diet at once. Use it '
+                'to compare similar foods, not to judge an entire day.'
             ),
         },
         'action_tips': {
             'simple_guidance': (
-                'Use HENI to compare similar foods (e.g. two breakfast '
-                'options) and lean toward the ones with higher HENI scores. '
-                'Small consistent swaps add up over time.'
+                'Use this score to compare similar choices, such as two '
+                'breakfast options, and lean toward the higher-scoring ones. '
+                'Small swaps repeated over time can add up.'
             ),
         },
     }

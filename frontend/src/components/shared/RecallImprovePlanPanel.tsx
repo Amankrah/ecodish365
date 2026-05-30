@@ -18,6 +18,7 @@ import {
 } from '@/lib/recallHistory';
 import { fromRecallAggregated, saveActiveFoodList } from '@/lib/activeFoodList';
 import { stashScorecardSwapHandoff } from '@/lib/scorecardSwapHandoff';
+import { buildImprovePlanSummary, friendlyMetricLabel, humanizeForUser } from '@/lib/humanizeCopy';
 import type { UserType } from './AudienceToggle';
 
 const PURPOSE_OPTIONS: Array<{ id: SubstitutionPurpose; label: string }> = [
@@ -27,12 +28,12 @@ const PURPOSE_OPTIONS: Array<{ id: SubstitutionPurpose; label: string }> = [
   { id: 'sustainability', label: 'Lower environmental impact' },
 ];
 
-const FLAG_LABELS: Record<string, string> = {
+const FLAG_LABELS_DISPLAY: Record<string, string> = {
   sugary_drink: 'Sugary drink',
   refined_grain: 'Refined grain',
   red_meat: 'Red meat',
   poultry: 'Poultry',
-  wafct: 'West African food',
+  wafct: 'West African staple',
 };
 
 function metricVal(
@@ -154,12 +155,12 @@ export function RecallImprovePlanPanel({ days, onClose, backHref }: Props): JSX.
         <div>
           <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-violet-600" aria-hidden="true" />
-            Improvement plan
+            Improvement ideas
           </h2>
           <p className="text-xs text-gray-600 mt-0.5">
             {days.length === 1
-              ? `Based on ${days[0].date}${days[0].label ? ` (${days[0].label})` : ''}`
-              : `Combined across ${days.length} saved recall days`}
+              ? `For ${days[0].date}${days[0].label ? ` (${days[0].label})` : ''}`
+              : `Across ${days.length} saved days`}
             {' · '}
             {plan?.baseline.ingredient_count ?? '…'} foods
           </p>
@@ -186,7 +187,7 @@ export function RecallImprovePlanPanel({ days, onClose, backHref }: Props): JSX.
       <div className="p-4 space-y-4">
         <div className="flex flex-wrap items-center gap-2">
           <label htmlFor="improve-purpose" className="text-xs font-medium text-gray-700">
-            Swap goal (used on scorecard)
+            What do you want to improve?
           </label>
           <select
             id="improve-purpose"
@@ -212,7 +213,7 @@ export function RecallImprovePlanPanel({ days, onClose, backHref }: Props): JSX.
         {loading && (
           <div className="flex items-center gap-2 text-sm text-gray-600 py-6 justify-center">
             <Loader2 className="h-5 w-5 animate-spin text-violet-600" aria-hidden="true" />
-            Scoring your day across all six metrics…
+            Scoring your day…
           </div>
         )}
 
@@ -222,16 +223,18 @@ export function RecallImprovePlanPanel({ days, onClose, backHref }: Props): JSX.
           </div>
         )}
 
-        {plan && !loading && (
+            {plan && !loading && (
           <>
-            {plan.summary && (
-              <p className="text-sm text-gray-800 leading-relaxed">{plan.summary}</p>
+            {(buildImprovePlanSummary(plan) || plan.summary) && (
+              <p className="text-sm text-gray-800 leading-relaxed">
+                {buildImprovePlanSummary(plan) || humanizeForUser(plan.summary)}
+              </p>
             )}
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
               {(['hefi', 'heni', 'fcs', 'hsr', 'environmental', 'dietary_pattern'] as const).map(k => (
                 <div key={k} className="rounded-md border border-gray-100 bg-gray-50 px-2 py-2 text-center">
-                  <div className="text-[10px] uppercase tracking-wide text-gray-500">{k.replace('_', ' ')}</div>
+                  <div className="text-[10px] uppercase tracking-wide text-gray-500">{friendlyMetricLabel(k)}</div>
                   <div className="text-sm font-semibold text-gray-900">{metricVal(baselineSc, k)}</div>
                 </div>
               ))}
@@ -239,8 +242,8 @@ export function RecallImprovePlanPanel({ days, onClose, backHref }: Props): JSX.
 
             {pop && (
               <div className="rounded-md border border-blue-100 bg-blue-50 px-3 py-2 text-xs text-blue-900">
-                <strong>Canadian context:</strong> HEFI {pop.value.toFixed(1)}/80 — {pop.band_phrase}.
-                {' '}{pop.caveat}
+                <strong>Compared with Canadians:</strong> your score is {pop.value.toFixed(1)} out of 80 ({pop.band_phrase.toLowerCase()}).
+                {' '}{humanizeForUser(pop.caveat)}
               </div>
             )}
 
@@ -248,7 +251,7 @@ export function RecallImprovePlanPanel({ days, onClose, backHref }: Props): JSX.
               <div>
                 <h3 className="text-xs font-semibold text-gray-800 mb-2 flex items-center gap-1">
                   <Target className="h-3.5 w-3.5" aria-hidden="true" />
-                  Priority swap targets
+                  Foods to focus on first
                 </h3>
                 <ul className="space-y-1.5">
                   {plan.priority_targets.slice(0, 5).map(t => (
@@ -257,13 +260,10 @@ export function RecallImprovePlanPanel({ days, onClose, backHref }: Props): JSX.
                       className="text-xs text-gray-700 flex flex-wrap items-center gap-x-2 gap-y-0.5"
                     >
                       <span className="font-medium truncate max-w-[16rem]">{t.food_description}</span>
-                      <span className="text-gray-500">{t.mass_g}g ({t.mass_pct}%)</span>
-                      {t.swap_rule_id && (
-                        <span className="text-violet-700 bg-violet-100 px-1.5 py-0.5 rounded">rule match</span>
-                      )}
+                      <span className="text-gray-500">{t.mass_g}g ({t.mass_pct}% of your day)</span>
                       {t.flags.map(f => (
                         <span key={f} className="text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded">
-                          {FLAG_LABELS[f] ?? f}
+                          {FLAG_LABELS_DISPLAY[f] ?? f}
                         </span>
                       ))}
                     </li>
@@ -275,8 +275,8 @@ export function RecallImprovePlanPanel({ days, onClose, backHref }: Props): JSX.
             <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900 flex gap-2">
               <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
               <p>
-                Swaps run on the scorecard only — this page scores your day and highlights what to
-                change first. Continue below to find and apply swaps in one place.
+                This page shows how you scored and where to start. Tap below to try ingredient swaps
+                and see updated scores in one place.
               </p>
             </div>
 
@@ -288,10 +288,10 @@ export function RecallImprovePlanPanel({ days, onClose, backHref }: Props): JSX.
                 className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white text-sm font-medium rounded-md"
               >
                 {opening ? (
-                  <>Opening scorecard…</>
+                  <>Opening…</>
                 ) : (
                   <>
-                    Try swaps on scorecard
+                    Try swaps and re-score
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </>
                 )}

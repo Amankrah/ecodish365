@@ -179,8 +179,8 @@ export default function RecallHistoryAnalyzePage() {
             <div className="flex-1">
               <h1 className="text-2xl font-bold text-gray-900">Analyze saved days</h1>
               <p className="text-sm text-gray-600 mt-1">
-                Score dietary patterns, get ranked swap suggestions, and review food-group
-                exposure across the days you selected on the history page.
+                See how your eating lines up with familiar styles like Mediterranean or DASH,
+                find foods worth swapping, and review food groups across the days you picked.
               </p>
             </div>
           </div>
@@ -214,8 +214,8 @@ export default function RecallHistoryAnalyzePage() {
             <h2 className="text-sm font-semibold text-gray-900">Dietary pattern</h2>
             <p className="text-xs text-gray-600 mt-1">
               {days.length === 1
-                ? 'Classify this day against Canadian dietary pattern prototypes.'
-                : `Combine ${days.length} days (mass-weighted) and classify the average pattern.`}
+                ? 'See which familiar eating style your day most closely matches.'
+                : `Blend ${days.length} days together and see which eating style fits best on average.`}
             </p>
           </div>
           <button

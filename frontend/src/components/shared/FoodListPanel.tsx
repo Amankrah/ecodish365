@@ -52,14 +52,14 @@ interface ScoreTarget {
 }
 
 const SCORE_TARGETS: ScoreTarget[] = [
-  { id: 'scorecard',       label: 'Scorecard',       emoji: '✨', path: '/scorecard' },
-  { id: 'hefi',            label: 'HEFI',            emoji: '🥗', path: '/hefi/calculate' },
-  { id: 'heni',            label: 'HENI',            emoji: '🧬', path: '/heni/calculate' },
-  { id: 'fcs',             label: 'FCS',             emoji: '🧭', path: '/fcs/calculate' },
-  { id: 'hsr',             label: 'HSR',             emoji: '⭐', path: '/hsr/calculate' },
-  { id: 'environmental',   label: 'Environmental',   emoji: '🌍', path: '/environmental/calculate' },
-  { id: 'dietary_pattern', label: 'Dietary pattern', emoji: '🎯', path: '/dietary-pattern' },
-  { id: 'planetary',       label: 'Planetary',       emoji: '🪐', path: '/planetary' },
+  { id: 'scorecard',       label: 'All scores',        emoji: '✨', path: '/scorecard' },
+  { id: 'hefi',            label: 'Healthy eating',    emoji: '🥗', path: '/hefi/calculate' },
+  { id: 'heni',            label: 'Health impact',     emoji: '🧬', path: '/heni/calculate' },
+  { id: 'fcs',             label: 'Food Compass',      emoji: '🧭', path: '/fcs/calculate' },
+  { id: 'hsr',             label: 'Star rating',       emoji: '⭐', path: '/hsr/calculate' },
+  { id: 'environmental',   label: 'Environment',       emoji: '🌍', path: '/environmental/calculate' },
+  { id: 'dietary_pattern', label: 'Eating style',      emoji: '🎯', path: '/dietary-pattern' },
+  { id: 'planetary',       label: 'Planet budget',     emoji: '🪐', path: '/planetary' },
 ];
 
 interface Props {
@@ -245,8 +245,8 @@ export function FoodListPanel({
         <summary className="cursor-pointer list-none px-3 py-2 flex items-center gap-2 text-xs text-gray-700">
           <Info className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
           <span className="flex-1">
-            <strong>Saved food list</strong> — empty. Run a 24-h recall or scan a packaged food to populate it,
-            or import a previously-exported list below.
+            <strong>Saved food list</strong> is empty. Log a food diary day or scan a product to fill it,
+            or import a list you saved before.
           </span>
           <ChevronDown className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
         </summary>
@@ -282,9 +282,9 @@ export function FoodListPanel({
 
   const provenanceLabel =
     isMultiDay && list.multi_day ? `${list.multi_day.n_days}-day average`
-    : isPackaged ? 'Packaged food (inferred)'
-    : isImported ? 'Imported'
-    : 'Recall (24h)';
+    : isPackaged ? 'Scanned product (estimated)'
+    : isImported ? 'Imported list'
+    : 'Food diary day';
 
   const isOpen = hydrated ? !collapsed : true;
 

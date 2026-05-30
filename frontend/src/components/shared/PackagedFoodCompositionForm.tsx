@@ -41,13 +41,15 @@ interface Props {
 
 // Scoring routes. Names match Recall24hWizard's SCORE_BUTTONS for consistency.
 // SCORECARD-1 (2026-05-26) tops the list with the consumer-friendly multi-metric view.
-const SCORE_ROUTES: Array<{
+type ScoreRoute = {
   id: 'hefi' | 'heni' | 'fcs' | 'environmental' | 'dietary_pattern' | 'scorecard' | 'planetary';
   emoji: string;
   label: string;
   path: string;
   note: string;
-}> = [
+};
+
+const SCORE_ROUTES_RESEARCH: ScoreRoute[] = [
   { id: 'scorecard', emoji: '✨', label: 'Scorecard',
     path: '/scorecard',
     note: 'All six metrics at a glance, framed for a lay reader' },
@@ -69,6 +71,30 @@ const SCORE_ROUTES: Array<{
   { id: 'planetary', emoji: '🪐', label: 'Planetary boundaries',
     path: '/planetary',
     note: 'EAT-Lancet 2.0 Table 2 — % of one person\'s daily food-system budget' },
+];
+
+const SCORE_ROUTES_INDIVIDUAL: ScoreRoute[] = [
+  { id: 'scorecard', emoji: '✨', label: 'All scores',
+    path: '/scorecard',
+    note: 'Every measure in one view' },
+  { id: 'dietary_pattern', emoji: '🎯', label: 'Eating style',
+    path: '/dietary-pattern',
+    note: 'Which familiar pattern this resembles' },
+  { id: 'hefi', emoji: '🥗', label: 'Healthy eating',
+    path: '/hefi/calculate',
+    note: 'How well it matches Canada\'s Food Guide' },
+  { id: 'heni', emoji: '🧬', label: 'Health impact',
+    path: '/heni/calculate',
+    note: 'Healthy-life minutes' },
+  { id: 'fcs', emoji: '🧭', label: 'Food Compass',
+    path: '/fcs/calculate',
+    note: 'One score from 1 to 100' },
+  { id: 'environmental', emoji: '🌍', label: 'Environment',
+    path: '/environmental/calculate',
+    note: 'Climate, land, and water footprint' },
+  { id: 'planetary', emoji: '🪐', label: 'Planet budget',
+    path: '/planetary',
+    note: 'Your share of a daily planet budget for food' },
 ];
 
 function confidenceColor(c: number): string {
@@ -158,7 +184,9 @@ export function PackagedFoodCompositionForm({
     position: r.position,
   }));
 
-  function routeTo(route: typeof SCORE_ROUTES[number]): void {
+  const scoreRoutes = userType === 'individual' ? SCORE_ROUTES_INDIVIDUAL : SCORE_ROUTES_RESEARCH;
+
+  function routeTo(route: ScoreRoute): void {
     setRouting(route.id);
     // Build the payload once; reuse for both the sessionStorage handoff
     // (consumed by the destination's useRecall24hReceiver) and the cross-page
@@ -441,7 +469,7 @@ export function PackagedFoodCompositionForm({
       <div className="border-t pt-3">
         <h3 className="text-sm font-semibold text-gray-900 mb-2">Score this composition with…</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-          {SCORE_ROUTES.map(route => (
+          {scoreRoutes.map(route => (
             <button
               key={route.id}
               type="button"

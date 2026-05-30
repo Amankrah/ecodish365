@@ -1,5 +1,5 @@
 /**
- * RecallDayPicker — choose a browser-local saved 24-h recall day.
+ * RecallDayPicker — choose a browser-local saved food diary day.
  * Used on improve-product and scorecard add flows.
  */
 'use client';
@@ -20,8 +20,8 @@ export function RecallDayPicker({ onSelect }: Props): JSX.Element {
       <div className="bg-white border rounded-lg p-6 text-center space-y-4">
         <Bookmark className="h-10 w-10 text-violet-600 mx-auto" aria-hidden="true" />
         <p className="text-sm text-gray-600 max-w-md mx-auto">
-          No saved recall days yet. Log a full day in the 24-h recall wizard, then click{' '}
-          <strong>Save this day</strong> on the review step.
+          No saved days yet. Log a full day in the food diary, then click{' '}
+          <strong>Save to history</strong> on the review step.
         </p>
         <div className="flex flex-wrap justify-center gap-2">
           <Link
@@ -29,13 +29,13 @@ export function RecallDayPicker({ onSelect }: Props): JSX.Element {
             className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700"
           >
             <CalendarClock className="h-4 w-4" aria-hidden="true" />
-            Log a 24-h recall
+            Log a food diary day
           </Link>
           <Link
             href="/recall-history"
             className="inline-flex items-center gap-1.5 px-4 py-2 border rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
-            Recall history
+            Food diary history
           </Link>
         </div>
       </div>
@@ -45,7 +45,7 @@ export function RecallDayPicker({ onSelect }: Props): JSX.Element {
   return (
     <div className="bg-white border rounded-lg p-4 space-y-3">
       <p className="text-sm text-gray-600">
-        Pick a day you saved from the 24-h recall wizard. We load its aggregated food list so you
+        Pick a day you saved from your food diary. We load its food list so you
         can try healthier swaps across the whole day.
       </p>
       <ul className="space-y-1 max-h-72 overflow-y-auto border rounded-md divide-y">
@@ -78,9 +78,9 @@ export function RecallDayPicker({ onSelect }: Props): JSX.Element {
       </ul>
       <p className="text-xs text-gray-500">
         Need a new day?{' '}
-        <Link href="/recall-24h" className="text-violet-700 underline">Log a 24-h recall</Link>
-        {' '}or manage saved days on{' '}
-        <Link href="/recall-history" className="text-violet-700 underline">recall history</Link>.
+        <Link href="/recall-24h" className="text-violet-700 underline">Log a food diary day</Link>
+        {' '}or manage saved days in{' '}
+        <Link href="/recall-history" className="text-violet-700 underline">food diary history</Link>.
       </p>
     </div>
   );

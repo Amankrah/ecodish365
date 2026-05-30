@@ -375,11 +375,9 @@ def _build_recall_explanations(
         'HSR is mathematically computable but methodologically suspect.'
     )
     base_caveat_individual = (
-        "What you logged is a single day's snapshot. Your real eating "
-        'varies day-to-day, so any single-day score is best read as a '
-        'rough indicator, not a definitive measure of how you usually eat. '
-        'For HEFI especially, researchers recommend averaging at least '
-        'two recall days before making personal conclusions.'
+        "What you logged is one day of eating. Your habits change from day to "
+        "day, so treat any single-day score as a snapshot, not a verdict on "
+        "how you usually eat. Logging several days gives a clearer picture."
     )
     methodology = (
         'Each meal is decomposed into CNF ingredients with an LLM-assisted '
@@ -402,15 +400,15 @@ def _build_recall_explanations(
     if user_type == 'individual':
         return {
             'plain_summary': {
-                'title': "Your day's eating, decomposed",
+                'title': "Your day's foods",
                 'message': (
                     f"You logged {result_dict.get('occasions_count', 0)} "
-                    f"meal occasion(s) totalling "
-                    f"~{result_dict.get('estimated_daily_kcal', 0):.0f} kcal. "
+                    f"meal(s) totalling about "
+                    f"{result_dict.get('estimated_daily_kcal', 0):.0f} calories. "
                     f"We matched your day to "
                     f"{len(result_dict.get('aggregated_daily_ingredients', []))} "
-                    f"CNF foods, ready to score against HEFI, HENI, HSR, "
-                    f"FCS, or environmental impact."
+                    f"foods, ready to score for nutrition, health, and "
+                    f"environment."
                 ),
             },
             'before_you_score': {
@@ -606,29 +604,41 @@ def recall_24h(request):
 # --- /api/dietary-pattern/classify/ -------------------------------------
 
 _NARRATIVE_SYSTEM_PROMPT = (
-    "You are explaining a dietary-pattern resemblance result to a "
-    "{user_type} user.\n\n"
-    "Input is the top-3 prototype resemblances (cosine values), the user's "
-    "top-5 foods by mass, and the confidence band.\n\n"
-    "Generate 2-3 short sentences total:\n"
-    "- Sentence 1: name the top pattern + cosine (as a percentage) + a "
-    "1-clause reason citing 1-2 user foods that drove the match.\n"
-    "- Sentence 2: name co-leading patterns if any, OR contrast briefly "
-    "with the second-place pattern.\n"
-    "- Sentence 3 (optional): one audience-appropriate observation or a "
-    "concrete swap if they wanted to shift toward a target — NOT a health "
-    "claim, NOT outcome wording.\n\n"
+    "You are explaining a dietary-pattern match to a {user_type} user.\n\n"
+    "Input is the top 3 eating-style matches, the user's heaviest foods, "
+    "and a confidence level.\n\n"
+    "Write 2-3 short sentences:\n"
+    "- Sentence 1: name the closest eating style, its match strength as a "
+    "percentage, and one or two foods that pulled the match that way.\n"
+    "- Sentence 2: mention a close second style if there is one.\n"
+    "- Sentence 3 (optional): one practical observation or swap idea. No "
+    "health promises or risk claims.\n\n"
     "RULES:\n"
-    "- NEVER say \"you eat\" or \"you are eating\" — say "
-    "\"today's food choices resemble\".\n"
-    "- NEVER quote outcome studies, mortality numbers, or risk reductions. "
-    "Those are reserved for the researcher-mode citation block.\n"
-    "- Keep it conversational; don't lecture.\n\n"
-    # NB: the literal JSON braces are doubled so Python's str.format() at
-    # render time substitutes only {user_type} and leaves the example JSON
-    # untouched.
+    "- Say \"today's food choices resemble\" or \"your day looks most like\". "
+    "Never say \"you are\" or \"you eat\".\n"
+    "- Do not cite studies, mortality, or disease risk.\n"
+    "- Use plain, conversational language.\n"
+    "- Do not mention cosine, embeddings, or technical scoring terms.\n\n"
     "Respond with JSON only: {{\"narrative\": \"...\"}}"
 )
+
+
+_CONFIDENCE_PLAIN = {
+    'high': 'strong match',
+    'moderate': 'reasonable match',
+    'low': 'uncertain match',
+}
+
+
+def _top_pattern_display(result_dict: Dict[str, Any]) -> str:
+    resemblances = result_dict.get('resemblances') or []
+    if resemblances:
+        return str(resemblances[0].get('display_name') or result_dict.get('top_pattern', '?'))
+    return str(result_dict.get('top_pattern', '?'))
+
+
+def _confidence_phrase(confidence: str) -> str:
+    return _CONFIDENCE_PLAIN.get(confidence, confidence.replace('_', ' '))
 
 
 def _strip_pattern_individual_mode_fields(
@@ -695,10 +705,9 @@ def _build_pattern_explanations(
     is_multi_day = bool(meta_label)
     is_inferred_composition = decomposition_provenance == 'packaged_food_inferred'
     base_caveat_individual = (
-        "Today's day-vector is one snapshot of your eating. For claims "
-        "about your usual eating pattern, log multiple recall days. The "
-        "patterns shown describe the SHAPE of today's food choices — they "
-        "are NOT personal health predictions."
+        "This is one snapshot of what you ate. To understand your usual "
+        "habits, log several days. These eating-style labels describe the "
+        "shape of your food choices. They are not personal health predictions."
     )
     base_caveat_researcher = (
         "MANDATORY CAVEAT: this resemblance is computed on a single-day "
@@ -713,12 +722,11 @@ def _build_pattern_explanations(
         "Mediterranean-resemblance cosine as a personal CVD-risk reduction."
     )
     multi_day_caveat_individual = (
-        f"This is your {meta_label}, which begins to approximate your "
-        "usual eating but is still based on a limited sample. The patterns "
-        "shown describe the SHAPE of your average food choices across these "
-        "days — they are NOT personal health predictions. Day-to-day "
-        "variation is also informative; check the per-day timeline on the "
-        "recall-history page to see how your pattern shifts."
+        f"This is your {meta_label}. That starts to reflect your usual "
+        "eating, but it is still a limited sample. These labels describe "
+        "the overall shape of your food choices across these days. They are "
+        "not personal health predictions. Check individual days on your food "
+        "diary to see how your pattern shifts."
     )
     multi_day_caveat_researcher = (
         f"MULTI-DAY AVERAGE CAVEAT ({meta_label}): the resemblance below is "
@@ -741,12 +749,10 @@ def _build_pattern_explanations(
     # Regulation only requires descending-mass-order on labels; the per-
     # ingredient masses are LLM-inferred from positions + NF panel macros.
     inferred_composition_caveat_individual = (
-        "This pattern resemblance was computed from an ingredient list AI-"
-        "extracted from a packaged food label. The per-ingredient masses "
-        "are an INFORMED ESTIMATE based on the ingredient ordering and the "
-        "Nutrition Facts panel macros — labels rarely disclose actual "
-        "percentages. Treat the resemblance as DIRECTIONAL only, and "
-        "remember that a single packaged product is not a full day's eating."
+        "This match used an ingredient list read from a packaged food label. "
+        "Amounts for each ingredient are estimated from label order and "
+        "nutrition facts, not weighed. Treat the result as directional. A "
+        "single packaged product is not a full day of eating."
     )
     inferred_composition_caveat_researcher = (
         "INFERRED-COMPOSITION CAVEAT (PKG-IMG-1 Phase 2): the ingredient "
@@ -762,43 +768,40 @@ def _build_pattern_explanations(
     )
 
     out: Dict[str, Any] = {}
+    pattern_name = _top_pattern_display(result_dict)
+    confidence = _confidence_phrase(str(result_dict.get('top_pattern_confidence', '')))
     if user_type == 'individual':
         if is_inferred_composition:
             out['plain_summary'] = {
-                'title': 'Packaged food — pattern resemblance',
+                'title': 'Packaged product eating style',
                 'message': (
-                    f"This packaged product's ingredient composition most "
-                    f"closely resembles the {result_dict.get('top_pattern', '?')} "
-                    f"pattern (confidence: "
-                    f"{result_dict.get('top_pattern_confidence', '?')}). "
-                    f"Read this as a property of the product, not your diet."
+                    f"This product's ingredients look most like the "
+                    f"{pattern_name} eating style ({confidence}). "
+                    f"Read this as a property of the product, not your whole diet."
                 ),
             }
             out['mandatory_caveat'] = {
-                'title': 'About this result (packaged-food inferred composition)',
+                'title': 'About this result',
                 'message': inferred_composition_caveat_individual,
             }
         elif is_multi_day:
             out['plain_summary'] = {
                 'title': f'Your {meta_label}',
                 'message': (
-                    f"Across {meta_label}, your average food choices most "
-                    f"closely resemble {result_dict.get('top_pattern', '?')} "
-                    f"pattern (confidence: "
-                    f"{result_dict.get('top_pattern_confidence', '?')})."
+                    f"Across {meta_label}, your average food choices look most "
+                    f"like the {pattern_name} eating style ({confidence})."
                 ),
             }
             out['mandatory_caveat'] = {
-                'title': 'About this multi-day average',
+                'title': 'About this average',
                 'message': multi_day_caveat_individual,
             }
         else:
             out['plain_summary'] = {
-                'title': "Today's dietary pattern",
+                'title': "Today's eating style",
                 'message': (
-                    f"Today's food choices most closely resemble "
-                    f"{result_dict.get('top_pattern', '?')} pattern "
-                    f"(confidence: {result_dict.get('top_pattern_confidence', '?')})."
+                    f"Today's food choices look most like the {pattern_name} "
+                    f"eating style ({confidence})."
                 ),
             }
             out['mandatory_caveat'] = {
@@ -1041,13 +1044,15 @@ def dietary_pattern_classify(request):
             drivers = fped_pattern_drivers(cleaned, proto_foods, n_days)
             if drivers:
                 explanations['fped_drivers'] = {
-                    'title': 'What drives the resemblance (food groups)',
+                    'title': 'Why it matched (food groups)',
                     'pattern': result_dict['top_pattern'],
                     'drivers': drivers,
-                    'caveat': ('Food-group deltas vs the average prototype day '
-                               '(USDA FPED equivalents borrowed from each food\'s US '
-                               'analog). Interpretive overlay — does not affect the '
-                               'resemblance score.'),
+                    'caveat': (
+                        'These are the biggest food-group differences between '
+                        'your day and a typical day in this eating style. '
+                        'They help explain the match. They do not change the '
+                        'score.'
+                    ),
                 }
         except Exception:  # noqa: BLE001 — overlay must never break classification
             logger.debug('FPED driver overlay skipped', exc_info=True)

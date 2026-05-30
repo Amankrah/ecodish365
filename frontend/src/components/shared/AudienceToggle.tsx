@@ -99,7 +99,7 @@ export function AudienceToggle({
         >
           <AlertCircle className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
           <span>
-            View changed — recalculate to refresh the explanations for this audience.
+            View changed. Recalculate to refresh the explanations for this audience.
           </span>
         </div>
       )}

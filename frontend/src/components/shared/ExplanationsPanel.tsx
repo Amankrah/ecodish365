@@ -22,6 +22,7 @@
 import { useState } from 'react';
 import { AlertTriangle, BookOpen, Info, ChevronDown, ChevronRight, Eye } from 'lucide-react';
 import type { ExplanationsBlock, UserType } from './AudienceToggle';
+import { humanizeForUser } from '@/lib/humanizeCopy';
 
 interface ExplanationsPanelProps {
   explanations: ExplanationsBlock | undefined;
@@ -54,6 +55,10 @@ export function ExplanationsPanel({
   }
   const summary = explanations.score_summary;
   const banner = AUDIENCE_BANNER[userType];
+  const plain = userType === 'individual';
+
+  const display = (text: string | undefined) =>
+    plain && text ? humanizeForUser(text) : (text ?? '');
 
   return (
     <div className="space-y-4">
@@ -73,20 +78,20 @@ export function ExplanationsPanel({
             </h3>
           )}
           {summary.headline && (
-            <p className={`text-lg font-bold ${accent}`}>{summary.headline}</p>
+            <p className={`text-lg font-bold ${accent}`}>{display(summary.headline)}</p>
           )}
           {summary.units && (
-            <p className="text-sm text-gray-700">{summary.units}</p>
+            <p className="text-sm text-gray-700">{display(summary.units)}</p>
           )}
           {summary.interpretation && (
-            <p className="text-sm text-gray-700">{summary.interpretation}</p>
+            <p className="text-sm text-gray-700">{display(summary.interpretation)}</p>
           )}
           {summary.mandatory_caveat && (
             <div className="bg-amber-50 border-l-4 border-amber-400 rounded-md p-3 mt-3">
               <div className="flex gap-2 items-start">
                 <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
                 <p className="text-xs text-amber-900 font-medium leading-relaxed">
-                  {summary.mandatory_caveat}
+                  {display(summary.mandatory_caveat)}
                 </p>
               </div>
             </div>
@@ -107,7 +112,7 @@ export function ExplanationsPanel({
               )}
               {explanations.recall_context.message && (
                 <p className="text-sm text-amber-900 leading-relaxed">
-                  {explanations.recall_context.message}
+                  {display(explanations.recall_context.message)}
                 </p>
               )}
             </div>
@@ -122,7 +127,7 @@ export function ExplanationsPanel({
             {explanations.nova_explainer.title}
           </h3>
           <p className="text-sm text-gray-600">
-            {explanations.nova_explainer.description}
+            {display(explanations.nova_explainer.description)}
           </p>
         </div>
       )}
@@ -193,7 +198,7 @@ export function ExplanationsPanel({
           <h3 className="text-sm font-semibold text-emerald-800 mb-2">What you can do</h3>
           <div className="space-y-2 text-sm text-emerald-900">
             {Object.entries(explanations.action_tips).map(([k, v]) => (
-              <p key={k}>{v}</p>
+              <p key={k}>{display(v)}</p>
             ))}
           </div>
         </div>

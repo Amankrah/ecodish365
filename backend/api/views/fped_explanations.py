@@ -260,9 +260,9 @@ def build_fped_explanations(agg: FpedAggregate, user_type: str = 'individual') -
         eat_more = []
         n_excl = int(cov.get('n_no_profile', 0))
         partial_note = (
-            f"We couldn't match {n_excl} of your foods to a food-group profile, so "
+            f"We couldn't match {n_excl} of your foods to a food group, so "
             f"this view covers about {round(cov.get('coverage_pct_by_mass', 0))}% of "
-            "what you ate — some groups may look lower here than they really are."
+            "what you ate. Some groups may look lower here than they really are."
         )
     else:
         partial_note = ''

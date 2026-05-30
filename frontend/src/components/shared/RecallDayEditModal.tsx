@@ -43,7 +43,7 @@ export function RecallDayEditModal({ day, onClose, onSaved }: RecallDayEditModal
     try {
       const updated = updateDayFromEdit(day.id, { date, label, ingredients });
       if (!updated) {
-        setError('This day could not be found — it may have been deleted.');
+        setError('This day could not be found. It may have been deleted.');
         setSaving(false);
         return;
       }
@@ -69,7 +69,7 @@ export function RecallDayEditModal({ day, onClose, onSaved }: RecallDayEditModal
         <div className="flex items-start justify-between p-4 border-b sticky top-0 bg-white z-10">
           <div>
             <h2 id="recall-edit-title" className="text-lg font-semibold text-gray-900">
-              Edit 24-h recall
+              Edit food diary day
             </h2>
             <p className="text-xs text-gray-600 mt-0.5">
               Search by name or use <strong>Find with AI</strong>. Pattern score clears until you re-view.
@@ -119,13 +119,13 @@ export function RecallDayEditModal({ day, onClose, onSaved }: RecallDayEditModal
             onChange={setIngredients}
             defaultMassG={100}
             searchPlaceholder="Search foods to add…"
-            emptyHint="No foods in this day yet — search or use Find with AI."
+            emptyHint="No foods in this day yet. Search or use Find with AI."
           />
 
           <div className="text-xs text-gray-600 flex flex-wrap gap-x-3 gap-y-1">
             <span>{ingredients.length} foods</span>
             <span>{totalMass.toFixed(0)} g total</span>
-            <span>{day.estimated_daily_kcal.toFixed(0)} kcal (from last save — re-score to refresh)</span>
+            <span>{day.estimated_daily_kcal.toFixed(0)} kcal (from last save; re-score to refresh)</span>
           </div>
 
           {error && (

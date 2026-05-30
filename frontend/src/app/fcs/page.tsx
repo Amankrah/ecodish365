@@ -261,7 +261,7 @@ export default function FCSMainPage() {
                 </h2>
                 <p className="text-gray-700 mb-3">
                   The easiest way to score a whole day is to walk through it occasion by
-                  occasion in the 24-hour recall wizard. Each meal contributes to the day&apos;s
+                  occasion in the food diary. Each meal contributes to the day&apos;s
                   overall score in proportion to how many calories it adds, so a big bowl of
                   oats counts for more than a small sprinkle of cocoa.
                 </p>
@@ -270,7 +270,7 @@ export default function FCSMainPage() {
                     href="/recall-24h?then=fcs"
                     className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
                   >
-                    Open the 24-h recall wizard
+                    Open the food diary
                   </Link>
                   <Link
                     href="/recall-history"

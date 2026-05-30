@@ -277,20 +277,18 @@ export default function HSRCalculate() {
               <div className="flex">
                 <ExclamationTriangleIcon className="w-5 h-5 text-amber-700 mr-2 flex-shrink-0" />
                 <div className="text-sm text-amber-900">
-                  <p className="font-semibold">Scoring a 24-h dietary recall — informational only.</p>
+                  <p className="font-semibold">Scoring a full food diary day</p>
                   <p className="mt-1">
-                    HSRAC v9 rates individual packaged products within their category, not whole
-                    days of eating. This combined star rating is a rough snapshot; for daily diet
-                    quality use{' '}
+                    Star ratings compare packaged products within the same category, not whole days.
+                    Treat this combined rating as a rough snapshot. For daily diet quality, try{' '}
                     <a href="/hefi/calculate" className="underline font-medium hover:text-amber-950">
-                      HEFI
+                      healthy eating
                     </a>{' '}
                     or{' '}
                     <a href="/fcs/calculate" className="underline font-medium hover:text-amber-950">
-                      FCS
+                      Food Compass
                     </a>
-                    . Healthier-alternatives lookup is off for recall loads (up to{' '}
-                    {HSR_CALCULATE_MAX_FOODS} foods).
+                    .
                   </p>
                 </div>
               </div>
@@ -301,12 +299,12 @@ export default function HSRCalculate() {
                 <InformationCircleIcon className="w-5 h-5 text-blue-700 mr-2 flex-shrink-0" />
                 <div className="text-sm text-blue-900">
                   <p>
-                    HSR compares products <strong>within the same food category</strong>. For a full
-                    day&apos;s eating,{' '}
+                    Stars compare products <strong>within the same food category</strong>. For a full
+                    day of eating,{' '}
                     <a href="/recall-24h?then=hsr" className="underline font-medium hover:text-blue-950">
-                      build a 24-h recall
-                    </a>{' '}
-                    — daily HSR is informational; HEFI and FCS are better daily metrics.
+                      log a food diary day
+                    </a>
+                    . Daily star averages are only a rough guide; healthy eating and Food Compass scores work better for whole days.
                   </p>
                 </div>
               </div>
@@ -353,7 +351,7 @@ export default function HSRCalculate() {
               headerClassName="p-6"
               whenCollapsedHint={
                 <p className="px-6 pb-4 text-xs text-gray-600">
-                  Click above to search the CNF database and add or change foods.
+                  Click above to search and add foods to your list.
                 </p>
               }
             >
@@ -589,7 +587,7 @@ export default function HSRCalculate() {
                 onClick={() => setRecipeModalOpen(true)}
                 className="w-full mt-2 flex items-center justify-center gap-1.5 text-sm text-amber-700 hover:text-amber-900 hover:underline"
               >
-                🍳 Score a homemade dish (decompose into CNF ingredients)
+                🍳 Break down a homemade dish
               </button>
               {/* AI-MATCH-2 (2026-05-24): 24-h dietary recall. NOTE: daily
                   HSR is informational only — HSRAC v9 is a per-product
@@ -599,7 +597,7 @@ export default function HSRCalculate() {
                 href="/recall-24h?then=hsr"
                 className="w-full mt-1 flex items-center justify-center gap-1.5 text-sm text-amber-700 hover:text-amber-900 hover:underline"
               >
-                🍽️ Build a 24-h recall instead (six-occasion daily eating)
+                🍽️ Log a full food diary day instead
               </a>
 
               </div>

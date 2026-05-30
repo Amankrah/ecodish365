@@ -3,25 +3,25 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Documentation',
-  description: 'How to use EcoDish365: Scorecard, 24-h recall, packaged-food scanning, and the six scoring lenses.',
+  description: 'How to use EcoDish365: all scores, food diary, packaged-food scanning, and the six scoring lenses.',
 };
 
 const guides = [
-  { title: 'Scorecard (all six lenses)', href: '/scorecard', blurb: 'Score one food list under HEFI, HENI, HSR, FCS, environmental, and dietary pattern at once.' },
-  { title: '24-h dietary recall', href: '/recall-24h', blurb: 'Build a full day occasion by occasion, then route to any scorer.' },
+  { title: 'All scores (six lenses)', href: '/scorecard', blurb: 'Score one food list under healthy eating, health impact, star rating, Food Compass, environment, and eating style at once.' },
+  { title: 'Food diary', href: '/recall-24h', blurb: 'Build a full day meal by meal, then send it to any score.' },
   { title: 'Packaged-food scanner', href: '/scan-product', blurb: 'Photograph a label, confirm extracted values, score the product.' },
-  { title: 'Recall history', href: '/recall-history', blurb: 'Save days and average across multiple recalls.' },
-  { title: 'CNF + WAFCT explorer', href: '/cnf', blurb: 'Search 6,719 foods in the integrated catalogue.' },
+  { title: 'Food diary history', href: '/recall-history', blurb: 'Save days and average across multiple logs.' },
+  { title: 'Food catalogue explorer', href: '/cnf', blurb: 'Search 6,719 foods in the integrated catalogue.' },
   { title: 'My meals', href: '/meals', blurb: 'Save reusable meal templates.' },
 ];
 
 const lenses = [
-  { title: 'HEFI-2019', href: '/hefi' },
-  { title: 'HENI', href: '/heni' },
-  { title: 'HSR', href: '/hsr' },
+  { title: 'Healthy eating (HEFI)', href: '/hefi' },
+  { title: 'Health impact (HENI)', href: '/heni' },
+  { title: 'Star rating (HSR)', href: '/hsr' },
   { title: 'Food Compass', href: '/fcs' },
-  { title: 'Environmental', href: '/environmental' },
-  { title: 'Dietary pattern', href: '/dietary-pattern' },
+  { title: 'Environment', href: '/environmental' },
+  { title: 'Eating style', href: '/dietary-pattern' },
 ];
 
 export default function DocumentationPage() {

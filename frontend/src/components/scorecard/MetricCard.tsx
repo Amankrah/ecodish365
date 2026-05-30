@@ -80,7 +80,7 @@ export function MetricCard({ card, stale, onRetry, retrying }: Props): JSX.Eleme
           {card.driver && (
             <p className="text-xs text-gray-600 leading-snug italic">{card.driver}</p>
           )}
-          <p className="text-[11px] text-gray-500 leading-snug">⚠ {card.caveat}</p>
+          <p className="text-[11px] text-gray-500 leading-snug">Note: {card.caveat}</p>
         </>
       )}
 

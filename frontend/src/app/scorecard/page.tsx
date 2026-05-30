@@ -48,12 +48,12 @@ const METRIC_ORDER: MetricKey[] = [
 ];
 
 const METRIC_LABELS: Record<MetricKey, { emoji: string; title: string }> = {
-  hefi:            { emoji: '🥗', title: 'HEFI-2019' },
-  heni:            { emoji: '🧬', title: 'HENI' },
-  hsr:             { emoji: '⭐', title: 'HSR' },
-  fcs:             { emoji: '🧭', title: 'FCS' },
-  environmental:   { emoji: '🌍', title: 'Environmental' },
-  dietary_pattern: { emoji: '🎯', title: 'Dietary pattern' },
+  hefi:            { emoji: '🥗', title: 'Healthy eating' },
+  heni:            { emoji: '🧬', title: 'Health impact' },
+  hsr:             { emoji: '⭐', title: 'Product rating' },
+  fcs:             { emoji: '🧭', title: 'Food Compass' },
+  environmental:   { emoji: '🌍', title: 'Environment' },
+  dietary_pattern: { emoji: '🎯', title: 'Eating style' },
 };
 
 export default function ScorecardPage(): JSX.Element {
@@ -257,10 +257,10 @@ export default function ScorecardPage(): JSX.Element {
               <Sparkles className="h-7 w-7 text-blue-700" aria-hidden="true" />
             </div>
             <div className="flex-1">
-              <h1 className="text-2xl font-bold text-gray-900">Scorecard</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Your nutrition scores</h1>
               <p className="text-sm text-gray-600 mt-1">
-                See how the same food, dish, or full day ranks under six different scoring lenses
-                — at a glance, in plain English.
+                See how your foods score on nutrition, health, and environment in one view.
+                Click <strong>Score all</strong> when your list is ready.
               </p>
             </div>
           </div>
@@ -313,7 +313,8 @@ export default function ScorecardPage(): JSX.Element {
             defaultCollapsed={false}
           >
             <p className="text-xs text-gray-500 mb-3">
-              Realistic ingredient swaps for your current list. Applying a swap updates the food list above — re-score to refresh the metrics.
+              Try healthier ingredient swaps. When you apply a swap, your food list updates above.
+              Click <strong>Score all</strong> again to refresh the numbers.
             </p>
             <SubstitutionSuggestionsPanel
               composition={compositionForSubstitution}
@@ -372,10 +373,8 @@ export default function ScorecardPage(): JSX.Element {
             <span>
               <strong>Small sample</strong> ({totalMassG.toFixed(0)} g
               {typeof dailyKcal === 'number' && dailyKcal > 0 ? `, ${dailyKcal.toFixed(0)} kcal` : ''}).
-              HEFI, HENI, Environmental, and Dietary Pattern need a fuller day to be meaningful —
-              treat their absolute numbers below as illustrative, not as a personal diet diagnosis.
-              HSR here summarises individual products only (not a daily HSR score); FCS aggregates
-              this list as one combined meal.
+              Some scores work best with a full day of eating. Treat the numbers below as a preview,
+              not a diagnosis. HSR rates individual products. FCS treats your list as one combined meal.
             </span>
           </div>
         )}
@@ -385,10 +384,8 @@ export default function ScorecardPage(): JSX.Element {
           <div role="status" className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-md p-3 text-sm text-amber-900">
             <Info className="h-4 w-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
             <span>
-              <strong>Packaged product — inferred composition.</strong>{' '}
-              One or more foods came from a label scan; per-ingredient masses were inferred from
-              descending-mass-order + Nutrition Facts macros, not weighed. Metric caveats below
-              reflect this uncertainty.
+              <strong>Scanned product.</strong> Ingredient amounts were estimated from the nutrition label,
+              not weighed. Scores may be less precise because of that.
             </span>
           </div>
         )}

@@ -5,14 +5,15 @@
 
 import { TrendingDown, TrendingUp } from 'lucide-react';
 import type { SubstitutionScorecardDeltaMap } from '@/lib/api';
+import { friendlyMetricLabel } from '@/lib/humanizeCopy';
 
 const METRIC_LABELS: Record<string, string> = {
-  hefi: 'HEFI',
-  heni: 'HENI',
-  hsr: 'HSR',
-  fcs: 'FCS',
-  environmental: 'Env',
-  dietary_pattern: 'Pattern',
+  hefi: 'Healthy eating',
+  heni: 'Health impact',
+  hsr: 'Product rating',
+  fcs: 'Diet quality',
+  environmental: 'Environment',
+  dietary_pattern: 'Eating style',
 };
 
 interface Props {
@@ -45,10 +46,10 @@ function DeltaChip({
   return (
     <span
       className={`inline-flex items-center gap-0.5 rounded ${compact ? 'text-[10px] px-1 py-0.5' : 'text-xs px-1.5 py-0.5'} ${color}`}
-      title={`${METRIC_LABELS[metric] ?? metric}: ${delta.before ?? '—'} → ${delta.after ?? '—'}`}
+      title={`${friendlyMetricLabel(metric)}: ${delta.before ?? 'n/a'} to ${delta.after ?? 'n/a'}`}
     >
       {!neutral && <Icon className="h-3 w-3" aria-hidden="true" />}
-      <span className="font-medium">{METRIC_LABELS[metric] ?? metric}</span>
+      <span className="font-medium">{friendlyMetricLabel(metric)}</span>
       {sign}{delta.delta.toFixed(metric === 'hsr' ? 2 : 1)}{unit}
     </span>
   );

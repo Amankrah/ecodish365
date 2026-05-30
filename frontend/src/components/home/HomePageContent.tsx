@@ -18,39 +18,39 @@ import {
 const lenses = [
   {
     emoji: '🥗',
-    name: 'HEFI-2019',
-    tagline: 'Adherence to Canada\'s Food Guide',
-    meaning: 'How well does a day\'s eating line up with Canada\'s Food Guide? Scored 0–80 across 10 components.',
+    name: 'Healthy eating',
+    tagline: 'How well you match Canada\'s Food Guide',
+    meaning: 'Scores a day of eating from 0 to 80 across vegetables, grains, protein, drinks, and more.',
     citation: 'Brassard 2022, APNM',
     href: '/hefi',
-    linkLabel: 'Open HEFI-2019',
+    linkLabel: 'Open healthy eating score',
     accent: 'from-green-500 to-emerald-600',
   },
   {
     emoji: '🧬',
-    name: 'HENI',
+    name: 'Health impact',
     tagline: 'Minutes of healthy life per serving',
-    meaning: 'Translates a food into minutes of healthy life gained or lost, drawn from 15 diet-related risks in the Global Burden of Disease study.',
+    meaning: 'Estimates minutes of healthy life gained or lost from one serving, based on long-term disease research.',
     citation: 'Stylianou 2021, Nature Food',
     href: '/heni',
-    linkLabel: 'Open HENI',
+    linkLabel: 'Open health impact',
     accent: 'from-purple-500 to-violet-600',
   },
   {
     emoji: '⭐',
-    name: 'HSR (HSRAC v9)',
-    tagline: 'A star rating for packaged products',
-    meaning: 'Rates a packaged product from 0.5 to 5 stars against others in its own category. Built for comparing products on the shelf.',
+    name: 'Health Star Rating',
+    tagline: 'Stars for packaged products',
+    meaning: 'Rates a packaged product from 0.5 to 5 stars against others in the same category on the shelf.',
     citation: 'HSRAC Implementation Guide v9',
     href: '/hsr',
-    linkLabel: 'Open HSR',
+    linkLabel: 'Open star ratings',
     accent: 'from-amber-500 to-orange-600',
   },
   {
     emoji: '🧭',
     name: 'Food Compass',
-    tagline: 'How closely a food tracks longer-life eating patterns',
-    meaning: 'Scores every food on a single 1 to 100 scale across nine areas of nutrition. Higher means the food more closely resembles patterns linked to longer, healthier lives in research studies.',
+    tagline: 'One score across all food types',
+    meaning: 'Grades every food from 1 to 100 on nutrition and processing. Higher scores align with eating patterns linked to longer life in research.',
     citation: 'Mozaffarian 2021, Nature Food',
     href: '/fcs',
     linkLabel: 'Open Food Compass',
@@ -58,22 +58,22 @@ const lenses = [
   },
   {
     emoji: '🌍',
-    name: 'Environmental (ReCiPe 2016)',
-    tagline: 'The climate, land, and water cost of producing this food',
-    meaning: 'A production-stage footprint with honest uncertainty ranges, built on ReCiPe 2016 and AGRIBALYSE 3.2.',
-    citation: 'Huijbregts 2017; Poore & Nemecek 2018; ADEME',
+    name: 'Environmental impact',
+    tagline: 'Climate, land, and water',
+    meaning: 'Estimates the climate, land, and water needed to produce your food, with honest uncertainty ranges.',
+    citation: 'Poore & Nemecek 2018; Mekonnen & Hoekstra',
     href: '/environmental',
-    linkLabel: 'Open Environmental',
+    linkLabel: 'Open environmental impact',
     accent: 'from-emerald-500 to-teal-600',
   },
   {
     emoji: '🎯',
     name: 'Dietary pattern',
-    tagline: 'Mediterranean, DASH, Vegan, West African, and more',
-    meaning: 'Which well-studied eating pattern does your day most resemble? We compare it against 8 patterns drawn from the research.',
-    citation: 'Trichopoulou 2003; Sacks 2001; Orlich 2013; Willett 2019',
+    tagline: 'Mediterranean, DASH, and more',
+    meaning: 'Shows which familiar eating style your day most closely matches, from eight patterns in the research.',
+    citation: 'Trichopoulou 2003; Sacks 2001; Orlich 2013',
     href: '/dietary-pattern',
-    linkLabel: 'Open Dietary',
+    linkLabel: 'Open eating styles',
     accent: 'from-rose-500 to-pink-600',
   },
 ];
@@ -81,33 +81,33 @@ const lenses = [
 const tools = [
   {
     emoji: '✨',
-    name: 'Scorecard (all metrics)',
-    description: 'See all six lenses for the same food list in one clear view. One click, six compact summary cards.',
+    name: 'All scores',
+    description: 'See healthy eating, health impact, stars, Food Compass, environment, and eating style for the same food list in one view.',
     href: '/scorecard',
     highlight: true,
   },
   {
     emoji: '🍽️',
-    name: '24-h dietary recall wizard',
-    description: 'Build a full day, occasion by occasion: breakfast, snack, lunch, and so on. Each meal breaks down into its individual foods, then you can score the whole day under any lens.',
+    name: 'Food diary',
+    description: 'Log a full day meal by meal: breakfast, snacks, lunch, and dinner. Each meal breaks into individual foods you can score under any measure.',
     href: '/recall-24h',
   },
   {
     emoji: '📷',
-    name: 'Packaged-food scanner',
-    description: 'Snap one to three photos of a label. The app reads the Nutrition Facts panel and ingredient list, you confirm, and the product is scored across every lens.',
+    name: 'Scan a product',
+    description: 'Photograph a nutrition label, confirm the details, and score the product across every measure.',
     href: '/scan-product',
   },
   {
     emoji: '📚',
-    name: 'Recall history',
-    description: 'Save your recall days, then reload one or average across several. Averaging gives a truer picture of how you usually eat than any single day can.',
+    name: 'Saved days',
+    description: 'Save logged days and revisit them, or average several days together for a truer picture of how you usually eat.',
     href: '/recall-history',
   },
   {
     emoji: '🔍',
-    name: 'CNF + WAFCT explorer',
-    description: 'Search the full food catalogue. Smart search understands synonyms, French, and compound queries.',
+    name: 'Food search',
+    description: 'Search thousands of foods from Canadian and West African databases. Smart search understands synonyms and everyday names.',
     href: '/cnf',
   },
   {
@@ -180,9 +180,9 @@ export default function HomePageContent() {
             pretending to settle the question.
           </p>
           <p className="mt-4 text-sm text-gray-500 max-w-3xl mx-auto leading-relaxed">
-            HEFI-2019 (Brassard 2022), HENI healthy-life-minutes (Stylianou 2021), Health Star Rating
-            (HSRAC v9), Food Compass (Mozaffarian 2021), ReCiPe 2016 LCA (AGRIBALYSE 3.2), and
-            dietary-pattern resemblance across Mediterranean, DASH, Vegan, West African staple, and more.
+            Six published measures cover healthy eating, health impact, product stars,
+            Food Compass, environmental footprint, and eating style. Each one answers a
+            different question. We explain what each score means and where its limits are.
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
@@ -191,7 +191,7 @@ export default function HomePageContent() {
               className="inline-flex items-center justify-center px-6 py-3 text-base font-semibold rounded-lg text-white bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700 transition shadow-lg hover:shadow-xl"
             >
               <SparklesIcon className="mr-2 w-5 h-5" aria-hidden="true" />
-              Open the Scorecard
+              See all your scores
               <ArrowRightIcon className="ml-2 w-5 h-5" aria-hidden="true" />
             </Link>
             <Link
@@ -199,7 +199,7 @@ export default function HomePageContent() {
               className="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-lg text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition shadow-sm"
             >
               <CalendarDaysIcon className="mr-2 w-5 h-5" aria-hidden="true" />
-              Log a 24-h recall
+              Log a food diary day
             </Link>
             <Link
               href="/scan-product"
@@ -281,7 +281,7 @@ export default function HomePageContent() {
               className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium rounded-lg text-white bg-emerald-600 hover:bg-emerald-700"
             >
               <SparklesIcon className="mr-2 w-4 h-4" aria-hidden="true" />
-              See all six at once on the Scorecard
+              See all six at once
             </Link>
           </div>
         </div>
@@ -438,13 +438,13 @@ export default function HomePageContent() {
               href="/scorecard"
               className="inline-flex items-center justify-center px-5 py-3 text-sm font-semibold rounded-lg text-emerald-700 bg-white hover:bg-gray-50 shadow"
             >
-              Scorecard
+              All scores
             </Link>
             <Link
               href="/recall-24h"
               className="inline-flex items-center justify-center px-5 py-3 text-sm font-semibold rounded-lg text-white border border-white hover:bg-white/10"
             >
-              24-h recall
+              Food diary
             </Link>
             <Link
               href="/scan-product"

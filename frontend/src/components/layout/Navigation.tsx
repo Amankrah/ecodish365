@@ -48,7 +48,7 @@ const navigation: NavItem[] = [
     href: '/hsr', 
     icon: ScaleIcon,
     dropdown: [
-      { name: '✨ Scorecard (all metrics)', href: '/scorecard' },
+      { name: '✨ All scores', href: '/scorecard' },
       { name: 'Scan packaged food', href: '/scan-product' },
       { name: 'Improve one meal', href: '/improve-product' },
       { 
@@ -92,7 +92,7 @@ const navigation: NavItem[] = [
       { name: 'Calculate Impact', href: '/environmental/calculate' },
       { name: 'Compare Foods', href: '/environmental/compare' },
       // PLANETARY-1 (2026-05-27): EAT-Lancet 2.0 Table 2 food-system share.
-      { name: '🪐 Planetary boundaries (EAT-Lancet 2.0)', href: '/planetary' },
+      { name: '🪐 Planet budget share', href: '/planetary' },
     ]
   },
   // RECALL-HISTORY-1 (2026-05-24): surface the 24-h recall → history →

@@ -73,7 +73,11 @@ export function FoodProfileContent({
       },
       userType,
     );
-    toast.success(`Added ${food.FoodDescription} (${massG} g) to Scorecard`);
+    toast.success(
+      userType === 'individual'
+        ? `Added ${food.FoodDescription} (${massG} g) to all scores`
+        : `Added ${food.FoodDescription} (${massG} g) to Scorecard`,
+    );
   };
 
   const copyShareLink = async () => {
@@ -164,8 +168,8 @@ export function FoodProfileContent({
 
       {userType === 'individual' && (
         <p className="text-sm text-gray-600 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2">
-          This profile shows what is in the food catalogue. To see HEFI, HENI, HSR, FCS, environmental,
-          or dietary-pattern scores, add it to the Scorecard at your chosen portion size.
+          This profile shows what is in the food catalogue. To see your nutrition and
+          sustainability scores, add this food at your chosen portion size.
         </p>
       )}
 
@@ -238,10 +242,10 @@ export function FoodProfileContent({
         <div className="mt-3 flex flex-wrap gap-2">
           <button type="button" onClick={handleAddToScorecard} className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg text-white bg-emerald-600 hover:bg-emerald-700">
             <SparklesIcon className="w-4 h-4 mr-1.5" />
-            Add to Scorecard
+            {userType === 'individual' ? 'Add to all scores' : 'Add to Scorecard'}
           </button>
           <Link href="/scorecard" className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg text-emerald-800 bg-white border border-emerald-300 hover:bg-emerald-50">
-            Open Scorecard
+            {userType === 'individual' ? 'Open all scores' : 'Open Scorecard'}
           </Link>
           {onAddToCompare && (
             <button type="button" onClick={onAddToCompare} className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg text-gray-700 bg-white border border-gray-300 hover:bg-gray-50">

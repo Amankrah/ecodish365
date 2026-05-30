@@ -486,7 +486,7 @@ export function ScorerFoodInput(props: ScorerFoodInputProps): JSX.Element {
           onClick={() => setRecipeModalOpen(true)}
           className="w-full text-sm text-gray-700 hover:text-gray-900 hover:underline text-left"
         >
-          🍳 Add a homemade dish (decompose into CNF ingredients)
+          🍳 Break down a homemade dish
         </button>
       )}
 
@@ -495,7 +495,7 @@ export function ScorerFoodInput(props: ScorerFoodInputProps): JSX.Element {
           href={`/recall-24h?then=${target}`}
           className="block text-sm text-gray-700 hover:text-gray-900 hover:underline"
         >
-          🍽️ Build a 24-h recall instead
+          🍽️ Log a full food diary day instead
         </a>
       )}
 

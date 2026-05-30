@@ -20,6 +20,7 @@ import {
 } from '@/lib/substitutionApply';
 import type { UserType } from './AudienceToggle';
 import { SubstitutionScorecardDelta } from './SubstitutionScorecardDelta';
+import { humanizeSwapRationale } from '@/lib/humanizeCopy';
 
 const PURPOSE_OPTIONS: Array<{ id: SubstitutionPurpose; label: string; hint: string }> = [
   { id: 'general_health', label: 'Overall health', hint: 'Balance fibre, sodium, and saturated fat' },
@@ -33,8 +34,8 @@ const PURPOSE_OPTIONS: Array<{ id: SubstitutionPurpose; label: string; hint: str
 
 const SOURCE_LABELS: Record<SubstitutionSourceFilter, string> = {
   both: 'Canada + West Africa',
-  cnf: 'Canada (CNF)',
-  wafct: 'West Africa (WAFCT)',
+  cnf: 'Canada',
+  wafct: 'West Africa',
 };
 
 const CULTURE_LABELS: Record<SubstitutionCulturalContext, string> = {
@@ -129,7 +130,7 @@ function FpedSwapDeltaBlock({
       )}
       {deltas.partial && (
         <p className="text-[11px] text-amber-800 mt-1">
-          Partial mapping — some foods could not be linked to a food-group profile.
+          Some foods could not be grouped. The rest of the summary still applies.
         </p>
       )}
     </div>
@@ -262,9 +263,8 @@ export function SubstitutionSuggestionsPanel({
         </div>
 
         <p className="text-sm text-gray-600">
-          Check the ingredient list first. When the amounts look right, choose what you want to
-          improve and click <strong>Find swaps</strong>. You can apply swaps one at a time or pick
-          a <strong>multi-step plan</strong> to change several ingredients at once.
+          Check that your ingredient amounts look right, pick a goal, then click <strong>Find swaps</strong>.
+          Apply one swap at a time, or choose a multi-step plan to change several foods together.
         </p>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -444,7 +444,7 @@ export function SubstitutionSuggestionsPanel({
                       <p className="text-sm font-semibold text-gray-900">{s.label}</p>
                       {onFrontier && (
                         <span className="text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-amber-200 text-amber-900">
-                          Strong balance
+                          Good all-round pick
                         </span>
                       )}
                       {tag && (
@@ -484,7 +484,12 @@ export function SubstitutionSuggestionsPanel({
                       <FpedSwapDeltaBlock deltas={s.fped_deltas} userType={userType} />
                     )}
 
-                    <p className="text-xs text-gray-500 mt-2">{s.rationale}</p>
+                    {(() => {
+                      const note = humanizeSwapRationale(s.rationale, userType);
+                      return note ? (
+                        <p className="text-xs text-gray-500 mt-2">{note}</p>
+                      ) : null;
+                    })()}
                   </div>
                   <button
                     type="button"

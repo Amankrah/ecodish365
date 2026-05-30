@@ -240,37 +240,35 @@ def get_explanations(
     # Default: individual audience (consumer-facing)
     return {
         'score_summary': {
-            'title': 'Diet Quality (HEFI-2019)',
+            'title': 'Healthy eating score',
             'headline': (
-                f'{total_score:.1f} out of 80 — {band_label} for adherence to '
+                f'{total_score:.1f} out of 80. {band_label}, based on '
                 f'Canada\'s Food Guide 2019.'
             ),
             'units': (
-                'HEFI-2019 measures how well your food choices align with '
-                'Canada\'s Food Guide 2019 recommendations. Out of 80 points '
-                'across 10 components (vegetables/fruits, whole grains, '
-                'protein, beverages, sugars, sodium, etc.).'
+                'This score shows how closely your food choices match '
+                'Canada\'s Food Guide. You can earn up to 80 points across '
+                'vegetables and fruit, whole grains, protein, drinks, added '
+                'sugars, sodium, and other components.'
             ),
             'interpretation': (
-                f'For context, the typical Canadian adult scores about 43/80 '
-                f'on this index. Scores above the median (43-51) show better-'
-                f'than-average alignment with the Food Guide; scores above 62 '
-                f'are in the top 1%.'
+                f'Most Canadian adults score around 43 out of 80. Scores '
+                f'between 43 and 51 are above average. Scores above 62 place '
+                f'you in the top 1%.'
             ),
             'mandatory_caveat': (
-                'IMPORTANT: a HEFI score from ONE day of eating does NOT '
-                'reflect your usual eating pattern. Use this as a snapshot, '
-                'not a verdict. The score also measures Food Guide '
-                'alignment — it has not been directly linked to specific '
-                'health outcomes.'
+                'One day of eating is only a snapshot. It may not reflect '
+                'your usual habits, so use this as a guide rather than a '
+                'final judgment. This score measures Food Guide alignment. '
+                'It has not been directly linked to specific health outcomes.'
             ),
         },
         'action_tips': {
             'simple_guidance': (
-                'Pay attention to which components scored lowest — those are '
-                'the easiest wins. Common low-scoring areas: plant-based '
-                'protein, whole grains, and Free Sugars / Sodium when '
-                'eating processed foods.'
+                'Start with the areas that scored lowest. Those are often '
+                'the easiest places to improve. Many people fall short on '
+                'plant-based protein, whole grains, and added sugars or '
+                'sodium from processed foods.'
             ),
         },
     }

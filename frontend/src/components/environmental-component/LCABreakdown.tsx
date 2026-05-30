@@ -106,6 +106,12 @@ const CONSUMED_CATEGORIES = [
   },
 ];
 
+const INDIVIDUAL_CATEGORY_DESCRIPTIONS: Record<(typeof CONSUMED_CATEGORIES)[number]['key'], string> = {
+  'Global warming': 'Greenhouse gas emissions from growing and processing these foods.',
+  'Land use': 'Farmland needed to produce these foods.',
+  'Water consumption': 'Fresh water used to grow and process these foods.',
+};
+
 // Categories NOT consumed in v1; surfaced in the methodology accordion only.
 const NON_CONSUMED_CATEGORIES = [
   { name: 'Terrestrial acidification', why: 'P&N reports SO₂-aggregate, not unit-compatible with ReCiPe' },
@@ -133,13 +139,13 @@ const ZONE_BADGE_CLASSES: Record<string, string> = {
   Unknown:  'bg-gray-100    text-gray-700    ring-1 ring-gray-300',
 };
 
-const ZoneBadge: React.FC<{ zone?: string }> = ({ zone }) => {
+const ZoneBadge: React.FC<{ zone?: string; userType: UserType }> = ({ zone, userType }) => {
   if (!zone) return null;
   const cls = ZONE_BADGE_CLASSES[zone] || ZONE_BADGE_CLASSES.Unknown;
   return (
     <span
       className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide ${cls}`}
-      title={`Stylianou 2021 SI Table 11B zone (per-serving percentile)`}
+      title={userType === 'individual' ? 'Compared with typical meals' : 'Stylianou 2021 SI Table 11B zone (per-serving percentile)'}
     >
       {zone}
     </span>
@@ -152,6 +158,7 @@ export const LCABreakdown: React.FC<LCABreakdownProps> = ({
 }) => {
   const [showMethodology, setShowMethodology] = useState(false);
   const [showEndpoints, setShowEndpoints] = useState(false);
+  const isResearch = userType !== 'individual';
   const analysis = (results?.data?.meal_analysis || {}) as Partial<
     Required<EnvironmentalImpactResult>['data']['meal_analysis']
   >;
@@ -197,15 +204,24 @@ export const LCABreakdown: React.FC<LCABreakdownProps> = ({
       <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-md">
         <AlertCircle className="h-5 w-5 text-amber-700 mt-0.5 flex-shrink-0" />
         <div className="text-sm text-amber-900">
-          <strong>v1 scope</strong>: 3 of 18 ReCiPe 2016 midpoint categories with
-          literature-anchored centrals and worst/best-case uncertainty envelopes.
-          The other 15 categories are documented but not consumed —
-          see <button type="button" className="underline" onClick={() => setShowMethodology(true)}>methodology</button>.
+          {isResearch ? (
+            <>
+              <strong>v1 scope</strong>: 3 of 18 ReCiPe 2016 midpoint categories with
+              literature-anchored centrals and worst/best-case uncertainty envelopes.
+              The other 15 categories are documented but not consumed —
+              see <button type="button" className="underline" onClick={() => setShowMethodology(true)}>methodology</button>.
+            </>
+          ) : (
+            <>
+              <strong>What we show:</strong> climate change, land use, and water use.
+              Other environmental impact types are not included in this version.
+            </>
+          )}
         </div>
       </div>
 
-      {/* Active methodology chip */}
-      {(methodologyMeta.methodology || methodologyMeta.methodology_pack) && (
+      {/* Active methodology chip — researcher / policy only */}
+      {isResearch && (methodologyMeta.methodology || methodologyMeta.methodology_pack) && (
         <div className="flex flex-wrap items-center gap-2 text-xs text-gray-600">
           <span className="inline-flex items-center px-2 py-1 rounded-full bg-gray-100 border border-gray-200 font-mono">
             {methodologyMeta.methodology || 'ReCiPe 2016 v1.1'}
@@ -233,8 +249,8 @@ export const LCABreakdown: React.FC<LCABreakdownProps> = ({
         </div>
       )}
 
-      {/* Tier γ recipe decomposition audit panel */}
-      {showDecompPanel && (
+      {/* Tier γ recipe decomposition audit panel — researcher / policy only */}
+      {isResearch && showDecompPanel && (
         <details className="border border-purple-200 bg-purple-50/30 rounded-md">
           <summary className="cursor-pointer px-3 py-2 text-sm font-medium text-purple-900">
             🧪 Recipe decomposition audit ({decompDecisions.length} composite{decompDecisions.length === 1 ? '' : 's'} processed)
@@ -313,15 +329,19 @@ export const LCABreakdown: React.FC<LCABreakdownProps> = ({
                   <div className="flex items-baseline justify-between gap-2">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h3 className={`font-semibold ${palette.text}`}>{cat.name}</h3>
-                      <ZoneBadge zone={categoryZones[cat.key]} />
+                      <ZoneBadge zone={categoryZones[cat.key]} userType={userType} />
                       <ConfidenceBadge
                         confidence={factorConfidence[cat.key]}
                         userType={userType}
                       />
                     </div>
-                    <span className="text-xs text-gray-500">per 100 kcal of meal</span>
+                    <span className="text-xs text-gray-500">
+                      {isResearch ? 'per 100 kcal of meal' : 'per 100 calories of food'}
+                    </span>
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">{cat.description}</p>
+                  <p className="text-xs text-gray-600 mt-1">
+                    {isResearch ? cat.description : INDIVIDUAL_CATEGORY_DESCRIPTIONS[cat.key]}
+                  </p>
                 </div>
               </div>
               {band ? (
@@ -337,7 +357,8 @@ export const LCABreakdown: React.FC<LCABreakdownProps> = ({
         })}
       </div>
 
-      {/* Endpoint section */}
+      {/* Endpoint section — researcher / policy only */}
+      {isResearch && (
       <div className="border rounded-lg bg-gray-50/50">
         <Button
           variant="ghost"
@@ -380,8 +401,10 @@ export const LCABreakdown: React.FC<LCABreakdownProps> = ({
           </div>
         )}
       </div>
+      )}
 
-      {/* Methodology accordion — the 15 non-consumed categories */}
+      {/* Methodology accordion — researcher / policy only */}
+      {isResearch && (
       <div className="border rounded-lg bg-gray-50/50">
         <Button
           variant="ghost"
@@ -423,6 +446,7 @@ export const LCABreakdown: React.FC<LCABreakdownProps> = ({
           </div>
         )}
       </div>
+      )}
 
       {/* CODE-5 data-quality report (additive). Researcher / policy mode
           shows full known-issues + recommendations list expanded by default;
@@ -436,7 +460,8 @@ export const LCABreakdown: React.FC<LCABreakdownProps> = ({
         />
       )}
 
-      {/* Methodology summary footer */}
+      {/* Methodology summary footer — researcher / policy only */}
+      {isResearch && (
       <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
         <h4 className="font-semibold text-indigo-900 mb-2 text-sm">Methodology</h4>
         <div className="text-xs text-indigo-800 space-y-1">
@@ -447,6 +472,7 @@ export const LCABreakdown: React.FC<LCABreakdownProps> = ({
           <p><strong>Regionalisation:</strong> Canadian regional multipliers applied to group-default fallback foods only (not to Agribalyse-matched values)</p>
         </div>
       </div>
+      )}
     </div>
   );
 };

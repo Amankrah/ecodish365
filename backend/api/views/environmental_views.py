@@ -215,25 +215,25 @@ def get_user_explanations(user_type: str = "individual") -> Dict[str, Dict[str, 
     explanations = {
         "individual": {
             "monetization": {
-                "title": "💰 Environmental Cost in Dollars",
-                "simple_explanation": "This shows what your meal's environmental impact costs society in Canadian dollars.",
-                "detailed_explanation": "Every meal has hidden environmental costs - like climate change from greenhouse gases, health costs from air pollution, and cleanup costs for water contamination. We calculate these real costs in dollars so you can understand the true price of your food choices.",
-                "what_it_means": "A higher cost means your meal has a bigger environmental impact on our planet and future generations.",
-                "action_tips": "Choose meals with lower environmental costs to save money for society and protect the environment."
+                "title": "Environmental cost in dollars",
+                "simple_explanation": "This shows the hidden environmental cost of your meal in Canadian dollars.",
+                "detailed_explanation": "Food production affects climate, air quality, water, and land. We translate those impacts into dollar costs so you can see the real price your meal places on society and the environment.",
+                "what_it_means": "A higher cost means a bigger environmental footprint.",
+                "action_tips": "Choosing lower-cost meals helps reduce pressure on climate, water, and land."
             },
             "reference_meals": {
-                "title": "📊 How Your Meal Compares",
-                "simple_explanation": "We compare your meal to three typical meal types to show you where it stands.",
-                "detailed_explanation": "We created three reference meals: (1) Sustainable meals with mostly plants, local foods, and minimal processing, (2) Unsustainable meals with lots of red meat and processed foods, (3) Ultra-processed meals with packaged and fast foods.",
-                "what_it_means": "Numbers above 1.0 mean your meal has more environmental impact than that meal type. Numbers below 1.0 mean less impact.",
-                "action_tips": "Aim for your meal to be similar to or better than the sustainable meal (ratio close to 1.0 or lower)."
+                "title": "How your meal compares",
+                "simple_explanation": "We compare your meal to three typical meal types so you can see where it sits.",
+                "detailed_explanation": "The three reference meals are: a plant-forward sustainable meal, a meat-heavy high-impact meal, and an ultra-processed convenience meal. Each gives you a benchmark for climate and cost.",
+                "what_it_means": "A number above 1.0 means more impact than that reference meal. Below 1.0 means less.",
+                "action_tips": "Aim to be at or below the sustainable meal benchmark when you can."
             },
             "lca_results": {
-                "title": "🌍 Environmental Impact Categories",
-                "simple_explanation": "These show different ways your meal affects the environment.",
-                "detailed_explanation": "Life Cycle Assessment (LCA) looks at your meal's environmental impact from farm to plate, including carbon footprint (climate change), water use, land use, and effects on human health and ecosystems.",
-                "what_it_means": "Each category shows a different environmental impact. Lower numbers are better for the planet.",
-                "action_tips": "Focus on reducing the highest impact categories by choosing different ingredients."
+                "title": "Environmental impact",
+                "simple_explanation": "These numbers show how your meal affects climate, land, and water.",
+                "detailed_explanation": "We estimate impacts from farm to plate: greenhouse gases (climate), land needed to grow the food, and water used in production. Lower numbers are better for the planet.",
+                "what_it_means": "Each category shows a different kind of environmental pressure. Focus on the highest ones first.",
+                "action_tips": "Swapping the foods that drive the highest category usually gives the biggest improvement."
             }
         },
         "researcher": {
@@ -548,14 +548,14 @@ def _get_comparison_interpretation(cost_ratio: float, carbon_ratio: float, meal_
     if user_type == "individual":
         if meal_type == "sustainable":
             if cost_ratio <= 1.0:
-                return "Excellent! Your meal is as sustainable as our eco-friendly reference meal."
+                return "Your meal is in the same range as our plant-forward reference meal."
             else:
-                return f"Your meal has {cost_ratio:.1f}x more environmental impact than a sustainable meal. Try adding more plants!"
+                return f"Your meal has about {cost_ratio:.1f}x the impact of a plant-forward meal. Adding more vegetables or legumes can help."
         elif meal_type == "unsustainable":
             if cost_ratio < 1.0:
-                return f"Good news! Your meal is {1/cost_ratio:.1f}x better than a high-impact meal."
+                return f"Your meal is lighter than a meat-heavy reference meal by about {1/cost_ratio:.1f}x."
             else:
-                return "Your meal has similar or higher impact than an unsustainable meal. Consider healthier choices."
+                return "Your meal is in the same range as a meat-heavy reference meal. Smaller meat portions or plant swaps can help."
     
     elif user_type == "researcher":
         return f"Environmental cost ratio: {cost_ratio:.2f}, Carbon footprint ratio: {carbon_ratio:.2f} relative to {meal_type} reference scenario."
@@ -577,27 +577,27 @@ def _get_overall_assessment(meal_data: Dict[str, Any], user_type: str) -> Dict[s
         # Choice!" labels for meals that the score tile showed as "Good".
         if sustainability_score >= 80 and cost < 0.1:
             return {
-                "rating": "Excellent Choice! 🌟",
-                "message": "Your meal is both environmentally friendly and nutritious. Keep up the great work!",
-                "recommendation": "Share your sustainable eating choices with friends and family."
+                "rating": "Excellent choice",
+                "message": "Your meal has a light environmental footprint overall.",
+                "recommendation": "This is a strong pattern to repeat when it fits your tastes and budget."
             }
         elif sustainability_score >= 65:
             return {
-                "rating": "Good Choice 👍",
-                "message": "Your meal scores well overall, with some room to lower the environmental impact further.",
-                "recommendation": "Consider seasonal produce, smaller animal-product portions, or substituting in legumes."
+                "rating": "Good choice",
+                "message": "Your meal scores well overall, with some room to lower impact further.",
+                "recommendation": "Try seasonal produce, smaller meat portions, or more legumes and whole grains."
             }
         elif sustainability_score >= 50:
             return {
-                "rating": "Moderate 🟡",
-                "message": "Your meal has a mixed sustainability profile.",
-                "recommendation": "Look for the highest-impact category in the per-category cards and target a substitution there."
+                "rating": "Moderate",
+                "message": "Your meal has a mixed environmental profile.",
+                "recommendation": "Look at the highest-impact category below and try one swap there first."
             }
         else:
             return {
-                "rating": "Room for Improvement 🔄",
-                "message": "Your meal has a high environmental impact in at least one category.",
-                "recommendation": "Reducing red-meat or large dairy portions usually gives the biggest single improvement."
+                "rating": "Room to improve",
+                "message": "Your meal has a heavy environmental footprint in at least one area.",
+                "recommendation": "Cutting back on red meat or large dairy portions often helps the most."
             }
     
     elif user_type == "researcher":

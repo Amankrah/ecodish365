@@ -30,8 +30,8 @@ export function MetricEmptyHint({
         <div>
           <h2 className="text-lg font-semibold text-gray-900">Score one food, dish, or full day</h2>
           <p className="text-sm text-gray-600 mt-1">
-            Add foods to your list, then click <strong>Score all</strong> to see how today&apos;s eating
-            ranks under HEFI, HENI, HSR, FCS, Environmental, and Dietary Pattern — all in one view.
+            Add foods to your list, then click <strong>Score all</strong> to see nutrition,
+            health, environment, and eating-style scores in one place.
           </p>
         </div>
       </div>
@@ -58,7 +58,7 @@ export function MetricEmptyHint({
           <ChefHat className="h-4 w-4 text-purple-700 flex-shrink-0 mt-0.5" aria-hidden="true" />
           <span className="flex-1">
             <span className="block text-sm font-medium text-gray-900">Decompose a homemade dish</span>
-            <span className="block text-xs text-gray-600">Describe it in plain English; AI maps it to CNF ingredients.</span>
+            <span className="block text-xs text-gray-600">Describe it in plain English; we match it to foods in our database.</span>
           </span>
         </button>
 
@@ -68,8 +68,8 @@ export function MetricEmptyHint({
         >
           <CalendarClock className="h-4 w-4 text-green-700 flex-shrink-0 mt-0.5" aria-hidden="true" />
           <span className="flex-1">
-            <span className="block text-sm font-medium text-gray-900">Log a 24-h recall</span>
-            <span className="block text-xs text-gray-600">Six-occasion daily eating; route back here when done.</span>
+            <span className="block text-sm font-medium text-gray-900">Log a food diary day</span>
+            <span className="block text-xs text-gray-600">Log meals through the day, then score them here.</span>
           </span>
         </Link>
 

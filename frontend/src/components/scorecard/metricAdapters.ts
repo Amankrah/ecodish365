@@ -19,6 +19,7 @@ import type {
 } from '@/lib/api';
 import type { UserType, ExplanationsBlock } from '@/components/shared/AudienceToggle';
 import type { MetricKey, MetricOutcome } from '@/lib/foodProfileOrchestrator';
+import { humanizeForUser } from '@/lib/humanizeCopy';
 
 export type Accent =
   | 'green' | 'purple' | 'amber' | 'blue' | 'emerald' | 'rose' | 'gray';
@@ -66,70 +67,70 @@ const META: Record<MetricKey, {
   ctaLabel: string;
 }> = {
   hefi: {
-    title: 'HEFI-2019',
+    title: 'Healthy eating',
     emoji: '🥗',
     accent: 'green',
     meaningIndividual:
-      "How well your eating aligns with Canada's Food Guide today.",
+      'How closely your foods match Canada\'s Food Guide recommendations.',
     caveatIndividual:
-      'Designed for a full day of foods — single meals are a rough estimate.',
+      'Best with a full day of eating. A single meal is only a rough guide.',
     ctaHref: '/hefi/calculate?from=scorecard',
-    ctaLabel: 'View full HEFI breakdown',
+    ctaLabel: 'See healthy eating breakdown',
   },
   heni: {
-    title: 'HENI',
+    title: 'Health impact',
     emoji: '🧬',
     accent: 'purple',
     meaningIndividual:
-      'Estimated minutes of healthy life your foods add or subtract.',
+      'Estimated minutes of healthy life these foods may add or take away.',
     caveatIndividual:
-      'Population-marginal estimate, not a personal prediction.',
+      'Based on population averages, not a personal health prediction.',
     ctaHref: '/heni/calculate?from=scorecard',
-    ctaLabel: 'View full HENI breakdown',
+    ctaLabel: 'See health impact breakdown',
   },
   hsr: {
-    title: 'HSR',
+    title: 'Star rating',
     emoji: '⭐',
     accent: 'amber',
     meaningIndividual:
-      "How healthy your products are compared to others in their category.",
+      'How healthy each product is compared with others in the same category.',
     caveatIndividual:
-      'Per-product comparison. A healthy product is not a healthy day.',
+      'Rates products one at a time. A healthy product does not mean a healthy whole day.',
     ctaHref: '/hsr/calculate?from=scorecard',
-    ctaLabel: 'View full HSR breakdown',
+    ctaLabel: 'See star rating breakdown',
   },
   fcs: {
-    title: 'FCS',
+    title: 'Food Compass',
     emoji: '🧭',
     accent: 'blue',
     meaningIndividual:
-      'How much your foods resemble those linked to longer life in cohort studies.',
+      'How much these foods resemble diets linked to longer life in research studies.',
     caveatIndividual:
-      'Anchored to US cohorts; Canadian validation is pending.',
+      'Based mainly on U.S. cohort data. Canadian validation is still in progress.',
     ctaHref: '/fcs/calculate?from=scorecard',
-    ctaLabel: 'View full FCS breakdown',
+    ctaLabel: 'See Food Compass breakdown',
   },
   environmental: {
-    title: 'Environmental',
+    title: 'Environment',
     emoji: '🌍',
     accent: 'emerald',
     meaningIndividual:
-      'Climate, land, and water cost of producing this food.',
+      'Estimated climate, land, and water needed to produce these foods.',
     caveatIndividual:
-      'Production-stage only — does not cover preparation or end-of-life.',
+      'Covers farming and processing. Cooking and packaging are not included.',
     ctaHref: '/environmental/calculate?from=scorecard',
-    ctaLabel: 'View full environmental breakdown',
+    ctaLabel: 'See environment breakdown',
   },
   dietary_pattern: {
-    title: 'Dietary pattern',
+    title: 'Eating style',
     emoji: '🎯',
     accent: 'rose',
     meaningIndividual:
-      'Which canonical eating pattern your day most resembles.',
+      'Which familiar eating style your day most closely resembles.',
     caveatIndividual:
-      'Needs several foods over a full day to be meaningful.',
+      'Works best with a full day and several different foods.',
     ctaHref: '/dietary-pattern?from=scorecard',
-    ctaLabel: 'View full pattern breakdown',
+    ctaLabel: 'See eating style breakdown',
   },
 };
 
@@ -154,10 +155,13 @@ function pickCaveat(
       || inferredMsg
       || wafctMsg;
     if (c) return c;
+  } else {
+    const c = explanations?.score_summary?.mandatory_caveat
+      || explanations?.recall_context?.message
+      || inferredMsg
+      || wafctMsg;
+    if (c) return humanizeForUser(c);
   }
-
-  if (inferredMsg) return inferredMsg;
-  if (wafctMsg) return wafctMsg;
 
   return META[metric].caveatIndividual;
 }
@@ -173,6 +177,11 @@ function pickMeaning(
       || explanations?.score_summary?.message
       || explanations?.recall_context?.message;
     if (m) return m;
+  } else {
+    const m = explanations?.score_summary?.interpretation
+      || explanations?.score_summary?.description
+      || explanations?.score_summary?.message;
+    if (m) return humanizeForUser(m);
   }
   return META[metric].meaningIndividual;
 }
@@ -366,11 +375,11 @@ export function toHsrCard(
   // Truncate long food names so the driver line stays one short sentence.
   const trunc = (s: string, n = 32) => s.length > n ? `${s.slice(0, n - 1)}…` : s;
   const driver = high && low && high.food_id !== low.food_id
-    ? `Range ${summary.min.toFixed(1)}–${summary.max.toFixed(1)}★ · strongest: ${trunc(high.food_name)} · weakest: ${trunc(low.food_name)}`
-    : `Range ${summary.min.toFixed(1)}–${summary.max.toFixed(1)}★`;
+    ? `From ${summary.min.toFixed(1)} to ${summary.max.toFixed(1)} stars. Best: ${trunc(high.food_name)}. Weakest: ${trunc(low.food_name)}.`
+    : `Star ratings range from ${summary.min.toFixed(1)} to ${summary.max.toFixed(1)}.`;
   const dist = summary.distribution;
   const goodOrBetter = dist.excellent + dist.good;
-  const multiMeaning = 'How healthy each individual product is within its own category — averaged across your list.';
+  const multiMeaning = 'Each product is rated within its own category, then averaged across your list.';
   return {
     metric: 'hsr',
     title: meta.title,
@@ -482,11 +491,11 @@ export function toEnvironmentalCard(
       if (p >= 10) return `${p.toFixed(1)} %`;
       return `${p.toFixed(2)} %`;
     };
-    driver = `Climate ${fmt(climatePct)} · Land ${fmt(landPct)} · Water ${fmt(waterPct)} of daily food-system budget`;
+    driver = `Uses about ${fmt(climatePct)} of a daily climate budget, ${fmt(landPct)} for land, and ${fmt(waterPct)} for water.`;
   } else {
     const co2Band = bands['Global warming'];
     driver = co2Band && typeof co2Band.low === 'number' && typeof co2Band.high === 'number'
-      ? `CO₂e uncertainty: ${co2Band.low.toFixed(2)}–${co2Band.high.toFixed(2)} kg`
+      ? `Climate impact estimate ranges from ${co2Band.low.toFixed(2)} to ${co2Band.high.toFixed(2)} kg CO₂e.`
       : undefined;
   }
   return {
@@ -515,7 +524,7 @@ export function toDietaryPatternCard(
   if (nFoods < 5) {
     return {
       ...hintCard('dietary_pattern',
-        `Pattern resemblance needs at least 5 foods for a confident match (you have ${nFoods}).`),
+        `Add more foods for a reliable pattern match. You have ${nFoods}; we suggest at least 5.`),
     };
   }
   const result = outcome.result?.result;
@@ -538,10 +547,12 @@ export function toDietaryPatternCard(
     emoji: meta.emoji,
     headline,
     subline,
-    meaning: explanations?.plain_summary?.message
-      || pickMeaning('dietary_pattern', userType, outcome.explanations),
-    caveat: explanations?.mandatory_caveat?.message
-      || pickCaveat('dietary_pattern', userType, outcome.explanations),
+    meaning: userType === 'individual'
+      ? (humanizeForUser(explanations?.plain_summary?.message) || pickMeaning('dietary_pattern', userType, outcome.explanations))
+      : (explanations?.plain_summary?.message || pickMeaning('dietary_pattern', userType, outcome.explanations)),
+    caveat: userType === 'individual'
+      ? (humanizeForUser(explanations?.mandatory_caveat?.message) || pickCaveat('dietary_pattern', userType, outcome.explanations))
+      : (explanations?.mandatory_caveat?.message || pickCaveat('dietary_pattern', userType, outcome.explanations)),
     ctaHref: meta.ctaHref,
     ctaLabel: meta.ctaLabel,
     accent: meta.accent,

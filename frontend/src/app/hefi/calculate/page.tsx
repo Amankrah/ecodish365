@@ -397,8 +397,7 @@ export default function HEFICalculatePage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">HEFI Calculator</h1>
           <p className="text-lg text-gray-600">
-            Build a meal or day from foods to estimate HEFI-2019 alignment. For scientifically valid use, HEFI-2019 is intended for complete
-            daily dietary patterns (24-hour recalls), not single foods.
+            See how closely a day of eating matches Canada&apos;s Food Guide. Best with a full day logged, not a single food.
           </p>
           {/* Audience selector (AUDIENCE-CODE-1 2026-05-23) */}
           <div className="mt-4">
@@ -414,11 +413,10 @@ export default function HEFICalculatePage() {
               <div className="flex">
                 <CheckCircleIcon className="w-5 h-5 text-green-700 mr-2 flex-shrink-0" />
                 <div className="text-sm text-green-900">
-                  <p className="font-semibold">Scoring a 24-h dietary recall — natural fit for HEFI-2019.</p>
+                  <p className="font-semibold">Scoring a full food diary day</p>
                   <p className="mt-1">
-                    HEFI-2019 was designed against 24-h recall data (Brassard et&nbsp;al. 2022b).
-                    This score reflects one day&rsquo;s eating; for usual-intake claims,
-                    score multiple recall days.
+                    This score works best with a complete day of eating. One day is a snapshot;
+                    log several days for a clearer picture of your usual habits.
                   </p>
                 </div>
               </div>
@@ -428,15 +426,15 @@ export default function HEFICalculatePage() {
               <div className="flex">
                 <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600 mr-2 flex-shrink-0" />
                 <div className="text-sm text-yellow-800">
-                  <p className="font-semibold">Important: HEFI-2019 is a pattern-level index</p>
+                  <p className="font-semibold">Best with a full day of eating</p>
                   <ul className="list-disc list-inside mt-1 space-y-1">
-                    <li>Use HEFI with complete meals or 24-hour recalls.</li>
-                    <li>Single-food scores are educational estimates and should be interpreted cautiously.</li>
+                    <li>Log meals across the day, not just one food.</li>
+                    <li>A single-food score is only a rough preview.</li>
                   </ul>
                   <p className="mt-2 text-xs">
-                    Building your full day instead?{' '}
+                    Want to log a full day?{' '}
                     <a href="/recall-24h?then=hefi" className="underline font-medium hover:text-yellow-900">
-                      Use the 24-h recall wizard
+                      Use the food diary
                     </a>.
                   </p>
                 </div>
@@ -477,7 +475,7 @@ export default function HEFICalculatePage() {
               headerClassName="p-6"
               whenCollapsedHint={
                 <p className="px-6 pb-4 text-xs text-gray-600">
-                  Click above to search the CNF database and add or change foods.
+                  Click above to search and add foods to your list.
                 </p>
               }
             >
@@ -566,7 +564,7 @@ export default function HEFICalculatePage() {
                   onClick={() => setRecipeModalOpen(true)}
                   className="inline-flex items-center gap-1.5 text-sm text-purple-700 hover:text-purple-900 hover:underline"
                 >
-                  🍳 Score a homemade dish (decompose into CNF ingredients)
+                  🍳 Break down a homemade dish
                 </button>
                 {/* AI-MATCH-2 (2026-05-24): 24-h dietary recall — natural anchor for HEFI
                     since Brassard 2022b designed HEFI-2019 explicitly for 24-h recall data. */}
@@ -574,7 +572,7 @@ export default function HEFICalculatePage() {
                   href="/recall-24h?then=hefi"
                   className="inline-flex items-center gap-1.5 text-sm text-purple-700 hover:text-purple-900 hover:underline"
                 >
-                  🍽️ Build a 24-h recall instead (six-occasion daily eating)
+                  🍽️ Log a full food diary day instead
                 </a>
 
                 {searchResults.length > 0 && (
