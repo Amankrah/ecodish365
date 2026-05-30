@@ -37,12 +37,12 @@ interface CriterionRow { key: string; nutrientId: number | null; min: string; ma
 let _rowSeq = 0;
 const newRow = (): CriterionRow => ({ key: `c${++_rowSeq}`, nutrientId: null, min: '', max: '' });
 
-export function NutrientWorkbench() {
+export function NutrientWorkbench({ initialFoodGroupId }: { initialFoodGroupId?: number }) {
   const { userType, foodGroups, resolveGroupName } = useCnfExplorer();
   const [nutrients, setNutrients] = useState<Nutrient[]>([]);
   const [criteria, setCriteria] = useState<CriterionRow[]>([newRow()]);
   const [basis, setBasis] = useState<DiscoverBasis>('per_100g');
-  const [foodGroupId, setFoodGroupId] = useState<number | ''>('');
+  const [foodGroupId, setFoodGroupId] = useState<number | ''>(initialFoodGroupId ?? '');
   const [source, setSource] = useState<SourceChoice>('both');
   const [ratioNum, setRatioNum] = useState<number | ''>('');
   const [ratioDen, setRatioDen] = useState<number | ''>('');
@@ -57,6 +57,12 @@ export function NutrientWorkbench() {
   useEffect(() => {
     CNFApiService.getNutrients().then(setNutrients).catch(() => toast.error('Failed to load nutrient list'));
   }, []);
+
+  useEffect(() => {
+    if (initialFoodGroupId != null && Number.isFinite(initialFoodGroupId)) {
+      setFoodGroupId(initialFoodGroupId);
+    }
+  }, [initialFoodGroupId]);
 
   const grouped = useMemo(() => groupNutrients(nutrients), [nutrients]);
   const nutrientById = useMemo(() => {

@@ -114,6 +114,56 @@ export interface FoodGroup {
   FoodGroupName: string;
 }
 
+/** Enriched row from GET /cnf/groups/{id}/foods/ */
+export interface GroupFoodRow {
+  FoodID: number;
+  FoodCode: string;
+  FoodDescription: string;
+  FoodDescriptionF?: string;
+  source: 'cnf' | 'wafct';
+  energy_kcal?: number | null;
+  protein_g?: number | null;
+  fibre_g?: number | null;
+  food_type?: 'single' | 'mixed' | null;
+  thermal_state?: string | null;
+  preservation_state?: string | null;
+}
+
+export interface GroupSummary {
+  total_in_group: number;
+  cnf_count: number;
+  wafct_count: number;
+  food_type: { single: number; mixed: number; unknown: number };
+  thermal_state: Record<string, number>;
+  preservation_state: Record<string, number>;
+  prep_both_known_pct: number;
+}
+
+export interface GroupFoodsQuery {
+  limit?: number;
+  offset?: number;
+  q?: string;
+  sort?: 'name' | 'kcal' | 'food_id';
+  sort_dir?: 'asc' | 'desc';
+  food_type?: 'single' | 'mixed';
+  thermal?: string;
+  preservation?: string;
+  source?: 'cnf' | 'wafct' | 'both';
+  summary?: boolean;
+}
+
+export interface GroupFoodsResult {
+  foods: GroupFoodRow[];
+  food_group_id: number;
+  count: number;
+  total_count: number;
+  total_in_group: number;
+  limit: number;
+  offset: number;
+  has_more: boolean;
+  summary?: GroupSummary;
+}
+
 export interface Nutrient {
   NutrientID: number;
   NutrientName: string;
@@ -727,15 +777,23 @@ export class CNFApiService {
     return response.data.data;
   }
 
-  static async getFoodsByGroup(foodGroupId: number, limit = 100): Promise<{
-    foods: Partial<Food>[];
-    food_group_id: number;
-    count: number;
-    limit: number;
-  }> {
-    const response = await api.get(`/cnf/groups/${foodGroupId}/foods/`, {
-      params: { limit }
-    });
+  static async getFoodsByGroup(
+    foodGroupId: number,
+    query: GroupFoodsQuery = {},
+  ): Promise<GroupFoodsResult> {
+    const params: Record<string, string | number | boolean> = {
+      limit: query.limit ?? 100,
+    };
+    if (query.offset != null) params.offset = query.offset;
+    if (query.q) params.q = query.q;
+    if (query.sort) params.sort = query.sort;
+    if (query.sort_dir) params.sort_dir = query.sort_dir;
+    if (query.food_type) params.food_type = query.food_type;
+    if (query.thermal) params.thermal = query.thermal;
+    if (query.preservation) params.preservation = query.preservation;
+    if (query.source && query.source !== 'both') params.source = query.source;
+    if (query.summary) params.summary = 'true';
+    const response = await api.get(`/cnf/groups/${foodGroupId}/foods/`, { params });
     return response.data.data;
   }
 

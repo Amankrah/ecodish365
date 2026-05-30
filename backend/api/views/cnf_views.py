@@ -346,7 +346,7 @@ def discover_foods(request):
 @permission_classes([AllowAny])
 @handle_exceptions
 def get_foods_by_group(request, food_group_id):
-    """Get all foods in a specific food group."""
+    """Get foods in a food group with optional filters, sort, and pagination."""
     try:
         food_group_id = int(food_group_id)
     except ValueError:
@@ -354,19 +354,49 @@ def get_foods_by_group(request, food_group_id):
             "error": "Invalid food group ID",
             "details": "Food group ID must be a valid integer"
         }, status=status.HTTP_400_BAD_REQUEST)
-    
-    limit = min(int(request.GET.get('limit', 100)), 500)
-    foods = get_cnf_pipeline().get_foods_by_group(food_group_id, limit)
-    
-    return Response({
-        "success": True,
-        "data": {
-            "foods": foods,
-            "food_group_id": food_group_id,
-            "count": len(foods),
-            "limit": limit
-        }
-    })
+
+    try:
+        limit = min(int(request.GET.get('limit', 100)), 500)
+        offset = max(0, int(request.GET.get('offset', 0)))
+    except (TypeError, ValueError):
+        return Response({
+            "error": "Invalid pagination",
+            "details": "limit and offset must be integers"
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    q = (request.GET.get('q') or '').strip() or None
+    sort = (request.GET.get('sort') or 'name').strip().lower()
+    sort_dir = (request.GET.get('sort_dir') or 'asc').strip().lower()
+    food_type = (request.GET.get('food_type') or '').strip().lower() or None
+    thermal = (request.GET.get('thermal') or '').strip().lower() or None
+    preservation = (request.GET.get('preservation') or '').strip().lower() or None
+    source = (request.GET.get('source') or '').strip().lower() or None
+    if source == 'both':
+        source = None
+    include_summary = request.GET.get('summary', '').lower() in ('1', 'true', 'yes')
+
+    if food_type not in (None, 'single', 'mixed'):
+        food_type = None
+    if source not in (None, 'cnf', 'wafct'):
+        source = None
+    if sort not in ('name', 'kcal', 'food_id'):
+        sort = 'name'
+
+    result = get_cnf_pipeline().get_foods_by_group(
+        food_group_id,
+        limit=limit,
+        offset=offset,
+        q=q,
+        sort=sort,
+        sort_dir=sort_dir,
+        food_type=food_type,
+        thermal=thermal,
+        preservation=preservation,
+        source=source,
+        include_summary=include_summary,
+    )
+
+    return Response({"success": True, "data": result})
 
 @api_view(['POST'])
 @permission_classes([AllowAny])

@@ -445,18 +445,238 @@ class CNFDataPipeline:
             'count': len(foods),
         }
 
-    def get_foods_by_group(self, food_group_id: int, limit: int = 100) -> List[Dict]:
-        """Get all foods in a specific food group."""
+    def get_foods_by_group(
+        self,
+        food_group_id: int,
+        limit: int = 100,
+        offset: int = 0,
+        q: Optional[str] = None,
+        sort: str = 'name',
+        sort_dir: str = 'asc',
+        food_type: Optional[str] = None,
+        thermal: Optional[str] = None,
+        preservation: Optional[str] = None,
+        source: Optional[str] = None,
+        include_summary: bool = False,
+    ) -> Dict:
+        """List foods in a food group with enrichment, filters, and pagination.
+
+        Enriches each row with source, energy/protein/fibre per 100 g, food_type,
+        and two-axis prep-state tags from the offline CNF/WAFCT label files.
+        """
+        from api.services.cnf_food_type import get_food_type
+        from api.services.cnf_prep_state import prep_state_of
+
+        ENERGY_ID, PROTEIN_ID, FIBRE_ID = 208, 203, 291
+        limit = max(1, min(int(limit), 500))
+        offset = max(0, int(offset))
+        sort = (sort or 'name').lower()
+        sort_dir = (sort_dir or 'asc').lower()
+        if sort_dir not in ('asc', 'desc'):
+            sort_dir = 'asc'
+
         try:
-            foods_in_group = self.data_loader.food_name_df[
-                self.data_loader.food_name_df['FoodGroupID'] == food_group_id
-            ].head(limit)
-            
-            return foods_in_group[['FoodID', 'FoodCode', 'FoodDescription', 'FoodDescriptionF']].to_dict('records')
-            
+            fn = self.data_loader.food_name_df
+            pool = fn[fn['FoodGroupID'] == int(food_group_id)].copy()
+            total_in_group = len(pool)
+
+            if pool.empty:
+                empty = {
+                    'foods': [],
+                    'food_group_id': int(food_group_id),
+                    'count': 0,
+                    'total_count': 0,
+                    'total_in_group': 0,
+                    'limit': limit,
+                    'offset': offset,
+                    'has_more': False,
+                }
+                if include_summary:
+                    empty['summary'] = self._empty_group_summary()
+                return empty
+
+            if 'source' not in pool.columns:
+                pool['source'] = 'cnf'
+            if source in ('cnf', 'wafct'):
+                pool = pool[pool['source'] == source]
+
+            if food_type in ('single', 'mixed'):
+                matched_ids = []
+                for fid in pool['FoodID'].astype(int):
+                    rec = get_food_type(int(fid))
+                    if rec and rec.get('food_type') == food_type:
+                        matched_ids.append(int(fid))
+                pool = pool[pool['FoodID'].astype(int).isin(matched_ids)]
+
+            if thermal:
+                matched_ids = []
+                for fid in pool['FoodID'].astype(int):
+                    ps = prep_state_of(int(fid))
+                    t = ps.thermal_state if ps else 'unknown'
+                    if t == thermal:
+                        matched_ids.append(int(fid))
+                pool = pool[pool['FoodID'].astype(int).isin(matched_ids)]
+
+            if preservation:
+                matched_ids = []
+                for fid in pool['FoodID'].astype(int):
+                    ps = prep_state_of(int(fid))
+                    p = ps.preservation_state if ps else 'unknown'
+                    if p == preservation:
+                        matched_ids.append(int(fid))
+                pool = pool[pool['FoodID'].astype(int).isin(matched_ids)]
+
+            summary = None
+            if include_summary:
+                summary = self._compute_group_summary_from_df(pool)
+
+            if q and q.strip():
+                needle = q.strip().lower()
+                if 'search_index' in pool.columns:
+                    pool = pool[pool['search_index'].str.contains(needle, na=False, regex=False)]
+                else:
+                    pool = pool[
+                        pool['FoodDescription'].str.lower().str.contains(needle, na=False, regex=False)
+                        | pool['FoodDescriptionF'].fillna('').str.lower().str.contains(needle, na=False, regex=False)
+                    ]
+
+            total_count = len(pool)
+            if total_count == 0:
+                result = {
+                    'foods': [],
+                    'food_group_id': int(food_group_id),
+                    'count': 0,
+                    'total_count': 0,
+                    'total_in_group': total_in_group,
+                    'limit': limit,
+                    'offset': offset,
+                    'has_more': False,
+                }
+                if include_summary:
+                    result['summary'] = summary or self._empty_group_summary()
+                return result
+
+            food_ids = pool['FoodID'].astype(int).tolist()
+            na = self.data_loader.nutrient_amount_df
+            nut_sub = na[
+                na['FoodID'].isin(food_ids) & na['NutrientID'].isin([ENERGY_ID, PROTEIN_ID, FIBRE_ID])
+            ][['FoodID', 'NutrientID', 'NutrientValue']]
+            nut_map: Dict[int, Dict[int, float]] = {}
+            for row in nut_sub.itertuples(index=False):
+                fid = int(row.FoodID)
+                bucket = nut_map.get(fid)
+                if bucket is None:
+                    bucket = {}
+                    nut_map[fid] = bucket
+                bucket[int(row.NutrientID)] = float(row.NutrientValue)
+
+            rows: List[Dict] = []
+            for rec in pool.itertuples(index=False):
+                fid = int(rec.FoodID)
+                nuts = nut_map.get(fid, {})
+                ft = get_food_type(fid)
+                ps = prep_state_of(fid)
+                src = str(getattr(rec, 'source', 'cnf') or 'cnf')
+                rows.append({
+                    'FoodID': fid,
+                    'FoodCode': str(rec.FoodCode),
+                    'FoodDescription': str(rec.FoodDescription),
+                    'FoodDescriptionF': str(getattr(rec, 'FoodDescriptionF', '') or ''),
+                    'source': src,
+                    'energy_kcal': nuts.get(ENERGY_ID),
+                    'protein_g': nuts.get(PROTEIN_ID),
+                    'fibre_g': nuts.get(FIBRE_ID),
+                    'food_type': ft.get('food_type') if ft else None,
+                    'thermal_state': ps.thermal_state if ps else None,
+                    'preservation_state': ps.preservation_state if ps else None,
+                })
+
+            reverse = sort_dir == 'desc'
+            if sort == 'kcal':
+                rows.sort(key=lambda r: (r['energy_kcal'] is None, r['energy_kcal'] or 0), reverse=reverse)
+            elif sort == 'food_id':
+                rows.sort(key=lambda r: r['FoodID'], reverse=reverse)
+            else:
+                rows.sort(key=lambda r: (r['FoodDescription'] or '').lower(), reverse=reverse)
+
+            page = rows[offset:offset + limit]
+            return {
+                'foods': page,
+                'food_group_id': int(food_group_id),
+                'count': len(page),
+                'total_count': total_count,
+                'total_in_group': total_in_group,
+                'limit': limit,
+                'offset': offset,
+                'has_more': (offset + len(page)) < total_count,
+                **({'summary': summary} if include_summary else {}),
+            }
+
         except Exception as e:
             logger.error(f"Error getting foods by group: {str(e)}")
             raise
+
+    @staticmethod
+    def _empty_group_summary() -> Dict:
+        return {
+            'total_in_group': 0,
+            'cnf_count': 0,
+            'wafct_count': 0,
+            'food_type': {'single': 0, 'mixed': 0, 'unknown': 0},
+            'thermal_state': {},
+            'preservation_state': {},
+            'prep_both_known_pct': 0.0,
+        }
+
+    @staticmethod
+    def _compute_group_summary_from_df(pool) -> Dict:
+        """Aggregate source, food-type, and prep-state counts for a food frame."""
+        from api.services.cnf_food_type import get_food_type
+        from api.services.cnf_prep_state import prep_state_of
+
+        cnf_count = wafct_count = 0
+        ft_single = ft_mixed = ft_unknown = 0
+        thermal_counts: Dict[str, int] = {}
+        preservation_counts: Dict[str, int] = {}
+        both_known = 0
+
+        for rec in pool.itertuples(index=False):
+            fid = int(rec.FoodID)
+            src = str(getattr(rec, 'source', 'cnf') or 'cnf')
+            if src == 'wafct':
+                wafct_count += 1
+            else:
+                cnf_count += 1
+
+            ft = get_food_type(fid)
+            if ft is None:
+                ft_unknown += 1
+            elif ft.get('food_type') == 'mixed':
+                ft_mixed += 1
+            else:
+                ft_single += 1
+
+            ps = prep_state_of(fid)
+            if ps:
+                t = ps.thermal_state or 'unknown'
+                p = ps.preservation_state or 'unknown'
+            else:
+                t = p = 'unknown'
+            thermal_counts[t] = thermal_counts.get(t, 0) + 1
+            preservation_counts[p] = preservation_counts.get(p, 0) + 1
+            if t != 'unknown' and p != 'unknown':
+                both_known += 1
+
+        total = len(pool)
+        return {
+            'total_in_group': total,
+            'cnf_count': cnf_count,
+            'wafct_count': wafct_count,
+            'food_type': {'single': ft_single, 'mixed': ft_mixed, 'unknown': ft_unknown},
+            'thermal_state': dict(sorted(thermal_counts.items(), key=lambda kv: -kv[1])),
+            'preservation_state': dict(sorted(preservation_counts.items(), key=lambda kv: -kv[1])),
+            'prep_both_known_pct': round(100.0 * both_known / total, 1) if total else 0.0,
+        }
 
     def compare_foods(self, food_ids: List[int], nutrient_ids: List[int] = None) -> Dict:
         """
