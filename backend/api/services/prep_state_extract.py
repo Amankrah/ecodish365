@@ -207,7 +207,12 @@ _PRESERVATION_PATTERNS = (
     ('dried',       re.compile(
         r'\bdried\b|\bs[eé]ch[eé]' + _FR_PART + r'\b|\bpowder(?:ed)?\b|\bpoudre\b|'
         r'\binstant(?:an[eé])?\b|'
-        r'\bdry\b(?!\s+(?:curd|mix|weight|roast|toast|matter|run))',
+        # 'dry' alone is too broad. For an unprocessed grain or seed "dry, raw"
+        # just means uncooked, not preserved-by-drying. Exclude well-known
+        # food-state phrases ("dry, raw" / "dry curd" / "dry mix" / "dry weight"
+        # / "dry roast" / "dry toast" / "dry matter" / "dry run") so the tag
+        # only fires for true drying-as-preservation contexts.
+        r'\bdry\b(?!\s*(?:,\s*raw|curd|mix|weight|roast|toast|matter|run))',
         re.IGNORECASE)),
     ('dehydrated',  re.compile(r'\bdehydrated\b|\bd[eé]shydrat[eé]' + _FR_PART + r'\b', re.IGNORECASE)),
     ('frozen',      re.compile(r'\bfrozen\b|\bcong[eé]l[eé]' + _FR_PART + r'\b', re.IGNORECASE)),

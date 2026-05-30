@@ -212,6 +212,20 @@ class CNFCorpus:
 
 _NORMALISE_RE = re.compile(r'\s+')
 
+# Dish-context heuristic for the LLM rerank prompt. When the query phrases an
+# ingredient as part of a dish ("carrots in chicken soup", "boiled egg on
+# salad", "fried plantain chips", "apple filling in apple pie"), the LLM
+# should prefer single-ingredient candidates over composite-dish rows.
+_DISH_CONTEXT_RE = re.compile(
+    r'\b(?:'
+    r'in\s+(?:a\s+)?(?:soup|stew|sauce|salad|pie|sandwich|porridge|chowder|casserole|stir[- ]?fry|wrap|burrito|taco|roll|cake|burger)'
+    r'|on\s+(?:a\s+)?(?:salad|sandwich|toast|bread|pizza|burger|cracker)'
+    r'|(?:chips|sandwich|filling|topping)'
+    r'|side\s+(?:of|dish)'
+    r')\b',
+    re.IGNORECASE,
+)
+
 
 def _normalise_query(q: str) -> str:
     """Cache key normalisation: lowercase, collapse whitespace, strip."""
@@ -613,46 +627,130 @@ class CNFMatcher:
     ) -> Dict[str, Any]:
         """Build prompt + call ChatJSONClient + return parsed dict.
 
-        Strategy A (2026-05-30) — when the query carries a regex-extractable
-        preparation state ("boiled egg on salad", "fried plantain chips"), we
-        pass it to the LLM as an extra weighting signal. The hint is advisory
-        rather than a hard filter, so a strongly semantically matched candidate
-        with a different prep state can still win. The lab simulator showed
-        this lifts joint prep-state accuracy by 5 pp and fixes the dish-context
-        failures (boiled-egg-on-salad, roasted-chicken-in-sandwich).
+        The prompt carries five sources of disambiguating signal beyond raw
+        cosine similarity, surfaced as advisory rules the model is asked to
+        weigh together with semantic match:
+
+          1. Per-candidate food_type tag (single | mixed) from
+             ``api.services.cnf_food_type``, so the model can favour
+             single-ingredient rows when the query names an ingredient and
+             composite rows when it names a dish.
+          2. Per-candidate prep-state tag (thermal | preservation) from
+             ``api.services.cnf_prep_state``, so the model can favour rows
+             whose recorded preparation matches the query's intent.
+          3. Query-side prep hint (regex extraction) — same as Strategy A.
+          4. Dish-context heuristic — when the query contains a "X in a Y"
+             dish phrase, prefer single-ingredient rows (the user is asking
+             about an ingredient, not the dish wrapper).
+          5. Commodity-preference notes for the three failure modes the lab
+             surfaced: generic chicken should default to broiler unless the
+             query names stewing or roasting birds; "canned X" should not
+             pick the juice row; canonical CNF rows beat WAFCT "as part of a
+             recipe" rows when the query has no dish framing.
         """
-        # Strategy A — extract a preparation-state hint from the query and
-        # attach it to the prompt when at least one axis is specific. Lazy
-        # import keeps this module decoupled from the prep-state extractor
-        # under static analysis.
-        prep_hint_line = ''
+        # Lazy imports keep this module decoupled from the tagging services
+        # under static analysis and avoid Django-import-at-import-time.
         try:
             from api.services.prep_state_extract import extract_prep_state
-            q_ps = extract_prep_state(query)
-            if q_ps.thermal_state != 'unknown' or q_ps.preservation_state != 'unknown':
-                prep_hint_line = (
-                    f'Preparation hint extracted from the query: '
-                    f'thermal={q_ps.thermal_state}, preservation={q_ps.preservation_state}. '
-                    f'Weight this alongside semantic similarity — when two candidates '
-                    f'are close on the description, prefer the one whose CNF '
-                    f'description matches this preparation state.'
-                )
+            from api.services.cnf_food_type import get_food_type
+            from api.services.cnf_prep_state import prep_state_of
         except Exception:  # noqa: BLE001
-            pass
+            extract_prep_state = None
+            get_food_type = None
+            prep_state_of = None
 
+        # --- query-side signal ---------------------------------------------
+        q_ps = None
+        if extract_prep_state is not None:
+            try:
+                q_ps = extract_prep_state(query)
+            except Exception:  # noqa: BLE001
+                q_ps = None
+
+        q_lower = query.lower()
+        dish_in_phrase = bool(_DISH_CONTEXT_RE.search(q_lower))
+        chicken_query = 'chicken' in q_lower
+        chicken_specific_bird = bool(re.search(r'\b(?:stewing|roasting)\s+(?:bird|chicken)\b', q_lower))
+        canned_query = 'canned' in q_lower
+        juice_in_query = 'juice' in q_lower
+
+        # --- per-candidate enrichment --------------------------------------
         lines = [f'User query: {query}', '']
         lines.append('Candidates (ranked by embedding similarity):')
         for idx, sim in candidates:
             food_id = int(self.corpus.food_ids[idx])
             desc = self.corpus.food_descriptions[idx]
             group = self.corpus.food_groups[idx]
+            tags: List[str] = []
+            if get_food_type is not None:
+                try:
+                    ft = get_food_type(food_id)
+                    if ft and ft.get('food_type') in ('single', 'mixed'):
+                        tags.append(f'type={ft["food_type"]}')
+                except Exception:  # noqa: BLE001
+                    pass
+            if prep_state_of is not None:
+                try:
+                    ps = prep_state_of(food_id)
+                    if ps is not None:
+                        if ps.thermal_state != 'unknown':
+                            tags.append(f't={ps.thermal_state}')
+                        if ps.preservation_state != 'unknown':
+                            tags.append(f'p={ps.preservation_state}')
+                except Exception:  # noqa: BLE001
+                    pass
+            tag_str = (' ' + ' '.join(tags)) if tags else ''
             lines.append(
-                f'  food_id={food_id}: {desc} [group: {group}] (sim={sim:.3f})'
+                f'  food_id={food_id}: {desc} [group: {group}{tag_str}] (sim={sim:.3f})'
             )
         lines.append('')
-        if prep_hint_line:
-            lines.append(prep_hint_line)
-            lines.append('')
+
+        # --- rule lines (only emit those that apply to this query) ----------
+        rules: List[str] = []
+
+        if q_ps is not None and (
+            q_ps.thermal_state != 'unknown' or q_ps.preservation_state != 'unknown'
+        ):
+            rules.append(
+                f'Preparation hint from the query: thermal={q_ps.thermal_state}, '
+                f'preservation={q_ps.preservation_state}. When two candidates are '
+                f'semantically close, prefer the one whose [t=...] [p=...] tags '
+                f'match this hint.'
+            )
+
+        if dish_in_phrase:
+            rules.append(
+                'Dish-context detected (phrasing like "X in soup", "on salad", '
+                '"chips", "filling"). The query is asking about an INGREDIENT in '
+                'that dish, not the dish itself. Prefer candidates tagged '
+                '[type=single]; treat [type=mixed] composite rows as fallback only.'
+            )
+
+        if chicken_query and not chicken_specific_bird:
+            rules.append(
+                'Chicken commodity preference: the query says "chicken" without '
+                'naming a stewing or roasting bird, so default to the broiler '
+                'variant (CNF rows whose description starts "Chicken, broiler, …") '
+                'rather than the stewing or roasting bird variants.'
+            )
+
+        if canned_query and not juice_in_query:
+            rules.append(
+                'Canned commodity preference: the query says "canned" without '
+                'mentioning juice, so do NOT pick a juice row even if it ranks high.'
+            )
+
+        rules.append(
+            'WAFCT vs CNF tie-break: when a CNF row and a WAFCT row '
+            '(food_id >= 700000) both match and the query has no explicit '
+            'West African context, prefer the CNF canonical row. Conversely '
+            'a WAFCT "as part of a recipe" row should only win when the query '
+            'names a dish, not a plain ingredient.'
+        )
+
+        for r in rules:
+            lines.append(r)
+        lines.append('')
         lines.append(
             'Respond with JSON: {"food_id": <one of the above integer FoodIDs exactly>, '
             '"confidence": <float 0-1>, "justification": "<≤40 words>"}'
