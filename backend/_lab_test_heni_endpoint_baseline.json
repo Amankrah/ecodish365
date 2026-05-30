@@ -1,0 +1,56 @@
+{
+  "D1 AGGREGATED (14 ing)": {
+    "daly_breakdown_keys": [],
+    "daly_values": {},
+    "health_impact_minutes": null,
+    "health_impact_minutes_2": null,
+    "per_ingredient": [],
+    "risk_factor_contributions": {},
+    "total_heni_score": null
+  },
+  "D1 breakfast \u2014 scrambled egg + OJ": {
+    "daly_breakdown_keys": [],
+    "daly_values": {},
+    "health_impact_minutes": null,
+    "health_impact_minutes_2": null,
+    "per_ingredient": [],
+    "risk_factor_contributions": {},
+    "total_heni_score": null
+  },
+  "D1 dinner \u2014 oat porridge": {
+    "daly_breakdown_keys": [],
+    "daly_values": {},
+    "health_impact_minutes": null,
+    "health_impact_minutes_2": null,
+    "per_ingredient": [],
+    "risk_factor_contributions": {},
+    "total_heni_score": null
+  },
+  "D1 lunch \u2014 chicken biryani": {
+    "daly_breakdown_keys": [],
+    "daly_values": {},
+    "health_impact_minutes": null,
+    "health_impact_minutes_2": null,
+    "per_ingredient": [],
+    "risk_factor_contributions": {},
+    "total_heni_score": null
+  },
+  "D2 AGGREGATED (11 ing)": {
+    "daly_breakdown_keys": [],
+    "daly_values": {},
+    "health_impact_minutes": null,
+    "health_impact_minutes_2": null,
+    "per_ingredient": [],
+    "risk_factor_contributions": {},
+    "total_heni_score": null
+  },
+  "D2 dinner \u2014 fufu + groundnut soup": {
+    "daly_breakdown_keys": [],
+    "daly_values": {},
+    "health_impact_minutes": null,
+    "health_impact_minutes_2": null,
+    "per_ingredient": [],
+    "risk_factor_contributions": {},
+    "total_heni_score": null
+  }
+}

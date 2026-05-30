@@ -1,0 +1,3662 @@
+{
+  "D1 AGGREGATED (14 foods)": {
+    "data": {
+      "data": {
+        "environmental_impacts": {
+          "all_impacts": {
+            "Global warming": 0.438711,
+            "Land use": 1.063712,
+            "Water consumption": 0.015087
+          },
+          "all_impacts_bands": {
+            "Global warming": {
+              "central": 0.438711,
+              "high": 1.158982,
+              "low": 0.131689
+            },
+            "Land use": {
+              "central": 1.063712,
+              "high": 2.972448,
+              "low": 0.265996
+            },
+            "Water consumption": {
+              "central": 0.015087,
+              "high": 0.037709,
+              "low": 0.005638
+            }
+          },
+          "basis_factors": {
+            "per_100_kcal": 0.048141,
+            "per_100g_product": 0.061312,
+            "per_100g_protein": 1.062995,
+            "per_serving": 1.0
+          },
+          "catalog_version": null,
+          "data_quality": {
+            "confidence_by_category": {
+              "Global warming": {
+                "level": "high"
+              },
+              "Land use": {
+                "level": "medium"
+              },
+              "Water consumption": {
+                "level": "high"
+              }
+            },
+            "confidence_summary": {},
+            "consumer_perspective": "global",
+            "country": null,
+            "endpoint_factor_sources": {
+              "climate_change_ecosystem": "world_average",
+              "climate_change_ecosystem_freshwater": "world_average",
+              "climate_change_human": "world_average",
+              "freshwater_ecotoxicity_ecosystem": "world_average",
+              "freshwater_eutrophication_ecosystem": "world_average",
+              "human_toxicity_cancer": "world_average",
+              "human_toxicity_non_cancer": "world_average",
+              "ionizing_radiation_human": "world_average",
+              "land_use_ecosystem": "world_average",
+              "marine_ecotoxicity_ecosystem": "world_average",
+              "marine_eutrophication_ecosystem": "world_average",
+              "ozone_depletion_human": "world_average",
+              "particulate_matter_human": "world_average",
+              "photochemical_ozone_ecosystem": "world_average",
+              "photochemical_ozone_human": "world_average",
+              "terrestrial_acidification_ecosystem": "world_average",
+              "terrestrial_ecotoxicity_ecosystem": "world_average",
+              "water_use_ecosystem_freshwater": "world_average",
+              "water_use_ecosystem_terrestrial": "world_average",
+              "water_use_human": "world_average"
+            },
+            "known_issues": [
+              "Toxicity factors carry an explicit low-confidence flag (RIVM 2017 \u00a71.3 p. 20).",
+              "Fossil resource scarcity endpoint approximated as crude-oil-equivalent; per-substance resolution requires LCI upgrade.",
+              "Land use endpoint captures local impact only; global extinction not modelled.",
+              "Egalitarian climate factors omit climate-carbon feedbacks for non-CO2 GHGs.",
+              "v1 midpoint scope trimmed to {Global warming, Land use, Water consumption}; 15 other ReCiPe midpoints not consumed pending TODO-CODE-LCA-2."
+            ],
+            "methodology_provenance": {
+              "checksum_status": {
+                "country_factors": "ok",
+                "endpoint_factors": "ok",
+                "normalization": "ok"
+              },
+              "country_pack_sha256": "d588ea76f77a4729079665f3325db0eb012a80fd8c8ec89500b44738155ab6d3",
+              "endpoint_pack_sha256": "cc5faba76ee045246f6cd4260bab932c2e0ba9a444dad47585f9aa10e92d2c75",
+              "etl_git_rev": "84b00cd",
+              "extracted_at_utc": "2026-05-22T12:41:16+00:00",
+              "methodology": "recipe2016",
+              "methodology_version": "v1.1",
+              "normalization_pack_sha256": "c90f32c4fd9b66bd83bb158cc4a33c8e1f7c04853794cb5bdcece067ca419311",
+              "schema_version": "1.0",
+              "source_workbooks": [
+                "ReCiPe2016_CFs_v1.1_20180117.xlsx",
+                "Normalization scores ReCiPe2016v1.1_20190514.xlsx",
+                "ReCiPe2016_country factors_v1.1_20171221.xlsx"
+              ]
+            },
+            "methodology_version": "recipe2016 v1.1",
+            "perspective": "H",
+            "recommendations": [
+              "Use midpoint results for primary analysis; treat endpoint single-score as ranking aid.",
+              "Cross-validate with IMPACT World+ or PEF for critical applications."
+            ],
+            "sources": [
+              "Huijbregts et al. 2017, doi:10.1007/s11367-016-1246-y",
+              "RIVM 2016-0104a (October 2017), ReCiPe 2016 v1.1 workbooks"
+            ]
+          },
+          "endpoint_impacts": {
+            "Ecosystems": 0.0,
+            "Human Health": 0.0,
+            "Resources": null
+          },
+          "endpoint_impacts_bands": {
+            "Ecosystems": {
+              "central": 0.0,
+              "high": 0.0,
+              "low": 0.0
+            },
+            "Human Health": {
+              "central": 0.0,
+              "high": 1e-06,
+              "low": 0.0
+            }
+          },
+          "endpoint_impacts_by_basis": {
+            "per_100_kcal": {
+              "Ecosystems": 0.0,
+              "Human Health": 0.0,
+              "Resources": null
+            },
+            "per_100g_product": {
+              "Ecosystems": 0.0,
+              "Human Health": 1e-06,
+              "Resources": null
+            },
+            "per_100g_protein": {
+              "Ecosystems": 0.0,
+              "Human Health": 1e-05,
+              "Resources": null
+            },
+            "per_serving": {
+              "Ecosystems": 0.0,
+              "Human Health": 9e-06,
+              "Resources": null
+            }
+          },
+          "impacts_bands_by_basis": {
+            "per_100_kcal": {
+              "Global warming": {
+                "central": 0.438711,
+                "high": 1.158982,
+                "low": 0.131689
+              },
+              "Land use": {
+                "central": 1.063712,
+                "high": 2.972448,
+                "low": 0.265996
+              },
+              "Water consumption": {
+                "central": 0.015087,
+                "high": 0.037709,
+                "low": 0.005638
+              }
+            },
+            "per_100g_product": {
+              "Global warming": {
+                "central": 0.558744,
+                "high": 1.476086,
+                "low": 0.16772
+              },
+              "Land use": {
+                "central": 1.354749,
+                "high": 3.785725,
+                "low": 0.338774
+              },
+              "Water consumption": {
+                "central": 0.019215,
+                "high": 0.048026,
+                "low": 0.00718
+              }
+            },
+            "per_100g_protein": {
+              "Global warming": {
+                "central": 9.687199,
+                "high": 25.591557,
+                "low": 2.907839
+              },
+              "Land use": {
+                "central": 23.487886,
+                "high": 65.634793,
+                "low": 5.873474
+              },
+              "Water consumption": {
+                "central": 0.333143,
+                "high": 0.832644,
+                "low": 0.124487
+              }
+            },
+            "per_serving": {
+              "Global warming": {
+                "central": 9.113121,
+                "high": 24.074963,
+                "low": 2.735516
+              },
+              "Land use": {
+                "central": 22.095959,
+                "high": 61.745176,
+                "low": 5.525403
+              },
+              "Water consumption": {
+                "central": 0.3134,
+                "high": 0.7833,
+                "low": 0.11711
+              }
+            }
+          },
+          "impacts_by_basis": {
+            "per_100_kcal": {
+              "Global warming": 0.438711,
+              "Land use": 1.063712,
+              "Water consumption": 0.015087
+            },
+            "per_100g_product": {
+              "Global warming": 0.558744,
+              "Land use": 1.354749,
+              "Water consumption": 0.019215
+            },
+            "per_100g_protein": {
+              "Global warming": 9.687199,
+              "Land use": 23.487886,
+              "Water consumption": 0.333143
+            },
+            "per_serving": {
+              "Global warming": 9.113121,
+              "Land use": 22.095959,
+              "Water consumption": 0.3134
+            }
+          },
+          "key_impacts": {
+            "carbon_footprint": {
+              "category": "Climate Change",
+              "formatted": "0.43871 kg CO2-eq",
+              "importance": "Primary driver of global warming and climate change",
+              "unit": "kg CO2-eq",
+              "value": 0.438711
+            },
+            "land_use": {
+              "category": "Ecosystem Impact",
+              "formatted": "1.064 m\u00b2a crop-eq",
+              "importance": "Land conversion and biodiversity impact",
+              "unit": "m\u00b2a crop-eq",
+              "value": 1.063712
+            },
+            "water_consumption": {
+              "category": "Resource Use",
+              "formatted": "0.01509 m\u00b3",
+              "importance": "Freshwater resource depletion",
+              "unit": "m\u00b3",
+              "value": 0.015087
+            }
+          },
+          "lca_matcher_decisions": [],
+          "lca_matcher_enabled": false,
+          "planetary_boundary_shares": {
+            "citation": {
+              "doi": "10.1016/S0140-6736(25)01201-2",
+              "manuscript_anchor": "literature_extractions.md \u00a7E28 Table 2",
+              "table": "Table 2 (p. 1640) \u2014 food-system boundaries (selected control variables)"
+            },
+            "days_per_year": 365,
+            "n_covered": 3,
+            "n_total": 9,
+            "population_assumption": 8000000000,
+            "shares": [
+              {
+                "available": true,
+                "control_variable": "Atmospheric CO\u2082 (CO\u2082-eq emissions)",
+                "current_food_system_contribution": "16\u201317.7 Gt CO\u2082e/yr (about 30 % of all human emissions)",
+                "global_boundary_per_year": 5000000000000.0,
+                "global_boundary_source": "5 Gt CO\u2082e/yr",
+                "key": "climate_change",
+                "label": "Climate change",
+                "meal_value": 0.438711,
+                "method_note": "Production-stage CO\u2082-equivalent emissions, weighted across CO\u2082, methane, and N\u2082O over 100 years.",
+                "per_capita_daily_budget": 1.712329,
+                "recipe_midpoint_key": "Global warming",
+                "share_of_daily_budget_pct": 25.620713,
+                "unit": "kg CO\u2082e"
+              },
+              {
+                "available": true,
+                "control_variable": "Agricultural land area (current footprint, no further conversion of intact nature)",
+                "current_food_system_contribution": "48 million km\u00b2 (about 34 % of Earth's land)",
+                "global_boundary_per_year": 48000000000000.0,
+                "global_boundary_source": "Hold today's agricultural land area; halt conversion of remaining intact nature",
+                "key": "land_use",
+                "label": "Land system change",
+                "meal_value": 1.063712,
+                "per_capita_daily_budget": 16.438356,
+                "recipe_midpoint_key": "Land use",
+                "share_of_daily_budget_pct": 6.470915,
+                "unit": "m\u00b2\u00b7yr"
+              },
+              {
+                "available": true,
+                "control_variable": "Freshwater (consumptive) use",
+                "current_food_system_contribution": "1200\u20131800 km\u00b3/yr",
+                "global_boundary_per_year": 2000000000000.0,
+                "global_boundary_source": "2000 km\u00b3/yr of fresh water",
+                "key": "water_consumption",
+                "label": "Blue water consumption",
+                "meal_value": 0.015087,
+                "method_note": "Blue (irrigation) water use, weighted by how scarce water is in the producing region. The recommended limit is a single global number; we divide it equally across people for comparison.",
+                "per_capita_daily_budget": 0.684932,
+                "recipe_midpoint_key": "Water consumption",
+                "share_of_daily_budget_pct": 2.202739,
+                "unit": "m\u00b3"
+              },
+              {
+                "available": false,
+                "control_variable": "Human appropriation of net primary production",
+                "current_food_system_contribution": "9.9\u201311.7 Gt of carbon per year (about three-quarters of the global total)",
+                "global_boundary_per_year": 5500000000.0,
+                "global_boundary_source": "5.5 Gt of carbon per year",
+                "key": "biosphere_integrity_hanpp",
+                "label": "Biosphere integrity (HANPP)",
+                "reason": "We don't yet have per-food data for global biodiversity loss. Available life-cycle datasets capture local land use, not the global biosphere impact this target measures.",
+                "unit": "Gt C/yr"
+              },
+              {
+                "available": false,
+                "control_variable": "Reactive nitrogen as N\u2082O",
+                "current_food_system_contribution": "3.9\u20134.2 Tg per year (roughly two-thirds of the global total)",
+                "global_boundary_per_year": 1800000000.0,
+                "global_boundary_source": "1.8 Tg of nitrous-oxide nitrogen per year",
+                "key": "stratospheric_ozone_n2o",
+                "label": "Stratospheric ozone (N\u2082O)",
+                "reason": "Per-food nitrous-oxide data exists in the source life-cycle catalogue but isn't yet wired into our pipeline. Planned for a later release.",
+                "unit": "Tg N\u2082O-N"
+              },
+              {
+                "available": false,
+                "control_variable": "CO\u2082 from food-chain land-use change + fossil energy",
+                "current_food_system_contribution": "About 25 % of global CO\u2082 emissions",
+                "global_boundary_per_year": 0.0,
+                "global_boundary_source": "Zero food-chain CO\u2082 from clearing land and burning fossil fuels",
+                "key": "ocean_acidification",
+                "label": "Ocean acidification",
+                "unit": "% of food-chain CO\u2082"
+              },
+              {
+                "available": false,
+                "control_variable": "Net reactive-N input minus removal",
+                "current_food_system_contribution": "119 Tg of nitrogen per year",
+                "global_boundary_per_year": 57000000000.0,
+                "global_boundary_source": "57 Tg of nitrogen per year (less than half today's rate)",
+                "key": "nitrogen_surplus",
+                "label": "Nitrogen surplus",
+                "reason": "Nitrogen surplus isn't yet available as a per-food number in our data. Eutrophication numbers come close but measure local water pollution, not the global nitrogen surplus this target tracks.",
+                "unit": "Tg N/yr"
+              },
+              {
+                "available": false,
+                "control_variable": "P loss from agricultural land to surface water",
+                "current_food_system_contribution": "7.2 Tg per year (about three-quarters of the global total)",
+                "global_boundary_per_year": 4600000000.0,
+                "global_boundary_source": "4.6 Tg of phosphorus reaching surface water per year",
+                "key": "phosphorus_loss",
+                "label": "Phosphorus loss to surface water",
+                "reason": "Per-food phosphorus-loss numbers are available in the source life-cycle data but not yet active in our pipeline. Planned for a later release.",
+                "unit": "Tg P/yr"
+              },
+              {
+                "available": false,
+                "control_variable": "Pesticide active-substance use (kg PAS/yr)",
+                "current_food_system_contribution": "3.3\u20133.7 Tg per year (most of global pesticide use)",
+                "global_boundary_per_year": 1000000000.0,
+                "global_boundary_source": "Cut total pesticide use to 1 Tg per year (or 0.2 Tg for the most harmful)",
+                "key": "novel_entities_pesticides",
+                "label": "Novel entities (pesticides)",
+                "reason": "Our life-cycle data doesn't track pesticide use by product. This category would need a different data source.",
+                "unit": "Tg PAS/yr"
+              }
+            ]
+          },
+          "recipe2016_h_ef31_sensitivity": null,
+          "recipe_decomposer_enabled": false,
+          "recipe_decomposition_decisions": [],
+          "reporting_basis": "per_100_kcal",
+          "summary_score": {
+            "formatted": "3.227e-04 points",
+            "value": 0.000323
+          }
+        },
+        "monetization": {
+          "interpretation": {
+            "context": "Based on environmental cost of $0.341 CAD",
+            "level": "high"
+          },
+          "results": {
+            "cost_breakdown": {
+              "Climate & Energy": {
+                "individual_impacts": {
+                  "Global warming": 0.153183
+                },
+                "percentage_of_total": 44.880809,
+                "total_cost": 0.153183
+              },
+              "Ecosystem Quality": {
+                "individual_impacts": {},
+                "percentage_of_total": 0.0,
+                "total_cost": 0
+              },
+              "Human Health": {
+                "individual_impacts": {},
+                "percentage_of_total": 0.0,
+                "total_cost": 0
+              },
+              "Resource Depletion": {
+                "individual_impacts": {
+                  "Land use": 0.187938,
+                  "Water consumption": 0.000189
+                },
+                "percentage_of_total": 55.119191,
+                "total_cost": 0.188127
+              }
+            },
+            "cost_per_calorie": {
+              "context": "Environmental cost per calorie consumed",
+              "formatted": "$0.00016 CAD per calorie",
+              "unit": "CAD/kcal",
+              "value": 0.000164
+            },
+            "cost_per_protein": {
+              "context": "Environmental cost per gram of protein",
+              "formatted": "$0.00363 CAD per gram protein",
+              "unit": "CAD/g protein",
+              "value": 0.003628
+            },
+            "monetized_impacts": {
+              "Global warming": 0.153183,
+              "Land use": 0.187938,
+              "Water consumption": 0.000189
+            },
+            "top_cost_drivers": [
+              {
+                "cost": 0.187938,
+                "impact_category": "Land use",
+                "percentage_of_total": 55.063846,
+                "rank": 1
+              },
+              {
+                "cost": 0.153183,
+                "impact_category": "Global warming",
+                "percentage_of_total": 44.880809,
+                "rank": 2
+              },
+              {
+                "cost": 0.000189,
+                "impact_category": "Water consumption",
+                "percentage_of_total": 0.055345,
+                "rank": 3
+              }
+            ],
+            "total_environmental_cost": {
+              "context": "Total cost of environmental damage caused by this meal",
+              "formatted": "$0.341 CAD",
+              "unit": "CAD",
+              "value": 0.34131
+            },
+            "value_sources": {
+              "Global warming": {
+                "currency_year": "2021 CAD",
+                "last_verified": "2026-05-25",
+                "methodological_note": "CO2-eq aggregate only; CH4/N2O folded in via AR5 GWPs per ReCiPe midpoint. Per ECCC \u00a74.2 this is a known underestimate but per-gas separation requires an LCA-layer architecture change.",
+                "page_anchor": "literature_extractions.md \u00a7H47 lines 3496-3509",
+                "sensitivity_range_2026": "170 (2.5 % discount) \u2013 275 (2.0 %, central) \u2013 467 (1.5 %)",
+                "source": "ECCC 2023, Guidance on the Social Cost of GHG Emissions, Table 1 (2026 central, 2 % Near-term Ramsey discount rate)",
+                "status": "verified"
+              },
+              "Land use": {
+                "currency_year": "2021 CAD (converted from EUR 2015 via EUR_2015_TO_CAD_2021 \u2248 1.59)",
+                "last_verified": "2026-05-25",
+                "methodological_note": "Replaces the True Price 2024 Canadian farmland-rental placeholder. ReCiPe land use unit (m\u00b2\u00b7yr crop-eq) matches CE Delft directly.",
+                "page_anchor": "literature_extractions.md \u00a7H48 line 3641",
+                "source": "CE Delft 2018, Environmental Prices Handbook EU28 version, Table 2 (Summary p. 5), Hierarchist weighting factor \u20ac0.126/m\u00b2\u00b7yr",
+                "status": "verified"
+              },
+              "Water consumption": {
+                "currency_year": "2024 CAD",
+                "last_verified": "2026-05-25",
+                "override_env": "WATER_COST_PER_M3",
+                "source": "Canadian municipal tariff median; True Price 2024",
+                "status": "pending_page_citation"
+              }
+            }
+          }
+        },
+        "overall_assessment": {
+          "rating": "Room for Improvement \ud83d\udd04",
+          "recommendation": "Reducing red-meat or large dairy portions usually gives the biggest single improvement."
+        },
+        "sustainability": {
+          "category_scores": {
+            "Global warming": 29.050029,
+            "Land use": 45.744667,
+            "Water consumption": 36.904588
+          },
+          "category_zones": {
+            "Global warming": "High",
+            "Land use": "Moderate",
+            "Water consumption": "High"
+          },
+          "environmental_rating": "Poor",
+          "environmental_score": 36.02206,
+          "nutritional_score": 5.169467,
+          "overall_sustainability_score": 32.667123,
+          "overall_weights": {
+            "environmental": 0.5,
+            "nutritional": 0.3,
+            "processing": 0.2
+          },
+          "processing_score": 65.526262,
+          "recommendations": [],
+          "sustainability_rating": "Very Poor"
+        }
+      },
+      "meal_info": {
+        "composition": [
+          {
+            "group": "Cereals, Grains and Pasta",
+            "id": 4473,
+            "name": "Grains, rice, white, long-grain, parboiled, cooked",
+            "quantity": 320
+          },
+          {
+            "group": "Fruits and fruit juices",
+            "id": 1620,
+            "name": "Orange juice, chilled, includes from concentrate",
+            "quantity": 273
+          },
+          {
+            "group": "Breakfast cereals",
+            "id": 1465,
+            "name": "Cereal, hot, oats (oatmeal), large flakes, prepared, Quaker",
+            "quantity": 250
+          },
+          {
+            "group": "Dairy and Egg Products",
+            "id": 133,
+            "name": "Egg, chicken, whole, cooked, scrambled or omelet",
+            "quantity": 200
+          },
+          {
+            "group": "Poultry Products",
+            "id": 851,
+            "name": "Chicken, broiler, thigh, meat and skin, roasted",
+            "quantity": 200
+          },
+          {
+            "group": "Dairy and Egg Products",
+            "id": 61,
+            "name": "Milk, fluid, partly skimmed, 2% M.F.",
+            "quantity": 145
+          },
+          {
+            "group": "Fruits and fruit juices",
+            "id": 1704,
+            "name": "Banana, raw",
+            "quantity": 65
+          },
+          {
+            "group": "Dairy and Egg Products",
+            "id": 6971,
+            "name": "Yogourt (yogurt), Balkan style, 4-6% M.F., plain",
+            "quantity": 50
+          },
+          {
+            "group": "Vegetables and Vegetable Products",
+            "id": 5960,
+            "name": "Onion, yellow, sauteed",
+            "quantity": 50
+          },
+          {
+            "group": "Dairy and Egg Products",
+            "id": 7829,
+            "name": "Butter, Clarified butter (ghee)",
+            "quantity": 30
+          },
+          {
+            "group": "Vegetables and Vegetable Products",
+            "id": 2460,
+            "name": "Tomato, red, ripe, raw, year round average",
+            "quantity": 25
+          },
+          {
+            "group": "Dairy and Egg Products",
+            "id": 118,
+            "name": "Butter, regular",
+            "quantity": 8
+          },
+          {
+            "group": "Vegetables and Vegetable Products",
+            "id": 2394,
+            "name": "Garlic, raw",
+            "quantity": 8
+          },
+          {
+            "group": "Vegetables and Vegetable Products",
+            "id": 2091,
+            "name": "Ginger root, raw",
+            "quantity": 7
+          }
+        ],
+        "macronutrient_distribution": {
+          "carbohydrate_percent": 36.418469,
+          "fat_percent": 45.451673,
+          "protein_percent": 18.129858
+        },
+        "total_calories": 2077.25,
+        "total_weight": 1631
+      },
+      "metadata": {
+        "currency": "CAD",
+        "data_source": "Canadian Nutrient File (Health Canada)",
+        "functional_unit": "per 100 kcal",
+        "methodology": "ReCiPe 2016 v1.1 (H)",
+        "methodology_pack": "recipe2016:v1.1:endpoint_sha=cc5faba76ee0:perspectives=3:countries=246",
+        "parameters": {
+          "basis": "per_100_kcal",
+          "consumer_perspective": "global",
+          "country": null,
+          "methodology": "recipe2016",
+          "perspective": "H"
+        },
+        "user_type": "individual"
+      },
+      "seo_metadata": {
+        "keywords": "environmental impact, individual, LCA, food sustainability, carbon footprint, meal assessment"
+      }
+    },
+    "seo_metadata": {
+      "keywords": "environmental impact, LCA, food sustainability, carbon footprint, meal comparison, monetization"
+    }
+  },
+  "D1 breakfast \u2014 scrambled egg + OJ": {
+    "data": {
+      "data": {
+        "environmental_impacts": {
+          "all_impacts": {
+            "Global warming": 0.52022,
+            "Land use": 1.633901,
+            "Water consumption": 0.011553
+          },
+          "all_impacts_bands": {
+            "Global warming": {
+              "central": 0.52022,
+              "high": 1.517342,
+              "low": 0.118339
+            },
+            "Land use": {
+              "central": 1.633901,
+              "high": 4.825898,
+              "low": 0.321474
+            },
+            "Water consumption": {
+              "central": 0.011553,
+              "high": 0.035652,
+              "low": 0.004251
+            }
+          },
+          "basis_factors": {
+            "per_100_kcal": 0.198342,
+            "per_100g_product": 0.201613,
+            "per_100g_protein": 4.310921,
+            "per_serving": 1.0
+          },
+          "catalog_version": null,
+          "data_quality": {
+            "confidence_by_category": {
+              "Global warming": {
+                "level": "high"
+              },
+              "Land use": {
+                "level": "medium"
+              },
+              "Water consumption": {
+                "level": "high"
+              }
+            },
+            "confidence_summary": {},
+            "consumer_perspective": "global",
+            "country": null,
+            "endpoint_factor_sources": {
+              "climate_change_ecosystem": "world_average",
+              "climate_change_ecosystem_freshwater": "world_average",
+              "climate_change_human": "world_average",
+              "freshwater_ecotoxicity_ecosystem": "world_average",
+              "freshwater_eutrophication_ecosystem": "world_average",
+              "human_toxicity_cancer": "world_average",
+              "human_toxicity_non_cancer": "world_average",
+              "ionizing_radiation_human": "world_average",
+              "land_use_ecosystem": "world_average",
+              "marine_ecotoxicity_ecosystem": "world_average",
+              "marine_eutrophication_ecosystem": "world_average",
+              "ozone_depletion_human": "world_average",
+              "particulate_matter_human": "world_average",
+              "photochemical_ozone_ecosystem": "world_average",
+              "photochemical_ozone_human": "world_average",
+              "terrestrial_acidification_ecosystem": "world_average",
+              "terrestrial_ecotoxicity_ecosystem": "world_average",
+              "water_use_ecosystem_freshwater": "world_average",
+              "water_use_ecosystem_terrestrial": "world_average",
+              "water_use_human": "world_average"
+            },
+            "known_issues": [
+              "Toxicity factors carry an explicit low-confidence flag (RIVM 2017 \u00a71.3 p. 20).",
+              "Fossil resource scarcity endpoint approximated as crude-oil-equivalent; per-substance resolution requires LCI upgrade.",
+              "Land use endpoint captures local impact only; global extinction not modelled.",
+              "Egalitarian climate factors omit climate-carbon feedbacks for non-CO2 GHGs.",
+              "v1 midpoint scope trimmed to {Global warming, Land use, Water consumption}; 15 other ReCiPe midpoints not consumed pending TODO-CODE-LCA-2."
+            ],
+            "methodology_provenance": {
+              "checksum_status": {
+                "country_factors": "ok",
+                "endpoint_factors": "ok",
+                "normalization": "ok"
+              },
+              "country_pack_sha256": "d588ea76f77a4729079665f3325db0eb012a80fd8c8ec89500b44738155ab6d3",
+              "endpoint_pack_sha256": "cc5faba76ee045246f6cd4260bab932c2e0ba9a444dad47585f9aa10e92d2c75",
+              "etl_git_rev": "84b00cd",
+              "extracted_at_utc": "2026-05-22T12:41:16+00:00",
+              "methodology": "recipe2016",
+              "methodology_version": "v1.1",
+              "normalization_pack_sha256": "c90f32c4fd9b66bd83bb158cc4a33c8e1f7c04853794cb5bdcece067ca419311",
+              "schema_version": "1.0",
+              "source_workbooks": [
+                "ReCiPe2016_CFs_v1.1_20180117.xlsx",
+                "Normalization scores ReCiPe2016v1.1_20190514.xlsx",
+                "ReCiPe2016_country factors_v1.1_20171221.xlsx"
+              ]
+            },
+            "methodology_version": "recipe2016 v1.1",
+            "perspective": "H",
+            "recommendations": [
+              "Use midpoint results for primary analysis; treat endpoint single-score as ranking aid.",
+              "Cross-validate with IMPACT World+ or PEF for critical applications."
+            ],
+            "sources": [
+              "Huijbregts et al. 2017, doi:10.1007/s11367-016-1246-y",
+              "RIVM 2016-0104a (October 2017), ReCiPe 2016 v1.1 workbooks"
+            ]
+          },
+          "endpoint_impacts": {
+            "Ecosystems": 0.0,
+            "Human Health": 1e-06,
+            "Resources": null
+          },
+          "endpoint_impacts_bands": {
+            "Ecosystems": {
+              "central": 0.0,
+              "high": 0.0,
+              "low": 0.0
+            },
+            "Human Health": {
+              "central": 1e-06,
+              "high": 1e-06,
+              "low": 0.0
+            }
+          },
+          "endpoint_impacts_by_basis": {
+            "per_100_kcal": {
+              "Ecosystems": 0.0,
+              "Human Health": 1e-06,
+              "Resources": null
+            },
+            "per_100g_product": {
+              "Ecosystems": 0.0,
+              "Human Health": 1e-06,
+              "Resources": null
+            },
+            "per_100g_protein": {
+              "Ecosystems": 0.0,
+              "Human Health": 1.1e-05,
+              "Resources": null
+            },
+            "per_serving": {
+              "Ecosystems": 0.0,
+              "Human Health": 3e-06,
+              "Resources": null
+            }
+          },
+          "impacts_bands_by_basis": {
+            "per_100_kcal": {
+              "Global warming": {
+                "central": 0.52022,
+                "high": 1.517342,
+                "low": 0.118339
+              },
+              "Land use": {
+                "central": 1.633901,
+                "high": 4.825898,
+                "low": 0.321474
+              },
+              "Water consumption": {
+                "central": 0.011553,
+                "high": 0.035652,
+                "low": 0.004251
+              }
+            },
+            "per_100g_product": {
+              "Global warming": {
+                "central": 0.528799,
+                "high": 1.542366,
+                "low": 0.120291
+              },
+              "Land use": {
+                "central": 1.660848,
+                "high": 4.905487,
+                "low": 0.326776
+              },
+              "Water consumption": {
+                "central": 0.011744,
+                "high": 0.03624,
+                "low": 0.004322
+              }
+            },
+            "per_100g_protein": {
+              "Global warming": {
+                "central": 11.306878,
+                "high": 32.979129,
+                "low": 2.572072
+              },
+              "Land use": {
+                "central": 35.512523,
+                "high": 104.889934,
+                "low": 6.98717
+              },
+              "Water consumption": {
+                "central": 0.251111,
+                "high": 0.774888,
+                "low": 0.092405
+              }
+            },
+            "per_serving": {
+              "Global warming": {
+                "central": 2.622845,
+                "high": 7.650136,
+                "low": 0.596641
+              },
+              "Land use": {
+                "central": 8.237804,
+                "high": 24.331213,
+                "low": 1.620807
+              },
+              "Water consumption": {
+                "central": 0.05825,
+                "high": 0.17975,
+                "low": 0.021435
+              }
+            }
+          },
+          "impacts_by_basis": {
+            "per_100_kcal": {
+              "Global warming": 0.52022,
+              "Land use": 1.633901,
+              "Water consumption": 0.011553
+            },
+            "per_100g_product": {
+              "Global warming": 0.528799,
+              "Land use": 1.660848,
+              "Water consumption": 0.011744
+            },
+            "per_100g_protein": {
+              "Global warming": 11.306878,
+              "Land use": 35.512523,
+              "Water consumption": 0.251111
+            },
+            "per_serving": {
+              "Global warming": 2.622845,
+              "Land use": 8.237804,
+              "Water consumption": 0.05825
+            }
+          },
+          "key_impacts": {
+            "carbon_footprint": {
+              "category": "Climate Change",
+              "formatted": "0.52022 kg CO2-eq",
+              "importance": "Primary driver of global warming and climate change",
+              "unit": "kg CO2-eq",
+              "value": 0.52022
+            },
+            "land_use": {
+              "category": "Ecosystem Impact",
+              "formatted": "1.634 m\u00b2a crop-eq",
+              "importance": "Land conversion and biodiversity impact",
+              "unit": "m\u00b2a crop-eq",
+              "value": 1.633901
+            },
+            "water_consumption": {
+              "category": "Resource Use",
+              "formatted": "0.01155 m\u00b3",
+              "importance": "Freshwater resource depletion",
+              "unit": "m\u00b3",
+              "value": 0.011553
+            }
+          },
+          "lca_matcher_decisions": [],
+          "lca_matcher_enabled": false,
+          "planetary_boundary_shares": {
+            "citation": {
+              "doi": "10.1016/S0140-6736(25)01201-2",
+              "manuscript_anchor": "literature_extractions.md \u00a7E28 Table 2",
+              "table": "Table 2 (p. 1640) \u2014 food-system boundaries (selected control variables)"
+            },
+            "days_per_year": 365,
+            "n_covered": 3,
+            "n_total": 9,
+            "population_assumption": 8000000000,
+            "shares": [
+              {
+                "available": true,
+                "control_variable": "Atmospheric CO\u2082 (CO\u2082-eq emissions)",
+                "current_food_system_contribution": "16\u201317.7 Gt CO\u2082e/yr (about 30 % of all human emissions)",
+                "global_boundary_per_year": 5000000000000.0,
+                "global_boundary_source": "5 Gt CO\u2082e/yr",
+                "key": "climate_change",
+                "label": "Climate change",
+                "meal_value": 0.52022,
+                "method_note": "Production-stage CO\u2082-equivalent emissions, weighted across CO\u2082, methane, and N\u2082O over 100 years.",
+                "per_capita_daily_budget": 1.712329,
+                "recipe_midpoint_key": "Global warming",
+                "share_of_daily_budget_pct": 30.380848,
+                "unit": "kg CO\u2082e"
+              },
+              {
+                "available": true,
+                "control_variable": "Agricultural land area (current footprint, no further conversion of intact nature)",
+                "current_food_system_contribution": "48 million km\u00b2 (about 34 % of Earth's land)",
+                "global_boundary_per_year": 48000000000000.0,
+                "global_boundary_source": "Hold today's agricultural land area; halt conversion of remaining intact nature",
+                "key": "land_use",
+                "label": "Land system change",
+                "meal_value": 1.633901,
+                "per_capita_daily_budget": 16.438356,
+                "recipe_midpoint_key": "Land use",
+                "share_of_daily_budget_pct": 9.939567,
+                "unit": "m\u00b2\u00b7yr"
+              },
+              {
+                "available": true,
+                "control_variable": "Freshwater (consumptive) use",
+                "current_food_system_contribution": "1200\u20131800 km\u00b3/yr",
+                "global_boundary_per_year": 2000000000000.0,
+                "global_boundary_source": "2000 km\u00b3/yr of fresh water",
+                "key": "water_consumption",
+                "label": "Blue water consumption",
+                "meal_value": 0.011553,
+                "method_note": "Blue (irrigation) water use, weighted by how scarce water is in the producing region. The recommended limit is a single global number; we divide it equally across people for comparison.",
+                "per_capita_daily_budget": 0.684932,
+                "recipe_midpoint_key": "Water consumption",
+                "share_of_daily_budget_pct": 1.686798,
+                "unit": "m\u00b3"
+              },
+              {
+                "available": false,
+                "control_variable": "Human appropriation of net primary production",
+                "current_food_system_contribution": "9.9\u201311.7 Gt of carbon per year (about three-quarters of the global total)",
+                "global_boundary_per_year": 5500000000.0,
+                "global_boundary_source": "5.5 Gt of carbon per year",
+                "key": "biosphere_integrity_hanpp",
+                "label": "Biosphere integrity (HANPP)",
+                "reason": "We don't yet have per-food data for global biodiversity loss. Available life-cycle datasets capture local land use, not the global biosphere impact this target measures.",
+                "unit": "Gt C/yr"
+              },
+              {
+                "available": false,
+                "control_variable": "Reactive nitrogen as N\u2082O",
+                "current_food_system_contribution": "3.9\u20134.2 Tg per year (roughly two-thirds of the global total)",
+                "global_boundary_per_year": 1800000000.0,
+                "global_boundary_source": "1.8 Tg of nitrous-oxide nitrogen per year",
+                "key": "stratospheric_ozone_n2o",
+                "label": "Stratospheric ozone (N\u2082O)",
+                "reason": "Per-food nitrous-oxide data exists in the source life-cycle catalogue but isn't yet wired into our pipeline. Planned for a later release.",
+                "unit": "Tg N\u2082O-N"
+              },
+              {
+                "available": false,
+                "control_variable": "CO\u2082 from food-chain land-use change + fossil energy",
+                "current_food_system_contribution": "About 25 % of global CO\u2082 emissions",
+                "global_boundary_per_year": 0.0,
+                "global_boundary_source": "Zero food-chain CO\u2082 from clearing land and burning fossil fuels",
+                "key": "ocean_acidification",
+                "label": "Ocean acidification",
+                "unit": "% of food-chain CO\u2082"
+              },
+              {
+                "available": false,
+                "control_variable": "Net reactive-N input minus removal",
+                "current_food_system_contribution": "119 Tg of nitrogen per year",
+                "global_boundary_per_year": 57000000000.0,
+                "global_boundary_source": "57 Tg of nitrogen per year (less than half today's rate)",
+                "key": "nitrogen_surplus",
+                "label": "Nitrogen surplus",
+                "reason": "Nitrogen surplus isn't yet available as a per-food number in our data. Eutrophication numbers come close but measure local water pollution, not the global nitrogen surplus this target tracks.",
+                "unit": "Tg N/yr"
+              },
+              {
+                "available": false,
+                "control_variable": "P loss from agricultural land to surface water",
+                "current_food_system_contribution": "7.2 Tg per year (about three-quarters of the global total)",
+                "global_boundary_per_year": 4600000000.0,
+                "global_boundary_source": "4.6 Tg of phosphorus reaching surface water per year",
+                "key": "phosphorus_loss",
+                "label": "Phosphorus loss to surface water",
+                "reason": "Per-food phosphorus-loss numbers are available in the source life-cycle data but not yet active in our pipeline. Planned for a later release.",
+                "unit": "Tg P/yr"
+              },
+              {
+                "available": false,
+                "control_variable": "Pesticide active-substance use (kg PAS/yr)",
+                "current_food_system_contribution": "3.3\u20133.7 Tg per year (most of global pesticide use)",
+                "global_boundary_per_year": 1000000000.0,
+                "global_boundary_source": "Cut total pesticide use to 1 Tg per year (or 0.2 Tg for the most harmful)",
+                "key": "novel_entities_pesticides",
+                "label": "Novel entities (pesticides)",
+                "reason": "Our life-cycle data doesn't track pesticide use by product. This category would need a different data source.",
+                "unit": "Tg PAS/yr"
+              }
+            ]
+          },
+          "recipe2016_h_ef31_sensitivity": null,
+          "recipe_decomposer_enabled": false,
+          "recipe_decomposition_decisions": [],
+          "reporting_basis": "per_100_kcal",
+          "summary_score": {
+            "formatted": "1.009e-04 points",
+            "value": 0.000101
+          }
+        },
+        "monetization": {
+          "interpretation": {
+            "context": "Based on environmental cost of $0.470 CAD",
+            "level": "high"
+          },
+          "results": {
+            "cost_breakdown": {
+              "Climate & Energy": {
+                "individual_impacts": {
+                  "Global warming": 0.181643
+                },
+                "percentage_of_total": 38.60898,
+                "total_cost": 0.181643
+              },
+              "Ecosystem Quality": {
+                "individual_impacts": {},
+                "percentage_of_total": 0.0,
+                "total_cost": 0
+              },
+              "Human Health": {
+                "individual_impacts": {},
+                "percentage_of_total": 0.0,
+                "total_cost": 0
+              },
+              "Resource Depletion": {
+                "individual_impacts": {
+                  "Land use": 0.28868,
+                  "Water consumption": 0.000145
+                },
+                "percentage_of_total": 61.39102,
+                "total_cost": 0.288825
+              }
+            },
+            "cost_per_calorie": {
+              "context": "Environmental cost per calorie consumed",
+              "formatted": "$0.00093 CAD per calorie",
+              "unit": "CAD/kcal",
+              "value": 0.000933
+            },
+            "cost_per_protein": {
+              "context": "Environmental cost per gram of protein",
+              "formatted": "$0.02028 CAD per gram protein",
+              "unit": "CAD/g protein",
+              "value": 0.020282
+            },
+            "monetized_impacts": {
+              "Global warming": 0.181643,
+              "Land use": 0.28868,
+              "Water consumption": 0.000145
+            },
+            "top_cost_drivers": [
+              {
+                "cost": 0.28868,
+                "impact_category": "Land use",
+                "percentage_of_total": 61.360274,
+                "rank": 1
+              },
+              {
+                "cost": 0.181643,
+                "impact_category": "Global warming",
+                "percentage_of_total": 38.60898,
+                "rank": 2
+              },
+              {
+                "cost": 0.000145,
+                "impact_category": "Water consumption",
+                "percentage_of_total": 0.030746,
+                "rank": 3
+              }
+            ],
+            "total_environmental_cost": {
+              "context": "Total cost of environmental damage caused by this meal",
+              "formatted": "$0.470 CAD",
+              "unit": "CAD",
+              "value": 0.470468
+            },
+            "value_sources": {
+              "Global warming": {
+                "currency_year": "2021 CAD",
+                "last_verified": "2026-05-25",
+                "methodological_note": "CO2-eq aggregate only; CH4/N2O folded in via AR5 GWPs per ReCiPe midpoint. Per ECCC \u00a74.2 this is a known underestimate but per-gas separation requires an LCA-layer architecture change.",
+                "page_anchor": "literature_extractions.md \u00a7H47 lines 3496-3509",
+                "sensitivity_range_2026": "170 (2.5 % discount) \u2013 275 (2.0 %, central) \u2013 467 (1.5 %)",
+                "source": "ECCC 2023, Guidance on the Social Cost of GHG Emissions, Table 1 (2026 central, 2 % Near-term Ramsey discount rate)",
+                "status": "verified"
+              },
+              "Land use": {
+                "currency_year": "2021 CAD (converted from EUR 2015 via EUR_2015_TO_CAD_2021 \u2248 1.59)",
+                "last_verified": "2026-05-25",
+                "methodological_note": "Replaces the True Price 2024 Canadian farmland-rental placeholder. ReCiPe land use unit (m\u00b2\u00b7yr crop-eq) matches CE Delft directly.",
+                "page_anchor": "literature_extractions.md \u00a7H48 line 3641",
+                "source": "CE Delft 2018, Environmental Prices Handbook EU28 version, Table 2 (Summary p. 5), Hierarchist weighting factor \u20ac0.126/m\u00b2\u00b7yr",
+                "status": "verified"
+              },
+              "Water consumption": {
+                "currency_year": "2024 CAD",
+                "last_verified": "2026-05-25",
+                "override_env": "WATER_COST_PER_M3",
+                "source": "Canadian municipal tariff median; True Price 2024",
+                "status": "pending_page_citation"
+              }
+            }
+          }
+        },
+        "overall_assessment": {
+          "rating": "Room for Improvement \ud83d\udd04",
+          "recommendation": "Reducing red-meat or large dairy portions usually gives the biggest single improvement."
+        },
+        "sustainability": {
+          "category_scores": {
+            "Global warming": 39.913283,
+            "Land use": 42.626483,
+            "Water consumption": 52.700353
+          },
+          "category_zones": {
+            "Global warming": "Low",
+            "Land use": "Low",
+            "Water consumption": "Low"
+          },
+          "environmental_rating": "Poor",
+          "environmental_score": 43.92401,
+          "nutritional_score": 8.111718,
+          "overall_sustainability_score": 39.331005,
+          "overall_weights": {
+            "environmental": 0.5,
+            "nutritional": 0.3,
+            "processing": 0.2
+          },
+          "processing_score": 74.677419,
+          "recommendations": [],
+          "sustainability_rating": "Poor"
+        }
+      },
+      "meal_info": {
+        "composition": [
+          {
+            "group": "Dairy and Egg Products",
+            "id": 133,
+            "name": "Egg, chicken, whole, cooked, scrambled or omelet",
+            "quantity": 200
+          },
+          {
+            "group": "Dairy and Egg Products",
+            "id": 118,
+            "name": "Butter, regular",
+            "quantity": 8
+          },
+          {
+            "group": "Dairy and Egg Products",
+            "id": 61,
+            "name": "Milk, fluid, partly skimmed, 2% M.F.",
+            "quantity": 15
+          },
+          {
+            "group": "Fruits and fruit juices",
+            "id": 1620,
+            "name": "Orange juice, chilled, includes from concentrate",
+            "quantity": 273
+          }
+        ],
+        "macronutrient_distribution": {
+          "carbohydrate_percent": 29.730946,
+          "fat_percent": 52.243289,
+          "protein_percent": 18.025765
+        },
+        "total_calories": 504.18,
+        "total_weight": 496
+      },
+      "metadata": {
+        "currency": "CAD",
+        "data_source": "Canadian Nutrient File (Health Canada)",
+        "functional_unit": "per 100 kcal",
+        "methodology": "ReCiPe 2016 v1.1 (H)",
+        "methodology_pack": "recipe2016:v1.1:endpoint_sha=cc5faba76ee0:perspectives=3:countries=246",
+        "parameters": {
+          "basis": "per_100_kcal",
+          "consumer_perspective": "global",
+          "country": null,
+          "methodology": "recipe2016",
+          "perspective": "H"
+        },
+        "user_type": "individual"
+      },
+      "seo_metadata": {
+        "keywords": "environmental impact, individual, LCA, food sustainability, carbon footprint, meal assessment"
+      }
+    },
+    "seo_metadata": {
+      "keywords": "environmental impact, LCA, food sustainability, carbon footprint, meal comparison, monetization"
+    }
+  },
+  "D1 dinner \u2014 oat porridge": {
+    "data": {
+      "data": {
+        "environmental_impacts": {
+          "all_impacts": {
+            "Global warming": 0.751629,
+            "Land use": 2.135243,
+            "Water consumption": 0.028105
+          },
+          "all_impacts_bands": {
+            "Global warming": {
+              "central": 0.751629,
+              "high": 2.23896,
+              "low": 0.186215
+            },
+            "Land use": {
+              "central": 2.135243,
+              "high": 6.377853,
+              "low": 0.425097
+            },
+            "Water consumption": {
+              "central": 0.028105,
+              "high": 0.082325,
+              "low": 0.009427
+            }
+          },
+          "basis_factors": {
+            "per_100_kcal": 0.306326,
+            "per_100g_product": 0.224719,
+            "per_100g_protein": 8.238081,
+            "per_serving": 1.0
+          },
+          "catalog_version": null,
+          "data_quality": {
+            "confidence_by_category": {
+              "Global warming": {
+                "level": "high"
+              },
+              "Land use": {
+                "level": "medium"
+              },
+              "Water consumption": {
+                "level": "high"
+              }
+            },
+            "confidence_summary": {},
+            "consumer_perspective": "global",
+            "country": null,
+            "endpoint_factor_sources": {
+              "climate_change_ecosystem": "world_average",
+              "climate_change_ecosystem_freshwater": "world_average",
+              "climate_change_human": "world_average",
+              "freshwater_ecotoxicity_ecosystem": "world_average",
+              "freshwater_eutrophication_ecosystem": "world_average",
+              "human_toxicity_cancer": "world_average",
+              "human_toxicity_non_cancer": "world_average",
+              "ionizing_radiation_human": "world_average",
+              "land_use_ecosystem": "world_average",
+              "marine_ecotoxicity_ecosystem": "world_average",
+              "marine_eutrophication_ecosystem": "world_average",
+              "ozone_depletion_human": "world_average",
+              "particulate_matter_human": "world_average",
+              "photochemical_ozone_ecosystem": "world_average",
+              "photochemical_ozone_human": "world_average",
+              "terrestrial_acidification_ecosystem": "world_average",
+              "terrestrial_ecotoxicity_ecosystem": "world_average",
+              "water_use_ecosystem_freshwater": "world_average",
+              "water_use_ecosystem_terrestrial": "world_average",
+              "water_use_human": "world_average"
+            },
+            "known_issues": [
+              "Toxicity factors carry an explicit low-confidence flag (RIVM 2017 \u00a71.3 p. 20).",
+              "Fossil resource scarcity endpoint approximated as crude-oil-equivalent; per-substance resolution requires LCI upgrade.",
+              "Land use endpoint captures local impact only; global extinction not modelled.",
+              "Egalitarian climate factors omit climate-carbon feedbacks for non-CO2 GHGs.",
+              "v1 midpoint scope trimmed to {Global warming, Land use, Water consumption}; 15 other ReCiPe midpoints not consumed pending TODO-CODE-LCA-2."
+            ],
+            "methodology_provenance": {
+              "checksum_status": {
+                "country_factors": "ok",
+                "endpoint_factors": "ok",
+                "normalization": "ok"
+              },
+              "country_pack_sha256": "d588ea76f77a4729079665f3325db0eb012a80fd8c8ec89500b44738155ab6d3",
+              "endpoint_pack_sha256": "cc5faba76ee045246f6cd4260bab932c2e0ba9a444dad47585f9aa10e92d2c75",
+              "etl_git_rev": "84b00cd",
+              "extracted_at_utc": "2026-05-22T12:41:16+00:00",
+              "methodology": "recipe2016",
+              "methodology_version": "v1.1",
+              "normalization_pack_sha256": "c90f32c4fd9b66bd83bb158cc4a33c8e1f7c04853794cb5bdcece067ca419311",
+              "schema_version": "1.0",
+              "source_workbooks": [
+                "ReCiPe2016_CFs_v1.1_20180117.xlsx",
+                "Normalization scores ReCiPe2016v1.1_20190514.xlsx",
+                "ReCiPe2016_country factors_v1.1_20171221.xlsx"
+              ]
+            },
+            "methodology_version": "recipe2016 v1.1",
+            "perspective": "H",
+            "recommendations": [
+              "Use midpoint results for primary analysis; treat endpoint single-score as ranking aid.",
+              "Cross-validate with IMPACT World+ or PEF for critical applications."
+            ],
+            "sources": [
+              "Huijbregts et al. 2017, doi:10.1007/s11367-016-1246-y",
+              "RIVM 2016-0104a (October 2017), ReCiPe 2016 v1.1 workbooks"
+            ]
+          },
+          "endpoint_impacts": {
+            "Ecosystems": 0.0,
+            "Human Health": 1e-06,
+            "Resources": null
+          },
+          "endpoint_impacts_bands": {
+            "Ecosystems": {
+              "central": 0.0,
+              "high": 0.0,
+              "low": 0.0
+            },
+            "Human Health": {
+              "central": 1e-06,
+              "high": 2e-06,
+              "low": 0.0
+            }
+          },
+          "endpoint_impacts_by_basis": {
+            "per_100_kcal": {
+              "Ecosystems": 0.0,
+              "Human Health": 1e-06,
+              "Resources": null
+            },
+            "per_100g_product": {
+              "Ecosystems": 0.0,
+              "Human Health": 1e-06,
+              "Resources": null
+            },
+            "per_100g_protein": {
+              "Ecosystems": 1e-06,
+              "Human Health": 2e-05,
+              "Resources": null
+            },
+            "per_serving": {
+              "Ecosystems": 0.0,
+              "Human Health": 2e-06,
+              "Resources": null
+            }
+          },
+          "impacts_bands_by_basis": {
+            "per_100_kcal": {
+              "Global warming": {
+                "central": 0.751629,
+                "high": 2.23896,
+                "low": 0.186215
+              },
+              "Land use": {
+                "central": 2.135243,
+                "high": 6.377853,
+                "low": 0.425097
+              },
+              "Water consumption": {
+                "central": 0.028105,
+                "high": 0.082325,
+                "low": 0.009427
+              }
+            },
+            "per_100g_product": {
+              "Global warming": {
+                "central": 0.551392,
+                "high": 1.642491,
+                "low": 0.136606
+              },
+              "Land use": {
+                "central": 1.566405,
+                "high": 4.678764,
+                "low": 0.311849
+              },
+              "Water consumption": {
+                "central": 0.020618,
+                "high": 0.060393,
+                "low": 0.006916
+              }
+            },
+            "per_100g_protein": {
+              "Global warming": {
+                "central": 20.213733,
+                "high": 60.212818,
+                "low": 5.00792
+              },
+              "Land use": {
+                "central": 57.423543,
+                "high": 171.520964,
+                "low": 11.432232
+              },
+              "Water consumption": {
+                "central": 0.755844,
+                "high": 2.213984,
+                "low": 0.253527
+              }
+            },
+            "per_serving": {
+              "Global warming": {
+                "central": 2.453694,
+                "high": 7.309083,
+                "low": 0.607899
+              },
+              "Land use": {
+                "central": 6.9705,
+                "high": 20.820501,
+                "low": 1.38773
+              },
+              "Water consumption": {
+                "central": 0.09175,
+                "high": 0.26875,
+                "low": 0.030775
+              }
+            }
+          },
+          "impacts_by_basis": {
+            "per_100_kcal": {
+              "Global warming": 0.751629,
+              "Land use": 2.135243,
+              "Water consumption": 0.028105
+            },
+            "per_100g_product": {
+              "Global warming": 0.551392,
+              "Land use": 1.566405,
+              "Water consumption": 0.020618
+            },
+            "per_100g_protein": {
+              "Global warming": 20.213733,
+              "Land use": 57.423543,
+              "Water consumption": 0.755844
+            },
+            "per_serving": {
+              "Global warming": 2.453694,
+              "Land use": 6.9705,
+              "Water consumption": 0.09175
+            }
+          },
+          "key_impacts": {
+            "carbon_footprint": {
+              "category": "Climate Change",
+              "formatted": "0.75163 kg CO2-eq",
+              "importance": "Primary driver of global warming and climate change",
+              "unit": "kg CO2-eq",
+              "value": 0.751629
+            },
+            "land_use": {
+              "category": "Ecosystem Impact",
+              "formatted": "2.135 m\u00b2a crop-eq",
+              "importance": "Land conversion and biodiversity impact",
+              "unit": "m\u00b2a crop-eq",
+              "value": 2.135243
+            },
+            "water_consumption": {
+              "category": "Resource Use",
+              "formatted": "0.02811 m\u00b3",
+              "importance": "Freshwater resource depletion",
+              "unit": "m\u00b3",
+              "value": 0.028105
+            }
+          },
+          "lca_matcher_decisions": [],
+          "lca_matcher_enabled": false,
+          "planetary_boundary_shares": {
+            "citation": {
+              "doi": "10.1016/S0140-6736(25)01201-2",
+              "manuscript_anchor": "literature_extractions.md \u00a7E28 Table 2",
+              "table": "Table 2 (p. 1640) \u2014 food-system boundaries (selected control variables)"
+            },
+            "days_per_year": 365,
+            "n_covered": 3,
+            "n_total": 9,
+            "population_assumption": 8000000000,
+            "shares": [
+              {
+                "available": true,
+                "control_variable": "Atmospheric CO\u2082 (CO\u2082-eq emissions)",
+                "current_food_system_contribution": "16\u201317.7 Gt CO\u2082e/yr (about 30 % of all human emissions)",
+                "global_boundary_per_year": 5000000000000.0,
+                "global_boundary_source": "5 Gt CO\u2082e/yr",
+                "key": "climate_change",
+                "label": "Climate change",
+                "meal_value": 0.751629,
+                "method_note": "Production-stage CO\u2082-equivalent emissions, weighted across CO\u2082, methane, and N\u2082O over 100 years.",
+                "per_capita_daily_budget": 1.712329,
+                "recipe_midpoint_key": "Global warming",
+                "share_of_daily_budget_pct": 43.895163,
+                "unit": "kg CO\u2082e"
+              },
+              {
+                "available": true,
+                "control_variable": "Agricultural land area (current footprint, no further conversion of intact nature)",
+                "current_food_system_contribution": "48 million km\u00b2 (about 34 % of Earth's land)",
+                "global_boundary_per_year": 48000000000000.0,
+                "global_boundary_source": "Hold today's agricultural land area; halt conversion of remaining intact nature",
+                "key": "land_use",
+                "label": "Land system change",
+                "meal_value": 2.135243,
+                "per_capita_daily_budget": 16.438356,
+                "recipe_midpoint_key": "Land use",
+                "share_of_daily_budget_pct": 12.989394,
+                "unit": "m\u00b2\u00b7yr"
+              },
+              {
+                "available": true,
+                "control_variable": "Freshwater (consumptive) use",
+                "current_food_system_contribution": "1200\u20131800 km\u00b3/yr",
+                "global_boundary_per_year": 2000000000000.0,
+                "global_boundary_source": "2000 km\u00b3/yr of fresh water",
+                "key": "water_consumption",
+                "label": "Blue water consumption",
+                "meal_value": 0.028105,
+                "method_note": "Blue (irrigation) water use, weighted by how scarce water is in the producing region. The recommended limit is a single global number; we divide it equally across people for comparison.",
+                "per_capita_daily_budget": 0.684932,
+                "recipe_midpoint_key": "Water consumption",
+                "share_of_daily_budget_pct": 4.103385,
+                "unit": "m\u00b3"
+              },
+              {
+                "available": false,
+                "control_variable": "Human appropriation of net primary production",
+                "current_food_system_contribution": "9.9\u201311.7 Gt of carbon per year (about three-quarters of the global total)",
+                "global_boundary_per_year": 5500000000.0,
+                "global_boundary_source": "5.5 Gt of carbon per year",
+                "key": "biosphere_integrity_hanpp",
+                "label": "Biosphere integrity (HANPP)",
+                "reason": "We don't yet have per-food data for global biodiversity loss. Available life-cycle datasets capture local land use, not the global biosphere impact this target measures.",
+                "unit": "Gt C/yr"
+              },
+              {
+                "available": false,
+                "control_variable": "Reactive nitrogen as N\u2082O",
+                "current_food_system_contribution": "3.9\u20134.2 Tg per year (roughly two-thirds of the global total)",
+                "global_boundary_per_year": 1800000000.0,
+                "global_boundary_source": "1.8 Tg of nitrous-oxide nitrogen per year",
+                "key": "stratospheric_ozone_n2o",
+                "label": "Stratospheric ozone (N\u2082O)",
+                "reason": "Per-food nitrous-oxide data exists in the source life-cycle catalogue but isn't yet wired into our pipeline. Planned for a later release.",
+                "unit": "Tg N\u2082O-N"
+              },
+              {
+                "available": false,
+                "control_variable": "CO\u2082 from food-chain land-use change + fossil energy",
+                "current_food_system_contribution": "About 25 % of global CO\u2082 emissions",
+                "global_boundary_per_year": 0.0,
+                "global_boundary_source": "Zero food-chain CO\u2082 from clearing land and burning fossil fuels",
+                "key": "ocean_acidification",
+                "label": "Ocean acidification",
+                "unit": "% of food-chain CO\u2082"
+              },
+              {
+                "available": false,
+                "control_variable": "Net reactive-N input minus removal",
+                "current_food_system_contribution": "119 Tg of nitrogen per year",
+                "global_boundary_per_year": 57000000000.0,
+                "global_boundary_source": "57 Tg of nitrogen per year (less than half today's rate)",
+                "key": "nitrogen_surplus",
+                "label": "Nitrogen surplus",
+                "reason": "Nitrogen surplus isn't yet available as a per-food number in our data. Eutrophication numbers come close but measure local water pollution, not the global nitrogen surplus this target tracks.",
+                "unit": "Tg N/yr"
+              },
+              {
+                "available": false,
+                "control_variable": "P loss from agricultural land to surface water",
+                "current_food_system_contribution": "7.2 Tg per year (about three-quarters of the global total)",
+                "global_boundary_per_year": 4600000000.0,
+                "global_boundary_source": "4.6 Tg of phosphorus reaching surface water per year",
+                "key": "phosphorus_loss",
+                "label": "Phosphorus loss to surface water",
+                "reason": "Per-food phosphorus-loss numbers are available in the source life-cycle data but not yet active in our pipeline. Planned for a later release.",
+                "unit": "Tg P/yr"
+              },
+              {
+                "available": false,
+                "control_variable": "Pesticide active-substance use (kg PAS/yr)",
+                "current_food_system_contribution": "3.3\u20133.7 Tg per year (most of global pesticide use)",
+                "global_boundary_per_year": 1000000000.0,
+                "global_boundary_source": "Cut total pesticide use to 1 Tg per year (or 0.2 Tg for the most harmful)",
+                "key": "novel_entities_pesticides",
+                "label": "Novel entities (pesticides)",
+                "reason": "Our life-cycle data doesn't track pesticide use by product. This category would need a different data source.",
+                "unit": "Tg PAS/yr"
+              }
+            ]
+          },
+          "recipe2016_h_ef31_sensitivity": null,
+          "recipe_decomposer_enabled": false,
+          "recipe_decomposition_decisions": [],
+          "reporting_basis": "per_100_kcal",
+          "summary_score": {
+            "formatted": "9.258e-05 points",
+            "value": 9.3e-05
+          }
+        },
+        "monetization": {
+          "interpretation": {
+            "context": "Based on environmental cost of $0.640 CAD",
+            "level": "high"
+          },
+          "results": {
+            "cost_breakdown": {
+              "Climate & Energy": {
+                "individual_impacts": {
+                  "Global warming": 0.262443
+                },
+                "percentage_of_total": 41.003322,
+                "total_cost": 0.262443
+              },
+              "Ecosystem Quality": {
+                "individual_impacts": {},
+                "percentage_of_total": 0.0,
+                "total_cost": 0
+              },
+              "Human Health": {
+                "individual_impacts": {},
+                "percentage_of_total": 0.0,
+                "total_cost": 0
+              },
+              "Resource Depletion": {
+                "individual_impacts": {
+                  "Land use": 0.377258,
+                  "Water consumption": 0.000352
+                },
+                "percentage_of_total": 58.996678,
+                "total_cost": 0.37761
+              }
+            },
+            "cost_per_calorie": {
+              "context": "Environmental cost per calorie consumed",
+              "formatted": "$0.00196 CAD per calorie",
+              "unit": "CAD/kcal",
+              "value": 0.001961
+            },
+            "cost_per_protein": {
+              "context": "Environmental cost per gram of protein",
+              "formatted": "$0.05273 CAD per gram protein",
+              "unit": "CAD/g protein",
+              "value": 0.052728
+            },
+            "monetized_impacts": {
+              "Global warming": 0.262443,
+              "Land use": 0.377258,
+              "Water consumption": 0.000352
+            },
+            "top_cost_drivers": [
+              {
+                "cost": 0.377258,
+                "impact_category": "Land use",
+                "percentage_of_total": 58.9417,
+                "rank": 1
+              },
+              {
+                "cost": 0.262443,
+                "impact_category": "Global warming",
+                "percentage_of_total": 41.003322,
+                "rank": 2
+              },
+              {
+                "cost": 0.000352,
+                "impact_category": "Water consumption",
+                "percentage_of_total": 0.054978,
+                "rank": 3
+              }
+            ],
+            "total_environmental_cost": {
+              "context": "Total cost of environmental damage caused by this meal",
+              "formatted": "$0.640 CAD",
+              "unit": "CAD",
+              "value": 0.640053
+            },
+            "value_sources": {
+              "Global warming": {
+                "currency_year": "2021 CAD",
+                "last_verified": "2026-05-25",
+                "methodological_note": "CO2-eq aggregate only; CH4/N2O folded in via AR5 GWPs per ReCiPe midpoint. Per ECCC \u00a74.2 this is a known underestimate but per-gas separation requires an LCA-layer architecture change.",
+                "page_anchor": "literature_extractions.md \u00a7H47 lines 3496-3509",
+                "sensitivity_range_2026": "170 (2.5 % discount) \u2013 275 (2.0 %, central) \u2013 467 (1.5 %)",
+                "source": "ECCC 2023, Guidance on the Social Cost of GHG Emissions, Table 1 (2026 central, 2 % Near-term Ramsey discount rate)",
+                "status": "verified"
+              },
+              "Land use": {
+                "currency_year": "2021 CAD (converted from EUR 2015 via EUR_2015_TO_CAD_2021 \u2248 1.59)",
+                "last_verified": "2026-05-25",
+                "methodological_note": "Replaces the True Price 2024 Canadian farmland-rental placeholder. ReCiPe land use unit (m\u00b2\u00b7yr crop-eq) matches CE Delft directly.",
+                "page_anchor": "literature_extractions.md \u00a7H48 line 3641",
+                "source": "CE Delft 2018, Environmental Prices Handbook EU28 version, Table 2 (Summary p. 5), Hierarchist weighting factor \u20ac0.126/m\u00b2\u00b7yr",
+                "status": "verified"
+              },
+              "Water consumption": {
+                "currency_year": "2024 CAD",
+                "last_verified": "2026-05-25",
+                "override_env": "WATER_COST_PER_M3",
+                "source": "Canadian municipal tariff median; True Price 2024",
+                "status": "pending_page_citation"
+              }
+            }
+          }
+        },
+        "overall_assessment": {
+          "rating": "Room for Improvement \ud83d\udd04",
+          "recommendation": "Reducing red-meat or large dairy portions usually gives the biggest single improvement."
+        },
+        "sustainability": {
+          "category_scores": {
+            "Global warming": 18.485333,
+            "Land use": 43.735268,
+            "Water consumption": 34.856898
+          },
+          "category_zones": {
+            "Global warming": "High",
+            "Land use": "Moderate",
+            "Water consumption": "High"
+          },
+          "environmental_rating": "Very Poor",
+          "environmental_score": 30.153205,
+          "nutritional_score": 5.159355,
+          "overall_sustainability_score": 24.909053,
+          "overall_weights": {
+            "environmental": 0.5,
+            "nutritional": 0.3,
+            "processing": 0.2
+          },
+          "processing_score": 41.423221,
+          "recommendations": [],
+          "sustainability_rating": "Very Poor"
+        }
+      },
+      "meal_info": {
+        "composition": [
+          {
+            "group": "Breakfast cereals",
+            "id": 1465,
+            "name": "Cereal, hot, oats (oatmeal), large flakes, prepared, Quaker",
+            "quantity": 250
+          },
+          {
+            "group": "Dairy and Egg Products",
+            "id": 61,
+            "name": "Milk, fluid, partly skimmed, 2% M.F.",
+            "quantity": 130
+          },
+          {
+            "group": "Fruits and fruit juices",
+            "id": 1704,
+            "name": "Banana, raw",
+            "quantity": 65
+          }
+        ],
+        "macronutrient_distribution": {
+          "carbohydrate_percent": 67.883384,
+          "fat_percent": 17.499928,
+          "protein_percent": 14.616688
+        },
+        "total_calories": 326.45,
+        "total_weight": 445
+      },
+      "metadata": {
+        "currency": "CAD",
+        "data_source": "Canadian Nutrient File (Health Canada)",
+        "functional_unit": "per 100 kcal",
+        "methodology": "ReCiPe 2016 v1.1 (H)",
+        "methodology_pack": "recipe2016:v1.1:endpoint_sha=cc5faba76ee0:perspectives=3:countries=246",
+        "parameters": {
+          "basis": "per_100_kcal",
+          "consumer_perspective": "global",
+          "country": null,
+          "methodology": "recipe2016",
+          "perspective": "H"
+        },
+        "user_type": "individual"
+      },
+      "seo_metadata": {
+        "keywords": "environmental impact, individual, LCA, food sustainability, carbon footprint, meal assessment"
+      }
+    },
+    "seo_metadata": {
+      "keywords": "environmental impact, LCA, food sustainability, carbon footprint, meal comparison, monetization"
+    }
+  },
+  "D1 lunch \u2014 chicken biryani": {
+    "data": {
+      "data": {
+        "environmental_impacts": {
+          "all_impacts": {
+            "Global warming": 0.323802,
+            "Land use": 0.552506,
+            "Water consumption": 0.013107
+          },
+          "all_impacts_bands": {
+            "Global warming": {
+              "central": 0.323802,
+              "high": 0.731237,
+              "low": 0.12281
+            },
+            "Land use": {
+              "central": 0.552506,
+              "high": 1.331076,
+              "low": 0.201895
+            },
+            "Water consumption": {
+              "central": 0.013107,
+              "high": 0.026857,
+              "low": 0.005206
+            }
+          },
+          "basis_factors": {
+            "per_100_kcal": 0.080217,
+            "per_100g_product": 0.144928,
+            "per_100g_protein": 1.70247,
+            "per_serving": 1.0
+          },
+          "catalog_version": null,
+          "data_quality": {
+            "confidence_by_category": {
+              "Global warming": {
+                "level": "high"
+              },
+              "Land use": {
+                "level": "medium"
+              },
+              "Water consumption": {
+                "level": "high"
+              }
+            },
+            "confidence_summary": {},
+            "consumer_perspective": "global",
+            "country": null,
+            "endpoint_factor_sources": {
+              "climate_change_ecosystem": "world_average",
+              "climate_change_ecosystem_freshwater": "world_average",
+              "climate_change_human": "world_average",
+              "freshwater_ecotoxicity_ecosystem": "world_average",
+              "freshwater_eutrophication_ecosystem": "world_average",
+              "human_toxicity_cancer": "world_average",
+              "human_toxicity_non_cancer": "world_average",
+              "ionizing_radiation_human": "world_average",
+              "land_use_ecosystem": "world_average",
+              "marine_ecotoxicity_ecosystem": "world_average",
+              "marine_eutrophication_ecosystem": "world_average",
+              "ozone_depletion_human": "world_average",
+              "particulate_matter_human": "world_average",
+              "photochemical_ozone_ecosystem": "world_average",
+              "photochemical_ozone_human": "world_average",
+              "terrestrial_acidification_ecosystem": "world_average",
+              "terrestrial_ecotoxicity_ecosystem": "world_average",
+              "water_use_ecosystem_freshwater": "world_average",
+              "water_use_ecosystem_terrestrial": "world_average",
+              "water_use_human": "world_average"
+            },
+            "known_issues": [
+              "Toxicity factors carry an explicit low-confidence flag (RIVM 2017 \u00a71.3 p. 20).",
+              "Fossil resource scarcity endpoint approximated as crude-oil-equivalent; per-substance resolution requires LCI upgrade.",
+              "Land use endpoint captures local impact only; global extinction not modelled.",
+              "Egalitarian climate factors omit climate-carbon feedbacks for non-CO2 GHGs.",
+              "v1 midpoint scope trimmed to {Global warming, Land use, Water consumption}; 15 other ReCiPe midpoints not consumed pending TODO-CODE-LCA-2."
+            ],
+            "methodology_provenance": {
+              "checksum_status": {
+                "country_factors": "ok",
+                "endpoint_factors": "ok",
+                "normalization": "ok"
+              },
+              "country_pack_sha256": "d588ea76f77a4729079665f3325db0eb012a80fd8c8ec89500b44738155ab6d3",
+              "endpoint_pack_sha256": "cc5faba76ee045246f6cd4260bab932c2e0ba9a444dad47585f9aa10e92d2c75",
+              "etl_git_rev": "84b00cd",
+              "extracted_at_utc": "2026-05-22T12:41:16+00:00",
+              "methodology": "recipe2016",
+              "methodology_version": "v1.1",
+              "normalization_pack_sha256": "c90f32c4fd9b66bd83bb158cc4a33c8e1f7c04853794cb5bdcece067ca419311",
+              "schema_version": "1.0",
+              "source_workbooks": [
+                "ReCiPe2016_CFs_v1.1_20180117.xlsx",
+                "Normalization scores ReCiPe2016v1.1_20190514.xlsx",
+                "ReCiPe2016_country factors_v1.1_20171221.xlsx"
+              ]
+            },
+            "methodology_version": "recipe2016 v1.1",
+            "perspective": "H",
+            "recommendations": [
+              "Use midpoint results for primary analysis; treat endpoint single-score as ranking aid.",
+              "Cross-validate with IMPACT World+ or PEF for critical applications."
+            ],
+            "sources": [
+              "Huijbregts et al. 2017, doi:10.1007/s11367-016-1246-y",
+              "RIVM 2016-0104a (October 2017), ReCiPe 2016 v1.1 workbooks"
+            ]
+          },
+          "endpoint_impacts": {
+            "Ecosystems": 0.0,
+            "Human Health": 0.0,
+            "Resources": null
+          },
+          "endpoint_impacts_bands": {
+            "Ecosystems": {
+              "central": 0.0,
+              "high": 0.0,
+              "low": 0.0
+            },
+            "Human Health": {
+              "central": 0.0,
+              "high": 1e-06,
+              "low": 0.0
+            }
+          },
+          "endpoint_impacts_by_basis": {
+            "per_100_kcal": {
+              "Ecosystems": 0.0,
+              "Human Health": 0.0,
+              "Resources": null
+            },
+            "per_100g_product": {
+              "Ecosystems": 0.0,
+              "Human Health": 1e-06,
+              "Resources": null
+            },
+            "per_100g_protein": {
+              "Ecosystems": 0.0,
+              "Human Health": 7e-06,
+              "Resources": null
+            },
+            "per_serving": {
+              "Ecosystems": 0.0,
+              "Human Health": 4e-06,
+              "Resources": null
+            }
+          },
+          "impacts_bands_by_basis": {
+            "per_100_kcal": {
+              "Global warming": {
+                "central": 0.323802,
+                "high": 0.731237,
+                "low": 0.12281
+              },
+              "Land use": {
+                "central": 0.552506,
+                "high": 1.331076,
+                "low": 0.201895
+              },
+              "Water consumption": {
+                "central": 0.013107,
+                "high": 0.026857,
+                "low": 0.005206
+              }
+            },
+            "per_100g_product": {
+              "Global warming": {
+                "central": 0.585012,
+                "high": 1.321122,
+                "low": 0.221881
+              },
+              "Land use": {
+                "central": 0.998211,
+                "high": 2.40485,
+                "low": 0.364763
+              },
+              "Water consumption": {
+                "central": 0.023681,
+                "high": 0.048522,
+                "low": 0.009406
+              }
+            },
+            "per_100g_protein": {
+              "Global warming": {
+                "central": 6.872157,
+                "high": 15.519277,
+                "low": 2.606441
+              },
+              "Land use": {
+                "central": 11.726022,
+                "high": 28.249865,
+                "low": 4.284888
+              },
+              "Water consumption": {
+                "central": 0.278184,
+                "high": 0.569987,
+                "low": 0.11049
+              }
+            },
+            "per_serving": {
+              "Global warming": {
+                "central": 4.036581,
+                "high": 9.115744,
+                "low": 1.530976
+              },
+              "Land use": {
+                "central": 6.887654,
+                "high": 16.593462,
+                "low": 2.516866
+              },
+              "Water consumption": {
+                "central": 0.1634,
+                "high": 0.3348,
+                "low": 0.0649
+              }
+            }
+          },
+          "impacts_by_basis": {
+            "per_100_kcal": {
+              "Global warming": 0.323802,
+              "Land use": 0.552506,
+              "Water consumption": 0.013107
+            },
+            "per_100g_product": {
+              "Global warming": 0.585012,
+              "Land use": 0.998211,
+              "Water consumption": 0.023681
+            },
+            "per_100g_protein": {
+              "Global warming": 6.872157,
+              "Land use": 11.726022,
+              "Water consumption": 0.278184
+            },
+            "per_serving": {
+              "Global warming": 4.036581,
+              "Land use": 6.887654,
+              "Water consumption": 0.1634
+            }
+          },
+          "key_impacts": {
+            "carbon_footprint": {
+              "category": "Climate Change",
+              "formatted": "0.32380 kg CO2-eq",
+              "importance": "Primary driver of global warming and climate change",
+              "unit": "kg CO2-eq",
+              "value": 0.323802
+            },
+            "land_use": {
+              "category": "Ecosystem Impact",
+              "formatted": "0.55251 m\u00b2a crop-eq",
+              "importance": "Land conversion and biodiversity impact",
+              "unit": "m\u00b2a crop-eq",
+              "value": 0.552506
+            },
+            "water_consumption": {
+              "category": "Resource Use",
+              "formatted": "0.01311 m\u00b3",
+              "importance": "Freshwater resource depletion",
+              "unit": "m\u00b3",
+              "value": 0.013107
+            }
+          },
+          "lca_matcher_decisions": [],
+          "lca_matcher_enabled": false,
+          "planetary_boundary_shares": {
+            "citation": {
+              "doi": "10.1016/S0140-6736(25)01201-2",
+              "manuscript_anchor": "literature_extractions.md \u00a7E28 Table 2",
+              "table": "Table 2 (p. 1640) \u2014 food-system boundaries (selected control variables)"
+            },
+            "days_per_year": 365,
+            "n_covered": 3,
+            "n_total": 9,
+            "population_assumption": 8000000000,
+            "shares": [
+              {
+                "available": true,
+                "control_variable": "Atmospheric CO\u2082 (CO\u2082-eq emissions)",
+                "current_food_system_contribution": "16\u201317.7 Gt CO\u2082e/yr (about 30 % of all human emissions)",
+                "global_boundary_per_year": 5000000000000.0,
+                "global_boundary_source": "5 Gt CO\u2082e/yr",
+                "key": "climate_change",
+                "label": "Climate change",
+                "meal_value": 0.323802,
+                "method_note": "Production-stage CO\u2082-equivalent emissions, weighted across CO\u2082, methane, and N\u2082O over 100 years.",
+                "per_capita_daily_budget": 1.712329,
+                "recipe_midpoint_key": "Global warming",
+                "share_of_daily_budget_pct": 18.91004,
+                "unit": "kg CO\u2082e"
+              },
+              {
+                "available": true,
+                "control_variable": "Agricultural land area (current footprint, no further conversion of intact nature)",
+                "current_food_system_contribution": "48 million km\u00b2 (about 34 % of Earth's land)",
+                "global_boundary_per_year": 48000000000000.0,
+                "global_boundary_source": "Hold today's agricultural land area; halt conversion of remaining intact nature",
+                "key": "land_use",
+                "label": "Land system change",
+                "meal_value": 0.552506,
+                "per_capita_daily_budget": 16.438356,
+                "recipe_midpoint_key": "Land use",
+                "share_of_daily_budget_pct": 3.36108,
+                "unit": "m\u00b2\u00b7yr"
+              },
+              {
+                "available": true,
+                "control_variable": "Freshwater (consumptive) use",
+                "current_food_system_contribution": "1200\u20131800 km\u00b3/yr",
+                "global_boundary_per_year": 2000000000000.0,
+                "global_boundary_source": "2000 km\u00b3/yr of fresh water",
+                "key": "water_consumption",
+                "label": "Blue water consumption",
+                "meal_value": 0.013107,
+                "method_note": "Blue (irrigation) water use, weighted by how scarce water is in the producing region. The recommended limit is a single global number; we divide it equally across people for comparison.",
+                "per_capita_daily_budget": 0.684932,
+                "recipe_midpoint_key": "Water consumption",
+                "share_of_daily_budget_pct": 1.913687,
+                "unit": "m\u00b3"
+              },
+              {
+                "available": false,
+                "control_variable": "Human appropriation of net primary production",
+                "current_food_system_contribution": "9.9\u201311.7 Gt of carbon per year (about three-quarters of the global total)",
+                "global_boundary_per_year": 5500000000.0,
+                "global_boundary_source": "5.5 Gt of carbon per year",
+                "key": "biosphere_integrity_hanpp",
+                "label": "Biosphere integrity (HANPP)",
+                "reason": "We don't yet have per-food data for global biodiversity loss. Available life-cycle datasets capture local land use, not the global biosphere impact this target measures.",
+                "unit": "Gt C/yr"
+              },
+              {
+                "available": false,
+                "control_variable": "Reactive nitrogen as N\u2082O",
+                "current_food_system_contribution": "3.9\u20134.2 Tg per year (roughly two-thirds of the global total)",
+                "global_boundary_per_year": 1800000000.0,
+                "global_boundary_source": "1.8 Tg of nitrous-oxide nitrogen per year",
+                "key": "stratospheric_ozone_n2o",
+                "label": "Stratospheric ozone (N\u2082O)",
+                "reason": "Per-food nitrous-oxide data exists in the source life-cycle catalogue but isn't yet wired into our pipeline. Planned for a later release.",
+                "unit": "Tg N\u2082O-N"
+              },
+              {
+                "available": false,
+                "control_variable": "CO\u2082 from food-chain land-use change + fossil energy",
+                "current_food_system_contribution": "About 25 % of global CO\u2082 emissions",
+                "global_boundary_per_year": 0.0,
+                "global_boundary_source": "Zero food-chain CO\u2082 from clearing land and burning fossil fuels",
+                "key": "ocean_acidification",
+                "label": "Ocean acidification",
+                "unit": "% of food-chain CO\u2082"
+              },
+              {
+                "available": false,
+                "control_variable": "Net reactive-N input minus removal",
+                "current_food_system_contribution": "119 Tg of nitrogen per year",
+                "global_boundary_per_year": 57000000000.0,
+                "global_boundary_source": "57 Tg of nitrogen per year (less than half today's rate)",
+                "key": "nitrogen_surplus",
+                "label": "Nitrogen surplus",
+                "reason": "Nitrogen surplus isn't yet available as a per-food number in our data. Eutrophication numbers come close but measure local water pollution, not the global nitrogen surplus this target tracks.",
+                "unit": "Tg N/yr"
+              },
+              {
+                "available": false,
+                "control_variable": "P loss from agricultural land to surface water",
+                "current_food_system_contribution": "7.2 Tg per year (about three-quarters of the global total)",
+                "global_boundary_per_year": 4600000000.0,
+                "global_boundary_source": "4.6 Tg of phosphorus reaching surface water per year",
+                "key": "phosphorus_loss",
+                "label": "Phosphorus loss to surface water",
+                "reason": "Per-food phosphorus-loss numbers are available in the source life-cycle data but not yet active in our pipeline. Planned for a later release.",
+                "unit": "Tg P/yr"
+              },
+              {
+                "available": false,
+                "control_variable": "Pesticide active-substance use (kg PAS/yr)",
+                "current_food_system_contribution": "3.3\u20133.7 Tg per year (most of global pesticide use)",
+                "global_boundary_per_year": 1000000000.0,
+                "global_boundary_source": "Cut total pesticide use to 1 Tg per year (or 0.2 Tg for the most harmful)",
+                "key": "novel_entities_pesticides",
+                "label": "Novel entities (pesticides)",
+                "reason": "Our life-cycle data doesn't track pesticide use by product. This category would need a different data source.",
+                "unit": "Tg PAS/yr"
+              }
+            ]
+          },
+          "recipe2016_h_ef31_sensitivity": null,
+          "recipe_decomposer_enabled": false,
+          "recipe_decomposition_decisions": [],
+          "reporting_basis": "per_100_kcal",
+          "summary_score": {
+            "formatted": "1.292e-04 points",
+            "value": 0.000129
+          }
+        },
+        "monetization": {
+          "interpretation": {
+            "context": "Based on environmental cost of $0.211 CAD",
+            "level": "high"
+          },
+          "results": {
+            "cost_breakdown": {
+              "Climate & Energy": {
+                "individual_impacts": {
+                  "Global warming": 0.113061
+                },
+                "percentage_of_total": 53.623245,
+                "total_cost": 0.113061
+              },
+              "Ecosystem Quality": {
+                "individual_impacts": {},
+                "percentage_of_total": 0.0,
+                "total_cost": 0
+              },
+              "Human Health": {
+                "individual_impacts": {},
+                "percentage_of_total": 0.0,
+                "total_cost": 0
+              },
+              "Resource Depletion": {
+                "individual_impacts": {
+                  "Land use": 0.097618,
+                  "Water consumption": 0.000164
+                },
+                "percentage_of_total": 46.376755,
+                "total_cost": 0.097782
+              }
+            },
+            "cost_per_calorie": {
+              "context": "Environmental cost per calorie consumed",
+              "formatted": "$0.00017 CAD per calorie",
+              "unit": "CAD/kcal",
+              "value": 0.000169
+            },
+            "cost_per_protein": {
+              "context": "Environmental cost per gram of protein",
+              "formatted": "$0.00359 CAD per gram protein",
+              "unit": "CAD/g protein",
+              "value": 0.00359
+            },
+            "monetized_impacts": {
+              "Global warming": 0.113061,
+              "Land use": 0.097618,
+              "Water consumption": 0.000164
+            },
+            "top_cost_drivers": [
+              {
+                "cost": 0.113061,
+                "impact_category": "Global warming",
+                "percentage_of_total": 53.623245,
+                "rank": 1
+              },
+              {
+                "cost": 0.097618,
+                "impact_category": "Land use",
+                "percentage_of_total": 46.29892,
+                "rank": 2
+              },
+              {
+                "cost": 0.000164,
+                "impact_category": "Water consumption",
+                "percentage_of_total": 0.077835,
+                "rank": 3
+              }
+            ],
+            "total_environmental_cost": {
+              "context": "Total cost of environmental damage caused by this meal",
+              "formatted": "$0.211 CAD",
+              "unit": "CAD",
+              "value": 0.210842
+            },
+            "value_sources": {
+              "Global warming": {
+                "currency_year": "2021 CAD",
+                "last_verified": "2026-05-25",
+                "methodological_note": "CO2-eq aggregate only; CH4/N2O folded in via AR5 GWPs per ReCiPe midpoint. Per ECCC \u00a74.2 this is a known underestimate but per-gas separation requires an LCA-layer architecture change.",
+                "page_anchor": "literature_extractions.md \u00a7H47 lines 3496-3509",
+                "sensitivity_range_2026": "170 (2.5 % discount) \u2013 275 (2.0 %, central) \u2013 467 (1.5 %)",
+                "source": "ECCC 2023, Guidance on the Social Cost of GHG Emissions, Table 1 (2026 central, 2 % Near-term Ramsey discount rate)",
+                "status": "verified"
+              },
+              "Land use": {
+                "currency_year": "2021 CAD (converted from EUR 2015 via EUR_2015_TO_CAD_2021 \u2248 1.59)",
+                "last_verified": "2026-05-25",
+                "methodological_note": "Replaces the True Price 2024 Canadian farmland-rental placeholder. ReCiPe land use unit (m\u00b2\u00b7yr crop-eq) matches CE Delft directly.",
+                "page_anchor": "literature_extractions.md \u00a7H48 line 3641",
+                "source": "CE Delft 2018, Environmental Prices Handbook EU28 version, Table 2 (Summary p. 5), Hierarchist weighting factor \u20ac0.126/m\u00b2\u00b7yr",
+                "status": "verified"
+              },
+              "Water consumption": {
+                "currency_year": "2024 CAD",
+                "last_verified": "2026-05-25",
+                "override_env": "WATER_COST_PER_M3",
+                "source": "Canadian municipal tariff median; True Price 2024",
+                "status": "pending_page_citation"
+              }
+            }
+          }
+        },
+        "overall_assessment": {
+          "rating": "Room for Improvement \ud83d\udd04",
+          "recommendation": "Reducing red-meat or large dairy portions usually gives the biggest single improvement."
+        },
+        "sustainability": {
+          "category_scores": {
+            "Global warming": 29.679088,
+            "Land use": 50.375622,
+            "Water consumption": 28.555346
+          },
+          "category_zones": {
+            "Global warming": "Moderate",
+            "Land use": "Moderate",
+            "Water consumption": "High"
+          },
+          "environmental_rating": "Poor",
+          "environmental_score": 35.607113,
+          "nutritional_score": 3.982158,
+          "overall_sustainability_score": 33.896755,
+          "overall_weights": {
+            "environmental": 0.5,
+            "nutritional": 0.3,
+            "processing": 0.2
+          },
+          "processing_score": 74.492754,
+          "recommendations": [],
+          "sustainability_rating": "Very Poor"
+        }
+      },
+      "meal_info": {
+        "composition": [
+          {
+            "group": "Cereals, Grains and Pasta",
+            "id": 4473,
+            "name": "Grains, rice, white, long-grain, parboiled, cooked",
+            "quantity": 320
+          },
+          {
+            "group": "Poultry Products",
+            "id": 851,
+            "name": "Chicken, broiler, thigh, meat and skin, roasted",
+            "quantity": 200
+          },
+          {
+            "group": "Dairy and Egg Products",
+            "id": 6971,
+            "name": "Yogourt (yogurt), Balkan style, 4-6% M.F., plain",
+            "quantity": 50
+          },
+          {
+            "group": "Vegetables and Vegetable Products",
+            "id": 5960,
+            "name": "Onion, yellow, sauteed",
+            "quantity": 50
+          },
+          {
+            "group": "Dairy and Egg Products",
+            "id": 7829,
+            "name": "Butter, Clarified butter (ghee)",
+            "quantity": 30
+          },
+          {
+            "group": "Vegetables and Vegetable Products",
+            "id": 2460,
+            "name": "Tomato, red, ripe, raw, year round average",
+            "quantity": 25
+          },
+          {
+            "group": "Vegetables and Vegetable Products",
+            "id": 2394,
+            "name": "Garlic, raw",
+            "quantity": 8
+          },
+          {
+            "group": "Vegetables and Vegetable Products",
+            "id": 2091,
+            "name": "Ginger root, raw",
+            "quantity": 7
+          }
+        ],
+        "macronutrient_distribution": {
+          "carbohydrate_percent": 30.712957,
+          "fat_percent": 50.163696,
+          "protein_percent": 19.123346
+        },
+        "total_calories": 1246.62,
+        "total_weight": 690
+      },
+      "metadata": {
+        "currency": "CAD",
+        "data_source": "Canadian Nutrient File (Health Canada)",
+        "functional_unit": "per 100 kcal",
+        "methodology": "ReCiPe 2016 v1.1 (H)",
+        "methodology_pack": "recipe2016:v1.1:endpoint_sha=cc5faba76ee0:perspectives=3:countries=246",
+        "parameters": {
+          "basis": "per_100_kcal",
+          "consumer_perspective": "global",
+          "country": null,
+          "methodology": "recipe2016",
+          "perspective": "H"
+        },
+        "user_type": "individual"
+      },
+      "seo_metadata": {
+        "keywords": "environmental impact, individual, LCA, food sustainability, carbon footprint, meal assessment"
+      }
+    },
+    "seo_metadata": {
+      "keywords": "environmental impact, LCA, food sustainability, carbon footprint, meal comparison, monetization"
+    }
+  },
+  "D2 AGGREGATED (11 foods)": {
+    "data": {
+      "data": {
+        "environmental_impacts": {
+          "all_impacts": {
+            "Global warming": 0.303174,
+            "Land use": 0.698762,
+            "Water consumption": 0.01346
+          },
+          "all_impacts_bands": {
+            "Global warming": {
+              "central": 0.303174,
+              "high": 0.80637,
+              "low": 0.095206
+            },
+            "Land use": {
+              "central": 0.698762,
+              "high": 1.933668,
+              "low": 0.17852
+            },
+            "Water consumption": {
+              "central": 0.01346,
+              "high": 0.036468,
+              "low": 0.005117
+            }
+          },
+          "basis_factors": {
+            "per_100_kcal": 0.059467,
+            "per_100g_product": 0.087489,
+            "per_100g_protein": 1.481986,
+            "per_serving": 1.0
+          },
+          "catalog_version": null,
+          "data_quality": {
+            "confidence_by_category": {
+              "Global warming": {
+                "level": "high"
+              },
+              "Land use": {
+                "level": "medium"
+              },
+              "Water consumption": {
+                "level": "high"
+              }
+            },
+            "confidence_summary": {},
+            "consumer_perspective": "global",
+            "country": null,
+            "endpoint_factor_sources": {
+              "climate_change_ecosystem": "world_average",
+              "climate_change_ecosystem_freshwater": "world_average",
+              "climate_change_human": "world_average",
+              "freshwater_ecotoxicity_ecosystem": "world_average",
+              "freshwater_eutrophication_ecosystem": "world_average",
+              "human_toxicity_cancer": "world_average",
+              "human_toxicity_non_cancer": "world_average",
+              "ionizing_radiation_human": "world_average",
+              "land_use_ecosystem": "world_average",
+              "marine_ecotoxicity_ecosystem": "world_average",
+              "marine_eutrophication_ecosystem": "world_average",
+              "ozone_depletion_human": "world_average",
+              "particulate_matter_human": "world_average",
+              "photochemical_ozone_ecosystem": "world_average",
+              "photochemical_ozone_human": "world_average",
+              "terrestrial_acidification_ecosystem": "world_average",
+              "terrestrial_ecotoxicity_ecosystem": "world_average",
+              "water_use_ecosystem_freshwater": "world_average",
+              "water_use_ecosystem_terrestrial": "world_average",
+              "water_use_human": "world_average"
+            },
+            "known_issues": [
+              "Toxicity factors carry an explicit low-confidence flag (RIVM 2017 \u00a71.3 p. 20).",
+              "Fossil resource scarcity endpoint approximated as crude-oil-equivalent; per-substance resolution requires LCI upgrade.",
+              "Land use endpoint captures local impact only; global extinction not modelled.",
+              "Egalitarian climate factors omit climate-carbon feedbacks for non-CO2 GHGs.",
+              "v1 midpoint scope trimmed to {Global warming, Land use, Water consumption}; 15 other ReCiPe midpoints not consumed pending TODO-CODE-LCA-2."
+            ],
+            "methodology_provenance": {
+              "checksum_status": {
+                "country_factors": "ok",
+                "endpoint_factors": "ok",
+                "normalization": "ok"
+              },
+              "country_pack_sha256": "d588ea76f77a4729079665f3325db0eb012a80fd8c8ec89500b44738155ab6d3",
+              "endpoint_pack_sha256": "cc5faba76ee045246f6cd4260bab932c2e0ba9a444dad47585f9aa10e92d2c75",
+              "etl_git_rev": "84b00cd",
+              "extracted_at_utc": "2026-05-22T12:41:16+00:00",
+              "methodology": "recipe2016",
+              "methodology_version": "v1.1",
+              "normalization_pack_sha256": "c90f32c4fd9b66bd83bb158cc4a33c8e1f7c04853794cb5bdcece067ca419311",
+              "schema_version": "1.0",
+              "source_workbooks": [
+                "ReCiPe2016_CFs_v1.1_20180117.xlsx",
+                "Normalization scores ReCiPe2016v1.1_20190514.xlsx",
+                "ReCiPe2016_country factors_v1.1_20171221.xlsx"
+              ]
+            },
+            "methodology_version": "recipe2016 v1.1",
+            "perspective": "H",
+            "recommendations": [
+              "Use midpoint results for primary analysis; treat endpoint single-score as ranking aid.",
+              "Cross-validate with IMPACT World+ or PEF for critical applications."
+            ],
+            "sources": [
+              "Huijbregts et al. 2017, doi:10.1007/s11367-016-1246-y",
+              "RIVM 2016-0104a (October 2017), ReCiPe 2016 v1.1 workbooks"
+            ]
+          },
+          "endpoint_impacts": {
+            "Ecosystems": 0.0,
+            "Human Health": 0.0,
+            "Resources": null
+          },
+          "endpoint_impacts_bands": {
+            "Ecosystems": {
+              "central": 0.0,
+              "high": 0.0,
+              "low": 0.0
+            },
+            "Human Health": {
+              "central": 0.0,
+              "high": 1e-06,
+              "low": 0.0
+            }
+          },
+          "endpoint_impacts_by_basis": {
+            "per_100_kcal": {
+              "Ecosystems": 0.0,
+              "Human Health": 0.0,
+              "Resources": null
+            },
+            "per_100g_product": {
+              "Ecosystems": 0.0,
+              "Human Health": 0.0,
+              "Resources": null
+            },
+            "per_100g_protein": {
+              "Ecosystems": 0.0,
+              "Human Health": 8e-06,
+              "Resources": null
+            },
+            "per_serving": {
+              "Ecosystems": 0.0,
+              "Human Health": 5e-06,
+              "Resources": null
+            }
+          },
+          "impacts_bands_by_basis": {
+            "per_100_kcal": {
+              "Global warming": {
+                "central": 0.303174,
+                "high": 0.80637,
+                "low": 0.095206
+              },
+              "Land use": {
+                "central": 0.698762,
+                "high": 1.933668,
+                "low": 0.17852
+              },
+              "Water consumption": {
+                "central": 0.01346,
+                "high": 0.036468,
+                "low": 0.005117
+              }
+            },
+            "per_100g_product": {
+              "Global warming": {
+                "central": 0.446037,
+                "high": 1.186351,
+                "low": 0.14007
+              },
+              "Land use": {
+                "central": 1.028036,
+                "high": 2.844861,
+                "low": 0.262644
+              },
+              "Water consumption": {
+                "central": 0.019803,
+                "high": 0.053653,
+                "low": 0.007528
+              }
+            },
+            "per_100g_protein": {
+              "Global warming": {
+                "central": 7.55546,
+                "high": 20.095727,
+                "low": 2.372654
+              },
+              "Land use": {
+                "central": 17.414014,
+                "high": 48.189402,
+                "low": 4.448948
+              },
+              "Water consumption": {
+                "central": 0.335448,
+                "high": 0.908828,
+                "low": 0.127518
+              }
+            },
+            "per_serving": {
+              "Global warming": {
+                "central": 5.098198,
+                "high": 13.559994,
+                "low": 1.600996
+              },
+              "Land use": {
+                "central": 11.750454,
+                "high": 32.516763,
+                "low": 3.002017
+              },
+              "Water consumption": {
+                "central": 0.22635,
+                "high": 0.61325,
+                "low": 0.086045
+              }
+            }
+          },
+          "impacts_by_basis": {
+            "per_100_kcal": {
+              "Global warming": 0.303174,
+              "Land use": 0.698762,
+              "Water consumption": 0.01346
+            },
+            "per_100g_product": {
+              "Global warming": 0.446037,
+              "Land use": 1.028036,
+              "Water consumption": 0.019803
+            },
+            "per_100g_protein": {
+              "Global warming": 7.55546,
+              "Land use": 17.414014,
+              "Water consumption": 0.335448
+            },
+            "per_serving": {
+              "Global warming": 5.098198,
+              "Land use": 11.750454,
+              "Water consumption": 0.22635
+            }
+          },
+          "key_impacts": {
+            "carbon_footprint": {
+              "category": "Climate Change",
+              "formatted": "0.30317 kg CO2-eq",
+              "importance": "Primary driver of global warming and climate change",
+              "unit": "kg CO2-eq",
+              "value": 0.303174
+            },
+            "land_use": {
+              "category": "Ecosystem Impact",
+              "formatted": "0.69876 m\u00b2a crop-eq",
+              "importance": "Land conversion and biodiversity impact",
+              "unit": "m\u00b2a crop-eq",
+              "value": 0.698762
+            },
+            "water_consumption": {
+              "category": "Resource Use",
+              "formatted": "0.01346 m\u00b3",
+              "importance": "Freshwater resource depletion",
+              "unit": "m\u00b3",
+              "value": 0.01346
+            }
+          },
+          "lca_matcher_decisions": [],
+          "lca_matcher_enabled": false,
+          "planetary_boundary_shares": {
+            "citation": {
+              "doi": "10.1016/S0140-6736(25)01201-2",
+              "manuscript_anchor": "literature_extractions.md \u00a7E28 Table 2",
+              "table": "Table 2 (p. 1640) \u2014 food-system boundaries (selected control variables)"
+            },
+            "days_per_year": 365,
+            "n_covered": 3,
+            "n_total": 9,
+            "population_assumption": 8000000000,
+            "shares": [
+              {
+                "available": true,
+                "control_variable": "Atmospheric CO\u2082 (CO\u2082-eq emissions)",
+                "current_food_system_contribution": "16\u201317.7 Gt CO\u2082e/yr (about 30 % of all human emissions)",
+                "global_boundary_per_year": 5000000000000.0,
+                "global_boundary_source": "5 Gt CO\u2082e/yr",
+                "key": "climate_change",
+                "label": "Climate change",
+                "meal_value": 0.303174,
+                "method_note": "Production-stage CO\u2082-equivalent emissions, weighted across CO\u2082, methane, and N\u2082O over 100 years.",
+                "per_capita_daily_budget": 1.712329,
+                "recipe_midpoint_key": "Global warming",
+                "share_of_daily_budget_pct": 17.705339,
+                "unit": "kg CO\u2082e"
+              },
+              {
+                "available": true,
+                "control_variable": "Agricultural land area (current footprint, no further conversion of intact nature)",
+                "current_food_system_contribution": "48 million km\u00b2 (about 34 % of Earth's land)",
+                "global_boundary_per_year": 48000000000000.0,
+                "global_boundary_source": "Hold today's agricultural land area; halt conversion of remaining intact nature",
+                "key": "land_use",
+                "label": "Land system change",
+                "meal_value": 0.698762,
+                "per_capita_daily_budget": 16.438356,
+                "recipe_midpoint_key": "Land use",
+                "share_of_daily_budget_pct": 4.250803,
+                "unit": "m\u00b2\u00b7yr"
+              },
+              {
+                "available": true,
+                "control_variable": "Freshwater (consumptive) use",
+                "current_food_system_contribution": "1200\u20131800 km\u00b3/yr",
+                "global_boundary_per_year": 2000000000000.0,
+                "global_boundary_source": "2000 km\u00b3/yr of fresh water",
+                "key": "water_consumption",
+                "label": "Blue water consumption",
+                "meal_value": 0.01346,
+                "method_note": "Blue (irrigation) water use, weighted by how scarce water is in the producing region. The recommended limit is a single global number; we divide it equally across people for comparison.",
+                "per_capita_daily_budget": 0.684932,
+                "recipe_midpoint_key": "Water consumption",
+                "share_of_daily_budget_pct": 1.965206,
+                "unit": "m\u00b3"
+              },
+              {
+                "available": false,
+                "control_variable": "Human appropriation of net primary production",
+                "current_food_system_contribution": "9.9\u201311.7 Gt of carbon per year (about three-quarters of the global total)",
+                "global_boundary_per_year": 5500000000.0,
+                "global_boundary_source": "5.5 Gt of carbon per year",
+                "key": "biosphere_integrity_hanpp",
+                "label": "Biosphere integrity (HANPP)",
+                "reason": "We don't yet have per-food data for global biodiversity loss. Available life-cycle datasets capture local land use, not the global biosphere impact this target measures.",
+                "unit": "Gt C/yr"
+              },
+              {
+                "available": false,
+                "control_variable": "Reactive nitrogen as N\u2082O",
+                "current_food_system_contribution": "3.9\u20134.2 Tg per year (roughly two-thirds of the global total)",
+                "global_boundary_per_year": 1800000000.0,
+                "global_boundary_source": "1.8 Tg of nitrous-oxide nitrogen per year",
+                "key": "stratospheric_ozone_n2o",
+                "label": "Stratospheric ozone (N\u2082O)",
+                "reason": "Per-food nitrous-oxide data exists in the source life-cycle catalogue but isn't yet wired into our pipeline. Planned for a later release.",
+                "unit": "Tg N\u2082O-N"
+              },
+              {
+                "available": false,
+                "control_variable": "CO\u2082 from food-chain land-use change + fossil energy",
+                "current_food_system_contribution": "About 25 % of global CO\u2082 emissions",
+                "global_boundary_per_year": 0.0,
+                "global_boundary_source": "Zero food-chain CO\u2082 from clearing land and burning fossil fuels",
+                "key": "ocean_acidification",
+                "label": "Ocean acidification",
+                "unit": "% of food-chain CO\u2082"
+              },
+              {
+                "available": false,
+                "control_variable": "Net reactive-N input minus removal",
+                "current_food_system_contribution": "119 Tg of nitrogen per year",
+                "global_boundary_per_year": 57000000000.0,
+                "global_boundary_source": "57 Tg of nitrogen per year (less than half today's rate)",
+                "key": "nitrogen_surplus",
+                "label": "Nitrogen surplus",
+                "reason": "Nitrogen surplus isn't yet available as a per-food number in our data. Eutrophication numbers come close but measure local water pollution, not the global nitrogen surplus this target tracks.",
+                "unit": "Tg N/yr"
+              },
+              {
+                "available": false,
+                "control_variable": "P loss from agricultural land to surface water",
+                "current_food_system_contribution": "7.2 Tg per year (about three-quarters of the global total)",
+                "global_boundary_per_year": 4600000000.0,
+                "global_boundary_source": "4.6 Tg of phosphorus reaching surface water per year",
+                "key": "phosphorus_loss",
+                "label": "Phosphorus loss to surface water",
+                "reason": "Per-food phosphorus-loss numbers are available in the source life-cycle data but not yet active in our pipeline. Planned for a later release.",
+                "unit": "Tg P/yr"
+              },
+              {
+                "available": false,
+                "control_variable": "Pesticide active-substance use (kg PAS/yr)",
+                "current_food_system_contribution": "3.3\u20133.7 Tg per year (most of global pesticide use)",
+                "global_boundary_per_year": 1000000000.0,
+                "global_boundary_source": "Cut total pesticide use to 1 Tg per year (or 0.2 Tg for the most harmful)",
+                "key": "novel_entities_pesticides",
+                "label": "Novel entities (pesticides)",
+                "reason": "Our life-cycle data doesn't track pesticide use by product. This category would need a different data source.",
+                "unit": "Tg PAS/yr"
+              }
+            ]
+          },
+          "recipe2016_h_ef31_sensitivity": null,
+          "recipe_decomposer_enabled": false,
+          "recipe_decomposition_decisions": [],
+          "reporting_basis": "per_100_kcal",
+          "summary_score": {
+            "formatted": "1.801e-04 points",
+            "value": 0.00018
+          }
+        },
+        "monetization": {
+          "interpretation": {
+            "context": "Based on environmental cost of $0.229 CAD",
+            "level": "high"
+          },
+          "results": {
+            "cost_breakdown": {
+              "Climate & Energy": {
+                "individual_impacts": {
+                  "Global warming": 0.105858
+                },
+                "percentage_of_total": 46.128454,
+                "total_cost": 0.105858
+              },
+              "Ecosystem Quality": {
+                "individual_impacts": {},
+                "percentage_of_total": 0.0,
+                "total_cost": 0
+              },
+              "Human Health": {
+                "individual_impacts": {},
+                "percentage_of_total": 0.0,
+                "total_cost": 0
+              },
+              "Resource Depletion": {
+                "individual_impacts": {
+                  "Land use": 0.123458,
+                  "Water consumption": 0.000169
+                },
+                "percentage_of_total": 53.871546,
+                "total_cost": 0.123627
+              }
+            },
+            "cost_per_calorie": {
+              "context": "Environmental cost per calorie consumed",
+              "formatted": "$0.00014 CAD per calorie",
+              "unit": "CAD/kcal",
+              "value": 0.000136
+            },
+            "cost_per_protein": {
+              "context": "Environmental cost per gram of protein",
+              "formatted": "$0.00340 CAD per gram protein",
+              "unit": "CAD/g protein",
+              "value": 0.003401
+            },
+            "monetized_impacts": {
+              "Global warming": 0.105858,
+              "Land use": 0.123458,
+              "Water consumption": 0.000169
+            },
+            "top_cost_drivers": [
+              {
+                "cost": 0.123458,
+                "impact_category": "Land use",
+                "percentage_of_total": 53.798109,
+                "rank": 1
+              },
+              {
+                "cost": 0.105858,
+                "impact_category": "Global warming",
+                "percentage_of_total": 46.128454,
+                "rank": 2
+              },
+              {
+                "cost": 0.000169,
+                "impact_category": "Water consumption",
+                "percentage_of_total": 0.073437,
+                "rank": 3
+              }
+            ],
+            "total_environmental_cost": {
+              "context": "Total cost of environmental damage caused by this meal",
+              "formatted": "$0.229 CAD",
+              "unit": "CAD",
+              "value": 0.229485
+            },
+            "value_sources": {
+              "Global warming": {
+                "currency_year": "2021 CAD",
+                "last_verified": "2026-05-25",
+                "methodological_note": "CO2-eq aggregate only; CH4/N2O folded in via AR5 GWPs per ReCiPe midpoint. Per ECCC \u00a74.2 this is a known underestimate but per-gas separation requires an LCA-layer architecture change.",
+                "page_anchor": "literature_extractions.md \u00a7H47 lines 3496-3509",
+                "sensitivity_range_2026": "170 (2.5 % discount) \u2013 275 (2.0 %, central) \u2013 467 (1.5 %)",
+                "source": "ECCC 2023, Guidance on the Social Cost of GHG Emissions, Table 1 (2026 central, 2 % Near-term Ramsey discount rate)",
+                "status": "verified"
+              },
+              "Land use": {
+                "currency_year": "2021 CAD (converted from EUR 2015 via EUR_2015_TO_CAD_2021 \u2248 1.59)",
+                "last_verified": "2026-05-25",
+                "methodological_note": "Replaces the True Price 2024 Canadian farmland-rental placeholder. ReCiPe land use unit (m\u00b2\u00b7yr crop-eq) matches CE Delft directly.",
+                "page_anchor": "literature_extractions.md \u00a7H48 line 3641",
+                "source": "CE Delft 2018, Environmental Prices Handbook EU28 version, Table 2 (Summary p. 5), Hierarchist weighting factor \u20ac0.126/m\u00b2\u00b7yr",
+                "status": "verified"
+              },
+              "Water consumption": {
+                "currency_year": "2024 CAD",
+                "last_verified": "2026-05-25",
+                "override_env": "WATER_COST_PER_M3",
+                "source": "Canadian municipal tariff median; True Price 2024",
+                "status": "pending_page_citation"
+              }
+            }
+          }
+        },
+        "overall_assessment": {
+          "rating": "Room for Improvement \ud83d\udd04",
+          "recommendation": "Reducing red-meat or large dairy portions usually gives the biggest single improvement."
+        },
+        "sustainability": {
+          "category_scores": {
+            "Global warming": 42.784573,
+            "Land use": 55.208192,
+            "Water consumption": 49.263184
+          },
+          "category_zones": {
+            "Global warming": "High",
+            "Land use": "Low",
+            "Water consumption": "Moderate"
+          },
+          "environmental_rating": "Poor",
+          "environmental_score": 48.131311,
+          "nutritional_score": 4.807634,
+          "overall_sustainability_score": 40.062627,
+          "overall_weights": {
+            "environmental": 0.5,
+            "nutritional": 0.3,
+            "processing": 0.2
+          },
+          "processing_score": 72.773403,
+          "recommendations": [],
+          "sustainability_rating": "Poor"
+        }
+      },
+      "meal_info": {
+        "composition": [
+          {
+            "group": "Fruits and fruit juices",
+            "id": 6205,
+            "name": "Mango, nectar, canned",
+            "quantity": 240
+          },
+          {
+            "group": "WAFCT \u2014 Starchy roots, tubers and their products",
+            "id": 700194,
+            "name": "Cassava, tuber, white flesh, boiled* (without salt), drained",
+            "quantity": 200
+          },
+          {
+            "group": "Beverages",
+            "id": 2933,
+            "name": "Water, municipal",
+            "quantity": 160
+          },
+          {
+            "group": "Dairy and Egg Products",
+            "id": 133,
+            "name": "Egg, chicken, whole, cooked, scrambled or omelet",
+            "quantity": 150
+          },
+          {
+            "group": "Poultry Products",
+            "id": 648,
+            "name": "Chicken, stewing, meat and skin, stewed",
+            "quantity": 120
+          },
+          {
+            "group": "Fruits and fruit juices",
+            "id": 1662,
+            "name": "Plantain, yellow cooked",
+            "quantity": 100
+          },
+          {
+            "group": "Legumes and Legume Products",
+            "id": 3399,
+            "name": "Peanut butter, smooth type, fat, sugar and salt added",
+            "quantity": 70
+          },
+          {
+            "group": "Vegetables and Vegetable Products",
+            "id": 2460,
+            "name": "Tomato, red, ripe, raw, year round average",
+            "quantity": 50
+          },
+          {
+            "group": "Vegetables and Vegetable Products",
+            "id": 2401,
+            "name": "Onion, raw",
+            "quantity": 30
+          },
+          {
+            "group": "Fats and Oils",
+            "id": 423,
+            "name": "Vegetable oil, palm",
+            "quantity": 15
+          },
+          {
+            "group": "Dairy and Egg Products",
+            "id": 118,
+            "name": "Butter, regular",
+            "quantity": 8
+          }
+        ],
+        "macronutrient_distribution": {
+          "carbohydrate_percent": 32.919491,
+          "fat_percent": 51.390787,
+          "protein_percent": 15.689722
+        },
+        "total_calories": 1681.61,
+        "total_weight": 1143
+      },
+      "metadata": {
+        "currency": "CAD",
+        "data_source": "Canadian Nutrient File (Health Canada)",
+        "functional_unit": "per 100 kcal",
+        "methodology": "ReCiPe 2016 v1.1 (H)",
+        "methodology_pack": "recipe2016:v1.1:endpoint_sha=cc5faba76ee0:perspectives=3:countries=246",
+        "parameters": {
+          "basis": "per_100_kcal",
+          "consumer_perspective": "global",
+          "country": null,
+          "methodology": "recipe2016",
+          "perspective": "H"
+        },
+        "user_type": "individual"
+      },
+      "seo_metadata": {
+        "keywords": "environmental impact, individual, LCA, food sustainability, carbon footprint, meal assessment"
+      }
+    },
+    "seo_metadata": {
+      "keywords": "environmental impact, LCA, food sustainability, carbon footprint, meal comparison, monetization"
+    }
+  },
+  "D2 dinner \u2014 fufu + groundnut soup": {
+    "data": {
+      "data": {
+        "environmental_impacts": {
+          "all_impacts": {
+            "Global warming": 0.251707,
+            "Land use": 0.459669,
+            "Water consumption": 0.014363
+          },
+          "all_impacts_bands": {
+            "Global warming": {
+              "central": 0.251707,
+              "high": 0.633882,
+              "low": 0.091053
+            },
+            "Land use": {
+              "central": 0.459669,
+              "high": 1.19049,
+              "low": 0.14502
+            },
+            "Water consumption": {
+              "central": 0.014363,
+              "high": 0.037274,
+              "low": 0.005551
+            }
+          },
+          "basis_factors": {
+            "per_100_kcal": 0.078595,
+            "per_100g_product": 0.134228,
+            "per_100g_protein": 1.939375,
+            "per_serving": 1.0
+          },
+          "catalog_version": null,
+          "data_quality": {
+            "confidence_by_category": {
+              "Global warming": {
+                "level": "high"
+              },
+              "Land use": {
+                "level": "medium"
+              },
+              "Water consumption": {
+                "level": "high"
+              }
+            },
+            "confidence_summary": {},
+            "consumer_perspective": "global",
+            "country": null,
+            "endpoint_factor_sources": {
+              "climate_change_ecosystem": "world_average",
+              "climate_change_ecosystem_freshwater": "world_average",
+              "climate_change_human": "world_average",
+              "freshwater_ecotoxicity_ecosystem": "world_average",
+              "freshwater_eutrophication_ecosystem": "world_average",
+              "human_toxicity_cancer": "world_average",
+              "human_toxicity_non_cancer": "world_average",
+              "ionizing_radiation_human": "world_average",
+              "land_use_ecosystem": "world_average",
+              "marine_ecotoxicity_ecosystem": "world_average",
+              "marine_eutrophication_ecosystem": "world_average",
+              "ozone_depletion_human": "world_average",
+              "particulate_matter_human": "world_average",
+              "photochemical_ozone_ecosystem": "world_average",
+              "photochemical_ozone_human": "world_average",
+              "terrestrial_acidification_ecosystem": "world_average",
+              "terrestrial_ecotoxicity_ecosystem": "world_average",
+              "water_use_ecosystem_freshwater": "world_average",
+              "water_use_ecosystem_terrestrial": "world_average",
+              "water_use_human": "world_average"
+            },
+            "known_issues": [
+              "Toxicity factors carry an explicit low-confidence flag (RIVM 2017 \u00a71.3 p. 20).",
+              "Fossil resource scarcity endpoint approximated as crude-oil-equivalent; per-substance resolution requires LCI upgrade.",
+              "Land use endpoint captures local impact only; global extinction not modelled.",
+              "Egalitarian climate factors omit climate-carbon feedbacks for non-CO2 GHGs.",
+              "v1 midpoint scope trimmed to {Global warming, Land use, Water consumption}; 15 other ReCiPe midpoints not consumed pending TODO-CODE-LCA-2."
+            ],
+            "methodology_provenance": {
+              "checksum_status": {
+                "country_factors": "ok",
+                "endpoint_factors": "ok",
+                "normalization": "ok"
+              },
+              "country_pack_sha256": "d588ea76f77a4729079665f3325db0eb012a80fd8c8ec89500b44738155ab6d3",
+              "endpoint_pack_sha256": "cc5faba76ee045246f6cd4260bab932c2e0ba9a444dad47585f9aa10e92d2c75",
+              "etl_git_rev": "84b00cd",
+              "extracted_at_utc": "2026-05-22T12:41:16+00:00",
+              "methodology": "recipe2016",
+              "methodology_version": "v1.1",
+              "normalization_pack_sha256": "c90f32c4fd9b66bd83bb158cc4a33c8e1f7c04853794cb5bdcece067ca419311",
+              "schema_version": "1.0",
+              "source_workbooks": [
+                "ReCiPe2016_CFs_v1.1_20180117.xlsx",
+                "Normalization scores ReCiPe2016v1.1_20190514.xlsx",
+                "ReCiPe2016_country factors_v1.1_20171221.xlsx"
+              ]
+            },
+            "methodology_version": "recipe2016 v1.1",
+            "perspective": "H",
+            "recommendations": [
+              "Use midpoint results for primary analysis; treat endpoint single-score as ranking aid.",
+              "Cross-validate with IMPACT World+ or PEF for critical applications."
+            ],
+            "sources": [
+              "Huijbregts et al. 2017, doi:10.1007/s11367-016-1246-y",
+              "RIVM 2016-0104a (October 2017), ReCiPe 2016 v1.1 workbooks"
+            ]
+          },
+          "endpoint_impacts": {
+            "Ecosystems": 0.0,
+            "Human Health": 0.0,
+            "Resources": null
+          },
+          "endpoint_impacts_bands": {
+            "Ecosystems": {
+              "central": 0.0,
+              "high": 0.0,
+              "low": 0.0
+            },
+            "Human Health": {
+              "central": 0.0,
+              "high": 1e-06,
+              "low": 0.0
+            }
+          },
+          "endpoint_impacts_by_basis": {
+            "per_100_kcal": {
+              "Ecosystems": 0.0,
+              "Human Health": 0.0,
+              "Resources": null
+            },
+            "per_100g_product": {
+              "Ecosystems": 0.0,
+              "Human Health": 0.0,
+              "Resources": null
+            },
+            "per_100g_protein": {
+              "Ecosystems": 0.0,
+              "Human Health": 7e-06,
+              "Resources": null
+            },
+            "per_serving": {
+              "Ecosystems": 0.0,
+              "Human Health": 3e-06,
+              "Resources": null
+            }
+          },
+          "impacts_bands_by_basis": {
+            "per_100_kcal": {
+              "Global warming": {
+                "central": 0.251707,
+                "high": 0.633882,
+                "low": 0.091053
+              },
+              "Land use": {
+                "central": 0.459669,
+                "high": 1.19049,
+                "low": 0.14502
+              },
+              "Water consumption": {
+                "central": 0.014363,
+                "high": 0.037274,
+                "low": 0.005551
+              }
+            },
+            "per_100g_product": {
+              "Global warming": {
+                "central": 0.429879,
+                "high": 1.082577,
+                "low": 0.155506
+              },
+              "Land use": {
+                "central": 0.785047,
+                "high": 2.033181,
+                "low": 0.247673
+              },
+              "Water consumption": {
+                "central": 0.02453,
+                "high": 0.063658,
+                "low": 0.00948
+              }
+            },
+            "per_100g_protein": {
+              "Global warming": {
+                "central": 6.211043,
+                "high": 15.641448,
+                "low": 2.246797
+              },
+              "Land use": {
+                "central": 11.342629,
+                "high": 29.376103,
+                "low": 3.578469
+              },
+              "Water consumption": {
+                "central": 0.354421,
+                "high": 0.919749,
+                "low": 0.136968
+              }
+            },
+            "per_serving": {
+              "Global warming": {
+                "central": 3.2026,
+                "high": 8.0652,
+                "low": 1.158516
+              },
+              "Land use": {
+                "central": 5.8486,
+                "high": 15.1472,
+                "low": 1.845166
+              },
+              "Water consumption": {
+                "central": 0.18275,
+                "high": 0.47425,
+                "low": 0.070625
+              }
+            }
+          },
+          "impacts_by_basis": {
+            "per_100_kcal": {
+              "Global warming": 0.251707,
+              "Land use": 0.459669,
+              "Water consumption": 0.014363
+            },
+            "per_100g_product": {
+              "Global warming": 0.429879,
+              "Land use": 0.785047,
+              "Water consumption": 0.02453
+            },
+            "per_100g_protein": {
+              "Global warming": 6.211043,
+              "Land use": 11.342629,
+              "Water consumption": 0.354421
+            },
+            "per_serving": {
+              "Global warming": 3.2026,
+              "Land use": 5.8486,
+              "Water consumption": 0.18275
+            }
+          },
+          "key_impacts": {
+            "carbon_footprint": {
+              "category": "Climate Change",
+              "formatted": "0.25171 kg CO2-eq",
+              "importance": "Primary driver of global warming and climate change",
+              "unit": "kg CO2-eq",
+              "value": 0.251707
+            },
+            "land_use": {
+              "category": "Ecosystem Impact",
+              "formatted": "0.45967 m\u00b2a crop-eq",
+              "importance": "Land conversion and biodiversity impact",
+              "unit": "m\u00b2a crop-eq",
+              "value": 0.459669
+            },
+            "water_consumption": {
+              "category": "Resource Use",
+              "formatted": "0.01436 m\u00b3",
+              "importance": "Freshwater resource depletion",
+              "unit": "m\u00b3",
+              "value": 0.014363
+            }
+          },
+          "lca_matcher_decisions": [],
+          "lca_matcher_enabled": false,
+          "planetary_boundary_shares": {
+            "citation": {
+              "doi": "10.1016/S0140-6736(25)01201-2",
+              "manuscript_anchor": "literature_extractions.md \u00a7E28 Table 2",
+              "table": "Table 2 (p. 1640) \u2014 food-system boundaries (selected control variables)"
+            },
+            "days_per_year": 365,
+            "n_covered": 3,
+            "n_total": 9,
+            "population_assumption": 8000000000,
+            "shares": [
+              {
+                "available": true,
+                "control_variable": "Atmospheric CO\u2082 (CO\u2082-eq emissions)",
+                "current_food_system_contribution": "16\u201317.7 Gt CO\u2082e/yr (about 30 % of all human emissions)",
+                "global_boundary_per_year": 5000000000000.0,
+                "global_boundary_source": "5 Gt CO\u2082e/yr",
+                "key": "climate_change",
+                "label": "Climate change",
+                "meal_value": 0.251707,
+                "method_note": "Production-stage CO\u2082-equivalent emissions, weighted across CO\u2082, methane, and N\u2082O over 100 years.",
+                "per_capita_daily_budget": 1.712329,
+                "recipe_midpoint_key": "Global warming",
+                "share_of_daily_budget_pct": 14.699716,
+                "unit": "kg CO\u2082e"
+              },
+              {
+                "available": true,
+                "control_variable": "Agricultural land area (current footprint, no further conversion of intact nature)",
+                "current_food_system_contribution": "48 million km\u00b2 (about 34 % of Earth's land)",
+                "global_boundary_per_year": 48000000000000.0,
+                "global_boundary_source": "Hold today's agricultural land area; halt conversion of remaining intact nature",
+                "key": "land_use",
+                "label": "Land system change",
+                "meal_value": 0.459669,
+                "per_capita_daily_budget": 16.438356,
+                "recipe_midpoint_key": "Land use",
+                "share_of_daily_budget_pct": 2.79632,
+                "unit": "m\u00b2\u00b7yr"
+              },
+              {
+                "available": true,
+                "control_variable": "Freshwater (consumptive) use",
+                "current_food_system_contribution": "1200\u20131800 km\u00b3/yr",
+                "global_boundary_per_year": 2000000000000.0,
+                "global_boundary_source": "2000 km\u00b3/yr of fresh water",
+                "key": "water_consumption",
+                "label": "Blue water consumption",
+                "meal_value": 0.014363,
+                "method_note": "Blue (irrigation) water use, weighted by how scarce water is in the producing region. The recommended limit is a single global number; we divide it equally across people for comparison.",
+                "per_capita_daily_budget": 0.684932,
+                "recipe_midpoint_key": "Water consumption",
+                "share_of_daily_budget_pct": 2.097025,
+                "unit": "m\u00b3"
+              },
+              {
+                "available": false,
+                "control_variable": "Human appropriation of net primary production",
+                "current_food_system_contribution": "9.9\u201311.7 Gt of carbon per year (about three-quarters of the global total)",
+                "global_boundary_per_year": 5500000000.0,
+                "global_boundary_source": "5.5 Gt of carbon per year",
+                "key": "biosphere_integrity_hanpp",
+                "label": "Biosphere integrity (HANPP)",
+                "reason": "We don't yet have per-food data for global biodiversity loss. Available life-cycle datasets capture local land use, not the global biosphere impact this target measures.",
+                "unit": "Gt C/yr"
+              },
+              {
+                "available": false,
+                "control_variable": "Reactive nitrogen as N\u2082O",
+                "current_food_system_contribution": "3.9\u20134.2 Tg per year (roughly two-thirds of the global total)",
+                "global_boundary_per_year": 1800000000.0,
+                "global_boundary_source": "1.8 Tg of nitrous-oxide nitrogen per year",
+                "key": "stratospheric_ozone_n2o",
+                "label": "Stratospheric ozone (N\u2082O)",
+                "reason": "Per-food nitrous-oxide data exists in the source life-cycle catalogue but isn't yet wired into our pipeline. Planned for a later release.",
+                "unit": "Tg N\u2082O-N"
+              },
+              {
+                "available": false,
+                "control_variable": "CO\u2082 from food-chain land-use change + fossil energy",
+                "current_food_system_contribution": "About 25 % of global CO\u2082 emissions",
+                "global_boundary_per_year": 0.0,
+                "global_boundary_source": "Zero food-chain CO\u2082 from clearing land and burning fossil fuels",
+                "key": "ocean_acidification",
+                "label": "Ocean acidification",
+                "unit": "% of food-chain CO\u2082"
+              },
+              {
+                "available": false,
+                "control_variable": "Net reactive-N input minus removal",
+                "current_food_system_contribution": "119 Tg of nitrogen per year",
+                "global_boundary_per_year": 57000000000.0,
+                "global_boundary_source": "57 Tg of nitrogen per year (less than half today's rate)",
+                "key": "nitrogen_surplus",
+                "label": "Nitrogen surplus",
+                "reason": "Nitrogen surplus isn't yet available as a per-food number in our data. Eutrophication numbers come close but measure local water pollution, not the global nitrogen surplus this target tracks.",
+                "unit": "Tg N/yr"
+              },
+              {
+                "available": false,
+                "control_variable": "P loss from agricultural land to surface water",
+                "current_food_system_contribution": "7.2 Tg per year (about three-quarters of the global total)",
+                "global_boundary_per_year": 4600000000.0,
+                "global_boundary_source": "4.6 Tg of phosphorus reaching surface water per year",
+                "key": "phosphorus_loss",
+                "label": "Phosphorus loss to surface water",
+                "reason": "Per-food phosphorus-loss numbers are available in the source life-cycle data but not yet active in our pipeline. Planned for a later release.",
+                "unit": "Tg P/yr"
+              },
+              {
+                "available": false,
+                "control_variable": "Pesticide active-substance use (kg PAS/yr)",
+                "current_food_system_contribution": "3.3\u20133.7 Tg per year (most of global pesticide use)",
+                "global_boundary_per_year": 1000000000.0,
+                "global_boundary_source": "Cut total pesticide use to 1 Tg per year (or 0.2 Tg for the most harmful)",
+                "key": "novel_entities_pesticides",
+                "label": "Novel entities (pesticides)",
+                "reason": "Our life-cycle data doesn't track pesticide use by product. This category would need a different data source.",
+                "unit": "Tg PAS/yr"
+              }
+            ]
+          },
+          "recipe2016_h_ef31_sensitivity": null,
+          "recipe_decomposer_enabled": false,
+          "recipe_decomposition_decisions": [],
+          "reporting_basis": "per_100_kcal",
+          "summary_score": {
+            "formatted": "1.074e-04 points",
+            "value": 0.000107
+          }
+        },
+        "monetization": {
+          "interpretation": {
+            "context": "Based on environmental cost of $0.169 CAD",
+            "level": "medium"
+          },
+          "results": {
+            "cost_breakdown": {
+              "Climate & Energy": {
+                "individual_impacts": {
+                  "Global warming": 0.087888
+                },
+                "percentage_of_total": 51.917691,
+                "total_cost": 0.087888
+              },
+              "Ecosystem Quality": {
+                "individual_impacts": {},
+                "percentage_of_total": 0.0,
+                "total_cost": 0
+              },
+              "Human Health": {
+                "individual_impacts": {},
+                "percentage_of_total": 0.0,
+                "total_cost": 0
+              },
+              "Resource Depletion": {
+                "individual_impacts": {
+                  "Land use": 0.081215,
+                  "Water consumption": 0.00018
+                },
+                "percentage_of_total": 48.082309,
+                "total_cost": 0.081395
+              }
+            },
+            "cost_per_calorie": {
+              "context": "Environmental cost per calorie consumed",
+              "formatted": "$0.00013 CAD per calorie",
+              "unit": "CAD/kcal",
+              "value": 0.000133
+            },
+            "cost_per_protein": {
+              "context": "Environmental cost per gram of protein",
+              "formatted": "$0.00328 CAD per gram protein",
+              "unit": "CAD/g protein",
+              "value": 0.003283
+            },
+            "monetized_impacts": {
+              "Global warming": 0.087888,
+              "Land use": 0.081215,
+              "Water consumption": 0.00018
+            },
+            "top_cost_drivers": [
+              {
+                "cost": 0.087888,
+                "impact_category": "Global warming",
+                "percentage_of_total": 51.917691,
+                "rank": 1
+              },
+              {
+                "cost": 0.081215,
+                "impact_category": "Land use",
+                "percentage_of_total": 47.976077,
+                "rank": 2
+              },
+              {
+                "cost": 0.00018,
+                "impact_category": "Water consumption",
+                "percentage_of_total": 0.106231,
+                "rank": 3
+              }
+            ],
+            "total_environmental_cost": {
+              "context": "Total cost of environmental damage caused by this meal",
+              "formatted": "$0.169 CAD",
+              "unit": "CAD",
+              "value": 0.169283
+            },
+            "value_sources": {
+              "Global warming": {
+                "currency_year": "2021 CAD",
+                "last_verified": "2026-05-25",
+                "methodological_note": "CO2-eq aggregate only; CH4/N2O folded in via AR5 GWPs per ReCiPe midpoint. Per ECCC \u00a74.2 this is a known underestimate but per-gas separation requires an LCA-layer architecture change.",
+                "page_anchor": "literature_extractions.md \u00a7H47 lines 3496-3509",
+                "sensitivity_range_2026": "170 (2.5 % discount) \u2013 275 (2.0 %, central) \u2013 467 (1.5 %)",
+                "source": "ECCC 2023, Guidance on the Social Cost of GHG Emissions, Table 1 (2026 central, 2 % Near-term Ramsey discount rate)",
+                "status": "verified"
+              },
+              "Land use": {
+                "currency_year": "2021 CAD (converted from EUR 2015 via EUR_2015_TO_CAD_2021 \u2248 1.59)",
+                "last_verified": "2026-05-25",
+                "methodological_note": "Replaces the True Price 2024 Canadian farmland-rental placeholder. ReCiPe land use unit (m\u00b2\u00b7yr crop-eq) matches CE Delft directly.",
+                "page_anchor": "literature_extractions.md \u00a7H48 line 3641",
+                "source": "CE Delft 2018, Environmental Prices Handbook EU28 version, Table 2 (Summary p. 5), Hierarchist weighting factor \u20ac0.126/m\u00b2\u00b7yr",
+                "status": "verified"
+              },
+              "Water consumption": {
+                "currency_year": "2024 CAD",
+                "last_verified": "2026-05-25",
+                "override_env": "WATER_COST_PER_M3",
+                "source": "Canadian municipal tariff median; True Price 2024",
+                "status": "pending_page_citation"
+              }
+            }
+          }
+        },
+        "overall_assessment": {
+          "rating": "Room for Improvement \ud83d\udd04",
+          "recommendation": "Reducing red-meat or large dairy portions usually gives the biggest single improvement."
+        },
+        "sustainability": {
+          "category_scores": {
+            "Global warming": 42.161865,
+            "Land use": 57.792543,
+            "Water consumption": 43.946066
+          },
+          "category_zones": {
+            "Global warming": "High",
+            "Land use": "Moderate",
+            "Water consumption": "Moderate"
+          },
+          "environmental_rating": "Poor",
+          "environmental_score": 47.297119,
+          "nutritional_score": 4.533005,
+          "overall_sustainability_score": 39.209803,
+          "overall_weights": {
+            "environmental": 0.5,
+            "nutritional": 0.3,
+            "processing": 0.2
+          },
+          "processing_score": 71.006711,
+          "recommendations": [],
+          "sustainability_rating": "Poor"
+        }
+      },
+      "meal_info": {
+        "composition": [
+          {
+            "group": "WAFCT \u2014 Starchy roots, tubers and their products",
+            "id": 700194,
+            "name": "Cassava, tuber, white flesh, boiled* (without salt), drained",
+            "quantity": 200
+          },
+          {
+            "group": "Fruits and fruit juices",
+            "id": 1662,
+            "name": "Plantain, yellow cooked",
+            "quantity": 100
+          },
+          {
+            "group": "Beverages",
+            "id": 2933,
+            "name": "Water, municipal",
+            "quantity": 160
+          },
+          {
+            "group": "Legumes and Legume Products",
+            "id": 3399,
+            "name": "Peanut butter, smooth type, fat, sugar and salt added",
+            "quantity": 70
+          },
+          {
+            "group": "Poultry Products",
+            "id": 648,
+            "name": "Chicken, stewing, meat and skin, stewed",
+            "quantity": 120
+          },
+          {
+            "group": "Vegetables and Vegetable Products",
+            "id": 2460,
+            "name": "Tomato, red, ripe, raw, year round average",
+            "quantity": 50
+          },
+          {
+            "group": "Vegetables and Vegetable Products",
+            "id": 2401,
+            "name": "Onion, raw",
+            "quantity": 30
+          },
+          {
+            "group": "Fats and Oils",
+            "id": 423,
+            "name": "Vegetable oil, palm",
+            "quantity": 15
+          }
+        ],
+        "macronutrient_distribution": {
+          "carbohydrate_percent": 32.494291,
+          "fat_percent": 51.62627,
+          "protein_percent": 15.879439
+        },
+        "total_calories": 1272.35,
+        "total_weight": 745
+      },
+      "metadata": {
+        "currency": "CAD",
+        "data_source": "Canadian Nutrient File (Health Canada)",
+        "functional_unit": "per 100 kcal",
+        "methodology": "ReCiPe 2016 v1.1 (H)",
+        "methodology_pack": "recipe2016:v1.1:endpoint_sha=cc5faba76ee0:perspectives=3:countries=246",
+        "parameters": {
+          "basis": "per_100_kcal",
+          "consumer_perspective": "global",
+          "country": null,
+          "methodology": "recipe2016",
+          "perspective": "H"
+        },
+        "user_type": "individual"
+      },
+      "seo_metadata": {
+        "keywords": "environmental impact, individual, LCA, food sustainability, carbon footprint, meal assessment"
+      }
+    },
+    "seo_metadata": {
+      "keywords": "environmental impact, LCA, food sustainability, carbon footprint, meal comparison, monetization"
+    }
+  }
+}

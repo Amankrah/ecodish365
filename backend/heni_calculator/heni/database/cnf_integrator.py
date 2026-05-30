@@ -7,7 +7,8 @@ with HEFI and FCS implementations.
 import os
 import sys
 import logging
-from typing import Dict, List, Optional
+from functools import lru_cache
+from typing import Dict, List, Optional, Tuple, Any
 import pandas as pd
 
 # Use the single process-wide CNF pipeline. See backend/api/cnf_cache.py.
@@ -61,20 +62,51 @@ class HENICNFIntegrator:
             "Poultry Products": "poultry"
         }
     
-    def get_kcal(self, food_id: int) -> float:
-        """Get energy content in kilocalories for a food item"""
+    @lru_cache(maxsize=8192)
+    def _nutrient_pairs(self, food_id: int) -> Tuple[Tuple[Any, float], ...]:
+        """Cached: ((nutrient_name, value > 0), …) for one food.
+
+        Pure function of food_id given the static CNF pipeline DataFrames —
+        a process-wide singleton ([heni_calculator/heni/service.py]).
+        Eliminates the per-call pandas filter + merge that `get_nutrient_data`
+        and `get_kcal` both used to run independently.
+
+        Returns the same `(name, value)` pairs the original
+        `get_nutrient_data` would emit, in DataFrame iteration order, with
+        the same `nutrient_value > 0` filter. Names are returned exactly as
+        the merged DataFrame produced them (may be float NaN for WAFCT rows
+        whose NutrientID has no entry in `nutrient_name_df`) so callers see
+        bit-identical output.
+        """
         try:
-            nutrients = self._get_nutrients([food_id])
-            energy_rows = nutrients[nutrients['NutrientName'] == 'ENERGY (KILOCALORIES)']
-            if not energy_rows.empty:
-                return float(energy_rows['NutrientValue'].iloc[0])
+            nutrients = self._get_nutrients([int(food_id)])
+        except Exception as e:  # noqa: BLE001
+            logger.warning(f"Could not get nutrient pairs for food ID {food_id}: {e}")
+            return ()
+        pairs: List[Tuple[Any, float]] = []
+        for _, row in nutrients.iterrows():
+            nutrient_value = float(row['NutrientValue'])
+            if nutrient_value > 0:
+                pairs.append((row['NutrientName'], nutrient_value))
+        return tuple(pairs)
+
+    @lru_cache(maxsize=8192)
+    def get_kcal(self, food_id: int) -> float:
+        """Get energy content in kilocalories for a food item. Cached: pure
+        function of food_id."""
+        try:
+            for name, value in self._nutrient_pairs(int(food_id)):
+                if name == 'ENERGY (KILOCALORIES)':
+                    return value
             return 0.0
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.warning(f"Could not get kcal for food ID {food_id}: {e}")
             return 0.0
-    
+
+    @lru_cache(maxsize=8192)
     def get_food_description(self, food_id: int) -> str:
-        """Get food description for a food item"""
+        """Get food description for a food item. Cached: pure function of
+        food_id."""
         try:
             food_row = self.pipeline.food_name_df[
                 self.pipeline.food_name_df['FoodID'] == food_id
@@ -82,12 +114,14 @@ class HENICNFIntegrator:
             if not food_row.empty:
                 return str(food_row['FoodDescription'].iloc[0])
             return "Unknown"
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.warning(f"Could not get description for food ID {food_id}: {e}")
             return "Unknown"
-    
+
+    @lru_cache(maxsize=8192)
     def get_food_group(self, food_id: int) -> str:
-        """Get food group name for a food item"""
+        """Get food group name for a food item. Cached: pure function of
+        food_id."""
         try:
             food_row = self.pipeline.food_name_df[
                 self.pipeline.food_name_df['FoodID'] == food_id
@@ -100,24 +134,20 @@ class HENICNFIntegrator:
                 if not group_row.empty:
                     return str(group_row['FoodGroupName'].iloc[0])
             return "Unknown"
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.warning(f"Could not get food group for food ID {food_id}: {e}")
             return "Unknown"
-    
+
     def get_nutrient_data(self, food_id: int) -> Dict[str, float]:
-        """Get all nutrient data for a food item"""
+        """Get all nutrient data for a food item.
+
+        Materialises a FRESH dict every call from the cached
+        `_nutrient_pairs` so callers may mutate the returned dict without
+        corrupting the cache.
+        """
         try:
-            nutrients = self._get_nutrients([food_id])
-            nutrient_data = {}
-            
-            for _, row in nutrients.iterrows():
-                nutrient_name = row['NutrientName']
-                nutrient_value = float(row['NutrientValue'])
-                if nutrient_value > 0:
-                    nutrient_data[nutrient_name] = nutrient_value
-            
-            return nutrient_data
-        except Exception as e:
+            return {name: value for name, value in self._nutrient_pairs(int(food_id))}
+        except Exception as e:  # noqa: BLE001
             logger.warning(f"Could not get nutrient data for food ID {food_id}: {e}")
             return {}
     

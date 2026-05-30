@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import logging
+from functools import lru_cache
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 import threading
@@ -372,30 +373,41 @@ class CNFIntegrator:
         except Exception as e:
             self.logger.error(f"Error creating mappings: {e}")
     
+    @lru_cache(maxsize=8192)
     def get_food_data(self, food_id: int) -> Optional[Dict[str, Any]]:
-        """Get comprehensive food data for a given food ID"""
+        """Get comprehensive food data for a given food ID.
+
+        Cached: pure function of `food_id` given the static (process-lifetime)
+        CNF DataFrames borrowed from the shared pipeline. The returned dict
+        and its nested lists are SHARED across callers — treat as read-only
+        (no caller in the current codebase mutates them; see file-top audit
+        notes).
+
+        Eliminates four separate pandas scalar filters per call from the
+        substitution / scorecard / LCA hot paths.
+        """
         if not self._initialized:
             raise RuntimeError("CNF Integrator not initialized. Call initialize() first.")
-        
+
         try:
             # Get food info
             food_name_df = self._dataframes.get('food_name', pd.DataFrame())
             if food_name_df.empty:
                 return None
-                
+
             food_info = food_name_df[food_name_df['FoodID'] == food_id]
             if food_info.empty:
                 return None
-                
+
             food_info = food_info.iloc[0].to_dict()
-            
+
             # Get nutrient data
             nutrient_amount_df = self._dataframes.get('nutrient_amount', pd.DataFrame())
             nutrients = []
             if not nutrient_amount_df.empty:
                 nutrient_data = nutrient_amount_df[nutrient_amount_df['FoodID'] == food_id]
                 nutrients = nutrient_data.to_dict('records')
-            
+
             # Get food group info
             food_group_df = self._dataframes.get('food_group', pd.DataFrame())
             food_group = {}
@@ -403,43 +415,45 @@ class CNFIntegrator:
                 group_info = food_group_df[food_group_df['FoodGroupID'] == food_info['FoodGroupID']]
                 if not group_info.empty:
                     food_group = group_info.iloc[0].to_dict()
-            
+
             # Get conversion factors
             conversion_factor_df = self._dataframes.get('conversion_factor', pd.DataFrame())
             conversion_factors = []
             if not conversion_factor_df.empty:
                 conv_data = conversion_factor_df[conversion_factor_df['FoodID'] == food_id]
                 conversion_factors = conv_data.to_dict('records')
-            
+
             return {
                 'food_info': food_info,
                 'nutrients': nutrients,
                 'food_group': food_group,
                 'conversion_factors': conversion_factors
             }
-            
+
         except Exception as e:
             self.logger.error(f"Error getting food data for ID {food_id}: {e}")
             return None
-    
+
+    @lru_cache(maxsize=16384)
     def get_nutrient_amount(self, food_id: int, nutrient_name: str) -> float:
-        """Get nutrient amount for a specific food and nutrient"""
+        """Get nutrient amount for a specific food and nutrient. Cached: pure
+        function of (food_id, nutrient_name); returns an immutable float."""
         nutrient_id = self.get_nutrient_id(nutrient_name)
         if nutrient_id is None:
             return 0.0
-        
+
         nutrient_amount_df = self._dataframes.get('nutrient_amount', pd.DataFrame())
         if nutrient_amount_df.empty:
             return 0.0
-        
+
         nutrient_data = nutrient_amount_df[
-            (nutrient_amount_df['FoodID'] == food_id) & 
+            (nutrient_amount_df['FoodID'] == food_id) &
             (nutrient_amount_df['NutrientID'] == nutrient_id)
         ]
-        
+
         if nutrient_data.empty:
             return 0.0
-        
+
         return float(nutrient_data.iloc[0]['NutrientValue'])
     
     def get_nutrient_id(self, nutrient_name: str) -> Optional[int]:
@@ -454,20 +468,22 @@ class CNFIntegrator:
         """Get food group name from food group ID"""
         return self._nutrient_mappings.get('group_id_to_name', {}).get(food_group_id, "Unknown")
     
+    @lru_cache(maxsize=16384)
     def get_conversion_factor(self, food_id: int, measure_id: int) -> float:
-        """Get conversion factor for a specific food and measure"""
+        """Get conversion factor for a specific food and measure. Cached:
+        pure function of (food_id, measure_id); returns an immutable float."""
         conversion_factor_df = self._dataframes.get('conversion_factor', pd.DataFrame())
         if conversion_factor_df.empty:
             return 1.0
-        
+
         conversion_data = conversion_factor_df[
-            (conversion_factor_df['FoodID'] == food_id) & 
+            (conversion_factor_df['FoodID'] == food_id) &
             (conversion_factor_df['MeasureID'] == measure_id)
         ]
-        
+
         if conversion_data.empty:
             return 1.0
-        
+
         return float(conversion_data.iloc[0]['ConversionFactorValue'])
     
     def search_foods(self, query: str, limit: int = 50) -> List[Dict[str, Any]]:
@@ -482,9 +498,13 @@ class CNFIntegrator:
         
         return results.to_dict('records')
     
+    @lru_cache(maxsize=8192)
     def get_environmental_impact_factors(self, food_id: int) -> Dict[str, float]:
         """
         Per-food-group ReCiPe 2016 H midpoint factors, per 100 g food product.
+
+        Cached: pure function of food_id given static CNF data. The returned
+        dict is SHARED across callers — treat as read-only.
 
         v1 scope (see `_smoke_validate_cnf_integrator.py` audit):
 
