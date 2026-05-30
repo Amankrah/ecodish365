@@ -1,12 +1,12 @@
 {
-  "version": "2026-05-30",
+  "version": "2026-05-30-phase1.6",
   "description": "Ground-truth probe panel for the preparation-state lab (Phase 1). Each row pairs a natural-language query phrase with the CNF FoodID(s) a curator would accept as correct AND the expected two-axis prep-state tag (thermal_state, preservation_state). Used by _lab_test_prep_state_matcher.py to measure current matcher accuracy without changing any production code. FoodIDs verified against backend/raw_cnf/FOOD_NAME.csv on 2026-05-30.",
   "schema": {
     "label": "human-readable probe name",
     "query": "the free-text input fed to CNFMatcher.match()",
     "expected_food_ids": "list of CNF FoodIDs any of which would be a correct match",
-    "expected_thermal_state": "one of raw|boiled|fried|baked|roasted|stewed|grilled|steamed|poached|scrambled|heated|cooked|unknown",
-    "expected_preservation_state": "one of fresh|canned|dried|dehydrated|frozen|salted|smoked|cured|pickled|unknown",
+    "expected_thermal_state": "one of raw|boiled|fried|baked|roasted|stewed|grilled|steamed|poached|scrambled|heated|cooked|braised|toasted|sauteed|microwaved|blanched|barbecued|stir_fried|broiled|reheated|unknown",
+    "expected_preservation_state": "one of fresh|canned|dried|dehydrated|frozen|salted|smoked|cured|pickled|fermented|condensed|ready_to_eat|unknown",
     "category": "probe grouping for the report aggregator",
     "notes": "free-text rationale / known caveats"
   },

@@ -7,7 +7,7 @@ Returns a two-axis tag aligned with the prep-state lab plan:
                    stir_fried | broiled | reheated | unknown
   - preservation_state: fresh | canned | dried | dehydrated | frozen | salted |
                         smoked | cured | pickled | fermented | condensed |
-                        unknown
+                        ready_to_eat | unknown
 
 Anchored on CNF's controlled vocabulary as observed in
 ``backend/raw_cnf/FOOD_NAME.csv``. Both EN and FR variants are accepted so the
@@ -30,6 +30,10 @@ as unknown/unknown. Preservation extended with fermented (WAFCT-critical) and
 condensed/concentrated/evaporated. 'pasteurized' / 'UHT' fold into 'fresh'
 (default state of fluid dairy — substitution semantics treat pasteurized milk
 as fresh milk, not a separate preservation class).
+
+Phase 1.6 (2026-05-30): French plural participles (rôties, bouillies, braisés),
+RTE / powder / dry → dried, yogurt → fermented, condensed-before-canned ordering,
+frozen-produce → raw default, refrigerated/chilled → fresh.
 """
 from __future__ import annotations
 
@@ -77,6 +81,8 @@ PRESERVATION_STATES = (
     # Phase 1.5 additions
     'fermented',
     'condensed',
+    # Phase 1.6
+    'ready_to_eat',
     'unknown',
 )
 
@@ -106,35 +112,48 @@ class PrepState:
 #
 # Phase 1.5 ordering: compound terms first (stir-fried before fried, hard-cooked
 # already absorbed into boiled). Specific cooking methods before generic 'cooked'.
+#
+# Phase 1.6: FR participles use optional (?:e(?:s)?|s)? for m/f/pl forms
+# (rôti/rôtie/rôtis/rôties; braisé/braisés). \bsauti\b catches accent-less FR.
+# \bblanchi…\b deliberately does NOT match 'blanche' (white flour).
+_FR_PART = r'(?:e(?:s)?|s)?'
 _THERMAL_PATTERNS = (
     # Compound / specific cooking methods (must precede their family generics)
     ('stir_fried', re.compile(r'\bstir[- ]fried\b|\bstir[- ]fry\b|\bstir[- ]frying\b', re.IGNORECASE)),
     ('barbecued',  re.compile(r'\bbarbecued?\b|\bbarbecue\b|\bBBQ\b|\bbarbec', re.IGNORECASE)),
-    ('blanched',   re.compile(r'\bblanched\b|\bblanchi\b|\bblanchie\b', re.IGNORECASE)),
-    ('braised',    re.compile(r'\bbraised\b|\bbrais[eé]\b|\bbrais[eé]e\b', re.IGNORECASE)),
-    ('sauteed',    re.compile(r'\bsaut[eé]ed?\b|\bsaut[eé]\b|\bsaut[eé]e\b|\bsaut[eé]es\b', re.IGNORECASE)),
-    ('toasted',    re.compile(r'\btoasted\b|\btoast[eé]\b', re.IGNORECASE)),
+    ('blanched',   re.compile(r'\bblanched\b|\bblanchi' + _FR_PART + r'\b', re.IGNORECASE)),
+    ('braised',    re.compile(
+        r'\bbraised\b|\bbrais[eé]' + _FR_PART + r'\b',
+        re.IGNORECASE)),
+    ('sauteed',    re.compile(
+        r'\bsaut[eé]ed?\b|\bsaut[eé]' + _FR_PART + r'\b|\bsauti\b',
+        re.IGNORECASE)),
+    ('toasted',    re.compile(r'\btoasted\b|\btoast[eé]' + _FR_PART + r'\b', re.IGNORECASE)),
     ('microwaved', re.compile(r'\bmicrowaved?\b|\bmicro[- ]ondes\b', re.IGNORECASE)),
-    ('reheated',   re.compile(r'\breheated\b', re.IGNORECASE)),
+    ('reheated',   re.compile(r'\breheated\b|\br[eé]chauff[eé]' + _FR_PART + r'\b', re.IGNORECASE)),
     ('broiled',    re.compile(r'\bbroiled\b', re.IGNORECASE)),  # \b prevents 'broiler' from matching
     # Original verbs
     ('scrambled',  re.compile(r'\bscramb|\bbrouill', re.IGNORECASE)),
     ('poached',    re.compile(r'\bpoach|\bpoch[eé]', re.IGNORECASE)),
-    ('boiled',     re.compile(
-        r'\bboiled\b|\bbouilli\b|\bbouillie\b|hard[- ]cooked',
-        re.IGNORECASE)),
     ('steamed',    re.compile(
-        r'\bsteamed\b|cuit\s+[aà]\s+la\s+vapeur',
+        r'\bsteamed\b|cuit\s+[aà]\s+la\s+vapeur|\b(?:à|a)\s+vapeur\b',
         re.IGNORECASE)),
-    ('grilled',    re.compile(r'\bgrilled\b|\bgrill[eé]\b', re.IGNORECASE)),
-    ('fried',      re.compile(r'\bfried\b|\bpan[- ]fried\b|\bdeep[- ]fried\b|\bfrit\b|\bfrite\b|\bfrits\b|\bfrites\b', re.IGNORECASE)),
-    ('roasted',    re.compile(r'\broasted\b|\br[oô]ti\b|\br[oô]tis\b|\br[oô]tie\b', re.IGNORECASE)),
+    ('boiled',     re.compile(
+        r'\bboiled\b|\bbouilli' + _FR_PART + r'\b|hard[- ]cooked',
+        re.IGNORECASE)),
+    ('grilled',    re.compile(r'\bgrilled\b|\bgrill[eé]' + _FR_PART + r'\b', re.IGNORECASE)),
+    ('fried',      re.compile(
+        r'\bfried\b|\bpan[- ]fried\b|\bdeep[- ]fried\b|\bfrit' + _FR_PART + r'\b',
+        re.IGNORECASE)),
+    ('roasted',    re.compile(r'\broasted\b|\br[oô]ti' + _FR_PART + r'\b', re.IGNORECASE)),
     ('baked',      re.compile(r'\bbaked\b|cuit\s+au\s+four', re.IGNORECASE)),
     ('stewed',     re.compile(
-        r'\bstewed\b|\bsimmered\b|\bmijot[eé]\b|\bmijot[eé]e?\b|à\s+l[\'’]?étuvée?',
+        r'\bstewed\b|\bsimmered\b|\bmijot[eé]' + _FR_PART + r'\b|à\s+l[\'’]?étuvée?',
         re.IGNORECASE)),
-    ('heated',     re.compile(r'\bheated\b|\br[eé]chauff[eé]\b', re.IGNORECASE)),
-    ('cooked',     re.compile(r'\bcooked\b|\bcuit\b|\bcuite\b|\bcuits\b|\bcuites\b', re.IGNORECASE)),
+    ('heated',     re.compile(r'\bheated\b|\br[eé]chauff[eé]' + _FR_PART + r'\b', re.IGNORECASE)),
+    ('cooked',     re.compile(
+        r'\bcooked\b|\bcuit' + _FR_PART + r'\b',
+        re.IGNORECASE)),
     ('raw',        re.compile(
         r'\braw\b|\buncooked\b|\bunheated\b|\bunprepared\b|\bcru\b|\bcrue\b|\bcrus\b|\bcrues\b|\bnon\s+cuit\b|\bnon\s+pr[eé]par[eé]\b',
         re.IGNORECASE)),
@@ -152,18 +171,37 @@ _THERMAL_PATTERNS = (
 # - 'condensed' / 'concentrated' / 'evaporated' fold into 'condensed' (these
 #   collapse mass by water removal; substituting condensed for fresh inflates
 #   sugar/protein per gram).
+#
+# Phase 1.6: 'condensed' before 'canned' so evaporated milk tags condensed.
+# 'ready_to_eat' for RTE cereals. Powder/instant/poudre/dry fold into 'dried'.
+# Yogurt/yogourt/kefir fold into 'fermented'. Refrigerated/chilled → fresh.
 _PRESERVATION_PATTERNS = (
     ('fresh',       re.compile(
-        r'\bfresh\b|\bfra[iî]s\b|\bfra[iî]che\b|\bpasteurized\b|\bpasteuris[ée]\b|\bUHT\b',
+        r'\bfresh\b|\bfra[iî]s\b|\bfra[iî]che\b|\bpasteurized\b|\bpasteuris[ée]\b|\bUHT\b|'
+        r'\brefrigerated\b|\br[eé]frig[eé]r(?:[eé](?:e)?)?\b|\bchilled\b',
+        re.IGNORECASE)),
+    ('condensed',   re.compile(
+        r'\bcondensed\b|\bconcentrated\b|\bevaporated\b|\bconcentr[ée]' + _FR_PART + r'\b|\b[eé]vapor[ée]' + _FR_PART + r'\b',
         re.IGNORECASE)),
     ('canned',      re.compile(
         r'\bcanned\b|\bconserve\b|\bin\s+(?:water|juice|syrup|oil|brine)\s+pack\b|\bwater\s+pack\b|\bsyrup\s+pack\b',
         re.IGNORECASE)),
-    ('fermented',   re.compile(r'\bfermented\b|\bferment[eé]\b|\bferment[eé]e\b|\bcultured\b', re.IGNORECASE)),
-    ('condensed',   re.compile(r'\bcondensed\b|\bconcentrated\b|\bevaporated\b|\bconcentr[ée]e?\b', re.IGNORECASE)),
-    ('dried',       re.compile(r'\bdried\b|\bs[eé]ch[eé]\b|\bs[eé]ch[eé]e\b', re.IGNORECASE)),
-    ('dehydrated',  re.compile(r'\bdehydrated\b|\bd[eé]shydrat[eé]\b|\bd[eé]shydrat[eé]e\b', re.IGNORECASE)),
-    ('frozen',      re.compile(r'\bfrozen\b|\bcong[eé]l[eé]\b|\bcong[eé]l[eé]e\b', re.IGNORECASE)),
+    ('ready_to_eat', re.compile(
+        r'\bready[- ]to[- ](?:eat|serve)\b|\bready to (?:eat|serve)\b|'
+        r'\bpr[eê]te[- ]à[- ](?:manger|servir)\b|'
+        r'\bpretes?\s+[àa]\s+manger\b|\bpretes?\s+[àa]\s+servir\b',
+        re.IGNORECASE)),
+    ('fermented',   re.compile(
+        r'\bfermented\b|\bferment[eé]' + _FR_PART + r'\b|\bcultured\b|'
+        r'\byogurt\b|\byogourt\b|\bkefir\b',
+        re.IGNORECASE)),
+    ('dried',       re.compile(
+        r'\bdried\b|\bs[eé]ch[eé]' + _FR_PART + r'\b|\bpowder(?:ed)?\b|\bpoudre\b|'
+        r'\binstant(?:an[eé])?\b|'
+        r'\bdry\b(?!\s+(?:curd|mix|weight|roast|toast|matter|run))',
+        re.IGNORECASE)),
+    ('dehydrated',  re.compile(r'\bdehydrated\b|\bd[eé]shydrat[eé]' + _FR_PART + r'\b', re.IGNORECASE)),
+    ('frozen',      re.compile(r'\bfrozen\b|\bcong[eé]l[eé]' + _FR_PART + r'\b', re.IGNORECASE)),
     ('salted',      re.compile(r'\bsalted\b|\bsal[eé]\b|\bsal[eé]e\b', re.IGNORECASE)),
     ('smoked',      re.compile(r'\bsmoked\b|\bfum[eé]\b|\bfum[eé]e\b', re.IGNORECASE)),
     ('cured',       re.compile(r'\bcured\b', re.IGNORECASE)),
@@ -194,6 +232,31 @@ _COOKED_CLASS = frozenset({
     'braised', 'toasted', 'sauteed', 'microwaved', 'blanched',
     'barbecued', 'stir_fried', 'broiled', 'reheated',
 })
+
+
+# Frozen IQF produce is raw unless the row names a cooking step or is a composite
+# meal (entree / produit:). Skip rows that already name a thermal verb.
+_FROZEN_RAW_SKIP = re.compile(
+    r'\bentree\b|\bentrée\b|\bmet\s+surgel|\bfrozen\s+entree\b|'
+    r'\bheated\b|\br[eé]chauff|\bcooked\b|\bboiled\b|\bfried\b|\broasted\b|'
+    r'\bstewed\b|\bgrilled\b|\bbraised\b|\bmicro|\bproduct:\b|\bproduit:\b',
+    re.IGNORECASE,
+)
+
+
+def _apply_post_heuristics(
+    description: str,
+    thermal: str,
+    preservation: str,
+    matched: list,
+) -> tuple[str, str]:
+    """Apply corpus-informed defaults after regex passes."""
+    if thermal == 'unknown' and preservation == 'frozen':
+        if not _FROZEN_RAW_SKIP.search(description):
+            thermal = 'raw'
+            matched.append('raw(frozen-default)')
+
+    return thermal, preservation
 
 
 def _compute_confidence(thermal: str, preservation: str) -> float:
@@ -236,6 +299,10 @@ def extract_prep_state(description: str) -> PrepState:
             preservation = name
             matched.append(f'p:{name}')
             break
+
+    thermal, preservation = _apply_post_heuristics(
+        description, thermal, preservation, matched,
+    )
 
     # Default-fresh heuristic: CNF rows that name an explicit thermal state
     # (raw or a cooking verb) but no preservation are by convention 'fresh'.
