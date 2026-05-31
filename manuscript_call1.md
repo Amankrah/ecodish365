@@ -128,7 +128,7 @@ The processing domain incorporates NOVA ultra-processing classification (Monteir
 
 ### 2.4 Life-cycle impact assessment: ReCiPe 2016
 
-Environmental scoring follows the four-phase LCA framework of ISO 14040/14044: goal and scope, inventory analysis, impact assessment, and interpretation (ISO, 2006a,b). For a meal comprising foods $i=1,\ldots,n$ with edible mass $q_i$ (kg) and midpoint characterisation factor $\sigma_{i,k}$ for category $k$, the meal-level midpoint impact is
+Environmental scoring follows the four-phase LCA framework of ISO 14040/14044: goal and scope, inventory analysis, impact assessment, and interpretation (ISO, 2006a,b). For a meal comprising foods $i=1,\ldots,n$ with edible mass $q_{i}$ (kg) and midpoint characterisation factor $\sigma_{i,k}$ for category $k$, the meal-level midpoint impact is
 
 $$m_k \;=\; \sum_{i=1}^{n} q_i \,\sigma_{i,k},$$
 
@@ -142,7 +142,7 @@ $$S \;=\; \sum_{A \in \{\mathrm{HH,\,ECO,\,RES}\}} w_A \,\frac{E^P_A}{N^P_A}.$$
 
 Because mass-based comparisons penalise high-water foods and favour energy-dense items (Weidema & Stylianou, 2020), we report impacts on four bases in parallel: per serving (the intake quantity), per 100 g product, per 100 kcal, and per 100 g protein. The last two mirror Poore & Nemecek (2018) Panels C and A. Aggregation occurs once in absolute mass units; each basis is obtained by scaling $m_k$ with the appropriate denominator (Poore & Nemecek, 2018; Dekker et al., 2019).
 
-We apply ReCiPe 2016 Hierarchist characterisation to inventory data rather than the Product Environmental Footprint (PEF) indicators native to AGRIBALYSE 3.2 (ADEME, 2024), because nutritional LCA studies, including HENI's parent framework (Stylianou et al., 2016, 2021), are built on ReCiPe, and food-product rankings are stable across ReCiPe versions (Spearman $\rho = 0.85$–$0.99$; Dekker et al., 2019). PEF–ReCiPe divergence is treated as sensitivity analysis (Section 4.2). Country-specific characterisation factors are available for five spatially explicit categories (Huijbregts et al., 2017, §4.2); we parameterise perspective, country, and consumer supply-chain versus national lens in Section 3.10.
+We apply ReCiPe 2016 Hierarchist characterisation to inventory data rather than the Product Environmental Footprint (PEF) indicators native to AGRIBALYSE 3.2 (ADEME, 2024), because nutritional LCA studies, including HENI's parent framework (Stylianou et al., 2016, 2021), are built on ReCiPe, and food-product rankings are stable across ReCiPe versions (Spearman $\rho = 0.85\text{–}0.99$; Dekker et al., 2019). PEF–ReCiPe divergence is treated as sensitivity analysis (Section 4.2). Country-specific characterisation factors are available for five spatially explicit categories (Huijbregts et al., 2017, §4.2); we parameterise perspective, country, and consumer supply-chain versus national lens in Section 3.10.
 
 ### 2.5 Uncertainty propagation
 
@@ -182,11 +182,11 @@ The mathematical definitions of HEFI-2019, HENI, HSR, the Food Compass, and ReCi
 
 #### 3.2.1 Common substrate and quantity scaling
 
-All nutrition indicators consume the same per-100 g nutrient vector $\mathbf{n}_i$ for CNF FoodID $i$. For a meal with foods $i = 1,\ldots,n$ at edible mass $m_i$ (g), nutrient $j$ scales linearly:
+All nutrition indicators consume the same per-100 g nutrient vector $\mathbf{n}_{i}$ for CNF FoodID $i$. For a meal with foods $i = 1,\ldots,n$ at edible mass $m_{i}$ (g), nutrient $j$ scales linearly:
 
-$$N_{i,j} = \frac{m_i}{100}\, n_{i,j}.$$
+$$N_{i,j} = \frac{m_{i}}{100}\, n_{i,j}.$$
 
-HEFI-2019 aggregates $N_{i,j}$ through Health Canada Reference Amounts (Health Canada, 2016) and food-classification rules (Brassard et al., 2022a, Table A1). HENI applies the TMREL-capped exposure sum of Section 2.2 to nutrient and food-group masses derived from $N_{i,j}$ and the FPED bridge (Section 3.6). HSR and Food Compass evaluate per-100 g attributes directly from $\mathbf{n}_i$ (with ingredient-list logic where required). Life-cycle assessment converts $m_i$ to kilograms $q_i = m_i/1000$ and aggregates midpoint factors $\sigma_{i,k}$ as in Section 2.4.
+HEFI-2019 aggregates $N_{i,j}$ through Health Canada Reference Amounts (Health Canada, 2016) and food-classification rules (Brassard et al., 2022a, Table A1). HENI applies the TMREL-capped exposure sum of Section 2.2 to nutrient and food-group masses derived from $N_{i,j}$ and the FPED bridge (Section 3.6). HSR and Food Compass evaluate per-100 g attributes directly from $\mathbf{n}_{i}$ (with ingredient-list logic where required). Life-cycle assessment converts mass to kilograms, $q_{i} = m_{i}/1000$, and aggregates midpoint factors $\sigma_{i,k}$ as in Section 2.4.
 
 #### 3.2.2 HEFI-2019
 
@@ -232,9 +232,11 @@ An eleven-food recommendation-band panel covers the published dynamic range and 
 
 The pipeline applies ReCiPe 2016 v1.1 Hierarchist characterisation per Section 2.4. For each food $i$ and midpoint category $k$, the per-kilogram factor $\sigma_{i,k}$ resolves through a three-tier hierarchy:
 
-$$\sigma_{i,k} = \begin{cases} \sigma^{\mathrm{Ag}}_{i,k} & \text{if Agribalyse match accepted at } p \geq 0.6 \text{ (Section 3.5)} \\[4pt] \sum_j \frac{m_{i,j}}{m_i}\,\sigma^{\mathrm{Ag}}_{j,k} & \text{if composite decomposed into ingredients } j \text{ (Section 3.8.9)} \\[4pt] \sigma^{\mathrm{PN}}_{g(i),k} & \text{otherwise: Poore and Nemecek group default for CNF group } g(i) \end{cases}$$
+1. **Agribalyse match** (Section 3.5): $\sigma_{i,k} = \sigma^{\mathrm{Ag}}_{i,k}$ when the matcher accepts a row at $p \geq 0.6$.
+2. **Composite decomposition** (Section 3.8.9): $\sigma_{i,k} = \sum_{j} (m_{i,j}/m_{i})\,\sigma^{\mathrm{Ag}}_{j,k}$ when the dish is split into ingredients $j$.
+3. **Group default** (Section 3.10): $\sigma_{i,k} = \sigma^{\mathrm{PN}}_{g(i),k}$ otherwise, using Poore and Nemecek panel means for CNF group $g(i)$.
 
-Meal-level midpoints follow $m_k = \sum_i q_i \sigma_{i,k}$ with $q_i = m_i/1000$ kg. The v1 response trim reports Global warming, Land use, and Water consumption, the three midpoints with the strongest per-food Agribalyse coverage, while the upstream vector retains all eighteen ReCiPe midpoints. Group defaults $\sigma^{\mathrm{PN}}_{g,k}$ derive deterministically from Poore & Nemecek (2018) panel means via documented protein-fraction, density, and kcal-density conversions (Section 3.10). AGRIBALYSE 3.2 supplies the inventory layer; characterisation is re-applied through ReCiPe 2016 v1.1 rather than the Environmental Footprint method native to AGRIBALYSE (ADEME, 2024), because nutritional LCA literature is built on ReCiPe (Stylianou et al., 2016, 2021; Dekker et al., 2019) and food-product rankings are stable across ReCiPe versions (Spearman $\rho = 0.85$–$0.99$; Dekker et al., 2019). PEF–ReCiPe divergence is treated as sensitivity analysis (Section 4.2). Country-specific endpoint substitution, perspective selection, functional-unit scaling, and single-score aggregation are parameterised in Section 3.10.
+Meal-level midpoints follow $m_{k} = \sum_{i} q_{i}\,\sigma_{i,k}$ with $q_{i} = m_{i}/1000$ kg. The v1 response trim reports Global warming, Land use, and Water consumption, the three midpoints with the strongest per-food Agribalyse coverage, while the upstream vector retains all eighteen ReCiPe midpoints. Group defaults $\sigma^{\mathrm{PN}}_{g,k}$ derive deterministically from Poore & Nemecek (2018) panel means via documented protein-fraction, density, and kcal-density conversions (Section 3.10). AGRIBALYSE 3.2 supplies the inventory layer; characterisation is re-applied through ReCiPe 2016 v1.1 rather than the Environmental Footprint method native to AGRIBALYSE (ADEME, 2024), because nutritional LCA literature is built on ReCiPe (Stylianou et al., 2016, 2021; Dekker et al., 2019) and food-product rankings are stable across ReCiPe versions (Spearman $\rho = 0.85\text{–}0.99$; Dekker et al., 2019). PEF–ReCiPe divergence is treated as sensitivity analysis (Section 4.2). Country-specific endpoint substitution, perspective selection, functional-unit scaling, and single-score aggregation are parameterised in Section 3.10.
 
 ### 3.3 Monetary valuation of environmental impacts
 
@@ -388,11 +390,7 @@ Three further errors share the same root cause. A request to lower the sodium in
 
 We therefore added a second catalogue-wide label, alongside the single-vs-mixed one of Section 3.8.9, that gives every CNF and WAFCT food a two-axis preparation-state tag. The thermal axis records whether the food is raw or has been cooked, and if cooked by what method: boiled, fried, baked, roasted, stewed, grilled, steamed, poached, scrambled, braised, toasted, sautéed, microwaved, blanched, barbecued, stir-fried, broiled, reheated, or the generic "cooked" or "heated" when no specific verb is named. The preservation axis records how the food is kept: fresh as the default for foods that are neither preserved nor explicitly altered, canned, dried, dehydrated, frozen, salted, smoked, cured, pickled, fermented, condensed for evaporated and concentrated forms, or ready-to-eat for shelf-stable packaged products. Each axis carries an explicit "unknown" value for descriptions that leave the state genuinely under-specified, so callers can distinguish "no opinion" from a confident assertion.
 
-The labels come from a hybrid regex-and-language-model tagger mirroring the single-versus-mixed build of Section 3.8.9. A regex prior reads each bilingual description against a controlled vocabulary (raw/cru, boiled/bouilli, fried/frit, canned/en conserve, and morphological variants across both axes). Regex confidence is
-
-$$c(t,p) = \begin{cases} 1.0 & \text{if both thermal } t \text{ and preservation } p \text{ resolve} \\ 0.7 & \text{if exactly one axis resolves} \\ 0.5 & \text{otherwise.} \end{cases}$$
-
-When $c = 1.0$ the regex output is final; otherwise a language model at temperature 0 completes the tag from the regex partial and description context, constrained to enumerated values only. The pass labelled 7 006 of 7 021 foods successfully (3 592 by regex alone, 3 414 by language model) at one-time cost US$0.29; fifteen failures (mostly popcorn rows with out-of-vocabulary thermal states) degrade to unlabelled rather than failing downstream gates.
+The labels come from a hybrid regex-and-language-model tagger mirroring the single-versus-mixed build of Section 3.8.9. A regex prior reads each bilingual description against a controlled vocabulary (raw/cru, boiled/bouilli, fried/frit, canned/en conserve, and morphological variants across both axes). Regex confidence is $c(t,p) = 1.0$ when both thermal state $t$ and preservation state $p$ resolve, $0.7$ when exactly one axis resolves, and $0.5$ otherwise. When $c = 1.0$ the regex output is final; otherwise a language model at temperature 0 completes the tag from the regex partial and description context, constrained to enumerated values only. The pass labelled 7 006 of 7 021 foods successfully (3 592 by regex alone, 3 414 by language model) at one-time cost US$0.29; fifteen failures (mostly popcorn rows with out-of-vocabulary thermal states) degrade to unlabelled rather than failing downstream gates.
 
 With these labels, the substitution culinary gate rejects thermal crosses between raw and any cooked state in either direction, and preservation crosses between fresh and canned, dried, dehydrated, condensed, or fermented forms. Either axis suffices for rejection; unlabelled foods fall back to the original regex-only behaviour, strictly tightening the filter without dropping previously allowed swaps on labelled pairs.
 
