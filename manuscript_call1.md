@@ -196,8 +196,7 @@ Component-level threshold pairs $(T_k^{0},\, T_k^{\max})$ and maximum point allo
 
 Dose-response coefficients $\mathrm{DRF}_r$ and theoretical-minimum-risk exposure levels $\mathrm{TMREL}_r$ follow Stylianou et al. (2021, Suppl. Tables S1 and S3). Effective exposure applies the published cap:
 
-$$g_r^{\mathrm{eff}} = \min\!\left(g_r,\; \mathrm{TMREL}_r\right), \qquad
-\mathrm{HENI}_{\mathrm{min}} = -0.53 \sum_{r=1}^{16} g_r^{\mathrm{eff}} \cdot \mathrm{DRF}_r.$$
+$$g_r^{\mathrm{eff}} = \min\!\left(g_r,\; \mathrm{TMREL}_r\right), \qquad \mathrm{HENI}_{\mathrm{min}} = -0.53 \sum_{r=1}^{16} g_r^{\mathrm{eff}} \cdot \mathrm{DRF}_r.$$
 
 Nutrient-based components read from CNF (omega-3 as EPA plus DHA; sodium in mg converted to g). Food-group components read from FPED-equivalent masses via the Section 3.6 bridge. Fibre routes to fruit–vegetable–legume–whole-grain sources or other sources per Stylianou et al. (2021, SI §S2.9); the milk-versus-calcium carve-out and energy-relative PUFA and trans-fat caps follow the source paper. Validation spans implementation (ten-food panel, ±0.1 min), FNDDS-substrate reproduction (seven-food panel, median divergence 0.35 min per serving), and population scale (100-day panel, mean absolute divergence 3.88 min per day; Sections 4.1, 5.1). GBD 2016-vintage coefficients are retained; GBD 2023 TMREL revision is logged as future work (Cardinaals et al., 2024).
 
@@ -233,11 +232,7 @@ An eleven-food recommendation-band panel covers the published dynamic range and 
 
 The pipeline applies ReCiPe 2016 v1.1 Hierarchist characterisation per Section 2.4. For each food $i$ and midpoint category $k$, the per-kilogram factor $\sigma_{i,k}$ resolves through a three-tier hierarchy:
 
-$$\sigma_{i,k} = \begin{cases}
-\sigma^{\mathrm{Ag}}_{i,k} & \text{if Agribalyse match accepted at } p \geq 0.6 \text{ (Section 3.5)} \\[4pt]
-\sum_j \frac{m_{i,j}}{m_i}\,\sigma^{\mathrm{Ag}}_{j,k} & \text{if composite decomposed into ingredients } j \text{ (Section 3.8.9)} \\[4pt]
-\sigma^{\mathrm{PN}}_{g(i),k} & \text{otherwise: Poore \& Nemecek group default for CNF group } g(i)
-\end{cases}$$
+$$\sigma_{i,k} = \begin{cases} \sigma^{\mathrm{Ag}}_{i,k} & \text{if Agribalyse match accepted at } p \geq 0.6 \text{ (Section 3.5)} \\[4pt] \sum_j \frac{m_{i,j}}{m_i}\,\sigma^{\mathrm{Ag}}_{j,k} & \text{if composite decomposed into ingredients } j \text{ (Section 3.8.9)} \\[4pt] \sigma^{\mathrm{PN}}_{g(i),k} & \text{otherwise: Poore and Nemecek group default for CNF group } g(i) \end{cases}$$
 
 Meal-level midpoints follow $m_k = \sum_i q_i \sigma_{i,k}$ with $q_i = m_i/1000$ kg. The v1 response trim reports Global warming, Land use, and Water consumption, the three midpoints with the strongest per-food Agribalyse coverage, while the upstream vector retains all eighteen ReCiPe midpoints. Group defaults $\sigma^{\mathrm{PN}}_{g,k}$ derive deterministically from Poore & Nemecek (2018) panel means via documented protein-fraction, density, and kcal-density conversions (Section 3.10). AGRIBALYSE 3.2 supplies the inventory layer; characterisation is re-applied through ReCiPe 2016 v1.1 rather than the Environmental Footprint method native to AGRIBALYSE (ADEME, 2024), because nutritional LCA literature is built on ReCiPe (Stylianou et al., 2016, 2021; Dekker et al., 2019) and food-product rankings are stable across ReCiPe versions (Spearman $\rho = 0.85$–$0.99$; Dekker et al., 2019). PEF–ReCiPe divergence is treated as sensitivity analysis (Section 4.2). Country-specific endpoint substitution, perspective selection, functional-unit scaling, and single-score aggregation are parameterised in Section 3.10.
 
@@ -379,14 +374,9 @@ The second part is catalog preference. When the dish name itself matches a CNF f
 
 The third part makes the weaker-match fallback safe, and it rests on a new catalogue-wide label. Every food is tagged single or mixed: a single food is one ingredient as eaten, including cooked or minimally processed forms such as a roasted chicken breast, boiled carrot, or whole milk; a mixed food is a composite dish or multi-ingredient product such as a soup, a pizza, a sausage, or a baked good. We produced the label with a one-time language-model pass that reads each food's bilingual description, its CNF food group, and a recipe-compilation source flag, and returns the class with a confidence and a one-line rationale (gpt-4.1-mini at temperature 0, JSON only). The pass covered all 7,021 catalogue foods, the 5,993 CNF entries and the 1,028 West African WAFCT entries, at a one-time cost near US$0.60, yielding 4,263 single and 2,758 mixed with no failures. The labels are committed as a checksummed JSON artefact and loaded as a process-wide singleton, so the gate below costs a dictionary lookup and nothing per score. Covering WAFCT matters because West African composite dishes, the porridges, stews, and sauces, are exactly the foods the fallback should be free to use.
 
-With the mixed-food label in hand, the reconstruction-gated override applies the piecewise policy
+With the mixed-food label in hand, the reconstruction-gated override applies a piecewise policy. Return $g$ directly when $c \geq 0.88$ and $g$ has measured energy (short-circuit). Replace the decomposition with $g$ when $c \geq 0.70$, $\mathrm{mixed}(g)=\mathrm{true}$, $g$ has measured energy, and any of $e_{\mathrm{energy}} > 0.25$, $\bar{e}_{\mathrm{macro}} > 0.30$, or structural-gate failure holds (override). Otherwise keep the language-model decomposition.
 
-$$\text{short-circuit:}\quad \text{return } g \text{ directly if } c \geq 0.88 \text{ and } g \text{ has measured energy;}$$
-$$\text{override:}\quad \text{replace decomposition with } g \text{ if } c \geq 0.70,\; \mathrm{mixed}(g)=\text{true},\; g \text{ has measured energy,}$$
-$$\quad\quad\quad\quad\text{and }\big(e_{\mathrm{energy}} > 0.25 \;\lor\; \bar{e}_{\mathrm{macro}} > 0.30 \;\lor\; \text{structural gates fail}\big);$$
-$$\text{keep:}\quad \text{return the language-model decomposition otherwise.}$$
-
-The $\mathrm{mixed}(g)=\text{true}$ requirement prevents collapsing a dish name onto a single-ingredient row (e.g. "beef stew" onto ground beef). Compound-meal queries naming two separately eaten items bypass catalog preference entirely.
+The $\mathrm{mixed}(g)=\mathrm{true}$ requirement prevents collapsing a dish name onto a single-ingredient row (e.g. "beef stew" onto ground beef). Compound-meal queries naming two separately eaten items bypass catalog preference entirely.
 
 A `force_decompose` switch bypasses both catalog paths so that the validation harness and the golden regression tests keep measuring raw decomposition quality rather than the shortcut. Ingredient-level detail is not lost when catalog preference fires, because the FPID layer (Section 3.6) still resolves where each food group in the composite comes from, using USDA's recipe rather than a language model. Quantitative before-and-after results appear in Section 4.7.
 
