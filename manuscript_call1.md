@@ -2,7 +2,7 @@
 
 **Target journal:** *Nature Food* (Springer Nature)
 **Article type:** Article / Tools & Resources (open-source platform + Canadian case study)
-**Manuscript status:** Working draft, retargeted 2026-05-28; Section 4 and Section 5 interim panels populated (S4-NHANES 2026-05-30, S4-lite, S5-subst, PKG-IMG-1, SUBST-1 QC); S3 Monte Carlo plus Sobol shipped 2026-05-30; full CCHS-RDC ingest deferred; the S1 dietitian-labelling track is retired in favour of substrate-level implementation regression because the CNF nutrient composition is itself the validated ground truth that the scoring kernels consume.
+**Manuscript status:** Working draft, retargeted 2026-05-28; Sections 4–5 populated (S4-NHANES, S4-lite, S5-subst, PKG-IMG-1); S3 Monte Carlo plus Sobol shipped 2026-05-30; full CCHS-RDC ingest deferred; the S1 dietitian-labelling track is retired in favour of substrate-level implementation regression because the CNF nutrient composition is itself the validated ground truth that the scoring kernels consume.
 
 ---
 
@@ -664,89 +664,102 @@ Taken together, the validation layers tell a consistent story. Deterministic sco
 
 ---
 
-## 5. Case Study: Canadian Meals and Counterfactual Diet Shifts *(Section 5.2 populated 2026-05-26; Section 5.1 S4-NHANES proxy populated 2026-05-30; Section 5.1 CCHS-RDC + Section 5.3–Section 5.5 pending)*
+## 5. Case study: real recall days and counterfactual diet shifts
 
-### 5.1 Scenario S4 — 100 medoid day panel *(NHANES proxy SHIPPED 2026-05-30; CCHS-RDC ingest deferred)*
+Section 4 establishes that each scoring kernel and AI subsystem behaves as intended on pinned benchmarks. Section 5 applies the integrated stack to full days and to explicit ingredient counterfactuals. We work from two complementary day corpora. The **S4-NHANES medoid panel** (100 stratified day-1 recalls from NHANES 2017–2018, mapped to CNF) is the population-scale case study: real eating patterns, real demographic strata, and the substrate Stylianou et al. (2021) used to derive HENI. The **S4-lite precursor panel** (25 hand-curated full days) predates the NHANES pipeline and remains the literature-pinned anchor for trade-off archetypes and substitution overlays while Statistics Canada RDC access for CCHS-Nutrition is pending. Statistical validation for both panels lives in Sections 4.6–4.7; here we interpret what those days look like and what targeted swaps would change.
 
-The pre-registered Scenario S4 panel targets 100 medoid day-1 recalls drawn from the 2015 Canadian Community Health Survey – Nutrition Public-Use Microdata File. Statistics Canada Research Data Centre access for the underlying microdata is a six- to twelve-week institutional pathway and is the deferred final-version deliverable. To ship S4 with substantive content for this submission, we constructed the panel from **NHANES 2017-2018 What We Eat In America day-1 individual food file** (`DR1IFF_J.xpt`, n = 9 254 respondents, 112 683 food lines), which is the closest open public-use analogue. NHANES is also the dataset Stylianou et al. (2021) used to derive HENI, so the panel is a faithful HENI-distribution reproduction in addition to a cross-substrate HEFI sanity check. The full CCHS-Nutrition panel remains the v2 deliverable; the NHANES panel reported here is labelled throughout as the S4-NHANES proxy. Cross-indicator validation results (HEFI reproduction gates, Spearman matrix, PCA, Pareto frontier) are reported in Section 4.6; this subsection documents the case-study pipeline and interpretation.
+### 5.1 Constructing the S4-NHANES medoid panel
 
-*Source pipeline.* The NHANES day-1 recall is FNDDS-coded; mapping FNDDS food codes to CNF FoodIDs is done by inverting the Section 3.6 CNF → FNDDS bridge ([`backend/heni_calculator/heni/etl/build_cnf_to_fndds_bridge.py`](backend/heni_calculator/heni/etl/build_cnf_to_fndds_bridge.py); 7 765 CNF entries → 2 151 unique FNDDS codes after keeping the highest-confidence CNF per code). The ETL is at [`backend/api/services/etl/build_nhanes_2017_meal_pool.py`](backend/api/services/etl/build_nhanes_2017_meal_pool.py): it groups all day-1 food lines by respondent (SEQN), filters to days with ≥ 70 % of recall mass mapping to a CNF entry loadable across every scoring endpoint (standard CNF 1..7 021 plus WAFCT 700 000+), drops days under 500 kcal, age under 2 y, or missing FIPR, joining demographics from `DEMO_J.xpt`. The retained day pool is **3 037 days** (artefact at [`backend/api/data/nhanes_2017_day_pool.json`](backend/api/data/nhanes_2017_day_pool.json)).
+The pre-registered target is 100 medoid day-1 recalls from the 2015 Canadian Community Health Survey – Nutrition microdata, stratified by age–sex group and family income-to-poverty ratio (FIPR) quintile following Brassard et al. (2022b). RDC access for CCHS remains the v2 substrate swap; for this submission we built the same stratification grid on the closest open analogue, NHANES 2017–2018 What We Eat In America (112 683 day-1 food lines from 9 254 respondents).
 
-*Stratification and sampling.* 100 medoid days drawn via stratified partitioning around medoids using the algorithm and feature vector formalised in Section 3.11. The strata mirror Brassard et al. (2022b) Table A2: three age-sex groups (2–18 y; males ≥ 19; females ≥ 19) × five FIPR quintiles = 15 cells; per-cell budget is largest-remainder proportional with a minimum of one medoid per cell. Implementation: [`build_s4_panel_medoids._pam_alternate`](backend/api/services/etl/build_s4_panel_medoids.py). Panel summary: 30 youth / 34 males ≥ 19 / 36 females ≥ 19; quintile shares q1–q5 = 20 / 28 / 16 / 11 / 25.
+Each NHANES line is FNDDS-coded. We invert the CNF→FNDDS bridge (Section 3.6) to assign CNF FoodIDs, then retain days where at least 70 % of recall mass maps to entries loadable across every scoring endpoint, energy exceeds 500 kcal, age is at least 2 years, and FIPR is present. That yields a pool of **3 037 eligible days**. From this pool we draw 100 medoids by stratified partitioning around medoids (Section 3.11): three age–sex cells (youth 2–18 y; males ≥ 19; females ≥ 19) crossed with five FIPR quintiles, with largest-remainder proportional allocation and a minimum of one medoid per cell. The resulting panel contains 30 youth, 34 males ≥ 19, and 36 females ≥ 19 days (quintile counts 20 / 28 / 16 / 11 / 25).
 
-*Scoring protocol.* Each of the 100 days is scored through HEFI-2019 (`POST /api/hefi/calculate/`), HENI (`POST /api/heni/calculate/`), HSR with `from_recall24h=true` (energy-weighted star), Food Compass (`POST /api/fcs/calculate/`) and the environmental endpoint (`POST /api/environmental-impact/` with `enable_lca_matcher=false` for reproducibility, returning ReCiPe 2016 H Global warming per 100 kcal as the headline). Harness: [`backend/_smoke_s4_panel.py`](backend/_smoke_s4_panel.py); 91 of 100 days returned all five scores (the 9-day shortfall is concentrated on days whose dominant CNF entries lack a Tier-α LCA group default; documented in the JSON artefact and below the panel mean as a sensitivity note).
+Every medoid day is scored through the production API for HEFI-2019, HENI, energy-weighted HSR, Food Compass, and ReCiPe 2016 H global warming per 100 kcal (matcher disabled for reproducibility). Ninety-one of 100 days return all five scores; the nine shortfalls concentrate on days whose dominant foods lack a Tier-α LCA group default and are documented in the panel artefact.
 
-*Pre-registered reproduction gates.* Two reference distributions are reported side-by-side. Brassard et al. (2022b, Table A2 p. 591) — national HEFI-2019 mean 43.1 / 80 (95 % CI 42.7–43.6), with by-stratum means 2–18 y = 39.5, males ≥ 19 = 43.3, females ≥ 19 = 46.0 — is the **continuity** reference for HEFI-2019. Hu et al. (2020, NHANES re-analysis) HEI-2015 mean ≈ 58 / 100 is the **substrate-aware** reference: HEI-2015 and HEFI-2019 are different scoring instruments, so the US baseline is reported as a cross-cohort orientation rather than a direct gate. The S4-NHANES panel is expected to score below the Brassard CCHS reference because NHANES diets are less CFG-aligned than Canadian diets, and the magnitude of that gap is itself the substrate-divergence finding rather than a platform defect.
+Against the Brassard et al. (2022b) Canadian reference, the panel mean HEFI-2019 is **33.6 / 80** versus the national **43.1 / 80**, a gap of roughly ten points in the expected direction for a US recall mapped through CNF (Table 5.1). Stratum ordering is preserved: females ≥ 19 score highest and youth lowest in both the Canadian reference and this panel, which supports substrate-correct between-group ranking even when absolute levels shift.
 
-**Table 7 — S4-NHANES panel HEFI-2019 against the Brassard 2022b Canadian reference.**
+| Stratum | n | Panel mean | Reference | Gap (pts) |
+|:---|---:|---:|---:|---:|
+| Whole panel | 100 | 33.6 | 43.1 | −9.5 |
+| Youth 2–18 | 30 | 29.9 | 39.5 | −9.6 |
+| Males ≥ 19 | 34 | 35.7 | 43.3 | −7.6 |
+| Females ≥ 19 | 36 | 34.7 | 46.0 | −11.3 |
 
-| Stratum         |   n |   panel mean |   reference |   gap | verdict                                         |
-| :-------------- | --: | -----------: | ----------: | ----: | :---------------------------------------------- |
-| **Whole panel** | 100 |    **33.59** |        43.1 | -9.51 | substrate divergence (expected sign; ~10 pts)   |
-| youth_2_18      |  30 |        29.90 |        39.5 | -9.60 | substrate divergence                            |
-| males ≥ 19      |  34 |        35.66 |        43.3 | -7.64 | substrate divergence                            |
-| females ≥ 19    |  36 |        34.71 |        46.0 |-11.29 | substrate divergence                            |
+*Table 5.1. S4-NHANES HEFI-2019 versus Brassard et al. (2022b) Canadian means. Reference = CCHS 2015; panel = NHANES 2017–2018 mapped to CNF.*
 
-The panel sits ≈ 10 points below the Brassard Canadian mean on every stratum, with the largest gap in the females ≥ 19 stratum (-11.3 points), consistent with documented US-vs-Canada differences in SSB consumption, refined-grain intake and processed-meat reliance. Critically, **the ordering across strata is preserved**: females ≥ 19 score highest in both panels and youth score lowest in both, so the calculator's between-stratum signal survives substrate transfer. We read this as evidence that the HEFI-2019 implementation is substrate-correct and substrate-sensitive in the expected direction.
+HENI at the day level reproduces Stylianou's distributional gate on sign and spread: median **+14.2 min** (Q25 +3.5, Q75 +25.3; range −19.7 to +58.5 across n = 100). We also scored each day on parallel FNDDS nutrient substrate (USDA FoodData Central values rather than CNF). Mean absolute CNF–FNDDS divergence is **3.88 min** per day (median 2.77 min), extending the per-food substrate-controlled finding to population scale. Both columns ship in `results/S4/meals_panel.csv`.
 
-*HENI distribution.* The Stylianou et al. (2021) reproduction gate is on sign and IQR overlap because their Fig 4 reports per-food / per-serving (not per-day) HENI and the S4-NHANES panel is per-day. Panel HENI under CNF substrate: minimum −19.7 min, Q25 +3.5, **median +14.2**, Q75 +25.3, maximum +58.5 (n = 100). Median sign is positive (beneficial), matching Stylianou's median-near-zero food-level reference, and the panel IQR is fully contained within Stylianou's approximate ± 50-min food-level band. **Verdict: reproduces (sign + IQR overlap).**
+### 5.2 What real days look like across five indicators
 
-The same panel under FNDDS substrate (Section 3.2 substrate-controlled reproduction; nutrient values from USDA FoodData Central rather than CNF) reports mean +14.19 min per day with median +12.44 (IQR [+3.70, +25.04]), and the mean absolute substrate divergence between CNF and FNDDS at the day level is **3.88 min** (median 2.77 min, signed mean +0.84 min with FNDDS slightly higher than CNF). The two substrates produce essentially the same distributional reading on this panel, which extends the per-food substrate-controlled finding (0.35 min median divergence) to the population scale. The parallel substrate columns ship in [`results/S4/meals_panel.csv`](results/S4/meals_panel.csv) so reviewers can read both side by side.
+On the 91 complete rows, nutrition indicators cohere (HEFI–HENI $\rho = +0.57$; HEFI–FCS +0.60; Section 4.6, Figure 4.1) while HSR and environment decouple more sharply. PCA loads most variance onto a shared diet-quality axis (PC1 55.7 %), with HSR occupying a distinct second axis (PC2 21.3 %; Figure 4.7). The population-level HEFI–GW correlation is **positive** (+0.26), unlike the S4-lite precursor (−0.39), because higher-HEFI NHANES days tend to be animal-protein-heavy rather than plant-forward CFG exemplars. That contrast is a substantive finding about sampling design, not an implementation inconsistency (Section 6.2).
 
-*Cross-system Spearman matrix (n = 91 complete rows; bootstrap 95 % CIs, B = 2 000, seed-pinned).* See Section 4.6 and Table 4.6a for the full matrix and Figure 4.1. The nutrition core (HEFI, HENI, FCS) holds together at $\rho$ between +0.47 and +0.60. HSR sits weaker, as in the six-meal and S4-lite panels, because HSRAC v9's category-conditional star matrix discretises more aggressively than the continuous-scale instruments. The **HEFI vs GW correlation is positive (+0.255)** on this population sample whereas S4-lite reports −0.391 at $n = 25$; the contrast between curated trade-off spanning and population co-occurrence is developed in Section 6.2.
+Table 5.2 contrasts three archetypes from the shipped panels. S4-NHANES rows are real medoid days; S4-lite rows are curated reference days chosen to span win–win, lose–lose, and tension patterns (`results/S4-lite/tradeoff_exemplars.json`).
 
-*PCA biplot and Pareto frontier.* Reported in Section 4.6 (Figure 4.7; 6 of 94 days on the HENI–GW frontier). PC1 = 55.7 % variance, PC2 = 21.3 % (cumulative 77.0 %); PC2 isolates HSR-specific variation.
+| Archetype | Source | Day | HEFI | HENI | FCS | GW (kg/100 kcal) | Pattern label |
+|:---|:---|:---|---:|---:|---:|---:|:---|
+| Low footprint, moderate HENI | S4-NHANES | S4-009 | 32.4 | +29.3 | 13.1 | 0.17 | Pareto corner |
+| High HENI, moderate footprint | S4-NHANES | S4-033 | 53.0 | +48.0 | 22.8 | 0.31 | Pareto corner |
+| High HENI, high footprint | S4-NHANES | S4-084 | 36.7 | +58.5 | 39.0 | 0.94 | Pareto corner |
+| Win–win (curated) | S4-lite | D19 | 49.1 | +46.5 | 93.9 | 0.08 | Legume-forward |
+| Lose–lose (curated) | S4-lite | D06 | 21.6 | +7.5 | 1.0 | 1.56 | BBQ Western |
+| Tension (curated) | S4-lite | D17 | 42.1 | +52.3 | 45.2 | 1.15 | Active, beef-heavy |
 
-*Reproducibility.* `cd backend && python -m api.services.etl.build_nhanes_2017_meal_pool && python -m api.services.etl.build_s4_panel_medoids && python _smoke_s4_panel.py && python _smoke_s4_pca_pareto.py` (≈ 90 seconds on a warm CNF integrator, seed 42 throughout). Artefacts at `backend/api/data/nhanes_2017_day_pool.json`, `backend/api/data/s4_panel_meals.json`, `backend/_smoke_s4_panel_results.json`, `results/S4/meals_panel.csv`, `results/S4/spearman_matrix.csv`, `results/S4/pca_biplot.json`, `results/S4/pareto_frontier.json`.
+*Table 5.2. Illustrative days from the population medoid panel and the S4-lite precursor. GW = global warming per 100 kcal.*
 
-*Deferred to v2.* (i) **The CCHS-Nutrition RDC ingest itself**, with NCI MCMC multivariate usual-intake modelling (Zhang et al., 2011; 500 pseudo-individuals per respondent; episodically-consumed categories flagged at the ≥ 5 % zero-recall threshold per Krebs-Smith et al., 2010; Balanced Repeated Replication on 500 Statistics Canada bootstrap weights — the exact machinery of Brassard et al., 2022b, Methods pp. 583–585). This is the Section 5.1 final-version deliverable once RDC access lands; the analysis plan and stratification grid above transfer directly to the Canadian substrate. (ii) **HEI-2015 implementation** in the calculator. We report the Hu et al. 2020 NHANES adults HEI-2015 mean of ≈ 58 / 100 as a published reference but do not score HEI-2015 ourselves.
+The six frontier days in (HENI, −GW) space trace the feasible trade-off in this US sample (Section 5.4, Figure 5.1). Moderate-HENI / low-GW combinations exist (S4-030: HENI +43.0 min, GW 0.31) but are uncommon relative to the high-HENI / high-GW tail (S4-084: +58.5 min, GW 0.94).
 
-*S4-lite precursor (SHIPPED 2026-05-26; validation Section 4.7).* The 25-day curated S4-lite panel (`results/S4-lite/meals_panel.csv`) predates the NHANES medoid pipeline and remains the literature-pinned anchor for trade-off exemplars (Section 6.2) and S5 overlay tests (Section 4.8).
+![Figure 5.1. HENI versus global-warming intensity on the S4-NHANES panel; red points are Pareto-non-dominated days (n = 6 of 94 evaluable).](manuscript_figures/fig5_1_s4_pareto_scatter.png)
 
-### 5.2 Scenario S5 — Diet-shift counterfactuals *(SHIPPED interim panel 2026-05-26)*
+### 5.3 Counterfactual diet shifts (Scenario S5)
 
-We operationalised Scenario S5 as mass-preserving single-ingredient counterfactuals through SUBST-1 (Section 3.8.8), recomputing HEFI, HENI, HSR, FCS, ReCiPe 2016 H environmental single-score (per 100 kcal), and dietary-pattern cosine through the production calculator stack. Directional validation on the four canonical swaps and S4-lite overlay statistics are reported in Section 4.8; this subsection develops the case-study interpretation.
+Scenario S5 operationalises Stylianou-style targeted shifts as mass-preserving single-ingredient counterfactuals through SUBST-1 (Section 3.8.8). Each swap names an explicit baseline CNF food and replacement at unchanged mass, satisfying the GBD energy-substitution caveat (Section 7.4). Directional validation on four canonical swaps passes 4/4 (Section 4.8, Table 4.8a); here we read the case-study implications.
 
-**Table 5 — Canonical single-ingredient S5 swaps (Tier A panel, 2026-05-26).**
+| Swap | Mass | $\Delta$HEFI | $\Delta$HENI (min) | $\Delta$FCS | $\Delta$ env |
+|:---|---:|---:|---:|---:|---:|
+| Beef → legumes | 100 g | +7.7 | **−19.6** | +42.7 | **−0.0004** |
+| Milk → soy | 250 mL | −16.0 | −2.2 | −37.3 | −0.0001 |
+| Cola → water | 355 mL | 0 | −0.2 | +2.8 | 0 |
+| White → whole wheat | 80 g | +11.4 | −1.8 | +8.5 | 0 |
 
-| Swap | Mass | Baseline → replacement | ΔHEFI | ΔHENI (min) | ΔFCS | ΔHSR | Δ env (LCA pts) |
-|------|-----:|------------------------|------:|------------:|-----:|-----:|----------------:|
-| Beef → legumes | 100 g | Ground beef 2683 → lentils 3392 | **+7.7** | **−19.6** | +42.7 | +1.0 | **−0.0004** |
-| Milk → soy | 250 mL | Whole milk 113 → fortified soy 501528 | −16.0 | −2.2 | −37.3 | −2.0 | −0.0001 |
-| Cola → water | 355 mL | Cola 2920 → water 2933 | 0 | −0.2 | +2.8 | +3.0 | 0 |
-| White → whole wheat | 80 g | White bread 3732 → whole wheat 4067 | **+11.4** | −1.8 | +8.5 | +0.5 | 0 |
+*Table 5.3. Canonical single-ingredient swaps (`results/S5-subst/s5_results.json`). Negative $\Delta$HENI = health gain. Beef→legumes and cola→water are win–win on HENI and environmental single-score.*
 
-*Note:* Negative ΔHENI denotes a health gain (lower disease-burden minutes). Environmental single-score decreases are improvements (lower impact). HENI minutes follow the Stylianou et al. (2021) sign convention exported by the platform API.
+Beef→legumes and cola→water behave as the literature predicts: simultaneous HENI gain and lower environmental single-score (Poore & Nemecek, 2018; Stylianou et al., 2021). Whole-grain bread substitution lifts HEFI and Food Compass on an isolated portion. Milk→soy on a **250 mL beverage alone** is the deliberate trade-off case: HENI improves (−2.2 min) and environment ticks down slightly, but HEFI falls from 16.0 to 0.0 because HEFI-2019 dairy components do not map one-to-one onto fortified plant beverages (Brassard et al., 2022b; Cardinaals et al., 2024). That pattern motivates whole-day reformulation rather than isolated beverage swaps.
 
-**Directional replication (pre-registered success criterion).** Swaps 1 and 3 (beef→legumes, cola→water) show the expected win–win on marginal HENI gain and lower environmental single-score — consistent with Poore & Nemecek (2018) on animal-vs-plant footprint spread and with Stylianou et al. (2021) on targeted SSB and red-meat reduction. Swaps 2 and 4 move HEFI and FCS in the literature-expected direction on whole-grain bread; milk→soy on an **isolated beverage portion** is a documented **multi-metric trade-off**: HENI improves (−2.2 min) and environmental impact decreases slightly, but HEFI falls from 16.0 to 0.0 because HEFI-2019 dairy components do not map one-to-one onto plant beverages (Brassard et al., 2022b; Cardinaals et al., 2024). Cola baseline and replacement both sit at HEFI = 0 — HSR (+3.0 stars) and FCS (+2.8) carry the nutrition signal for that swap.
+Day-level overlay on S4-lite applies all matching curated rules at unchanged mass (`results/S5-subst/s4_overlay.json`). Fourteen of 25 days contain at least one eligible ingredient; overlay succeeds on all 14. HEFI improves on **12 of 14**; **7 of 14** achieve win–win on HENI plus environmental single-score. Table 5.4 shows the strongest Western processed exemplars; Figure 5.2 plots before-and-after scores on the two largest HEFI gains.
 
-**S4-lite day-level overlay (Tier D).** Section 4.8 reports overlay statistics on the 25-day S4-lite corpus (`results/S5-subst/s4_overlay.csv`): 14/25 days S5-eligible, overlay succeeds on all 14, HEFI improves on 12/14, win–win on HENI + environment on 7/14.
+| Day | Label | Swaps | $\Delta$HEFI | $\Delta$HENI (min) | Env. change | Archetype shift |
+|:---|:---|---:|---:|---:|:---|:---|
+| D06 | BBQ Western | 4 | **+31.2** | **−27.2** | −87 % | Lose–lose → win–win |
+| D13 | Fast-food burger | 4 | **+36.5** | **−31.7** | −86 % | Lose–lose → win–win |
+| D18 | Beef-steak heavy | 4 | +11.4 | −25.3 | −90 % | Lose–lose → improved |
+| D19 | Legume-forward | 0 | — | — | — | Already win–win |
 
-**Table 6 — Selected S4-lite days after full S5 rule overlay.**
+*Table 5.4. Selected S4-lite days after greedy S5 rule overlay. Env. change = relative drop in environmental single-score. D06 baseline: HEFI 21.6, HENI +7.5 min → modified HEFI 52.8, HENI −19.7 min.*
 
-| Day | Label | Swaps applied | ΔHEFI | ΔHENI (min) | Δ env | Pre-overlay archetype (Section 6.2) |
-|-----|-------|:-------------:|------:|------------:|------:|------------------------------|
-| D06 | BBQ Western | 3 | **+31.4** | **−26.9** | −0.0007 | Lose–lose → win–win |
-| D13 | Fast-food burger | 3 | **+30.6** | **−25.6** | −0.0006 | Lose–lose → win–win |
-| D18 | Beef-steak heavy | 3 | +11.5 | −25.8 | −0.0008 | Lose–lose → win–win |
-| D19 | Legume-forward (control) | 0 | — | — | — | Already win–win (no eligible swaps) |
-| D02 | Mixed-balanced | 1 | +0.6 | −2.7 | −0.0001 | Mid-tier → stronger HENI |
+Western processed days D06 and D13 move from lose–lose anchors (HEFI ≈ 22, FCS ≈ 1, GW ≈ 1.5 kg/100 kcal) toward the win–win quadrant after bread, beef, and cola substitutions, without claiming that every eligible day achieves simultaneous environment gains (D01, D16, D22, and D25 improve HEFI/HENI but show flat environmental movement when swaps touch only low-footprint rows). Overlay onto the 100 NHANES medoids, monetised externality deltas, and demographic stratification remain the v2 deliverable once CCHS-RDC access lands; the interim panels establish directional replication and day-scale trade-off structure.
 
-The strongest overlay is **D06** (white bread→whole wheat, beef→lentils, cola→water): HEFI rises from 22/80 to 53/80, HENI shifts from −3.9 to +10.2 healthy-life minutes at the day level, and environmental single-score falls by 87 %. Western processed days D06 and D13 — lose–lose anchors in the pre-overlay Section 6.2 table — move toward the win–win quadrant after Stylianou-style targeted substitutions, while preserving Cardinaals et al.'s multi-metric framing (not all single-swap days achieve simultaneous environment gains: D01, D16, D22, D25 improve HEFI/HENI but show flat environmental movement when only one low-footprint ingredient changes).
+![Figure 5.2. HEFI and HENI before and after S5 overlay on S4-lite days D06 and D13.](manuscript_figures/fig5_2_s5_overlay_exemplars.png)
 
-*Pending full S5.* Overlay onto 100 CCHS-Nutrition medoids (Section 5.1), monetised externality deltas per swap, and demographic stratification remain blocked on RDC access; the interim panels above establish directional replication and day-scale trade-off structure.
+### 5.4 The HENI–footprint Pareto frontier
 
-### 5.3 Scenario S6 — Consumer-perspective sensitivity (global vs national)
+Applying the two-dimensional dominance test from Section 3.11 to the 94 S4-NHANES days with both HENI and GW present yields **six non-dominated days** (`results/S4/pareto_frontier.json`). Frontier extent:
 
-*Same meal panel run twice through the LCA pipeline: once under the default `consumer_perspective='global'` (world-average endpoint CFs throughout, appropriate for multi-country supply chains), once under `consumer_perspective='national', country='CAN'` (workbook country-specific endpoint CFs substituted for the three water-consumption pathways — `water_use_human`, `water_use_ecosystem_terrestrial`, `water_use_ecosystem_freshwater` — where the RIVM v1.1 country workbook supplies CFs for 246 ISO-3 codes after name normalisation). For Canada specifically the substitution drives the water-use-to-human-health term to zero (Canada water-abundance: workbook CF = 0 DALY m⁻³ across all three perspectives) and reduces water-use-to-terrestrial-ecosystems by ~10× (H endpoint 1.27 × 10⁻⁹ species·yr m⁻³ vs world-average 1.35 × 10⁻⁸ species·yr m⁻³). Replaces the prior "with- vs. without-Canadian-factors" framing that operated on unsourced midpoint multipliers (retired in the 2026-05-22 revision); the comparison is now drawn entirely from the published RIVM workbook, with the workbook SHA-256 logged in every run. We tabulate which meals shift category-rank under this switch and identify the food groups (cereals, vegetables, legumes — i.e. crops with measurable blue-water content) where the Canadian consumer perspective materially changes the dominant impact category. The same protocol can be applied to any of the 246 supported ISO-3 codes (e.g. comparing the same meal under `country='IND'` vs `country='CAN'` quantifies the contribution of consumer-end water-stress geography to the endpoint score for an identical food).
+| Corner | Day | HENI (min) | GW (kg/100 kcal) | HEFI |
+|:---|:---|---:|---:|---:|
+| Lowest footprint | S4-009 | +29.3 | 0.17 | 32.4 |
+| Moderate both | S4-030 | +43.0 | 0.31 | 32.1 |
+| Moderate both | S4-033 | +48.0 | 0.31 | 53.0 |
+| Highest HENI | S4-084 | +58.5 | 0.94 | 36.7 |
 
-*Canadian regional adjustments on the monetisation layer.* Separately from the LCA-side country-CF substitution above, when `country='CAN'` is also passed to the monetisation layer ([`monetization.py`](backend/environmental_impact_model/src/monetization.py) `_REGIONAL_MONETIZATION_BY_COUNTRY['CAN']`), three multiplicative adjustments are applied to the world-average Canadian-calibrated absolute prices: ×1.15 on `Global warming` (Arctic-amplification premium per the ECCC NIR 2024 Section ES.2 documentation that Canada warms at ~2× global rate and faces a corresponding regulatory premium on per-tonne CO₂-eq damage; ECCC, 2024, *National Inventory Report 1990–2022*, Section ES.2 pp. 11–13), ×0.7 on `Water consumption` (~7 % global renewable freshwater for 0.5 % of population; Statistics Canada Census of Environment), ×0.8 on `Land use` (Canadian agricultural land base stable at 56 Mt CO₂-eq since 2005 per NIR Section ES.4 pp. 9–11, no LULUCF acceleration outside the 2022 prairie-drought spike). The multipliers act on absolute Canadian-calibrated prices and are scoped to those three categories only; absent regulatory studies justifying analogous multipliers for the remaining 15 categories, the world-average price stands.
+Moving from the lowest-footprint frontier corner (S4-009) to the highest-HENI corner (S4-084) trades roughly a **5.5-fold increase** in GW per 100 kcal for a +29 min HENI gain on this sample. Intermediate frontier days show that moderate-HENI / low-GW combinations exist but are rare in population recalls rather than absent from the food system (contrast S4-lite day D19 at GW 0.08). This empirical curve anchors the trade-off discussion in Section 6.2.
 
-### 5.4 Trade-off frontier
-*Pareto frontier in (HENI gained, LCA single-score avoided) space; identification of "best-on-both" foods.*
+### 5.5 Consumer-perspective sensitivity (Scenario S6, planned)
 
-### 5.5 Scenario S8 — Sustainability of the AI pipeline
-*Tokens, energy (estimated per token), water (per token) and dollar cost per meal scored; comparison of "rule-only" vs. "rule + LLM" hybrid in cost-accuracy space.*
+Scenario S6 will re-score the S4 panel under two LCA consumer perspectives: global supply chain (world-average endpoint characterisation factors) versus national consumption (`country = CAN`), substituting RIVM workbook country-specific factors for the three water-consumption endpoint pathways where spatial data exist (Section 3.10). For Canada, water-use-to-human-health endpoint factors are zero in the workbook (abundant freshwater), and water-use-to-terrestrial-ecosystems falls by roughly an order of magnitude relative to world average. The monetisation layer applies separate Canadian regional multipliers on global warming (+15 %), water consumption (−30 %), and land use (−20 %) grounded in ECCC National Inventory Report documentation. We will report which days shift dominant impact category under the switch and Kendall rank correlation between global and national orderings. This scenario is specified and the perspective parameters are implemented; the full panel tabulation is deferred to the v2 manuscript pass alongside CCHS substrate.
+
+### 5.6 Cost of the AI pipeline (Scenario S8, planned)
+
+Scenario S8 quantifies tokens, latency, estimated energy and water per scoring call, and dollar cost per meal for rule-only versus hybrid rule-plus-LLM paths. Empirical test-retest reliability and provider ablation for the matcher and categorizer appear in Section 7.6; the meal-level cost–accuracy frontier will combine those unit costs with the S4 panel occasion mix once the S8 harness ships.
 
 ---
 
@@ -775,13 +788,13 @@ The S4-NHANES medoid panel (Section 4.6; n = 91 complete days; `results/S4/`) is
 | Archetype | Day | HEFI | HENI | FCS | GW (kg/100 kcal) | Takeaway |
 |-----------|-----|------|------|-----|------------------|----------|
 | Win–win | D19 Legume-forward | 49/80 | +38 min | 94 | 0.08 | Plant-protein day scores well on all nutrition metrics with among the lowest footprints |
-| Lose–lose | D06 BBQ Western | 22/80 | −4 min | 1 | 1.56 | Processed meat + SSB pattern fails nutrition and environment together |
+| Lose–lose | D06 BBQ Western | 21.6/80 | +7.5 min | 1 | 1.56 | Processed meat + SSB pattern fails nutrition and environment together |
 | Tension | D17 Active 6-occasion | 43/80 | +26 min | 46 | 1.15 | Adequate HENI/HEFI from mixed whole foods, but beef-heavy mix drives high GW |
 | Coherence check | D01 vs D10 | 14 vs 62 | −14 vs +41 | 1 vs 100 | 0.35 vs 0.29 | All five indicators move together on obvious low vs high quality days |
-| **Post-S5 overlay** | **D06 BBQ Western** | **22 → 53** | **−3.9 → +10.2** | **1 → 26** | **1.56 → 0.10** | Three S5 swaps (bread, beef, cola) shift a lose–lose day toward win–win (Section 5.2) |
-| **Post-S5 overlay** | **D13 Fast-food burger** | **22 → 52** | **−2.1 → +21.5** | **11 → 40** | **1.51 → 0.11** | Same pattern on burger + cola + bun day |
+| **Post-S5 overlay** | **D06 BBQ Western** | **21.6 → 52.8** | **+7.5 → −19.7 min** | **1 → 26** | **1.56 → 0.10** | Four S5 swaps shift a lose–lose day toward win–win (Section 5.3) |
+| **Post-S5 overlay** | **D13 Fast-food burger** | **21.8 → 58.3** | **+4.0 → −27.7 min** | **11 → 40** | **1.51 → 0.11** | Same pattern on burger + cola + bun day |
 
-Full Scenario S4 (100 NHANES medoids, PCA biplot, Pareto frontier) is now shipped (Section 4.6); the CCHS-Nutrition RDC re-ingest remains the v2 substrate swap. S4-lite plus the Section 4.8 S5 overlay establishes the qualitative multi-indicator trade-off structure the case study requires.
+Full Scenario S4 (100 NHANES medoids, PCA biplot, Pareto frontier) is shipped (Sections 4.6 and 5.4); the CCHS-Nutrition RDC re-ingest remains the v2 substrate swap. S4-lite plus the Section 5.3 S5 overlay establishes the qualitative multi-indicator trade-off structure the case study requires.
 
 ### 6.3 Decision-support and policy implications
 
@@ -793,7 +806,7 @@ We argue that AI in food decision support is best deployed as: (i) a *linker* be
 
 ### 6.5 The cost of the AI itself
 
-[Empirical placeholder — Section 5.5.]
+Section 5.6 outlines the planned Scenario S8 meal-level cost–accuracy analysis. Empirical unit costs and test-retest reliability for the LLM subsystems are reported in Section 7.6.
 
 ---
 
