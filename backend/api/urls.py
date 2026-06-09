@@ -10,6 +10,7 @@ from .views import (
     fped_views,                         # FPED-1 (food-group exposure: cup/oz equivalents + guideline gaps)
     fpid_views,                         # FPID-1 (ingredient-level food-group attribution + reconstruction QC)
     profile_views,                      # Unified profile score (all six metrics)
+    research_deep_dive_views,           # RESEARCH-DEEP-DIVE (full nutrient panel + DRI + FPED + NOVA + contributions)
 )
 from .views.cnf_views import (
     # Food Management
@@ -192,6 +193,18 @@ urlpatterns = [
     # food, which ingredients contribute which food groups (from its US FNDDS recipe
     # analog, USDA FPID 2017-18) + a reconstruction QC vs the food's own FPED profile.
     path('fpid/breakdown/', fpid_views.fpid_breakdown_view, name='fpid_breakdown'),
+
+    # RESEARCH-DEEP-DIVE (2026-06-09) — research-grade meal / 24h-recall surface for
+    # nutrition epidemiology. Returns the full nutrient panel against IOM/NASEM DRIs by
+    # life stage, FPED food-group decomposition, NOVA processing-level distribution,
+    # macronutrient distribution against AMDR bands, and per-nutrient top-contributor
+    # ranking. Deterministic (no LLM), no rate limit, sub-500 ms on a 50-food day.
+    path('research/meal-deep-dive/',
+         research_deep_dive_views.research_meal_deep_dive,
+         name='research_meal_deep_dive'),
+    path('research/meal-deep-dive/export.csv/',
+         research_deep_dive_views.research_meal_deep_dive_export_csv,
+         name='research_meal_deep_dive_export_csv'),
 
     # =============================================================================
     # PKG-IMG-1 (2026-05-26) Phase 1 — packaged-food image → HSR

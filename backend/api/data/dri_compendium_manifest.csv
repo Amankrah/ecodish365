@@ -1,0 +1,521 @@
+nutrient_id,nutrient_name,unit,life_stage,EAR,RDA,AI,UL,status,source_citation
+203,PROTEIN,Gram,infants_0_6m,,,,,pending_curation,
+203,PROTEIN,Gram,infants_7_12m,,,,,pending_curation,
+203,PROTEIN,Gram,children_1_3y,,,,,pending_curation,
+203,PROTEIN,Gram,children_4_8y,,,,,pending_curation,
+203,PROTEIN,Gram,males_9_13y,,,,,pending_curation,
+203,PROTEIN,Gram,males_14_18y,,,,,pending_curation,
+203,PROTEIN,Gram,males_19_30y,46,56,,,populated,IOM 2005 Table 10-13 p. 685 (protein RDA/EAR by age and sex)
+203,PROTEIN,Gram,males_31_50y,46,56,,,populated,IOM 2005 Table 10-13 p. 685 (protein RDA/EAR by age and sex)
+203,PROTEIN,Gram,males_51_70y,46,56,,,populated,IOM 2005 Table 10-13 p. 685 (protein RDA/EAR by age and sex)
+203,PROTEIN,Gram,males_71plus,46,56,,,populated,IOM 2005 Table 10-13 p. 685 (protein RDA/EAR by age and sex)
+203,PROTEIN,Gram,females_9_13y,,,,,pending_curation,
+203,PROTEIN,Gram,females_14_18y,,,,,pending_curation,
+203,PROTEIN,Gram,females_19_30y,38,46,,,populated,IOM 2005 Table 10-13 p. 685 (protein RDA/EAR by age and sex)
+203,PROTEIN,Gram,females_31_50y,38,46,,,populated,IOM 2005 Table 10-13 p. 685 (protein RDA/EAR by age and sex)
+203,PROTEIN,Gram,females_51_70y,38,46,,,populated,IOM 2005 Table 10-13 p. 685 (protein RDA/EAR by age and sex)
+203,PROTEIN,Gram,females_71plus,38,46,,,populated,IOM 2005 Table 10-13 p. 685 (protein RDA/EAR by age and sex)
+203,PROTEIN,Gram,pregnant_19_30y,50,71,,,populated,IOM 2005 Table 10-13 p. 685 (protein RDA/EAR by age and sex)
+203,PROTEIN,Gram,pregnant_31_50y,50,71,,,populated,IOM 2005 Table 10-13 p. 685 (protein RDA/EAR by age and sex)
+203,PROTEIN,Gram,lactating_19_30y,60,71,,,populated,IOM 2005 Table 10-13 p. 685 (protein RDA/EAR by age and sex)
+203,PROTEIN,Gram,lactating_31_50y,60,71,,,populated,IOM 2005 Table 10-13 p. 685 (protein RDA/EAR by age and sex)
+205,"CARBOHYDRATE, TOTAL (BY DIFFERENCE)",Gram,infants_0_6m,,,,,pending_curation,
+205,"CARBOHYDRATE, TOTAL (BY DIFFERENCE)",Gram,infants_7_12m,,,,,pending_curation,
+205,"CARBOHYDRATE, TOTAL (BY DIFFERENCE)",Gram,children_1_3y,,,,,pending_curation,
+205,"CARBOHYDRATE, TOTAL (BY DIFFERENCE)",Gram,children_4_8y,,,,,pending_curation,
+205,"CARBOHYDRATE, TOTAL (BY DIFFERENCE)",Gram,males_9_13y,,,,,pending_curation,
+205,"CARBOHYDRATE, TOTAL (BY DIFFERENCE)",Gram,males_14_18y,,,,,pending_curation,
+205,"CARBOHYDRATE, TOTAL (BY DIFFERENCE)",Gram,males_19_30y,100,130,,,populated,IOM 2005 Table 6-2 p. 275 (carbohydrate EAR/RDA)
+205,"CARBOHYDRATE, TOTAL (BY DIFFERENCE)",Gram,males_31_50y,100,130,,,populated,IOM 2005 Table 6-2 p. 275 (carbohydrate EAR/RDA)
+205,"CARBOHYDRATE, TOTAL (BY DIFFERENCE)",Gram,males_51_70y,100,130,,,populated,IOM 2005 Table 6-2 p. 275 (carbohydrate EAR/RDA)
+205,"CARBOHYDRATE, TOTAL (BY DIFFERENCE)",Gram,males_71plus,100,130,,,populated,IOM 2005 Table 6-2 p. 275 (carbohydrate EAR/RDA)
+205,"CARBOHYDRATE, TOTAL (BY DIFFERENCE)",Gram,females_9_13y,,,,,pending_curation,
+205,"CARBOHYDRATE, TOTAL (BY DIFFERENCE)",Gram,females_14_18y,,,,,pending_curation,
+205,"CARBOHYDRATE, TOTAL (BY DIFFERENCE)",Gram,females_19_30y,100,130,,,populated,IOM 2005 Table 6-2 p. 275 (carbohydrate EAR/RDA)
+205,"CARBOHYDRATE, TOTAL (BY DIFFERENCE)",Gram,females_31_50y,100,130,,,populated,IOM 2005 Table 6-2 p. 275 (carbohydrate EAR/RDA)
+205,"CARBOHYDRATE, TOTAL (BY DIFFERENCE)",Gram,females_51_70y,100,130,,,populated,IOM 2005 Table 6-2 p. 275 (carbohydrate EAR/RDA)
+205,"CARBOHYDRATE, TOTAL (BY DIFFERENCE)",Gram,females_71plus,100,130,,,populated,IOM 2005 Table 6-2 p. 275 (carbohydrate EAR/RDA)
+205,"CARBOHYDRATE, TOTAL (BY DIFFERENCE)",Gram,pregnant_19_30y,135,175,,,populated,IOM 2005 Table 6-2 p. 275 (carbohydrate EAR/RDA)
+205,"CARBOHYDRATE, TOTAL (BY DIFFERENCE)",Gram,pregnant_31_50y,135,175,,,populated,IOM 2005 Table 6-2 p. 275 (carbohydrate EAR/RDA)
+205,"CARBOHYDRATE, TOTAL (BY DIFFERENCE)",Gram,lactating_19_30y,160,210,,,populated,IOM 2005 Table 6-2 p. 275 (carbohydrate EAR/RDA)
+205,"CARBOHYDRATE, TOTAL (BY DIFFERENCE)",Gram,lactating_31_50y,160,210,,,populated,IOM 2005 Table 6-2 p. 275 (carbohydrate EAR/RDA)
+291,"FIBRE, TOTAL DIETARY",Gram,infants_0_6m,,,,,pending_curation,
+291,"FIBRE, TOTAL DIETARY",Gram,infants_7_12m,,,,,pending_curation,
+291,"FIBRE, TOTAL DIETARY",Gram,children_1_3y,,,,,pending_curation,
+291,"FIBRE, TOTAL DIETARY",Gram,children_4_8y,,,,,pending_curation,
+291,"FIBRE, TOTAL DIETARY",Gram,males_9_13y,,,,,pending_curation,
+291,"FIBRE, TOTAL DIETARY",Gram,males_14_18y,,,,,pending_curation,
+291,"FIBRE, TOTAL DIETARY",Gram,males_19_30y,,,38,,populated,IOM 2005 Table 7-4 p. 380 (total fibre AI by age and sex)
+291,"FIBRE, TOTAL DIETARY",Gram,males_31_50y,,,38,,populated,IOM 2005 Table 7-4 p. 380 (total fibre AI by age and sex)
+291,"FIBRE, TOTAL DIETARY",Gram,males_51_70y,,,30,,populated,IOM 2005 Table 7-4 p. 380 (total fibre AI by age and sex)
+291,"FIBRE, TOTAL DIETARY",Gram,males_71plus,,,30,,populated,IOM 2005 Table 7-4 p. 380 (total fibre AI by age and sex)
+291,"FIBRE, TOTAL DIETARY",Gram,females_9_13y,,,,,pending_curation,
+291,"FIBRE, TOTAL DIETARY",Gram,females_14_18y,,,,,pending_curation,
+291,"FIBRE, TOTAL DIETARY",Gram,females_19_30y,,,25,,populated,IOM 2005 Table 7-4 p. 380 (total fibre AI by age and sex)
+291,"FIBRE, TOTAL DIETARY",Gram,females_31_50y,,,25,,populated,IOM 2005 Table 7-4 p. 380 (total fibre AI by age and sex)
+291,"FIBRE, TOTAL DIETARY",Gram,females_51_70y,,,21,,populated,IOM 2005 Table 7-4 p. 380 (total fibre AI by age and sex)
+291,"FIBRE, TOTAL DIETARY",Gram,females_71plus,,,21,,populated,IOM 2005 Table 7-4 p. 380 (total fibre AI by age and sex)
+291,"FIBRE, TOTAL DIETARY",Gram,pregnant_19_30y,,,28,,populated,IOM 2005 Table 7-4 p. 380 (total fibre AI by age and sex)
+291,"FIBRE, TOTAL DIETARY",Gram,pregnant_31_50y,,,28,,populated,IOM 2005 Table 7-4 p. 380 (total fibre AI by age and sex)
+291,"FIBRE, TOTAL DIETARY",Gram,lactating_19_30y,,,29,,populated,IOM 2005 Table 7-4 p. 380 (total fibre AI by age and sex)
+291,"FIBRE, TOTAL DIETARY",Gram,lactating_31_50y,,,29,,populated,IOM 2005 Table 7-4 p. 380 (total fibre AI by age and sex)
+301,CALCIUM,Milligram,infants_0_6m,,,,,pending_curation,
+301,CALCIUM,Milligram,infants_7_12m,,,,,pending_curation,
+301,CALCIUM,Milligram,children_1_3y,,,,,pending_curation,
+301,CALCIUM,Milligram,children_4_8y,,,,,pending_curation,
+301,CALCIUM,Milligram,males_9_13y,,,,,pending_curation,
+301,CALCIUM,Milligram,males_14_18y,,,,,pending_curation,
+301,CALCIUM,Milligram,males_19_30y,800,1000,,2500,populated,IOM 2011 Tables S-3 and S-5 (calcium EAR/RDA/UL)
+301,CALCIUM,Milligram,males_31_50y,800,1000,,2500,populated,IOM 2011 Tables S-3 and S-5 (calcium EAR/RDA/UL)
+301,CALCIUM,Milligram,males_51_70y,800,1000,,2000,populated,IOM 2011 Tables S-3 and S-5 (calcium EAR/RDA/UL)
+301,CALCIUM,Milligram,males_71plus,1000,1200,,2000,populated,IOM 2011 Tables S-3 and S-5 (calcium EAR/RDA/UL)
+301,CALCIUM,Milligram,females_9_13y,,,,,pending_curation,
+301,CALCIUM,Milligram,females_14_18y,,,,,pending_curation,
+301,CALCIUM,Milligram,females_19_30y,800,1000,,2500,populated,IOM 2011 Tables S-3 and S-5 (calcium EAR/RDA/UL)
+301,CALCIUM,Milligram,females_31_50y,800,1000,,2500,populated,IOM 2011 Tables S-3 and S-5 (calcium EAR/RDA/UL)
+301,CALCIUM,Milligram,females_51_70y,1000,1200,,2000,populated,IOM 2011 Tables S-3 and S-5 (calcium EAR/RDA/UL)
+301,CALCIUM,Milligram,females_71plus,1000,1200,,2000,populated,IOM 2011 Tables S-3 and S-5 (calcium EAR/RDA/UL)
+301,CALCIUM,Milligram,pregnant_19_30y,800,1000,,2500,populated,IOM 2011 Tables S-3 and S-5 (calcium EAR/RDA/UL)
+301,CALCIUM,Milligram,pregnant_31_50y,800,1000,,2500,populated,IOM 2011 Tables S-3 and S-5 (calcium EAR/RDA/UL)
+301,CALCIUM,Milligram,lactating_19_30y,800,1000,,2500,populated,IOM 2011 Tables S-3 and S-5 (calcium EAR/RDA/UL)
+301,CALCIUM,Milligram,lactating_31_50y,800,1000,,2500,populated,IOM 2011 Tables S-3 and S-5 (calcium EAR/RDA/UL)
+303,IRON,Milligram,infants_0_6m,,,,,pending_curation,
+303,IRON,Milligram,infants_7_12m,,,,,pending_curation,
+303,IRON,Milligram,children_1_3y,,,,,pending_curation,
+303,IRON,Milligram,children_4_8y,,,,,pending_curation,
+303,IRON,Milligram,males_9_13y,,,,,pending_curation,
+303,IRON,Milligram,males_14_18y,,,,,pending_curation,
+303,IRON,Milligram,males_19_30y,6,8,,45,populated,IOM 2001 Table S-7 (iron EAR/RDA/UL)
+303,IRON,Milligram,males_31_50y,6,8,,45,populated,IOM 2001 Table S-7 (iron EAR/RDA/UL)
+303,IRON,Milligram,males_51_70y,6,8,,45,populated,IOM 2001 Table S-7 (iron EAR/RDA/UL)
+303,IRON,Milligram,males_71plus,6,8,,45,populated,IOM 2001 Table S-7 (iron EAR/RDA/UL)
+303,IRON,Milligram,females_9_13y,,,,,pending_curation,
+303,IRON,Milligram,females_14_18y,,,,,pending_curation,
+303,IRON,Milligram,females_19_30y,8.1,18,,45,populated,IOM 2001 Table S-7 (iron EAR/RDA/UL)
+303,IRON,Milligram,females_31_50y,8.1,18,,45,populated,IOM 2001 Table S-7 (iron EAR/RDA/UL)
+303,IRON,Milligram,females_51_70y,5,8,,45,populated,IOM 2001 Table S-7 (iron EAR/RDA/UL)
+303,IRON,Milligram,females_71plus,5,8,,45,populated,IOM 2001 Table S-7 (iron EAR/RDA/UL)
+303,IRON,Milligram,pregnant_19_30y,22,27,,45,populated,IOM 2001 Table S-7 (iron EAR/RDA/UL)
+303,IRON,Milligram,pregnant_31_50y,22,27,,45,populated,IOM 2001 Table S-7 (iron EAR/RDA/UL)
+303,IRON,Milligram,lactating_19_30y,6.5,9,,45,populated,IOM 2001 Table S-7 (iron EAR/RDA/UL)
+303,IRON,Milligram,lactating_31_50y,6.5,9,,45,populated,IOM 2001 Table S-7 (iron EAR/RDA/UL)
+304,MAGNESIUM,Milligram,infants_0_6m,,,,,pending_curation,
+304,MAGNESIUM,Milligram,infants_7_12m,,,,,pending_curation,
+304,MAGNESIUM,Milligram,children_1_3y,,,,,pending_curation,
+304,MAGNESIUM,Milligram,children_4_8y,,,,,pending_curation,
+304,MAGNESIUM,Milligram,males_9_13y,,,,,pending_curation,
+304,MAGNESIUM,Milligram,males_14_18y,,,,,pending_curation,
+304,MAGNESIUM,Milligram,males_19_30y,330,400,,350,populated,IOM 1997 Table S-3 (magnesium EAR/RDA/UL)
+304,MAGNESIUM,Milligram,males_31_50y,350,420,,350,populated,IOM 1997 Table S-3 (magnesium EAR/RDA/UL)
+304,MAGNESIUM,Milligram,males_51_70y,350,420,,350,populated,IOM 1997 Table S-3 (magnesium EAR/RDA/UL)
+304,MAGNESIUM,Milligram,males_71plus,350,420,,350,populated,IOM 1997 Table S-3 (magnesium EAR/RDA/UL)
+304,MAGNESIUM,Milligram,females_9_13y,,,,,pending_curation,
+304,MAGNESIUM,Milligram,females_14_18y,,,,,pending_curation,
+304,MAGNESIUM,Milligram,females_19_30y,255,310,,350,populated,IOM 1997 Table S-3 (magnesium EAR/RDA/UL)
+304,MAGNESIUM,Milligram,females_31_50y,265,320,,350,populated,IOM 1997 Table S-3 (magnesium EAR/RDA/UL)
+304,MAGNESIUM,Milligram,females_51_70y,265,320,,350,populated,IOM 1997 Table S-3 (magnesium EAR/RDA/UL)
+304,MAGNESIUM,Milligram,females_71plus,265,320,,350,populated,IOM 1997 Table S-3 (magnesium EAR/RDA/UL)
+304,MAGNESIUM,Milligram,pregnant_19_30y,290,350,,350,populated,IOM 1997 Table S-3 (magnesium EAR/RDA/UL)
+304,MAGNESIUM,Milligram,pregnant_31_50y,300,360,,350,populated,IOM 1997 Table S-3 (magnesium EAR/RDA/UL)
+304,MAGNESIUM,Milligram,lactating_19_30y,300,310,,350,populated,IOM 1997 Table S-3 (magnesium EAR/RDA/UL)
+304,MAGNESIUM,Milligram,lactating_31_50y,310,320,,350,populated,IOM 1997 Table S-3 (magnesium EAR/RDA/UL)
+305,PHOSPHORUS,Milligram,infants_0_6m,,,,,pending_curation,
+305,PHOSPHORUS,Milligram,infants_7_12m,,,,,pending_curation,
+305,PHOSPHORUS,Milligram,children_1_3y,,,,,pending_curation,
+305,PHOSPHORUS,Milligram,children_4_8y,,,,,pending_curation,
+305,PHOSPHORUS,Milligram,males_9_13y,,,,,pending_curation,
+305,PHOSPHORUS,Milligram,males_14_18y,,,,,pending_curation,
+305,PHOSPHORUS,Milligram,males_19_30y,580,700,,4000,populated,IOM 1997 Table S-2 (phosphorus EAR/RDA/UL)
+305,PHOSPHORUS,Milligram,males_31_50y,580,700,,4000,populated,IOM 1997 Table S-2 (phosphorus EAR/RDA/UL)
+305,PHOSPHORUS,Milligram,males_51_70y,580,700,,4000,populated,IOM 1997 Table S-2 (phosphorus EAR/RDA/UL)
+305,PHOSPHORUS,Milligram,males_71plus,580,700,,3000,populated,IOM 1997 Table S-2 (phosphorus EAR/RDA/UL)
+305,PHOSPHORUS,Milligram,females_9_13y,,,,,pending_curation,
+305,PHOSPHORUS,Milligram,females_14_18y,,,,,pending_curation,
+305,PHOSPHORUS,Milligram,females_19_30y,580,700,,4000,populated,IOM 1997 Table S-2 (phosphorus EAR/RDA/UL)
+305,PHOSPHORUS,Milligram,females_31_50y,580,700,,4000,populated,IOM 1997 Table S-2 (phosphorus EAR/RDA/UL)
+305,PHOSPHORUS,Milligram,females_51_70y,580,700,,4000,populated,IOM 1997 Table S-2 (phosphorus EAR/RDA/UL)
+305,PHOSPHORUS,Milligram,females_71plus,580,700,,3000,populated,IOM 1997 Table S-2 (phosphorus EAR/RDA/UL)
+305,PHOSPHORUS,Milligram,pregnant_19_30y,580,700,,3500,populated,IOM 1997 Table S-2 (phosphorus EAR/RDA/UL)
+305,PHOSPHORUS,Milligram,pregnant_31_50y,580,700,,3500,populated,IOM 1997 Table S-2 (phosphorus EAR/RDA/UL)
+305,PHOSPHORUS,Milligram,lactating_19_30y,580,700,,4000,populated,IOM 1997 Table S-2 (phosphorus EAR/RDA/UL)
+305,PHOSPHORUS,Milligram,lactating_31_50y,580,700,,4000,populated,IOM 1997 Table S-2 (phosphorus EAR/RDA/UL)
+306,POTASSIUM,Milligram,infants_0_6m,,,,,pending_curation,
+306,POTASSIUM,Milligram,infants_7_12m,,,,,pending_curation,
+306,POTASSIUM,Milligram,children_1_3y,,,,,pending_curation,
+306,POTASSIUM,Milligram,children_4_8y,,,,,pending_curation,
+306,POTASSIUM,Milligram,males_9_13y,,,,,pending_curation,
+306,POTASSIUM,Milligram,males_14_18y,,,,,pending_curation,
+306,POTASSIUM,Milligram,males_19_30y,,,3400,,populated,NASEM 2019 Table S-3 (potassium AI)
+306,POTASSIUM,Milligram,males_31_50y,,,3400,,populated,NASEM 2019 Table S-3 (potassium AI)
+306,POTASSIUM,Milligram,males_51_70y,,,3400,,populated,NASEM 2019 Table S-3 (potassium AI)
+306,POTASSIUM,Milligram,males_71plus,,,3400,,populated,NASEM 2019 Table S-3 (potassium AI)
+306,POTASSIUM,Milligram,females_9_13y,,,,,pending_curation,
+306,POTASSIUM,Milligram,females_14_18y,,,,,pending_curation,
+306,POTASSIUM,Milligram,females_19_30y,,,2600,,populated,NASEM 2019 Table S-3 (potassium AI)
+306,POTASSIUM,Milligram,females_31_50y,,,2600,,populated,NASEM 2019 Table S-3 (potassium AI)
+306,POTASSIUM,Milligram,females_51_70y,,,2600,,populated,NASEM 2019 Table S-3 (potassium AI)
+306,POTASSIUM,Milligram,females_71plus,,,2600,,populated,NASEM 2019 Table S-3 (potassium AI)
+306,POTASSIUM,Milligram,pregnant_19_30y,,,2900,,populated,NASEM 2019 Table S-3 (potassium AI)
+306,POTASSIUM,Milligram,pregnant_31_50y,,,2900,,populated,NASEM 2019 Table S-3 (potassium AI)
+306,POTASSIUM,Milligram,lactating_19_30y,,,2800,,populated,NASEM 2019 Table S-3 (potassium AI)
+306,POTASSIUM,Milligram,lactating_31_50y,,,2800,,populated,NASEM 2019 Table S-3 (potassium AI)
+307,SODIUM,Milligram,infants_0_6m,,,,,pending_curation,
+307,SODIUM,Milligram,infants_7_12m,,,,,pending_curation,
+307,SODIUM,Milligram,children_1_3y,,,,,pending_curation,
+307,SODIUM,Milligram,children_4_8y,,,,,pending_curation,
+307,SODIUM,Milligram,males_9_13y,,,,,pending_curation,
+307,SODIUM,Milligram,males_14_18y,,,,,pending_curation,
+307,SODIUM,Milligram,males_19_30y,,,1500,,populated,NASEM 2019 Tables S-3 and S-5 (sodium AI; CDRR at 2300 mg/d)
+307,SODIUM,Milligram,males_31_50y,,,1500,,populated,NASEM 2019 Tables S-3 and S-5 (sodium AI; CDRR at 2300 mg/d)
+307,SODIUM,Milligram,males_51_70y,,,1500,,populated,NASEM 2019 Tables S-3 and S-5 (sodium AI; CDRR at 2300 mg/d)
+307,SODIUM,Milligram,males_71plus,,,1500,,populated,NASEM 2019 Tables S-3 and S-5 (sodium AI; CDRR at 2300 mg/d)
+307,SODIUM,Milligram,females_9_13y,,,,,pending_curation,
+307,SODIUM,Milligram,females_14_18y,,,,,pending_curation,
+307,SODIUM,Milligram,females_19_30y,,,1500,,populated,NASEM 2019 Tables S-3 and S-5 (sodium AI; CDRR at 2300 mg/d)
+307,SODIUM,Milligram,females_31_50y,,,1500,,populated,NASEM 2019 Tables S-3 and S-5 (sodium AI; CDRR at 2300 mg/d)
+307,SODIUM,Milligram,females_51_70y,,,1500,,populated,NASEM 2019 Tables S-3 and S-5 (sodium AI; CDRR at 2300 mg/d)
+307,SODIUM,Milligram,females_71plus,,,1500,,populated,NASEM 2019 Tables S-3 and S-5 (sodium AI; CDRR at 2300 mg/d)
+307,SODIUM,Milligram,pregnant_19_30y,,,1500,,populated,NASEM 2019 Tables S-3 and S-5 (sodium AI; CDRR at 2300 mg/d)
+307,SODIUM,Milligram,pregnant_31_50y,,,1500,,populated,NASEM 2019 Tables S-3 and S-5 (sodium AI; CDRR at 2300 mg/d)
+307,SODIUM,Milligram,lactating_19_30y,,,1500,,populated,NASEM 2019 Tables S-3 and S-5 (sodium AI; CDRR at 2300 mg/d)
+307,SODIUM,Milligram,lactating_31_50y,,,1500,,populated,NASEM 2019 Tables S-3 and S-5 (sodium AI; CDRR at 2300 mg/d)
+309,ZINC,Milligram,infants_0_6m,,,,,pending_curation,
+309,ZINC,Milligram,infants_7_12m,,,,,pending_curation,
+309,ZINC,Milligram,children_1_3y,,,,,pending_curation,
+309,ZINC,Milligram,children_4_8y,,,,,pending_curation,
+309,ZINC,Milligram,males_9_13y,,,,,pending_curation,
+309,ZINC,Milligram,males_14_18y,,,,,pending_curation,
+309,ZINC,Milligram,males_19_30y,9.4,11,,40,populated,IOM 2001 Table S-9 (zinc EAR/RDA/UL)
+309,ZINC,Milligram,males_31_50y,9.4,11,,40,populated,IOM 2001 Table S-9 (zinc EAR/RDA/UL)
+309,ZINC,Milligram,males_51_70y,9.4,11,,40,populated,IOM 2001 Table S-9 (zinc EAR/RDA/UL)
+309,ZINC,Milligram,males_71plus,9.4,11,,40,populated,IOM 2001 Table S-9 (zinc EAR/RDA/UL)
+309,ZINC,Milligram,females_9_13y,,,,,pending_curation,
+309,ZINC,Milligram,females_14_18y,,,,,pending_curation,
+309,ZINC,Milligram,females_19_30y,6.8,8,,40,populated,IOM 2001 Table S-9 (zinc EAR/RDA/UL)
+309,ZINC,Milligram,females_31_50y,6.8,8,,40,populated,IOM 2001 Table S-9 (zinc EAR/RDA/UL)
+309,ZINC,Milligram,females_51_70y,6.8,8,,40,populated,IOM 2001 Table S-9 (zinc EAR/RDA/UL)
+309,ZINC,Milligram,females_71plus,6.8,8,,40,populated,IOM 2001 Table S-9 (zinc EAR/RDA/UL)
+309,ZINC,Milligram,pregnant_19_30y,9.5,11,,40,populated,IOM 2001 Table S-9 (zinc EAR/RDA/UL)
+309,ZINC,Milligram,pregnant_31_50y,9.5,11,,40,populated,IOM 2001 Table S-9 (zinc EAR/RDA/UL)
+309,ZINC,Milligram,lactating_19_30y,10.4,12,,40,populated,IOM 2001 Table S-9 (zinc EAR/RDA/UL)
+309,ZINC,Milligram,lactating_31_50y,10.4,12,,40,populated,IOM 2001 Table S-9 (zinc EAR/RDA/UL)
+312,COPPER,Microgram,infants_0_6m,,,,,pending_curation,
+312,COPPER,Microgram,infants_7_12m,,,,,pending_curation,
+312,COPPER,Microgram,children_1_3y,,,,,pending_curation,
+312,COPPER,Microgram,children_4_8y,,,,,pending_curation,
+312,COPPER,Microgram,males_9_13y,,,,,pending_curation,
+312,COPPER,Microgram,males_14_18y,,,,,pending_curation,
+312,COPPER,Microgram,males_19_30y,700,900,,10000,populated,IOM 2001 Table S-9 (copper EAR/RDA/UL)
+312,COPPER,Microgram,males_31_50y,700,900,,10000,populated,IOM 2001 Table S-9 (copper EAR/RDA/UL)
+312,COPPER,Microgram,males_51_70y,700,900,,10000,populated,IOM 2001 Table S-9 (copper EAR/RDA/UL)
+312,COPPER,Microgram,males_71plus,700,900,,10000,populated,IOM 2001 Table S-9 (copper EAR/RDA/UL)
+312,COPPER,Microgram,females_9_13y,,,,,pending_curation,
+312,COPPER,Microgram,females_14_18y,,,,,pending_curation,
+312,COPPER,Microgram,females_19_30y,700,900,,10000,populated,IOM 2001 Table S-9 (copper EAR/RDA/UL)
+312,COPPER,Microgram,females_31_50y,700,900,,10000,populated,IOM 2001 Table S-9 (copper EAR/RDA/UL)
+312,COPPER,Microgram,females_51_70y,700,900,,10000,populated,IOM 2001 Table S-9 (copper EAR/RDA/UL)
+312,COPPER,Microgram,females_71plus,700,900,,10000,populated,IOM 2001 Table S-9 (copper EAR/RDA/UL)
+312,COPPER,Microgram,pregnant_19_30y,800,1000,,10000,populated,IOM 2001 Table S-9 (copper EAR/RDA/UL)
+312,COPPER,Microgram,pregnant_31_50y,800,1000,,10000,populated,IOM 2001 Table S-9 (copper EAR/RDA/UL)
+312,COPPER,Microgram,lactating_19_30y,1000,1300,,10000,populated,IOM 2001 Table S-9 (copper EAR/RDA/UL)
+312,COPPER,Microgram,lactating_31_50y,1000,1300,,10000,populated,IOM 2001 Table S-9 (copper EAR/RDA/UL)
+315,MANGANESE,Milligram,infants_0_6m,,,,,pending_curation,
+315,MANGANESE,Milligram,infants_7_12m,,,,,pending_curation,
+315,MANGANESE,Milligram,children_1_3y,,,,,pending_curation,
+315,MANGANESE,Milligram,children_4_8y,,,,,pending_curation,
+315,MANGANESE,Milligram,males_9_13y,,,,,pending_curation,
+315,MANGANESE,Milligram,males_14_18y,,,,,pending_curation,
+315,MANGANESE,Milligram,males_19_30y,,,2.3,11,populated,IOM 2001 Table S-9 (manganese AI/UL)
+315,MANGANESE,Milligram,males_31_50y,,,2.3,11,populated,IOM 2001 Table S-9 (manganese AI/UL)
+315,MANGANESE,Milligram,males_51_70y,,,2.3,11,populated,IOM 2001 Table S-9 (manganese AI/UL)
+315,MANGANESE,Milligram,males_71plus,,,2.3,11,populated,IOM 2001 Table S-9 (manganese AI/UL)
+315,MANGANESE,Milligram,females_9_13y,,,,,pending_curation,
+315,MANGANESE,Milligram,females_14_18y,,,,,pending_curation,
+315,MANGANESE,Milligram,females_19_30y,,,1.8,11,populated,IOM 2001 Table S-9 (manganese AI/UL)
+315,MANGANESE,Milligram,females_31_50y,,,1.8,11,populated,IOM 2001 Table S-9 (manganese AI/UL)
+315,MANGANESE,Milligram,females_51_70y,,,1.8,11,populated,IOM 2001 Table S-9 (manganese AI/UL)
+315,MANGANESE,Milligram,females_71plus,,,1.8,11,populated,IOM 2001 Table S-9 (manganese AI/UL)
+315,MANGANESE,Milligram,pregnant_19_30y,,,2.0,11,populated,IOM 2001 Table S-9 (manganese AI/UL)
+315,MANGANESE,Milligram,pregnant_31_50y,,,2.0,11,populated,IOM 2001 Table S-9 (manganese AI/UL)
+315,MANGANESE,Milligram,lactating_19_30y,,,2.6,11,populated,IOM 2001 Table S-9 (manganese AI/UL)
+315,MANGANESE,Milligram,lactating_31_50y,,,2.6,11,populated,IOM 2001 Table S-9 (manganese AI/UL)
+317,SELENIUM,Microgram,infants_0_6m,,,,,pending_curation,
+317,SELENIUM,Microgram,infants_7_12m,,,,,pending_curation,
+317,SELENIUM,Microgram,children_1_3y,,,,,pending_curation,
+317,SELENIUM,Microgram,children_4_8y,,,,,pending_curation,
+317,SELENIUM,Microgram,males_9_13y,,,,,pending_curation,
+317,SELENIUM,Microgram,males_14_18y,,,,,pending_curation,
+317,SELENIUM,Microgram,males_19_30y,45,55,,400,populated,IOM 2000 Table S-3 (selenium EAR/RDA/UL)
+317,SELENIUM,Microgram,males_31_50y,45,55,,400,populated,IOM 2000 Table S-3 (selenium EAR/RDA/UL)
+317,SELENIUM,Microgram,males_51_70y,45,55,,400,populated,IOM 2000 Table S-3 (selenium EAR/RDA/UL)
+317,SELENIUM,Microgram,males_71plus,45,55,,400,populated,IOM 2000 Table S-3 (selenium EAR/RDA/UL)
+317,SELENIUM,Microgram,females_9_13y,,,,,pending_curation,
+317,SELENIUM,Microgram,females_14_18y,,,,,pending_curation,
+317,SELENIUM,Microgram,females_19_30y,45,55,,400,populated,IOM 2000 Table S-3 (selenium EAR/RDA/UL)
+317,SELENIUM,Microgram,females_31_50y,45,55,,400,populated,IOM 2000 Table S-3 (selenium EAR/RDA/UL)
+317,SELENIUM,Microgram,females_51_70y,45,55,,400,populated,IOM 2000 Table S-3 (selenium EAR/RDA/UL)
+317,SELENIUM,Microgram,females_71plus,45,55,,400,populated,IOM 2000 Table S-3 (selenium EAR/RDA/UL)
+317,SELENIUM,Microgram,pregnant_19_30y,49,60,,400,populated,IOM 2000 Table S-3 (selenium EAR/RDA/UL)
+317,SELENIUM,Microgram,pregnant_31_50y,49,60,,400,populated,IOM 2000 Table S-3 (selenium EAR/RDA/UL)
+317,SELENIUM,Microgram,lactating_19_30y,59,70,,400,populated,IOM 2000 Table S-3 (selenium EAR/RDA/UL)
+317,SELENIUM,Microgram,lactating_31_50y,59,70,,400,populated,IOM 2000 Table S-3 (selenium EAR/RDA/UL)
+320,RETINOL ACTIVITY EQUIVALENTS (RAE),Microgram,infants_0_6m,,,,,pending_curation,
+320,RETINOL ACTIVITY EQUIVALENTS (RAE),Microgram,infants_7_12m,,,,,pending_curation,
+320,RETINOL ACTIVITY EQUIVALENTS (RAE),Microgram,children_1_3y,,,,,pending_curation,
+320,RETINOL ACTIVITY EQUIVALENTS (RAE),Microgram,children_4_8y,,,,,pending_curation,
+320,RETINOL ACTIVITY EQUIVALENTS (RAE),Microgram,males_9_13y,,,,,pending_curation,
+320,RETINOL ACTIVITY EQUIVALENTS (RAE),Microgram,males_14_18y,,,,,pending_curation,
+320,RETINOL ACTIVITY EQUIVALENTS (RAE),Microgram,males_19_30y,625,900,,3000,populated,IOM 2001 Table S-9 (vitamin A RAE EAR/RDA/UL)
+320,RETINOL ACTIVITY EQUIVALENTS (RAE),Microgram,males_31_50y,625,900,,3000,populated,IOM 2001 Table S-9 (vitamin A RAE EAR/RDA/UL)
+320,RETINOL ACTIVITY EQUIVALENTS (RAE),Microgram,males_51_70y,625,900,,3000,populated,IOM 2001 Table S-9 (vitamin A RAE EAR/RDA/UL)
+320,RETINOL ACTIVITY EQUIVALENTS (RAE),Microgram,males_71plus,625,900,,3000,populated,IOM 2001 Table S-9 (vitamin A RAE EAR/RDA/UL)
+320,RETINOL ACTIVITY EQUIVALENTS (RAE),Microgram,females_9_13y,,,,,pending_curation,
+320,RETINOL ACTIVITY EQUIVALENTS (RAE),Microgram,females_14_18y,,,,,pending_curation,
+320,RETINOL ACTIVITY EQUIVALENTS (RAE),Microgram,females_19_30y,500,700,,3000,populated,IOM 2001 Table S-9 (vitamin A RAE EAR/RDA/UL)
+320,RETINOL ACTIVITY EQUIVALENTS (RAE),Microgram,females_31_50y,500,700,,3000,populated,IOM 2001 Table S-9 (vitamin A RAE EAR/RDA/UL)
+320,RETINOL ACTIVITY EQUIVALENTS (RAE),Microgram,females_51_70y,500,700,,3000,populated,IOM 2001 Table S-9 (vitamin A RAE EAR/RDA/UL)
+320,RETINOL ACTIVITY EQUIVALENTS (RAE),Microgram,females_71plus,500,700,,3000,populated,IOM 2001 Table S-9 (vitamin A RAE EAR/RDA/UL)
+320,RETINOL ACTIVITY EQUIVALENTS (RAE),Microgram,pregnant_19_30y,550,770,,3000,populated,IOM 2001 Table S-9 (vitamin A RAE EAR/RDA/UL)
+320,RETINOL ACTIVITY EQUIVALENTS (RAE),Microgram,pregnant_31_50y,550,770,,3000,populated,IOM 2001 Table S-9 (vitamin A RAE EAR/RDA/UL)
+320,RETINOL ACTIVITY EQUIVALENTS (RAE),Microgram,lactating_19_30y,900,1300,,3000,populated,IOM 2001 Table S-9 (vitamin A RAE EAR/RDA/UL)
+320,RETINOL ACTIVITY EQUIVALENTS (RAE),Microgram,lactating_31_50y,900,1300,,3000,populated,IOM 2001 Table S-9 (vitamin A RAE EAR/RDA/UL)
+323,ALPHA-TOCOPHEROL,Milligram,infants_0_6m,,,,,pending_curation,
+323,ALPHA-TOCOPHEROL,Milligram,infants_7_12m,,,,,pending_curation,
+323,ALPHA-TOCOPHEROL,Milligram,children_1_3y,,,,,pending_curation,
+323,ALPHA-TOCOPHEROL,Milligram,children_4_8y,,,,,pending_curation,
+323,ALPHA-TOCOPHEROL,Milligram,males_9_13y,,,,,pending_curation,
+323,ALPHA-TOCOPHEROL,Milligram,males_14_18y,,,,,pending_curation,
+323,ALPHA-TOCOPHEROL,Milligram,males_19_30y,12,15,,1000,populated,IOM 2000 Table S-3 (vitamin E alpha-tocopherol EAR/RDA/UL)
+323,ALPHA-TOCOPHEROL,Milligram,males_31_50y,12,15,,1000,populated,IOM 2000 Table S-3 (vitamin E alpha-tocopherol EAR/RDA/UL)
+323,ALPHA-TOCOPHEROL,Milligram,males_51_70y,12,15,,1000,populated,IOM 2000 Table S-3 (vitamin E alpha-tocopherol EAR/RDA/UL)
+323,ALPHA-TOCOPHEROL,Milligram,males_71plus,12,15,,1000,populated,IOM 2000 Table S-3 (vitamin E alpha-tocopherol EAR/RDA/UL)
+323,ALPHA-TOCOPHEROL,Milligram,females_9_13y,,,,,pending_curation,
+323,ALPHA-TOCOPHEROL,Milligram,females_14_18y,,,,,pending_curation,
+323,ALPHA-TOCOPHEROL,Milligram,females_19_30y,12,15,,1000,populated,IOM 2000 Table S-3 (vitamin E alpha-tocopherol EAR/RDA/UL)
+323,ALPHA-TOCOPHEROL,Milligram,females_31_50y,12,15,,1000,populated,IOM 2000 Table S-3 (vitamin E alpha-tocopherol EAR/RDA/UL)
+323,ALPHA-TOCOPHEROL,Milligram,females_51_70y,12,15,,1000,populated,IOM 2000 Table S-3 (vitamin E alpha-tocopherol EAR/RDA/UL)
+323,ALPHA-TOCOPHEROL,Milligram,females_71plus,12,15,,1000,populated,IOM 2000 Table S-3 (vitamin E alpha-tocopherol EAR/RDA/UL)
+323,ALPHA-TOCOPHEROL,Milligram,pregnant_19_30y,12,15,,1000,populated,IOM 2000 Table S-3 (vitamin E alpha-tocopherol EAR/RDA/UL)
+323,ALPHA-TOCOPHEROL,Milligram,pregnant_31_50y,12,15,,1000,populated,IOM 2000 Table S-3 (vitamin E alpha-tocopherol EAR/RDA/UL)
+323,ALPHA-TOCOPHEROL,Milligram,lactating_19_30y,16,19,,1000,populated,IOM 2000 Table S-3 (vitamin E alpha-tocopherol EAR/RDA/UL)
+323,ALPHA-TOCOPHEROL,Milligram,lactating_31_50y,16,19,,1000,populated,IOM 2000 Table S-3 (vitamin E alpha-tocopherol EAR/RDA/UL)
+328,VITAMIN D (D2 + D3),Microgram,infants_0_6m,,,,,pending_curation,
+328,VITAMIN D (D2 + D3),Microgram,infants_7_12m,,,,,pending_curation,
+328,VITAMIN D (D2 + D3),Microgram,children_1_3y,,,,,pending_curation,
+328,VITAMIN D (D2 + D3),Microgram,children_4_8y,,,,,pending_curation,
+328,VITAMIN D (D2 + D3),Microgram,males_9_13y,,,,,pending_curation,
+328,VITAMIN D (D2 + D3),Microgram,males_14_18y,,,,,pending_curation,
+328,VITAMIN D (D2 + D3),Microgram,males_19_30y,10,15,,100,populated,IOM 2011 Tables S-3 and S-5 (vitamin D EAR/RDA/UL)
+328,VITAMIN D (D2 + D3),Microgram,males_31_50y,10,15,,100,populated,IOM 2011 Tables S-3 and S-5 (vitamin D EAR/RDA/UL)
+328,VITAMIN D (D2 + D3),Microgram,males_51_70y,10,15,,100,populated,IOM 2011 Tables S-3 and S-5 (vitamin D EAR/RDA/UL)
+328,VITAMIN D (D2 + D3),Microgram,males_71plus,10,20,,100,populated,IOM 2011 Tables S-3 and S-5 (vitamin D EAR/RDA/UL)
+328,VITAMIN D (D2 + D3),Microgram,females_9_13y,,,,,pending_curation,
+328,VITAMIN D (D2 + D3),Microgram,females_14_18y,,,,,pending_curation,
+328,VITAMIN D (D2 + D3),Microgram,females_19_30y,10,15,,100,populated,IOM 2011 Tables S-3 and S-5 (vitamin D EAR/RDA/UL)
+328,VITAMIN D (D2 + D3),Microgram,females_31_50y,10,15,,100,populated,IOM 2011 Tables S-3 and S-5 (vitamin D EAR/RDA/UL)
+328,VITAMIN D (D2 + D3),Microgram,females_51_70y,10,15,,100,populated,IOM 2011 Tables S-3 and S-5 (vitamin D EAR/RDA/UL)
+328,VITAMIN D (D2 + D3),Microgram,females_71plus,10,20,,100,populated,IOM 2011 Tables S-3 and S-5 (vitamin D EAR/RDA/UL)
+328,VITAMIN D (D2 + D3),Microgram,pregnant_19_30y,10,15,,100,populated,IOM 2011 Tables S-3 and S-5 (vitamin D EAR/RDA/UL)
+328,VITAMIN D (D2 + D3),Microgram,pregnant_31_50y,10,15,,100,populated,IOM 2011 Tables S-3 and S-5 (vitamin D EAR/RDA/UL)
+328,VITAMIN D (D2 + D3),Microgram,lactating_19_30y,10,15,,100,populated,IOM 2011 Tables S-3 and S-5 (vitamin D EAR/RDA/UL)
+328,VITAMIN D (D2 + D3),Microgram,lactating_31_50y,10,15,,100,populated,IOM 2011 Tables S-3 and S-5 (vitamin D EAR/RDA/UL)
+401,VITAMIN C,Milligram,infants_0_6m,,,,,pending_curation,
+401,VITAMIN C,Milligram,infants_7_12m,,,,,pending_curation,
+401,VITAMIN C,Milligram,children_1_3y,,,,,pending_curation,
+401,VITAMIN C,Milligram,children_4_8y,,,,,pending_curation,
+401,VITAMIN C,Milligram,males_9_13y,,,,,pending_curation,
+401,VITAMIN C,Milligram,males_14_18y,,,,,pending_curation,
+401,VITAMIN C,Milligram,males_19_30y,75,90,,2000,populated,IOM 2000 Table S-3 (vitamin C EAR/RDA/UL)
+401,VITAMIN C,Milligram,males_31_50y,75,90,,2000,populated,IOM 2000 Table S-3 (vitamin C EAR/RDA/UL)
+401,VITAMIN C,Milligram,males_51_70y,75,90,,2000,populated,IOM 2000 Table S-3 (vitamin C EAR/RDA/UL)
+401,VITAMIN C,Milligram,males_71plus,75,90,,2000,populated,IOM 2000 Table S-3 (vitamin C EAR/RDA/UL)
+401,VITAMIN C,Milligram,females_9_13y,,,,,pending_curation,
+401,VITAMIN C,Milligram,females_14_18y,,,,,pending_curation,
+401,VITAMIN C,Milligram,females_19_30y,60,75,,2000,populated,IOM 2000 Table S-3 (vitamin C EAR/RDA/UL)
+401,VITAMIN C,Milligram,females_31_50y,60,75,,2000,populated,IOM 2000 Table S-3 (vitamin C EAR/RDA/UL)
+401,VITAMIN C,Milligram,females_51_70y,60,75,,2000,populated,IOM 2000 Table S-3 (vitamin C EAR/RDA/UL)
+401,VITAMIN C,Milligram,females_71plus,60,75,,2000,populated,IOM 2000 Table S-3 (vitamin C EAR/RDA/UL)
+401,VITAMIN C,Milligram,pregnant_19_30y,70,85,,2000,populated,IOM 2000 Table S-3 (vitamin C EAR/RDA/UL)
+401,VITAMIN C,Milligram,pregnant_31_50y,70,85,,2000,populated,IOM 2000 Table S-3 (vitamin C EAR/RDA/UL)
+401,VITAMIN C,Milligram,lactating_19_30y,100,120,,2000,populated,IOM 2000 Table S-3 (vitamin C EAR/RDA/UL)
+401,VITAMIN C,Milligram,lactating_31_50y,100,120,,2000,populated,IOM 2000 Table S-3 (vitamin C EAR/RDA/UL)
+404,THIAMIN,Milligram,infants_0_6m,,,,,pending_curation,
+404,THIAMIN,Milligram,infants_7_12m,,,,,pending_curation,
+404,THIAMIN,Milligram,children_1_3y,,,,,pending_curation,
+404,THIAMIN,Milligram,children_4_8y,,,,,pending_curation,
+404,THIAMIN,Milligram,males_9_13y,,,,,pending_curation,
+404,THIAMIN,Milligram,males_14_18y,,,,,pending_curation,
+404,THIAMIN,Milligram,males_19_30y,1.0,1.2,,,populated,IOM 1998 Table S-3 (thiamin EAR/RDA)
+404,THIAMIN,Milligram,males_31_50y,1.0,1.2,,,populated,IOM 1998 Table S-3 (thiamin EAR/RDA)
+404,THIAMIN,Milligram,males_51_70y,1.0,1.2,,,populated,IOM 1998 Table S-3 (thiamin EAR/RDA)
+404,THIAMIN,Milligram,males_71plus,1.0,1.2,,,populated,IOM 1998 Table S-3 (thiamin EAR/RDA)
+404,THIAMIN,Milligram,females_9_13y,,,,,pending_curation,
+404,THIAMIN,Milligram,females_14_18y,,,,,pending_curation,
+404,THIAMIN,Milligram,females_19_30y,0.9,1.1,,,populated,IOM 1998 Table S-3 (thiamin EAR/RDA)
+404,THIAMIN,Milligram,females_31_50y,0.9,1.1,,,populated,IOM 1998 Table S-3 (thiamin EAR/RDA)
+404,THIAMIN,Milligram,females_51_70y,0.9,1.1,,,populated,IOM 1998 Table S-3 (thiamin EAR/RDA)
+404,THIAMIN,Milligram,females_71plus,0.9,1.1,,,populated,IOM 1998 Table S-3 (thiamin EAR/RDA)
+404,THIAMIN,Milligram,pregnant_19_30y,1.2,1.4,,,populated,IOM 1998 Table S-3 (thiamin EAR/RDA)
+404,THIAMIN,Milligram,pregnant_31_50y,1.2,1.4,,,populated,IOM 1998 Table S-3 (thiamin EAR/RDA)
+404,THIAMIN,Milligram,lactating_19_30y,1.2,1.4,,,populated,IOM 1998 Table S-3 (thiamin EAR/RDA)
+404,THIAMIN,Milligram,lactating_31_50y,1.2,1.4,,,populated,IOM 1998 Table S-3 (thiamin EAR/RDA)
+405,RIBOFLAVIN,Milligram,infants_0_6m,,,,,pending_curation,
+405,RIBOFLAVIN,Milligram,infants_7_12m,,,,,pending_curation,
+405,RIBOFLAVIN,Milligram,children_1_3y,,,,,pending_curation,
+405,RIBOFLAVIN,Milligram,children_4_8y,,,,,pending_curation,
+405,RIBOFLAVIN,Milligram,males_9_13y,,,,,pending_curation,
+405,RIBOFLAVIN,Milligram,males_14_18y,,,,,pending_curation,
+405,RIBOFLAVIN,Milligram,males_19_30y,1.1,1.3,,,populated,IOM 1998 Table S-3 (riboflavin EAR/RDA)
+405,RIBOFLAVIN,Milligram,males_31_50y,1.1,1.3,,,populated,IOM 1998 Table S-3 (riboflavin EAR/RDA)
+405,RIBOFLAVIN,Milligram,males_51_70y,1.1,1.3,,,populated,IOM 1998 Table S-3 (riboflavin EAR/RDA)
+405,RIBOFLAVIN,Milligram,males_71plus,1.1,1.3,,,populated,IOM 1998 Table S-3 (riboflavin EAR/RDA)
+405,RIBOFLAVIN,Milligram,females_9_13y,,,,,pending_curation,
+405,RIBOFLAVIN,Milligram,females_14_18y,,,,,pending_curation,
+405,RIBOFLAVIN,Milligram,females_19_30y,0.9,1.1,,,populated,IOM 1998 Table S-3 (riboflavin EAR/RDA)
+405,RIBOFLAVIN,Milligram,females_31_50y,0.9,1.1,,,populated,IOM 1998 Table S-3 (riboflavin EAR/RDA)
+405,RIBOFLAVIN,Milligram,females_51_70y,0.9,1.1,,,populated,IOM 1998 Table S-3 (riboflavin EAR/RDA)
+405,RIBOFLAVIN,Milligram,females_71plus,0.9,1.1,,,populated,IOM 1998 Table S-3 (riboflavin EAR/RDA)
+405,RIBOFLAVIN,Milligram,pregnant_19_30y,1.2,1.4,,,populated,IOM 1998 Table S-3 (riboflavin EAR/RDA)
+405,RIBOFLAVIN,Milligram,pregnant_31_50y,1.2,1.4,,,populated,IOM 1998 Table S-3 (riboflavin EAR/RDA)
+405,RIBOFLAVIN,Milligram,lactating_19_30y,1.3,1.6,,,populated,IOM 1998 Table S-3 (riboflavin EAR/RDA)
+405,RIBOFLAVIN,Milligram,lactating_31_50y,1.3,1.6,,,populated,IOM 1998 Table S-3 (riboflavin EAR/RDA)
+406,NIACIN (NIACIN EQUIVALENT NE),NE,infants_0_6m,,,,,pending_curation,
+406,NIACIN (NIACIN EQUIVALENT NE),NE,infants_7_12m,,,,,pending_curation,
+406,NIACIN (NIACIN EQUIVALENT NE),NE,children_1_3y,,,,,pending_curation,
+406,NIACIN (NIACIN EQUIVALENT NE),NE,children_4_8y,,,,,pending_curation,
+406,NIACIN (NIACIN EQUIVALENT NE),NE,males_9_13y,,,,,pending_curation,
+406,NIACIN (NIACIN EQUIVALENT NE),NE,males_14_18y,,,,,pending_curation,
+406,NIACIN (NIACIN EQUIVALENT NE),NE,males_19_30y,12,16,,35,populated,IOM 1998 Table S-3 (niacin NE EAR/RDA/UL)
+406,NIACIN (NIACIN EQUIVALENT NE),NE,males_31_50y,12,16,,35,populated,IOM 1998 Table S-3 (niacin NE EAR/RDA/UL)
+406,NIACIN (NIACIN EQUIVALENT NE),NE,males_51_70y,12,16,,35,populated,IOM 1998 Table S-3 (niacin NE EAR/RDA/UL)
+406,NIACIN (NIACIN EQUIVALENT NE),NE,males_71plus,12,16,,35,populated,IOM 1998 Table S-3 (niacin NE EAR/RDA/UL)
+406,NIACIN (NIACIN EQUIVALENT NE),NE,females_9_13y,,,,,pending_curation,
+406,NIACIN (NIACIN EQUIVALENT NE),NE,females_14_18y,,,,,pending_curation,
+406,NIACIN (NIACIN EQUIVALENT NE),NE,females_19_30y,11,14,,35,populated,IOM 1998 Table S-3 (niacin NE EAR/RDA/UL)
+406,NIACIN (NIACIN EQUIVALENT NE),NE,females_31_50y,11,14,,35,populated,IOM 1998 Table S-3 (niacin NE EAR/RDA/UL)
+406,NIACIN (NIACIN EQUIVALENT NE),NE,females_51_70y,11,14,,35,populated,IOM 1998 Table S-3 (niacin NE EAR/RDA/UL)
+406,NIACIN (NIACIN EQUIVALENT NE),NE,females_71plus,11,14,,35,populated,IOM 1998 Table S-3 (niacin NE EAR/RDA/UL)
+406,NIACIN (NIACIN EQUIVALENT NE),NE,pregnant_19_30y,14,18,,35,populated,IOM 1998 Table S-3 (niacin NE EAR/RDA/UL)
+406,NIACIN (NIACIN EQUIVALENT NE),NE,pregnant_31_50y,14,18,,35,populated,IOM 1998 Table S-3 (niacin NE EAR/RDA/UL)
+406,NIACIN (NIACIN EQUIVALENT NE),NE,lactating_19_30y,13,17,,35,populated,IOM 1998 Table S-3 (niacin NE EAR/RDA/UL)
+406,NIACIN (NIACIN EQUIVALENT NE),NE,lactating_31_50y,13,17,,35,populated,IOM 1998 Table S-3 (niacin NE EAR/RDA/UL)
+410,PANTOTHENIC ACID,Milligram,infants_0_6m,,,,,pending_curation,
+410,PANTOTHENIC ACID,Milligram,infants_7_12m,,,,,pending_curation,
+410,PANTOTHENIC ACID,Milligram,children_1_3y,,,,,pending_curation,
+410,PANTOTHENIC ACID,Milligram,children_4_8y,,,,,pending_curation,
+410,PANTOTHENIC ACID,Milligram,males_9_13y,,,,,pending_curation,
+410,PANTOTHENIC ACID,Milligram,males_14_18y,,,,,pending_curation,
+410,PANTOTHENIC ACID,Milligram,males_19_30y,,,5,,populated,IOM 1998 Table S-3 (pantothenic acid AI)
+410,PANTOTHENIC ACID,Milligram,males_31_50y,,,5,,populated,IOM 1998 Table S-3 (pantothenic acid AI)
+410,PANTOTHENIC ACID,Milligram,males_51_70y,,,5,,populated,IOM 1998 Table S-3 (pantothenic acid AI)
+410,PANTOTHENIC ACID,Milligram,males_71plus,,,5,,populated,IOM 1998 Table S-3 (pantothenic acid AI)
+410,PANTOTHENIC ACID,Milligram,females_9_13y,,,,,pending_curation,
+410,PANTOTHENIC ACID,Milligram,females_14_18y,,,,,pending_curation,
+410,PANTOTHENIC ACID,Milligram,females_19_30y,,,5,,populated,IOM 1998 Table S-3 (pantothenic acid AI)
+410,PANTOTHENIC ACID,Milligram,females_31_50y,,,5,,populated,IOM 1998 Table S-3 (pantothenic acid AI)
+410,PANTOTHENIC ACID,Milligram,females_51_70y,,,5,,populated,IOM 1998 Table S-3 (pantothenic acid AI)
+410,PANTOTHENIC ACID,Milligram,females_71plus,,,5,,populated,IOM 1998 Table S-3 (pantothenic acid AI)
+410,PANTOTHENIC ACID,Milligram,pregnant_19_30y,,,6,,populated,IOM 1998 Table S-3 (pantothenic acid AI)
+410,PANTOTHENIC ACID,Milligram,pregnant_31_50y,,,6,,populated,IOM 1998 Table S-3 (pantothenic acid AI)
+410,PANTOTHENIC ACID,Milligram,lactating_19_30y,,,7,,populated,IOM 1998 Table S-3 (pantothenic acid AI)
+410,PANTOTHENIC ACID,Milligram,lactating_31_50y,,,7,,populated,IOM 1998 Table S-3 (pantothenic acid AI)
+415,VITAMIN B6,Milligram,infants_0_6m,,,,,pending_curation,
+415,VITAMIN B6,Milligram,infants_7_12m,,,,,pending_curation,
+415,VITAMIN B6,Milligram,children_1_3y,,,,,pending_curation,
+415,VITAMIN B6,Milligram,children_4_8y,,,,,pending_curation,
+415,VITAMIN B6,Milligram,males_9_13y,,,,,pending_curation,
+415,VITAMIN B6,Milligram,males_14_18y,,,,,pending_curation,
+415,VITAMIN B6,Milligram,males_19_30y,1.1,1.3,,100,populated,IOM 1998 Table S-3 (vitamin B6 EAR/RDA/UL)
+415,VITAMIN B6,Milligram,males_31_50y,1.1,1.3,,100,populated,IOM 1998 Table S-3 (vitamin B6 EAR/RDA/UL)
+415,VITAMIN B6,Milligram,males_51_70y,1.4,1.7,,100,populated,IOM 1998 Table S-3 (vitamin B6 EAR/RDA/UL)
+415,VITAMIN B6,Milligram,males_71plus,1.4,1.7,,100,populated,IOM 1998 Table S-3 (vitamin B6 EAR/RDA/UL)
+415,VITAMIN B6,Milligram,females_9_13y,,,,,pending_curation,
+415,VITAMIN B6,Milligram,females_14_18y,,,,,pending_curation,
+415,VITAMIN B6,Milligram,females_19_30y,1.1,1.3,,100,populated,IOM 1998 Table S-3 (vitamin B6 EAR/RDA/UL)
+415,VITAMIN B6,Milligram,females_31_50y,1.1,1.3,,100,populated,IOM 1998 Table S-3 (vitamin B6 EAR/RDA/UL)
+415,VITAMIN B6,Milligram,females_51_70y,1.3,1.5,,100,populated,IOM 1998 Table S-3 (vitamin B6 EAR/RDA/UL)
+415,VITAMIN B6,Milligram,females_71plus,1.3,1.5,,100,populated,IOM 1998 Table S-3 (vitamin B6 EAR/RDA/UL)
+415,VITAMIN B6,Milligram,pregnant_19_30y,1.6,1.9,,100,populated,IOM 1998 Table S-3 (vitamin B6 EAR/RDA/UL)
+415,VITAMIN B6,Milligram,pregnant_31_50y,1.6,1.9,,100,populated,IOM 1998 Table S-3 (vitamin B6 EAR/RDA/UL)
+415,VITAMIN B6,Milligram,lactating_19_30y,1.7,2.0,,100,populated,IOM 1998 Table S-3 (vitamin B6 EAR/RDA/UL)
+415,VITAMIN B6,Milligram,lactating_31_50y,1.7,2.0,,100,populated,IOM 1998 Table S-3 (vitamin B6 EAR/RDA/UL)
+418,VITAMIN B12,Microgram,infants_0_6m,,,,,pending_curation,
+418,VITAMIN B12,Microgram,infants_7_12m,,,,,pending_curation,
+418,VITAMIN B12,Microgram,children_1_3y,,,,,pending_curation,
+418,VITAMIN B12,Microgram,children_4_8y,,,,,pending_curation,
+418,VITAMIN B12,Microgram,males_9_13y,,,,,pending_curation,
+418,VITAMIN B12,Microgram,males_14_18y,,,,,pending_curation,
+418,VITAMIN B12,Microgram,males_19_30y,2.0,2.4,,,populated,IOM 1998 Table S-3 (vitamin B12 EAR/RDA)
+418,VITAMIN B12,Microgram,males_31_50y,2.0,2.4,,,populated,IOM 1998 Table S-3 (vitamin B12 EAR/RDA)
+418,VITAMIN B12,Microgram,males_51_70y,2.0,2.4,,,populated,IOM 1998 Table S-3 (vitamin B12 EAR/RDA)
+418,VITAMIN B12,Microgram,males_71plus,2.0,2.4,,,populated,IOM 1998 Table S-3 (vitamin B12 EAR/RDA)
+418,VITAMIN B12,Microgram,females_9_13y,,,,,pending_curation,
+418,VITAMIN B12,Microgram,females_14_18y,,,,,pending_curation,
+418,VITAMIN B12,Microgram,females_19_30y,2.0,2.4,,,populated,IOM 1998 Table S-3 (vitamin B12 EAR/RDA)
+418,VITAMIN B12,Microgram,females_31_50y,2.0,2.4,,,populated,IOM 1998 Table S-3 (vitamin B12 EAR/RDA)
+418,VITAMIN B12,Microgram,females_51_70y,2.0,2.4,,,populated,IOM 1998 Table S-3 (vitamin B12 EAR/RDA)
+418,VITAMIN B12,Microgram,females_71plus,2.0,2.4,,,populated,IOM 1998 Table S-3 (vitamin B12 EAR/RDA)
+418,VITAMIN B12,Microgram,pregnant_19_30y,2.2,2.6,,,populated,IOM 1998 Table S-3 (vitamin B12 EAR/RDA)
+418,VITAMIN B12,Microgram,pregnant_31_50y,2.2,2.6,,,populated,IOM 1998 Table S-3 (vitamin B12 EAR/RDA)
+418,VITAMIN B12,Microgram,lactating_19_30y,2.4,2.8,,,populated,IOM 1998 Table S-3 (vitamin B12 EAR/RDA)
+418,VITAMIN B12,Microgram,lactating_31_50y,2.4,2.8,,,populated,IOM 1998 Table S-3 (vitamin B12 EAR/RDA)
+421,"CHOLINE, TOTAL",Milligram,infants_0_6m,,,,,pending_curation,
+421,"CHOLINE, TOTAL",Milligram,infants_7_12m,,,,,pending_curation,
+421,"CHOLINE, TOTAL",Milligram,children_1_3y,,,,,pending_curation,
+421,"CHOLINE, TOTAL",Milligram,children_4_8y,,,,,pending_curation,
+421,"CHOLINE, TOTAL",Milligram,males_9_13y,,,,,pending_curation,
+421,"CHOLINE, TOTAL",Milligram,males_14_18y,,,,,pending_curation,
+421,"CHOLINE, TOTAL",Milligram,males_19_30y,,,550,3500,populated,IOM 1998 Table S-3 (choline AI/UL)
+421,"CHOLINE, TOTAL",Milligram,males_31_50y,,,550,3500,populated,IOM 1998 Table S-3 (choline AI/UL)
+421,"CHOLINE, TOTAL",Milligram,males_51_70y,,,550,3500,populated,IOM 1998 Table S-3 (choline AI/UL)
+421,"CHOLINE, TOTAL",Milligram,males_71plus,,,550,3500,populated,IOM 1998 Table S-3 (choline AI/UL)
+421,"CHOLINE, TOTAL",Milligram,females_9_13y,,,,,pending_curation,
+421,"CHOLINE, TOTAL",Milligram,females_14_18y,,,,,pending_curation,
+421,"CHOLINE, TOTAL",Milligram,females_19_30y,,,425,3500,populated,IOM 1998 Table S-3 (choline AI/UL)
+421,"CHOLINE, TOTAL",Milligram,females_31_50y,,,425,3500,populated,IOM 1998 Table S-3 (choline AI/UL)
+421,"CHOLINE, TOTAL",Milligram,females_51_70y,,,425,3500,populated,IOM 1998 Table S-3 (choline AI/UL)
+421,"CHOLINE, TOTAL",Milligram,females_71plus,,,425,3500,populated,IOM 1998 Table S-3 (choline AI/UL)
+421,"CHOLINE, TOTAL",Milligram,pregnant_19_30y,,,450,3500,populated,IOM 1998 Table S-3 (choline AI/UL)
+421,"CHOLINE, TOTAL",Milligram,pregnant_31_50y,,,450,3500,populated,IOM 1998 Table S-3 (choline AI/UL)
+421,"CHOLINE, TOTAL",Milligram,lactating_19_30y,,,550,3500,populated,IOM 1998 Table S-3 (choline AI/UL)
+421,"CHOLINE, TOTAL",Milligram,lactating_31_50y,,,550,3500,populated,IOM 1998 Table S-3 (choline AI/UL)
+430,VITAMIN K,Microgram,infants_0_6m,,,,,pending_curation,
+430,VITAMIN K,Microgram,infants_7_12m,,,,,pending_curation,
+430,VITAMIN K,Microgram,children_1_3y,,,,,pending_curation,
+430,VITAMIN K,Microgram,children_4_8y,,,,,pending_curation,
+430,VITAMIN K,Microgram,males_9_13y,,,,,pending_curation,
+430,VITAMIN K,Microgram,males_14_18y,,,,,pending_curation,
+430,VITAMIN K,Microgram,males_19_30y,,,120,,populated,IOM 2001 Table S-9 (vitamin K AI)
+430,VITAMIN K,Microgram,males_31_50y,,,120,,populated,IOM 2001 Table S-9 (vitamin K AI)
+430,VITAMIN K,Microgram,males_51_70y,,,120,,populated,IOM 2001 Table S-9 (vitamin K AI)
+430,VITAMIN K,Microgram,males_71plus,,,120,,populated,IOM 2001 Table S-9 (vitamin K AI)
+430,VITAMIN K,Microgram,females_9_13y,,,,,pending_curation,
+430,VITAMIN K,Microgram,females_14_18y,,,,,pending_curation,
+430,VITAMIN K,Microgram,females_19_30y,,,90,,populated,IOM 2001 Table S-9 (vitamin K AI)
+430,VITAMIN K,Microgram,females_31_50y,,,90,,populated,IOM 2001 Table S-9 (vitamin K AI)
+430,VITAMIN K,Microgram,females_51_70y,,,90,,populated,IOM 2001 Table S-9 (vitamin K AI)
+430,VITAMIN K,Microgram,females_71plus,,,90,,populated,IOM 2001 Table S-9 (vitamin K AI)
+430,VITAMIN K,Microgram,pregnant_19_30y,,,90,,populated,IOM 2001 Table S-9 (vitamin K AI)
+430,VITAMIN K,Microgram,pregnant_31_50y,,,90,,populated,IOM 2001 Table S-9 (vitamin K AI)
+430,VITAMIN K,Microgram,lactating_19_30y,,,90,,populated,IOM 2001 Table S-9 (vitamin K AI)
+430,VITAMIN K,Microgram,lactating_31_50y,,,90,,populated,IOM 2001 Table S-9 (vitamin K AI)
+435,"FOLATE, DFE",Microgram,infants_0_6m,,,,,pending_curation,
+435,"FOLATE, DFE",Microgram,infants_7_12m,,,,,pending_curation,
+435,"FOLATE, DFE",Microgram,children_1_3y,,,,,pending_curation,
+435,"FOLATE, DFE",Microgram,children_4_8y,,,,,pending_curation,
+435,"FOLATE, DFE",Microgram,males_9_13y,,,,,pending_curation,
+435,"FOLATE, DFE",Microgram,males_14_18y,,,,,pending_curation,
+435,"FOLATE, DFE",Microgram,males_19_30y,320,400,,1000,populated,IOM 1998 Table S-3 (folate DFE EAR/RDA/UL)
+435,"FOLATE, DFE",Microgram,males_31_50y,320,400,,1000,populated,IOM 1998 Table S-3 (folate DFE EAR/RDA/UL)
+435,"FOLATE, DFE",Microgram,males_51_70y,320,400,,1000,populated,IOM 1998 Table S-3 (folate DFE EAR/RDA/UL)
+435,"FOLATE, DFE",Microgram,males_71plus,320,400,,1000,populated,IOM 1998 Table S-3 (folate DFE EAR/RDA/UL)
+435,"FOLATE, DFE",Microgram,females_9_13y,,,,,pending_curation,
+435,"FOLATE, DFE",Microgram,females_14_18y,,,,,pending_curation,
+435,"FOLATE, DFE",Microgram,females_19_30y,320,400,,1000,populated,IOM 1998 Table S-3 (folate DFE EAR/RDA/UL)
+435,"FOLATE, DFE",Microgram,females_31_50y,320,400,,1000,populated,IOM 1998 Table S-3 (folate DFE EAR/RDA/UL)
+435,"FOLATE, DFE",Microgram,females_51_70y,320,400,,1000,populated,IOM 1998 Table S-3 (folate DFE EAR/RDA/UL)
+435,"FOLATE, DFE",Microgram,females_71plus,320,400,,1000,populated,IOM 1998 Table S-3 (folate DFE EAR/RDA/UL)
+435,"FOLATE, DFE",Microgram,pregnant_19_30y,520,600,,1000,populated,IOM 1998 Table S-3 (folate DFE EAR/RDA/UL)
+435,"FOLATE, DFE",Microgram,pregnant_31_50y,520,600,,1000,populated,IOM 1998 Table S-3 (folate DFE EAR/RDA/UL)
+435,"FOLATE, DFE",Microgram,lactating_19_30y,450,500,,1000,populated,IOM 1998 Table S-3 (folate DFE EAR/RDA/UL)
+435,"FOLATE, DFE",Microgram,lactating_31_50y,450,500,,1000,populated,IOM 1998 Table S-3 (folate DFE EAR/RDA/UL)

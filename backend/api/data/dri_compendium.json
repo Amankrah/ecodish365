@@ -1,0 +1,3632 @@
+{
+  "_meta": {
+    "version": "2026-06-09",
+    "description": "IOM / NASEM / Health Canada DRI compendium keyed by CNF NutrientID. Adult life-stage cells (males / females 19-30, 31-50, 51-70, 71+) plus pregnant / lactating (19-30, 31-50) are fully populated from the published IOM and NASEM tables. Child and infant cells ship as null with status=pending_curation pending a separate curation pass; the loader returns None for null cells so no false DRI percent is ever fabricated.",
+    "primary_sources": [
+      "IOM 1997 Dietary Reference Intakes for Calcium, Phosphorus, Magnesium, Vitamin D, and Fluoride.",
+      "IOM 1998 Dietary Reference Intakes for Thiamin, Riboflavin, Niacin, Vitamin B6, Folate, Vitamin B12, Pantothenic Acid, Biotin, and Choline.",
+      "IOM 2000 Dietary Reference Intakes for Vitamin C, Vitamin E, Selenium, and Carotenoids.",
+      "IOM 2001 Dietary Reference Intakes for Vitamin A, Vitamin K, Arsenic, Boron, Chromium, Copper, Iodine, Iron, Manganese, Molybdenum, Nickel, Silicon, Vanadium, and Zinc.",
+      "IOM 2005 Dietary Reference Intakes for Energy, Carbohydrate, Fiber, Fat, Fatty Acids, Cholesterol, Protein, and Amino Acids.",
+      "IOM 2011 Dietary Reference Intakes for Calcium and Vitamin D.",
+      "NASEM 2019 Dietary Reference Intakes for Sodium and Potassium.",
+      "Health Canada 2023 Dietary Reference Intakes - reference tables."
+    ],
+    "reference_types": [
+      "EAR",
+      "RDA",
+      "AI",
+      "UL"
+    ],
+    "amdr_block": {
+      "carbohydrate": {
+        "pct_kcal_min": 45.0,
+        "pct_kcal_max": 65.0
+      },
+      "protein": {
+        "pct_kcal_min": 10.0,
+        "pct_kcal_max": 35.0
+      },
+      "fat": {
+        "pct_kcal_min": 20.0,
+        "pct_kcal_max": 35.0
+      },
+      "linoleic_acid": {
+        "pct_kcal_min": 5.0,
+        "pct_kcal_max": 10.0
+      },
+      "alpha_linolenic_acid": {
+        "pct_kcal_min": 0.6,
+        "pct_kcal_max": 1.2
+      },
+      "added_sugars_dga_2020": {
+        "pct_kcal_min": 0.0,
+        "pct_kcal_max": 10.0
+      },
+      "saturated_fat_dga_2020": {
+        "pct_kcal_min": 0.0,
+        "pct_kcal_max": 10.0
+      }
+    },
+    "cdrr_block": {
+      "307": {
+        "cdrr_mg_per_day": 2300.0,
+        "source": "NASEM 2019 Sodium and Potassium DRIs, Chapter 7 p. 322.",
+        "note": "Intake above the CDRR is expected to reduce chronic disease risk if reduced; not a tolerable upper limit."
+      }
+    },
+    "life_stages_populated": [
+      "males_19_30y",
+      "males_31_50y",
+      "males_51_70y",
+      "males_71plus",
+      "females_19_30y",
+      "females_31_50y",
+      "females_51_70y",
+      "females_71plus",
+      "pregnant_19_30y",
+      "pregnant_31_50y",
+      "lactating_19_30y",
+      "lactating_31_50y"
+    ],
+    "life_stages_pending": [
+      "infants_0_6m",
+      "infants_7_12m",
+      "children_1_3y",
+      "children_4_8y",
+      "males_9_13y",
+      "males_14_18y",
+      "females_9_13y",
+      "females_14_18y"
+    ],
+    "nutrient_count": 26
+  },
+  "life_stages": {
+    "infants_0_6m": {
+      "label": "Infants, 0-6 months",
+      "age_min": 0.0,
+      "age_max": 0.5,
+      "sex": "either",
+      "pregnancy": false,
+      "lactation": false,
+      "status": "pending_curation"
+    },
+    "infants_7_12m": {
+      "label": "Infants, 7-12 months",
+      "age_min": 0.6,
+      "age_max": 1.0,
+      "sex": "either",
+      "pregnancy": false,
+      "lactation": false,
+      "status": "pending_curation"
+    },
+    "children_1_3y": {
+      "label": "Children, 1-3 years",
+      "age_min": 1.0,
+      "age_max": 3.9,
+      "sex": "either",
+      "pregnancy": false,
+      "lactation": false,
+      "status": "pending_curation"
+    },
+    "children_4_8y": {
+      "label": "Children, 4-8 years",
+      "age_min": 4.0,
+      "age_max": 8.9,
+      "sex": "either",
+      "pregnancy": false,
+      "lactation": false,
+      "status": "pending_curation"
+    },
+    "males_9_13y": {
+      "label": "Males, 9-13 years",
+      "age_min": 9.0,
+      "age_max": 13.9,
+      "sex": "male",
+      "pregnancy": false,
+      "lactation": false,
+      "status": "pending_curation"
+    },
+    "males_14_18y": {
+      "label": "Males, 14-18 years",
+      "age_min": 14.0,
+      "age_max": 18.9,
+      "sex": "male",
+      "pregnancy": false,
+      "lactation": false,
+      "status": "pending_curation"
+    },
+    "males_19_30y": {
+      "label": "Males, 19-30 years",
+      "age_min": 19.0,
+      "age_max": 30.9,
+      "sex": "male",
+      "pregnancy": false,
+      "lactation": false,
+      "status": "populated"
+    },
+    "males_31_50y": {
+      "label": "Males, 31-50 years",
+      "age_min": 31.0,
+      "age_max": 50.9,
+      "sex": "male",
+      "pregnancy": false,
+      "lactation": false,
+      "status": "populated"
+    },
+    "males_51_70y": {
+      "label": "Males, 51-70 years",
+      "age_min": 51.0,
+      "age_max": 70.9,
+      "sex": "male",
+      "pregnancy": false,
+      "lactation": false,
+      "status": "populated"
+    },
+    "males_71plus": {
+      "label": "Males, 71+ years",
+      "age_min": 71.0,
+      "age_max": 130.0,
+      "sex": "male",
+      "pregnancy": false,
+      "lactation": false,
+      "status": "populated"
+    },
+    "females_9_13y": {
+      "label": "Females, 9-13 years",
+      "age_min": 9.0,
+      "age_max": 13.9,
+      "sex": "female",
+      "pregnancy": false,
+      "lactation": false,
+      "status": "pending_curation"
+    },
+    "females_14_18y": {
+      "label": "Females, 14-18 years",
+      "age_min": 14.0,
+      "age_max": 18.9,
+      "sex": "female",
+      "pregnancy": false,
+      "lactation": false,
+      "status": "pending_curation"
+    },
+    "females_19_30y": {
+      "label": "Females, 19-30 years",
+      "age_min": 19.0,
+      "age_max": 30.9,
+      "sex": "female",
+      "pregnancy": false,
+      "lactation": false,
+      "status": "populated"
+    },
+    "females_31_50y": {
+      "label": "Females, 31-50 years",
+      "age_min": 31.0,
+      "age_max": 50.9,
+      "sex": "female",
+      "pregnancy": false,
+      "lactation": false,
+      "status": "populated"
+    },
+    "females_51_70y": {
+      "label": "Females, 51-70 years",
+      "age_min": 51.0,
+      "age_max": 70.9,
+      "sex": "female",
+      "pregnancy": false,
+      "lactation": false,
+      "status": "populated"
+    },
+    "females_71plus": {
+      "label": "Females, 71+ years",
+      "age_min": 71.0,
+      "age_max": 130.0,
+      "sex": "female",
+      "pregnancy": false,
+      "lactation": false,
+      "status": "populated"
+    },
+    "pregnant_19_30y": {
+      "label": "Pregnant, 19-30 years",
+      "age_min": 19.0,
+      "age_max": 30.9,
+      "sex": "female",
+      "pregnancy": true,
+      "lactation": false,
+      "status": "populated"
+    },
+    "pregnant_31_50y": {
+      "label": "Pregnant, 31-50 years",
+      "age_min": 31.0,
+      "age_max": 50.9,
+      "sex": "female",
+      "pregnancy": true,
+      "lactation": false,
+      "status": "populated"
+    },
+    "lactating_19_30y": {
+      "label": "Lactating, 19-30 years",
+      "age_min": 19.0,
+      "age_max": 30.9,
+      "sex": "female",
+      "pregnancy": false,
+      "lactation": true,
+      "status": "populated"
+    },
+    "lactating_31_50y": {
+      "label": "Lactating, 31-50 years",
+      "age_min": 31.0,
+      "age_max": 50.9,
+      "sex": "female",
+      "pregnancy": false,
+      "lactation": true,
+      "status": "populated"
+    }
+  },
+  "nutrients": {
+    "203": {
+      "nutrient_id": 203,
+      "name": "PROTEIN",
+      "unit": "Gram",
+      "amdr_pct_kcal": {
+        "pct_kcal_min": 10.0,
+        "pct_kcal_max": 35.0
+      },
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": 46,
+          "RDA": 56,
+          "AI": null,
+          "UL": null
+        },
+        "males_31_50y": {
+          "EAR": 46,
+          "RDA": 56,
+          "AI": null,
+          "UL": null
+        },
+        "males_51_70y": {
+          "EAR": 46,
+          "RDA": 56,
+          "AI": null,
+          "UL": null
+        },
+        "males_71plus": {
+          "EAR": 46,
+          "RDA": 56,
+          "AI": null,
+          "UL": null
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": 38,
+          "RDA": 46,
+          "AI": null,
+          "UL": null
+        },
+        "females_31_50y": {
+          "EAR": 38,
+          "RDA": 46,
+          "AI": null,
+          "UL": null
+        },
+        "females_51_70y": {
+          "EAR": 38,
+          "RDA": 46,
+          "AI": null,
+          "UL": null
+        },
+        "females_71plus": {
+          "EAR": 38,
+          "RDA": 46,
+          "AI": null,
+          "UL": null
+        },
+        "pregnant_19_30y": {
+          "EAR": 50,
+          "RDA": 71,
+          "AI": null,
+          "UL": null
+        },
+        "pregnant_31_50y": {
+          "EAR": 50,
+          "RDA": 71,
+          "AI": null,
+          "UL": null
+        },
+        "lactating_19_30y": {
+          "EAR": 60,
+          "RDA": 71,
+          "AI": null,
+          "UL": null
+        },
+        "lactating_31_50y": {
+          "EAR": 60,
+          "RDA": 71,
+          "AI": null,
+          "UL": null
+        }
+      }
+    },
+    "205": {
+      "nutrient_id": 205,
+      "name": "CARBOHYDRATE, TOTAL (BY DIFFERENCE)",
+      "unit": "Gram",
+      "amdr_pct_kcal": {
+        "pct_kcal_min": 45.0,
+        "pct_kcal_max": 65.0
+      },
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": 100,
+          "RDA": 130,
+          "AI": null,
+          "UL": null
+        },
+        "males_31_50y": {
+          "EAR": 100,
+          "RDA": 130,
+          "AI": null,
+          "UL": null
+        },
+        "males_51_70y": {
+          "EAR": 100,
+          "RDA": 130,
+          "AI": null,
+          "UL": null
+        },
+        "males_71plus": {
+          "EAR": 100,
+          "RDA": 130,
+          "AI": null,
+          "UL": null
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": 100,
+          "RDA": 130,
+          "AI": null,
+          "UL": null
+        },
+        "females_31_50y": {
+          "EAR": 100,
+          "RDA": 130,
+          "AI": null,
+          "UL": null
+        },
+        "females_51_70y": {
+          "EAR": 100,
+          "RDA": 130,
+          "AI": null,
+          "UL": null
+        },
+        "females_71plus": {
+          "EAR": 100,
+          "RDA": 130,
+          "AI": null,
+          "UL": null
+        },
+        "pregnant_19_30y": {
+          "EAR": 135,
+          "RDA": 175,
+          "AI": null,
+          "UL": null
+        },
+        "pregnant_31_50y": {
+          "EAR": 135,
+          "RDA": 175,
+          "AI": null,
+          "UL": null
+        },
+        "lactating_19_30y": {
+          "EAR": 160,
+          "RDA": 210,
+          "AI": null,
+          "UL": null
+        },
+        "lactating_31_50y": {
+          "EAR": 160,
+          "RDA": 210,
+          "AI": null,
+          "UL": null
+        }
+      }
+    },
+    "291": {
+      "nutrient_id": 291,
+      "name": "FIBRE, TOTAL DIETARY",
+      "unit": "Gram",
+      "amdr_pct_kcal": null,
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 38,
+          "UL": null
+        },
+        "males_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 38,
+          "UL": null
+        },
+        "males_51_70y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 30,
+          "UL": null
+        },
+        "males_71plus": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 30,
+          "UL": null
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 25,
+          "UL": null
+        },
+        "females_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 25,
+          "UL": null
+        },
+        "females_51_70y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 21,
+          "UL": null
+        },
+        "females_71plus": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 21,
+          "UL": null
+        },
+        "pregnant_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 28,
+          "UL": null
+        },
+        "pregnant_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 28,
+          "UL": null
+        },
+        "lactating_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 29,
+          "UL": null
+        },
+        "lactating_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 29,
+          "UL": null
+        }
+      }
+    },
+    "301": {
+      "nutrient_id": 301,
+      "name": "CALCIUM",
+      "unit": "Milligram",
+      "amdr_pct_kcal": null,
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": 800,
+          "RDA": 1000,
+          "AI": null,
+          "UL": 2500
+        },
+        "males_31_50y": {
+          "EAR": 800,
+          "RDA": 1000,
+          "AI": null,
+          "UL": 2500
+        },
+        "males_51_70y": {
+          "EAR": 800,
+          "RDA": 1000,
+          "AI": null,
+          "UL": 2000
+        },
+        "males_71plus": {
+          "EAR": 1000,
+          "RDA": 1200,
+          "AI": null,
+          "UL": 2000
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": 800,
+          "RDA": 1000,
+          "AI": null,
+          "UL": 2500
+        },
+        "females_31_50y": {
+          "EAR": 800,
+          "RDA": 1000,
+          "AI": null,
+          "UL": 2500
+        },
+        "females_51_70y": {
+          "EAR": 1000,
+          "RDA": 1200,
+          "AI": null,
+          "UL": 2000
+        },
+        "females_71plus": {
+          "EAR": 1000,
+          "RDA": 1200,
+          "AI": null,
+          "UL": 2000
+        },
+        "pregnant_19_30y": {
+          "EAR": 800,
+          "RDA": 1000,
+          "AI": null,
+          "UL": 2500
+        },
+        "pregnant_31_50y": {
+          "EAR": 800,
+          "RDA": 1000,
+          "AI": null,
+          "UL": 2500
+        },
+        "lactating_19_30y": {
+          "EAR": 800,
+          "RDA": 1000,
+          "AI": null,
+          "UL": 2500
+        },
+        "lactating_31_50y": {
+          "EAR": 800,
+          "RDA": 1000,
+          "AI": null,
+          "UL": 2500
+        }
+      }
+    },
+    "303": {
+      "nutrient_id": 303,
+      "name": "IRON",
+      "unit": "Milligram",
+      "amdr_pct_kcal": null,
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": 6,
+          "RDA": 8,
+          "AI": null,
+          "UL": 45
+        },
+        "males_31_50y": {
+          "EAR": 6,
+          "RDA": 8,
+          "AI": null,
+          "UL": 45
+        },
+        "males_51_70y": {
+          "EAR": 6,
+          "RDA": 8,
+          "AI": null,
+          "UL": 45
+        },
+        "males_71plus": {
+          "EAR": 6,
+          "RDA": 8,
+          "AI": null,
+          "UL": 45
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": 8.1,
+          "RDA": 18,
+          "AI": null,
+          "UL": 45
+        },
+        "females_31_50y": {
+          "EAR": 8.1,
+          "RDA": 18,
+          "AI": null,
+          "UL": 45
+        },
+        "females_51_70y": {
+          "EAR": 5,
+          "RDA": 8,
+          "AI": null,
+          "UL": 45
+        },
+        "females_71plus": {
+          "EAR": 5,
+          "RDA": 8,
+          "AI": null,
+          "UL": 45
+        },
+        "pregnant_19_30y": {
+          "EAR": 22,
+          "RDA": 27,
+          "AI": null,
+          "UL": 45
+        },
+        "pregnant_31_50y": {
+          "EAR": 22,
+          "RDA": 27,
+          "AI": null,
+          "UL": 45
+        },
+        "lactating_19_30y": {
+          "EAR": 6.5,
+          "RDA": 9,
+          "AI": null,
+          "UL": 45
+        },
+        "lactating_31_50y": {
+          "EAR": 6.5,
+          "RDA": 9,
+          "AI": null,
+          "UL": 45
+        }
+      }
+    },
+    "304": {
+      "nutrient_id": 304,
+      "name": "MAGNESIUM",
+      "unit": "Milligram",
+      "amdr_pct_kcal": null,
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": 330,
+          "RDA": 400,
+          "AI": null,
+          "UL": 350
+        },
+        "males_31_50y": {
+          "EAR": 350,
+          "RDA": 420,
+          "AI": null,
+          "UL": 350
+        },
+        "males_51_70y": {
+          "EAR": 350,
+          "RDA": 420,
+          "AI": null,
+          "UL": 350
+        },
+        "males_71plus": {
+          "EAR": 350,
+          "RDA": 420,
+          "AI": null,
+          "UL": 350
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": 255,
+          "RDA": 310,
+          "AI": null,
+          "UL": 350
+        },
+        "females_31_50y": {
+          "EAR": 265,
+          "RDA": 320,
+          "AI": null,
+          "UL": 350
+        },
+        "females_51_70y": {
+          "EAR": 265,
+          "RDA": 320,
+          "AI": null,
+          "UL": 350
+        },
+        "females_71plus": {
+          "EAR": 265,
+          "RDA": 320,
+          "AI": null,
+          "UL": 350
+        },
+        "pregnant_19_30y": {
+          "EAR": 290,
+          "RDA": 350,
+          "AI": null,
+          "UL": 350
+        },
+        "pregnant_31_50y": {
+          "EAR": 300,
+          "RDA": 360,
+          "AI": null,
+          "UL": 350
+        },
+        "lactating_19_30y": {
+          "EAR": 300,
+          "RDA": 310,
+          "AI": null,
+          "UL": 350
+        },
+        "lactating_31_50y": {
+          "EAR": 310,
+          "RDA": 320,
+          "AI": null,
+          "UL": 350
+        }
+      }
+    },
+    "305": {
+      "nutrient_id": 305,
+      "name": "PHOSPHORUS",
+      "unit": "Milligram",
+      "amdr_pct_kcal": null,
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": 580,
+          "RDA": 700,
+          "AI": null,
+          "UL": 4000
+        },
+        "males_31_50y": {
+          "EAR": 580,
+          "RDA": 700,
+          "AI": null,
+          "UL": 4000
+        },
+        "males_51_70y": {
+          "EAR": 580,
+          "RDA": 700,
+          "AI": null,
+          "UL": 4000
+        },
+        "males_71plus": {
+          "EAR": 580,
+          "RDA": 700,
+          "AI": null,
+          "UL": 3000
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": 580,
+          "RDA": 700,
+          "AI": null,
+          "UL": 4000
+        },
+        "females_31_50y": {
+          "EAR": 580,
+          "RDA": 700,
+          "AI": null,
+          "UL": 4000
+        },
+        "females_51_70y": {
+          "EAR": 580,
+          "RDA": 700,
+          "AI": null,
+          "UL": 4000
+        },
+        "females_71plus": {
+          "EAR": 580,
+          "RDA": 700,
+          "AI": null,
+          "UL": 3000
+        },
+        "pregnant_19_30y": {
+          "EAR": 580,
+          "RDA": 700,
+          "AI": null,
+          "UL": 3500
+        },
+        "pregnant_31_50y": {
+          "EAR": 580,
+          "RDA": 700,
+          "AI": null,
+          "UL": 3500
+        },
+        "lactating_19_30y": {
+          "EAR": 580,
+          "RDA": 700,
+          "AI": null,
+          "UL": 4000
+        },
+        "lactating_31_50y": {
+          "EAR": 580,
+          "RDA": 700,
+          "AI": null,
+          "UL": 4000
+        }
+      }
+    },
+    "306": {
+      "nutrient_id": 306,
+      "name": "POTASSIUM",
+      "unit": "Milligram",
+      "amdr_pct_kcal": null,
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 3400,
+          "UL": null
+        },
+        "males_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 3400,
+          "UL": null
+        },
+        "males_51_70y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 3400,
+          "UL": null
+        },
+        "males_71plus": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 3400,
+          "UL": null
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 2600,
+          "UL": null
+        },
+        "females_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 2600,
+          "UL": null
+        },
+        "females_51_70y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 2600,
+          "UL": null
+        },
+        "females_71plus": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 2600,
+          "UL": null
+        },
+        "pregnant_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 2900,
+          "UL": null
+        },
+        "pregnant_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 2900,
+          "UL": null
+        },
+        "lactating_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 2800,
+          "UL": null
+        },
+        "lactating_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 2800,
+          "UL": null
+        }
+      }
+    },
+    "307": {
+      "nutrient_id": 307,
+      "name": "SODIUM",
+      "unit": "Milligram",
+      "amdr_pct_kcal": null,
+      "cdrr": {
+        "cdrr_mg_per_day": 2300.0,
+        "source": "NASEM 2019 Sodium and Potassium DRIs, Chapter 7 p. 322.",
+        "note": "Intake above the CDRR is expected to reduce chronic disease risk if reduced; not a tolerable upper limit."
+      },
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 1500,
+          "UL": null
+        },
+        "males_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 1500,
+          "UL": null
+        },
+        "males_51_70y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 1500,
+          "UL": null
+        },
+        "males_71plus": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 1500,
+          "UL": null
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 1500,
+          "UL": null
+        },
+        "females_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 1500,
+          "UL": null
+        },
+        "females_51_70y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 1500,
+          "UL": null
+        },
+        "females_71plus": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 1500,
+          "UL": null
+        },
+        "pregnant_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 1500,
+          "UL": null
+        },
+        "pregnant_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 1500,
+          "UL": null
+        },
+        "lactating_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 1500,
+          "UL": null
+        },
+        "lactating_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 1500,
+          "UL": null
+        }
+      }
+    },
+    "309": {
+      "nutrient_id": 309,
+      "name": "ZINC",
+      "unit": "Milligram",
+      "amdr_pct_kcal": null,
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": 9.4,
+          "RDA": 11,
+          "AI": null,
+          "UL": 40
+        },
+        "males_31_50y": {
+          "EAR": 9.4,
+          "RDA": 11,
+          "AI": null,
+          "UL": 40
+        },
+        "males_51_70y": {
+          "EAR": 9.4,
+          "RDA": 11,
+          "AI": null,
+          "UL": 40
+        },
+        "males_71plus": {
+          "EAR": 9.4,
+          "RDA": 11,
+          "AI": null,
+          "UL": 40
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": 6.8,
+          "RDA": 8,
+          "AI": null,
+          "UL": 40
+        },
+        "females_31_50y": {
+          "EAR": 6.8,
+          "RDA": 8,
+          "AI": null,
+          "UL": 40
+        },
+        "females_51_70y": {
+          "EAR": 6.8,
+          "RDA": 8,
+          "AI": null,
+          "UL": 40
+        },
+        "females_71plus": {
+          "EAR": 6.8,
+          "RDA": 8,
+          "AI": null,
+          "UL": 40
+        },
+        "pregnant_19_30y": {
+          "EAR": 9.5,
+          "RDA": 11,
+          "AI": null,
+          "UL": 40
+        },
+        "pregnant_31_50y": {
+          "EAR": 9.5,
+          "RDA": 11,
+          "AI": null,
+          "UL": 40
+        },
+        "lactating_19_30y": {
+          "EAR": 10.4,
+          "RDA": 12,
+          "AI": null,
+          "UL": 40
+        },
+        "lactating_31_50y": {
+          "EAR": 10.4,
+          "RDA": 12,
+          "AI": null,
+          "UL": 40
+        }
+      }
+    },
+    "312": {
+      "nutrient_id": 312,
+      "name": "COPPER",
+      "unit": "Microgram",
+      "amdr_pct_kcal": null,
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": 700,
+          "RDA": 900,
+          "AI": null,
+          "UL": 10000
+        },
+        "males_31_50y": {
+          "EAR": 700,
+          "RDA": 900,
+          "AI": null,
+          "UL": 10000
+        },
+        "males_51_70y": {
+          "EAR": 700,
+          "RDA": 900,
+          "AI": null,
+          "UL": 10000
+        },
+        "males_71plus": {
+          "EAR": 700,
+          "RDA": 900,
+          "AI": null,
+          "UL": 10000
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": 700,
+          "RDA": 900,
+          "AI": null,
+          "UL": 10000
+        },
+        "females_31_50y": {
+          "EAR": 700,
+          "RDA": 900,
+          "AI": null,
+          "UL": 10000
+        },
+        "females_51_70y": {
+          "EAR": 700,
+          "RDA": 900,
+          "AI": null,
+          "UL": 10000
+        },
+        "females_71plus": {
+          "EAR": 700,
+          "RDA": 900,
+          "AI": null,
+          "UL": 10000
+        },
+        "pregnant_19_30y": {
+          "EAR": 800,
+          "RDA": 1000,
+          "AI": null,
+          "UL": 10000
+        },
+        "pregnant_31_50y": {
+          "EAR": 800,
+          "RDA": 1000,
+          "AI": null,
+          "UL": 10000
+        },
+        "lactating_19_30y": {
+          "EAR": 1000,
+          "RDA": 1300,
+          "AI": null,
+          "UL": 10000
+        },
+        "lactating_31_50y": {
+          "EAR": 1000,
+          "RDA": 1300,
+          "AI": null,
+          "UL": 10000
+        }
+      }
+    },
+    "315": {
+      "nutrient_id": 315,
+      "name": "MANGANESE",
+      "unit": "Milligram",
+      "amdr_pct_kcal": null,
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 2.3,
+          "UL": 11
+        },
+        "males_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 2.3,
+          "UL": 11
+        },
+        "males_51_70y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 2.3,
+          "UL": 11
+        },
+        "males_71plus": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 2.3,
+          "UL": 11
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 1.8,
+          "UL": 11
+        },
+        "females_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 1.8,
+          "UL": 11
+        },
+        "females_51_70y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 1.8,
+          "UL": 11
+        },
+        "females_71plus": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 1.8,
+          "UL": 11
+        },
+        "pregnant_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 2.0,
+          "UL": 11
+        },
+        "pregnant_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 2.0,
+          "UL": 11
+        },
+        "lactating_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 2.6,
+          "UL": 11
+        },
+        "lactating_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 2.6,
+          "UL": 11
+        }
+      }
+    },
+    "317": {
+      "nutrient_id": 317,
+      "name": "SELENIUM",
+      "unit": "Microgram",
+      "amdr_pct_kcal": null,
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": 45,
+          "RDA": 55,
+          "AI": null,
+          "UL": 400
+        },
+        "males_31_50y": {
+          "EAR": 45,
+          "RDA": 55,
+          "AI": null,
+          "UL": 400
+        },
+        "males_51_70y": {
+          "EAR": 45,
+          "RDA": 55,
+          "AI": null,
+          "UL": 400
+        },
+        "males_71plus": {
+          "EAR": 45,
+          "RDA": 55,
+          "AI": null,
+          "UL": 400
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": 45,
+          "RDA": 55,
+          "AI": null,
+          "UL": 400
+        },
+        "females_31_50y": {
+          "EAR": 45,
+          "RDA": 55,
+          "AI": null,
+          "UL": 400
+        },
+        "females_51_70y": {
+          "EAR": 45,
+          "RDA": 55,
+          "AI": null,
+          "UL": 400
+        },
+        "females_71plus": {
+          "EAR": 45,
+          "RDA": 55,
+          "AI": null,
+          "UL": 400
+        },
+        "pregnant_19_30y": {
+          "EAR": 49,
+          "RDA": 60,
+          "AI": null,
+          "UL": 400
+        },
+        "pregnant_31_50y": {
+          "EAR": 49,
+          "RDA": 60,
+          "AI": null,
+          "UL": 400
+        },
+        "lactating_19_30y": {
+          "EAR": 59,
+          "RDA": 70,
+          "AI": null,
+          "UL": 400
+        },
+        "lactating_31_50y": {
+          "EAR": 59,
+          "RDA": 70,
+          "AI": null,
+          "UL": 400
+        }
+      }
+    },
+    "320": {
+      "nutrient_id": 320,
+      "name": "RETINOL ACTIVITY EQUIVALENTS (RAE)",
+      "unit": "Microgram",
+      "amdr_pct_kcal": null,
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": 625,
+          "RDA": 900,
+          "AI": null,
+          "UL": 3000
+        },
+        "males_31_50y": {
+          "EAR": 625,
+          "RDA": 900,
+          "AI": null,
+          "UL": 3000
+        },
+        "males_51_70y": {
+          "EAR": 625,
+          "RDA": 900,
+          "AI": null,
+          "UL": 3000
+        },
+        "males_71plus": {
+          "EAR": 625,
+          "RDA": 900,
+          "AI": null,
+          "UL": 3000
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": 500,
+          "RDA": 700,
+          "AI": null,
+          "UL": 3000
+        },
+        "females_31_50y": {
+          "EAR": 500,
+          "RDA": 700,
+          "AI": null,
+          "UL": 3000
+        },
+        "females_51_70y": {
+          "EAR": 500,
+          "RDA": 700,
+          "AI": null,
+          "UL": 3000
+        },
+        "females_71plus": {
+          "EAR": 500,
+          "RDA": 700,
+          "AI": null,
+          "UL": 3000
+        },
+        "pregnant_19_30y": {
+          "EAR": 550,
+          "RDA": 770,
+          "AI": null,
+          "UL": 3000
+        },
+        "pregnant_31_50y": {
+          "EAR": 550,
+          "RDA": 770,
+          "AI": null,
+          "UL": 3000
+        },
+        "lactating_19_30y": {
+          "EAR": 900,
+          "RDA": 1300,
+          "AI": null,
+          "UL": 3000
+        },
+        "lactating_31_50y": {
+          "EAR": 900,
+          "RDA": 1300,
+          "AI": null,
+          "UL": 3000
+        }
+      }
+    },
+    "323": {
+      "nutrient_id": 323,
+      "name": "ALPHA-TOCOPHEROL",
+      "unit": "Milligram",
+      "amdr_pct_kcal": null,
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": 12,
+          "RDA": 15,
+          "AI": null,
+          "UL": 1000
+        },
+        "males_31_50y": {
+          "EAR": 12,
+          "RDA": 15,
+          "AI": null,
+          "UL": 1000
+        },
+        "males_51_70y": {
+          "EAR": 12,
+          "RDA": 15,
+          "AI": null,
+          "UL": 1000
+        },
+        "males_71plus": {
+          "EAR": 12,
+          "RDA": 15,
+          "AI": null,
+          "UL": 1000
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": 12,
+          "RDA": 15,
+          "AI": null,
+          "UL": 1000
+        },
+        "females_31_50y": {
+          "EAR": 12,
+          "RDA": 15,
+          "AI": null,
+          "UL": 1000
+        },
+        "females_51_70y": {
+          "EAR": 12,
+          "RDA": 15,
+          "AI": null,
+          "UL": 1000
+        },
+        "females_71plus": {
+          "EAR": 12,
+          "RDA": 15,
+          "AI": null,
+          "UL": 1000
+        },
+        "pregnant_19_30y": {
+          "EAR": 12,
+          "RDA": 15,
+          "AI": null,
+          "UL": 1000
+        },
+        "pregnant_31_50y": {
+          "EAR": 12,
+          "RDA": 15,
+          "AI": null,
+          "UL": 1000
+        },
+        "lactating_19_30y": {
+          "EAR": 16,
+          "RDA": 19,
+          "AI": null,
+          "UL": 1000
+        },
+        "lactating_31_50y": {
+          "EAR": 16,
+          "RDA": 19,
+          "AI": null,
+          "UL": 1000
+        }
+      }
+    },
+    "328": {
+      "nutrient_id": 328,
+      "name": "VITAMIN D (D2 + D3)",
+      "unit": "Microgram",
+      "amdr_pct_kcal": null,
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": 10,
+          "RDA": 15,
+          "AI": null,
+          "UL": 100
+        },
+        "males_31_50y": {
+          "EAR": 10,
+          "RDA": 15,
+          "AI": null,
+          "UL": 100
+        },
+        "males_51_70y": {
+          "EAR": 10,
+          "RDA": 15,
+          "AI": null,
+          "UL": 100
+        },
+        "males_71plus": {
+          "EAR": 10,
+          "RDA": 20,
+          "AI": null,
+          "UL": 100
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": 10,
+          "RDA": 15,
+          "AI": null,
+          "UL": 100
+        },
+        "females_31_50y": {
+          "EAR": 10,
+          "RDA": 15,
+          "AI": null,
+          "UL": 100
+        },
+        "females_51_70y": {
+          "EAR": 10,
+          "RDA": 15,
+          "AI": null,
+          "UL": 100
+        },
+        "females_71plus": {
+          "EAR": 10,
+          "RDA": 20,
+          "AI": null,
+          "UL": 100
+        },
+        "pregnant_19_30y": {
+          "EAR": 10,
+          "RDA": 15,
+          "AI": null,
+          "UL": 100
+        },
+        "pregnant_31_50y": {
+          "EAR": 10,
+          "RDA": 15,
+          "AI": null,
+          "UL": 100
+        },
+        "lactating_19_30y": {
+          "EAR": 10,
+          "RDA": 15,
+          "AI": null,
+          "UL": 100
+        },
+        "lactating_31_50y": {
+          "EAR": 10,
+          "RDA": 15,
+          "AI": null,
+          "UL": 100
+        }
+      }
+    },
+    "401": {
+      "nutrient_id": 401,
+      "name": "VITAMIN C",
+      "unit": "Milligram",
+      "amdr_pct_kcal": null,
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": 75,
+          "RDA": 90,
+          "AI": null,
+          "UL": 2000
+        },
+        "males_31_50y": {
+          "EAR": 75,
+          "RDA": 90,
+          "AI": null,
+          "UL": 2000
+        },
+        "males_51_70y": {
+          "EAR": 75,
+          "RDA": 90,
+          "AI": null,
+          "UL": 2000
+        },
+        "males_71plus": {
+          "EAR": 75,
+          "RDA": 90,
+          "AI": null,
+          "UL": 2000
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": 60,
+          "RDA": 75,
+          "AI": null,
+          "UL": 2000
+        },
+        "females_31_50y": {
+          "EAR": 60,
+          "RDA": 75,
+          "AI": null,
+          "UL": 2000
+        },
+        "females_51_70y": {
+          "EAR": 60,
+          "RDA": 75,
+          "AI": null,
+          "UL": 2000
+        },
+        "females_71plus": {
+          "EAR": 60,
+          "RDA": 75,
+          "AI": null,
+          "UL": 2000
+        },
+        "pregnant_19_30y": {
+          "EAR": 70,
+          "RDA": 85,
+          "AI": null,
+          "UL": 2000
+        },
+        "pregnant_31_50y": {
+          "EAR": 70,
+          "RDA": 85,
+          "AI": null,
+          "UL": 2000
+        },
+        "lactating_19_30y": {
+          "EAR": 100,
+          "RDA": 120,
+          "AI": null,
+          "UL": 2000
+        },
+        "lactating_31_50y": {
+          "EAR": 100,
+          "RDA": 120,
+          "AI": null,
+          "UL": 2000
+        }
+      }
+    },
+    "404": {
+      "nutrient_id": 404,
+      "name": "THIAMIN",
+      "unit": "Milligram",
+      "amdr_pct_kcal": null,
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": 1.0,
+          "RDA": 1.2,
+          "AI": null,
+          "UL": null
+        },
+        "males_31_50y": {
+          "EAR": 1.0,
+          "RDA": 1.2,
+          "AI": null,
+          "UL": null
+        },
+        "males_51_70y": {
+          "EAR": 1.0,
+          "RDA": 1.2,
+          "AI": null,
+          "UL": null
+        },
+        "males_71plus": {
+          "EAR": 1.0,
+          "RDA": 1.2,
+          "AI": null,
+          "UL": null
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": 0.9,
+          "RDA": 1.1,
+          "AI": null,
+          "UL": null
+        },
+        "females_31_50y": {
+          "EAR": 0.9,
+          "RDA": 1.1,
+          "AI": null,
+          "UL": null
+        },
+        "females_51_70y": {
+          "EAR": 0.9,
+          "RDA": 1.1,
+          "AI": null,
+          "UL": null
+        },
+        "females_71plus": {
+          "EAR": 0.9,
+          "RDA": 1.1,
+          "AI": null,
+          "UL": null
+        },
+        "pregnant_19_30y": {
+          "EAR": 1.2,
+          "RDA": 1.4,
+          "AI": null,
+          "UL": null
+        },
+        "pregnant_31_50y": {
+          "EAR": 1.2,
+          "RDA": 1.4,
+          "AI": null,
+          "UL": null
+        },
+        "lactating_19_30y": {
+          "EAR": 1.2,
+          "RDA": 1.4,
+          "AI": null,
+          "UL": null
+        },
+        "lactating_31_50y": {
+          "EAR": 1.2,
+          "RDA": 1.4,
+          "AI": null,
+          "UL": null
+        }
+      }
+    },
+    "405": {
+      "nutrient_id": 405,
+      "name": "RIBOFLAVIN",
+      "unit": "Milligram",
+      "amdr_pct_kcal": null,
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": 1.1,
+          "RDA": 1.3,
+          "AI": null,
+          "UL": null
+        },
+        "males_31_50y": {
+          "EAR": 1.1,
+          "RDA": 1.3,
+          "AI": null,
+          "UL": null
+        },
+        "males_51_70y": {
+          "EAR": 1.1,
+          "RDA": 1.3,
+          "AI": null,
+          "UL": null
+        },
+        "males_71plus": {
+          "EAR": 1.1,
+          "RDA": 1.3,
+          "AI": null,
+          "UL": null
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": 0.9,
+          "RDA": 1.1,
+          "AI": null,
+          "UL": null
+        },
+        "females_31_50y": {
+          "EAR": 0.9,
+          "RDA": 1.1,
+          "AI": null,
+          "UL": null
+        },
+        "females_51_70y": {
+          "EAR": 0.9,
+          "RDA": 1.1,
+          "AI": null,
+          "UL": null
+        },
+        "females_71plus": {
+          "EAR": 0.9,
+          "RDA": 1.1,
+          "AI": null,
+          "UL": null
+        },
+        "pregnant_19_30y": {
+          "EAR": 1.2,
+          "RDA": 1.4,
+          "AI": null,
+          "UL": null
+        },
+        "pregnant_31_50y": {
+          "EAR": 1.2,
+          "RDA": 1.4,
+          "AI": null,
+          "UL": null
+        },
+        "lactating_19_30y": {
+          "EAR": 1.3,
+          "RDA": 1.6,
+          "AI": null,
+          "UL": null
+        },
+        "lactating_31_50y": {
+          "EAR": 1.3,
+          "RDA": 1.6,
+          "AI": null,
+          "UL": null
+        }
+      }
+    },
+    "406": {
+      "nutrient_id": 406,
+      "name": "NIACIN (NIACIN EQUIVALENT NE)",
+      "unit": "NE",
+      "amdr_pct_kcal": null,
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": 12,
+          "RDA": 16,
+          "AI": null,
+          "UL": 35
+        },
+        "males_31_50y": {
+          "EAR": 12,
+          "RDA": 16,
+          "AI": null,
+          "UL": 35
+        },
+        "males_51_70y": {
+          "EAR": 12,
+          "RDA": 16,
+          "AI": null,
+          "UL": 35
+        },
+        "males_71plus": {
+          "EAR": 12,
+          "RDA": 16,
+          "AI": null,
+          "UL": 35
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": 11,
+          "RDA": 14,
+          "AI": null,
+          "UL": 35
+        },
+        "females_31_50y": {
+          "EAR": 11,
+          "RDA": 14,
+          "AI": null,
+          "UL": 35
+        },
+        "females_51_70y": {
+          "EAR": 11,
+          "RDA": 14,
+          "AI": null,
+          "UL": 35
+        },
+        "females_71plus": {
+          "EAR": 11,
+          "RDA": 14,
+          "AI": null,
+          "UL": 35
+        },
+        "pregnant_19_30y": {
+          "EAR": 14,
+          "RDA": 18,
+          "AI": null,
+          "UL": 35
+        },
+        "pregnant_31_50y": {
+          "EAR": 14,
+          "RDA": 18,
+          "AI": null,
+          "UL": 35
+        },
+        "lactating_19_30y": {
+          "EAR": 13,
+          "RDA": 17,
+          "AI": null,
+          "UL": 35
+        },
+        "lactating_31_50y": {
+          "EAR": 13,
+          "RDA": 17,
+          "AI": null,
+          "UL": 35
+        }
+      }
+    },
+    "410": {
+      "nutrient_id": 410,
+      "name": "PANTOTHENIC ACID",
+      "unit": "Milligram",
+      "amdr_pct_kcal": null,
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 5,
+          "UL": null
+        },
+        "males_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 5,
+          "UL": null
+        },
+        "males_51_70y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 5,
+          "UL": null
+        },
+        "males_71plus": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 5,
+          "UL": null
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 5,
+          "UL": null
+        },
+        "females_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 5,
+          "UL": null
+        },
+        "females_51_70y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 5,
+          "UL": null
+        },
+        "females_71plus": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 5,
+          "UL": null
+        },
+        "pregnant_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 6,
+          "UL": null
+        },
+        "pregnant_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 6,
+          "UL": null
+        },
+        "lactating_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 7,
+          "UL": null
+        },
+        "lactating_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 7,
+          "UL": null
+        }
+      }
+    },
+    "415": {
+      "nutrient_id": 415,
+      "name": "VITAMIN B6",
+      "unit": "Milligram",
+      "amdr_pct_kcal": null,
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": 1.1,
+          "RDA": 1.3,
+          "AI": null,
+          "UL": 100
+        },
+        "males_31_50y": {
+          "EAR": 1.1,
+          "RDA": 1.3,
+          "AI": null,
+          "UL": 100
+        },
+        "males_51_70y": {
+          "EAR": 1.4,
+          "RDA": 1.7,
+          "AI": null,
+          "UL": 100
+        },
+        "males_71plus": {
+          "EAR": 1.4,
+          "RDA": 1.7,
+          "AI": null,
+          "UL": 100
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": 1.1,
+          "RDA": 1.3,
+          "AI": null,
+          "UL": 100
+        },
+        "females_31_50y": {
+          "EAR": 1.1,
+          "RDA": 1.3,
+          "AI": null,
+          "UL": 100
+        },
+        "females_51_70y": {
+          "EAR": 1.3,
+          "RDA": 1.5,
+          "AI": null,
+          "UL": 100
+        },
+        "females_71plus": {
+          "EAR": 1.3,
+          "RDA": 1.5,
+          "AI": null,
+          "UL": 100
+        },
+        "pregnant_19_30y": {
+          "EAR": 1.6,
+          "RDA": 1.9,
+          "AI": null,
+          "UL": 100
+        },
+        "pregnant_31_50y": {
+          "EAR": 1.6,
+          "RDA": 1.9,
+          "AI": null,
+          "UL": 100
+        },
+        "lactating_19_30y": {
+          "EAR": 1.7,
+          "RDA": 2.0,
+          "AI": null,
+          "UL": 100
+        },
+        "lactating_31_50y": {
+          "EAR": 1.7,
+          "RDA": 2.0,
+          "AI": null,
+          "UL": 100
+        }
+      }
+    },
+    "418": {
+      "nutrient_id": 418,
+      "name": "VITAMIN B12",
+      "unit": "Microgram",
+      "amdr_pct_kcal": null,
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": 2.0,
+          "RDA": 2.4,
+          "AI": null,
+          "UL": null
+        },
+        "males_31_50y": {
+          "EAR": 2.0,
+          "RDA": 2.4,
+          "AI": null,
+          "UL": null
+        },
+        "males_51_70y": {
+          "EAR": 2.0,
+          "RDA": 2.4,
+          "AI": null,
+          "UL": null
+        },
+        "males_71plus": {
+          "EAR": 2.0,
+          "RDA": 2.4,
+          "AI": null,
+          "UL": null
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": 2.0,
+          "RDA": 2.4,
+          "AI": null,
+          "UL": null
+        },
+        "females_31_50y": {
+          "EAR": 2.0,
+          "RDA": 2.4,
+          "AI": null,
+          "UL": null
+        },
+        "females_51_70y": {
+          "EAR": 2.0,
+          "RDA": 2.4,
+          "AI": null,
+          "UL": null
+        },
+        "females_71plus": {
+          "EAR": 2.0,
+          "RDA": 2.4,
+          "AI": null,
+          "UL": null
+        },
+        "pregnant_19_30y": {
+          "EAR": 2.2,
+          "RDA": 2.6,
+          "AI": null,
+          "UL": null
+        },
+        "pregnant_31_50y": {
+          "EAR": 2.2,
+          "RDA": 2.6,
+          "AI": null,
+          "UL": null
+        },
+        "lactating_19_30y": {
+          "EAR": 2.4,
+          "RDA": 2.8,
+          "AI": null,
+          "UL": null
+        },
+        "lactating_31_50y": {
+          "EAR": 2.4,
+          "RDA": 2.8,
+          "AI": null,
+          "UL": null
+        }
+      }
+    },
+    "421": {
+      "nutrient_id": 421,
+      "name": "CHOLINE, TOTAL",
+      "unit": "Milligram",
+      "amdr_pct_kcal": null,
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 550,
+          "UL": 3500
+        },
+        "males_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 550,
+          "UL": 3500
+        },
+        "males_51_70y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 550,
+          "UL": 3500
+        },
+        "males_71plus": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 550,
+          "UL": 3500
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 425,
+          "UL": 3500
+        },
+        "females_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 425,
+          "UL": 3500
+        },
+        "females_51_70y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 425,
+          "UL": 3500
+        },
+        "females_71plus": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 425,
+          "UL": 3500
+        },
+        "pregnant_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 450,
+          "UL": 3500
+        },
+        "pregnant_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 450,
+          "UL": 3500
+        },
+        "lactating_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 550,
+          "UL": 3500
+        },
+        "lactating_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 550,
+          "UL": 3500
+        }
+      }
+    },
+    "430": {
+      "nutrient_id": 430,
+      "name": "VITAMIN K",
+      "unit": "Microgram",
+      "amdr_pct_kcal": null,
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 120,
+          "UL": null
+        },
+        "males_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 120,
+          "UL": null
+        },
+        "males_51_70y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 120,
+          "UL": null
+        },
+        "males_71plus": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 120,
+          "UL": null
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 90,
+          "UL": null
+        },
+        "females_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 90,
+          "UL": null
+        },
+        "females_51_70y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 90,
+          "UL": null
+        },
+        "females_71plus": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 90,
+          "UL": null
+        },
+        "pregnant_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 90,
+          "UL": null
+        },
+        "pregnant_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 90,
+          "UL": null
+        },
+        "lactating_19_30y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 90,
+          "UL": null
+        },
+        "lactating_31_50y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": 90,
+          "UL": null
+        }
+      }
+    },
+    "435": {
+      "nutrient_id": 435,
+      "name": "FOLATE, DFE",
+      "unit": "Microgram",
+      "amdr_pct_kcal": null,
+      "cdrr": null,
+      "cells": {
+        "infants_0_6m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "infants_7_12m": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_1_3y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "children_4_8y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "males_19_30y": {
+          "EAR": 320,
+          "RDA": 400,
+          "AI": null,
+          "UL": 1000
+        },
+        "males_31_50y": {
+          "EAR": 320,
+          "RDA": 400,
+          "AI": null,
+          "UL": 1000
+        },
+        "males_51_70y": {
+          "EAR": 320,
+          "RDA": 400,
+          "AI": null,
+          "UL": 1000
+        },
+        "males_71plus": {
+          "EAR": 320,
+          "RDA": 400,
+          "AI": null,
+          "UL": 1000
+        },
+        "females_9_13y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_14_18y": {
+          "EAR": null,
+          "RDA": null,
+          "AI": null,
+          "UL": null
+        },
+        "females_19_30y": {
+          "EAR": 320,
+          "RDA": 400,
+          "AI": null,
+          "UL": 1000
+        },
+        "females_31_50y": {
+          "EAR": 320,
+          "RDA": 400,
+          "AI": null,
+          "UL": 1000
+        },
+        "females_51_70y": {
+          "EAR": 320,
+          "RDA": 400,
+          "AI": null,
+          "UL": 1000
+        },
+        "females_71plus": {
+          "EAR": 320,
+          "RDA": 400,
+          "AI": null,
+          "UL": 1000
+        },
+        "pregnant_19_30y": {
+          "EAR": 520,
+          "RDA": 600,
+          "AI": null,
+          "UL": 1000
+        },
+        "pregnant_31_50y": {
+          "EAR": 520,
+          "RDA": 600,
+          "AI": null,
+          "UL": 1000
+        },
+        "lactating_19_30y": {
+          "EAR": 450,
+          "RDA": 500,
+          "AI": null,
+          "UL": 1000
+        },
+        "lactating_31_50y": {
+          "EAR": 450,
+          "RDA": 500,
+          "AI": null,
+          "UL": 1000
+        }
+      }
+    }
+  }
+}
