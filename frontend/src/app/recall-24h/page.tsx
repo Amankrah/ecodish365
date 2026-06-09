@@ -28,7 +28,8 @@ function RecallPageInner() {
   const then = params?.get('then');
   const preselect = (then === 'hefi' || then === 'heni' || then === 'hsr'
                   || then === 'fcs'  || then === 'environmental'
-                  || then === 'dietary_pattern') ? then : undefined;
+                  || then === 'dietary_pattern'
+                  || then === 'research_deep_dive') ? then : undefined;
 
   return (
     <main className="min-h-screen bg-gray-50 py-8 px-4">

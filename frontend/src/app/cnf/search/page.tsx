@@ -14,7 +14,9 @@ import {
 } from '@heroicons/react/24/outline';
 import { CNFApiService, SearchResult, FoodGroup, Food, EnhancedSearchOptions, FilterOptions } from '@/lib/api';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import { saveActiveFoodList, ACTIVE_FOOD_LIST_SCHEMA_VERSION } from '@/lib/activeFoodList';
 import { debounce } from 'lodash';
 // AI-MATCH-1 (2026-05-23): opt-in LLM ranking layer alongside the basic
 // fuzzy search. CNF Explorer is the first surface; others follow in Phase 6.
@@ -50,9 +52,17 @@ export default function CNFSearchPage() {
   const [foodGroups, setFoodGroups] = useState<FoodGroup[]>([]);
   const [filterOptions, setFilterOptions] = useState<FilterOptions | null>(null);
   const [selectedFoods, setSelectedFoods] = useState<number[]>([]);
+  // Persistent metadata for selected foods so the "Send to deep-dive"
+  // handoff still works after the user paginates past the page on which
+  // they made the selection. Mirrors the FoodID -> {description, group}
+  // shape consumers downstream need.
+  const [selectedFoodMeta, setSelectedFoodMeta] = useState<
+    Record<number, { food_description: string; food_group?: string }>
+  >({});
   const [loading, setLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [offset, setOffset] = useState(0);
+  const router = useRouter();
   // WAFCT-EXTEND (2026-05-24): food-database scope. Default 'both' so users
   // see CNF + WAFCT together unless they actively narrow.
   const [source, setSource] = useState<SourceChoice>('both');
@@ -174,16 +184,49 @@ export default function CNFSearchPage() {
     }
   };
 
-  const toggleFoodSelection = (foodId: number) => {
-    setSelectedFoods(prev => 
-      prev.includes(foodId) 
+  const toggleFoodSelection = (
+    foodId: number,
+    meta?: { food_description: string; food_group?: string },
+  ) => {
+    setSelectedFoods(prev =>
+      prev.includes(foodId)
         ? prev.filter(id => id !== foodId)
         : [...prev, foodId]
     );
+    if (meta) {
+      setSelectedFoodMeta(prev => ({ ...prev, [foodId]: meta }));
+    }
   };
 
   const clearSelections = () => {
     setSelectedFoods([]);
+    setSelectedFoodMeta({});
+  };
+
+  // Pipe selected foods into the research deep-dive via the shared
+  // activeFoodList handoff. Foods that the user selected but for which we
+  // do not yet have a description (selected on a previous page that has
+  // since been navigated away from) fall back to a synthetic placeholder;
+  // the deep-dive page will still resolve the nutrient panel correctly
+  // because aggregation is keyed by FoodID.
+  const sendToDeepDive = () => {
+    if (selectedFoods.length === 0) return;
+    const ingredients = selectedFoods.map(food_id => {
+      const meta = selectedFoodMeta[food_id];
+      return {
+        food_id,
+        food_description: meta?.food_description || `CNF FoodID ${food_id}`,
+        food_group: meta?.food_group,
+        mass_g: 100,
+      };
+    });
+    saveActiveFoodList({
+      schema_version: ACTIVE_FOOD_LIST_SCHEMA_VERSION,
+      captured_at: new Date().toISOString(),
+      source: 'catalogue',
+      ingredients,
+    });
+    router.push('/research/meal-deep-dive?from=cnf_search');
   };
 
   const getRelevanceColor = (relevance: number) => {
@@ -300,6 +343,16 @@ export default function CNFSearchPage() {
                   Compare Selected
                 </Link>
                 <button
+                  type="button"
+                  onClick={sendToDeepDive}
+                  className="inline-flex items-center text-sm py-2 px-4 rounded border border-emerald-300 text-emerald-800 bg-emerald-50 hover:bg-emerald-100"
+                  title="Open the research deep-dive (nutrient panel, DRIs, FPED, NOVA, food-source attribution) on the selected foods"
+                >
+                  <SparklesIcon className="w-4 h-4 mr-2" />
+                  Send to deep-dive
+                </button>
+                <button
+                  type="button"
                   onClick={clearSelections}
                   className="text-sm text-gray-500 hover:text-gray-700"
                 >
@@ -496,7 +549,10 @@ export default function CNFSearchPage() {
                         <input
                           type="checkbox"
                           checked={selectedFoods.includes(food.FoodID)}
-                          onChange={() => toggleFoodSelection(food.FoodID)}
+                          onChange={() => toggleFoodSelection(food.FoodID, {
+                            food_description: food.FoodDescription,
+                            food_group: resolveGroupName(food.FoodGroupID),
+                          })}
                           className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                           aria-label={`Select ${food.FoodDescription}`}
                         />
@@ -584,7 +640,14 @@ export default function CNFSearchPage() {
               if (!selectedFoods.includes(selectedFood.FoodID)) {
                 setSelectedFoods(prev => [...prev, selectedFood.FoodID]);
               }
-              toast.success('Added to compare selection');
+              setSelectedFoodMeta(prev => ({
+                ...prev,
+                [selectedFood.FoodID]: {
+                  food_description: selectedFood.FoodDescription,
+                  food_group: resolveGroupName(selectedFood.FoodGroupID, selectedFood.FoodGroupName),
+                },
+              }));
+              toast.success('Added to selection');
             }}
           />
         )}

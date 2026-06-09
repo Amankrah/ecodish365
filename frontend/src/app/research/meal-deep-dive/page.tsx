@@ -12,8 +12,10 @@
 // Exports the full payload as JSON, and pulls the long-format CSV from
 // the dedicated export endpoint.
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { Suspense, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { CNFApiService } from '@/lib/api';
+import { loadActiveFoodList } from '@/lib/activeFoodList';
 import axios from 'axios';
 
 const API_BASE_URL =
@@ -120,7 +122,28 @@ function newMeal(label: string): Meal {
   return { label, foods: [] };
 }
 
+// One-shot hydration: when the page mounts after a handoff from the recall
+// wizard, the recipe decomposer's recall path, or the CNF search page, the
+// shared activeFoodList carries the preloaded ingredient list. We seed the
+// meal builder from it and surface a small banner so the user knows where
+// the data came from.
+type HandoffSource = 'recall24h' | 'cnf_search' | 'manual';
+
 export default function ResearchMealDeepDivePage() {
+  // useSearchParams requires a Suspense boundary in the Next.js App Router.
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50" />}>
+      <ResearchMealDeepDiveInner />
+    </Suspense>
+  );
+}
+
+function ResearchMealDeepDiveInner() {
+  const searchParams = useSearchParams();
+  const fromParam = (searchParams?.get('from') || '') as string;
+  const [handoffSource, setHandoffSource] = useState<HandoffSource>('manual');
+  const [handoffMessage, setHandoffMessage] = useState<string>('');
+
   const [meals, setMeals] = useState<Meal[]>([newMeal('breakfast')]);
   const [activeMealIdx, setActiveMealIdx] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
@@ -143,6 +166,105 @@ export default function ResearchMealDeepDivePage() {
   const [payload, setPayload] = useState<DeepDivePayload | null>(null);
   const [error, setError] = useState<string>('');
   const [activeTab, setActiveTab] = useState<TabKey>('nutrients');
+
+  // Hydrate the meal builder from a handoff source on first mount.
+  //
+  // Priority order (each source wins over the next):
+  //   1. sessionStorage `recall_24h_payload` — the recall wizard sets this
+  //      when routing to a target page; it carries occasion-tagged meals
+  //      and the deduped daily ingredient list.
+  //   2. localStorage activeFoodList — set by the recall wizard, the CNF
+  //      search "Send to deep-dive" handoff, and any future producer.
+  //      Carries a flat ingredient list with no occasion metadata.
+  //
+  // Anything we hydrate is purely advisory; the user can edit the meal
+  // builder freely before submitting.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // 1. Try the sessionStorage recall payload first — it carries per-meal
+    //    decomposition with occasion labels, which is the richest shape.
+    try {
+      const raw = sessionStorage.getItem('recall_24h_payload');
+      if (raw) {
+        const payload = JSON.parse(raw);
+        if (payload?.target === 'research_deep_dive'
+            && Array.isArray(payload.aggregated_daily_ingredients)
+            && payload.aggregated_daily_ingredients.length > 0) {
+          // Use the per-meal_meta breakdown when present so each meal becomes
+          // its own occasion tab; otherwise fall back to one "day" meal.
+          const mealsMeta = Array.isArray(payload.meals_meta)
+            ? payload.meals_meta
+            : [];
+          if (mealsMeta.length > 0) {
+            // We do not have per-meal ingredient lists in the aggregated
+            // payload (the wizard dedupes across occasions), so we render
+            // a single occasion-grouped meal labelled "Day" plus a
+            // per-meal note. The user can split if they want.
+            setMeals([{
+              label: 'Day (from 24h recall)',
+              foods: payload.aggregated_daily_ingredients.map((i: any) => ({
+                food_id: i.food_id,
+                food_description: i.food_description || `CNF FoodID ${i.food_id}`,
+                mass_g: i.mass_g,
+              })),
+            }]);
+            setScope('day');
+            setHandoffSource('recall24h');
+            setHandoffMessage(
+              `Loaded ${payload.aggregated_daily_ingredients.length} foods from your 24h recall `
+              + `(${mealsMeta.length} occasion${mealsMeta.length === 1 ? '' : 's'}).`,
+            );
+          } else {
+            setMeals([{
+              label: 'Day',
+              foods: payload.aggregated_daily_ingredients.map((i: any) => ({
+                food_id: i.food_id,
+                food_description: i.food_description || `CNF FoodID ${i.food_id}`,
+                mass_g: i.mass_g,
+              })),
+            }]);
+            setScope('day');
+            setHandoffSource('recall24h');
+            setHandoffMessage(
+              `Loaded ${payload.aggregated_daily_ingredients.length} foods from your 24h recall.`,
+            );
+          }
+          sessionStorage.removeItem('recall_24h_payload');
+          return;
+        }
+      }
+    } catch { /* sessionStorage unavailable; fall through */ }
+
+    // 2. Fall back to the cross-page activeFoodList.
+    try {
+      const list = loadActiveFoodList();
+      if (list && Array.isArray(list.ingredients) && list.ingredients.length > 0) {
+        setMeals([{
+          label: list.source === 'recall_24h' ? 'Day (from food diary)' : 'Selected foods',
+          foods: list.ingredients.map(i => ({
+            food_id: i.food_id,
+            food_description: i.food_description,
+            mass_g: i.mass_g,
+          })),
+        }]);
+        setScope(list.ingredients.length > 6 ? 'day' : 'meal');
+        if (fromParam === 'cnf_search' || list.source === 'catalogue') {
+          setHandoffSource('cnf_search');
+          setHandoffMessage(
+            `Loaded ${list.ingredients.length} food${list.ingredients.length === 1 ? '' : 's'} `
+            + `from Food Search. Default mass is 100 g — edit as needed.`,
+          );
+        } else if (list.source === 'recall_24h') {
+          setHandoffSource('recall24h');
+          setHandoffMessage(
+            `Loaded ${list.ingredients.length} foods from your food diary.`,
+          );
+        }
+      }
+    } catch { /* localStorage unavailable; fall through */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Food search.
   useEffect(() => {
@@ -335,14 +457,25 @@ export default function ResearchMealDeepDivePage() {
           Research deep-dive: meal and 24h-recall composition
         </h1>
         <p className="max-w-3xl text-sm text-gray-600">
-          Build a meal or a 24h recall from the Canadian Nutrient File. The
-          deep-dive returns the full nutrient panel with %EAR / %RDA / %AI
-          / %UL against the IOM/NASEM Dietary Reference Intakes by
-          life-stage, FPED food-group decomposition, NOVA processing-level
-          breakdown, macronutrient distribution against the IOM AMDR
-          bands, and per-nutrient top-contributor ranking. Substrate
-          revisions and provenance are surfaced in the coverage tab.
+          Build a meal or a 24h recall from the Canadian Nutrient File, or
+          arrive here from the food diary, the recipe decomposer, or Food
+          Search. The deep-dive returns the full nutrient panel with %EAR
+          / %RDA / %AI / %UL against the IOM/NASEM Dietary Reference
+          Intakes by life-stage, FPED food-group decomposition, NOVA
+          processing-level breakdown, macronutrient distribution against
+          the IOM AMDR bands, and per-nutrient top-contributor ranking.
+          Substrate revisions and provenance are surfaced in the coverage
+          tab.
         </p>
+        {handoffMessage && (
+          <div className={`rounded border px-3 py-2 text-sm ${
+            handoffSource === 'recall24h'
+              ? 'border-blue-200 bg-blue-50 text-blue-900'
+              : 'border-emerald-200 bg-emerald-50 text-emerald-900'
+          }`}>
+            {handoffMessage}
+          </div>
+        )}
       </header>
 
       <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">

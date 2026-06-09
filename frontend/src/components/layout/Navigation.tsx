@@ -16,7 +16,6 @@ import {
   PlusCircleIcon,
   BookmarkIcon,
   ClockIcon,
-  BeakerIcon,
   ArrowRightOnRectangleIcon
 } from '@heroicons/react/24/outline';
 import { clsx } from 'clsx';
@@ -106,17 +105,6 @@ const navigation: NavItem[] = [
       { name: 'Dietary pattern', href: '/dietary-pattern' },
     ],
   },
-  // RESEARCH-DEEP-DIVE (2026-06-09): researcher-facing substrate exposure
-  // (full nutrient panel against IOM DRIs by life-stage, FPED food-group
-  // decomposition, NOVA processing, per-nutrient food-source attribution).
-  {
-    name: 'Research',
-    href: '/research/meal-deep-dive',
-    icon: BeakerIcon,
-    dropdown: [
-      { name: 'Meal & 24h-recall deep-dive', href: '/research/meal-deep-dive' },
-    ],
-  },
   {
     name: 'Meals',
     href: '/meals', 
@@ -188,10 +176,10 @@ export default function Navigation() {
       return foodDiary?.dropdown?.map((d) => ({ name: d.name, href: d.href })) ?? [];
     }
 
-    // Research context
-    if (currentPath.startsWith('/research')) {
-      const research = filteredNavigation.find((n) => n.name === 'Research');
-      return research?.dropdown?.map((d) => ({ name: d.name, href: d.href })) ?? [];
+    // Food catalogue context (covers /cnf/* and the researcher /research/* deep-dive)
+    if (currentPath.startsWith('/cnf') || currentPath.startsWith('/research')) {
+      const catalogue = filteredNavigation.find((n) => n.name === CATALOGUE_NAV.section);
+      return catalogue?.dropdown?.map((d) => ({ name: d.name, href: d.href })) ?? [];
     }
 
     return [];

@@ -68,7 +68,7 @@ import { fromRecallAggregated, saveActiveFoodList } from '@/lib/activeFoodList';
 interface Recall24hWizardProps {
   userType: UserType;
   /** When set, pre-highlights one score-routing button on step 4. */
-  preselectScore?: 'hefi' | 'heni' | 'hsr' | 'fcs' | 'environmental' | 'dietary_pattern' | 'scorecard' | 'planetary' | 'improve_product';
+  preselectScore?: 'hefi' | 'heni' | 'hsr' | 'fcs' | 'environmental' | 'dietary_pattern' | 'scorecard' | 'planetary' | 'improve_product' | 'research_deep_dive';
 }
 
 interface OccasionMeta {
@@ -90,7 +90,7 @@ const OCCASIONS: OccasionMeta[] = [
 ];
 
 const SCORE_BUTTONS: Array<{
-  id: 'hefi' | 'heni' | 'hsr' | 'fcs' | 'environmental' | 'dietary_pattern' | 'scorecard' | 'planetary' | 'improve_product';
+  id: 'hefi' | 'heni' | 'hsr' | 'fcs' | 'environmental' | 'dietary_pattern' | 'scorecard' | 'planetary' | 'improve_product' | 'research_deep_dive';
   emoji: string;
   label: string;
   path: string;
@@ -106,6 +106,10 @@ const SCORE_BUTTONS: Array<{
   { id: 'environmental',   emoji: '🌍', label: 'Environment',           path: '/environmental/calculate', note: 'Climate, land, and water footprint' },
   { id: 'dietary_pattern', emoji: '🎯', label: 'Eating style',          path: '/dietary-pattern',        note: 'Which familiar pattern your day resembles' },
   { id: 'planetary',       emoji: '🪐', label: 'Planet budget',         path: '/planetary',              note: 'Your share of a daily planet budget for food' },
+  // RESEARCH-DEEP-DIVE (2026-06-09): substrate exposure for nutrition-epi
+  // research — full nutrient panel against IOM DRIs by life stage, FPED
+  // food groups, NOVA processing, per-nutrient top-contributor attribution.
+  { id: 'research_deep_dive', emoji: '🔬', label: 'Research deep-dive',  path: '/research/meal-deep-dive', note: 'Full nutrient panel against life-stage DRIs, FPED groups, NOVA processing, food-source attribution' },
 ];
 
 interface MealRow {
