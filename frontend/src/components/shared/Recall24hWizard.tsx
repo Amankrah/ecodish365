@@ -107,7 +107,7 @@ const SCORE_BUTTONS: Array<{
   { id: 'dietary_pattern', emoji: '🎯', label: 'Eating style',          path: '/dietary-pattern',        note: 'Which familiar pattern your day resembles' },
   { id: 'planetary',       emoji: '🪐', label: 'Planet budget',         path: '/planetary',              note: 'Your share of a daily planet budget for food' },
   // RESEARCH-DEEP-DIVE (2026-06-09): substrate exposure for nutrition-epi
-  // research — full nutrient panel against IOM DRIs by life stage, FPED
+  // research: full nutrient panel against IOM DRIs by life stage, FPED
   // food groups, NOVA processing, per-nutrient top-contributor attribution.
   { id: 'research_deep_dive', emoji: '🔬', label: 'Research deep-dive',  path: '/research/meal-deep-dive', note: 'Full nutrient panel against life-stage DRIs, FPED groups, NOVA processing, food-source attribution' },
 ];

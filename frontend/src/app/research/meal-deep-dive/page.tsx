@@ -13,9 +13,11 @@
 // the dedicated export endpoint.
 
 import React, { Suspense, useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { CNFApiService } from '@/lib/api';
 import { loadActiveFoodList } from '@/lib/activeFoodList';
+import { SourceFilter, type SourceChoice } from '@/components/shared/SourceFilter';
 import axios from 'axios';
 
 const API_BASE_URL =
@@ -122,6 +124,81 @@ function newMeal(label: string): Meal {
   return { label, foods: [] };
 }
 
+// Nutrient-name presentation helpers.
+//
+// The CNF NUTRIENT_NAME table ships all-uppercase labels with embedded
+// abbreviations (e.g. "RETINOL ACTIVITY EQUIVALENTS (RAE)",
+// "NIACIN (NIACIN EQUIVALENT NE)", "FOLATE, DFE"). For research-facing
+// presentation we title-case the label, keep the canonical abbreviations
+// uppercase, and spell out the abbreviation glossary alongside the
+// nutrient so readers do not need a separate reference.
+
+const PRESERVE_UPPERCASE = new Set([
+  'RAE', 'DFE', 'NE', 'DV', 'EAR', 'RDA', 'AI', 'UL', 'EER', 'CDRR',
+  'EPA', 'DHA', 'ALA', 'CLA', 'MUFA', 'PUFA', 'SFA', 'AMDR',
+  'D2', 'D3', 'B6', 'B12', 'K1', 'K2',
+]);
+
+const NUTRIENT_ABBREVIATIONS: Record<string, string> = {
+  RAE: 'Retinol Activity Equivalents',
+  DFE: 'Dietary Folate Equivalents',
+  NE: 'Niacin Equivalents',
+  DV: 'Daily Value',
+  EPA: 'Eicosapentaenoic Acid',
+  DHA: 'Docosahexaenoic Acid',
+  ALA: 'Alpha-Linolenic Acid',
+  CLA: 'Conjugated Linoleic Acid',
+  MUFA: 'Monounsaturated Fatty Acids',
+  PUFA: 'Polyunsaturated Fatty Acids',
+  SFA: 'Saturated Fatty Acids',
+};
+
+const NUTRIENT_UNIT_DISPLAY: Record<string, string> = {
+  Gram: 'g',
+  Milligram: 'mg',
+  Microgram: 'μg',
+  kilocalorie: 'kcal',
+  kilojoule: 'kJ',
+  NE: 'mg NE',
+};
+
+function prettyNutrientName(name: string): string {
+  if (!name) return '';
+  // Split on whitespace and punctuation so we can title-case the words
+  // but preserve the punctuation tokens that follow them.
+  return name
+    .split(/(\s+|,|\(|\)|\+|\/)/)
+    .map((tok) => {
+      if (!tok || /^\s+$/.test(tok)) return tok;
+      if (',()+/'.includes(tok)) return tok;
+      const upper = tok.toUpperCase();
+      if (PRESERVE_UPPERCASE.has(upper)) return upper;
+      return tok.charAt(0).toUpperCase() + tok.slice(1).toLowerCase();
+    })
+    .join('')
+    // CNF often uses a comma instead of a space before subgroup tags.
+    .replace(/\s+,/g, ',')
+    .replace(/,(\S)/g, ', $1')
+    .trim();
+}
+
+function prettyUnit(unit: string): string {
+  return NUTRIENT_UNIT_DISPLAY[unit] || unit;
+}
+
+function nutrientAbbreviations(name: string): string[] {
+  const tokens = (name || '').toUpperCase().split(/[\s(),+/]+/);
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const t of tokens) {
+    if (NUTRIENT_ABBREVIATIONS[t] && !seen.has(t)) {
+      seen.add(t);
+      out.push(t);
+    }
+  }
+  return out;
+}
+
 // One-shot hydration: when the page mounts after a handoff from the recall
 // wizard, the recipe decomposer's recall path, or the CNF search page, the
 // shared activeFoodList carries the preloaded ingredient list. We seed the
@@ -144,15 +221,27 @@ function ResearchMealDeepDiveInner() {
   const [handoffSource, setHandoffSource] = useState<HandoffSource>('manual');
   const [handoffMessage, setHandoffMessage] = useState<string>('');
 
-  const [meals, setMeals] = useState<Meal[]>([newMeal('breakfast')]);
-  const [activeMealIdx, setActiveMealIdx] = useState(0);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Array<{
-    FoodID: number;
-    FoodDescription: string;
-    relevance?: number;
-  }>>([]);
-  const [searchLoading, setSearchLoading] = useState(false);
+  // The deep-dive treats the food list as one logical "meal" (or aggregated
+  // day) keyed by a single label. Multi-occasion days arrive via the 24h
+  // recall wizard and land here as one aggregated list; this page does not
+  // re-offer occasion-by-occasion entry because that is exactly what the
+  // /recall-24h wizard already does.
+  const [meal, setMeal] = useState<Meal>(newMeal('Meal'));
+
+  // Entry-mode picker: which input flow the user wants to use when the
+  // meal is empty. `decomposer` shows the inline single-dish form;
+  // `recall` is a deep-link out to the existing 24h-recall wizard.
+  const [entryMode, setEntryMode] = useState<'picker' | 'decomposer'>('picker');
+  const [dishName, setDishName] = useState('');
+  const [dishMass, setDishMass] = useState<number>(350);
+  const [decomposing, setDecomposing] = useState(false);
+  const [decomposeError, setDecomposeError] = useState('');
+  const [decomposeNote, setDecomposeNote] = useState('');
+  // Researcher-facing food-database scope for the decomposer. Default to
+  // `both` (CNF + WAFCT) so users do not get accidentally narrowed; they
+  // opt into single-source by clicking CNF or WAFCT. The Stage-2 LLM
+  // ingredient resolver then only ranks in-scope catalogue rows.
+  const [decomposerSource, setDecomposerSource] = useState<SourceChoice>('both');
 
   const [lifeStage, setLifeStage] = useState<LifeStageInput>({
     age_years: 34,
@@ -170,10 +259,10 @@ function ResearchMealDeepDiveInner() {
   // Hydrate the meal builder from a handoff source on first mount.
   //
   // Priority order (each source wins over the next):
-  //   1. sessionStorage `recall_24h_payload` — the recall wizard sets this
+  //   1. sessionStorage `recall_24h_payload`. The recall wizard sets this
   //      when routing to a target page; it carries occasion-tagged meals
   //      and the deduped daily ingredient list.
-  //   2. localStorage activeFoodList — set by the recall wizard, the CNF
+  //   2. localStorage activeFoodList. Set by the recall wizard, the CNF
   //      search "Send to deep-dive" handoff, and any future producer.
   //      Carries a flat ingredient list with no occasion metadata.
   //
@@ -182,7 +271,7 @@ function ResearchMealDeepDiveInner() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // 1. Try the sessionStorage recall payload first — it carries per-meal
+    // 1. Try the sessionStorage recall payload first. It carries per-meal
     //    decomposition with occasion labels, which is the richest shape.
     try {
       const raw = sessionStorage.getItem('recall_24h_payload');
@@ -196,40 +285,22 @@ function ResearchMealDeepDiveInner() {
           const mealsMeta = Array.isArray(payload.meals_meta)
             ? payload.meals_meta
             : [];
-          if (mealsMeta.length > 0) {
-            // We do not have per-meal ingredient lists in the aggregated
-            // payload (the wizard dedupes across occasions), so we render
-            // a single occasion-grouped meal labelled "Day" plus a
-            // per-meal note. The user can split if they want.
-            setMeals([{
-              label: 'Day (from 24h recall)',
-              foods: payload.aggregated_daily_ingredients.map((i: any) => ({
-                food_id: i.food_id,
-                food_description: i.food_description || `CNF FoodID ${i.food_id}`,
-                mass_g: i.mass_g,
-              })),
-            }]);
-            setScope('day');
-            setHandoffSource('recall24h');
-            setHandoffMessage(
-              `Loaded ${payload.aggregated_daily_ingredients.length} foods from your 24h recall `
-              + `(${mealsMeta.length} occasion${mealsMeta.length === 1 ? '' : 's'}).`,
-            );
-          } else {
-            setMeals([{
-              label: 'Day',
-              foods: payload.aggregated_daily_ingredients.map((i: any) => ({
-                food_id: i.food_id,
-                food_description: i.food_description || `CNF FoodID ${i.food_id}`,
-                mass_g: i.mass_g,
-              })),
-            }]);
-            setScope('day');
-            setHandoffSource('recall24h');
-            setHandoffMessage(
-              `Loaded ${payload.aggregated_daily_ingredients.length} foods from your 24h recall.`,
-            );
-          }
+          const label = mealsMeta.length > 0
+            ? `Day (from 24h recall, ${mealsMeta.length} occasion${mealsMeta.length === 1 ? '' : 's'})`
+            : 'Day (from 24h recall)';
+          setMeal({
+            label,
+            foods: payload.aggregated_daily_ingredients.map((i: any) => ({
+              food_id: i.food_id,
+              food_description: i.food_description || `CNF FoodID ${i.food_id}`,
+              mass_g: i.mass_g,
+            })),
+          });
+          setScope('day');
+          setHandoffSource('recall24h');
+          setHandoffMessage(
+            `Loaded ${payload.aggregated_daily_ingredients.length} foods from your 24h recall.`,
+          );
           sessionStorage.removeItem('recall_24h_payload');
           return;
         }
@@ -240,20 +311,21 @@ function ResearchMealDeepDiveInner() {
     try {
       const list = loadActiveFoodList();
       if (list && Array.isArray(list.ingredients) && list.ingredients.length > 0) {
-        setMeals([{
-          label: list.source === 'recall_24h' ? 'Day (from food diary)' : 'Selected foods',
+        const isDay = list.source === 'recall_24h';
+        setMeal({
+          label: isDay ? 'Day (from food diary)' : 'Selected foods',
           foods: list.ingredients.map(i => ({
             food_id: i.food_id,
             food_description: i.food_description,
             mass_g: i.mass_g,
           })),
-        }]);
+        });
         setScope(list.ingredients.length > 6 ? 'day' : 'meal');
         if (fromParam === 'cnf_search' || list.source === 'catalogue') {
           setHandoffSource('cnf_search');
           setHandoffMessage(
             `Loaded ${list.ingredients.length} food${list.ingredients.length === 1 ? '' : 's'} `
-            + `from Food Search. Default mass is 100 g — edit as needed.`,
+            + `from Food Search. Default mass is 100 g; edit as needed.`,
           );
         } else if (list.source === 'recall_24h') {
           setHandoffSource('recall24h');
@@ -266,110 +338,105 @@ function ResearchMealDeepDiveInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Food search.
-  useEffect(() => {
-    if (searchQuery.trim().length < 2) {
-      setSearchResults([]);
+  // Run the recipe decomposer on a single dish name and replace the
+  // current meal with the resolved CNF ingredient list. Mirrors the
+  // recall-wizard text-occasion flow but for the deep-dive's single-meal
+  // case.
+  const runDecomposer = async () => {
+    const name = dishName.trim();
+    if (!name) {
+      setDecomposeError('Enter a dish name first.');
       return;
     }
-    const handle = setTimeout(async () => {
-      try {
-        setSearchLoading(true);
-        const r = await CNFApiService.searchFoodsEnhanced({
-          query: searchQuery,
-          limit: 25,
-        });
-        setSearchResults(
-          (r.results || []).map((f) => ({
-            FoodID: f.FoodID,
-            FoodDescription: f.FoodDescription,
-            relevance: f.relevance,
-          })),
+    if (!dishMass || dishMass <= 0) {
+      setDecomposeError('Enter a total mass in grams.');
+      return;
+    }
+    setDecomposing(true);
+    setDecomposeError('');
+    setDecomposeNote('');
+    try {
+      const result = await CNFApiService.decomposeRecipe(name, dishMass, {
+        userType: 'researcher',
+        source: decomposerSource,
+      });
+      if (!result.ingredients || result.ingredients.length === 0) {
+        setDecomposeError(
+          result.fallback_reason
+            ? `Decomposer returned no ingredients (${result.fallback_reason}).`
+            : 'Decomposer returned no ingredients.',
         );
-      } catch (err) {
-        console.error('search error', err);
-        setSearchResults([]);
-      } finally {
-        setSearchLoading(false);
+        return;
       }
-    }, 200);
-    return () => clearTimeout(handle);
-  }, [searchQuery]);
-
-  const addFood = (food: { FoodID: number; FoodDescription: string }) => {
-    setMeals((prev) => {
-      const next = prev.map((m, i) =>
-        i === activeMealIdx
-          ? {
-              ...m,
-              foods: [
-                ...m.foods,
-                {
-                  food_id: food.FoodID,
-                  food_description: food.FoodDescription,
-                  mass_g: 100,
-                },
-              ],
-            }
-          : m,
+      setMeal({
+        label: result.normalised_dish_name || name,
+        foods: result.ingredients.map(i => ({
+          food_id: i.food_id,
+          food_description: i.food_description,
+          mass_g: i.mass_g,
+        })),
+      });
+      setScope('meal');
+      const confidencePct = Math.round(result.decomposition_confidence * 100);
+      const unresolvedPct = result.total_mass_g > 0
+        ? Math.round(result.unresolved_mass_g / result.total_mass_g * 100)
+        : 0;
+      const sourceLabel = decomposerSource === 'both'
+        ? 'CNF + WAFCT'
+        : decomposerSource === 'cnf' ? 'CNF only' : 'WAFCT only';
+      setDecomposeNote(
+        `Decomposed ${result.ingredients.length} ingredient${result.ingredients.length === 1 ? '' : 's'} `
+        + `from ${sourceLabel} at ${confidencePct}% confidence`
+        + (unresolvedPct > 0 ? `; ${unresolvedPct}% mass unresolved` : '')
+        + (result.cache_hit ? ' (cached)' : '')
+        + '.',
       );
-      return next;
-    });
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || 'decompose failed';
+      setDecomposeError(msg);
+    } finally {
+      setDecomposing(false);
+    }
   };
 
-  const updateMass = (mealIdx: number, foodIdx: number, mass: number) => {
-    setMeals((prev) =>
-      prev.map((m, i) =>
-        i === mealIdx
-          ? {
-              ...m,
-              foods: m.foods.map((f, j) =>
-                j === foodIdx ? { ...f, mass_g: mass } : f,
-              ),
-            }
-          : m,
-      ),
-    );
+  const updateMass = (foodIdx: number, mass: number) => {
+    setMeal(prev => ({
+      ...prev,
+      foods: prev.foods.map((f, j) => j === foodIdx ? { ...f, mass_g: mass } : f),
+    }));
   };
 
-  const removeFood = (mealIdx: number, foodIdx: number) => {
-    setMeals((prev) =>
-      prev.map((m, i) =>
-        i === mealIdx
-          ? { ...m, foods: m.foods.filter((_, j) => j !== foodIdx) }
-          : m,
-      ),
-    );
+  const removeFood = (foodIdx: number) => {
+    setMeal(prev => ({
+      ...prev,
+      foods: prev.foods.filter((_, j) => j !== foodIdx),
+    }));
   };
 
-  const addMeal = () => {
-    const presets = ['breakfast', 'lunch', 'dinner', 'snack 1', 'snack 2'];
-    const label =
-      presets[meals.length] || `meal ${meals.length + 1}`;
-    setMeals((prev) => [...prev, newMeal(label)]);
-    setActiveMealIdx(meals.length);
-    setScope('day');
-  };
-
-  const removeMeal = (idx: number) => {
-    if (meals.length === 1) return;
-    setMeals((prev) => prev.filter((_, i) => i !== idx));
-    setActiveMealIdx((cur) => Math.max(0, Math.min(cur, meals.length - 2)));
-    if (meals.length - 1 === 1) setScope('meal');
+  const resetMeal = () => {
+    setMeal(newMeal('Meal'));
+    setEntryMode('picker');
+    setDishName('');
+    setDishMass(350);
+    setDecomposeError('');
+    setDecomposeNote('');
+    setHandoffSource('manual');
+    setHandoffMessage('');
+    setPayload(null);
   };
 
   const requestBody = useMemo(() => {
     return {
       scope,
-      meals: meals
-        .filter((m) => m.foods.length > 0)
-        .map((m) => ({
-          label: m.label,
-          foods: m.foods.map((f) => ({
-            food_id: f.food_id,
-            mass_g: f.mass_g,
-          })),
-        })),
+      meals: meal.foods.length > 0
+        ? [{
+            label: meal.label,
+            foods: meal.foods.map((f) => ({
+              food_id: f.food_id,
+              mass_g: f.mass_g,
+            })),
+          }]
+        : [],
       life_stage:
         lifeStage.age_years && lifeStage.sex
           ? {
@@ -381,12 +448,12 @@ function ResearchMealDeepDiveInner() {
           : null,
       options: {
         nutrient_set: 'research_canonical',
-        include_per_meal_breakdown: true,
+        include_per_meal_breakdown: false,
         include_top_contributors: true,
         top_k: 5,
       },
     };
-  }, [meals, lifeStage, scope]);
+  }, [meal, lifeStage, scope]);
 
   const submit = async () => {
     setSubmitting(true);
@@ -443,12 +510,8 @@ function ResearchMealDeepDiveInner() {
     }
   };
 
-  const currentMeal = meals[activeMealIdx];
-  const totalMass = meals.reduce(
-    (sum, m) => sum + m.foods.reduce((s, f) => s + f.mass_g, 0),
-    0,
-  );
-  const totalFoods = meals.reduce((sum, m) => sum + m.foods.length, 0);
+  const totalMass = meal.foods.reduce((s, f) => s + f.mass_g, 0);
+  const totalFoods = meal.foods.length;
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 px-4 py-6">
@@ -479,148 +542,189 @@ function ResearchMealDeepDiveInner() {
       </header>
 
       <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* ---------- Meal builder column ---------- */}
+        {/* ---------- Meal source + ingredient list column ---------- */}
         <div className="space-y-4 lg:col-span-2">
-          <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-            <div className="mb-3 flex items-center justify-between">
+          {/* Empty state: choose an entry mode (decompose a single meal,
+              or jump to the 24h-recall wizard for a full day). The
+              catalogue search pages handle the "look at one food" case
+              already; this page is meal- and recall-scoped on purpose. */}
+          {meal.foods.length === 0 && entryMode === 'picker' && (
+            <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
               <h2 className="text-lg font-semibold text-gray-900">
-                Meal builder
+                How will you build this meal?
               </h2>
-              <div className="flex items-center gap-2">
+              <p className="mt-1 text-sm text-gray-600">
+                The deep-dive runs on meals and 24-hour recalls. For
+                catalogue-level questions about a single food, use{' '}
+                <Link href="/cnf/search" className="text-blue-700 underline">Food Search</Link>{' '}
+                or{' '}
+                <Link href="/cnf/discover" className="text-blue-700 underline">Discover by Nutrient</Link>.
+              </p>
+              <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
                 <button
-                  onClick={() => setScope(scope === 'meal' ? 'day' : 'meal')}
-                  className="rounded border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50"
+                  type="button"
+                  onClick={() => setEntryMode('decomposer')}
+                  className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-left hover:bg-blue-100"
                 >
-                  scope: {scope}
+                  <div className="flex items-center gap-2 font-semibold text-blue-900">
+                    <span aria-hidden="true">🍽️</span> Decompose a meal
+                  </div>
+                  <p className="mt-1 text-sm text-blue-900">
+                    Describe one dish in free text (pasta with tomato sauce, jollof rice,
+                    scrambled eggs and toast) and we break it into CNF ingredients via the
+                    decomposer.
+                  </p>
                 </button>
-                <button
-                  onClick={addMeal}
-                  className="rounded border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50"
+                <Link
+                  href="/recall-24h?then=research_deep_dive"
+                  className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-left hover:bg-emerald-100"
                 >
-                  + meal
-                </button>
+                  <div className="flex items-center gap-2 font-semibold text-emerald-900">
+                    <span aria-hidden="true">📓</span> Log a 24-hour recall
+                  </div>
+                  <p className="mt-1 text-sm text-emerald-900">
+                    Walk through up to six meal occasions for a full day; the wizard
+                    aggregates the day and lands back here with the foods preloaded.
+                  </p>
+                </Link>
               </div>
             </div>
+          )}
 
-            {/* Meal tabs */}
-            {meals.length > 1 && (
-              <div className="mb-3 flex flex-wrap gap-1">
-                {meals.map((m, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setActiveMealIdx(idx)}
-                    className={`rounded px-3 py-1 text-sm ${
-                      idx === activeMealIdx
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {m.label} ({m.foods.length})
-                    {meals.length > 1 && (
-                      <span
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeMeal(idx);
-                        }}
-                        className="ml-2 text-gray-400 hover:text-red-600"
-                      >
-                        x
-                      </span>
-                    )}
-                  </button>
-                ))}
+          {/* Decomposer form. Calls /api/recipes/decompose/ via
+              CNFApiService.decomposeRecipe and replaces `meal` with the
+              resolved ingredient list. */}
+          {meal.foods.length === 0 && entryMode === 'decomposer' && (
+            <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-900">Decompose a meal</h2>
+                <button
+                  type="button"
+                  onClick={() => { setEntryMode('picker'); setDecomposeError(''); }}
+                  className="text-sm text-gray-500 hover:text-gray-700"
+                >
+                  back
+                </button>
               </div>
-            )}
-
-            {/* Food search */}
-            <div className="space-y-2">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search CNF foods (e.g. apple, broiled chicken, whole wheat bread)"
-                className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-              />
-              {searchLoading && (
-                <p className="text-xs text-gray-500">searching...</p>
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                <SourceFilter
+                  source={decomposerSource}
+                  onChange={setDecomposerSource}
+                  accent="blue"
+                />
+                <p className="text-xs text-gray-500">
+                  Database scope for the Stage-2 ingredient resolver.
+                </p>
+              </div>
+              <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-[1fr_140px_auto]">
+                <input
+                  type="text"
+                  value={dishName}
+                  onChange={(e) => setDishName(e.target.value)}
+                  placeholder="e.g. spaghetti bolognese, jollof rice, oatmeal with berries"
+                  className="rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                  aria-label="Dish name"
+                />
+                <input
+                  type="number"
+                  value={dishMass}
+                  onChange={(e) => setDishMass(Math.max(0, Number(e.target.value) || 0))}
+                  className="rounded border border-gray-300 px-3 py-2 text-right text-sm focus:border-blue-500 focus:outline-none"
+                  aria-label="Total mass in grams"
+                  placeholder="grams"
+                />
+                <button
+                  type="button"
+                  onClick={runDecomposer}
+                  disabled={decomposing || !dishName.trim() || dishMass <= 0}
+                  className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 hover:bg-blue-700"
+                >
+                  {decomposing ? 'decomposing…' : 'Decompose'}
+                </button>
+              </div>
+              <p className="mt-2 text-xs text-gray-500">
+                The decomposer runs at 5–15 s typically; results are cached. CNF
+                ingredients then become editable below.
+              </p>
+              {decomposeError && (
+                <p className="mt-2 text-sm text-red-600">{decomposeError}</p>
               )}
-              {searchResults.length > 0 && (
-                <div className="max-h-48 overflow-y-auto rounded border border-gray-200">
-                  {searchResults.slice(0, 12).map((r) => (
-                    <button
-                      key={r.FoodID}
-                      onClick={() => addFood(r)}
-                      className="block w-full border-b border-gray-100 px-3 py-2 text-left text-sm hover:bg-blue-50"
-                    >
-                      <span className="font-mono text-xs text-gray-500">
-                        {r.FoodID}
-                      </span>{' '}
-                      {r.FoodDescription}
-                    </button>
-                  ))}
+            </div>
+          )}
+
+          {/* Editable ingredient list. Same shape regardless of entry path
+              (decomposer output, recall hydration, or catalogue handoff). */}
+          {meal.foods.length > 0 && (
+            <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+              <div className="mb-3 flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">{meal.label}</h2>
+                  <p className="text-xs text-gray-600">
+                    {meal.foods.length} food{meal.foods.length === 1 ? '' : 's'} · {totalMass.toFixed(0)} g total
+                    {decomposeNote && ` · ${decomposeNote}`}
+                  </p>
                 </div>
-              )}
-            </div>
-
-            {/* Current meal contents */}
-            <div className="mt-4">
-              <h3 className="mb-2 text-sm font-medium text-gray-700">
-                {currentMeal.label} ({currentMeal.foods.length} foods, total{' '}
-                {currentMeal.foods.reduce((s, f) => s + f.mass_g, 0).toFixed(0)} g)
-              </h3>
-              {currentMeal.foods.length === 0 ? (
-                <p className="text-sm italic text-gray-500">no foods yet</p>
-              ) : (
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-gray-200 text-left text-xs text-gray-600">
-                      <th className="py-1">food</th>
-                      <th className="py-1 text-right">mass (g)</th>
-                      <th className="py-1"></th>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setScope(scope === 'meal' ? 'day' : 'meal')}
+                    className="rounded border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50"
+                    title="Scope flag attached to the deep-dive request; affects per-meal vs day-level framing in the response."
+                  >
+                    scope: {scope}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={resetMeal}
+                    className="rounded border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50"
+                  >
+                    start over
+                  </button>
+                </div>
+              </div>
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-200 text-left text-xs text-gray-600">
+                    <th className="py-1">food</th>
+                    <th className="py-1 text-right">mass (g)</th>
+                    <th className="py-1" aria-label="remove"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {meal.foods.map((f, idx) => (
+                    <tr key={`${f.food_id}-${idx}`} className="border-b border-gray-100">
+                      <td className="py-1">
+                        <span className="font-mono text-xs text-gray-500">{f.food_id}</span>{' '}
+                        {f.food_description}
+                      </td>
+                      <td className="py-1 text-right">
+                        <input
+                          type="number"
+                          aria-label={`Mass in grams for ${f.food_description}`}
+                          placeholder="g"
+                          value={f.mass_g}
+                          onChange={(e) =>
+                            updateMass(idx, Math.max(0, Number(e.target.value) || 0))
+                          }
+                          className="w-20 rounded border border-gray-300 px-2 py-0.5 text-right"
+                        />
+                      </td>
+                      <td className="py-1 pl-2 text-right">
+                        <button
+                          type="button"
+                          aria-label={`Remove ${f.food_description}`}
+                          onClick={() => removeFood(idx)}
+                          className="text-gray-400 hover:text-red-600"
+                        >
+                          x
+                        </button>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {currentMeal.foods.map((f, idx) => (
-                      <tr key={idx} className="border-b border-gray-100">
-                        <td className="py-1">
-                          <span className="font-mono text-xs text-gray-500">
-                            {f.food_id}
-                          </span>{' '}
-                          {f.food_description}
-                        </td>
-                        <td className="py-1 text-right">
-                          <input
-                            type="number"
-                            aria-label={`Mass in grams for ${f.food_description}`}
-                            placeholder="g"
-                            value={f.mass_g}
-                            onChange={(e) =>
-                              updateMass(
-                                activeMealIdx,
-                                idx,
-                                Math.max(0, Number(e.target.value) || 0),
-                              )
-                            }
-                            className="w-20 rounded border border-gray-300 px-2 py-0.5 text-right"
-                          />
-                        </td>
-                        <td className="py-1 pl-2 text-right">
-                          <button
-                            type="button"
-                            aria-label={`Remove ${f.food_description}`}
-                            onClick={() => removeFood(activeMealIdx, idx)}
-                            className="text-gray-400 hover:text-red-600"
-                          >
-                            x
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
+                  ))}
+                </tbody>
+              </table>
             </div>
-          </div>
+          )}
 
           <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
             <div className="flex items-center justify-between">
@@ -775,7 +879,10 @@ function ResearchMealDeepDiveInner() {
             <MacrosTab mac={payload.macronutrient_distribution} />
           )}
           {activeTab === 'contributions' && (
-            <ContributionsTab contribs={payload.contributions} />
+            <ContributionsTab
+              contribs={payload.contributions}
+              panel={payload.nutrient_panel}
+            />
           )}
           {activeTab === 'coverage' && (
             <CoverageTab
@@ -792,37 +899,139 @@ function ResearchMealDeepDiveInner() {
 
 // ---------- Tab components ----------
 
+// Plain-language definitions for the DRI table columns. Sourced from the
+// IOM and NASEM DRI compendium so the tooltip reads consistently with the
+// research deep-dive's reference compendium and the manuscript §3.13 prose.
+const DRI_COLUMN_TOOLTIPS: Record<string, string> = {
+  EAR:
+    'Estimated Average Requirement. The daily intake that meets the needs of '
+    + '50% of healthy individuals in this life-stage and sex group. The EAR is '
+    + 'the cut-point used at the population level: %EAR below 100% counts as '
+    + 'inadequate intake under the IOM (2000) cut-point method.',
+  RDA:
+    'Recommended Dietary Allowance. The average daily intake sufficient to '
+    + 'meet the requirement of nearly all (97 to 98%) healthy individuals in '
+    + 'this life-stage. Derived as EAR + 2 × CV. The standard "how much should '
+    + 'I get" target.',
+  AI:
+    'Adequate Intake. Set when the evidence is too thin to derive an EAR. '
+    + 'Believed to cover the needs of all healthy individuals in this '
+    + 'life-stage. Comparison against AI is descriptive, not a prevalence '
+    + 'estimator (IOM 2000).',
+  UL:
+    'Tolerable Upper Intake Level. The highest daily intake unlikely to cause '
+    + 'adverse health effects in almost all individuals in the general '
+    + 'population. Risk of adverse effects rises above the UL.',
+  '%EAR':
+    'Intake as a percentage of the published EAR for this life-stage. Below '
+    + '100% triggers the below_ear flag (inadequate by the cut-point method).',
+  '%RDA':
+    'Intake as a percentage of the RDA. At or above 100% means the '
+    + 'recommended level is met or exceeded.',
+  '%AI':
+    'Intake as a percentage of the AI. Used when the nutrient has no '
+    + 'published EAR; below 100% is below_ai, at or above 100% is at_or_above_ai.',
+  '%UL':
+    'Intake as a percentage of the UL. At or above 100% means intake is at '
+    + 'or above the tolerable upper limit and the row is flagged accordingly.',
+  flag:
+    'Adequacy summary distilled from the four reference comparisons. '
+    + 'Categories: below_ear, between_ear_rda, at_or_above_rda (when an EAR '
+    + 'is published), below_ai, at_or_above_ai (when only an AI is published), '
+    + 'at_or_above_ul (UL breach, independent of the adequacy axis), '
+    + 'no_reference (no DRI cell on file for this life-stage).',
+  coverage:
+    'Number of foods in the meal that carried a value for this nutrient over '
+    + 'the total food count. Below 100% means some foods are silent on this '
+    + 'nutrient in the CNF. That is no data, not a measured zero, and the '
+    + 'row is marked partially imputed in the JSON export.',
+};
+
+function ColHeader({
+  label,
+  tooltip,
+  align,
+}: {
+  label: string;
+  tooltip: string;
+  align: 'left' | 'right' | 'center';
+}) {
+  const alignClass =
+    align === 'right' ? 'text-right' : align === 'center' ? 'text-center' : 'text-left';
+  // Single tooltip source: the custom popover. We do NOT also set the HTML
+  // `title` attribute, because browsers render that as a second OS-native
+  // tooltip on hover and the two stack on top of each other.
+  // Keyboard accessibility: the label is focusable via tabIndex=0 and the
+  // popover reveals on focus-within as well as hover.
+  return (
+    <th scope="col" className={`group relative px-3 py-2 ${alignClass}`}>
+      <span
+        tabIndex={0}
+        aria-describedby={`tt-${label}`}
+        className="cursor-help border-b border-dotted border-gray-400 outline-none focus:ring-2 focus:ring-blue-300"
+      >
+        {label}
+      </span>
+      <span
+        id={`tt-${label}`}
+        role="tooltip"
+        className="pointer-events-none invisible absolute left-1/2 top-full z-20 mt-1 w-64 -translate-x-1/2 whitespace-normal rounded bg-gray-900 px-3 py-2 text-left text-xs font-normal normal-case leading-snug text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100"
+      >
+        {tooltip}
+      </span>
+    </th>
+  );
+}
+
 function NutrientsTab({ panel }: { panel: NutrientRow[] }) {
   return (
     <div className="overflow-x-auto rounded border border-gray-200 bg-white">
       <table className="min-w-full text-sm">
         <thead className="bg-gray-50 text-left text-xs text-gray-600">
           <tr>
-            <th className="px-3 py-2">nid</th>
-            <th className="px-3 py-2">nutrient</th>
-            <th className="px-3 py-2 text-right">amount</th>
-            <th className="px-3 py-2 text-right">per 100 g</th>
-            <th className="px-3 py-2 text-right">EAR</th>
-            <th className="px-3 py-2 text-right">RDA</th>
-            <th className="px-3 py-2 text-right">AI</th>
-            <th className="px-3 py-2 text-right">UL</th>
-            <th className="px-3 py-2 text-right">%EAR</th>
-            <th className="px-3 py-2 text-right">%RDA</th>
-            <th className="px-3 py-2 text-right">%AI</th>
-            <th className="px-3 py-2 text-right">%UL</th>
-            <th className="px-3 py-2">flag</th>
-            <th className="px-3 py-2 text-right">coverage</th>
+            <th className="px-3 py-2" scope="col">nid</th>
+            <th className="px-3 py-2" scope="col">nutrient</th>
+            <th className="px-3 py-2 text-right" scope="col">amount</th>
+            <th className="px-3 py-2 text-right" scope="col">per 100 g</th>
+            <ColHeader label="EAR"      tooltip={DRI_COLUMN_TOOLTIPS.EAR}      align="right" />
+            <ColHeader label="RDA"      tooltip={DRI_COLUMN_TOOLTIPS.RDA}      align="right" />
+            <ColHeader label="AI"       tooltip={DRI_COLUMN_TOOLTIPS.AI}       align="right" />
+            <ColHeader label="UL"       tooltip={DRI_COLUMN_TOOLTIPS.UL}       align="right" />
+            <ColHeader label="%EAR"     tooltip={DRI_COLUMN_TOOLTIPS['%EAR']}  align="right" />
+            <ColHeader label="%RDA"     tooltip={DRI_COLUMN_TOOLTIPS['%RDA']}  align="right" />
+            <ColHeader label="%AI"      tooltip={DRI_COLUMN_TOOLTIPS['%AI']}   align="right" />
+            <ColHeader label="%UL"      tooltip={DRI_COLUMN_TOOLTIPS['%UL']}   align="right" />
+            <ColHeader label="flag"     tooltip={DRI_COLUMN_TOOLTIPS.flag}     align="left" />
+            <ColHeader label="coverage" tooltip={DRI_COLUMN_TOOLTIPS.coverage} align="right" />
           </tr>
         </thead>
         <tbody>
-          {panel.map((row) => (
+          {panel.map((row) => {
+            const niceName = prettyNutrientName(row.name);
+            const unitDisp = prettyUnit(row.unit);
+            const abbrs = nutrientAbbreviations(row.name);
+            const abbrTitle = abbrs
+              .map((a) => `${a} = ${NUTRIENT_ABBREVIATIONS[a]}`)
+              .join('; ');
+            return (
             <tr key={row.nutrient_id} className="border-t border-gray-100">
               <td className="px-3 py-1 font-mono text-xs text-gray-500">
                 {row.nutrient_id}
               </td>
-              <td className="px-3 py-1">{row.name}</td>
+              <td className="px-3 py-1">
+                {abbrs.length > 0 ? (
+                  <span
+                    title={abbrTitle}
+                    className="cursor-help border-b border-dotted border-gray-300"
+                  >
+                    {niceName}
+                  </span>
+                ) : (
+                  niceName
+                )}
+              </td>
               <td className="px-3 py-1 text-right">
-                {row.amount.toFixed(2)} {row.unit}
+                {row.amount.toFixed(2)} {unitDisp}
               </td>
               <td className="px-3 py-1 text-right">
                 {row.amount_per_100g_meal.toFixed(2)}
@@ -860,7 +1069,8 @@ function NutrientsTab({ panel }: { panel: NutrientRow[] }) {
                 {row.n_foods_with_value + row.n_foods_missing_value}
               </td>
             </tr>
-          ))}
+            );
+          })}
         </tbody>
       </table>
     </div>
@@ -1081,47 +1291,84 @@ function MacrosTab({ mac }: { mac: any }) {
   );
 }
 
-function ContributionsTab({ contribs }: { contribs: Record<string, any[]> }) {
+function ContributionsTab({
+  contribs,
+  panel,
+}: {
+  contribs: Record<string, any[]>;
+  panel: NutrientRow[];
+}) {
+  // Build a {nutrient_id -> {name, unit}} dictionary from the nutrient
+  // panel so contribution cards can show the readable name + canonical
+  // unit instead of bare CNF NutrientIDs.
+  const meta = useMemo(() => {
+    const m: Record<number, { name: string; unit: string }> = {};
+    for (const r of panel) m[r.nutrient_id] = { name: r.name, unit: r.unit };
+    return m;
+  }, [panel]);
+
   return (
     <div className="space-y-4">
-      {Object.entries(contribs).map(([nid, rows]) => (
-        <div key={nid} className="rounded border border-gray-200 bg-white p-4">
-          <h3 className="mb-2 text-sm font-semibold text-gray-900">
-            Nutrient ID {nid}
-          </h3>
-          <table className="w-full text-sm">
-            <thead className="text-xs text-gray-600">
-              <tr>
-                <th className="text-left">food</th>
-                <th className="text-right">amount</th>
-                <th className="text-right">share</th>
-                <th className="text-right">cumulative</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r, i) => (
-                <tr key={i} className="border-t border-gray-100">
-                  <td className="py-1">
-                    <span className="font-mono text-xs text-gray-500">
-                      {r.food_id}
-                    </span>{' '}
-                    {r.food_description}
-                  </td>
-                  <td className="py-1 text-right font-mono">
-                    {r.nutrient_amount?.toFixed(2)}
-                  </td>
-                  <td className="py-1 text-right">
-                    {(r.share_of_total * 100).toFixed(1)}%
-                  </td>
-                  <td className="py-1 text-right">
-                    {(r.cumulative_share * 100).toFixed(1)}%
-                  </td>
+      {Object.entries(contribs).map(([nid, rows]) => {
+        const nidNum = Number(nid);
+        const m = meta[nidNum];
+        const niceName = m ? prettyNutrientName(m.name) : `Nutrient ID ${nid}`;
+        const unit = m ? prettyUnit(m.unit) : '';
+        const abbrs = m ? nutrientAbbreviations(m.name) : [];
+        return (
+          <div key={nid} className="rounded border border-gray-200 bg-white p-4">
+            <div className="mb-2">
+              <h3 className="text-sm font-semibold text-gray-900">
+                {niceName}
+                {unit && (
+                  <span className="ml-1 font-normal text-gray-500">({unit})</span>
+                )}
+                <span className="ml-2 font-mono text-xs font-normal text-gray-400">
+                  nid {nid}
+                </span>
+              </h3>
+              {abbrs.length > 0 && (
+                <p className="mt-0.5 text-xs italic text-gray-500">
+                  {abbrs
+                    .map((a) => `${a} = ${NUTRIENT_ABBREVIATIONS[a]}`)
+                    .join('; ')}
+                </p>
+              )}
+            </div>
+            <table className="w-full text-sm">
+              <thead className="text-xs text-gray-600">
+                <tr>
+                  <th className="text-left">food</th>
+                  <th className="text-right">amount{unit && ` (${unit})`}</th>
+                  <th className="text-right">share</th>
+                  <th className="text-right">cumulative</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ))}
+              </thead>
+              <tbody>
+                {rows.map((r, i) => (
+                  <tr key={i} className="border-t border-gray-100">
+                    <td className="py-1">
+                      <span className="font-mono text-xs text-gray-500">
+                        {r.food_id}
+                      </span>{' '}
+                      {r.food_description}
+                    </td>
+                    <td className="py-1 text-right font-mono">
+                      {r.nutrient_amount?.toFixed(2)}
+                    </td>
+                    <td className="py-1 text-right">
+                      {(r.share_of_total * 100).toFixed(1)}%
+                    </td>
+                    <td className="py-1 text-right">
+                      {(r.cumulative_share * 100).toFixed(1)}%
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+      })}
     </div>
   );
 }

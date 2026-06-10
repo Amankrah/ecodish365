@@ -6,13 +6,13 @@ Combines three perspectives on the same meal into a single response:
    subgroup, oz-eq grains whole and refined, cup-eq dairy by subgroup,
    oz-eq protein foods by source, oils, solid fats, added sugars,
    alcoholic drinks) plus the MyPlate and Canada Food Guide gap reading.
-2. NOVA processing-level breakdown — per-food classification (Monteiro
+2. NOVA processing-level breakdown: per-food classification (Monteiro
    2019 four-group framework) plus the meal-level distribution as
    mass-weighted percent at each NOVA level and energy-weighted percent
    at each NOVA level. The energy-weighted column is the canonical
    reporting unit in the ultra-processed-foods literature (Monteiro
    et al. 2018 Lancet Public Health).
-3. Macronutrient distribution against the IOM AMDR bands — percent of
+3. Macronutrient distribution against the IOM AMDR bands: percent of
    energy from carbohydrate, protein, fat and alcohol, with a per-macro
    status flag (inside, above, below the AMDR range).
 

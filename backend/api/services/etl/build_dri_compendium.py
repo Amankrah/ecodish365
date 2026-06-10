@@ -2,11 +2,11 @@
 
 Generates two artefacts:
 
-1. `backend/api/data/dri_compendium.json` — canonical lookup table keyed by
+1. `backend/api/data/dri_compendium.json`: canonical lookup table keyed by
    CNF NutrientID. Each nutrient carries one cell per life-stage code with
    EAR / RDA / AI / UL values in the same unit the CNF nutrient registry
    already uses.
-2. `backend/api/data/dri_compendium_manifest.csv` — per-cell provenance
+2. `backend/api/data/dri_compendium_manifest.csv`: per-cell provenance
    manifest. Each row pairs a (nutrient_id, life_stage, reference_type)
    triple with the published IOM / NASEM table citation a reviewer can
    look up directly.
@@ -95,7 +95,7 @@ _ADULT_CODES = (
 # Values are in the unit named alongside the NutrientID; the loader
 # verifies the unit against the CNF nutrient registry on first call.
 #
-# Cell tuple: (EAR, RDA, AI, UL). Null values mean "not published" — the
+# Cell tuple: (EAR, RDA, AI, UL). Null values mean "not published": the
 # loader returns None for any null cell so a downstream caller never
 # fabricates a percent-of-DRI from a missing reference value.
 #
@@ -104,7 +104,7 @@ _ADULT_CODES = (
 
 # Standard convention: M = males, F = females, P = pregnant, L = lactating.
 
-# CARBOHYDRATE (NutrientID 205) — IOM 2005 Ch 6, Table 6-2 p. 275
+# CARBOHYDRATE (NutrientID 205): IOM 2005 Ch 6, Table 6-2 p. 275
 _CARB: Dict[str, Tuple] = {
     'males_19_30y':     (100, 130, None, None),
     'males_31_50y':     (100, 130, None, None),
@@ -120,7 +120,7 @@ _CARB: Dict[str, Tuple] = {
     'lactating_31_50y': (160, 210, None, None),
 }
 
-# PROTEIN (NutrientID 203) — IOM 2005 Ch 10, Table 10-13 p. 685
+# PROTEIN (NutrientID 203): IOM 2005 Ch 10, Table 10-13 p. 685
 # Reference body weights: 70 kg M, 57 kg F (IOM 2005 Table 1-1).
 _PROTEIN: Dict[str, Tuple] = {
     'males_19_30y':     (46, 56, None, None),
@@ -137,7 +137,7 @@ _PROTEIN: Dict[str, Tuple] = {
     'lactating_31_50y': (60, 71, None, None),
 }
 
-# FIBRE, TOTAL DIETARY (NutrientID 291) — IOM 2005 Ch 7, Table 7-4 p. 380
+# FIBRE, TOTAL DIETARY (NutrientID 291): IOM 2005 Ch 7, Table 7-4 p. 380
 _FIBER: Dict[str, Tuple] = {
     'males_19_30y':     (None, None, 38, None),
     'males_31_50y':     (None, None, 38, None),
@@ -153,7 +153,7 @@ _FIBER: Dict[str, Tuple] = {
     'lactating_31_50y': (None, None, 29, None),
 }
 
-# CALCIUM (NutrientID 301, mg) — IOM 2011 Tables S-3 and S-5
+# CALCIUM (NutrientID 301, mg): IOM 2011 Tables S-3 and S-5
 _CALCIUM: Dict[str, Tuple] = {
     'males_19_30y':     (800, 1000, None, 2500),
     'males_31_50y':     (800, 1000, None, 2500),
@@ -169,7 +169,7 @@ _CALCIUM: Dict[str, Tuple] = {
     'lactating_31_50y': (800, 1000, None, 2500),
 }
 
-# IRON (NutrientID 303, mg) — IOM 2001 Table S-7
+# IRON (NutrientID 303, mg): IOM 2001 Table S-7
 _IRON: Dict[str, Tuple] = {
     'males_19_30y':     (6, 8, None, 45),
     'males_31_50y':     (6, 8, None, 45),
@@ -185,7 +185,7 @@ _IRON: Dict[str, Tuple] = {
     'lactating_31_50y': (6.5, 9, None, 45),
 }
 
-# MAGNESIUM (NutrientID 304, mg) — IOM 1997 Table S-3 (UL applies to
+# MAGNESIUM (NutrientID 304, mg): IOM 1997 Table S-3 (UL applies to
 # supplemental Mg only; we expose it as the published UL)
 _MAGNESIUM: Dict[str, Tuple] = {
     'males_19_30y':     (330, 400, None, 350),
@@ -202,7 +202,7 @@ _MAGNESIUM: Dict[str, Tuple] = {
     'lactating_31_50y': (310, 320, None, 350),
 }
 
-# PHOSPHORUS (NutrientID 305, mg) — IOM 1997 Table S-2
+# PHOSPHORUS (NutrientID 305, mg): IOM 1997 Table S-2
 _PHOSPHORUS: Dict[str, Tuple] = {
     'males_19_30y':     (580, 700, None, 4000),
     'males_31_50y':     (580, 700, None, 4000),
@@ -218,7 +218,7 @@ _PHOSPHORUS: Dict[str, Tuple] = {
     'lactating_31_50y': (580, 700, None, 4000),
 }
 
-# POTASSIUM (NutrientID 306, mg) — NASEM 2019 Table S-3 (AI only; no EAR/RDA/UL)
+# POTASSIUM (NutrientID 306, mg): NASEM 2019 Table S-3 (AI only; no EAR/RDA/UL)
 _POTASSIUM: Dict[str, Tuple] = {
     'males_19_30y':     (None, None, 3400, None),
     'males_31_50y':     (None, None, 3400, None),
@@ -234,7 +234,7 @@ _POTASSIUM: Dict[str, Tuple] = {
     'lactating_31_50y': (None, None, 2800, None),
 }
 
-# SODIUM (NutrientID 307, mg) — NASEM 2019 Tables S-3, S-5 (AI only; CDRR at 2300 mg/d
+# SODIUM (NutrientID 307, mg): NASEM 2019 Tables S-3, S-5 (AI only; CDRR at 2300 mg/d
 # replaces the prior UL conceptually but is not stored here as UL because the
 # percent-of-UL semantics do not match CDRR semantics; the deep-dive surfaces it as
 # a separate CDRR flag at the endpoint layer)
@@ -253,7 +253,7 @@ _SODIUM: Dict[str, Tuple] = {
     'lactating_31_50y': (None, None, 1500, None),
 }
 
-# ZINC (NutrientID 309, mg) — IOM 2001 Table S-9
+# ZINC (NutrientID 309, mg): IOM 2001 Table S-9
 _ZINC: Dict[str, Tuple] = {
     'males_19_30y':     (9.4, 11, None, 40),
     'males_31_50y':     (9.4, 11, None, 40),
@@ -269,7 +269,7 @@ _ZINC: Dict[str, Tuple] = {
     'lactating_31_50y': (10.4, 12, None, 40),
 }
 
-# COPPER (NutrientID 312, mcg) — IOM 2001 Table S-9
+# COPPER (NutrientID 312, mcg): IOM 2001 Table S-9
 _COPPER: Dict[str, Tuple] = {
     'males_19_30y':     (700, 900, None, 10000),
     'males_31_50y':     (700, 900, None, 10000),
@@ -285,7 +285,7 @@ _COPPER: Dict[str, Tuple] = {
     'lactating_31_50y': (1000, 1300, None, 10000),
 }
 
-# MANGANESE (NutrientID 315, mg) — IOM 2001 Table S-9 (AI + UL)
+# MANGANESE (NutrientID 315, mg): IOM 2001 Table S-9 (AI + UL)
 _MANGANESE: Dict[str, Tuple] = {
     'males_19_30y':     (None, None, 2.3, 11),
     'males_31_50y':     (None, None, 2.3, 11),
@@ -301,7 +301,7 @@ _MANGANESE: Dict[str, Tuple] = {
     'lactating_31_50y': (None, None, 2.6, 11),
 }
 
-# SELENIUM (NutrientID 317, mcg) — IOM 2000 Table S-3
+# SELENIUM (NutrientID 317, mcg): IOM 2000 Table S-3
 _SELENIUM: Dict[str, Tuple] = {
     'males_19_30y':     (45, 55, None, 400),
     'males_31_50y':     (45, 55, None, 400),
@@ -317,7 +317,7 @@ _SELENIUM: Dict[str, Tuple] = {
     'lactating_31_50y': (59, 70, None, 400),
 }
 
-# VITAMIN A RAE (NutrientID 320, mcg RAE) — IOM 2001 Table S-9
+# VITAMIN A RAE (NutrientID 320, mcg RAE): IOM 2001 Table S-9
 _VIT_A: Dict[str, Tuple] = {
     'males_19_30y':     (625, 900, None, 3000),
     'males_31_50y':     (625, 900, None, 3000),
@@ -333,7 +333,7 @@ _VIT_A: Dict[str, Tuple] = {
     'lactating_31_50y': (900, 1300, None, 3000),
 }
 
-# VITAMIN E (NutrientID 323, mg alpha-tocopherol) — IOM 2000 Table S-3
+# VITAMIN E (NutrientID 323, mg alpha-tocopherol): IOM 2000 Table S-3
 _VIT_E: Dict[str, Tuple] = {
     'males_19_30y':     (12, 15, None, 1000),
     'males_31_50y':     (12, 15, None, 1000),
@@ -349,7 +349,7 @@ _VIT_E: Dict[str, Tuple] = {
     'lactating_31_50y': (16, 19, None, 1000),
 }
 
-# VITAMIN D (NutrientID 328, mcg) — IOM 2011 Tables S-3, S-5
+# VITAMIN D (NutrientID 328, mcg): IOM 2011 Tables S-3, S-5
 _VIT_D: Dict[str, Tuple] = {
     'males_19_30y':     (10, 15, None, 100),
     'males_31_50y':     (10, 15, None, 100),
@@ -365,7 +365,7 @@ _VIT_D: Dict[str, Tuple] = {
     'lactating_31_50y': (10, 15, None, 100),
 }
 
-# VITAMIN K (NutrientID 430, mcg) — IOM 2001 Table S-9 (AI only)
+# VITAMIN K (NutrientID 430, mcg): IOM 2001 Table S-9 (AI only)
 _VIT_K: Dict[str, Tuple] = {
     'males_19_30y':     (None, None, 120, None),
     'males_31_50y':     (None, None, 120, None),
@@ -381,7 +381,7 @@ _VIT_K: Dict[str, Tuple] = {
     'lactating_31_50y': (None, None, 90, None),
 }
 
-# VITAMIN C (NutrientID 401, mg) — IOM 2000 Table S-3
+# VITAMIN C (NutrientID 401, mg): IOM 2000 Table S-3
 _VIT_C: Dict[str, Tuple] = {
     'males_19_30y':     (75, 90, None, 2000),
     'males_31_50y':     (75, 90, None, 2000),
@@ -397,7 +397,7 @@ _VIT_C: Dict[str, Tuple] = {
     'lactating_31_50y': (100, 120, None, 2000),
 }
 
-# THIAMIN (B1) (NutrientID 404, mg) — IOM 1998 Table S-3
+# THIAMIN (B1) (NutrientID 404, mg): IOM 1998 Table S-3
 _THIAMIN: Dict[str, Tuple] = {
     'males_19_30y':     (1.0, 1.2, None, None),
     'males_31_50y':     (1.0, 1.2, None, None),
@@ -413,7 +413,7 @@ _THIAMIN: Dict[str, Tuple] = {
     'lactating_31_50y': (1.2, 1.4, None, None),
 }
 
-# RIBOFLAVIN (B2) (NutrientID 405, mg) — IOM 1998 Table S-3
+# RIBOFLAVIN (B2) (NutrientID 405, mg): IOM 1998 Table S-3
 _RIBOFLAVIN: Dict[str, Tuple] = {
     'males_19_30y':     (1.1, 1.3, None, None),
     'males_31_50y':     (1.1, 1.3, None, None),
@@ -429,7 +429,7 @@ _RIBOFLAVIN: Dict[str, Tuple] = {
     'lactating_31_50y': (1.3, 1.6, None, None),
 }
 
-# NIACIN (NutrientID 406, mg NE) — IOM 1998 Table S-3
+# NIACIN (NutrientID 406, mg NE): IOM 1998 Table S-3
 _NIACIN: Dict[str, Tuple] = {
     'males_19_30y':     (12, 16, None, 35),
     'males_31_50y':     (12, 16, None, 35),
@@ -445,7 +445,7 @@ _NIACIN: Dict[str, Tuple] = {
     'lactating_31_50y': (13, 17, None, 35),
 }
 
-# PANTOTHENIC ACID (NutrientID 410, mg) — IOM 1998 Table S-3 (AI only)
+# PANTOTHENIC ACID (NutrientID 410, mg): IOM 1998 Table S-3 (AI only)
 _PANTOTHENIC: Dict[str, Tuple] = {
     'males_19_30y':     (None, None, 5, None),
     'males_31_50y':     (None, None, 5, None),
@@ -461,7 +461,7 @@ _PANTOTHENIC: Dict[str, Tuple] = {
     'lactating_31_50y': (None, None, 7, None),
 }
 
-# VITAMIN B6 (NutrientID 415, mg) — IOM 1998 Table S-3
+# VITAMIN B6 (NutrientID 415, mg): IOM 1998 Table S-3
 _VIT_B6: Dict[str, Tuple] = {
     'males_19_30y':     (1.1, 1.3, None, 100),
     'males_31_50y':     (1.1, 1.3, None, 100),
@@ -477,7 +477,7 @@ _VIT_B6: Dict[str, Tuple] = {
     'lactating_31_50y': (1.7, 2.0, None, 100),
 }
 
-# VITAMIN B12 (NutrientID 418, mcg) — IOM 1998 Table S-3
+# VITAMIN B12 (NutrientID 418, mcg): IOM 1998 Table S-3
 _VIT_B12: Dict[str, Tuple] = {
     'males_19_30y':     (2.0, 2.4, None, None),
     'males_31_50y':     (2.0, 2.4, None, None),
@@ -493,7 +493,7 @@ _VIT_B12: Dict[str, Tuple] = {
     'lactating_31_50y': (2.4, 2.8, None, None),
 }
 
-# CHOLINE (NutrientID 421, mg) — IOM 1998 Table S-3 (AI + UL)
+# CHOLINE (NutrientID 421, mg): IOM 1998 Table S-3 (AI + UL)
 _CHOLINE: Dict[str, Tuple] = {
     'males_19_30y':     (None, None, 550, 3500),
     'males_31_50y':     (None, None, 550, 3500),
@@ -509,7 +509,7 @@ _CHOLINE: Dict[str, Tuple] = {
     'lactating_31_50y': (None, None, 550, 3500),
 }
 
-# FOLATE DFE (NutrientID 435, mcg DFE) — IOM 1998 Table S-3
+# FOLATE DFE (NutrientID 435, mcg DFE): IOM 1998 Table S-3
 _FOLATE: Dict[str, Tuple] = {
     'males_19_30y':     (320, 400, None, 1000),
     'males_31_50y':     (320, 400, None, 1000),

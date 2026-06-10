@@ -323,7 +323,7 @@ def _coverage_warnings(
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def research_meal_deep_dive(request):
-    """POST /api/research/meal-deep-dive/ — JSON deep-dive payload."""
+    """POST /api/research/meal-deep-dive/: JSON deep-dive payload."""
     data, code, error = _build_payload(request.data or {})
     if error is not None:
         return Response({
@@ -336,18 +336,18 @@ def research_meal_deep_dive(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def research_meal_deep_dive_export_csv(request):
-    """POST /api/research/meal-deep-dive/export.csv/ — long-format CSV.
+    """POST /api/research/meal-deep-dive/export.csv/: long-format CSV.
 
     Same request body as the JSON endpoint. Returns one CSV file with
     one row per (dimension, key, life_stage) cell, in tidy long format
     so a researcher can ingest it directly into R, Stata, or pandas.
 
     Dimensions emitted:
-      * nutrient_panel  — one row per nutrient
-      * food_groups     — one row per FPED component or guideline gap
-      * processing      — one row per NOVA level (mass and energy shares)
-      * macronutrients  — one row per macronutrient (CHO, PRO, FAT, alcohol)
-      * contributions   — one row per (nutrient, contributor)
+      * nutrient_panel : one row per nutrient
+      * food_groups    : one row per FPED component or guideline gap
+      * processing     : one row per NOVA level (mass and energy shares)
+      * macronutrients : one row per macronutrient (CHO, PRO, FAT, alcohol)
+      * contributions  : one row per (nutrient, contributor)
     """
     data, code, error = _build_payload(request.data or {})
     if error is not None:

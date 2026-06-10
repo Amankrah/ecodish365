@@ -205,16 +205,16 @@ def adequacy_flag(
     can colour and the manuscript can table directly.
 
     Categories:
-      * `below_ear`             — intake below EAR, classical inadequate
-      * `between_ear_rda`       — between EAR and RDA, individually sufficient
+      * `below_ear`            : intake below EAR, classical inadequate
+      * `between_ear_rda`      : between EAR and RDA, individually sufficient
                                    probability but population proportion has
                                    non-trivial inadequacy share
-      * `at_or_above_rda`       — intake at or above RDA
-      * `below_ai`              — for nutrients with only AI; intake below AI
-      * `at_or_above_ai`        — for nutrients with only AI; intake at or above AI
-      * `at_or_above_ul`        — intake at or above UL (independent of the
+      * `at_or_above_rda`      : intake at or above RDA
+      * `below_ai`             : for nutrients with only AI; intake below AI
+      * `at_or_above_ai`       : for nutrients with only AI; intake at or above AI
+      * `at_or_above_ul`       : intake at or above UL (independent of the
                                    adequacy axis)
-      * `no_reference`          — neither EAR nor AI is published
+      * `no_reference`         : neither EAR nor AI is published
     """
     ul_breach = (pct_ul is not None and pct_ul >= 100.0)
     if pct_ear is not None:
