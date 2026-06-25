@@ -1,4 +1,4 @@
-/** Shared labels for the CNF + WAFCT + FDC food-composition catalogue section (`/cnf/*`). */
+/** Shared labels for the CNF + WAFCT + FDC + CIQUAL food-composition catalogue section (`/cnf/*`). */
 export const CATALOGUE_NAV = {
   section: 'Food Catalogue',
   overview: 'Catalogue overview',

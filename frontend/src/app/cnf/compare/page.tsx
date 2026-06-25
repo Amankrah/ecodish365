@@ -850,10 +850,11 @@ function CNFComparePageContent() {
                     <div className="font-medium text-gray-700">Start typing to search for foods</div>
                     <div className="text-xs">
                       Searching <strong>{
-                        modalSource === 'both'  ? 'CNF + WAFCT + FDC' :
-                        modalSource === 'cnf'   ? 'CNF only' :
-                        modalSource === 'wafct' ? 'WAFCT only' :
-                                                  'FDC only'
+                        modalSource === 'both'   ? 'CNF + WAFCT + FDC + CIQUAL' :
+                        modalSource === 'cnf'    ? 'CNF only' :
+                        modalSource === 'wafct'  ? 'WAFCT only' :
+                        modalSource === 'fdc'    ? 'FDC only' :
+                                                   'CIQUAL only'
                       }</strong> —
                       try <code className="bg-gray-100 px-1 rounded">apple</code>,{' '}
                       <code className="bg-gray-100 px-1 rounded">salmon</code>,{' '}

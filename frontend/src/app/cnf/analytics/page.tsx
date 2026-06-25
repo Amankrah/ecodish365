@@ -21,7 +21,9 @@ import { CNFApiService, DatabaseStats, IntegrityCheck } from '@/lib/api';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { useCnfExplorer } from '@/components/cnf/CnfExplorerContext';
-import { formatGroupDisplayName, isCnfGroup, isFdcGroup, isWafctGroup } from '@/lib/cnfGroupDisplay';
+import {
+  formatGroupDisplayName, isCnfGroup, isFdcGroup, isWafctGroup, isCiqualGroup,
+} from '@/lib/cnfGroupDisplay';
 import { CATALOGUE_NAV } from '@/lib/catalogueNav';
 
 interface AnalyticsData {
@@ -29,7 +31,7 @@ interface AnalyticsData {
   integrityCheck: IntegrityCheck | null;
 }
 
-type ChartScope = 'all' | 'cnf' | 'wafct' | 'fdc';
+type ChartScope = 'all' | 'cnf' | 'wafct' | 'fdc' | 'ciqual';
 type ChartMetric = 'foodGroups' | 'topNutrients';
 
 const CHART_COLORS = [
@@ -89,7 +91,7 @@ export default function CatalogueOverviewPage() {
     try {
       const exportData = {
         timestamp: new Date().toISOString(),
-        catalogue: 'CNF + WAFCT + FDC',
+        catalogue: 'CNF + WAFCT + FDC + CIQUAL',
         statistics: data.stats,
         integrity_check: data.integrityCheck,
       };
@@ -121,8 +123,9 @@ export default function CatalogueOverviewPage() {
         if (chartMetric !== 'foodGroups' || chartScope === 'all') return true;
         const id = groupIdByName.get(name);
         if (id == null) return chartScope === 'cnf';
-        if (chartScope === 'wafct') return isWafctGroup(id);
-        if (chartScope === 'fdc')   return isFdcGroup(id);
+        if (chartScope === 'wafct')  return isWafctGroup(id);
+        if (chartScope === 'fdc')    return isFdcGroup(id);
+        if (chartScope === 'ciqual') return isCiqualGroup(id);
         return isCnfGroup(id);  // 'cnf' scope
       })
       .map(([name, value]) => {
@@ -131,7 +134,7 @@ export default function CatalogueOverviewPage() {
         return { name, label, value, groupId: id };
       })
       .sort((a, b) => b.value - a.value)
-      .slice(0, chartScope === 'fdc' ? 20 : chartScope === 'wafct' ? 14 : 10);
+      .slice(0, chartScope === 'fdc' ? 20 : chartScope === 'ciqual' ? 12 : chartScope === 'wafct' ? 14 : 10);
   }, [data.stats, chartMetric, chartScope, groupIdByName]);
 
   const maxChartValue = chartData.length ? Math.max(...chartData.map(d => d.value)) : 1;
@@ -165,6 +168,7 @@ export default function CatalogueOverviewPage() {
   const fdcFoundationCount = stats?.fdc_foundation_food_count ?? 0;
   const fdcSrLegacyCount   = stats?.fdc_sr_legacy_food_count ?? 0;
   const fdcFnddsCount      = stats?.fdc_survey_fndds_food_count ?? 0;
+  const ciqualCount        = stats?.ciqual_food_count ?? 0;
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
@@ -210,7 +214,7 @@ export default function CatalogueOverviewPage() {
         </div>
 
         {stats && (
-          <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
+          <div className="grid grid-cols-2 lg:grid-cols-7 gap-4 mb-6">
             <div className="stat-card col-span-2 lg:col-span-1">
               <div className="text-2xl font-bold text-gray-900">{formatNumber(stats.food_count)}</div>
               <div className="text-sm text-gray-600">Foods total</div>
@@ -226,6 +230,10 @@ export default function CatalogueOverviewPage() {
             <div className="stat-card">
               <div className="text-2xl font-bold text-sky-800">{formatNumber(fdcCount)}</div>
               <div className="text-sm text-gray-600">FDC foods</div>
+            </div>
+            <div className="stat-card">
+              <div className="text-2xl font-bold text-purple-800">{formatNumber(ciqualCount)}</div>
+              <div className="text-sm text-gray-600">CIQUAL foods</div>
             </div>
             <div className="stat-card">
               <div className="text-2xl font-bold text-gray-900">{formatNumber(stats.food_groups)}</div>
@@ -245,7 +253,7 @@ export default function CatalogueOverviewPage() {
               <div className="flex flex-wrap gap-2">
                 {chartMetric === 'foodGroups' && (
                   <>
-                    {(['all', 'cnf', 'wafct', 'fdc'] as ChartScope[]).map(scope => (
+                    {(['all', 'cnf', 'wafct', 'fdc', 'ciqual'] as ChartScope[]).map(scope => (
                       <button
                         key={scope}
                         type="button"
@@ -396,10 +404,11 @@ export default function CatalogueOverviewPage() {
               </div>
               <p className="text-sm text-blue-800">
                 {formatNumber(cnfCount)} Canadian (CNF), {formatNumber(wafctCount)} West African (WAFCT),
-                and {formatNumber(fdcCount)} US foods (FDC — {formatNumber(fdcFoundationCount)} Foundation,
-                {' '}{formatNumber(fdcSrLegacyCount)} SR Legacy, {formatNumber(fdcFnddsCount)} Survey FNDDS)
-                in {stats.food_groups} groups. Use the source filter on search and compare to scope any single database
-                or search all three at once.
+                {' '}{formatNumber(fdcCount)} US foods (FDC — {formatNumber(fdcFoundationCount)} Foundation,
+                {' '}{formatNumber(fdcSrLegacyCount)} SR Legacy, {formatNumber(fdcFnddsCount)} Survey FNDDS),
+                and {formatNumber(ciqualCount)} French foods (CIQUAL 2025), in {stats.food_groups} groups.
+                Use the source filter on search and compare to scope any single database or search all four
+                at once.
               </p>
             </div>
             <div className="bg-green-50 border border-green-100 rounded-xl p-4">

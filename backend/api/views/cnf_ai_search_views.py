@@ -182,9 +182,9 @@ def cnf_ai_enhanced_search(request):
     # filter restricts the candidate pool to one food database
     # (cnf / wafct / fdc / both).
     source = str(request.data.get('source', 'both')).lower()
-    if source not in ('cnf', 'wafct', 'fdc', 'both'):
+    if source not in ('cnf', 'wafct', 'fdc', 'ciqual', 'ciqual', 'both'):
         source = 'both'
-    source_filter = source if source in ('cnf', 'wafct', 'fdc') else None
+    source_filter = source if source in ('cnf', 'wafct', 'fdc', 'ciqual') else None
 
     # Rate limit + circuit breaker
     rate_err = _enforce_rate_limit(request, kind='search')
@@ -297,7 +297,7 @@ def decompose_recipe(request):
     # restricts Stage-2 ingredient resolution to one food database
     # (cnf / wafct / fdc / both).
     source_raw = str(request.data.get('source', 'both')).lower()
-    source = source_raw if source_raw in ('cnf', 'wafct', 'fdc') else None
+    source = source_raw if source_raw in ('cnf', 'wafct', 'fdc', 'ciqual') else None
 
     # Rate limit + circuit breaker (5x cost for decompose)
     rate_err = _enforce_rate_limit(request, kind='decompose')
@@ -557,7 +557,7 @@ def recall_24h(request):
     # WAFCT-EXTEND (2026-05-24); FDC-INGEST (2026-06-25): optional `source`
     # restricts every meal's Stage-2 ingredient resolution to one food database.
     source_raw = str(request.data.get('source', 'both')).lower()
-    source = source_raw if source_raw in ('cnf', 'wafct', 'fdc') else None
+    source = source_raw if source_raw in ('cnf', 'wafct', 'fdc', 'ciqual') else None
 
     # Rate limit: 5¢ per text meal (LLM decompose) up to 30¢ cap. Packaged
     # meals arrive pre-decomposed from the scan flow — no per-meal LLM cost.

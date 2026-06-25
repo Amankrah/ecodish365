@@ -293,6 +293,8 @@ export interface DatabaseStats {
   fdc_foundation_food_count?: number;
   fdc_sr_legacy_food_count?: number;
   fdc_survey_fndds_food_count?: number;
+  // CIQUAL-INGEST (2026-06-26): fourth catalogue source.
+  ciqual_food_count?: number;
   nutrient_records: number;
   conversion_records: number;
   food_groups: number;
@@ -564,8 +566,10 @@ export interface CNFAIMatchResult {
 // describes a CNF FOOD_SOURCE.csv row — this is provenance, not the row.)
 // FDC-INGEST (2026-06-25): added 'fdc' as the third in-pipeline source
 // (USDA FoodData Central — Foundation + SR Legacy + FNDDS, FoodIDs 800k+).
-export type FoodSourceTag = 'cnf' | 'wafct' | 'fdc';
-export type SourceFilter  = 'cnf' | 'wafct' | 'fdc' | 'both';
+// CIQUAL-INGEST (2026-06-26): added 'ciqual' as the fourth source
+// (ANSES CIQUAL 2025 — French nutrition database, FoodIDs 900k+).
+export type FoodSourceTag = 'cnf' | 'wafct' | 'fdc' | 'ciqual';
+export type SourceFilter  = 'cnf' | 'wafct' | 'fdc' | 'ciqual' | 'both';
 
 export interface ProfileSampleAdequacy {
   adequate: boolean;
@@ -1560,7 +1564,7 @@ export type SubstitutionPurpose =
   | 'diabetes_friendly'
   | 'sustainability';
 
-export type SubstitutionSourceFilter = 'both' | 'cnf' | 'wafct' | 'fdc';
+export type SubstitutionSourceFilter = 'both' | 'cnf' | 'wafct' | 'fdc' | 'ciqual';
 
 export type SubstitutionCulturalContext = 'auto' | 'west_africa' | 'north_america' | 'any';
 

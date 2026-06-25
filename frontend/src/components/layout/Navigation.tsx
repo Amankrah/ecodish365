@@ -354,27 +354,40 @@ export default function Navigation() {
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-              aria-expanded={mobileMenuOpen ? 'true' : 'false'}
-              aria-controls="mobile-nav-drawer"
-              className="p-2 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100/80 transition-all duration-200"
-            >
-              {mobileMenuOpen ? (
+            {mobileMenuOpen ? (
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(false)}
+                aria-label="Close menu"
+                aria-expanded="true"
+                aria-controls="mobile-nav-drawer"
+                className="p-2 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100/80 transition-all duration-200"
+              >
                 <XMarkIcon className="w-6 h-6" aria-hidden="true" />
-              ) : (
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(true)}
+                aria-label="Open menu"
+                aria-expanded="false"
+                aria-controls="mobile-nav-drawer"
+                className="p-2 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100/80 transition-all duration-200"
+              >
                 <Bars3Icon className="w-6 h-6" aria-hidden="true" />
-              )}
-            </button>
+              </button>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Mobile Navigation */}
-      {mobileMenuOpen && (
-        <div id="mobile-nav-drawer" className="md:hidden">
+      {/* Mobile Navigation — always in DOM so aria-controls stays valid */}
+      <div
+        id="mobile-nav-drawer"
+        className={clsx('md:hidden', !mobileMenuOpen && 'hidden')}
+        hidden={!mobileMenuOpen}
+      >
+        {mobileMenuOpen && (
           <div className="px-4 pt-2 pb-4 space-y-2 bg-white/95 backdrop-blur-sm border-t border-gray-200/50">
             {filteredNavigation.map((item) => {
               const isActive = pathname === item.href ||
@@ -441,8 +454,8 @@ export default function Navigation() {
               );
             })}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </nav>
     {/* Contextual Sub-Navigation Bar */}
     {contextSubnav.length > 0 && (

@@ -96,7 +96,7 @@ def _load_bridge() -> tuple[Dict[int, Dict], Dict[tuple, Dict]]:
         return {}, {}
     by_gid: Dict[int, Dict] = {}
     by_src: Dict[tuple, Dict] = {}
-    for source in ('cnf', 'wafct', 'fdc'):
+    for source in ('cnf', 'wafct', 'fdc', 'ciqual'):
         block = raw.get(source, {})
         if not isinstance(block, dict):
             continue

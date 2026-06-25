@@ -327,13 +327,31 @@ def dri_panel_for_meal(
         pa = _pct(amount, ai); pu = _pct(amount, ul)
         flag = adequacy_flag(pe, pr, pa, pu)
 
+        # CDRR (NASEM 2019). The block can be either:
+        #   - global, with `cdrr_mg_per_day` (sodium pattern)
+        #   - per-life-stage, with `by_life_stage[life_stage_code]` (potassium pattern)
+        # The `direction` field disambiguates the flag semantics:
+        #   - 'cap'    (sodium): intake AT/ABOVE the CDRR is risk-increasing
+        #   - 'target' (K, NASEM 2019 Ch. 6): intake AT/ABOVE the CDRR is risk-reducing
+        # When `direction` is missing on a legacy block, defaults to 'cap'
+        # (the original sodium-only assumption).
         cdrr_block = nut.get('cdrr')
         cdrr_value = None
         cdrr_flag = None
         if cdrr_block is not None:
-            cdrr_value = float(cdrr_block.get('cdrr_mg_per_day') or 0.0) or None
+            direction = str(cdrr_block.get('direction') or 'cap').lower()
+            by_ls = cdrr_block.get('by_life_stage') or {}
+            if isinstance(by_ls, dict) and life_stage in by_ls:
+                cdrr_value = float(by_ls.get(life_stage) or 0.0) or None
+            else:
+                cdrr_value = float(cdrr_block.get('cdrr_mg_per_day') or 0.0) or None
             if cdrr_value is not None and amount > 0:
-                cdrr_flag = 'above_cdrr' if amount >= cdrr_value else 'at_or_below_cdrr'
+                if direction == 'target':
+                    # Higher is better (potassium): meeting target = good.
+                    cdrr_flag = 'meets_cdrr_target' if amount >= cdrr_value else 'below_cdrr_target'
+                else:
+                    # Cap (sodium): lower is better.
+                    cdrr_flag = 'above_cdrr' if amount >= cdrr_value else 'at_or_below_cdrr'
 
         rows.append(NutrientDriRow(
             nutrient_id=nid, name=nut.get('name', ''),

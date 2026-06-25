@@ -29,7 +29,7 @@ const quickActions = [
   },
   {
     name: 'Advanced Search',
-    description: 'Search CNF + WAFCT + FDC with filters and relevance scoring',
+    description: 'Search CNF + WAFCT + FDC + CIQUAL with filters and relevance scoring',
     icon: MagnifyingGlassIcon,
     href: '/cnf/search',
     color: 'from-blue-500 to-blue-600',
@@ -43,7 +43,7 @@ const quickActions = [
   },
   {
     name: CATALOGUE_NAV.overview,
-    description: 'CNF + WAFCT + FDC counts, group distribution, data quality',
+    description: 'CNF + WAFCT + FDC + CIQUAL counts, group distribution, data quality',
     icon: ChartBarIcon,
     href: '/cnf/analytics',
     color: 'from-purple-500 to-purple-600',
@@ -65,13 +65,13 @@ const features = [
   },
   {
     title: 'Food Comparison',
-    description: 'Compare nutritional profiles of multiple foods side-by-side across all three databases. Cross-database comparisons surface per-source provenance badges so methodological differences stay visible.',
-    items: ['Multi-food comparison', 'Cross-database (CNF + WAFCT + FDC)', 'Per-source provenance badges', 'Visual charts']
+    description: 'Compare nutritional profiles of multiple foods side-by-side across all four databases. Cross-database comparisons surface per-source provenance badges so methodological differences stay visible.',
+    items: ['Multi-food comparison', 'Cross-database (CNF + WAFCT + FDC + CIQUAL)', 'Per-source provenance badges', 'Visual charts']
   },
   {
     title: 'Database Insights',
-    description: 'Statistics across three food-composition databases — Health Canada CNF (5,993 foods), FAO/INFOODS WAFCT 2019 (1,028 West African foods), and USDA FoodData Central (13,620 US foods: Foundation, SR Legacy, FNDDS).',
-    items: ['Combined database stats (20,641 foods)', 'INFOODS↔CNF bridge (48 WAFCT mappings)', 'FDC nutrient_nbr↔CNF bridge (150 mappings)', 'Per-source provenance + methodology notes']
+    description: 'Statistics across four food-composition databases — Health Canada CNF (5,993 foods), FAO/INFOODS WAFCT 2019 (1,028 West African foods), USDA FoodData Central (13,620 US foods: Foundation, SR Legacy, FNDDS), and ANSES CIQUAL 2025 (~3,484 French foods).',
+    items: ['Combined database stats (~24,125 foods)', 'INFOODS↔CNF bridge (48 WAFCT + 61 CIQUAL mappings)', 'FDC nutrient_nbr↔CNF bridge (150 mappings)', 'Per-source provenance + methodology notes']
   },
 ];
 
@@ -105,13 +105,15 @@ export default function CNFDashboard() {
             Food Catalogue
           </h1>
           <p className="text-lg text-gray-600 max-w-3xl">
-            Explore <strong>three food-composition databases side by side</strong>:
+            Explore <strong>four food-composition databases side by side</strong>:
             Health Canada&rsquo;s Canadian Nutrient File (CNF — 5,993 foods, 150+
             nutrients), FAO/INFOODS&rsquo; West African Food Composition Table 2019
             (WAFCT — 1,028 foods including fonio, baobab, dawadawa, gari, egusi, and
-            other West African staples), and USDA FoodData Central (FDC — 13,620 US
-            foods spanning Foundation, SR Legacy, and Survey FNDDS). Search, compare,
-            and analyze across any one source or all of them at once.
+            other West African staples), USDA FoodData Central (FDC — 13,620 US
+            foods spanning Foundation, SR Legacy, and Survey FNDDS), and ANSES&rsquo;
+            CIQUAL 2025 (~3,484 French foods, pairing with Agribalyse 3.2 LCA via
+            shared Ciqual codes). Search, compare, and analyze across any one source
+            or all of them at once.
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
             <span className="inline-flex items-center px-2 py-1 rounded border bg-gray-100 text-gray-700 border-gray-200 font-semibold">
@@ -123,8 +125,11 @@ export default function CNFDashboard() {
             <span className="inline-flex items-center px-2 py-1 rounded border bg-sky-100 text-sky-800 border-sky-200 font-semibold">
               FDC — USDA
             </span>
+            <span className="inline-flex items-center px-2 py-1 rounded border bg-purple-100 text-purple-800 border-purple-200 font-semibold">
+              CIQUAL — ANSES
+            </span>
             <span className="text-gray-500">
-              Source filter on every search lets you scope to any single database or search all three.
+              Source filter on every search lets you scope to any single database or search all four.
             </span>
           </div>
         </div>
@@ -142,7 +147,7 @@ export default function CNFDashboard() {
                     {formatNumber(stats.food_count)}
                   </div>
                   <div className="text-sm text-gray-600">Foods</div>
-                  <div className="text-xs text-gray-500">CNF + WAFCT + FDC combined</div>
+                  <div className="text-xs text-gray-500">CNF + WAFCT + FDC + CIQUAL combined</div>
                 </div>
               </div>
             </div>
@@ -339,7 +344,7 @@ export default function CNFDashboard() {
               </div>
               <div>
                 <div className="font-medium text-gray-900 mb-1">Coverage</div>
-                <div className="text-gray-600">~20,641 foods across Canada, West Africa, and the United States, with per-source provenance retained.</div>
+                <div className="text-gray-600">~24,125 foods across Canada, West Africa, the United States, and France, with per-source provenance retained.</div>
               </div>
               <div>
                 <div className="font-medium text-gray-900 mb-1">Last updated</div>
@@ -368,8 +373,8 @@ export default function CNFDashboard() {
         <div className="bg-gradient-to-r from-primary-600 to-accent-600 rounded-xl p-8 text-center text-white">
           <h2 className="text-2xl font-bold mb-4">Ready to Explore?</h2>
           <p className="text-primary-100 mb-6 max-w-2xl mx-auto">
-            Dive into three food-composition databases — Canadian, West African, and US —
-            and discover detailed nutritional information for over twenty thousand foods.
+            Dive into four food-composition databases — Canadian, West African, US, and French —
+            and discover detailed nutritional information for over twenty-four thousand foods.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

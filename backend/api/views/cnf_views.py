@@ -191,7 +191,7 @@ def search_cnf_foods(request):
     limit = min(int(request.GET.get('limit', 50)), 100)  # Max 100 results
     offset = int(request.GET.get('offset', 0))
     source = request.GET.get('source', 'both').lower()
-    if source not in ('cnf', 'wafct', 'fdc', 'both'):
+    if source not in ('cnf', 'wafct', 'fdc', 'ciqual', 'ciqual', 'both'):
         source = 'both'
 
     if not query:
@@ -204,7 +204,7 @@ def search_cnf_foods(request):
         query,
         limit,
         offset,
-        source if source in ('cnf', 'wafct', 'fdc') else 'both',
+        source if source in ('cnf', 'wafct', 'fdc', 'ciqual') else 'both',
     )
 
     return Response({
@@ -301,7 +301,7 @@ def discover_foods(request):
         food_group_id = None
 
     source = body.get('source')
-    if source not in ('cnf', 'wafct', 'fdc'):
+    if source not in ('cnf', 'wafct', 'fdc', 'ciqual'):
         source = None
 
     ratio = body.get('ratio')
@@ -378,7 +378,7 @@ def get_foods_by_group(request, food_group_id):
 
     if food_type not in (None, 'single', 'mixed'):
         food_type = None
-    if source not in (None, 'cnf', 'wafct', 'fdc'):
+    if source not in (None, 'cnf', 'wafct', 'fdc', 'ciqual'):
         source = None
     if sort not in ('name', 'kcal', 'food_id'):
         sort = 'name'

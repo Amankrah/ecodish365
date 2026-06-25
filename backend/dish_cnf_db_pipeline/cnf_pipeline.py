@@ -124,16 +124,16 @@ class CNFDataPipeline:
                 return {"results": [], "total": 0, "query": query}
 
             src = (source or 'both').lower()
-            if src not in ('cnf', 'wafct', 'fdc', 'both'):
+            if src not in ('cnf', 'wafct', 'fdc', 'ciqual', 'ciqual', 'both'):
                 src = 'both'
 
             query_lower = query.lower().strip()
 
             base = self.data_loader.food_name_df
             work_df = base
-            if src in ('cnf', 'wafct', 'fdc') and 'source' in base.columns:
+            if src in ('cnf', 'wafct', 'fdc', 'ciqual') and 'source' in base.columns:
                 work_df = base[base['source'] == src]
-            elif src in ('cnf', 'wafct', 'fdc'):
+            elif src in ('cnf', 'wafct', 'fdc', 'ciqual'):
                 logger.warning(
                     '`source` column missing on food_name_df; ignoring source=%r', src,
                 )
@@ -146,7 +146,7 @@ class CNFDataPipeline:
                     "limit": limit,
                     "offset": offset,
                     "has_more": False,
-                    **({"source_filter": src} if src in ('cnf', 'wafct', 'fdc') else {}),
+                    **({"source_filter": src} if src in ('cnf', 'wafct', 'fdc', 'ciqual') else {}),
                 }
 
             # Search in food descriptions
@@ -187,7 +187,7 @@ class CNFDataPipeline:
                 "offset": offset,
                 "has_more": offset + limit < total_results,
             }
-            if src in ('cnf', 'wafct', 'fdc'):
+            if src in ('cnf', 'wafct', 'fdc', 'ciqual'):
                 out["source_filter"] = src
                 out["filtered_count"] = total_results
             return out
@@ -372,7 +372,7 @@ class CNFDataPipeline:
         allowed = fn
         if food_group_id is not None:
             allowed = allowed[allowed['FoodGroupID'] == int(food_group_id)]
-        if source in ('cnf', 'wafct', 'fdc') and 'source' in allowed.columns:
+        if source in ('cnf', 'wafct', 'fdc', 'ciqual') and 'source' in allowed.columns:
             allowed = allowed[allowed['source'] == source]
         allowed_ids = set(int(x) for x in allowed['FoodID'].dropna().tolist())
         mask &= wide.index.to_series().isin(allowed_ids)
@@ -498,7 +498,7 @@ class CNFDataPipeline:
 
             if 'source' not in pool.columns:
                 pool['source'] = 'cnf'
-            if source in ('cnf', 'wafct', 'fdc'):
+            if source in ('cnf', 'wafct', 'fdc', 'ciqual'):
                 pool = pool[pool['source'] == source]
 
             if food_type in ('single', 'mixed'):
@@ -630,6 +630,7 @@ class CNFDataPipeline:
             'cnf_count': 0,
             'wafct_count': 0,
             'fdc_count': 0,
+            'ciqual_count': 0,
         }
 
     @staticmethod
@@ -638,7 +639,7 @@ class CNFDataPipeline:
         from api.services.cnf_food_type import get_food_type
         from api.services.cnf_prep_state import prep_state_of
 
-        cnf_count = wafct_count = fdc_count = 0
+        cnf_count = wafct_count = fdc_count = ciqual_count = 0
         ft_single = ft_mixed = ft_unknown = 0
         thermal_counts: Dict[str, int] = {}
         preservation_counts: Dict[str, int] = {}
@@ -651,6 +652,8 @@ class CNFDataPipeline:
                 wafct_count += 1
             elif src == 'fdc':
                 fdc_count += 1
+            elif src == 'ciqual':
+                ciqual_count += 1
             else:
                 cnf_count += 1
 
@@ -679,6 +682,7 @@ class CNFDataPipeline:
             'cnf_count': cnf_count,
             'wafct_count': wafct_count,
             'fdc_count': fdc_count,
+            'ciqual_count': ciqual_count,
             'food_type': {'single': ft_single, 'mixed': ft_mixed, 'unknown': ft_unknown},
             'thermal_state': dict(sorted(thermal_counts.items(), key=lambda kv: -kv[1])),
             'preservation_state': dict(sorted(preservation_counts.items(), key=lambda kv: -kv[1])),
@@ -981,10 +985,13 @@ class CNFDataPipeline:
                     stats['fdc_survey_fndds_food_count'] = int(
                         ((food_df.loc[fdc_mask, 'data_type']) == 'survey_fndds_food').sum()
                     )
+                # CIQUAL-INGEST (2026-06-26): fourth catalogue source.
+                stats['ciqual_food_count'] = int((food_df['source'] == 'ciqual').sum())
             else:
-                stats['cnf_food_count']   = len(food_df)
-                stats['wafct_food_count'] = 0
-                stats['fdc_food_count']   = 0
+                stats['cnf_food_count']    = len(food_df)
+                stats['wafct_food_count']  = 0
+                stats['fdc_food_count']    = 0
+                stats['ciqual_food_count'] = 0
             
             # Foods by group
             foods_by_group = self.data_loader.food_name_df.groupby('FoodGroupID').size()

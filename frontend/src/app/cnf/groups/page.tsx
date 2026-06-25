@@ -229,7 +229,7 @@ function CNFGroupsPageContent() {
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Browse by food groups</h1>
               <p className="text-gray-600 max-w-2xl">
-                Explore the CNF + WAFCT + FDC catalogue by category. Filter by source, food type, and
+                Explore the CNF + WAFCT + FDC + CIQUAL catalogue by category. Filter by source, food type, and
                 preparation state; screen within a group; or send selections to compare or all scores.
               </p>
             </div>
@@ -268,7 +268,7 @@ function CNFGroupsPageContent() {
                   <CubeIcon className="w-14 h-14 text-gray-300 mx-auto mb-3" />
                   <h3 className="text-lg font-medium text-gray-900 mb-1">Select a food group</h3>
                   <p className="text-gray-600 text-sm">
-                    {foodGroups.length} groups · CNF + WAFCT + FDC combined
+                    {foodGroups.length} groups · CNF + WAFCT + FDC + CIQUAL combined
                   </p>
                 </div>
 
@@ -379,6 +379,7 @@ function CNFGroupsPageContent() {
                       <option value="cnf">CNF only</option>
                       <option value="wafct">WAFCT only</option>
                       <option value="fdc">FDC only</option>
+                      <option value="ciqual">CIQUAL only</option>
                     </select>
                     <select
                       value={foodTypeFilter}

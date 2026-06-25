@@ -17,7 +17,7 @@ function DiscoverPageContent() {
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Discover by nutrient</h1>
           <p className="text-gray-600">
-            A research workbench over the CNF + WAFCT + FDC catalogue. Combine nutrient bounds, rank by
+            A research workbench over the CNF + WAFCT + FDC + CIQUAL catalogue. Combine nutrient bounds, rank by
             density per 100 kcal or by clinical ratios, threshold on % Daily Value, scope to a food
             group, and export the result set. Open any food for its scoring panels and all-scores handoff.
           </p>

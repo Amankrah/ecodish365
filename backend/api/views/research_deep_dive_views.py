@@ -38,6 +38,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from api.services import dri_compendium
+from api.services.derived_nutrient_metrics import compute_derived_metrics
 from api.services.meal_composition_deep_dive import (
     composition_deep_dive,
 )
@@ -142,6 +143,25 @@ def _build_payload(request_body: Dict[str, Any]) -> Tuple[Dict[str, Any], int, O
 
     life_stage_code, life_stage_echo = _resolve_life_stage(request_body.get('life_stage'))
 
+    # Optional anthropometry for the derived-metrics block (Phase B, 2026-06-26).
+    # Body weight enables protein g/kg and EER computation; PAL category +
+    # height refine the EER. All fields are optional — derived_metrics
+    # gracefully reports "not computed" when missing.
+    anthro = request_body.get('anthropometry') or {}
+    if not isinstance(anthro, dict):
+        anthro = {}
+    def _float_or_none(v):
+        try:
+            f = float(v)
+            return f if f > 0 else None
+        except (TypeError, ValueError):
+            return None
+    body_weight_kg = _float_or_none(anthro.get('body_weight_kg'))
+    height_cm      = _float_or_none(anthro.get('height_cm'))
+    pal_category   = anthro.get('pal_category')
+    if pal_category not in ('sedentary', 'low_active', 'active', 'very_active'):
+        pal_category = None
+
     # Compose all meals' foods into one day-level food list for the
     # day-level aggregation, then optionally aggregate each meal separately.
     day_foods: List[Dict[str, Any]] = []
@@ -233,6 +253,38 @@ def _build_payload(request_body: Dict[str, Any]) -> Tuple[Dict[str, Any], int, O
         'response_contract_version': '2026-06-09',
     }
 
+    # Methodology caveats — academic-rigor surface (2026-06-26). The DRI
+    # cut-point method (Beaton 1986; IOM 2000 Ch. 4) is for usual intake,
+    # not single-day intake; AMDR is a habitual recommendation; NOVA has
+    # documented inter-rater disagreement. Frontend renders these as a
+    # persistent banner so single-meal / single-day flags ("below_ear",
+    # "above_amdr") are read in the right interpretive context.
+    is_single_day = scope == 'meal' or len(cleaned_meals) <= 1
+    methodology_caveats = {
+        'single_day_cutpoint': (
+            "EAR cut-point method (IOM 2000 'Dietary Reference Intakes: "
+            "Applications in Dietary Assessment', Ch. 4) requires usual intake "
+            "distributions, typically ≥2 non-consecutive 24-h recalls adjusted "
+            "for within-person variability (NCI Method, Tooze 2010 Stat Med). "
+            "Applied here to a single day of intake — flags conflate random "
+            "day-to-day variation with chronic inadequacy. Interpret as "
+            "'single-day intake vs reference', not as a chronic adequacy verdict."
+        ) if is_single_day else None,
+        'amdr_habitual': (
+            "AMDR (IOM 2005 'DRIs for Energy, Carbohydrate, Fiber, Fat, Fatty "
+            "Acids, Cholesterol, Protein, and Amino Acids', Ch. 11) is a "
+            "habitual % energy recommendation. A single low-carb meal is not "
+            "'below AMDR' if the day balances out. Flags here are informational "
+            "for this single observation."
+        ),
+        'nova_reliability': (
+            "NOVA classification inter-rater agreement is moderate (κ ≈ 0.45; "
+            "Braesco et al. 2022 Eur J Clin Nutr) with ~25 % misclassification "
+            "between trained raters (Bleiweiss-Sande 2019 Curr Dev Nutr). "
+            "Per-food classifier confidence is reported alongside each food."
+        ),
+    }
+
     data = {
         'meta': {
             'scope': scope,
@@ -248,6 +300,7 @@ def _build_payload(request_body: Dict[str, Any]) -> Tuple[Dict[str, Any], int, O
                 'include_top_contributors': include_top_contrib,
                 'top_k': top_k,
             },
+            'methodology_caveats': methodology_caveats,
         },
         'nutrient_panel': nutrient_panel,
         'macronutrient_distribution':
@@ -263,6 +316,19 @@ def _build_payload(request_body: Dict[str, Any]) -> Tuple[Dict[str, Any], int, O
         'per_meal': per_meal_block,
         'coverage': coverage_block,
         'provenance': provenance,
+        # Phase B (2026-06-26): bioavailability splits + WHO/AHA thresholds +
+        # body-weight-anchored protein adequacy + IOM 2002 EER vs Goldberg
+        # cutoff. See `api.services.derived_nutrient_metrics`.
+        'derived_metrics': compute_derived_metrics(
+            nutrient_totals=day_nutrient_amounts,
+            foods=day_foods,
+            energy_kcal=float(day_nutrient_amounts.get(208, 0.0) or 0.0),
+            body_weight_kg=body_weight_kg,
+            age_years=(life_stage_echo or {}).get('age_years'),
+            sex=(life_stage_echo or {}).get('sex'),
+            pal_category=pal_category,
+            height_cm=height_cm,
+        ),
     }
     return data, status.HTTP_200_OK, None
 

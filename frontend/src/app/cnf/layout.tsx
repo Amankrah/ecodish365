@@ -3,7 +3,7 @@ import { CnfExplorerShell } from '@/components/cnf/CnfExplorerShell';
 
 export const metadata: Metadata = {
   title: "Food Catalogue — CNF + WAFCT + FDC",
-  description: "Explore three food-composition databases side by side: Health Canada's CNF (5,993 foods, 150+ nutrients), FAO/INFOODS' WAFCT 2019 (1,028 West African foods including fonio, baobab, dawadawa), and USDA FoodData Central (13,620 US foods spanning Foundation, SR Legacy, and Survey FNDDS). Search, compare, and analyze nutritional content with advanced filtering and per-source provenance.",
+  description: "Explore four food-composition databases side by side: Health Canada's CNF (5,993 foods, 150+ nutrients), FAO/INFOODS' WAFCT 2019 (1,028 West African foods including fonio, baobab, dawadawa), USDA FoodData Central (13,620 US foods spanning Foundation, SR Legacy, and Survey FNDDS), and ANSES CIQUAL 2025 (~3,484 French foods). Search, compare, and analyze nutritional content with advanced filtering and per-source provenance.",
   keywords: [
     "Canadian Nutrient File", "CNF database", "Canada nutrition database",
     "WAFCT", "West African Food Composition Table", "FAO INFOODS",

@@ -117,10 +117,10 @@ function SidebarSection({
 
 export function GroupSidebar({ groups, countById, selectedId, onSelect }: GroupSidebarProps) {
   const [query, setQuery] = useState('');
-  // FDC-INGEST (2026-06-25): three-way split (CNF / WAFCT / FDC). Each
-  // section gets its own divider chip so the three sources stay visually
-  // separated in the 237-group sidebar.
-  const { cnf, wafct, fdc } = useMemo(() => splitFoodGroups(groups), [groups]);
+  // CIQUAL-INGEST (2026-06-26): four-way split (CNF / WAFCT / FDC / CIQUAL).
+  // Each section gets its own divider chip so the four sources stay
+  // visually separated in the now ~250-group sidebar.
+  const { cnf, wafct, fdc, ciqual } = useMemo(() => splitFoodGroups(groups), [groups]);
 
   const filterGroups = (list: FoodGroup[]) => {
     if (!query.trim()) return list;
@@ -131,9 +131,10 @@ export function GroupSidebar({ groups, countById, selectedId, onSelect }: GroupS
     );
   };
 
-  const cnfFiltered   = filterGroups(cnf);
-  const wafctFiltered = filterGroups(wafct);
-  const fdcFiltered   = filterGroups(fdc);
+  const cnfFiltered    = filterGroups(cnf);
+  const wafctFiltered  = filterGroups(wafct);
+  const fdcFiltered    = filterGroups(fdc);
+  const ciqualFiltered = filterGroups(ciqual);
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 lg:p-5 sticky top-4">
@@ -186,6 +187,17 @@ export function GroupSidebar({ groups, countById, selectedId, onSelect }: GroupS
           selectedId={selectedId}
           onSelect={onSelect}
           totalInSource={fdc.length}
+        />
+        <SidebarSection
+          title="CIQUAL"
+          badge="ANSES France 2025"
+          badgeClass="bg-purple-100 text-purple-800 border-purple-200"
+          visible={ciqualFiltered}
+          emptyLabel="No matching CIQUAL groups"
+          countById={countById}
+          selectedId={selectedId}
+          onSelect={onSelect}
+          totalInSource={ciqual.length}
         />
       </div>
     </div>

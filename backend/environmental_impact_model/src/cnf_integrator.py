@@ -527,6 +527,20 @@ class CNFIntegrator:
         if not food_data:
             return {}
 
+        # CIQUAL-AGRIBALYSE-DIRECT (2026-06-26): for CIQUAL foods (FoodIDs
+        # 900,000+) every row carries its Ciqual code in `FoodCode` (e.g.
+        # "CIQUAL_24999"). Agribalyse 3.2's catalog is keyed on the same
+        # Ciqual code, so we can substitute the per-food, per-100g Global
+        # warming value directly — strictly more precise than the CNF
+        # group-mean fallback and with no LLM/embedding matcher needed.
+        # Land use and Water consumption are KEPT on the existing P&N + M&H
+        # methodology (Agribalyse only ships ReCiPe Global warming + climate
+        # sub-components + Stratospheric ozone in ReCiPe units; its Land
+        # and Water are EF 3.1 characterised scores in incompatible units
+        # — see §7.5 / TODO-CODE-LCA-2). All 20 EF 3.1 indicators are still
+        # surfaced as `_agribalyse_full` so opt-in consumers can read them.
+        ciqual_overlay = self._try_ciqual_agribalyse_overlay(food_id, food_data)
+
         food_group_name = food_data.get('food_group', {}).get('FoodGroupName', 'Unknown')
 
         # Per-food-group factors for the v1-consumed categories, COMPUTED from
@@ -608,7 +622,101 @@ class CNFIntegrator:
                 }
         factors_out['_uncertainty_bands'] = bands
 
+        # CIQUAL-AGRIBALYSE-DIRECT overlay (computed earlier in this method).
+        # Applied last so the rest of the function works in CNF-group-mean
+        # space and the per-food precision improvements only land where
+        # we have an Agribalyse match — single source of truth for the
+        # baseline, additive precision win for CIQUAL.
+        if ciqual_overlay is not None:
+            self._apply_ciqual_overlay(factors_out, ciqual_overlay)
+
         return factors_out
+
+    # ---------- CIQUAL-AGRIBALYSE-DIRECT helpers ------------------------
+
+    def _try_ciqual_agribalyse_overlay(
+        self, food_id: int, food_data: Dict[str, Any],
+    ) -> Optional[Dict[str, Any]]:
+        """Return Agribalyse 3.2 per-food data for a CIQUAL food, or None.
+
+        Returns None for any non-CIQUAL food (FoodID < 900,000) and for
+        CIQUAL foods not in the Agribalyse catalog. Callers MUST treat None
+        as "use the existing CNF group-mean path" — no error.
+        """
+        if food_id < 900_000:
+            return None
+        try:
+            from environmental_impact_model.src.agribalyse_ciqual_lookup import (
+                agribalyse_for_ciqual_code, ciqual_alim_code_from_food_code,
+            )
+        except ImportError:
+            return None
+        # `get_food_data` returns a NESTED dict shaped as
+        # `{food_info: {...FoodCode...}, nutrients: [...], food_group: {...}, ...}`
+        # so the FoodCode lives one level down inside `food_info`.
+        food_info = food_data.get('food_info') or {}
+        alim_code = ciqual_alim_code_from_food_code(food_info.get('FoodCode'))
+        if alim_code is None:
+            return None
+        return agribalyse_for_ciqual_code(alim_code)
+
+    def _apply_ciqual_overlay(
+        self, factors_out: Dict[str, Any], entry: Dict[str, Any],
+    ) -> None:
+        """Apply a matched Agribalyse 3.2 entry onto the in-progress
+        factors dict. Mutates `factors_out` in place.
+
+        Decisions:
+          - **Global warming**: REPLACE with Agribalyse per-food value
+            (kg CO2 eq / 100 g; same methodology as P&N central; strictly
+            more precise). Tighten the uncertainty band to ±15 % around
+            the new central — DQR-derived bands are deferred.
+          - **Land use / Water consumption**: KEEP existing P&N + M&H
+            CNF-group means. Agribalyse's Land + Water use EF 3.1
+            characterised scores in incompatible units (Pt/kg dimensionless
+            for Land; AWARE m³ deprived/kg for Water) — not unit-compatible
+            with the consumed v1 metrics.
+          - **All 20 EF 3.1 indicators** + **5 ReCiPe midpoints** + DQR +
+            agribalyse_group + agribalyse_subgroup: surface as
+            `_agribalyse_full` so opt-in consumers can read them.
+        """
+        recipe = entry.get('recipe2016_midpoints_per_100g') or {}
+        ef31   = entry.get('ef31_indicators_per_100g') or {}
+
+        gw = recipe.get('Global warming')
+        if isinstance(gw, (int, float)) and gw > 0:
+            factors_out['Global warming'] = float(gw)
+            # Re-tighten the GHG uncertainty band around the per-food value.
+            bands = factors_out.get('_uncertainty_bands') or {}
+            bands['Global warming'] = {
+                'low':     float(gw) * 0.85,
+                'central': float(gw),
+                'high':    float(gw) * 1.15,
+            }
+            factors_out['_uncertainty_bands'] = bands
+
+            # Update the GHG-specific provenance keys.
+            src_by_cat  = dict(factors_out.get('_data_source_by_category') or {})
+            conf_by_cat = dict(factors_out.get('_confidence_by_category') or {})
+            src_by_cat['Global warming']  = 'Agribalyse 3.2 (Ciqual code identity match)'
+            conf_by_cat['Global warming'] = 'Very high (per-food, no fuzzy matching)'
+            factors_out['_data_source_by_category']  = src_by_cat
+            factors_out['_confidence_by_category']  = conf_by_cat
+
+        factors_out['_agribalyse_full'] = {
+            'recipe2016_midpoints_per_100g': dict(recipe),
+            'ef31_indicators_per_100g':      dict(ef31),
+            'dqr':                           entry.get('dqr'),
+            'agribalyse_group':              entry.get('agribalyse_group'),
+            'agribalyse_subgroup':           entry.get('agribalyse_subgroup'),
+            'lci_name':                      entry.get('lci_name'),
+            'lci_name_fr':                   entry.get('lci_name_fr'),
+            'ciqual_code':                   entry.get('ciqual_code'),
+            'agb_code':                      entry.get('agb_code'),
+        }
+        factors_out['_matched_via']      = 'ciqual_code_identity'
+        factors_out['_ciqual_code']      = entry.get('ciqual_code')
+        factors_out['_agribalyse_dqr']   = entry.get('dqr')
     
     def is_initialized(self) -> bool:
         """Check if the integrator has been initialized"""

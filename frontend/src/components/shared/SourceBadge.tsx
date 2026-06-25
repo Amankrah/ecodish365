@@ -1,9 +1,10 @@
 /**
  * SourceBadge — small per-result provenance pill
- * (WAFCT-EXTEND 2026-05-24, FDC-INGEST 2026-06-25).
+ * (WAFCT-EXTEND 2026-05-24, FDC-INGEST 2026-06-25, CIQUAL-INGEST 2026-06-26).
  *
- * Renders a "CNF" / "WAFCT" / "FDC" tag next to a food name so users
- * know which food-composition database the row came from. Audience-aware:
+ * Renders a "CNF" / "WAFCT" / "FDC" / "CIQUAL" tag next to a food name so
+ * users know which food-composition database the row came from.
+ * Audience-aware:
  *   - researcher / policy modes: always visible
  *   - individual mode: rendered only for non-CNF sources (so the CNF
  *     default is silent)
@@ -16,7 +17,7 @@
 
 import type { UserType } from './AudienceToggle';
 
-export type FoodSource = 'cnf' | 'wafct' | 'fdc';
+export type FoodSource = 'cnf' | 'wafct' | 'fdc' | 'ciqual';
 
 /** Derive the food-database source from a FoodID. Offsets mirror the
  *  backend allocation in `backend/api/services/etl/*_ingest.py`:
@@ -24,10 +25,12 @@ export type FoodSource = 'cnf' | 'wafct' | 'fdc';
  *    - WAFCT      700,000 –  701,027
  *    - FDC        800,000 –  ~825,431  (Foundation 800k / SR Legacy 810k /
  *                                       FNDDS 820k)
+ *    - CIQUAL     900,000 –  ~903,483
  *  Lets call sites flag provenance without an extra API field on every
  *  search-result row — basic search responses already carry the FoodID. */
 export function sourceForFoodId(foodId: number | null | undefined): FoodSource | null {
   if (foodId === null || foodId === undefined) return null;
+  if (foodId >= 900_000) return 'ciqual';
   if (foodId >= 800_000) return 'fdc';
   if (foodId >= 700_000) return 'wafct';
   return 'cnf';
@@ -57,6 +60,11 @@ const SOURCE_META: Record<FoodSource, { label: string; styles: string; title: st
     label:  'FDC',
     styles: 'bg-sky-100 text-sky-800 border-sky-200',
     title:  'From USDA FoodData Central (Foundation / SR Legacy / FNDDS)',
+  },
+  ciqual: {
+    label:  'CIQUAL',
+    styles: 'bg-purple-100 text-purple-800 border-purple-200',
+    title:  'From ANSES Centre d\'Information sur la Qualité des Aliments (CIQUAL) 2025',
   },
 };
 

@@ -1400,5 +1400,19 @@
       "cnf_equivalent_group_id": null,
       "wweia_code": 9999
     }
+  },
+  "ciqual": {
+    "300": { "name": "CIQUAL — (uncategorised top-level)",                  "canonical": "unknown",          "cnf_equivalent_group_id": null },
+    "301": { "name": "CIQUAL — starters and dishes",                        "canonical": "mixed_dishes",     "cnf_equivalent_group_id": 22 },
+    "302": { "name": "CIQUAL — fruits, vegetables, legumes and nuts",       "canonical": "vegetables",       "cnf_equivalent_group_id": 11 },
+    "303": { "name": "CIQUAL — cereal products",                            "canonical": "cereals_grains",   "cnf_equivalent_group_id": 20 },
+    "304": { "name": "CIQUAL — meat, egg and fish",                         "canonical": "beef",             "cnf_equivalent_group_id": 13 },
+    "305": { "name": "CIQUAL — milk and milk products",                     "canonical": "dairy",            "cnf_equivalent_group_id": 1 },
+    "306": { "name": "CIQUAL — beverages",                                  "canonical": "beverages",        "cnf_equivalent_group_id": 14 },
+    "307": { "name": "CIQUAL — sugar and confectionery",                    "canonical": "sweets",           "cnf_equivalent_group_id": 19 },
+    "308": { "name": "CIQUAL — ice cream and sorbet",                       "canonical": "sweets",           "cnf_equivalent_group_id": 19 },
+    "309": { "name": "CIQUAL — fats and oils",                              "canonical": "fats_oils",        "cnf_equivalent_group_id": 4 },
+    "310": { "name": "CIQUAL — miscellaneous",                              "canonical": "mixed_dishes",     "cnf_equivalent_group_id": 22 },
+    "311": { "name": "CIQUAL — baby food",                                  "canonical": "babyfoods",        "cnf_equivalent_group_id": 3 }
   }
 }

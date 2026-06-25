@@ -1178,7 +1178,25 @@
       "name": "POTASSIUM",
       "unit": "Milligram",
       "amdr_pct_kcal": null,
-      "cdrr": null,
+      "cdrr": {
+        "direction": "target",
+        "by_life_stage": {
+          "males_19_30y":      3400.0,
+          "males_31_50y":      3400.0,
+          "males_51_70y":      3400.0,
+          "males_71plus":      3400.0,
+          "females_19_30y":    2600.0,
+          "females_31_50y":    2600.0,
+          "females_51_70y":    2600.0,
+          "females_71plus":    2600.0,
+          "pregnant_19_30y":   2900.0,
+          "pregnant_31_50y":   2900.0,
+          "lactating_19_30y":  2800.0,
+          "lactating_31_50y":  2800.0
+        },
+        "source": "NASEM 2019 Sodium and Potassium DRIs, Chapter 6 p. 222 (Table 6-2).",
+        "note": "Potassium CDRR is a chronic-disease-risk reduction TARGET — intake at or above the CDRR is expected to reduce risk (opposite direction to sodium's cap)."
+      },
       "cells": {
         "infants_0_6m": {
           "EAR": null,
@@ -1308,9 +1326,10 @@
       "unit": "Milligram",
       "amdr_pct_kcal": null,
       "cdrr": {
+        "direction": "cap",
         "cdrr_mg_per_day": 2300.0,
         "source": "NASEM 2019 Sodium and Potassium DRIs, Chapter 7 p. 322.",
-        "note": "Intake above the CDRR is expected to reduce chronic disease risk if reduced; not a tolerable upper limit."
+        "note": "Sodium CDRR is a CAP — intake at or above the CDRR is expected to INCREASE risk; reducing intake below the CDRR is protective. Not a tolerable upper limit."
       },
       "cells": {
         "infants_0_6m": {

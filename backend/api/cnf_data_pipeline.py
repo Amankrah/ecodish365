@@ -118,11 +118,11 @@ class CNFDataPipeline:
         return str(v)
 
     def filter_by_source(self, source: str):
-        """Return `food_name_df` filtered by `source` ∈ {'cnf', 'wafct', 'fdc', 'both'}.
+        """Return `food_name_df` filtered by `source` ∈ {'cnf', 'wafct', 'fdc', 'ciqual', 'both'}.
 
         `source='both'` (or any other value) returns the full DataFrame.
         """
-        if source not in ('cnf', 'wafct', 'fdc') or 'source' not in self.food_name_df.columns:
+        if source not in ('cnf', 'wafct', 'fdc', 'ciqual') or 'source' not in self.food_name_df.columns:
             return self.food_name_df
         return self.food_name_df[self.food_name_df['source'] == source]
 

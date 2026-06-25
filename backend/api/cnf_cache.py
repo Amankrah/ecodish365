@@ -32,6 +32,12 @@ ingest appends Foundation (~395), SR Legacy (~7,793), and Survey FNDDS
 (~5,432) at FoodIDs 800,000+ / 810,000+ / 820,000+. Source='fdc' with a
 sub-source `data_type` column. Per-sub-source graceful degrade: each of
 the three is skipped independently if its raw_fdc_* folder is missing.
+
+CIQUAL-INGEST (2026-06-26): after FDC, a one-time ANSES CIQUAL 2025
+(English) ingest appends ~3,484 French foods at FoodIDs 900,000+ with
+source='ciqual' and data_type='ciqual_2025'. Graceful degrade: if
+raw_ciqual/Table Ciqual 2025_ENG_2025_11_03.xlsx is missing, the
+platform runs without CIQUAL.
 """
 from __future__ import annotations
 
@@ -70,6 +76,10 @@ def get_api_cnf_pipeline():
                 # graceful degrade — Foundation / SR Legacy / FNDDS each
                 # skip independently if their raw folder is absent.
                 _maybe_ingest_fdc(_api_pipeline)
+                # CIQUAL-INGEST (2026-06-26): append ANSES CIQUAL 2025
+                # French foods at FoodIDs 900,000+ with source='ciqual'.
+                # Graceful degrade — skipped if the workbook is missing.
+                _maybe_ingest_ciqual(_api_pipeline)
     return _api_pipeline
 
 
@@ -139,6 +149,37 @@ def _maybe_ingest_fdc(pipeline) -> None:
     except Exception as exc:  # noqa: BLE001
         # FDC ingest failure must NEVER take down the CNF+WAFCT pipeline.
         logger.exception('FDC ingest failed; continuing without FDC: %s', exc)
+
+
+def _maybe_ingest_ciqual(pipeline) -> None:
+    """One-shot CIQUAL 2025 ingest. Skips silently if the workbook isn't
+    present. Mirrors the WAFCT/FDC pattern."""
+    try:
+        from api.services.etl.ciqual_ingest import (
+            ingest_ciqual, append_to_pipeline, workbook_present,
+        )
+    except ImportError as exc:
+        logger.warning('CIQUAL ingest module not importable; skipping CIQUAL: %s', exc)
+        return
+    if not workbook_present():
+        logger.info('raw_ciqual/ workbook not present; skipping CIQUAL ingest.')
+        return
+    try:
+        result = ingest_ciqual(pipeline)
+        append_to_pipeline(pipeline, result)
+        s = result.stats
+        logger.info(
+            'CIQUAL ingest appended %d foods (IDs %s-%s); '
+            '%d nutrient rows across %d CNF NutrientIDs; %d unmapped INFOODS tags',
+            s.get('foods_emitted', 0),
+            s.get('ciqual_food_id_min'), s.get('ciqual_food_id_max'),
+            s.get('nutrient_rows_emitted', 0),
+            s.get('unique_tags_used', 0),
+            s.get('unmapped_tag_count', 0),
+        )
+    except Exception as exc:  # noqa: BLE001
+        # CIQUAL ingest failure must NEVER take down the pipeline.
+        logger.exception('CIQUAL ingest failed; continuing without CIQUAL: %s', exc)
 
 
 def get_dish_cnf_pipeline():

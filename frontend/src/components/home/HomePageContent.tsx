@@ -128,7 +128,7 @@ const tools: ToolCard[] = [
   {
     icon: MagnifyingGlassIcon,
     name: 'Food search',
-    description: 'Search over twenty thousand foods from Canadian, West African, and US databases. Smart search understands synonyms and everyday names.',
+    description: 'Search over twenty-four thousand foods from Canadian, West African, US, and French databases. Smart search understands synonyms and everyday names.',
     href: '/cnf',
   },
   {
@@ -183,7 +183,7 @@ export default function HomePageContent() {
     {
       value: foodCount != null ? formatNumber(foodCount) : '—',
       label: 'Foods in catalogue',
-      sub: 'Canadian Nutrient File, West African Food Composition Table, and USDA FoodData Central',
+      sub: 'Canadian Nutrient File, West African Food Composition Table, USDA FoodData Central, and ANSES CIQUAL 2025',
     },
     ...staticStats,
   ];
@@ -355,11 +355,11 @@ export default function HomePageContent() {
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">A multi-database food catalogue</h2>
                 <p className="text-sm text-gray-700 mb-4">
                   New food-composition databases can be added without changing any of the scoring,
-                  so the catalogue keeps growing. WAFCT 2019 was the first addition in May 2026,
-                  USDA FoodData Central followed in June 2026, and other regional databases can plug in
-                  the same way. Pick any single source or search across all of them at once.
+                  so the catalogue keeps growing. WAFCT 2019 landed in May 2026, USDA FoodData Central
+                  in June 2026, ANSES CIQUAL 2025 also in June 2026 — and other regional databases can
+                  plug in the same way. Pick any single source or search across all of them at once.
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                   <div className="border border-gray-100 rounded-lg p-3">
                     <div className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">Active, authoritative</div>
                     <div className="text-sm font-medium text-gray-900 mt-1">Canadian Nutrient File</div>
@@ -375,14 +375,19 @@ export default function HomePageContent() {
                     <div className="text-sm font-medium text-gray-900 mt-1">USDA FoodData Central</div>
                     <div className="text-xs text-gray-600 mt-0.5">13,620 US foods — Foundation (395 analytically derived), SR Legacy (7,793 classic SR28), and Survey FNDDS (5,432 dietary-survey foods).</div>
                   </div>
+                  <div className="border border-gray-100 rounded-lg p-3">
+                    <div className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">Active, extension</div>
+                    <div className="text-sm font-medium text-gray-900 mt-1">ANSES CIQUAL 2025</div>
+                    <div className="text-xs text-gray-600 mt-0.5">~3,484 French foods (English release). Pairs with Agribalyse 3.2 LCA via shared Ciqual codes for nutrition + environment.</div>
+                  </div>
                   <div className="border border-dashed border-gray-300 rounded-lg p-3 text-gray-500">
                     <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Planned</div>
                     <div className="text-sm font-medium text-gray-700 mt-1">Further composition tables</div>
-                    <div className="text-xs mt-0.5">EuroFIR, AGRIBALYSE EU nutrition, EFSA FoodEx2, and other regional tables can plug in the same way.</div>
+                    <div className="text-xs mt-0.5">EuroFIR, EFSA FoodEx2, NEVO (NL), BLS (DE), and other regional tables can plug in the same way.</div>
                   </div>
                 </div>
                 <p className="text-xs text-gray-500 mt-3">
-                  Each source keeps its own provenance, so differences in how foods were measured stay visible across CNF, WAFCT, and FDC rows.
+                  Each source keeps its own provenance, so differences in how foods were measured stay visible across CNF, WAFCT, FDC, and CIQUAL rows.
                 </p>
               </div>
             </div>

@@ -8,13 +8,22 @@ export const WAFCT_GROUP_MAX_ID_EXCL = 70;
  *  USDA's food_category table at FoodGroupID 70–97, FNDDS uses WWEIA codes
  *  starting at FoodGroupID 100. */
 export const FDC_GROUP_MIN_ID = 70;
+/** Upper bound (exclusive) of the FDC range; CIQUAL starts at 300. */
+export const FDC_GROUP_MAX_ID_EXCL = 300;
+/** CIQUAL food groups (CIQUAL-INGEST, 2026-06-26) — 12 top-level groups at
+ *  FoodGroupID 300–311. */
+export const CIQUAL_GROUP_MIN_ID = 300;
 
 export function isWafctGroup(groupId: number): boolean {
   return groupId >= WAFCT_GROUP_MIN_ID && groupId < WAFCT_GROUP_MAX_ID_EXCL;
 }
 
 export function isFdcGroup(groupId: number): boolean {
-  return groupId >= FDC_GROUP_MIN_ID;
+  return groupId >= FDC_GROUP_MIN_ID && groupId < FDC_GROUP_MAX_ID_EXCL;
+}
+
+export function isCiqualGroup(groupId: number): boolean {
+  return groupId >= CIQUAL_GROUP_MIN_ID;
 }
 
 export function isCnfGroup(groupId: number): boolean {
@@ -38,25 +47,32 @@ export function formatGroupDisplayName(name: string, groupId: number): string {
     if (name.startsWith('FDC — ')) return name.slice('FDC — '.length);
     if (name.startsWith('FDC - '))     return name.slice('FDC - '.length);
   }
+  if (isCiqualGroup(groupId)) {
+    if (name.startsWith('CIQUAL — ')) return name.slice('CIQUAL — '.length);
+    if (name.startsWith('CIQUAL - '))     return name.slice('CIQUAL - '.length);
+  }
   return name;
 }
 
 export interface SplitFoodGroups {
-  cnf:   FoodGroup[];
-  wafct: FoodGroup[];
-  fdc:   FoodGroup[];
+  cnf:    FoodGroup[];
+  wafct:  FoodGroup[];
+  fdc:    FoodGroup[];
+  ciqual: FoodGroup[];
 }
 
 export function splitFoodGroups(groups: FoodGroup[]): SplitFoodGroups {
-  const cnf:   FoodGroup[] = [];
-  const wafct: FoodGroup[] = [];
-  const fdc:   FoodGroup[] = [];
+  const cnf:    FoodGroup[] = [];
+  const wafct:  FoodGroup[] = [];
+  const fdc:    FoodGroup[] = [];
+  const ciqual: FoodGroup[] = [];
   for (const g of groups) {
-    if (isFdcGroup(g.FoodGroupID))        fdc.push(g);
+    if (isCiqualGroup(g.FoodGroupID))     ciqual.push(g);
+    else if (isFdcGroup(g.FoodGroupID))   fdc.push(g);
     else if (isWafctGroup(g.FoodGroupID)) wafct.push(g);
     else                                  cnf.push(g);
   }
-  return { cnf, wafct, fdc };
+  return { cnf, wafct, fdc, ciqual };
 }
 
 export function topGroupsByCount(

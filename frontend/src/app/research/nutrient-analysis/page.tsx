@@ -29,6 +29,14 @@ import { useSearchParams } from 'next/navigation';
 import { CNFApiService } from '@/lib/api';
 import { loadActiveFoodList } from '@/lib/activeFoodList';
 import { SourceFilter, type SourceChoice } from '@/components/shared/SourceFilter';
+import { AudienceToggle, type UserType } from '@/components/shared/AudienceToggle';
+import {
+  NutrientRadarChart,
+  NutrientBulletChart,
+  FPEDTreemap,
+  ContributorsParetoChart,
+  NovaShareBar,
+} from '@/components/research/NutrientCharts';
 import { Utensils } from 'lucide-react';
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
@@ -99,6 +107,7 @@ const TAB_KEYS = [
   'food_groups',
   'processing',
   'macros',
+  'derived',
   'contributions',
   'coverage',
 ] as const;
@@ -110,8 +119,28 @@ const TAB_LABELS: Record<TabKey, string> = {
   food_groups: 'Food groups',
   processing: 'Processing (NOVA)',
   macros: 'Macronutrients',
+  derived: 'Derived metrics',
   contributions: 'Contributions',
   coverage: 'Coverage & provenance',
+};
+
+// Phase D audience-aware copy (2026-06-26).
+// AudienceToggle uses these to switch the header voice without changing
+// the underlying data — same nutrient panel, same DRI flags, same charts;
+// just different language and default-tab choice.
+const AUDIENCE_LABEL: Record<UserType, string> = {
+  individual: 'For individuals',
+  researcher: 'For researchers',
+  policy:     'For policy makers',
+};
+
+const AUDIENCE_TAGLINE: Record<UserType, string> = {
+  individual:
+    'See what your meal or day actually contains: which nutrients are short, which food groups are missing, and how much of your food is ultra-processed. Plain-language interpretation, no methodology jargon.',
+  researcher:
+    'Composition assessment for a meal or a 24-hour record. Full nutrient panel with %EAR / %RDA / %AI / %UL against IOM/NASEM DRIs by life-stage; FPED food-group decomposition; NOVA processing-level breakdown; macronutrient distribution against IOM AMDR bands; per-nutrient top-contributor ranking; bioavailability splits, WHO/AHA thresholds and EER + Goldberg cutoff in the Derived metrics tab. Substrate revisions and provenance in the Coverage tab. Export JSON or long-format CSV.',
+  policy:
+    'Population-level reading of a meal or representative day: nutrient adequacy patterns, WHO/AHA threshold breaches, ultra-processed share by energy with US population mean overlay, and bioavailability-adjusted derived metrics. The same substrate the lens calculators sit on.',
 };
 
 const ADEQUACY_COLOR: Record<string, string> = {
@@ -126,6 +155,106 @@ const ADEQUACY_COLOR: Record<string, string> = {
   at_or_above_ul: 'bg-red-100 text-red-800',
   no_reference: 'bg-gray-100 text-gray-600',
 };
+
+// NASEM 2019 CDRR flag colors (independent of the adequacy axis).
+// `cap`-direction (sodium): above_cdrr = red, at_or_below_cdrr = emerald.
+// `target`-direction (potassium): meets_cdrr_target = emerald, below_cdrr_target = amber.
+const CDRR_COLOR: Record<string, string> = {
+  above_cdrr:            'bg-red-100 text-red-800',
+  at_or_below_cdrr:      'bg-emerald-100 text-emerald-800',
+  meets_cdrr_target:     'bg-emerald-100 text-emerald-800',
+  below_cdrr_target:     'bg-amber-100 text-amber-800',
+};
+
+// Plain-language methodology caveats from the deep-dive endpoint's
+// `meta.methodology_caveats` block. Renders a persistent amber banner
+// above the tabs so single-day "below_ear" / "above_amdr" flags get
+// read in the right interpretive context (IOM 2000 Ch. 4 EAR cut-point
+// method requires usual intake; AMDR is habitual; NOVA inter-rater κ
+// ≈ 0.45 per Braesco 2022). Each caveat is collapsible.
+type MethodologyCaveats = {
+  single_day_cutpoint: string | null;
+  amdr_habitual: string | null;
+  nova_reliability: string | null;
+} | null | undefined;
+
+// View toggle for tabs that have both a chart and a table representation.
+// Chart-first by default; researchers can flip to the table for exact values
+// and CSV-equivalent display. The state is persisted per-tab via the page's
+// `tabView` map so flipping one tab doesn't unflip the others.
+function ViewToggleSection({
+  showChart, setView, chart, table,
+}: {
+  showChart: boolean;
+  setView: (v: 'chart' | 'table') => void;
+  chart: React.ReactNode;
+  table: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2">
+        <span className="text-xs font-medium text-gray-500">View as:</span>
+        <fieldset className="inline-flex rounded border border-gray-300 bg-white p-0.5 shadow-sm">
+          <legend className="sr-only">View mode</legend>
+          {(['chart', 'table'] as const).map((v) => (
+            <label
+              key={v}
+              className={`cursor-pointer rounded px-2 py-0.5 text-xs ${
+                (v === 'chart') === showChart
+                  ? 'bg-blue-100 text-blue-700 font-medium'
+                  : 'text-gray-500 hover:text-gray-800'
+              }`}
+            >
+              <input
+                type="radio"
+                name="view-mode"
+                value={v}
+                checked={(v === 'chart') === showChart}
+                onChange={() => setView(v)}
+                className="sr-only"
+              />
+              {v}
+            </label>
+          ))}
+        </fieldset>
+      </div>
+      {showChart ? chart : table}
+    </div>
+  );
+}
+
+function MethodologyCaveatStrip({ caveats }: { caveats: MethodologyCaveats }) {
+  const [open, setOpen] = useState(true);
+  if (!caveats) return null;
+  const items: Array<[string, string]> = [];
+  if (caveats.single_day_cutpoint) items.push(['Single-day intake vs DRI', caveats.single_day_cutpoint]);
+  if (caveats.amdr_habitual)        items.push(['AMDR is a habitual recommendation', caveats.amdr_habitual]);
+  if (caveats.nova_reliability)     items.push(['NOVA classifier reliability',       caveats.nova_reliability]);
+  if (items.length === 0) return null;
+  return (
+    <div className="rounded border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+      <div className="flex items-start justify-between gap-3">
+        <div className="font-semibold">Methodology notes ({items.length})</div>
+        <button
+          type="button"
+          onClick={() => setOpen(o => !o)}
+          className="text-xs text-amber-900 underline"
+        >
+          {open ? 'hide' : 'show'}
+        </button>
+      </div>
+      {open && (
+        <ul className="mt-2 space-y-2 text-xs leading-snug text-amber-900">
+          {items.map(([title, body]) => (
+            <li key={title}>
+              <span className="font-semibold">{title}.</span> {body}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
 
 const AMDR_COLOR: Record<string, string> = {
   within_amdr: 'bg-emerald-100 text-emerald-800',
@@ -269,9 +398,57 @@ function NutrientAnalysisInner() {
     lactation_status: 'not_lactating',
   });
 
+  // Phase B (FDC-MULTI-SOURCE 2026-06-26): optional anthropometry inputs.
+  // Body weight enables protein g/kg and EER computation. PAL category and
+  // height refine the EER. All values null → derived_metrics reports
+  // "not computed" gracefully for the body-weight-anchored metrics.
+  const [anthro, setAnthro] = useState<{
+    body_weight_kg: number | null;
+    height_cm: number | null;
+    pal_category: 'sedentary' | 'low_active' | 'active' | 'very_active' | '';
+  }>({
+    body_weight_kg: null,
+    height_cm: null,
+    pal_category: '',
+  });
+
   const [scope, setScope] = useState<'meal' | 'day'>('meal');
   const [submitting, setSubmitting] = useState(false);
   const [payload, setPayload] = useState<DeepDivePayload | null>(null);
+
+  // Phase C (2026-06-26): per-tab "View as: Chart | Table" toggle.
+  // Defaults to Chart for individuals (visual interpretation); researcher
+  // mode (Phase D) defaults to Table for exact-number readout.
+  const [userType, setUserType] = useState<UserType>('researcher');
+  const [tabView, setTabView] = useState<Record<string, 'chart' | 'table'>>({
+    nutrients:     'table',     // researcher default
+    food_groups:   'table',
+    processing:    'chart',     // chart is genuinely better here even for researchers
+    contributions: 'table',
+  });
+  // Drill-down: clicking a nutrient row jumps to the Contributions tab
+  // and scrolls to that nutrient's card. State is `null` when no
+  // drill-down is active.
+  const [drillNutrientId, setDrillNutrientId] = useState<number | null>(null);
+  const drillToNutrient = (nid: number) => {
+    setDrillNutrientId(nid);
+    setActiveTab('contributions');
+    // Defer scroll-into-view until after the contributions tab renders.
+    setTimeout(() => {
+      const el = document.getElementById(`contrib-${nid}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  };
+  // Flip view defaults when the audience changes.
+  useEffect(() => {
+    setTabView(
+      userType === 'individual'
+        ? { nutrients: 'chart',  food_groups: 'chart', processing: 'chart', contributions: 'chart' }
+        : userType === 'policy'
+          ? { nutrients: 'chart',  food_groups: 'chart', processing: 'chart', contributions: 'table' }
+          : { nutrients: 'table',  food_groups: 'table', processing: 'chart', contributions: 'table' }
+    );
+  }, [userType]);
   const [error, setError] = useState<string>('');
   const [activeTab, setActiveTab] = useState<TabKey>('nutrients');
 
@@ -496,6 +673,14 @@ function NutrientAnalysisInner() {
               lactation_status: lifeStage.lactation_status,
             }
           : null,
+      anthropometry:
+        anthro.body_weight_kg || anthro.height_cm || anthro.pal_category
+          ? {
+              body_weight_kg: anthro.body_weight_kg,
+              height_cm:      anthro.height_cm,
+              pal_category:   anthro.pal_category || undefined,
+            }
+          : undefined,
       options: {
         nutrient_set: 'research_canonical',
         include_per_meal_breakdown: false,
@@ -503,7 +688,7 @@ function NutrientAnalysisInner() {
         top_k: 5,
       },
     };
-  }, [meal, lifeStage, scope]);
+  }, [meal, lifeStage, scope, anthro]);
 
   const submit = async () => {
     setSubmitting(true);
@@ -566,19 +751,19 @@ function NutrientAnalysisInner() {
   return (
     <div className="mx-auto max-w-7xl space-y-6 px-4 py-6">
       <header className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-wide text-indigo-700">For researchers</p>
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-          Nutrient analysis
-        </h1>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-indigo-700">
+              {AUDIENCE_LABEL[userType]}
+            </p>
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+              Nutrient analysis
+            </h1>
+          </div>
+          <AudienceToggle userType={userType} onChange={setUserType} accent="blue" />
+        </div>
         <p className="max-w-3xl text-sm text-gray-600">
-          Composition assessment for a meal or a 24-hour record. The full nutrient panel with %EAR
-          / %RDA / %AI / %UL against the IOM/NASEM Dietary Reference Intakes by life-stage, FPED
-          food-group decomposition, NOVA processing-level breakdown, macronutrient distribution
-          against the IOM AMDR bands, and per-nutrient top-contributor ranking. Substrate revisions
-          and provenance are surfaced in the coverage tab. Export JSON or long-format CSV. For
-          published-lens scoring on the same substrate use{' '}
-          <Link href="/scorecard" className="text-blue-700 underline">All scores</Link>{' '}
-          or any individual lens calculator.
+          {AUDIENCE_TAGLINE[userType]}
         </p>
         {handoffMessage && (
           <div
@@ -910,6 +1095,57 @@ function NutrientAnalysisInner() {
                 resolved: {payload.meta.life_stage.resolved_code}
               </p>
             )}
+
+            {/* Phase B optional anthropometry — enables protein g/kg adequacy
+                (IOM 2005, ESPEN 2014) and the EER vs Goldberg cutoff (Black
+                2000). All optional; missing fields degrade gracefully. */}
+            <div className="mt-4 border-t border-gray-200 pt-3">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Anthropometry (optional)
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <label className="block text-xs">
+                  <span className="text-gray-700">weight (kg)</span>
+                  <input
+                    type="number" step="0.1" min="0"
+                    value={anthro.body_weight_kg ?? ''}
+                    onChange={(e) => setAnthro({
+                      ...anthro,
+                      body_weight_kg: e.target.value === '' ? null : Number(e.target.value),
+                    })}
+                    className="mt-1 w-full rounded border border-gray-300 px-2 py-1"
+                  />
+                </label>
+                <label className="block text-xs">
+                  <span className="text-gray-700">height (cm)</span>
+                  <input
+                    type="number" step="0.5" min="0"
+                    value={anthro.height_cm ?? ''}
+                    onChange={(e) => setAnthro({
+                      ...anthro,
+                      height_cm: e.target.value === '' ? null : Number(e.target.value),
+                    })}
+                    className="mt-1 w-full rounded border border-gray-300 px-2 py-1"
+                  />
+                </label>
+              </div>
+              <label className="mt-2 block text-xs">
+                <span className="text-gray-700">PAL (IOM 2002 EER)</span>
+                <select
+                  value={anthro.pal_category}
+                  onChange={(e) => setAnthro({
+                    ...anthro, pal_category: e.target.value as any,
+                  })}
+                  className="mt-1 w-full rounded border border-gray-300 px-2 py-1"
+                >
+                  <option value="">(not set)</option>
+                  <option value="sedentary">sedentary</option>
+                  <option value="low_active">low active</option>
+                  <option value="active">active</option>
+                  <option value="very_active">very active</option>
+                </select>
+              </label>
+            </div>
           </div>
         </div>
       </section>
@@ -917,7 +1153,25 @@ function NutrientAnalysisInner() {
       {/* ---------- Results ---------- */}
       {payload && (
         <section className="space-y-4">
-          <div className="flex flex-wrap gap-1 border-b border-gray-200">
+          <MethodologyCaveatStrip caveats={payload.meta?.methodology_caveats} />
+          {/* Tab list: button bar on tablet+ (sm:flex), dropdown on
+              mobile (default) for compactness. Phase D mobile-responsive
+              treatment. */}
+          <div className="sm:hidden">
+            <label className="block text-xs font-medium text-gray-600">
+              <span className="sr-only">Tab</span>
+              <select
+                value={activeTab}
+                onChange={(e) => setActiveTab(e.target.value as TabKey)}
+                className="mt-1 w-full rounded border border-gray-300 px-2 py-2 text-sm"
+              >
+                {TAB_KEYS.map((k) => (
+                  <option key={k} value={k}>{TAB_LABELS[k]}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <div className="hidden flex-wrap gap-1 border-b border-gray-200 sm:flex">
             {TAB_KEYS.map((k) => (
               <button
                 key={k}
@@ -935,21 +1189,57 @@ function NutrientAnalysisInner() {
           </div>
 
           {activeTab === 'nutrients' && (
-            <NutrientsTab panel={payload.nutrient_panel} />
+            <ViewToggleSection
+              showChart={tabView.nutrients === 'chart'}
+              setView={(v) => setTabView((p) => ({ ...p, nutrients: v }))}
+              chart={
+                <div className="space-y-3">
+                  <NutrientRadarChart panel={payload.nutrient_panel} />
+                  <NutrientBulletChart panel={payload.nutrient_panel} />
+                </div>
+              }
+              table={<NutrientsTab panel={payload.nutrient_panel} onDrill={drillToNutrient} />}
+            />
           )}
           {activeTab === 'food_groups' && (
-            <FoodGroupsTab fg={payload.food_groups} />
+            <ViewToggleSection
+              showChart={tabView.food_groups === 'chart'}
+              setView={(v) => setTabView((p) => ({ ...p, food_groups: v }))}
+              chart={<FPEDTreemap fg={payload.food_groups} />}
+              table={<FoodGroupsTab fg={payload.food_groups} />}
+            />
           )}
           {activeTab === 'processing' && (
-            <ProcessingTab proc={payload.processing} />
+            <ViewToggleSection
+              showChart={tabView.processing === 'chart'}
+              setView={(v) => setTabView((p) => ({ ...p, processing: v }))}
+              chart={<NovaShareBar proc={payload.processing} />}
+              table={<ProcessingTab proc={payload.processing} />}
+            />
           )}
           {activeTab === 'macros' && (
             <MacrosTab mac={payload.macronutrient_distribution} />
           )}
+          {activeTab === 'derived' && (
+            <DerivedMetricsTab dm={(payload as any).derived_metrics} />
+          )}
           {activeTab === 'contributions' && (
-            <ContributionsTab
-              contribs={payload.contributions}
-              panel={payload.nutrient_panel}
+            <ViewToggleSection
+              showChart={tabView.contributions === 'chart'}
+              setView={(v) => setTabView((p) => ({ ...p, contributions: v }))}
+              chart={
+                <ContributorsParetoChart
+                  contribs={payload.contributions}
+                  panel={payload.nutrient_panel}
+                />
+              }
+              table={
+                <ContributionsTab
+                  contribs={payload.contributions}
+                  panel={payload.nutrient_panel}
+                  drillNutrientId={drillNutrientId}
+                />
+              }
             />
           )}
           {activeTab === 'coverage' && (
@@ -1051,7 +1341,12 @@ function ColHeader({
   );
 }
 
-function NutrientsTab({ panel }: { panel: NutrientRow[] }) {
+function NutrientsTab({
+  panel, onDrill,
+}: {
+  panel: NutrientRow[];
+  onDrill?: (nid: number) => void;
+}) {
   return (
     <div className="overflow-x-auto rounded border border-gray-200 bg-white">
       <table className="min-w-full text-sm">
@@ -1082,7 +1377,12 @@ function NutrientsTab({ panel }: { panel: NutrientRow[] }) {
               .map((a) => `${a} = ${NUTRIENT_ABBREVIATIONS[a]}`)
               .join('; ');
             return (
-            <tr key={row.nutrient_id} className="border-t border-gray-100">
+            <tr
+              key={row.nutrient_id}
+              className={`border-t border-gray-100 ${onDrill ? 'cursor-pointer hover:bg-blue-50' : ''}`}
+              onClick={onDrill ? () => onDrill(row.nutrient_id) : undefined}
+              title={onDrill ? 'Click to see which foods contributed this nutrient' : undefined}
+            >
               <td className="px-3 py-1 font-mono text-xs text-gray-500">
                 {row.nutrient_id}
               </td>
@@ -1121,16 +1421,36 @@ function NutrientsTab({ panel }: { panel: NutrientRow[] }) {
                 {row.dri?.pct_ul != null ? row.dri.pct_ul.toFixed(1) : '-'}
               </td>
               <td className="px-3 py-1">
-                {row.dri && (
-                  <span
-                    className={`rounded px-2 py-0.5 text-xs ${
-                      ADEQUACY_COLOR[row.dri.adequacy_flag] ||
-                      'bg-gray-100 text-gray-600'
-                    }`}
-                  >
-                    {row.dri.adequacy_flag.replace(/_/g, ' ')}
-                  </span>
-                )}
+                <div className="flex flex-col gap-1">
+                  {row.dri && (
+                    <span
+                      className={`inline-block rounded px-2 py-0.5 text-xs ${
+                        ADEQUACY_COLOR[row.dri.adequacy_flag] ||
+                        'bg-gray-100 text-gray-600'
+                      }`}
+                    >
+                      {row.dri.adequacy_flag.replace(/_/g, ' ')}
+                    </span>
+                  )}
+                  {/* CDRR badge (NASEM 2019) — only sodium (NID 307) and
+                      potassium (NID 306) carry CDRR cells. Sodium is a cap
+                      (lower = better), potassium is a target (higher = better);
+                      the backend computes the directionally-correct flag. */}
+                  {row.dri?.cdrr_value != null && row.dri?.cdrr_flag && (
+                    <span
+                      title={
+                        row.nutrient_id === 306
+                          ? `NASEM 2019 K CDRR target (mg/d): higher than ${row.dri.cdrr_value} reduces chronic-disease risk.`
+                          : `NASEM 2019 Na CDRR cap (mg/d): at/above ${row.dri.cdrr_value} increases risk; reduce to be protective.`
+                      }
+                      className={`inline-block rounded px-2 py-0.5 text-[10px] ${
+                        CDRR_COLOR[row.dri.cdrr_flag] || 'bg-gray-100 text-gray-600'
+                      }`}
+                    >
+                      CDRR: {row.dri.cdrr_flag.replace(/_/g, ' ')} ({row.dri.cdrr_value.toFixed(0)})
+                    </span>
+                  )}
+                </div>
               </td>
               <td className="px-3 py-1 text-right text-xs text-gray-600">
                 {row.n_foods_with_value}/
@@ -1359,12 +1679,217 @@ function MacrosTab({ mac }: { mac: any }) {
   );
 }
 
+// DerivedMetricsTab (Phase B 2026-06-26)
+// Renders the academic-rigor derived block: Na:K ratio (AHA 2021),
+// WHO 2018/2023 SFA & TFA caps, WHO 2015 free-sugars guideline,
+// heme/non-heme iron split (FAO/WHO 2004), vitamin A RAE split
+// preformed-vs-provitamin (IOM 2001), folate DFE breakdown (IOM 1998),
+// phytate:Zn molar ratio for zinc bioavailability (Gibson 2010),
+// protein g/kg adequacy (IOM 2005, ESPEN 2014), EER + Goldberg cutoff
+// (IOM 2002, Black 2000). Each card cites its source verbatim.
+const DERIVED_STATUS_COLOR: Record<string, string> = {
+  within_ideal: 'bg-emerald-100 text-emerald-800',
+  within_max:   'bg-amber-100 text-amber-800',
+  above_max:    'bg-red-100 text-red-800',
+  high:         'bg-emerald-100 text-emerald-800',
+  moderate:     'bg-amber-100 text-amber-800',
+  low:          'bg-red-100 text-red-800',
+  plausible:                  'bg-emerald-100 text-emerald-800',
+  suspected_under_reporting:  'bg-red-100 text-red-800',
+  suspected_over_reporting:   'bg-amber-100 text-amber-800',
+};
+
+function DerivedMetricCard({
+  title, source, children,
+}: { title: string; source?: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded border border-gray-200 bg-white p-4">
+      <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
+      {source && (
+        <p className="mt-0.5 text-[11px] text-gray-500">{source}</p>
+      )}
+      <div className="mt-2 text-sm text-gray-800">{children}</div>
+    </div>
+  );
+}
+
+function DerivedMetricsTab({ dm }: { dm: any }) {
+  if (!dm) {
+    return (
+      <div className="rounded border border-gray-200 bg-white p-4 text-sm text-gray-600">
+        Derived metrics not available for this response.
+      </div>
+    );
+  }
+  const nk    = dm.na_k_ratio || {};
+  const who   = dm.who_thresholds || {};
+  const iron  = dm.iron_split || {};
+  const va    = dm.vitamin_a_split || {};
+  const dfe   = dm.folate_dfe || {};
+  const phyzn = dm.phytate_zn || {};
+  const ppk   = dm.protein_per_kg || {};
+  const eer   = dm.eer_goldberg || {};
+
+  const statusBadge = (status: string) => (
+    <span className={`inline-block rounded px-2 py-0.5 text-xs ${DERIVED_STATUS_COLOR[status] || 'bg-gray-100 text-gray-600'}`}>
+      {status.replace(/_/g, ' ')}
+    </span>
+  );
+
+  return (
+    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+      <DerivedMetricCard title="Sodium : Potassium ratio" source={nk.source}>
+        {nk.mass_ratio == null ? (
+          <p className="text-xs text-gray-500">{nk.note || 'not computed'}</p>
+        ) : (
+          <div>
+            <div className="font-mono tabular-nums">
+              mass {nk.mass_ratio} <span className="text-gray-400">(target ≤ 2.0)</span> · molar {nk.molar_ratio}
+            </div>
+            <div className="mt-1 text-xs">
+              Na {nk.sodium_mg} mg · K {nk.potassium_mg} mg ·{' '}
+              {nk.target_met ? statusBadge('within_max') : statusBadge('above_max')}
+            </div>
+          </div>
+        )}
+      </DerivedMetricCard>
+
+      <DerivedMetricCard title="WHO fat & sugar thresholds" source={who.source}>
+        {who.sfa_pct_e == null ? (
+          <p className="text-xs text-gray-500">{who.note || 'not computed'}</p>
+        ) : (
+          <ul className="space-y-1 text-xs">
+            <li>
+              SFA <span className="font-mono">{who.sfa_pct_e}%E</span>{' '}
+              ({who.sfa_g} g) {statusBadge(who.sfa_status)} <span className="text-gray-500">ideal ≤ 7 %E, max ≤ 10 %E</span>
+            </li>
+            <li>
+              TFA <span className="font-mono">{who.tfa_pct_e}%E</span>{' '}
+              ({who.tfa_g} g) {statusBadge(who.tfa_status)} <span className="text-gray-500">≤ 1 %E</span>
+            </li>
+            <li>
+              Sugars (total, upper bound on free) <span className="font-mono">{who.total_sugars_pct_e}%E</span>{' '}
+              ({who.total_sugars_g} g) {statusBadge(who.free_sugars_status_upper_bound)}{' '}
+              <span className="text-gray-500">free target ≤ 5 %E, max ≤ 10 %E</span>
+            </li>
+            {who.free_sugars_note && (
+              <li className="mt-1 text-[10px] italic text-gray-500">{who.free_sugars_note}</li>
+            )}
+          </ul>
+        )}
+      </DerivedMetricCard>
+
+      <DerivedMetricCard title="Iron: heme vs non-heme" source={iron.source}>
+        {iron.total_iron_mg == null || iron.total_iron_mg === 0 ? (
+          <p className="text-xs text-gray-500">no iron contribution</p>
+        ) : (
+          <div>
+            <div className="font-mono tabular-nums">
+              total {iron.total_iron_mg} mg · heme {iron.heme_mg} mg ({Math.round((iron.heme_fraction ?? 0) * 100)}%) · non-heme {iron.non_heme_mg} mg
+            </div>
+            <div className="mt-1 text-xs text-gray-600">
+              {iron.n_heme_source_foods} heme-source food(s), {iron.n_non_heme_foods} plant food(s).
+              Bioavailability: heme ~25 %, non-heme 5–15 % (FAO/WHO 2004).
+            </div>
+          </div>
+        )}
+      </DerivedMetricCard>
+
+      <DerivedMetricCard title="Vitamin A: preformed vs provitamin-A" source={va.source}>
+        {va.rae_computed == null || va.rae_computed === 0 ? (
+          <p className="text-xs text-gray-500">no vitamin A contribution</p>
+        ) : (
+          <div>
+            <div className="font-mono tabular-nums">
+              {va.rae_computed} µg RAE · {Math.round((va.preformed_fraction ?? 0) * 100)}% preformed retinol · {va.rae_from_provitamin_a} µg from carotenoids
+            </div>
+            <div className="mt-1 text-[11px] text-gray-500">{va.formula}</div>
+            {va.note && <div className="mt-1 text-xs text-gray-700">{va.note}</div>}
+          </div>
+        )}
+      </DerivedMetricCard>
+
+      <DerivedMetricCard title="Folate: Dietary Folate Equivalents" source={dfe.source}>
+        {dfe.dfe_computed_µg == null || dfe.dfe_computed_µg === 0 ? (
+          <p className="text-xs text-gray-500">no folate contribution</p>
+        ) : (
+          <div>
+            <div className="font-mono tabular-nums">
+              {dfe.dfe_computed_µg} µg DFE · food folate {dfe.food_folate_µg} µg · folic acid {dfe.folic_acid_µg} µg ({Math.round((dfe.fortification_fraction ?? 0) * 100)}% from fortification)
+            </div>
+            <div className="mt-1 text-[11px] text-gray-500">{dfe.formula}</div>
+          </div>
+        )}
+      </DerivedMetricCard>
+
+      <DerivedMetricCard title="Phytate : Zinc molar ratio" source={phyzn.source}>
+        {phyzn.molar_ratio == null ? (
+          <p className="text-xs text-gray-500">{phyzn.note}</p>
+        ) : (
+          <div>
+            <div className="font-mono tabular-nums">
+              {phyzn.molar_ratio} · zinc bioavailability {statusBadge(phyzn.bioavailability_band)}
+            </div>
+            <div className="mt-1 text-xs text-gray-600">
+              Phy:Zn molar &lt; 5 = high · 5–18 = moderate · &gt; 18 = low (WHO 1996)
+            </div>
+          </div>
+        )}
+      </DerivedMetricCard>
+
+      <DerivedMetricCard title="Protein adequacy (g/kg body weight)">
+        {ppk.protein_g_per_kg == null ? (
+          <p className="text-xs text-gray-500">{ppk.note || 'enter body weight in the Anthropometry box'}</p>
+        ) : (
+          <div>
+            <div className="font-mono tabular-nums">
+              {ppk.protein_g} g · {ppk.protein_g_per_kg} g/kg{' '}
+              {ppk.meets_rda ? statusBadge('within_ideal') : statusBadge('above_max')}
+            </div>
+            <div className="mt-1 text-xs text-gray-600">RDA {ppk.rda_label}</div>
+            {ppk.reference_bands && (
+              <ul className="mt-1 space-y-0.5 text-[11px] text-gray-500">
+                {Object.entries(ppk.reference_bands).map(([k, v]) => (
+                  <li key={k}>{k.replace(/_/g, ' ')}: {String(v)}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+      </DerivedMetricCard>
+
+      <DerivedMetricCard title="Energy: EER + Goldberg cutoff" source={eer.source}>
+        {eer.eer_kcal == null ? (
+          <p className="text-xs text-gray-500">{eer.note || 'enter weight + sex + age + PAL'}</p>
+        ) : (
+          <div>
+            <div className="font-mono tabular-nums">
+              intake {eer.intake_kcal} kcal · EER {eer.eer_kcal} kcal ({eer.pct_of_eer}% of EER) · BMR {eer.bmr_kcal} kcal
+            </div>
+            <div className="mt-1 text-xs">
+              intake/BMR = {eer.intake_to_bmr_ratio} · {statusBadge(eer.goldberg_flag)}{' '}
+              <span className="text-gray-500">(Goldberg cutoff: &lt; 1.35 suspected under-report; &gt; 2.4 over-report; PAL {eer.pal_category})</span>
+            </div>
+            {eer.height_assumed_cm && (
+              <div className="mt-1 text-[10px] italic text-gray-500">
+                Height not supplied; used population median {eer.height_assumed_cm} cm for BMR.
+              </div>
+            )}
+          </div>
+        )}
+      </DerivedMetricCard>
+    </div>
+  );
+}
+
 function ContributionsTab({
   contribs,
   panel,
+  drillNutrientId,
 }: {
   contribs: Record<string, any[]>;
   panel: NutrientRow[];
+  drillNutrientId?: number | null;
 }) {
   // Build a {nutrient_id -> {name, unit}} dictionary from the nutrient
   // panel so contribution cards can show the readable name + canonical
@@ -1383,8 +1908,17 @@ function ContributionsTab({
         const niceName = m ? prettyNutrientName(m.name) : `Nutrient ID ${nid}`;
         const unit = m ? prettyUnit(m.unit) : '';
         const abbrs = m ? nutrientAbbreviations(m.name) : [];
+        const highlighted = drillNutrientId === nidNum;
         return (
-          <div key={nid} className="rounded border border-gray-200 bg-white p-4">
+          <div
+            key={nid}
+            id={`contrib-${nid}`}
+            className={`rounded border bg-white p-4 transition-colors ${
+              highlighted
+                ? 'border-blue-400 ring-2 ring-blue-200'
+                : 'border-gray-200'
+            }`}
+          >
             <div className="mb-2">
               <h3 className="text-sm font-semibold text-gray-900">
                 {niceName}
