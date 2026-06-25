@@ -12,7 +12,7 @@ import {
   ArrowPathIcon,
   InformationCircleIcon
 } from '@heroicons/react/24/outline';
-import { HSRApiService, CNFApiService, type HSRResult, type SearchResult, type FilterOptions } from '@/lib/api';
+import { HSRApiService, CNFApiService, type HSRResult, type HSRScoreBreakdown, type SearchResult, type FilterOptions } from '@/lib/api';
 import StarRating from '@/components/StarRating';
 import { AudienceToggle, type UserType, type ExplanationsBlock } from '@/components/shared/AudienceToggle';
 import { AIEnhancedSearch } from '@/components/shared/AIEnhancedSearch';
@@ -238,7 +238,11 @@ export default function HSRCalculate() {
     return 'text-red-400';
   };
 
-  const hasScoreBreakdown = (hsrResult: HSRResult): boolean =>
+  type HSRResultWithBreakdown = HSRResult & {
+    hsr_result: HSRResult['hsr_result'] & { score_breakdown: HSRScoreBreakdown };
+  };
+
+  const hasScoreBreakdown = (hsrResult: HSRResult): hsrResult is HSRResultWithBreakdown =>
     Boolean(hsrResult.hsr_result?.score_breakdown?.components);
 
   const getPositiveAspectsCount = (hsrResult: HSRResult) => {
