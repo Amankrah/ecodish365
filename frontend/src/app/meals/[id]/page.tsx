@@ -502,9 +502,9 @@ export default function MealDetailPage() {
                     </div>
                     <div className="flex items-center justify-between">
                       <p className="text-sm text-green-600 font-medium">
-                        {meal.sustainability_score > 80 ? 'Excellent for the planet! 🌱' : 
-                         meal.sustainability_score > 60 ? 'Good environmental choice 🌿' : 
-                         meal.sustainability_score > 40 ? 'Moderate impact ⚖️' : 'Consider eco-alternatives 🌍'}
+                        {meal.sustainability_score > 80 ? 'Excellent for the planet' :
+                         meal.sustainability_score > 60 ? 'Good environmental choice' :
+                         meal.sustainability_score > 40 ? 'Moderate impact' : 'Consider eco-alternatives'}
                       </p>
                       <div className="text-xs text-green-600">
                         {meal.sustainability_score > 80 ? 'Planet-friendly' : 
@@ -558,7 +558,7 @@ export default function MealDetailPage() {
                 
                 {/* Environmental action guide */}
                 <div className="mt-4 p-4 bg-green-50 rounded-lg">
-                  <h4 className="text-sm font-bold text-green-700 mb-2">🌱 Making a Difference</h4>
+                  <h4 className="text-sm font-bold text-green-700 mb-2">Making a Difference</h4>
                   <div className="text-xs text-green-600 space-y-1">
                     <p>• <strong>Small changes matter:</strong> Every sustainable meal choice helps</p>
                     <p>• <strong>Share recipes:</strong> Inspire others with your eco-friendly meals</p>
@@ -597,8 +597,8 @@ export default function MealDetailPage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-blue-600">
-                      {meal.heni_score && meal.heni_score > 0 ? '✅ This meal supports longevity' : 
-                       meal.heni_score && meal.heni_score < 0 ? '⚠️ Consider healthier alternatives' : 
+                      {meal.heni_score && meal.heni_score > 0 ? 'This meal supports longevity' :
+                       meal.heni_score && meal.heni_score < 0 ? 'Consider healthier alternatives' :
                        'Neutral health impact'}
                     </div>
                     <div className="text-xs text-blue-500">
@@ -680,10 +680,10 @@ export default function MealDetailPage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-blue-600">
-                      {meal.hsr_score >= 4 ? '🌟 Excellent nutritional choice' :
-                       meal.hsr_score >= 3 ? '👍 Good nutritional value' :
-                       meal.hsr_score >= 2 ? '⚖️ Moderate nutrition' :
-                       '⚠️ Limited nutritional benefits'}
+                      {meal.hsr_score >= 4 ? 'Excellent nutritional choice' :
+                       meal.hsr_score >= 3 ? 'Good nutritional value' :
+                       meal.hsr_score >= 2 ? 'Moderate nutrition' :
+                       'Limited nutritional benefits'}
                     </div>
                     <div className="text-xs text-blue-500">
                       Higher stars = healthier choice
@@ -694,7 +694,7 @@ export default function MealDetailPage() {
               
               {/* Health action guide */}
               <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-                <h4 className="text-sm font-bold text-blue-700 mb-2">💪 Health Tips</h4>
+                <h4 className="text-sm font-bold text-blue-700 mb-2">Health Tips</h4>
                 <div className="text-xs text-blue-600 space-y-1">
                   <p>• <strong>Balance is key:</strong> Combine different food groups for optimal nutrition</p>
                   <p>• <strong>Mindful eating:</strong> Eat slowly and pay attention to your body's signals</p>
@@ -755,7 +755,7 @@ export default function MealDetailPage() {
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div>
                           <span className="text-lg font-semibold text-gray-700">Protein</span>
-                          <p className="text-xs text-gray-500 mt-1">💪 Builds and repairs muscles</p>
+                          <p className="text-xs text-gray-500 mt-1">Builds and repairs muscles</p>
                         </div>
                         <div className="text-right">
                           <span className="text-2xl font-bold text-gray-900">
@@ -776,7 +776,7 @@ export default function MealDetailPage() {
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div>
                           <span className="text-lg font-semibold text-gray-700">Carbs</span>
-                          <p className="text-xs text-gray-500 mt-1">⚡ Main energy source for your body</p>
+                          <p className="text-xs text-gray-500 mt-1">Main energy source for your body</p>
                         </div>
                         <div className="text-right">
                           <span className="text-2xl font-bold text-gray-900">
@@ -828,7 +828,7 @@ export default function MealDetailPage() {
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div>
                           <span className="text-lg font-semibold text-gray-700">Fiber</span>
-                          <p className="text-xs text-gray-500 mt-1">🌾 Supports digestion and heart health</p>
+                          <p className="text-xs text-gray-500 mt-1">Supports digestion and heart health</p>
                         </div>
                         <div className="text-right">
                           <span className="text-2xl font-bold text-gray-900">
@@ -907,7 +907,7 @@ export default function MealDetailPage() {
                 
                 {/* Nutritional guidance */}
                 <div className="mt-6 p-4 bg-orange-50 rounded-lg">
-                  <h4 className="text-sm font-bold text-orange-700 mb-2">🍎 Nutrition Tips</h4>
+                  <h4 className="text-sm font-bold text-orange-700 mb-2">Nutrition Tips</h4>
                   <div className="text-xs text-orange-600 space-y-1">
                     <p>• <strong>Balanced meals</strong> include protein, carbs, healthy fats, and fiber</p>
                     <p>• <strong>Portion control:</strong> Listen to your body's hunger cues</p>
@@ -989,7 +989,7 @@ export default function MealDetailPage() {
               
               <div className="space-y-4">
                 <div className="bg-white/70 rounded-xl p-4">
-                  <h4 className="text-lg font-bold text-emerald-700 mb-3">🌱 Growing Your Impact</h4>
+                  <h4 className="text-lg font-bold text-emerald-700 mb-3">Growing Your Impact</h4>
                   <p className="text-sm text-emerald-600 mb-3 leading-relaxed">
                     Every sustainable meal choice creates a ripple effect for our planet&apos;s health.
                   </p>
@@ -1003,15 +1003,13 @@ export default function MealDetailPage() {
                 
                 {meal.sustainability_score && meal.sustainability_score > 70 && (
                   <div className="bg-emerald-100 rounded-xl p-4 text-center">
-                    <div className="text-2xl mb-2">🌟</div>
-                    <div className="text-sm font-bold text-emerald-700">Eco-Champion Choice!</div>
+                    <div className="text-sm font-bold text-emerald-700">Eco-Champion Choice</div>
                     <div className="text-sm text-emerald-600">This meal supports planetary health</div>
                   </div>
                 )}
                 
                 {meal.sustainability_score && meal.sustainability_score <= 70 && (
                   <div className="bg-amber-100 rounded-xl p-4 text-center">
-                    <div className="text-2xl mb-2">💡</div>
                     <div className="text-sm font-bold text-amber-700">Room to Grow</div>
                     <div className="text-sm text-amber-600">Small swaps can make a big difference</div>
                   </div>
@@ -1019,7 +1017,7 @@ export default function MealDetailPage() {
                 
                 {/* Micro-actions */}
                 <div className="bg-white/70 rounded-xl p-4">
-                  <h4 className="text-lg font-bold text-emerald-700 mb-3">🔄 Next Steps</h4>
+                  <h4 className="text-lg font-bold text-emerald-700 mb-3">Next Steps</h4>
                   <div className="grid grid-cols-2 gap-3">
                     <button className="bg-emerald-200 hover:bg-emerald-300 text-emerald-700 px-3 py-2 rounded-lg transition-colors font-medium">
                       💚 Save Recipe

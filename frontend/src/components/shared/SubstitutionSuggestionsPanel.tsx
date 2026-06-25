@@ -33,9 +33,10 @@ const PURPOSE_OPTIONS: Array<{ id: SubstitutionPurpose; label: string; hint: str
 ];
 
 const SOURCE_LABELS: Record<SubstitutionSourceFilter, string> = {
-  both: 'Canada + West Africa',
+  both: 'All sources',
   cnf: 'Canada',
   wafct: 'West Africa',
+  fdc: 'United States',
 };
 
 const CULTURE_LABELS: Record<SubstitutionCulturalContext, string> = {

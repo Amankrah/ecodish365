@@ -551,12 +551,27 @@ class CNFIntegrator:
             'Water consumption': 0.025,  # M&H typical mid (unchanged)
         }
 
-        # Select group-specific factors or defaults
-        factors_out = dict(impact_factors_by_group.get(food_group_name, default_factors))
+        # Select group-specific factors or defaults. FDC-MULTI-SOURCE
+        # (2026-06-26): if the food's stored FoodGroupName isn't a CNF
+        # canonical name (i.e. it's a WAFCT/FDC food like "WAFCT — Beef..."
+        # or "FDC — Beef Products"), translate via the canonical-category
+        # bridge to its CNF equivalent name and use that group's factors
+        # instead of falling through to the wider default band.
+        resolved_group_name = food_group_name
+        if food_group_name not in impact_factors_by_group:
+            try:
+                from api.services.food_group_category import cnf_group_name_for_food
+                bridged = cnf_group_name_for_food(food_id)
+                if bridged and bridged in impact_factors_by_group:
+                    resolved_group_name = bridged
+            except Exception:  # noqa: BLE001 — bridge optional in some test paths
+                pass
+
+        factors_out = dict(impact_factors_by_group.get(resolved_group_name, default_factors))
 
         # Per-category data-source metadata (only the 3 consumed categories
         # carry literature grounding; see method docstring).
-        in_known_group = food_group_name in impact_factors_by_group
+        in_known_group = resolved_group_name in impact_factors_by_group
         factors_out['_data_source_by_category'] = {
             'Global warming':    'Poore & Nemecek 2018 Fig. 1' if in_known_group else 'P&N-derived geometric midpoint',
             'Land use':          'Poore & Nemecek 2018 Fig. 1' if in_known_group else 'P&N-derived geometric midpoint',

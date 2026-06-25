@@ -215,8 +215,8 @@ export default function MealCard({ meal, onUpdate }: MealCardProps) {
         <div className="absolute top-3 left-3 right-3 flex items-start justify-between">
           <div className="flex flex-col space-y-2">
             {meal.is_featured && (
-              <span className="inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 shadow-md">
-                ⭐ Featured
+              <span className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 shadow-md">
+                <StarIcon className="w-3 h-3" aria-hidden="true" /> Featured
               </span>
             )}
             <span className={`inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-bold shadow-md ${getDifficultyColor(meal.difficulty_level)}`}>

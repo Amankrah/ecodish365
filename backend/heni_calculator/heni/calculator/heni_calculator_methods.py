@@ -59,68 +59,93 @@ def _is_non_ssb_beverage(food_description_lower: str) -> bool:
     return any(ind in food_description_lower for ind in _NON_SSB_BEVERAGE_INDICATORS)
 
 
-def _legacy_food_group_attribution(
-    food_group: str,
+def _category_food_group_attribution(
+    canonical_category: str,
     food_description: str,
     nutrient_data: Dict[str, float],
     risk_factors: Dict[str, float],
 ) -> None:
-    """Legacy literal-100 food-group attribution for CNF foods NOT in the
+    """Canonical-category-driven food-group attribution for foods NOT in the
     FPED-grounded composition lookup. Mutates `risk_factors` in place.
 
-    Kept as the fallback path so unbridged CNF foods still get an attribution
-    (no worse than pre-2026-05-23 behaviour). The composition lookup at
-    `heni_calculator.heni.data.composition_loader` is the preferred path; see
-    HENI-CODE-1.y cause A in `code_action_items.md`.
-    """
-    food_group_mapping = {
-        "Nuts and Seeds": "nuts_seeds",
-        "Cereals, Grains and Pasta": "whole_grains",
-        "Fruits and fruit juices": "fruits",
-        "Vegetables and Vegetable Products": "vegetables",
-        "Legumes and Legume Products": "legumes",
-        "Milk Products": "milk",
-        "Dairy and Egg Products": "milk",
-        "Beverages": "sugar_sweetened_beverages",
-        "Beef Products": "red_meat",
-        "Pork Products": "red_meat",
-        "Lamb, Veal and Game": "red_meat",
-        "Poultry Products": "_poultry_neutral",
-    }
+    Replaces the previous CNF-name substring matcher (FDC-MULTI-SOURCE
+    2026-06-26) — see `code_action_items.md`. The composition lookup at
+    `heni_calculator.heni.data.composition_loader` is still the preferred
+    path; this fallback fires only when a food (CNF, WAFCT, or FDC) has no
+    FPED-bridged composition entry. Source-agnostic: WAFCT/FDC foods that
+    map to the same canonical category get the same attribution as their
+    CNF analogs.
 
-    for group_name, heni_factor in food_group_mapping.items():
-        if group_name not in food_group:
-            continue
-        if heni_factor == "_poultry_neutral":
-            if any(t in food_description for t in
-                   ("sausage", "deli", "processed", "cured", "smoked", "ham", "bacon")):
-                risk_factors["processed_meat"] = 100.0
-        elif heni_factor == "whole_grains":
-            if any(t in food_description for t in (
-                "whole grain", "whole-grain", "whole wheat", "100% whole",
-                "wheat bran", "wheat germ", "oats, rolled", "oats, steel cut",
-                "rolled oats", "quinoa", "brown rice",
-            )):
-                risk_factors[heni_factor] = 100.0
-        elif heni_factor == "sugar_sweetened_beverages":
-            if _is_non_ssb_beverage(food_description):
-                continue
-            if nutrient_data.get("SUGARS, TOTAL", 0) > 5:
-                risk_factors[heni_factor] = 100.0
-        elif heni_factor == "milk":
-            if _is_plant_milk(food_description):
-                continue
-            risk_factors[heni_factor] = 100.0
-        elif heni_factor == "red_meat":
-            if any(t in food_description for t in (
-                "processed", "sausage", "ham", "bacon", "deli", "cured", "smoked",
-                "hot dog", "bologna", "salami", "pepperoni", "jerky",
-            )):
-                risk_factors["processed_meat"] = 100.0
-            else:
-                risk_factors["red_meat"] = 100.0
+    Keyword-gated branches (whole-grain, SSB exclusion, plant-milk,
+    processed-meat) preserved verbatim — they read `food_description`
+    which is source-agnostic.
+    """
+    # Canonical category → primary HENI risk-factor key. Several CNF concepts
+    # collapse into the same HENI factor (e.g. dairy and dairy_egg_combined
+    # both go to 'milk'; beef / pork / lamb_veal_game all go to 'red_meat').
+    primary = _CATEGORY_TO_HENI_RISK_FACTOR.get(canonical_category)
+    if primary is None:
+        return  # category not relevant to HENI risk factors
+
+    if primary == "_poultry_neutral":
+        if any(t in food_description for t in
+               ("sausage", "deli", "processed", "cured", "smoked", "ham", "bacon")):
+            risk_factors["processed_meat"] = 100.0
+    elif primary == "whole_grains":
+        if any(t in food_description for t in (
+            "whole grain", "whole-grain", "whole wheat", "100% whole",
+            "wheat bran", "wheat germ", "oats, rolled", "oats, steel cut",
+            "rolled oats", "quinoa", "brown rice",
+        )):
+            risk_factors[primary] = 100.0
+    elif primary == "sugar_sweetened_beverages":
+        if _is_non_ssb_beverage(food_description):
+            return
+        if nutrient_data.get("SUGARS, TOTAL", 0) > 5:
+            risk_factors[primary] = 100.0
+    elif primary == "milk":
+        if _is_plant_milk(food_description):
+            return
+        risk_factors[primary] = 100.0
+    elif primary == "red_meat":
+        if any(t in food_description for t in (
+            "processed", "sausage", "ham", "bacon", "deli", "cured", "smoked",
+            "hot dog", "bologna", "salami", "pepperoni", "jerky",
+        )):
+            risk_factors["processed_meat"] = 100.0
         else:
-            risk_factors[heni_factor] = 100.0
+            risk_factors["red_meat"] = 100.0
+    elif primary == "processed_meat":
+        risk_factors["processed_meat"] = 100.0
+    else:
+        risk_factors[primary] = 100.0
+
+
+# Canonical category → HENI risk-factor name. `_poultry_neutral` is a
+# sentinel that means "no attribution unless the food description signals
+# processed". CNF FG1 ('dairy_egg_combined') and WAFCT 'dairy' both map
+# to milk for the dairy-side attribution; the plant-milk filter inside
+# `_category_food_group_attribution` excludes plant-based variants.
+_CATEGORY_TO_HENI_RISK_FACTOR: Dict[str, str] = {
+    'nuts_seeds':            'nuts_seeds',
+    'cereals_grains':        'whole_grains',
+    'breakfast_cereals':     'whole_grains',
+    'fruits':                'fruits',
+    'vegetables':            'vegetables',
+    'legumes':               'legumes',
+    'dairy':                 'milk',
+    'dairy_egg_combined':    'milk',
+    'beverages':             'sugar_sweetened_beverages',
+    'beef':                  'red_meat',
+    'pork':                  'red_meat',
+    'lamb_veal_game':        'red_meat',
+    'poultry':               '_poultry_neutral',
+    'sausages_luncheon':     'processed_meat',
+    # eggs, fish, fats_oils, spices_herbs, sweets, babyfoods, baked_products,
+    # fast_foods, mixed_dishes, snacks, soups_sauces, alcoholic_beverages,
+    # unknown → no fallback attribution; the FPED composition path
+    # (preferred) handles ingredient-level decomposition for those.
+}
 
 
 def _apply_double_counting_carve_outs(
@@ -226,8 +251,10 @@ def extract_risk_factors_from_ingredient(calculator, ingredient) -> Dict[str, fl
             f"not implemented; flag for review)."
         )
 
-    # Get food group classifications
-    food_group = calculator.cnf_integrator.get_food_group(ingredient.food_id)
+    # FDC-MULTI-SOURCE (2026-06-26): the legacy CNF group-name substring
+    # matcher was replaced with the canonical-category bridge, so the
+    # `calculator.cnf_integrator.get_food_group(...)` call here was dropped.
+    # The canonical category is resolved below.
     food_description = calculator.cnf_integrator.get_food_description(
         ingredient.food_id
     ).lower()
@@ -239,6 +266,17 @@ def extract_risk_factors_from_ingredient(calculator, ingredient) -> Dict[str, fl
     # The composition values are grams of risk-component category per 100g
     # of CNF food; the downstream scaler at `heni_calculator.py` multiplies
     # by (ingredient.amount / 100) to get per-serving masses.
+    # FDC-MULTI-SOURCE (2026-06-26): resolve the canonical food category
+    # once via the bridge — drives both the SSB beverage check below and
+    # the fallback attribution for foods missing from the FPED composition
+    # bridge. Source-aware: WAFCT/FDC foods get the same attribution as
+    # their CNF equivalents.
+    try:
+        from api.services.food_group_category import canonical_category_for_food
+        canonical_category = canonical_category_for_food(ingredient.food_id)
+    except Exception:  # noqa: BLE001 — bridge module optional in some test paths
+        canonical_category = 'unknown'
+
     composition = get_composition_for_food(ingredient.food_id)
     if composition:
         for risk_key, mass_per_100g in composition.items():
@@ -250,16 +288,22 @@ def extract_risk_factors_from_ingredient(calculator, ingredient) -> Dict[str, fl
                 continue
             risk_factors[risk_key] = mass_per_100g
         # SSB attribution is independent of FPED (no SSB column). Still
-        # apply the existing keyword-driven SSB rule on Beverages-group
-        # foods that pass the non-SSB exclusion + sugar threshold.
-        if 'Beverages' in food_group and not _is_non_ssb_beverage(food_description):
+        # apply the existing keyword-driven SSB rule on beverage-category
+        # foods that pass the non-SSB exclusion + sugar threshold. Was
+        # `'Beverages' in food_group` (CNF-name substring) → now
+        # canonical-category check, so WAFCT/FDC beverage rows are
+        # honoured too.
+        if canonical_category == 'beverages' and not _is_non_ssb_beverage(food_description):
             sugar_content = nutrient_data.get('SUGARS, TOTAL', 0)
             if sugar_content > 5:
                 risk_factors['sugar_sweetened_beverages'] = 100.0
     else:
-        # Legacy literal-100 attribution for CNF foods not bridged to FNDDS/FPED.
-        _legacy_food_group_attribution(
-            food_group, food_description, nutrient_data, risk_factors,
+        # Fallback attribution for foods not bridged to FNDDS/FPED.
+        # Canonical-category-driven (FDC-MULTI-SOURCE 2026-06-26) —
+        # source-agnostic by construction; the previous CNF-name substring
+        # matcher was deleted in this commit.
+        _category_food_group_attribution(
+            canonical_category, food_description, nutrient_data, risk_factors,
         )
 
     # 2026-05-23 (HENI-CODE-1.y quick-fix subset): the previous block here

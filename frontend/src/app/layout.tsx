@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 import Navigation from "@/components/layout/Navigation";
@@ -8,9 +8,22 @@ import { AuthProvider } from "@/contexts/AuthContext";
 
 const SITE_URL = "https://ecodish365.com";
 
-const inter = Inter({
+// IBM Plex Sans for everything by default; IBM Plex Mono surfaces on
+// data tables, score numbers, citations, and reproducibility manifests
+// via the `font-mono` Tailwind class. Both fonts are exposed as CSS
+// variables (--font-sans / --font-mono) so tailwind.config can map them.
+const ibmPlexSans = IBM_Plex_Sans({
   subsets: ["latin"],
-  variable: "--font-inter",
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-mono",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -20,7 +33,7 @@ export const metadata: Metadata = {
     template: "%s | EcoDish365",
   },
   description:
-    "Score any food, meal, or full day against six published research measures. Plain-language results, real uncertainty, and the limits the science actually states. 7,000+ foods, no invented grades, no single score pretending to settle it.",
+    "Score any food, meal, or full day against every published research lens on one substrate. Plain-language results, real uncertainty, and the limits the science actually states. 7,000+ foods, no invented grades, no single score pretending to settle it.",
   keywords: [
     "nutrition analysis", "Canadian Nutrient File", "CNF database", "food research", 
     "Health Star Rating", "HSR calculator", "Food Compass Score", "FCS calculator",
@@ -54,7 +67,7 @@ export const metadata: Metadata = {
     siteName: "EcoDish365",
     title: "EcoDish365: Honest nutrition and sustainability scoring for any food",
     description:
-      "Score any food, meal, or full day against six published research measures. Plain-language results with the limits the science states. 7,000+ foods.",
+      "Score any food, meal, or full day against every published research lens on one substrate. Plain-language results with the limits the science states. 7,000+ foods.",
     images: [
       {
         url: `${SITE_URL}/og-image.png`,
@@ -69,7 +82,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "EcoDish365: Honest nutrition and sustainability scoring for any food",
     description:
-      "Six published lenses. Plain-language results. No single composite score.",
+      "Every published lens. Plain-language results. No single composite score.",
     images: [`${SITE_URL}/og-image.png`],
     creator: "@ecodish365",
     site: "@ecodish365",
@@ -148,18 +161,24 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={`${ibmPlexSans.variable} ${ibmPlexMono.variable}`}>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
       </head>
-      <body className={`${inter.className} min-h-screen bg-gray-50`}>
+      <body className={`${ibmPlexSans.className} min-h-screen bg-slate-50`}>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[60] focus:bg-white focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 text-sm font-medium text-gray-900"
+        >
+          Skip to main content
+        </a>
         <AuthProvider>
           <div className="min-h-screen flex flex-col">
             <Navigation />
-            <main className="flex-1">
+            <main id="main-content" className="flex-1">
               {children}
             </main>
             <footer className="bg-white border-t border-gray-200 py-8">

@@ -29,7 +29,7 @@ const quickActions = [
   },
   {
     name: 'Advanced Search',
-    description: 'Search CNF + WAFCT with filters and relevance scoring',
+    description: 'Search CNF + WAFCT + FDC with filters and relevance scoring',
     icon: MagnifyingGlassIcon,
     href: '/cnf/search',
     color: 'from-blue-500 to-blue-600',
@@ -43,14 +43,14 @@ const quickActions = [
   },
   {
     name: CATALOGUE_NAV.overview,
-    description: 'CNF + WAFCT counts, group distribution, data quality',
+    description: 'CNF + WAFCT + FDC counts, group distribution, data quality',
     icon: ChartBarIcon,
     href: '/cnf/analytics',
     color: 'from-purple-500 to-purple-600',
   },
   {
     name: 'Browse by Groups',
-    description: 'Explore foods by CNF or WAFCT food group',
+    description: 'Explore foods by CNF, WAFCT, or FDC food group',
     icon: CubeIcon,
     href: '/cnf/groups',
     color: 'from-orange-500 to-orange-600',
@@ -60,18 +60,18 @@ const quickActions = [
 const features = [
   {
     title: 'Advanced Search',
-    description: 'Intelligent search with relevance scoring, pagination, and comprehensive filtering options. Includes a source filter to scope to CNF only, WAFCT only, or both.',
-    items: ['Text-based search', 'Source filter (CNF / WAFCT / both)', 'AI-enhanced LLM ranking', 'Nutrient + food-group filtering']
+    description: 'Intelligent search with relevance scoring, pagination, and comprehensive filtering options. The source filter scopes to any one of CNF, WAFCT, or FDC — or searches all three at once.',
+    items: ['Text-based search', 'Source filter (CNF / WAFCT / FDC / All)', 'AI-enhanced LLM ranking', 'Nutrient + food-group filtering']
   },
   {
     title: 'Food Comparison',
-    description: 'Compare nutritional profiles of multiple foods side-by-side. Cross-database comparisons (CNF vs WAFCT) surface per-source provenance badges.',
-    items: ['Multi-food comparison', 'Cross-database (CNF + WAFCT)', 'Per-source provenance badges', 'Visual charts']
+    description: 'Compare nutritional profiles of multiple foods side-by-side across all three databases. Cross-database comparisons surface per-source provenance badges so methodological differences stay visible.',
+    items: ['Multi-food comparison', 'Cross-database (CNF + WAFCT + FDC)', 'Per-source provenance badges', 'Visual charts']
   },
   {
     title: 'Database Insights',
-    description: 'Statistics across both food-composition databases — Health Canada CNF (5,691 foods) and FAO/INFOODS WAFCT 2019 (1,028 foods). 14 WAFCT food groups added at FoodGroupID 50-63.',
-    items: ['Combined database stats', 'INFOODS↔CNF nutrient bridge (48 mappings)', 'WAFCT mineral-bias caveats in scoring', '195 canonical WAFCT recipes (sheet 09)']
+    description: 'Statistics across three food-composition databases — Health Canada CNF (5,993 foods), FAO/INFOODS WAFCT 2019 (1,028 West African foods), and USDA FoodData Central (13,620 US foods: Foundation, SR Legacy, FNDDS).',
+    items: ['Combined database stats (20,641 foods)', 'INFOODS↔CNF bridge (48 WAFCT mappings)', 'FDC nutrient_nbr↔CNF bridge (150 mappings)', 'Per-source provenance + methodology notes']
   },
 ];
 
@@ -105,11 +105,13 @@ export default function CNFDashboard() {
             Food Catalogue
           </h1>
           <p className="text-lg text-gray-600 max-w-3xl">
-            Explore <strong>two food-composition databases side by side</strong>: Health
-            Canada&rsquo;s Canadian Nutrient File (CNF — 5,691 foods, 150+ nutrients) and
-            FAO/INFOODS&rsquo; West African Food Composition Table 2019 (WAFCT — 1,028
-            foods including fonio, baobab, dawadawa, gari, egusi, and other West African
-            staples). Search, compare, and analyze across either or both sources.
+            Explore <strong>three food-composition databases side by side</strong>:
+            Health Canada&rsquo;s Canadian Nutrient File (CNF — 5,993 foods, 150+
+            nutrients), FAO/INFOODS&rsquo; West African Food Composition Table 2019
+            (WAFCT — 1,028 foods including fonio, baobab, dawadawa, gari, egusi, and
+            other West African staples), and USDA FoodData Central (FDC — 13,620 US
+            foods spanning Foundation, SR Legacy, and Survey FNDDS). Search, compare,
+            and analyze across any one source or all of them at once.
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
             <span className="inline-flex items-center px-2 py-1 rounded border bg-gray-100 text-gray-700 border-gray-200 font-semibold">
@@ -118,8 +120,11 @@ export default function CNFDashboard() {
             <span className="inline-flex items-center px-2 py-1 rounded border bg-amber-100 text-amber-800 border-amber-200 font-semibold">
               WAFCT — FAO/INFOODS
             </span>
+            <span className="inline-flex items-center px-2 py-1 rounded border bg-sky-100 text-sky-800 border-sky-200 font-semibold">
+              FDC — USDA
+            </span>
             <span className="text-gray-500">
-              Source filter on every search lets you scope to one database or combine both.
+              Source filter on every search lets you scope to any single database or search all three.
             </span>
           </div>
         </div>
@@ -137,7 +142,7 @@ export default function CNFDashboard() {
                     {formatNumber(stats.food_count)}
                   </div>
                   <div className="text-sm text-gray-600">Foods</div>
-                  <div className="text-xs text-gray-500">CNF + WAFCT combined</div>
+                  <div className="text-xs text-gray-500">CNF + WAFCT + FDC combined</div>
                 </div>
               </div>
             </div>
@@ -196,7 +201,7 @@ export default function CNFDashboard() {
           <ol className="grid md:grid-cols-4 gap-4 text-sm">
             <li className="border border-gray-100 rounded-lg p-4">
               <div className="font-semibold text-gray-900 mb-1">1. Search or browse</div>
-              <p className="text-gray-600">Find foods by name, group, or AI match across CNF and WAFCT.</p>
+              <p className="text-gray-600">Find foods by name, group, or AI match across CNF, WAFCT, and FDC.</p>
             </li>
             <li className="border border-gray-100 rounded-lg p-4">
               <div className="font-semibold text-gray-900 mb-1">2. Open the profile</div>
@@ -325,22 +330,26 @@ export default function CNFDashboard() {
             </h3>
             <div className="space-y-4 text-sm">
               <div>
-                <div className="font-medium text-gray-900 mb-1">Data Source</div>
-                <div className="text-gray-600">Canadian Nutrient File (CNF) - Health Canada</div>
+                <div className="font-medium text-gray-900 mb-1">Data sources</div>
+                <div className="text-gray-600">
+                  Canadian Nutrient File (CNF, Health Canada),
+                  WAFCT 2019 (FAO/INFOODS), and
+                  USDA FoodData Central (Foundation + SR Legacy + FNDDS).
+                </div>
               </div>
               <div>
                 <div className="font-medium text-gray-900 mb-1">Coverage</div>
-                <div className="text-gray-600">Comprehensive nutritional data for Canadian foods</div>
+                <div className="text-gray-600">~20,641 foods across Canada, West Africa, and the United States, with per-source provenance retained.</div>
               </div>
               <div>
-                <div className="font-medium text-gray-900 mb-1">Last Updated</div>
+                <div className="font-medium text-gray-900 mb-1">Last updated</div>
                 <div className="text-gray-600">
                   {stats ? new Date(stats.timestamp).toLocaleDateString() : 'Loading...'}
                 </div>
               </div>
               <div>
-                <div className="font-medium text-gray-900 mb-1">Quality Assurance</div>
-                <div className="text-gray-600">Scientifically validated nutritional data</div>
+                <div className="font-medium text-gray-900 mb-1">Quality assurance</div>
+                <div className="text-gray-600">Scientifically validated, with INFOODS- and nutrient_nbr-based bridges that preserve source-level differences.</div>
               </div>
             </div>
             <div className="mt-6">
@@ -359,8 +368,8 @@ export default function CNFDashboard() {
         <div className="bg-gradient-to-r from-primary-600 to-accent-600 rounded-xl p-8 text-center text-white">
           <h2 className="text-2xl font-bold mb-4">Ready to Explore?</h2>
           <p className="text-primary-100 mb-6 max-w-2xl mx-auto">
-            Dive into the comprehensive Canadian Nutrient File database and discover 
-            detailed nutritional information for thousands of foods.
+            Dive into three food-composition databases — Canadian, West African, and US —
+            and discover detailed nutritional information for over twenty thousand foods.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

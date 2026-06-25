@@ -120,7 +120,7 @@ export interface GroupFoodRow {
   FoodCode: string;
   FoodDescription: string;
   FoodDescriptionF?: string;
-  source: 'cnf' | 'wafct';
+  source: FoodSourceTag;
   energy_kcal?: number | null;
   protein_g?: number | null;
   fibre_g?: number | null;
@@ -148,7 +148,7 @@ export interface GroupFoodsQuery {
   food_type?: 'single' | 'mixed';
   thermal?: string;
   preservation?: string;
-  source?: 'cnf' | 'wafct' | 'both';
+  source?: SourceFilter;
   summary?: boolean;
 }
 
@@ -180,7 +180,7 @@ export interface DiscoverRequest {
   criteria: DiscoverCriterion[];
   basis?: DiscoverBasis;
   food_group_id?: number | null;
-  source?: 'cnf' | 'wafct' | 'both';
+  source?: SourceFilter;
   ratio?: DiscoverRatio | null;
   dv_threshold?: DiscoverDvThreshold | null;
   sort?: DiscoverSort | null;
@@ -237,7 +237,7 @@ export interface FoodComparisonNutrientCell {
   unit: string;
   nutrient_source_id?: number;
   nutrient_source?: string;
-  database?: 'cnf' | 'wafct' | string;
+  database?: FoodSourceTag | string;
 }
 
 export interface CompareFoodSummary {
@@ -246,7 +246,7 @@ export interface CompareFoodSummary {
   FoodCode?: string;
   FoodGroup: string;
   FoodGroupID?: number;
-  source?: 'cnf' | 'wafct' | string;
+  source?: FoodSourceTag | string;
   energy_kcal?: number | null;
   protein_g?: number | null;
   fibre_g?: number | null;
@@ -287,6 +287,12 @@ export interface DatabaseStats {
   food_count: number;
   cnf_food_count?: number;
   wafct_food_count?: number;
+  // FDC-INGEST (2026-06-25): aggregate and per-sub-source counts. All
+  // optional so older backend builds without the FDC ingest don't break.
+  fdc_food_count?: number;
+  fdc_foundation_food_count?: number;
+  fdc_sr_legacy_food_count?: number;
+  fdc_survey_fndds_food_count?: number;
   nutrient_records: number;
   conversion_records: number;
   food_groups: number;
@@ -313,8 +319,9 @@ export interface EnhancedSearchOptions {
   method?: string;
   limit?: number;
   offset?: number;
-  /** WAFCT-EXTEND (2026-05-24): filter results to one food database. */
-  source?: 'cnf' | 'wafct' | 'both';
+  /** WAFCT-EXTEND (2026-05-24); FDC-INGEST (2026-06-25) — filter to one
+   *  food database. */
+  source?: SourceFilter;
 }
 
 // Filter Options
@@ -373,6 +380,18 @@ export interface CNFDecomposedRecipe {
     reason?: string;
   }>;
   raw_llm_response?: string | null;           // null in individual mode
+  // Layer 1 (2026-06-10): regional-signal routing. When the dish name carries
+  // a token that the platform routes to a specific extension (currently only
+  // WAFCT for West African dishes) and the active source filter excludes that
+  // extension, the decomposer attaches a one-line warning and a
+  // `recommended_source` so callers can offer a retry handoff. Both fields are
+  // null when no signal fires or the active source already covers the substrate.
+  source_warning?: string | null;
+  recommended_source?: SourceFilter | null;
+  // Layer 2 (2026-06-10): count of near-duplicate Stage-2 resolutions that
+  // were folded by the structural-key dedup pass (e.g. two CNF pepper entries
+  // differing only by a "with salt" suffix). Zero in the common case.
+  near_duplicate_folds?: number;
 }
 
 // DIET-PATTERN-1 (2026-05-24): dietary-pattern resemblance result payload
@@ -543,8 +562,10 @@ export interface CNFAIMatchResult {
 // are CNF. Backend `food_source(food_id)` is the authoritative resolver.
 // (Distinct from the existing `FoodSource` interface near line 121 which
 // describes a CNF FOOD_SOURCE.csv row — this is provenance, not the row.)
-export type FoodSourceTag = 'cnf' | 'wafct';
-export type SourceFilter  = 'cnf' | 'wafct' | 'both';
+// FDC-INGEST (2026-06-25): added 'fdc' as the third in-pipeline source
+// (USDA FoodData Central — Foundation + SR Legacy + FNDDS, FoodIDs 800k+).
+export type FoodSourceTag = 'cnf' | 'wafct' | 'fdc';
+export type SourceFilter  = 'cnf' | 'wafct' | 'fdc' | 'both';
 
 export interface ProfileSampleAdequacy {
   adequate: boolean;
@@ -1539,7 +1560,7 @@ export type SubstitutionPurpose =
   | 'diabetes_friendly'
   | 'sustainability';
 
-export type SubstitutionSourceFilter = 'both' | 'cnf' | 'wafct';
+export type SubstitutionSourceFilter = 'both' | 'cnf' | 'wafct' | 'fdc';
 
 export type SubstitutionCulturalContext = 'auto' | 'west_africa' | 'north_america' | 'any';
 
@@ -1909,14 +1930,15 @@ export interface HSRResult {
   success: boolean;
   hsr_result: {
     rating: HSRRating;
-    score_breakdown: HSRScoreBreakdown;
-    nutritional_analysis: NutrientAnalysis[];
-    health_insights: {
+    score_breakdown?: HSRScoreBreakdown;
+    nutritional_analysis?: NutrientAnalysis[];
+    health_insights?: {
       strengths: HealthInsight[];
       concerns: HealthInsight[];
       recommendations: HealthInsight[];
     };
-    validation: {
+    combined_meal_omitted?: boolean;
+    validation?: {
       confidence_score: number;
       warnings: string[];
     };

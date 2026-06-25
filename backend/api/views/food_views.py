@@ -51,7 +51,7 @@ def search_food_api(request):
     category_filter = request.GET.get('category', '').strip().lower() or None
     method_filter = request.GET.get('method', '').strip().lower() or None
     source = request.GET.get('source', 'both').strip().lower()
-    if source not in ('cnf', 'wafct', 'both'):
+    if source not in ('cnf', 'wafct', 'fdc', 'both'):
         source = 'both'
 
     if not query:
@@ -71,7 +71,7 @@ def search_food_api(request):
         else:
             logger.warning('FOOD_NAME cache miss; filter dropdowns empty (search still OK)')
 
-    pipe_source = source if source in ('cnf', 'wafct') else 'both'
+    pipe_source = source if source in ('cnf', 'wafct', 'fdc') else 'both'
 
     try:
         pipeline = get_dish_cnf_pipeline()

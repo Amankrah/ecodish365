@@ -517,7 +517,7 @@ export default function FCSCalculate() {
                 onClick={() => setRecipeModalOpen(true)}
                 className="w-full mt-2 flex items-center justify-center gap-1.5 text-sm text-blue-700 hover:text-blue-900 hover:underline"
               >
-                🍳 Break down a homemade dish
+                Break down a homemade dish
               </button>
               {/* AI-MATCH-2 (2026-05-24): 24-h dietary recall — the diet-level
                   Food Compass score (O'Hearn 2022, Nat Comm 13:7066) is the
@@ -527,7 +527,7 @@ export default function FCSCalculate() {
                 href="/recall-24h?then=fcs"
                 className="w-full mt-1 flex items-center justify-center gap-1.5 text-sm text-blue-700 hover:text-blue-900 hover:underline"
               >
-                🍽️ Log a full food diary day instead
+                Log a full food diary day instead
               </a>
 
               </div>

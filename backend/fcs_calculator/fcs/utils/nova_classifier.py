@@ -56,44 +56,50 @@ logger = logging.getLogger(__name__)
 
 
 # ----------------------------------------------------------------------
-# Stage 1: CNF FoodGroup hard rules per Monteiro 2019 + Khandpur 2020
+# Stage 1: Canonical-category hard rules per Monteiro 2019 + Khandpur 2020
 # ----------------------------------------------------------------------
 
-# CNF FoodGroupID → default NOVA level (overrides apply if description
-# matches an exception; see _foodgroup_hard_rule).
-_FOODGROUP_DEFAULT_NOVA: Dict[int, int] = {
+# Canonical food category → default NOVA level (overrides apply if description
+# matches an exception; see _foodgroup_hard_rule). Replaces the previous
+# CNF-id-keyed table (FDC-MULTI-SOURCE 2026-06-26) — source-agnostic by
+# construction: WAFCT and FDC foods that resolve to the same canonical
+# category get the same NOVA defaults as their CNF analogs.
+_CATEGORY_DEFAULT_NOVA: Dict[str, int] = {
     # NOVA 4 (always — Monteiro's canonical examples)
-    3:   4,   # Babyfoods (commercial infant foods per Monteiro)
-    7:   4,   # Sausages and Luncheon meats (cured + reconstituted)
-    8:   4,   # Breakfast cereals (per Monteiro: "ready-to-eat" packaged)
-    21:  4,   # Fast Foods (literal NOVA 4 per Monteiro)
-    25:  4,   # Snacks (packaged snacks per Monteiro)
+    'babyfoods':           4,   # Commercial infant foods per Monteiro
+    'sausages_luncheon':   4,   # Cured + reconstituted
+    'breakfast_cereals':   4,   # Monteiro: "ready-to-eat" packaged
+    'fast_foods':          4,   # Literal NOVA 4 per Monteiro
+    'snacks':              4,   # Packaged snacks per Monteiro
 
     # NOVA 4 by default but with exceptions for simple/homemade variants
-    18:  4,   # Baked Products (commercial baked = NOVA 4; freshly baked plain = NOVA 3 exception below)
-    19:  4,   # Sweets (candy/cookies/cake = NOVA 4; honey/maple syrup = NOVA 3 exception)
-    22:  4,   # Mixed Dishes (prepared/frozen = NOVA 4; simple home-style = NOVA 3 exception)
+    'baked_products':      4,   # Commercial baked = NOVA 4; freshly baked plain = NOVA 3 exception
+    'sweets':              4,   # Candy/cookies/cake = NOVA 4; honey/maple syrup = NOVA 3 exception
+    'mixed_dishes':        4,   # Prepared/frozen = NOVA 4; simple home-style = NOVA 3 exception
 
     # NOVA 2 culinary ingredients (always)
-    4:   2,   # Fats and Oils
+    'fats_oils':           2,
 
     # NOVA 1 minimally processed (default; exceptions for cured/processed variants)
-    1:   1,   # Dairy and Egg Products
-    5:   1,   # Poultry Products
-    9:   1,   # Fruits and fruit juices (juice exception → NOVA 3)
-    10:  1,   # Pork Products
-    11:  1,   # Vegetables and Vegetable Products
-    12:  1,   # Nuts and Seeds
-    13:  1,   # Beef Products
-    15:  1,   # Finfish and Shellfish Products
-    16:  1,   # Legumes and Legume Products
-    17:  1,   # Lamb, Veal and Game
-    20:  1,   # Cereals, Grains and Pasta (raw = NOVA 1; refined/instant = NOVA 4)
+    'dairy_egg_combined':  1,   # CNF FG1 (heterogeneous; keyword rules below split out cheese/yogurt/butter)
+    'dairy':               1,   # WAFCT/FDC FNDDS milk-only and dairy rows
+    'eggs':                1,   # WAFCT/FDC FNDDS egg-only rows
+    'poultry':             1,
+    'fruits':              1,   # Juice exception → NOVA 3
+    'pork':                1,
+    'vegetables':          1,
+    'nuts_seeds':          1,
+    'beef':                1,
+    'fish':                1,
+    'legumes':             1,
+    'lamb_veal_game':      1,
+    'cereals_grains':      1,   # Raw = NOVA 1; refined/instant = NOVA 4
 
-    # Heterogeneous — defer to keyword matching
-    # 2  Spices and Herbs    (mostly NOVA 1; commercial blends = NOVA 2/4)
-    # 6  Soups, Sauces and Gravies  (homemade = NOVA 3; commercial = NOVA 4)
-    # 14 Beverages           (water = NOVA 1; juice = NOVA 3; soda = NOVA 4)
+    # Heterogeneous — defer to keyword matching, no Stage-1 default fires
+    # 'spices_herbs'         (mostly NOVA 1; commercial blends = NOVA 2/4)
+    # 'soups_sauces'         (homemade = NOVA 3; commercial = NOVA 4)
+    # 'beverages'            (water = NOVA 1; juice = NOVA 3; soda = NOVA 4)
+    # 'alcoholic_beverages'  (caught by Stage 2 keyword rules)
 }
 
 
@@ -283,9 +289,19 @@ _BAKED_NOVA4_PATTERNS = _compile_rx_list([
 ])
 
 
-def _foodgroup_hard_rule(food_group_id: int, food_desc_lower: str) -> Optional[NovaClassification]:
-    """Stage 1: CNF FoodGroup-driven hard rules with description-pattern exceptions."""
-    if food_group_id == 1:   # Dairy and Egg Products — heterogeneous (milk=1, butter=2, cheese=3, sweetened-yogurt=4)
+def _foodgroup_hard_rule(canonical_category: str, food_desc_lower: str) -> Optional[NovaClassification]:
+    """Stage 1: Canonical-category-driven hard rules with description-pattern exceptions.
+
+    FDC-MULTI-SOURCE (2026-06-26): was keyed on CNF FoodGroupID (1, 9, 11, 14, ...),
+    now keyed on canonical category so the rule fires identically for CNF / WAFCT / FDC
+    foods that resolve to the same concept. Keyword-pattern regexes (_DAIRY_NOVA4_PATTERNS,
+    _MEAT_NOVA4_PROM, _BEV_NOVA4_PAT, etc.) are unchanged — they operate on the food
+    description string which is source-agnostic.
+    """
+    # Dairy bucket — covers CNF FG1 ('dairy_egg_combined' which is heterogeneous,
+    # spanning milk/butter/cheese/sweetened-yogurt) plus the WAFCT/FDC FNDDS
+    # finer-grained 'dairy' rows.
+    if canonical_category in ('dairy_egg_combined', 'dairy'):
         if _any_match(food_desc_lower, _DAIRY_NOVA4_PATTERNS):
             return NovaClassification(4, 0.9, 'foodgroup_rule:dairy_sweetened_or_milkshake', [])
         if _any_match(food_desc_lower, _DAIRY_NOVA3_PATTERNS):
@@ -293,16 +309,16 @@ def _foodgroup_hard_rule(food_group_id: int, food_desc_lower: str) -> Optional[N
         if _any_match(food_desc_lower, _DAIRY_NOVA2_PATTERNS):
             return NovaClassification(2, 0.9, 'foodgroup_rule:dairy_butter_culinary', [])
         return NovaClassification(1, 0.85, 'foodgroup_rule:dairy_plain_default', [])
-    if food_group_id == 9:   # Fruits and fruit juices
+    if canonical_category == 'fruits':
         if _any_match(food_desc_lower, _FRUIT_NOVA4_PROM):
             return NovaClassification(4, 0.95, 'foodgroup_rule:fruit_drink_or_punch', [])
         if _any_match(food_desc_lower, _JUICE_NOVA3_PROM):
             return NovaClassification(3, 0.95, 'foodgroup_rule:fruit_juice', [])
         return NovaClassification(1, 0.95, 'foodgroup_rule:fruit_default_raw', [])
-    if food_group_id == 11:  # Vegetables
+    if canonical_category == 'vegetables':
         # Frozen/canned plain veg stays NOVA 1; only promote if ultra-processed
         return None  # Defer to keyword classifier — most veg is NOVA 1 by default
-    if food_group_id == 14:  # Beverages — heterogeneous
+    if canonical_category == 'beverages':
         if _any_match(food_desc_lower, _BEV_NOVA4_PAT):
             return NovaClassification(4, 0.9, 'foodgroup_rule:beverage_ssb', [])
         if _any_match(food_desc_lower, _BEV_NOVA3_PAT):
@@ -310,39 +326,45 @@ def _foodgroup_hard_rule(food_group_id: int, food_desc_lower: str) -> Optional[N
         if _any_match(food_desc_lower, _BEV_NOVA1_PAT):
             return NovaClassification(1, 0.9, 'foodgroup_rule:beverage_plain', [])
         return None
-    if food_group_id == 6:   # Soups, Sauces and Gravies
+    if canonical_category == 'alcoholic_beverages':
+        # Beer / wine / liquor — Monteiro classes these as NOVA 1 (wine, beer)
+        # to NOVA 4 (cocktails with industrial additives). Conservative default
+        # NOVA 1 for plain; keyword Stage 2 catches mixers.
+        return NovaClassification(1, 0.85, 'foodgroup_rule:alcoholic_default', [])
+    if canonical_category == 'soups_sauces':
         if _any_match(food_desc_lower, _SOUP_NOVA4_PAT):
             return NovaClassification(4, 0.9, 'foodgroup_rule:commercial_soup', [])
         return NovaClassification(3, 0.85, 'foodgroup_rule:simple_soup_default', [])
-    if food_group_id in (5, 10, 13, 17):  # Poultry, Pork, Beef, Lamb/Game
+    # Meat: poultry / pork / beef / lamb_veal_game (CNF FG 5/10/13/17 + WAFCT/FDC analogs)
+    if canonical_category in ('poultry', 'pork', 'beef', 'lamb_veal_game'):
         if _any_match(food_desc_lower, _MEAT_NOVA4_PROM):
             return NovaClassification(4, 0.95, 'foodgroup_rule:processed_reconstituted_meat', [])
         if _any_match(food_desc_lower, _MEAT_NOVA3_PROM):
             return NovaClassification(3, 0.9, 'foodgroup_rule:cured_or_canned_meat', [])
         return NovaClassification(1, 0.9, 'foodgroup_rule:meat_default_unprocessed', [])
-    if food_group_id == 20:  # Cereals, Grains and Pasta
+    if canonical_category == 'cereals_grains':
         if _any_match(food_desc_lower, _GRAIN_NOVA4_PROM):
             return NovaClassification(4, 0.9, 'foodgroup_rule:instant_or_sweetened_grain', [])
         return None  # Most grains/pasta are NOVA 1 raw
-    if food_group_id == 19:  # Sweets — sugar/honey = NOVA 2/3, candy/dessert = NOVA 4
+    if canonical_category == 'sweets':
         if _any_match(food_desc_lower, _SWEETS_NOVA2_PATTERNS):
             return NovaClassification(2, 0.9, 'foodgroup_rule:sweets_pure_sugar_culinary', [])
         if _any_match(food_desc_lower, _SWEETS_NOVA3_EXC):
             return NovaClassification(3, 0.85, 'foodgroup_rule:sweets_simple_honey_maple', [])
         return NovaClassification(4, 0.85, 'foodgroup_rule:sweets_commercial_candy_dessert', [])
-    if food_group_id == 18:  # Baked Products — plain bread NOVA 3; sweetened/glazed/cookies NOVA 4
+    if canonical_category == 'baked_products':
         if _any_match(food_desc_lower, _PLAIN_NOVA3_EXC):
             return NovaClassification(3, 0.85, 'foodgroup_rule:baked_homemade', [])
         if _any_match(food_desc_lower, _BAKED_NOVA4_PATTERNS):
             return NovaClassification(4, 0.85, 'foodgroup_rule:baked_commercial_pastry_or_sweetened', [])
         return NovaClassification(3, 0.8, 'foodgroup_rule:baked_plain_bread_default', [])
-    if food_group_id == 22:  # Mixed Dishes — homemade = NOVA 3, frozen/pre-prepared = NOVA 4
+    if canonical_category == 'mixed_dishes':
         if _any_match(food_desc_lower, _PLAIN_NOVA3_EXC):
             return NovaClassification(3, 0.8, 'foodgroup_rule:mixed_dish_homemade', [])
         return NovaClassification(4, 0.85, 'foodgroup_rule:mixed_dish_commercial_default', [])
-    if food_group_id in _FOODGROUP_DEFAULT_NOVA:
-        return NovaClassification(_FOODGROUP_DEFAULT_NOVA[food_group_id], 0.9,
-                                  f'foodgroup_rule:default_for_group_{food_group_id}', [])
+    if canonical_category in _CATEGORY_DEFAULT_NOVA:
+        return NovaClassification(_CATEGORY_DEFAULT_NOVA[canonical_category], 0.9,
+                                  f'foodgroup_rule:default_for_{canonical_category}', [])
     return None
 
 
@@ -459,13 +481,16 @@ def llm_classify(
 # Top-level dispatcher
 # ----------------------------------------------------------------------
 
-# Food groups where Stage 1 doesn't fire AND where the food is heterogeneous enough
-# that LLM augmentation is worthwhile (rather than falling back to NOVA 1 default).
-_LLM_AUGMENT_GROUPS = frozenset({
-    1,   # Dairy and Egg Products (yogurts span 1/3/4)
-    2,   # Spices and Herbs (raw spices = 1; commercial blends = 2/4)
-    11,  # Vegetables (mostly 1, but commercial preparations vary)
-    20,  # Cereals (raw = 1; refined/instant = 4)
+# Canonical categories where Stage 1 doesn't fire and the food is heterogeneous
+# enough that LLM augmentation is worthwhile (rather than falling back to NOVA 1
+# default). FDC-MULTI-SOURCE (2026-06-26): keyed on canonical category — was CNF
+# group IDs 1/2/11/20.
+_LLM_AUGMENT_CATEGORIES = frozenset({
+    'dairy_egg_combined',  # CNF FG1 (heterogeneous yogurts span 1/3/4)
+    'dairy',               # WAFCT/FDC dairy that escapes Stage 1
+    'spices_herbs',        # raw spices = 1; commercial blends = 2/4
+    'vegetables',          # mostly 1, but commercial preparations vary
+    'cereals_grains',      # raw = 1; refined/instant = 4
 })
 
 
@@ -477,18 +502,30 @@ def classify(
     chat_json_client=None,
     enable_llm: bool = True,
 ) -> NovaClassification:
-    """Classify a CNF food into NOVA 1-4 per Monteiro 2019.
+    """Classify a food into NOVA 1-4 per Monteiro 2019.
 
     Pipeline:
-      Stage 1: CNF FoodGroup hard rule (deterministic)
+      Stage 1: Canonical-category hard rule (deterministic) — source-agnostic
+               via the food_group_canonical_category bridge.
       Stage 2: Word-boundary keyword classifier (deterministic)
-      Stage 3-bis: LLM augmentation when group is heterogeneous (optional)
+      Stage 3-bis: LLM augmentation when category is heterogeneous (optional)
       Stage 3: Default NOVA 1 (Monteiro's "natural foods" baseline)
+
+    FDC-MULTI-SOURCE (2026-06-26): Stage 1 now resolves canonical category
+    once via the bridge (covering CNF / WAFCT / FDC). Backward-compatible
+    signature retained — `food_group_id` is read here, not by the rule.
     """
     desc_lower = (food_description or '').lower()
 
+    # Resolve canonical category from FoodGroupID (source-agnostic).
+    try:
+        from api.services.food_group_category import canonical_category_for_group
+        canonical_category = canonical_category_for_group(int(food_group_id))
+    except Exception:  # noqa: BLE001 — bridge optional in some test contexts
+        canonical_category = 'unknown'
+
     # Stage 1
-    s1 = _foodgroup_hard_rule(food_group_id, desc_lower)
+    s1 = _foodgroup_hard_rule(canonical_category, desc_lower)
     if s1 is not None:
         return s1
 
@@ -498,7 +535,7 @@ def classify(
         return s2
 
     # Stage 3-bis
-    if enable_llm and chat_json_client is not None and food_group_id in _LLM_AUGMENT_GROUPS:
+    if enable_llm and chat_json_client is not None and canonical_category in _LLM_AUGMENT_CATEGORIES:
         s3b = llm_classify(food_id, food_description, food_group_name, chat_json_client)
         if s3b is not None:
             return s3b

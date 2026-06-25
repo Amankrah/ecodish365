@@ -9,6 +9,32 @@
 
 Each item below is genuinely outstanding. Resolved audits (AGRIBALYSE-INGEST, GROUP-D-RECONCILIATION, HSR-CODE-1, HEFI-CODE-1, FCS-CODE-1, HENI-CODE-1, CODE-1 through CODE-7) have moved to the **Done** section below with their implementation logs and numerical headlines.
 
+### PLATFORM-CODE-1 — What's missing to be the biggest in the world *(immediate; ranked by leverage)*
+
+Ranked by leverage, not by effort. **Items a–c are non-negotiable** for the "killer use case" claim; d–j unlock adoption, credibility, and citation at scale.
+
+- **PLATFORM-CODE-1.a — Cross-continent data wiring (CNF + WAFCT → unified continents).** Cross-continent is currently CNF + WAFCT only — two regions. For the unified-continents thesis we need at minimum **USDA FoodData Central (US)**, **Agribalyse 3.2 (EU LCA; already cited)**, and ideally **EFSA / FoodEx2 (EU nutrition)** and **SHARP-ID or IRENA** for water/land. The Search and Compare pages already expose a [`SourceFilter`](frontend/src/components/shared/SourceFilter.tsx) abstraction ([`frontend/src/lib/api.ts`](frontend/src/lib/api.ts) `SourceFilter = 'cnf' | 'wafct' | 'both'`); the substrate is ready, the data is not yet wired. Without this, the cross-continent claim is aspirational.
+
+- **PLATFORM-CODE-1.b — Cohort batch ingest UI.** A researcher with 200 NHANES recalls or 1,000 INCA3 days has no way to use the platform today except by API. [`FpedApiService.cohort()`](frontend/src/lib/api.ts) exists on the backend already; the frontend has **no cohort upload page**, **no respondent-level results table**, and **no cohort-vs-cohort comparison**. Without this, no one publishes with this tool.
+
+- **PLATFORM-CODE-1.c — Reproducibility envelope.** Every run should generate **`run_id` + factor-pack SHA-256 + git commit + permalink**. The provenance block is half there in the deep-dive payload ([`frontend/src/app/research/meal-deep-dive/page.tsx`](frontend/src/app/research/meal-deep-dive/page.tsx)); what is missing is a **single signed manifest** a researcher can paste into a *Nature Food* methods section and a **permalink that re-renders the exact result years later**. Without this, "reproducible" is a marketing word.
+
+- **PLATFORM-CODE-1.d — Methods & citation export.** A **"Download methods.md + citations.bib"** button on every deep-dive result. The text generator is small; the citation list (Brassard 2022, Stylianou 2021, Huijbregts 2017, Monteiro 2019, IOM/NASEM compendium, Poore & Nemecek 2018, EAT-Lancet 2.0) is fixed and already in the manuscript.
+
+- **PLATFORM-CODE-1.e — Policy scenario simulator.** This is the missing third pillar. Today the substitution engine handles one swap at a time ([`substitution_analyzer.py`](backend/api/services/substitution_analyzer.py)). A policy maker wants: *"if my national procurement replaced 30 % of beef with legumes across this country's diet, what happens to HENI, GHG, and the EAT-Lancet share?"* That is a different UI: a **population-level slider/rule editor** on top of a representative day or a national-survey medoid, with **monetized social-cost overlay**. The Pareto/SUBST-1 machinery in the substitution manuscript is the engine; it needs a policy-shaped front end.
+
+- **PLATFORM-CODE-1.f — Uncertainty bands in the UI.** Backend computes Monte Carlo ([`environmental_views.py`](backend/api/views/environmental_views.py) v1 uncertainty bands; [`cnf_integrator.py`](backend/environmental_impact_model/src/cnf_integrator.py) group-level ratios); the deep-dive renders **point estimates only**. Showing **±95 % CI** is what separates a published figure from a dashboard widget.
+
+- **PLATFORM-CODE-1.g — Saved analyses + side-by-side comparison.** Two meals, two cohorts, baseline vs intervention, with **delta tables across all six lenses**. Today the page shows one meal at a time and forgets it on refresh.
+
+- **PLATFORM-CODE-1.h — Living factor-pack registry.** A **`/methods/factor-packs`** page listing every CNF / WAFCT / Agribalyse / FPED / NOVA / DRI version, with **checksums, change logs, and the date each became default**. This is what convinces a reviewer the platform is maintained, not a thesis project.
+
+- **PLATFORM-CODE-1.i — Public API + cookbook.** A **`/research/api`** page with the same endpoints [`api.ts`](frontend/src/lib/api.ts) already calls, plus **Python and R cookbooks** ("recreate Figure 3 of the manuscript in 12 lines"). Researchers adopt platforms whose code they can paste into a notebook.
+
+- **PLATFORM-CODE-1.j — Citable DOI per release.** Zenodo deposit, semantic version, release notes. Without this, no one cites you.
+
+---
+
 ### GROUP-D-CODE-1.x — Remaining follow-ups (after AGRIBALYSE-INGEST)
 
 The §3.5 LCA matcher architecture landed in `2026-05-21 — GROUP-D-RECONCILIATION` and the full Agribalyse 3.2 ingest landed in `2026-05-21 — AGRIBALYSE-INGEST` (see Done; sub-item -A and -D now resolved). Two sub-items remain — both require human labellers, not code:

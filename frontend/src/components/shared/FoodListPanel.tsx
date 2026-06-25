@@ -25,7 +25,12 @@ import Link from 'next/link';
 import {
   ChevronDown, ChevronUp, Download, Upload, Trash2, Send,
   Package, Info, AlertCircle, Check, Scale,
+  Sparkles, Salad, Dna, Compass, Target,
 } from 'lucide-react';
+import { StarIcon, GlobeAltIcon, GlobeAmericasIcon } from '@heroicons/react/24/outline';
+import type { ComponentType, SVGProps } from 'react';
+
+type IconType = ComponentType<SVGProps<SVGSVGElement>>;
 import {
   type ActiveFoodList,
   loadActiveFoodList,
@@ -51,19 +56,19 @@ export type ScoreTargetId =
 interface ScoreTarget {
   id: ScoreTargetId;
   label: string;
-  emoji: string;
+  icon: IconType;
   path: string;
 }
 
 const SCORE_TARGETS: ScoreTarget[] = [
-  { id: 'scorecard',       label: 'All scores',        emoji: '✨', path: '/scorecard' },
-  { id: 'hefi',            label: 'Healthy eating',    emoji: '🥗', path: '/hefi/calculate' },
-  { id: 'heni',            label: 'Health impact',     emoji: '🧬', path: '/heni/calculate' },
-  { id: 'fcs',             label: 'Food Compass',      emoji: '🧭', path: '/fcs/calculate' },
-  { id: 'hsr',             label: 'Star rating',       emoji: '⭐', path: '/hsr/calculate' },
-  { id: 'environmental',   label: 'Environment',       emoji: '🌍', path: '/environmental/calculate' },
-  { id: 'dietary_pattern', label: 'Eating style',      emoji: '🎯', path: '/dietary-pattern' },
-  { id: 'planetary',       label: 'Planet budget',     emoji: '🪐', path: '/planetary' },
+  { id: 'scorecard',       label: 'All scores',        icon: Sparkles,          path: '/scorecard' },
+  { id: 'hefi',            label: 'Healthy eating',    icon: Salad,             path: '/hefi/calculate' },
+  { id: 'heni',            label: 'Health impact',     icon: Dna,               path: '/heni/calculate' },
+  { id: 'fcs',             label: 'Food Compass',      icon: Compass,           path: '/fcs/calculate' },
+  { id: 'hsr',             label: 'Star rating',       icon: StarIcon,          path: '/hsr/calculate' },
+  { id: 'environmental',   label: 'Environment',       icon: GlobeAltIcon,      path: '/environmental/calculate' },
+  { id: 'dietary_pattern', label: 'Eating style',      icon: Target,            path: '/dietary-pattern' },
+  { id: 'planetary',       label: 'Planet budget',     icon: GlobeAmericasIcon, path: '/planetary' },
 ];
 
 const COMPACT_TRANSFER_IDS: ScoreTargetId[] = ['hefi', 'environmental', 'hsr'];
@@ -529,7 +534,7 @@ export function FoodListPanel({
                       ? `You are on the ${target.label} scorer`
                       : `Score this list with ${target.label}`}
                   >
-                    <span aria-hidden="true">{target.emoji}</span>
+                    <target.icon className="w-3.5 h-3.5" aria-hidden="true" />
                     <span>{target.label}</span>
                     {!isCurrent && <Send className="h-3 w-3" aria-hidden="true" />}
                     {isCurrent && <span className="text-[10px]">(current)</span>}

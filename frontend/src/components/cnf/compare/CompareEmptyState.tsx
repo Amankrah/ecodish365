@@ -19,7 +19,7 @@ export function CompareEmptyState({
       <ScaleIcon className="w-14 h-14 text-gray-300 mx-auto mb-3" />
       <h3 className="text-lg font-medium text-gray-900 mb-1">No foods selected</h3>
       <p className="text-gray-600 text-sm mb-6 max-w-lg mx-auto">
-        Compare up to six foods from the CNF + WAFCT catalogue side by side, with optional
+        Compare up to six foods from the CNF + WAFCT + FDC catalogue side by side, with optional
         per-100 kcal density, %DV, and clinical ratios.
       </p>
       <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">

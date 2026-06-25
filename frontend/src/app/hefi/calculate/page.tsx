@@ -564,7 +564,7 @@ export default function HEFICalculatePage() {
                   onClick={() => setRecipeModalOpen(true)}
                   className="inline-flex items-center gap-1.5 text-sm text-purple-700 hover:text-purple-900 hover:underline"
                 >
-                  🍳 Break down a homemade dish
+                  Break down a homemade dish
                 </button>
                 {/* AI-MATCH-2 (2026-05-24): 24-h dietary recall — natural anchor for HEFI
                     since Brassard 2022b designed HEFI-2019 explicitly for 24-h recall data. */}
@@ -572,7 +572,7 @@ export default function HEFICalculatePage() {
                   href="/recall-24h?then=hefi"
                   className="inline-flex items-center gap-1.5 text-sm text-purple-700 hover:text-purple-900 hover:underline"
                 >
-                  🍽️ Log a full food diary day instead
+                  Log a full food diary day instead
                 </a>
 
                 {searchResults.length > 0 && (

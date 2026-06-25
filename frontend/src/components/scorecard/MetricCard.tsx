@@ -36,7 +36,7 @@ export function MetricCard({ card, stale, onRetry, retrying }: Props): JSX.Eleme
         <span
           className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${accent.chip}`}
         >
-          <span aria-hidden="true">{card.emoji}</span>
+          <card.icon className="w-3.5 h-3.5" aria-hidden="true" />
           {card.title}
         </span>
         {stale && (
@@ -46,14 +46,14 @@ export function MetricCard({ card, stale, onRetry, retrying }: Props): JSX.Eleme
 
       <div>
         <p
-          className={`text-xl font-bold leading-tight ${
+          className={`text-xl font-bold leading-tight font-mono tabular-nums ${
             isError || isHint ? 'text-gray-400' : 'text-gray-900'
           }`}
         >
           {card.headline}
         </p>
         {card.subline && (
-          <p className="text-xs text-gray-600 mt-0.5">{card.subline}</p>
+          <p className="text-xs text-gray-600 mt-0.5 font-mono tabular-nums">{card.subline}</p>
         )}
       </div>
 

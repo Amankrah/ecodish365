@@ -229,7 +229,7 @@ function CNFGroupsPageContent() {
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Browse by food groups</h1>
               <p className="text-gray-600 max-w-2xl">
-                Explore the CNF + WAFCT catalogue by category. Filter by source, food type, and
+                Explore the CNF + WAFCT + FDC catalogue by category. Filter by source, food type, and
                 preparation state; screen within a group; or send selections to compare or all scores.
               </p>
             </div>
@@ -268,7 +268,7 @@ function CNFGroupsPageContent() {
                   <CubeIcon className="w-14 h-14 text-gray-300 mx-auto mb-3" />
                   <h3 className="text-lg font-medium text-gray-900 mb-1">Select a food group</h3>
                   <p className="text-gray-600 text-sm">
-                    {foodGroups.length} groups · CNF + WAFCT combined
+                    {foodGroups.length} groups · CNF + WAFCT + FDC combined
                   </p>
                 </div>
 
@@ -284,7 +284,10 @@ function CNFGroupsPageContent() {
                         onClick={() => handleSelectGroup(group)}
                         className="text-left p-3 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50/50 transition-colors"
                       >
-                        <span className="text-lg">{getFoodGroupIcon(group.FoodGroupName)}</span>
+                        {(() => {
+                          const Icon = getFoodGroupIcon(group.FoodGroupName);
+                          return <Icon className="w-5 h-5 text-gray-600" aria-hidden="true" />;
+                        })()}
                         <div className="text-sm font-medium text-gray-900 mt-1 line-clamp-2 leading-snug">
                           {group.FoodGroupName}
                         </div>
@@ -312,7 +315,10 @@ function CNFGroupsPageContent() {
                   <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
                     <div>
                       <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                        <span className="text-xl">{getFoodGroupIcon(selectedGroup.FoodGroupName)}</span>
+                        {(() => {
+                          const Icon = getFoodGroupIcon(selectedGroup.FoodGroupName);
+                          return <Icon className="w-5 h-5 text-gray-600" aria-hidden="true" />;
+                        })()}
                         {selectedGroup.FoodGroupName}
                       </h2>
                       {foodsResult && (
@@ -369,9 +375,10 @@ function CNFGroupsPageContent() {
                       aria-label="Source filter"
                       className="text-xs px-2 py-1.5 border border-gray-300 rounded-lg bg-white"
                     >
-                      <option value="both">CNF + WAFCT</option>
+                      <option value="both">All sources</option>
                       <option value="cnf">CNF only</option>
                       <option value="wafct">WAFCT only</option>
+                      <option value="fdc">FDC only</option>
                     </select>
                     <select
                       value={foodTypeFilter}

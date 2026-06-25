@@ -16,79 +16,62 @@ import {
   PlusCircleIcon,
   BookmarkIcon,
   ClockIcon,
-  ArrowRightOnRectangleIcon
+  ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/outline';
 import { clsx } from 'clsx';
 import { CATALOGUE_DROPDOWN, CATALOGUE_NAV } from '@/lib/catalogueNav';
 
-type DropdownChild = { name: string; href: string };
-type DropdownItem = { name: string; href: string; children?: DropdownChild[] };
+type DropdownChild = {
+  name: string;
+  href: string;
+  disabled?: boolean;
+};
 type NavItem = {
   name: string;
   href: string;
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   requiresAuth?: boolean;
-  dropdown?: DropdownItem[];
+  dropdown: readonly DropdownChild[];
 };
 
+// Top-level navigation: functional categories with each individual metric
+// surfaced directly in its dropdown so researchers can run any single
+// lens calculator in one click. Per-lens overview pages (/hefi, /heni,
+// /hsr, /fcs, /environmental) remain reachable via the contextual
+// sub-nav once you are on a lens path.
 const navigation: NavItem[] = [
   {
     name: CATALOGUE_NAV.section,
     href: CATALOGUE_NAV.href,
     icon: ChartBarIcon,
-    dropdown: [...CATALOGUE_DROPDOWN],
+    dropdown: CATALOGUE_DROPDOWN,
   },
-  { 
-    name: 'Nutrition Indicators', 
-    href: '/hsr', 
+  {
+    name: 'Nutrition Indicators',
+    href: '/scorecard',
     icon: ScaleIcon,
+    // Top-line entries only — one per lens, going straight to its
+    // calculator. Compare / overview pages reachable via the contextual
+    // sub-nav once on a lens path, so we do not duplicate them here.
     dropdown: [
-      { name: '✨ All scores', href: '/scorecard' },
+      { name: 'All scores at once', href: '/scorecard' },
+      { name: 'HEFI', href: '/hefi/calculate' },
+      { name: 'HENI', href: '/heni/calculate' },
+      { name: 'HSR', href: '/hsr/calculate' },
+      { name: 'Food Compass', href: '/fcs/calculate' },
       { name: 'Scan packaged food', href: '/scan-product' },
       { name: 'Improve one meal', href: '/improve-product' },
-      { 
-        name: 'HSR', 
-        href: '/hsr', 
-        children: [
-          { name: 'Calculate HSR', href: '/hsr/calculate' },
-          { name: 'Compare products', href: '/hsr/compare' },
-        ]
-      },
-      { 
-        name: 'FCS', 
-        href: '/fcs', 
-        children: [
-          { name: 'Calculate FCS', href: '/fcs/calculate' },
-          { name: 'Compare products', href: '/fcs/compare' },
-        ]
-      },
-      { 
-        name: 'HEFI', 
-        href: '/hefi', 
-        children: [
-          { name: 'Calculate HEFI', href: '/hefi/calculate' },
-          { name: 'Compare meals', href: '/hefi/compare' },
-        ]
-      },
-      { 
-        name: 'HENI', 
-        href: '/heni', 
-        children: [
-          { name: 'Calculate HENI', href: '/heni/calculate' },
-        ]
-      },
-    ]
+    ],
   },
   {
     name: 'Environmental Indicators',
     href: '/environmental',
     icon: GlobeAltIcon,
     dropdown: [
-      { name: 'Calculate Impact', href: '/environmental/calculate' },
-      { name: 'Compare Foods', href: '/environmental/compare' },
+      { name: 'Environmental impact', href: '/environmental/calculate' },
       // PLANETARY-1 (2026-05-27): EAT-Lancet 2.0 Table 2 food-system share.
-      { name: '🪐 Planet budget share', href: '/planetary' },
-    ]
+      { name: 'Planet budget share', href: '/planetary' },
+    ],
   },
   // RECALL-HISTORY-1 (2026-05-24): surface the 24-h recall → history →
   // dietary-pattern workflow in the top nav so users (especially returning
@@ -107,7 +90,7 @@ const navigation: NavItem[] = [
   },
   {
     name: 'Meals',
-    href: '/meals', 
+    href: '/meals',
     icon: PlusCircleIcon,
     requiresAuth: true,
     dropdown: [
@@ -115,8 +98,29 @@ const navigation: NavItem[] = [
       { name: 'My Meals', href: '/meals/my-meals' },
       { name: 'Saved Meals', href: '/meals/saved-meals' },
       { name: 'Discover Meals', href: '/meals' },
-    ]
+    ],
   },
+];
+
+// Path-to-category routing for the contextual sub-nav bar. First match
+// wins. Keeps the original lens-page → Nutrition-dropdown behaviour and
+// adds /research/* under Food Catalogue (where Nutrient analysis lives).
+const CATEGORY_ROUTES: Array<{ prefix: string; category: string }> = [
+  { prefix: '/cnf', category: CATALOGUE_NAV.section },
+  { prefix: '/research', category: CATALOGUE_NAV.section },
+  { prefix: '/scorecard', category: 'Nutrition Indicators' },
+  { prefix: '/hefi', category: 'Nutrition Indicators' },
+  { prefix: '/heni', category: 'Nutrition Indicators' },
+  { prefix: '/hsr', category: 'Nutrition Indicators' },
+  { prefix: '/fcs', category: 'Nutrition Indicators' },
+  { prefix: '/scan-product', category: 'Nutrition Indicators' },
+  { prefix: '/improve-product', category: 'Nutrition Indicators' },
+  { prefix: '/environmental', category: 'Environmental Indicators' },
+  { prefix: '/planetary', category: 'Environmental Indicators' },
+  { prefix: '/recall-24h', category: 'Food diary' },
+  { prefix: '/recall-history', category: 'Food diary' },
+  { prefix: '/dietary-pattern', category: 'Food diary' },
+  { prefix: '/meals', category: 'Meals' },
 ];
 
 export default function Navigation() {
@@ -144,45 +148,18 @@ export default function Navigation() {
     }, 180);
   };
 
-  const filteredNavigation = navigation.filter(item => 
+  const filteredNavigation = navigation.filter(item =>
     !item.requiresAuth || isAuthenticated
   );
 
-  // Compute contextual sub-navigation for current section
+  // Compute contextual sub-navigation for the current section.
   const getContextSubnav = (): DropdownChild[] => {
     const currentPath = pathname || '/';
-    // Nutrition Indicators context (HSR/FCS/HEFI/HENI)
-    const nutrition = filteredNavigation.find((n) => n.name === 'Nutrition Indicators');
-    if (nutrition?.dropdown && Array.isArray(nutrition.dropdown)) {
-      const match = nutrition.dropdown.find((d) => currentPath.startsWith(d.href));
-      if (match?.children && match.children.length > 0) {
-        return match.children;
-      }
-    }
-
-    // Environmental Indicators context
-    const environmental = filteredNavigation.find((n) => n.name === 'Environmental Indicators');
-    if (environmental?.dropdown && currentPath.startsWith(environmental.href)) {
-      return environmental.dropdown.map((d) => ({ name: d.name, href: d.href }));
-    }
-
-    // Food diary context
-    if (
-      currentPath.startsWith('/recall-24h')
-      || currentPath.startsWith('/recall-history')
-      || currentPath.startsWith('/dietary-pattern')
-    ) {
-      const foodDiary = filteredNavigation.find((n) => n.name === 'Food diary');
-      return foodDiary?.dropdown?.map((d) => ({ name: d.name, href: d.href })) ?? [];
-    }
-
-    // Food catalogue context (covers /cnf/* and the researcher /research/* deep-dive)
-    if (currentPath.startsWith('/cnf') || currentPath.startsWith('/research')) {
-      const catalogue = filteredNavigation.find((n) => n.name === CATALOGUE_NAV.section);
-      return catalogue?.dropdown?.map((d) => ({ name: d.name, href: d.href })) ?? [];
-    }
-
-    return [];
+    const match = CATEGORY_ROUTES.find((r) => currentPath.startsWith(r.prefix));
+    if (!match) return [];
+    const item = filteredNavigation.find((n) => n.name === match.category);
+    if (!item) return [];
+    return [...item.dropdown];
   };
 
   const contextSubnav = getContextSubnav();
@@ -204,13 +181,7 @@ export default function Navigation() {
             {filteredNavigation.map((item) => {
               const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
               const isDropdownOpen = activeDropdown === item.name;
-              const showDropdown = Array.isArray(item.dropdown) && (
-                item.href === CATALOGUE_NAV.href
-                || item.name === 'Environmental Indicators'
-                || item.name === 'Nutrition Indicators'
-                || item.name === 'Meals'
-                || item.name === 'Food diary'
-              );
+              const showDropdown = Array.isArray(item.dropdown) && item.dropdown.length > 0;
               return (
                 <div key={item.name} className="relative group">
                   <div
@@ -251,35 +222,32 @@ export default function Navigation() {
                     )}
                   </div>
                   {showDropdown && isDropdownOpen && (
-                    <div 
-                      className="absolute top-full left-0 mt-2 w-64 bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/50 py-2 z-50"
+                    <div
+                      className="absolute top-full left-0 mt-2 w-72 bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/50 py-2 z-50"
                       onMouseEnter={() => openDropdown(item.name)}
                       onMouseLeave={scheduleCloseDropdown}
                     >
-                      {item.dropdown?.map((d: DropdownItem) => {
-                        // For Nutrition Indicators, only show main paths (no children)
-                        if (item.name === 'Nutrition Indicators') {
+                      {item.dropdown.map((d) => {
+                        const active = pathname === d.href || (d.href !== '/' && pathname.startsWith(d.href.split('#')[0]));
+                        if (d.disabled) {
                           return (
-                            <Link
-                              key={d.href}
-                              href={d.href}
-                              className={clsx('block px-4 py-2 text-sm mx-2 rounded-lg transition-colors',
-                                pathname.startsWith(d.href)
-                                  ? 'bg-gradient-to-r from-blue-50 to-green-50 text-blue-700'
-                                  : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50/80'
-                              )}
+                            <div
+                              key={d.href + d.name}
+                              className="flex items-center justify-between px-4 py-2 text-sm mx-2 rounded-lg text-gray-400 cursor-not-allowed"
+                              aria-disabled="true"
                             >
-                              {d.name}
-                            </Link>
+                              <span>{d.name}</span>
+                              <span className="text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-full">Soon</span>
+                            </div>
                           );
                         }
-                        // For CNF/Environmental, show their subdirectories
                         return (
                           <Link
-                            key={d.href}
+                            key={d.href + d.name}
                             href={d.href}
-                            className={clsx('block px-4 py-2 text-sm mx-2 rounded-lg transition-colors',
-                              pathname === d.href
+                            className={clsx(
+                              'block px-4 py-2 text-sm mx-2 rounded-lg transition-colors',
+                              active
                                 ? 'bg-gradient-to-r from-blue-50 to-green-50 text-blue-700'
                                 : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50/80'
                             )}
@@ -293,7 +261,7 @@ export default function Navigation() {
                 </div>
               );
             })}
-            
+
             {/* User Menu / Auth Buttons */}
             <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-gray-200">
               {isAuthenticated ? (
@@ -312,7 +280,7 @@ export default function Navigation() {
                       userMenuOpen ? 'rotate-180' : ''
                     )} />
                   </button>
-                  
+
                   {userMenuOpen && (
                     <div className="absolute right-0 top-full mt-2 w-56 bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/50 py-2 z-50">
                       <div className="px-4 py-2 border-b border-gray-200">
@@ -387,13 +355,17 @@ export default function Navigation() {
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
             <button
+              type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileMenuOpen ? 'true' : 'false'}
+              aria-controls="mobile-nav-drawer"
               className="p-2 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100/80 transition-all duration-200"
             >
               {mobileMenuOpen ? (
-                <XMarkIcon className="w-6 h-6" />
+                <XMarkIcon className="w-6 h-6" aria-hidden="true" />
               ) : (
-                <Bars3Icon className="w-6 h-6" />
+                <Bars3Icon className="w-6 h-6" aria-hidden="true" />
               )}
             </button>
           </div>
@@ -402,29 +374,69 @@ export default function Navigation() {
 
       {/* Mobile Navigation */}
       {mobileMenuOpen && (
-        <div className="md:hidden">
+        <div id="mobile-nav-drawer" className="md:hidden">
           <div className="px-4 pt-2 pb-4 space-y-2 bg-white/95 backdrop-blur-sm border-t border-gray-200/50">
             {filteredNavigation.map((item) => {
-              const isActive = pathname === item.href || 
+              const isActive = pathname === item.href ||
                 (item.href !== '/' && pathname.startsWith(item.href));
-              
+
               return (
                 <div key={item.name} className="space-y-1">
-                  {/* Main Category */}
-                  <div className={clsx(
-                    'flex items-center space-x-3 px-4 py-3 rounded-xl text-base font-medium',
-                    isActive
-                      ? 'bg-gradient-to-r from-blue-50 to-green-50 text-blue-700 shadow-sm border border-blue-100'
-                      : 'text-gray-700'
-                  )}>
-                    <item.icon className={clsx(
-                      'w-5 h-5',
-                      isActive ? 'text-blue-600' : 'text-gray-500'
-                    )} />
+                  <Link
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={clsx(
+                      'flex items-center space-x-3 px-4 py-3 rounded-xl text-base font-medium',
+                      isActive
+                        ? 'bg-gradient-to-r from-blue-50 to-green-50 text-blue-700 shadow-sm border border-blue-100'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    )}
+                  >
+                    <item.icon
+                      className={clsx(
+                        'w-5 h-5',
+                        isActive ? 'text-blue-600' : 'text-gray-500'
+                      )}
+                      aria-hidden="true"
+                    />
                     <span>{item.name}</span>
-                  </div>
-                  
-          {/* No dropdown items on mobile; use context sub-nav below */}
+                  </Link>
+                  {/* Stack each dropdown item beneath its category so mobile users
+                      can reach lens calculators and other sub-pages directly. */}
+                  {item.dropdown.length > 0 && (
+                    <div className="pl-7 pr-2 space-y-0.5">
+                      {item.dropdown.map((d) => {
+                        if (d.disabled) {
+                          return (
+                            <div
+                              key={d.href + d.name}
+                              className="flex items-center justify-between px-3 py-2 text-sm rounded-lg text-gray-400 cursor-not-allowed"
+                              aria-disabled="true"
+                            >
+                              <span>{d.name}</span>
+                              <span className="text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-full">Soon</span>
+                            </div>
+                          );
+                        }
+                        const subActive = pathname === d.href || (d.href !== '/' && pathname.startsWith(d.href.split('#')[0]));
+                        return (
+                          <Link
+                            key={d.href + d.name}
+                            href={d.href}
+                            onClick={() => setMobileMenuOpen(false)}
+                            className={clsx(
+                              'block px-3 py-2 text-sm rounded-lg transition-colors',
+                              subActive
+                                ? 'bg-blue-50 text-blue-700'
+                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                            )}
+                          >
+                            {d.name}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -438,10 +450,22 @@ export default function Navigation() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 overflow-x-auto py-2">
             {contextSubnav.map((link) => {
-              const active = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
+              if (link.disabled) {
+                return (
+                  <span
+                    key={link.href + link.name}
+                    className="px-3 py-1.5 rounded-lg text-sm whitespace-nowrap text-gray-400 inline-flex items-center gap-1.5"
+                    aria-disabled="true"
+                  >
+                    {link.name}
+                    <span className="text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-full">Soon</span>
+                  </span>
+                );
+              }
+              const active = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href.split('#')[0]));
               return (
                 <Link
-                  key={link.href}
+                  key={link.href + link.name}
                   href={link.href}
                   className={clsx(
                     'px-3 py-1.5 rounded-lg text-sm whitespace-nowrap transition-colors duration-200',
@@ -460,4 +484,4 @@ export default function Navigation() {
     )}
     </>
   );
-} 
+}

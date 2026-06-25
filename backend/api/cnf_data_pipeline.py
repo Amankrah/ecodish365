@@ -38,6 +38,13 @@ class CNFDataPipeline:
         # provenance see no behaviour change.
         self.food_name_df['source'] = 'cnf'
 
+        # FDC-INGEST (2026-06-25): two additional columns to disambiguate the
+        # three FDC sub-sources (foundation_food / sr_legacy_food /
+        # survey_fndds_food) and to round-trip the upstream USDA fdc_id.
+        # Both default to NA/None for CNF and WAFCT rows.
+        self.food_name_df['data_type'] = None
+        self.food_name_df['fdc_id'] = pd.NA
+
         # Build the nutrient index once: `{food_id: {nutrient_name: value_per_100g}}`.
         # Replaces the per-request nested `df[col==x]` filters that HEFI and
         # HENI used to run (O(F*N) pandas ops per meal). All downstream
@@ -88,7 +95,7 @@ class CNFDataPipeline:
     # --- WAFCT-EXTEND (2026-05-24) provenance helpers --------------------
 
     def food_source(self, food_id: int):
-        """Return 'cnf' or 'wafct' for a FoodID, or None if not found."""
+        """Return 'cnf', 'wafct', or 'fdc' for a FoodID, or None if not found."""
         if 'source' not in self.food_name_df.columns:
             return None
         rows = self.food_name_df[self.food_name_df['FoodID'] == int(food_id)]
@@ -96,12 +103,26 @@ class CNFDataPipeline:
             return None
         return str(rows.iloc[0]['source'])
 
+    def food_data_type(self, food_id: int):
+        """Return the FDC sub-source data_type for a FoodID
+        ('foundation_food' | 'sr_legacy_food' | 'survey_fndds_food'),
+        or None for CNF / WAFCT rows or missing FoodIDs."""
+        if 'data_type' not in self.food_name_df.columns:
+            return None
+        rows = self.food_name_df[self.food_name_df['FoodID'] == int(food_id)]
+        if rows.empty:
+            return None
+        v = rows.iloc[0]['data_type']
+        if v is None or (isinstance(v, float) and pd.isna(v)):
+            return None
+        return str(v)
+
     def filter_by_source(self, source: str):
-        """Return `food_name_df` filtered by `source` ∈ {'cnf', 'wafct', 'both'}.
+        """Return `food_name_df` filtered by `source` ∈ {'cnf', 'wafct', 'fdc', 'both'}.
 
         `source='both'` (or any other value) returns the full DataFrame.
         """
-        if source not in ('cnf', 'wafct') or 'source' not in self.food_name_df.columns:
+        if source not in ('cnf', 'wafct', 'fdc') or 'source' not in self.food_name_df.columns:
             return self.food_name_df
         return self.food_name_df[self.food_name_df['source'] == source]
 

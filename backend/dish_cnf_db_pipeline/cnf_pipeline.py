@@ -113,7 +113,8 @@ class CNFDataPipeline:
             query: Search query string
             limit: Maximum number of results to return
             offset: Number of results to skip (for pagination)
-            source: WAFCT-EXTEND — 'both' | 'cnf' | 'wafct' (subset rows before substring match).
+            source: WAFCT-EXTEND / FDC-INGEST — 'both' | 'cnf' | 'wafct' | 'fdc'
+                (subset rows before substring match).
 
         Returns:
             Dict containing search results and metadata
@@ -123,16 +124,16 @@ class CNFDataPipeline:
                 return {"results": [], "total": 0, "query": query}
 
             src = (source or 'both').lower()
-            if src not in ('cnf', 'wafct', 'both'):
+            if src not in ('cnf', 'wafct', 'fdc', 'both'):
                 src = 'both'
 
             query_lower = query.lower().strip()
 
             base = self.data_loader.food_name_df
             work_df = base
-            if src in ('cnf', 'wafct') and 'source' in base.columns:
+            if src in ('cnf', 'wafct', 'fdc') and 'source' in base.columns:
                 work_df = base[base['source'] == src]
-            elif src in ('cnf', 'wafct'):
+            elif src in ('cnf', 'wafct', 'fdc'):
                 logger.warning(
                     '`source` column missing on food_name_df; ignoring source=%r', src,
                 )
@@ -145,7 +146,7 @@ class CNFDataPipeline:
                     "limit": limit,
                     "offset": offset,
                     "has_more": False,
-                    **({"source_filter": src} if src in ('cnf', 'wafct') else {}),
+                    **({"source_filter": src} if src in ('cnf', 'wafct', 'fdc') else {}),
                 }
 
             # Search in food descriptions
@@ -186,7 +187,7 @@ class CNFDataPipeline:
                 "offset": offset,
                 "has_more": offset + limit < total_results,
             }
-            if src in ('cnf', 'wafct'):
+            if src in ('cnf', 'wafct', 'fdc'):
                 out["source_filter"] = src
                 out["filtered_count"] = total_results
             return out
@@ -371,7 +372,7 @@ class CNFDataPipeline:
         allowed = fn
         if food_group_id is not None:
             allowed = allowed[allowed['FoodGroupID'] == int(food_group_id)]
-        if source in ('cnf', 'wafct') and 'source' in allowed.columns:
+        if source in ('cnf', 'wafct', 'fdc') and 'source' in allowed.columns:
             allowed = allowed[allowed['source'] == source]
         allowed_ids = set(int(x) for x in allowed['FoodID'].dropna().tolist())
         mask &= wide.index.to_series().isin(allowed_ids)
@@ -497,7 +498,7 @@ class CNFDataPipeline:
 
             if 'source' not in pool.columns:
                 pool['source'] = 'cnf'
-            if source in ('cnf', 'wafct'):
+            if source in ('cnf', 'wafct', 'fdc'):
                 pool = pool[pool['source'] == source]
 
             if food_type in ('single', 'mixed'):
@@ -626,6 +627,9 @@ class CNFDataPipeline:
             'thermal_state': {},
             'preservation_state': {},
             'prep_both_known_pct': 0.0,
+            'cnf_count': 0,
+            'wafct_count': 0,
+            'fdc_count': 0,
         }
 
     @staticmethod
@@ -634,7 +638,7 @@ class CNFDataPipeline:
         from api.services.cnf_food_type import get_food_type
         from api.services.cnf_prep_state import prep_state_of
 
-        cnf_count = wafct_count = 0
+        cnf_count = wafct_count = fdc_count = 0
         ft_single = ft_mixed = ft_unknown = 0
         thermal_counts: Dict[str, int] = {}
         preservation_counts: Dict[str, int] = {}
@@ -645,6 +649,8 @@ class CNFDataPipeline:
             src = str(getattr(rec, 'source', 'cnf') or 'cnf')
             if src == 'wafct':
                 wafct_count += 1
+            elif src == 'fdc':
+                fdc_count += 1
             else:
                 cnf_count += 1
 
@@ -672,6 +678,7 @@ class CNFDataPipeline:
             'total_in_group': total,
             'cnf_count': cnf_count,
             'wafct_count': wafct_count,
+            'fdc_count': fdc_count,
             'food_type': {'single': ft_single, 'mixed': ft_mixed, 'unknown': ft_unknown},
             'thermal_state': dict(sorted(thermal_counts.items(), key=lambda kv: -kv[1])),
             'preservation_state': dict(sorted(preservation_counts.items(), key=lambda kv: -kv[1])),
@@ -957,11 +964,27 @@ class CNFDataPipeline:
 
             food_df = self.data_loader.food_name_df
             if 'source' in food_df.columns:
-                stats['cnf_food_count'] = int((food_df['source'] == 'cnf').sum())
+                stats['cnf_food_count']   = int((food_df['source'] == 'cnf').sum())
                 stats['wafct_food_count'] = int((food_df['source'] == 'wafct').sum())
+                # FDC-INGEST (2026-06-25): split FDC into its three sub-sources
+                # so the analytics surface can show Foundation / SR Legacy /
+                # FNDDS coverage independently. `fdc_food_count` is the sum.
+                stats['fdc_food_count'] = int((food_df['source'] == 'fdc').sum())
+                if 'data_type' in food_df.columns:
+                    fdc_mask = food_df['source'] == 'fdc'
+                    stats['fdc_foundation_food_count'] = int(
+                        ((food_df.loc[fdc_mask, 'data_type']) == 'foundation_food').sum()
+                    )
+                    stats['fdc_sr_legacy_food_count'] = int(
+                        ((food_df.loc[fdc_mask, 'data_type']) == 'sr_legacy_food').sum()
+                    )
+                    stats['fdc_survey_fndds_food_count'] = int(
+                        ((food_df.loc[fdc_mask, 'data_type']) == 'survey_fndds_food').sum()
+                    )
             else:
-                stats['cnf_food_count'] = len(food_df)
+                stats['cnf_food_count']   = len(food_df)
                 stats['wafct_food_count'] = 0
+                stats['fdc_food_count']   = 0
             
             # Foods by group
             foods_by_group = self.data_loader.food_name_df.groupby('FoodGroupID').size()

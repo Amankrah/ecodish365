@@ -180,17 +180,18 @@ def manage_cnf_food(request, food_id):
 def search_cnf_foods(request):
     """Advanced food search with pagination and relevance scoring.
 
-    WAFCT-EXTEND (2026-05-24): optional `source` query param filters the
-    response to one food database:
+    WAFCT-EXTEND (2026-05-24); FDC-INGEST (2026-06-25): optional `source`
+    query param filters the response to one food database:
       ?source=cnf   — Health Canada CNF only
       ?source=wafct — FAO/INFOODS WAFCT 2019 only
-      ?source=both  — both (default)
+      ?source=fdc   — USDA FoodData Central only (Foundation + SR Legacy + FNDDS)
+      ?source=both  — all three (default)
     """
     query = request.GET.get('q', '').strip()
     limit = min(int(request.GET.get('limit', 50)), 100)  # Max 100 results
     offset = int(request.GET.get('offset', 0))
     source = request.GET.get('source', 'both').lower()
-    if source not in ('cnf', 'wafct', 'both'):
+    if source not in ('cnf', 'wafct', 'fdc', 'both'):
         source = 'both'
 
     if not query:
@@ -203,7 +204,7 @@ def search_cnf_foods(request):
         query,
         limit,
         offset,
-        source if source in ('cnf', 'wafct') else 'both',
+        source if source in ('cnf', 'wafct', 'fdc') else 'both',
     )
 
     return Response({
@@ -300,7 +301,7 @@ def discover_foods(request):
         food_group_id = None
 
     source = body.get('source')
-    if source not in ('cnf', 'wafct'):
+    if source not in ('cnf', 'wafct', 'fdc'):
         source = None
 
     ratio = body.get('ratio')
@@ -377,7 +378,7 @@ def get_foods_by_group(request, food_group_id):
 
     if food_type not in (None, 'single', 'mixed'):
         food_type = None
-    if source not in (None, 'cnf', 'wafct'):
+    if source not in (None, 'cnf', 'wafct', 'fdc'):
         source = None
     if sort not in ('name', 'kcal', 'food_id'):
         sort = 'name'

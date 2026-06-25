@@ -15,7 +15,9 @@
 
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Loader2, RefreshCw, Sparkles, AlertCircle, Info, Download } from 'lucide-react';
+import { Loader2, RefreshCw, Sparkles, AlertCircle, Info, Download, Salad, Dna, Compass, Target } from 'lucide-react';
+import { StarIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
+import type { IconType } from '@/components/scorecard/metricAdapters';
 import {
   AudienceToggle, type UserType,
 } from '@/components/shared/AudienceToggle';
@@ -53,13 +55,13 @@ const METRIC_ORDER: MetricKey[] = [
   'hefi', 'heni', 'hsr', 'fcs', 'environmental', 'dietary_pattern',
 ];
 
-const METRIC_LABELS: Record<MetricKey, { emoji: string; title: string }> = {
-  hefi:            { emoji: '🥗', title: 'Healthy eating' },
-  heni:            { emoji: '🧬', title: 'Health impact' },
-  hsr:             { emoji: '⭐', title: 'Product rating' },
-  fcs:             { emoji: '🧭', title: 'Food Compass' },
-  environmental:   { emoji: '🌍', title: 'Environment' },
-  dietary_pattern: { emoji: '🎯', title: 'Eating style' },
+const METRIC_LABELS: Record<MetricKey, { icon: IconType; title: string }> = {
+  hefi:            { icon: Salad,        title: 'Healthy eating' },
+  heni:            { icon: Dna,          title: 'Health impact' },
+  hsr:             { icon: StarIcon,     title: 'Product rating' },
+  fcs:             { icon: Compass,      title: 'Food Compass' },
+  environmental:   { icon: GlobeAltIcon, title: 'Environment' },
+  dietary_pattern: { icon: Target,       title: 'Eating style' },
 };
 
 function ScorecardPageInner(): JSX.Element {
@@ -542,7 +544,7 @@ function ScorecardPageInner(): JSX.Element {
                 return (
                   <MetricSkeleton
                     key={m}
-                    emoji={METRIC_LABELS[m].emoji}
+                    icon={METRIC_LABELS[m].icon}
                     title={METRIC_LABELS[m].title}
                   />
                 );

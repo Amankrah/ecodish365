@@ -324,10 +324,10 @@ export function PackagedFoodPanelForm({
                   <span className="text-xs text-gray-500 self-center">{unit}</span>
                 </div>
                 {f.from_dv_percent && (
-                  <span className="text-[10px] text-amber-700">⚠ from %DV</span>
+                  <span className="text-[10px] text-amber-700">from %DV</span>
                 )}
                 {f.from_kcal_conversion && (
-                  <span className="text-[10px] text-amber-700">⚠ ×4.184 from kcal</span>
+                  <span className="text-[10px] text-amber-700">×4.184 from kcal</span>
                 )}
               </label>
             );
@@ -443,7 +443,7 @@ export function PackagedFoodPanelForm({
             disabled={busy}
             className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
           >
-            🔄 Re-extract
+            Re-extract
           </button>
         )}
         <button
@@ -508,7 +508,6 @@ function FvnlField({ productHints, fvnlPercent, setFvnlPercent }: FvnlFieldProps
       </label>
       {showHint && hit && (
         <div className="mt-2 p-2.5 bg-amber-50 border border-amber-300 rounded-md text-xs text-amber-900 flex items-start gap-2">
-          <span aria-hidden="true">💡</span>
           <div className="flex-1">
             <p>
               <strong>Likely too low for this product.</strong> The product name suggests{' '}

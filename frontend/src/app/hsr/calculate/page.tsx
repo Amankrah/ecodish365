@@ -238,19 +238,26 @@ export default function HSRCalculate() {
     return 'text-red-400';
   };
 
-  const getPositiveAspectsCount = (result: HSRResult) => {
+  const hasScoreBreakdown = (hsrResult: HSRResult): boolean =>
+    Boolean(hsrResult.hsr_result?.score_breakdown?.components);
+
+  const getPositiveAspectsCount = (hsrResult: HSRResult) => {
+    const breakdown = hsrResult.hsr_result.score_breakdown;
+    const components = breakdown?.components;
+    if (!breakdown || !components) return 0;
+
     let count = 0;
-    if (result.hsr_result.score_breakdown.baseline_points === 0) count++;
-    if (result.hsr_result.score_breakdown.baseline_points > 0 && result.hsr_result.score_breakdown.baseline_points <= 5) count++;
-    if (result.hsr_result.score_breakdown.components.fiber > 0) count++;
-    if (result.hsr_result.score_breakdown.components.protein > 0) count++;
-    if (result.hsr_result.score_breakdown.components.fvnl > 0) count++;
-    if (result.hsr_result.rating.star_rating >= 4.0) count++;
-    if (result.hsr_result.rating.star_rating >= 3.0 && result.hsr_result.rating.star_rating < 4.0) count++;
-    if (result.hsr_result.score_breakdown.components.energy === 0) count++;
-    if (result.hsr_result.score_breakdown.components.sodium === 0) count++;
-    if (result.hsr_result.score_breakdown.components.saturated_fat === 0) count++;
-    if (result.hsr_result.score_breakdown.components.sugar === 0) count++;
+    if (breakdown.baseline_points === 0) count++;
+    if (breakdown.baseline_points > 0 && breakdown.baseline_points <= 5) count++;
+    if (components.fiber > 0) count++;
+    if (components.protein > 0) count++;
+    if (components.fvnl > 0) count++;
+    if (hsrResult.hsr_result.rating.star_rating >= 4.0) count++;
+    if (hsrResult.hsr_result.rating.star_rating >= 3.0 && hsrResult.hsr_result.rating.star_rating < 4.0) count++;
+    if (components.energy === 0) count++;
+    if (components.sodium === 0) count++;
+    if (components.saturated_fat === 0) count++;
+    if (components.sugar === 0) count++;
     return count;
   };
 
@@ -587,7 +594,7 @@ export default function HSRCalculate() {
                 onClick={() => setRecipeModalOpen(true)}
                 className="w-full mt-2 flex items-center justify-center gap-1.5 text-sm text-amber-700 hover:text-amber-900 hover:underline"
               >
-                🍳 Break down a homemade dish
+                Break down a homemade dish
               </button>
               {/* AI-MATCH-2 (2026-05-24): 24-h dietary recall. NOTE: daily
                   HSR is informational only — HSRAC v9 is a per-product
@@ -597,7 +604,7 @@ export default function HSRCalculate() {
                 href="/recall-24h?then=hsr"
                 className="w-full mt-1 flex items-center justify-center gap-1.5 text-sm text-amber-700 hover:text-amber-900 hover:underline"
               >
-                🍽️ Log a full food diary day instead
+                Log a full food diary day instead
               </a>
 
               </div>
@@ -765,7 +772,47 @@ export default function HSRCalculate() {
                 </div>
 
                 {/* Score Breakdown */}
-                {analysisLevel === 'detailed' && (
+                {analysisLevel === 'detailed' && !hasScoreBreakdown(result) && (
+                  <div className="bg-white rounded-lg shadow-sm p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                      {result.food_details.length > 1 ? 'Meal Score Breakdown' : 'Food Score Breakdown'}
+                    </h3>
+                    <div className="bg-amber-50 border border-amber-200 rounded-md p-4 mb-4">
+                      <p className="text-sm text-amber-900">
+                        {cameFromRecall && result.food_details.length > 1
+                          ? 'Combined meal scoring is omitted for multi-food diary loads. HSRAC v9 applies per product within its own category — see per-food ratings below.'
+                          : 'Detailed score breakdown is not available for this result. Switch to Detailed analysis and recalculate, or score foods individually.'}
+                      </p>
+                    </div>
+                    {result.per_food_ratings && result.per_food_ratings.length > 0 && (
+                      <div className="overflow-x-auto">
+                        <table className="min-w-full text-sm">
+                          <thead>
+                            <tr className="border-b border-gray-200 text-left text-gray-600">
+                              <th className="py-2 pr-4 font-medium">Food</th>
+                              <th className="py-2 pr-4 font-medium">Serving</th>
+                              <th className="py-2 pr-4 font-medium">Category</th>
+                              <th className="py-2 font-medium">Stars</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {result.per_food_ratings.map((item) => (
+                              <tr key={item.food_id} className="border-b border-gray-100">
+                                <td className="py-2 pr-4 text-gray-900">{item.food_name}</td>
+                                <td className="py-2 pr-4 text-gray-600">{item.serving_size}g</td>
+                                <td className="py-2 pr-4 text-gray-600">{item.category}</td>
+                                <td className="py-2 font-medium text-gray-900">
+                                  {item.error ? item.error : item.hsr_rating}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {analysisLevel === 'detailed' && hasScoreBreakdown(result) && (
                   <div className="bg-white rounded-lg shadow-sm p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">
                       {result.food_details.length > 1 ? 'Meal Score Breakdown' : 'Food Score Breakdown'}
@@ -892,7 +939,7 @@ export default function HSRCalculate() {
                           "Score X in Y category = Z stars" line is removed
                           (already in the Calculation line above). */}
                       <div className="text-sm text-gray-500">
-                        <p>💡 <strong>Understanding your score:</strong></p>
+                        <p className="inline-flex items-center gap-1.5"><LightBulbIcon className="w-4 h-4" aria-hidden="true" /> <strong>Understanding your score:</strong></p>
                         <p>
                           • {hsrBandLabel(result.hsr_result.rating.star_rating)}
                           {' '}({result.hsr_result.rating.star_rating} of 5 stars
@@ -908,12 +955,12 @@ export default function HSRCalculate() {
                 )}
 
                 {/* Result Interpretation */}
-                {analysisLevel === 'detailed' && (
+                {analysisLevel === 'detailed' && hasScoreBreakdown(result) && (
                   <div className="bg-white rounded-lg shadow-sm p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">What Your Results Mean</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <h4 className="text-md font-medium text-green-600 mb-3">✅ Positive Aspects</h4>
+                        <h4 className="text-md font-medium text-green-600 mb-3">Positive Aspects</h4>
                         <ul className="text-sm text-gray-600 space-y-1">
                           {/* Dynamic positive aspects based on actual results */}
                           {result.hsr_result.score_breakdown.baseline_points === 0 && (
@@ -969,7 +1016,7 @@ export default function HSRCalculate() {
                           the within-category-only constraint and uses
                           HSRAC v9 / Shahid 2020 band terminology. */}
                       <div>
-                        <h4 className="text-md font-medium text-blue-600 mb-3">📊 Score Explanation</h4>
+                        <h4 className="text-md font-medium text-blue-600 mb-3 inline-flex items-center gap-1.5"><ChartBarIcon className="w-4 h-4" aria-hidden="true" /> Score Explanation</h4>
                         <div className="text-sm text-gray-600 space-y-1">
                           <p>Your final score of {result.hsr_result.score_breakdown.final_score} indicates:</p>
                           <p>• {hsrBandLabel(result.hsr_result.rating.star_rating)} in Category {result.hsr_result.rating.category}</p>
@@ -1003,7 +1050,7 @@ export default function HSRCalculate() {
                       result.hsr_result.score_breakdown.modifying_points === 0 || 
                       result.hsr_result.rating.star_rating < 3.0) && (
                       <div className="mt-6 pt-6 border-t border-gray-200">
-                        <h4 className="text-md font-medium text-orange-600 mb-3">⚠️ Areas for Improvement</h4>
+                        <h4 className="text-md font-medium text-orange-600 mb-3">Areas for Improvement</h4>
                         <ul className="text-sm text-gray-600 space-y-1">
                           {result.hsr_result.score_breakdown.components.energy > 5 && (
                             <li>• High energy density - consider smaller portions</li>
@@ -1033,10 +1080,10 @@ export default function HSRCalculate() {
                 )}
 
                 {/* Health Insights */}
-                {analysisLevel === 'detailed' && (
+                {analysisLevel === 'detailed' && result.hsr_result.health_insights && (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Strengths */}
-                    {result.hsr_result.health_insights.strengths.length > 0 && (
+                    {(result.hsr_result.health_insights.strengths?.length ?? 0) > 0 && (
                       <div className="bg-white rounded-lg shadow-sm p-6">
                         <h3 className="text-lg font-semibold text-green-600 mb-4 flex items-center">
                           <CheckCircleIcon className="w-5 h-5 mr-2" />
@@ -1054,7 +1101,7 @@ export default function HSRCalculate() {
                     )}
 
                     {/* Concerns */}
-                    {result.hsr_result.health_insights.concerns.length > 0 && (
+                    {(result.hsr_result.health_insights.concerns?.length ?? 0) > 0 && (
                       <div className="bg-white rounded-lg shadow-sm p-6">
                         <h3 className="text-lg font-semibold text-red-600 mb-4 flex items-center">
                           <ExclamationTriangleIcon className="w-5 h-5 mr-2" />
@@ -1072,7 +1119,7 @@ export default function HSRCalculate() {
                     )}
 
                     {/* Recommendations */}
-                    {result.hsr_result.health_insights.recommendations.length > 0 && (
+                    {(result.hsr_result.health_insights.recommendations?.length ?? 0) > 0 && (
                       <div className="bg-white rounded-lg shadow-sm p-6">
                         <h3 className="text-lg font-semibold text-blue-600 mb-4 flex items-center">
                           <LightBulbIcon className="w-5 h-5 mr-2" />

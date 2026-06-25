@@ -8,19 +8,21 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // EcoDish365 Brand Colors - Professional Nutrition Platform
+        // EcoDish365 Brand Colors — Scientific data-dense palette
+        // (ui-ux-pro-max skill 2026-06-25: blue primary + orange CTA +
+        // neutral slate base for Nature Food-positioned research platform).
         primary: {
-          50: '#ecfdf5',   // Very light green for backgrounds
-          100: '#d1fae5',  // Light green for highlights
-          200: '#a7f3d0',  // Soft green for accents
-          300: '#6ee7b7',  // Medium green for interactive elements
-          400: '#34d399',  // Bright green for primary actions
-          500: '#10b981',  // Main brand green - nutrition & health
-          600: '#059669',  // Dark green for hover states
-          700: '#047857',  // Deeper green for emphasis
-          800: '#065f46',  // Dark green for text
-          900: '#064e3b',  // Very dark green
-          950: '#022c22',  // Almost black green
+          50:  '#EFF6FF',  // Very light blue for backgrounds
+          100: '#DBEAFE',  // Light blue for highlights
+          200: '#BFDBFE',  // Soft blue for accents
+          300: '#93C5FD',  // Medium blue for interactive elements
+          400: '#60A5FA',  // Bright blue for secondary actions (= skill secondary)
+          500: '#3B82F6',  // Main brand blue — trust, dashboard, science (= skill primary)
+          600: '#2563EB',  // Dark blue for hover states
+          700: '#1D4ED8',  // Deeper blue for emphasis
+          800: '#1E40AF',  // Dark blue for text
+          900: '#1E3A8A',  // Very dark blue
+          950: '#172554',  // Almost black blue
         },
         secondary: {
           50: '#f0f9ff',   // Very light blue for backgrounds
@@ -68,7 +70,8 @@ module.exports = {
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-sans)', 'IBM Plex Sans', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-mono)', 'IBM Plex Mono', 'ui-monospace', 'monospace'],
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',

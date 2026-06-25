@@ -849,7 +849,12 @@ function CNFComparePageContent() {
                   <div className="text-center py-8 text-gray-500 space-y-1">
                     <div className="font-medium text-gray-700">Start typing to search for foods</div>
                     <div className="text-xs">
-                      Searching <strong>{modalSource === 'both' ? 'CNF + WAFCT' : modalSource === 'cnf' ? 'CNF only' : 'WAFCT only'}</strong> —
+                      Searching <strong>{
+                        modalSource === 'both'  ? 'CNF + WAFCT + FDC' :
+                        modalSource === 'cnf'   ? 'CNF only' :
+                        modalSource === 'wafct' ? 'WAFCT only' :
+                                                  'FDC only'
+                      }</strong> —
                       try <code className="bg-gray-100 px-1 rounded">apple</code>,{' '}
                       <code className="bg-gray-100 px-1 rounded">salmon</code>,{' '}
                       <code className="bg-gray-100 px-1 rounded">fonio</code>, or{' '}

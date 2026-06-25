@@ -2,19 +2,20 @@ import type { Metadata } from 'next';
 import { CnfExplorerShell } from '@/components/cnf/CnfExplorerShell';
 
 export const metadata: Metadata = {
-  title: "Food Catalogue — CNF + WAFCT",
-  description: "Explore two food-composition databases side by side: Health Canada's CNF (5,691 foods, 150+ nutrients) and FAO/INFOODS' WAFCT 2019 (1,028 West African foods including fonio, baobab, dawadawa). Search, compare, and analyze nutritional content with advanced filtering and per-source provenance.",
+  title: "Food Catalogue — CNF + WAFCT + FDC",
+  description: "Explore three food-composition databases side by side: Health Canada's CNF (5,993 foods, 150+ nutrients), FAO/INFOODS' WAFCT 2019 (1,028 West African foods including fonio, baobab, dawadawa), and USDA FoodData Central (13,620 US foods spanning Foundation, SR Legacy, and Survey FNDDS). Search, compare, and analyze nutritional content with advanced filtering and per-source provenance.",
   keywords: [
     "Canadian Nutrient File", "CNF database", "Canada nutrition database",
     "WAFCT", "West African Food Composition Table", "FAO INFOODS",
+    "USDA FoodData Central", "FDC", "Foundation Foods", "SR Legacy", "FNDDS",
     "fonio nutrition", "baobab nutrition", "African food database",
-    "food nutrients Canada", "nutritional analysis", "Health Canada food data",
+    "food nutrients Canada", "US food nutrients", "nutritional analysis", "Health Canada food data",
     "food composition database", "nutrient search tool", "nutrition research database",
     "food comparison tool", "dietary analysis", "cross-database nutrition"
   ],
   openGraph: {
-    title: "Food Composition Database Explorer (CNF + WAFCT) — EcoDish365",
-    description: "Access two nutrition databases side by side: Canada's CNF (5,691 foods) and FAO/INFOODS WAFCT 2019 (1,028 West African foods). Advanced search, comparison, and analysis tools.",
+    title: "Food Composition Database Explorer (CNF + WAFCT + FDC) — EcoDish365",
+    description: "Access three nutrition databases side by side: Canada's CNF (5,993 foods), FAO/INFOODS WAFCT 2019 (1,028 West African foods), and USDA FoodData Central (13,620 US foods). Advanced search, comparison, and analysis tools.",
     type: "website",
     url: "https://ecodish365.com/cnf",
     images: [
@@ -22,14 +23,14 @@ export const metadata: Metadata = {
         url: "/og-cnf.png",
         width: 1200,
         height: 630,
-        alt: "Food Composition Database Explorer — CNF + WAFCT",
+        alt: "Food Composition Database Explorer — CNF + WAFCT + FDC",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Food Composition Database Explorer (CNF + WAFCT)",
-    description: "Health Canada's CNF (5,691 foods) plus FAO/INFOODS WAFCT 2019 (1,028 West African foods) — one search, one comparison surface.",
+    title: "Food Composition Database Explorer (CNF + WAFCT + FDC)",
+    description: "Health Canada's CNF (5,993 foods), FAO/INFOODS WAFCT 2019 (1,028 West African foods), and USDA FoodData Central (13,620 US foods) — one search, one comparison surface.",
     images: ["/twitter-cnf.png"],
   },
   alternates: {
@@ -45,8 +46,8 @@ export default function CNFLayout({
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Dataset",
-    "name": "Food Composition Database Explorer (CNF + WAFCT)",
-    "description": "Interactive explorer combining Health Canada's Canadian Nutrient File (5,691 foods) and FAO/INFOODS' West African Food Composition Table 2019 (1,028 foods) into a single search + comparison surface.",
+    "name": "Food Composition Database Explorer (CNF + WAFCT + FDC)",
+    "description": "Interactive explorer combining Health Canada's Canadian Nutrient File (5,993 foods), FAO/INFOODS' West African Food Composition Table 2019 (1,028 foods), and USDA FoodData Central (13,620 foods across Foundation, SR Legacy, and Survey FNDDS) into a single search + comparison surface.",
     "url": "https://ecodish365.com/cnf",
     "creator": {
       "@type": "Organization",
@@ -63,6 +64,11 @@ export default function CNFLayout({
         "@type": "Organization",
         "name": "FAO / Bioversity / CIRAD (WAFCT 2019)",
         "url": "https://www.fao.org/infoods/infoods/tables-and-databases/faoinfoods-databases/en/"
+      },
+      {
+        "@type": "Organization",
+        "name": "USDA Agricultural Research Service (FoodData Central)",
+        "url": "https://fdc.nal.usda.gov/"
       }
     ],
     "includedInDataCatalog": [
@@ -75,6 +81,11 @@ export default function CNFLayout({
         "@type": "DataCatalog",
         "name": "FAO/INFOODS West African Food Composition Table 2019",
         "publisher": { "@type": "Organization", "name": "FAO" }
+      },
+      {
+        "@type": "DataCatalog",
+        "name": "USDA FoodData Central (Foundation, SR Legacy, Survey FNDDS)",
+        "publisher": { "@type": "Organization", "name": "USDA Agricultural Research Service" }
       }
     ],
     "mainEntity": {

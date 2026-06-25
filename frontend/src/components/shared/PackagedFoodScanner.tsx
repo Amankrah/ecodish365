@@ -531,7 +531,7 @@ function PackagedFoodResult({ result, userType, onAnother }: ResultProps): JSX.E
                         isMandatory ? 'text-amber-900 font-medium' : 'text-gray-700'
                       }`}
                     >
-                      {isMandatory && '⚠ '}
+                      {isMandatory && <strong>Required: </strong>}
                       {p.text}
                     </p>
                   );

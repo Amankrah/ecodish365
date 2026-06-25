@@ -1,0 +1,1404 @@
+{
+  "_doc": {
+    "purpose": "Maps every (source, food_group_id) tuple in the multi-source CNF+WAFCT+FDC catalogue to a canonical food category, plus a cnf_equivalent_group_id used as a shim for the Rust HSR kernel and the environmental-LCA per-group lookup. Lets each scorer key its hard-coded branches on the canonical category instead of source-specific group IDs.",
+    "canonical_categories": [
+      "dairy",
+      "eggs",
+      "dairy_egg_combined",
+      "fats_oils",
+      "fruits",
+      "vegetables",
+      "legumes",
+      "nuts_seeds",
+      "cereals_grains",
+      "breakfast_cereals",
+      "beef",
+      "pork",
+      "lamb_veal_game",
+      "poultry",
+      "fish",
+      "sausages_luncheon",
+      "beverages",
+      "alcoholic_beverages",
+      "sweets",
+      "babyfoods",
+      "baked_products",
+      "fast_foods",
+      "mixed_dishes",
+      "snacks",
+      "soups_sauces",
+      "spices_herbs",
+      "unknown"
+    ],
+    "ranges": {
+      "cnf": "1-25 (Health Canada, 23 groups, IDs 23/24 unused)",
+      "wafct": "50-63 (FAO/INFOODS WAFCT 2019, 14 groups)",
+      "fdc_legacy": "70-97 (FDC Foundation + SR Legacy share USDA food_category.csv)",
+      "fdc_fndds": "100+ (FDC FNDDS uses WWEIA categories, allocated sequentially)"
+    },
+    "cnf_equivalent_group_id_doc": "When the canonical category has a clear CNF analog (e.g. 'beef' → CNF 13), this is the CNF FoodGroupID. The Rust HSR kernel and env-LCA dict both key on CNF IDs; Python translates this shim ID before delegating to them, so non-CNF foods get the same scoring path as their CNF equivalents."
+  },
+  "cnf": {
+    "1": {
+      "name": "Dairy and Egg Products",
+      "canonical": "dairy_egg_combined",
+      "cnf_equivalent_group_id": 1
+    },
+    "2": {
+      "name": "Spices and Herbs",
+      "canonical": "spices_herbs",
+      "cnf_equivalent_group_id": 2
+    },
+    "3": {
+      "name": "Babyfoods",
+      "canonical": "babyfoods",
+      "cnf_equivalent_group_id": 3
+    },
+    "4": {
+      "name": "Fats and Oils",
+      "canonical": "fats_oils",
+      "cnf_equivalent_group_id": 4
+    },
+    "5": {
+      "name": "Poultry Products",
+      "canonical": "poultry",
+      "cnf_equivalent_group_id": 5
+    },
+    "6": {
+      "name": "Soups, Sauces and Gravies",
+      "canonical": "soups_sauces",
+      "cnf_equivalent_group_id": 6
+    },
+    "7": {
+      "name": "Sausages and Luncheon meats",
+      "canonical": "sausages_luncheon",
+      "cnf_equivalent_group_id": 7
+    },
+    "8": {
+      "name": "Breakfast cereals",
+      "canonical": "breakfast_cereals",
+      "cnf_equivalent_group_id": 8
+    },
+    "9": {
+      "name": "Fruits and fruit juices",
+      "canonical": "fruits",
+      "cnf_equivalent_group_id": 9
+    },
+    "10": {
+      "name": "Pork Products",
+      "canonical": "pork",
+      "cnf_equivalent_group_id": 10
+    },
+    "11": {
+      "name": "Vegetables and Vegetable Products",
+      "canonical": "vegetables",
+      "cnf_equivalent_group_id": 11
+    },
+    "12": {
+      "name": "Nuts and Seeds",
+      "canonical": "nuts_seeds",
+      "cnf_equivalent_group_id": 12
+    },
+    "13": {
+      "name": "Beef Products",
+      "canonical": "beef",
+      "cnf_equivalent_group_id": 13
+    },
+    "14": {
+      "name": "Beverages",
+      "canonical": "beverages",
+      "cnf_equivalent_group_id": 14
+    },
+    "15": {
+      "name": "Finfish and Shellfish Products",
+      "canonical": "fish",
+      "cnf_equivalent_group_id": 15
+    },
+    "16": {
+      "name": "Legumes and Legume Products",
+      "canonical": "legumes",
+      "cnf_equivalent_group_id": 16
+    },
+    "17": {
+      "name": "Lamb, Veal and Game",
+      "canonical": "lamb_veal_game",
+      "cnf_equivalent_group_id": 17
+    },
+    "18": {
+      "name": "Baked Products",
+      "canonical": "baked_products",
+      "cnf_equivalent_group_id": 18
+    },
+    "19": {
+      "name": "Sweets",
+      "canonical": "sweets",
+      "cnf_equivalent_group_id": 19
+    },
+    "20": {
+      "name": "Cereals, Grains and Pasta",
+      "canonical": "cereals_grains",
+      "cnf_equivalent_group_id": 20
+    },
+    "21": {
+      "name": "Fast Foods",
+      "canonical": "fast_foods",
+      "cnf_equivalent_group_id": 21
+    },
+    "22": {
+      "name": "Mixed Dishes",
+      "canonical": "mixed_dishes",
+      "cnf_equivalent_group_id": 22
+    },
+    "25": {
+      "name": "Snacks",
+      "canonical": "snacks",
+      "cnf_equivalent_group_id": 25
+    }
+  },
+  "wafct": {
+    "50": {
+      "name": "Cereals and their products",
+      "canonical": "cereals_grains",
+      "cnf_equivalent_group_id": 20
+    },
+    "51": {
+      "name": "Starchy roots, tubers and their products",
+      "canonical": "vegetables",
+      "cnf_equivalent_group_id": 11
+    },
+    "52": {
+      "name": "Legumes and their products",
+      "canonical": "legumes",
+      "cnf_equivalent_group_id": 16
+    },
+    "53": {
+      "name": "Vegetables and their products",
+      "canonical": "vegetables",
+      "cnf_equivalent_group_id": 11
+    },
+    "54": {
+      "name": "Fruits and their products",
+      "canonical": "fruits",
+      "cnf_equivalent_group_id": 9
+    },
+    "55": {
+      "name": "Nuts, seeds and their products",
+      "canonical": "nuts_seeds",
+      "cnf_equivalent_group_id": 12
+    },
+    "56": {
+      "name": "Meat, poultry and their products",
+      "canonical": "beef",
+      "cnf_equivalent_group_id": 13
+    },
+    "57": {
+      "name": "Eggs and their products",
+      "canonical": "eggs",
+      "cnf_equivalent_group_id": 1
+    },
+    "58": {
+      "name": "Fish and its products",
+      "canonical": "fish",
+      "cnf_equivalent_group_id": 15
+    },
+    "59": {
+      "name": "Milk and its products",
+      "canonical": "dairy",
+      "cnf_equivalent_group_id": 1
+    },
+    "60": {
+      "name": "Fats and oils",
+      "canonical": "fats_oils",
+      "cnf_equivalent_group_id": 4
+    },
+    "61": {
+      "name": "Beverages",
+      "canonical": "beverages",
+      "cnf_equivalent_group_id": 14
+    },
+    "62": {
+      "name": "Miscellaneous",
+      "canonical": "mixed_dishes",
+      "cnf_equivalent_group_id": 22
+    },
+    "63": {
+      "name": "Soups and sauces",
+      "canonical": "soups_sauces",
+      "cnf_equivalent_group_id": 6
+    }
+  },
+  "fdc": {
+    "70": {
+      "name": "FDC — Dairy and Egg Products",
+      "canonical": "dairy_egg_combined",
+      "cnf_equivalent_group_id": 1
+    },
+    "71": {
+      "name": "FDC — Spices and Herbs",
+      "canonical": "spices_herbs",
+      "cnf_equivalent_group_id": 2
+    },
+    "72": {
+      "name": "FDC — Baby Foods",
+      "canonical": "babyfoods",
+      "cnf_equivalent_group_id": 3
+    },
+    "73": {
+      "name": "FDC — Fats and Oils",
+      "canonical": "fats_oils",
+      "cnf_equivalent_group_id": 4
+    },
+    "74": {
+      "name": "FDC — Poultry Products",
+      "canonical": "poultry",
+      "cnf_equivalent_group_id": 5
+    },
+    "75": {
+      "name": "FDC — Soups, Sauces, and Gravies",
+      "canonical": "soups_sauces",
+      "cnf_equivalent_group_id": 6
+    },
+    "76": {
+      "name": "FDC — Sausages and Luncheon Meats",
+      "canonical": "sausages_luncheon",
+      "cnf_equivalent_group_id": 7
+    },
+    "77": {
+      "name": "FDC — Breakfast Cereals",
+      "canonical": "breakfast_cereals",
+      "cnf_equivalent_group_id": 8
+    },
+    "78": {
+      "name": "FDC — Fruits and Fruit Juices",
+      "canonical": "fruits",
+      "cnf_equivalent_group_id": 9
+    },
+    "79": {
+      "name": "FDC — Pork Products",
+      "canonical": "pork",
+      "cnf_equivalent_group_id": 10
+    },
+    "80": {
+      "name": "FDC — Vegetables and Vegetable Products",
+      "canonical": "vegetables",
+      "cnf_equivalent_group_id": 11
+    },
+    "81": {
+      "name": "FDC — Nut and Seed Products",
+      "canonical": "nuts_seeds",
+      "cnf_equivalent_group_id": 12
+    },
+    "82": {
+      "name": "FDC — Beef Products",
+      "canonical": "beef",
+      "cnf_equivalent_group_id": 13
+    },
+    "83": {
+      "name": "FDC — Beverages",
+      "canonical": "beverages",
+      "cnf_equivalent_group_id": 14
+    },
+    "84": {
+      "name": "FDC — Finfish and Shellfish Products",
+      "canonical": "fish",
+      "cnf_equivalent_group_id": 15
+    },
+    "85": {
+      "name": "FDC — Legumes and Legume Products",
+      "canonical": "legumes",
+      "cnf_equivalent_group_id": 16
+    },
+    "86": {
+      "name": "FDC — Lamb, Veal, and Game Products",
+      "canonical": "lamb_veal_game",
+      "cnf_equivalent_group_id": 17
+    },
+    "87": {
+      "name": "FDC — Baked Products",
+      "canonical": "baked_products",
+      "cnf_equivalent_group_id": 18
+    },
+    "88": {
+      "name": "FDC — Sweets",
+      "canonical": "sweets",
+      "cnf_equivalent_group_id": 19
+    },
+    "89": {
+      "name": "FDC — Cereal Grains and Pasta",
+      "canonical": "cereals_grains",
+      "cnf_equivalent_group_id": 20
+    },
+    "90": {
+      "name": "FDC — Fast Foods",
+      "canonical": "fast_foods",
+      "cnf_equivalent_group_id": 21
+    },
+    "91": {
+      "name": "FDC — Meals, Entrees, and Side Dishes",
+      "canonical": "mixed_dishes",
+      "cnf_equivalent_group_id": 22
+    },
+    "92": {
+      "name": "FDC — Snacks",
+      "canonical": "snacks",
+      "cnf_equivalent_group_id": 25
+    },
+    "93": {
+      "name": "FDC — American Indian/Alaska Native Foods",
+      "canonical": "mixed_dishes",
+      "cnf_equivalent_group_id": 22
+    },
+    "94": {
+      "name": "FDC — Restaurant Foods",
+      "canonical": "fast_foods",
+      "cnf_equivalent_group_id": 21
+    },
+    "95": {
+      "name": "FDC — Branded Food Products Database",
+      "canonical": "mixed_dishes",
+      "cnf_equivalent_group_id": 22
+    },
+    "96": {
+      "name": "FDC — Quality Control Materials",
+      "canonical": "unknown",
+      "cnf_equivalent_group_id": null
+    },
+    "97": {
+      "name": "FDC — Alcoholic Beverages",
+      "canonical": "alcoholic_beverages",
+      "cnf_equivalent_group_id": 14
+    },
+    "100": {
+      "name": "FDC FNDDS — Milk, whole",
+      "canonical": "dairy",
+      "cnf_equivalent_group_id": 1,
+      "wweia_code": 1002
+    },
+    "101": {
+      "name": "FDC FNDDS — Milk, reduced fat",
+      "canonical": "dairy",
+      "cnf_equivalent_group_id": 1,
+      "wweia_code": 1004
+    },
+    "102": {
+      "name": "FDC FNDDS — Milk, lowfat",
+      "canonical": "dairy",
+      "cnf_equivalent_group_id": 1,
+      "wweia_code": 1006
+    },
+    "103": {
+      "name": "FDC FNDDS — Milk, nonfat",
+      "canonical": "dairy",
+      "cnf_equivalent_group_id": 1,
+      "wweia_code": 1008
+    },
+    "104": {
+      "name": "FDC FNDDS — Flavored milk, whole",
+      "canonical": "dairy",
+      "cnf_equivalent_group_id": 1,
+      "wweia_code": 1202
+    },
+    "105": {
+      "name": "FDC FNDDS — Flavored milk, reduced fat",
+      "canonical": "dairy",
+      "cnf_equivalent_group_id": 1,
+      "wweia_code": 1204
+    },
+    "106": {
+      "name": "FDC FNDDS — Flavored milk, lowfat",
+      "canonical": "dairy",
+      "cnf_equivalent_group_id": 1,
+      "wweia_code": 1206
+    },
+    "107": {
+      "name": "FDC FNDDS — Flavored milk, nonfat",
+      "canonical": "dairy",
+      "cnf_equivalent_group_id": 1,
+      "wweia_code": 1208
+    },
+    "108": {
+      "name": "FDC FNDDS — Milk shakes and other dairy drinks",
+      "canonical": "dairy",
+      "cnf_equivalent_group_id": 1,
+      "wweia_code": 1402
+    },
+    "109": {
+      "name": "FDC FNDDS — Cheese",
+      "canonical": "dairy",
+      "cnf_equivalent_group_id": 1,
+      "wweia_code": 1602
+    },
+    "110": {
+      "name": "FDC FNDDS — Cottage/ricotta cheese",
+      "canonical": "dairy",
+      "cnf_equivalent_group_id": 1,
+      "wweia_code": 1604
+    },
+    "111": {
+      "name": "FDC FNDDS — Yogurt, regular",
+      "canonical": "dairy",
+      "cnf_equivalent_group_id": 1,
+      "wweia_code": 1820
+    },
+    "112": {
+      "name": "FDC FNDDS — Yogurt, Greek",
+      "canonical": "dairy",
+      "cnf_equivalent_group_id": 1,
+      "wweia_code": 1822
+    },
+    "113": {
+      "name": "FDC FNDDS — Plant-based milk",
+      "canonical": "dairy",
+      "cnf_equivalent_group_id": 1,
+      "wweia_code": 1902
+    },
+    "114": {
+      "name": "FDC FNDDS — Plant-based yogurt",
+      "canonical": "dairy",
+      "cnf_equivalent_group_id": 1,
+      "wweia_code": 1904
+    },
+    "115": {
+      "name": "FDC FNDDS — Beef, excludes ground",
+      "canonical": "beef",
+      "cnf_equivalent_group_id": 13,
+      "wweia_code": 2002
+    },
+    "116": {
+      "name": "FDC FNDDS — Ground beef",
+      "canonical": "beef",
+      "cnf_equivalent_group_id": 13,
+      "wweia_code": 2004
+    },
+    "117": {
+      "name": "FDC FNDDS — Pork",
+      "canonical": "pork",
+      "cnf_equivalent_group_id": 10,
+      "wweia_code": 2006
+    },
+    "118": {
+      "name": "FDC FNDDS — Lamb, goat, game",
+      "canonical": "lamb_veal_game",
+      "cnf_equivalent_group_id": 17,
+      "wweia_code": 2008
+    },
+    "119": {
+      "name": "FDC FNDDS — Liver and organ meats",
+      "canonical": "beef",
+      "cnf_equivalent_group_id": 13,
+      "wweia_code": 2010
+    },
+    "120": {
+      "name": "FDC FNDDS — Chicken, whole pieces",
+      "canonical": "poultry",
+      "cnf_equivalent_group_id": 5,
+      "wweia_code": 2202
+    },
+    "121": {
+      "name": "FDC FNDDS — Chicken patties, nuggets and tenders",
+      "canonical": "poultry",
+      "cnf_equivalent_group_id": 5,
+      "wweia_code": 2204
+    },
+    "122": {
+      "name": "FDC FNDDS — Turkey, duck, other poultry",
+      "canonical": "poultry",
+      "cnf_equivalent_group_id": 5,
+      "wweia_code": 2206
+    },
+    "123": {
+      "name": "FDC FNDDS — Fish",
+      "canonical": "fish",
+      "cnf_equivalent_group_id": 15,
+      "wweia_code": 2402
+    },
+    "124": {
+      "name": "FDC FNDDS — Shellfish",
+      "canonical": "fish",
+      "cnf_equivalent_group_id": 15,
+      "wweia_code": 2404
+    },
+    "125": {
+      "name": "FDC FNDDS — Eggs and omelets",
+      "canonical": "eggs",
+      "cnf_equivalent_group_id": 1,
+      "wweia_code": 2502
+    },
+    "126": {
+      "name": "FDC FNDDS — Cold cuts and cured meats",
+      "canonical": "sausages_luncheon",
+      "cnf_equivalent_group_id": 7,
+      "wweia_code": 2602
+    },
+    "127": {
+      "name": "FDC FNDDS — Bacon",
+      "canonical": "sausages_luncheon",
+      "cnf_equivalent_group_id": 7,
+      "wweia_code": 2604
+    },
+    "128": {
+      "name": "FDC FNDDS — Frankfurters",
+      "canonical": "sausages_luncheon",
+      "cnf_equivalent_group_id": 7,
+      "wweia_code": 2606
+    },
+    "129": {
+      "name": "FDC FNDDS — Sausages",
+      "canonical": "sausages_luncheon",
+      "cnf_equivalent_group_id": 7,
+      "wweia_code": 2608
+    },
+    "130": {
+      "name": "FDC FNDDS — Beans, peas, legumes",
+      "canonical": "legumes",
+      "cnf_equivalent_group_id": 16,
+      "wweia_code": 2802
+    },
+    "131": {
+      "name": "FDC FNDDS — Nuts and seeds",
+      "canonical": "nuts_seeds",
+      "cnf_equivalent_group_id": 12,
+      "wweia_code": 2804
+    },
+    "132": {
+      "name": "FDC FNDDS — Soy and meat-alternative products",
+      "canonical": "legumes",
+      "cnf_equivalent_group_id": 16,
+      "wweia_code": 2806
+    },
+    "133": {
+      "name": "FDC FNDDS — Meat mixed dishes",
+      "canonical": "mixed_dishes",
+      "cnf_equivalent_group_id": 22,
+      "wweia_code": 3002
+    },
+    "134": {
+      "name": "FDC FNDDS — Poultry mixed dishes",
+      "canonical": "poultry",
+      "cnf_equivalent_group_id": 5,
+      "wweia_code": 3004
+    },
+    "135": {
+      "name": "FDC FNDDS — Seafood mixed dishes",
+      "canonical": "mixed_dishes",
+      "cnf_equivalent_group_id": 22,
+      "wweia_code": 3006
+    },
+    "136": {
+      "name": "FDC FNDDS — Bean, pea, legume dishes",
+      "canonical": "legumes",
+      "cnf_equivalent_group_id": 16,
+      "wweia_code": 3102
+    },
+    "137": {
+      "name": "FDC FNDDS — Vegetable dishes",
+      "canonical": "mixed_dishes",
+      "cnf_equivalent_group_id": 22,
+      "wweia_code": 3104
+    },
+    "138": {
+      "name": "FDC FNDDS — Rice mixed dishes",
+      "canonical": "mixed_dishes",
+      "cnf_equivalent_group_id": 22,
+      "wweia_code": 3202
+    },
+    "139": {
+      "name": "FDC FNDDS — Pasta mixed dishes, excludes macaroni and cheese",
+      "canonical": "mixed_dishes",
+      "cnf_equivalent_group_id": 22,
+      "wweia_code": 3204
+    },
+    "140": {
+      "name": "FDC FNDDS — Macaroni and cheese",
+      "canonical": "mixed_dishes",
+      "cnf_equivalent_group_id": 22,
+      "wweia_code": 3206
+    },
+    "141": {
+      "name": "FDC FNDDS — Turnovers and other grain-based items",
+      "canonical": "mixed_dishes",
+      "cnf_equivalent_group_id": 22,
+      "wweia_code": 3208
+    },
+    "142": {
+      "name": "FDC FNDDS — Fried rice and lo/chow mein",
+      "canonical": "mixed_dishes",
+      "cnf_equivalent_group_id": 22,
+      "wweia_code": 3402
+    },
+    "143": {
+      "name": "FDC FNDDS — Stir-fry and soy-based sauce mixtures",
+      "canonical": "mixed_dishes",
+      "cnf_equivalent_group_id": 22,
+      "wweia_code": 3404
+    },
+    "144": {
+      "name": "FDC FNDDS — Egg rolls, dumplings, sushi",
+      "canonical": "eggs",
+      "cnf_equivalent_group_id": 1,
+      "wweia_code": 3406
+    },
+    "145": {
+      "name": "FDC FNDDS — Burritos and tacos",
+      "canonical": "mixed_dishes",
+      "cnf_equivalent_group_id": 22,
+      "wweia_code": 3502
+    },
+    "146": {
+      "name": "FDC FNDDS — Nachos",
+      "canonical": "mixed_dishes",
+      "cnf_equivalent_group_id": 22,
+      "wweia_code": 3504
+    },
+    "147": {
+      "name": "FDC FNDDS — Other Mexican mixed dishes",
+      "canonical": "mixed_dishes",
+      "cnf_equivalent_group_id": 22,
+      "wweia_code": 3506
+    },
+    "148": {
+      "name": "FDC FNDDS — Pizza",
+      "canonical": "mixed_dishes",
+      "cnf_equivalent_group_id": 22,
+      "wweia_code": 3602
+    },
+    "149": {
+      "name": "FDC FNDDS — Burgers",
+      "canonical": "mixed_dishes",
+      "cnf_equivalent_group_id": 22,
+      "wweia_code": 3702
+    },
+    "150": {
+      "name": "FDC FNDDS — Frankfurter sandwiches",
+      "canonical": "sausages_luncheon",
+      "cnf_equivalent_group_id": 7,
+      "wweia_code": 3703
+    },
+    "151": {
+      "name": "FDC FNDDS — Chicken fillet sandwiches",
+      "canonical": "poultry",
+      "cnf_equivalent_group_id": 5,
+      "wweia_code": 3704
+    },
+    "152": {
+      "name": "FDC FNDDS — Egg/breakfast sandwiches",
+      "canonical": "eggs",
+      "cnf_equivalent_group_id": 1,
+      "wweia_code": 3706
+    },
+    "153": {
+      "name": "FDC FNDDS — Cheese sandwiches",
+      "canonical": "dairy",
+      "cnf_equivalent_group_id": 1,
+      "wweia_code": 3720
+    },
+    "154": {
+      "name": "FDC FNDDS — Peanut butter and jelly sandwiches",
+      "canonical": "nuts_seeds",
+      "cnf_equivalent_group_id": 12,
+      "wweia_code": 3722
+    },
+    "155": {
+      "name": "FDC FNDDS — Seafood sandwiches",
+      "canonical": "mixed_dishes",
+      "cnf_equivalent_group_id": 22,
+      "wweia_code": 3730
+    },
+    "156": {
+      "name": "FDC FNDDS — Deli and cured meat sandwiches",
+      "canonical": "mixed_dishes",
+      "cnf_equivalent_group_id": 22,
+      "wweia_code": 3740
+    },
+    "157": {
+      "name": "FDC FNDDS — Meat and BBQ sandwiches",
+      "canonical": "mixed_dishes",
+      "cnf_equivalent_group_id": 22,
+      "wweia_code": 3742
+    },
+    "158": {
+      "name": "FDC FNDDS — Vegetable sandwiches/burgers",
+      "canonical": "mixed_dishes",
+      "cnf_equivalent_group_id": 22,
+      "wweia_code": 3744
+    },
+    "159": {
+      "name": "FDC FNDDS — Soups, broth-based",
+      "canonical": "soups_sauces",
+      "cnf_equivalent_group_id": 6,
+      "wweia_code": 3804
+    },
+    "160": {
+      "name": "FDC FNDDS — Soups, cream-based",
+      "canonical": "soups_sauces",
+      "cnf_equivalent_group_id": 6,
+      "wweia_code": 3806
+    },
+    "161": {
+      "name": "FDC FNDDS — Ramen and Asian broth-based soups",
+      "canonical": "soups_sauces",
+      "cnf_equivalent_group_id": 6,
+      "wweia_code": 3808
+    },
+    "162": {
+      "name": "FDC FNDDS — Rice",
+      "canonical": "cereals_grains",
+      "cnf_equivalent_group_id": 20,
+      "wweia_code": 4002
+    },
+    "163": {
+      "name": "FDC FNDDS — Pasta, noodles, cooked grains",
+      "canonical": "cereals_grains",
+      "cnf_equivalent_group_id": 20,
+      "wweia_code": 4004
+    },
+    "164": {
+      "name": "FDC FNDDS — Yeast breads",
+      "canonical": "baked_products",
+      "cnf_equivalent_group_id": 18,
+      "wweia_code": 4202
+    },
+    "165": {
+      "name": "FDC FNDDS — Rolls and buns",
+      "canonical": "baked_products",
+      "cnf_equivalent_group_id": 18,
+      "wweia_code": 4204
+    },
+    "166": {
+      "name": "FDC FNDDS — Bagels and English muffins",
+      "canonical": "baked_products",
+      "cnf_equivalent_group_id": 18,
+      "wweia_code": 4206
+    },
+    "167": {
+      "name": "FDC FNDDS — Tortillas",
+      "canonical": "baked_products",
+      "cnf_equivalent_group_id": 18,
+      "wweia_code": 4208
+    },
+    "168": {
+      "name": "FDC FNDDS — Biscuits, muffins, quick breads",
+      "canonical": "baked_products",
+      "cnf_equivalent_group_id": 18,
+      "wweia_code": 4402
+    },
+    "169": {
+      "name": "FDC FNDDS — Pancakes, waffles, French toast",
+      "canonical": "baked_products",
+      "cnf_equivalent_group_id": 18,
+      "wweia_code": 4404
+    },
+    "170": {
+      "name": "FDC FNDDS — Ready-to-eat cereal, higher sugar (>21.2g/100g)",
+      "canonical": "breakfast_cereals",
+      "cnf_equivalent_group_id": 8,
+      "wweia_code": 4602
+    },
+    "171": {
+      "name": "FDC FNDDS — Ready-to-eat cereal, lower sugar (=<21.2g/100g)",
+      "canonical": "breakfast_cereals",
+      "cnf_equivalent_group_id": 8,
+      "wweia_code": 4604
+    },
+    "172": {
+      "name": "FDC FNDDS — Oatmeal",
+      "canonical": "breakfast_cereals",
+      "cnf_equivalent_group_id": 8,
+      "wweia_code": 4802
+    },
+    "173": {
+      "name": "FDC FNDDS — Grits and other cooked cereals",
+      "canonical": "breakfast_cereals",
+      "cnf_equivalent_group_id": 8,
+      "wweia_code": 4804
+    },
+    "174": {
+      "name": "FDC FNDDS — Potato chips",
+      "canonical": "snacks",
+      "cnf_equivalent_group_id": 25,
+      "wweia_code": 5002
+    },
+    "175": {
+      "name": "FDC FNDDS — Tortilla, corn, other chips",
+      "canonical": "snacks",
+      "cnf_equivalent_group_id": 25,
+      "wweia_code": 5004
+    },
+    "176": {
+      "name": "FDC FNDDS — Popcorn",
+      "canonical": "snacks",
+      "cnf_equivalent_group_id": 25,
+      "wweia_code": 5006
+    },
+    "177": {
+      "name": "FDC FNDDS — Pretzels/snack mix",
+      "canonical": "snacks",
+      "cnf_equivalent_group_id": 25,
+      "wweia_code": 5008
+    },
+    "178": {
+      "name": "FDC FNDDS — Crackers, excludes saltines",
+      "canonical": "snacks",
+      "cnf_equivalent_group_id": 25,
+      "wweia_code": 5202
+    },
+    "179": {
+      "name": "FDC FNDDS — Saltine crackers",
+      "canonical": "snacks",
+      "cnf_equivalent_group_id": 25,
+      "wweia_code": 5204
+    },
+    "180": {
+      "name": "FDC FNDDS — Cereal bars",
+      "canonical": "snacks",
+      "cnf_equivalent_group_id": 25,
+      "wweia_code": 5402
+    },
+    "181": {
+      "name": "FDC FNDDS — Nutrition bars",
+      "canonical": "snacks",
+      "cnf_equivalent_group_id": 25,
+      "wweia_code": 5404
+    },
+    "182": {
+      "name": "FDC FNDDS — Cakes and pies",
+      "canonical": "sweets",
+      "cnf_equivalent_group_id": 19,
+      "wweia_code": 5502
+    },
+    "183": {
+      "name": "FDC FNDDS — Cookies and brownies",
+      "canonical": "sweets",
+      "cnf_equivalent_group_id": 19,
+      "wweia_code": 5504
+    },
+    "184": {
+      "name": "FDC FNDDS — Doughnuts, sweet rolls, pastries",
+      "canonical": "sweets",
+      "cnf_equivalent_group_id": 19,
+      "wweia_code": 5506
+    },
+    "185": {
+      "name": "FDC FNDDS — Candy containing chocolate",
+      "canonical": "sweets",
+      "cnf_equivalent_group_id": 19,
+      "wweia_code": 5702
+    },
+    "186": {
+      "name": "FDC FNDDS — Candy not containing chocolate",
+      "canonical": "sweets",
+      "cnf_equivalent_group_id": 19,
+      "wweia_code": 5704
+    },
+    "187": {
+      "name": "FDC FNDDS — Ice cream and frozen dairy desserts",
+      "canonical": "dairy",
+      "cnf_equivalent_group_id": 1,
+      "wweia_code": 5802
+    },
+    "188": {
+      "name": "FDC FNDDS — Pudding",
+      "canonical": "dairy",
+      "cnf_equivalent_group_id": 1,
+      "wweia_code": 5804
+    },
+    "189": {
+      "name": "FDC FNDDS — Gelatins, ices, sorbets",
+      "canonical": "sweets",
+      "cnf_equivalent_group_id": 19,
+      "wweia_code": 5806
+    },
+    "190": {
+      "name": "FDC FNDDS — Apples",
+      "canonical": "fruits",
+      "cnf_equivalent_group_id": 9,
+      "wweia_code": 6002
+    },
+    "191": {
+      "name": "FDC FNDDS — Bananas",
+      "canonical": "fruits",
+      "cnf_equivalent_group_id": 9,
+      "wweia_code": 6004
+    },
+    "192": {
+      "name": "FDC FNDDS — Grapes",
+      "canonical": "fruits",
+      "cnf_equivalent_group_id": 9,
+      "wweia_code": 6006
+    },
+    "193": {
+      "name": "FDC FNDDS — Peaches and nectarines",
+      "canonical": "fruits",
+      "cnf_equivalent_group_id": 9,
+      "wweia_code": 6008
+    },
+    "194": {
+      "name": "FDC FNDDS — Strawberries",
+      "canonical": "fruits",
+      "cnf_equivalent_group_id": 9,
+      "wweia_code": 6009
+    },
+    "195": {
+      "name": "FDC FNDDS — Blueberries and other berries",
+      "canonical": "fruits",
+      "cnf_equivalent_group_id": 9,
+      "wweia_code": 6011
+    },
+    "196": {
+      "name": "FDC FNDDS — Citrus fruits",
+      "canonical": "fruits",
+      "cnf_equivalent_group_id": 9,
+      "wweia_code": 6012
+    },
+    "197": {
+      "name": "FDC FNDDS — Melons",
+      "canonical": "fruits",
+      "cnf_equivalent_group_id": 9,
+      "wweia_code": 6014
+    },
+    "198": {
+      "name": "FDC FNDDS — Dried fruits",
+      "canonical": "fruits",
+      "cnf_equivalent_group_id": 9,
+      "wweia_code": 6016
+    },
+    "199": {
+      "name": "FDC FNDDS — Other fruits and fruit salads",
+      "canonical": "fruits",
+      "cnf_equivalent_group_id": 9,
+      "wweia_code": 6018
+    },
+    "200": {
+      "name": "FDC FNDDS — Pears",
+      "canonical": "fruits",
+      "cnf_equivalent_group_id": 9,
+      "wweia_code": 6020
+    },
+    "201": {
+      "name": "FDC FNDDS — Pineapple",
+      "canonical": "fruits",
+      "cnf_equivalent_group_id": 9,
+      "wweia_code": 6022
+    },
+    "202": {
+      "name": "FDC FNDDS — Mango and papaya",
+      "canonical": "fruits",
+      "cnf_equivalent_group_id": 9,
+      "wweia_code": 6024
+    },
+    "203": {
+      "name": "FDC FNDDS — Tomatoes",
+      "canonical": "vegetables",
+      "cnf_equivalent_group_id": 11,
+      "wweia_code": 6402
+    },
+    "204": {
+      "name": "FDC FNDDS — Carrots",
+      "canonical": "vegetables",
+      "cnf_equivalent_group_id": 11,
+      "wweia_code": 6404
+    },
+    "205": {
+      "name": "FDC FNDDS — Other red and orange vegetables",
+      "canonical": "vegetables",
+      "cnf_equivalent_group_id": 11,
+      "wweia_code": 6406
+    },
+    "206": {
+      "name": "FDC FNDDS — Broccoli",
+      "canonical": "vegetables",
+      "cnf_equivalent_group_id": 11,
+      "wweia_code": 6407
+    },
+    "207": {
+      "name": "FDC FNDDS — Spinach",
+      "canonical": "vegetables",
+      "cnf_equivalent_group_id": 11,
+      "wweia_code": 6409
+    },
+    "208": {
+      "name": "FDC FNDDS — Lettuce and lettuce salads",
+      "canonical": "vegetables",
+      "cnf_equivalent_group_id": 11,
+      "wweia_code": 6410
+    },
+    "209": {
+      "name": "FDC FNDDS — Other dark green vegetables",
+      "canonical": "vegetables",
+      "cnf_equivalent_group_id": 11,
+      "wweia_code": 6411
+    },
+    "210": {
+      "name": "FDC FNDDS — String beans",
+      "canonical": "vegetables",
+      "cnf_equivalent_group_id": 11,
+      "wweia_code": 6412
+    },
+    "211": {
+      "name": "FDC FNDDS — Cabbage",
+      "canonical": "vegetables",
+      "cnf_equivalent_group_id": 11,
+      "wweia_code": 6413
+    },
+    "212": {
+      "name": "FDC FNDDS — Onions",
+      "canonical": "vegetables",
+      "cnf_equivalent_group_id": 11,
+      "wweia_code": 6414
+    },
+    "213": {
+      "name": "FDC FNDDS — Corn",
+      "canonical": "vegetables",
+      "cnf_equivalent_group_id": 11,
+      "wweia_code": 6416
+    },
+    "214": {
+      "name": "FDC FNDDS — Other starchy vegetables",
+      "canonical": "vegetables",
+      "cnf_equivalent_group_id": 11,
+      "wweia_code": 6418
+    },
+    "215": {
+      "name": "FDC FNDDS — Other vegetables and combinations",
+      "canonical": "vegetables",
+      "cnf_equivalent_group_id": 11,
+      "wweia_code": 6420
+    },
+    "216": {
+      "name": "FDC FNDDS — Fried vegetables",
+      "canonical": "vegetables",
+      "cnf_equivalent_group_id": 11,
+      "wweia_code": 6430
+    },
+    "217": {
+      "name": "FDC FNDDS — Coleslaw, non-lettuce salads",
+      "canonical": "vegetables",
+      "cnf_equivalent_group_id": 11,
+      "wweia_code": 6432
+    },
+    "218": {
+      "name": "FDC FNDDS — Vegetables on a sandwich",
+      "canonical": "mixed_dishes",
+      "cnf_equivalent_group_id": 22,
+      "wweia_code": 6489
+    },
+    "219": {
+      "name": "FDC FNDDS — White potatoes, baked or boiled",
+      "canonical": "vegetables",
+      "cnf_equivalent_group_id": 11,
+      "wweia_code": 6802
+    },
+    "220": {
+      "name": "FDC FNDDS — French fries and other fried white potatoes",
+      "canonical": "vegetables",
+      "cnf_equivalent_group_id": 11,
+      "wweia_code": 6804
+    },
+    "221": {
+      "name": "FDC FNDDS — Mashed potatoes and white potato mixtures",
+      "canonical": "vegetables",
+      "cnf_equivalent_group_id": 11,
+      "wweia_code": 6806
+    },
+    "222": {
+      "name": "FDC FNDDS — Citrus juice",
+      "canonical": "fruits",
+      "cnf_equivalent_group_id": 9,
+      "wweia_code": 7002
+    },
+    "223": {
+      "name": "FDC FNDDS — Apple juice",
+      "canonical": "fruits",
+      "cnf_equivalent_group_id": 9,
+      "wweia_code": 7004
+    },
+    "224": {
+      "name": "FDC FNDDS — Other fruit juice",
+      "canonical": "fruits",
+      "cnf_equivalent_group_id": 9,
+      "wweia_code": 7006
+    },
+    "225": {
+      "name": "FDC FNDDS — Vegetable juice",
+      "canonical": "fruits",
+      "cnf_equivalent_group_id": 9,
+      "wweia_code": 7008
+    },
+    "226": {
+      "name": "FDC FNDDS — Diet soft drinks",
+      "canonical": "beverages",
+      "cnf_equivalent_group_id": 14,
+      "wweia_code": 7102
+    },
+    "227": {
+      "name": "FDC FNDDS — Diet sport and energy drinks",
+      "canonical": "beverages",
+      "cnf_equivalent_group_id": 14,
+      "wweia_code": 7104
+    },
+    "228": {
+      "name": "FDC FNDDS — Other diet drinks",
+      "canonical": "beverages",
+      "cnf_equivalent_group_id": 14,
+      "wweia_code": 7106
+    },
+    "229": {
+      "name": "FDC FNDDS — Soft drinks",
+      "canonical": "beverages",
+      "cnf_equivalent_group_id": 14,
+      "wweia_code": 7202
+    },
+    "230": {
+      "name": "FDC FNDDS — Fruit drinks",
+      "canonical": "beverages",
+      "cnf_equivalent_group_id": 14,
+      "wweia_code": 7204
+    },
+    "231": {
+      "name": "FDC FNDDS — Sport and energy drinks",
+      "canonical": "beverages",
+      "cnf_equivalent_group_id": 14,
+      "wweia_code": 7206
+    },
+    "232": {
+      "name": "FDC FNDDS — Nutritional beverages",
+      "canonical": "beverages",
+      "cnf_equivalent_group_id": 14,
+      "wweia_code": 7208
+    },
+    "233": {
+      "name": "FDC FNDDS — Smoothies and grain drinks",
+      "canonical": "beverages",
+      "cnf_equivalent_group_id": 14,
+      "wweia_code": 7220
+    },
+    "234": {
+      "name": "FDC FNDDS — Coffee",
+      "canonical": "beverages",
+      "cnf_equivalent_group_id": 14,
+      "wweia_code": 7302
+    },
+    "235": {
+      "name": "FDC FNDDS — Tea",
+      "canonical": "beverages",
+      "cnf_equivalent_group_id": 14,
+      "wweia_code": 7304
+    },
+    "236": {
+      "name": "FDC FNDDS — Beer",
+      "canonical": "alcoholic_beverages",
+      "cnf_equivalent_group_id": 14,
+      "wweia_code": 7502
+    },
+    "237": {
+      "name": "FDC FNDDS — Wine",
+      "canonical": "alcoholic_beverages",
+      "cnf_equivalent_group_id": 14,
+      "wweia_code": 7504
+    },
+    "238": {
+      "name": "FDC FNDDS — Liquor and cocktails",
+      "canonical": "alcoholic_beverages",
+      "cnf_equivalent_group_id": 14,
+      "wweia_code": 7506
+    },
+    "239": {
+      "name": "FDC FNDDS — Tap water",
+      "canonical": "beverages",
+      "cnf_equivalent_group_id": 14,
+      "wweia_code": 7702
+    },
+    "240": {
+      "name": "FDC FNDDS — Bottled water",
+      "canonical": "beverages",
+      "cnf_equivalent_group_id": 14,
+      "wweia_code": 7704
+    },
+    "241": {
+      "name": "FDC FNDDS — Flavored or carbonated water",
+      "canonical": "beverages",
+      "cnf_equivalent_group_id": 14,
+      "wweia_code": 7802
+    },
+    "242": {
+      "name": "FDC FNDDS — Enhanced water",
+      "canonical": "beverages",
+      "cnf_equivalent_group_id": 14,
+      "wweia_code": 7804
+    },
+    "243": {
+      "name": "FDC FNDDS — Butter and animal fats",
+      "canonical": "fats_oils",
+      "cnf_equivalent_group_id": 4,
+      "wweia_code": 8002
+    },
+    "244": {
+      "name": "FDC FNDDS — Margarine",
+      "canonical": "fats_oils",
+      "cnf_equivalent_group_id": 4,
+      "wweia_code": 8004
+    },
+    "245": {
+      "name": "FDC FNDDS — Cream cheese, sour cream, whipped cream",
+      "canonical": "fats_oils",
+      "cnf_equivalent_group_id": 4,
+      "wweia_code": 8006
+    },
+    "246": {
+      "name": "FDC FNDDS — Cream and cream substitutes",
+      "canonical": "fats_oils",
+      "cnf_equivalent_group_id": 4,
+      "wweia_code": 8008
+    },
+    "247": {
+      "name": "FDC FNDDS — Mayonnaise",
+      "canonical": "fats_oils",
+      "cnf_equivalent_group_id": 4,
+      "wweia_code": 8010
+    },
+    "248": {
+      "name": "FDC FNDDS — Salad dressings and vegetable oils",
+      "canonical": "fats_oils",
+      "cnf_equivalent_group_id": 4,
+      "wweia_code": 8012
+    },
+    "249": {
+      "name": "FDC FNDDS — Tomato-based condiments",
+      "canonical": "soups_sauces",
+      "cnf_equivalent_group_id": 6,
+      "wweia_code": 8402
+    },
+    "250": {
+      "name": "FDC FNDDS — Soy-based condiments",
+      "canonical": "legumes",
+      "cnf_equivalent_group_id": 16,
+      "wweia_code": 8404
+    },
+    "251": {
+      "name": "FDC FNDDS — Mustard and other condiments",
+      "canonical": "soups_sauces",
+      "cnf_equivalent_group_id": 6,
+      "wweia_code": 8406
+    },
+    "252": {
+      "name": "FDC FNDDS — Olives, pickles, pickled vegetables",
+      "canonical": "soups_sauces",
+      "cnf_equivalent_group_id": 6,
+      "wweia_code": 8408
+    },
+    "253": {
+      "name": "FDC FNDDS — Pasta sauces, tomato-based",
+      "canonical": "soups_sauces",
+      "cnf_equivalent_group_id": 6,
+      "wweia_code": 8410
+    },
+    "254": {
+      "name": "FDC FNDDS — Dips, gravies, other sauces",
+      "canonical": "soups_sauces",
+      "cnf_equivalent_group_id": 6,
+      "wweia_code": 8412
+    },
+    "255": {
+      "name": "FDC FNDDS — Sugars and honey",
+      "canonical": "sweets",
+      "cnf_equivalent_group_id": 19,
+      "wweia_code": 8802
+    },
+    "256": {
+      "name": "FDC FNDDS — Sugar substitutes",
+      "canonical": "sweets",
+      "cnf_equivalent_group_id": 19,
+      "wweia_code": 8804
+    },
+    "257": {
+      "name": "FDC FNDDS — Jams, syrups, toppings",
+      "canonical": "sweets",
+      "cnf_equivalent_group_id": 19,
+      "wweia_code": 8806
+    },
+    "258": {
+      "name": "FDC FNDDS — Baby food: cereals",
+      "canonical": "babyfoods",
+      "cnf_equivalent_group_id": 3,
+      "wweia_code": 9002
+    },
+    "259": {
+      "name": "FDC FNDDS — Baby food: fruit",
+      "canonical": "babyfoods",
+      "cnf_equivalent_group_id": 3,
+      "wweia_code": 9004
+    },
+    "260": {
+      "name": "FDC FNDDS — Baby food: vegetables",
+      "canonical": "babyfoods",
+      "cnf_equivalent_group_id": 3,
+      "wweia_code": 9006
+    },
+    "261": {
+      "name": "FDC FNDDS — Baby food: mixtures",
+      "canonical": "babyfoods",
+      "cnf_equivalent_group_id": 3,
+      "wweia_code": 9007
+    },
+    "262": {
+      "name": "FDC FNDDS — Baby food: meat and dinners",
+      "canonical": "babyfoods",
+      "cnf_equivalent_group_id": 3,
+      "wweia_code": 9008
+    },
+    "263": {
+      "name": "FDC FNDDS — Baby food: yogurt",
+      "canonical": "babyfoods",
+      "cnf_equivalent_group_id": 3,
+      "wweia_code": 9010
+    },
+    "264": {
+      "name": "FDC FNDDS — Baby food: snacks and sweets",
+      "canonical": "babyfoods",
+      "cnf_equivalent_group_id": 3,
+      "wweia_code": 9012
+    },
+    "265": {
+      "name": "FDC FNDDS — Baby juice",
+      "canonical": "fruits",
+      "cnf_equivalent_group_id": 9,
+      "wweia_code": 9202
+    },
+    "266": {
+      "name": "FDC FNDDS — Baby water",
+      "canonical": "babyfoods",
+      "cnf_equivalent_group_id": 3,
+      "wweia_code": 9204
+    },
+    "267": {
+      "name": "FDC FNDDS — Formula, ready-to-feed",
+      "canonical": "babyfoods",
+      "cnf_equivalent_group_id": 3,
+      "wweia_code": 9402
+    },
+    "268": {
+      "name": "FDC FNDDS — Formula, prepared from powder",
+      "canonical": "babyfoods",
+      "cnf_equivalent_group_id": 3,
+      "wweia_code": 9404
+    },
+    "269": {
+      "name": "FDC FNDDS — Human milk",
+      "canonical": "babyfoods",
+      "cnf_equivalent_group_id": 3,
+      "wweia_code": 9602
+    },
+    "270": {
+      "name": "FDC FNDDS — Protein and nutritional powders",
+      "canonical": "beverages",
+      "cnf_equivalent_group_id": 14,
+      "wweia_code": 9802
+    },
+    "271": {
+      "name": "FDC FNDDS — Not included in a food category",
+      "canonical": "unknown",
+      "cnf_equivalent_group_id": null,
+      "wweia_code": 9999
+    }
+  }
+}

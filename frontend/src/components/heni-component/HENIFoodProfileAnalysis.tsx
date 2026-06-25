@@ -588,7 +588,7 @@ const HENIFoodProfileAnalysis = () => {
                                 ))}
                             </div>
                             <div className="space-y-2">
-                              <h4 className="font-semibold text-amber-700">⚠ Consider Reducing</h4>
+                              <h4 className="font-semibold text-amber-700">Consider Reducing</h4>
                               {(Object.entries(analysis?.component_breakdown?.food_group_contributions || {}) as Array<[string, number]>)
                                 .filter(([, v]) => v < 0)
                                 .slice(0, 3)

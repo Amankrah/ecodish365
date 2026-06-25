@@ -4,12 +4,14 @@
  */
 'use client';
 
+import type { IconType } from './metricAdapters';
+
 interface Props {
-  emoji: string;
+  icon: IconType;
   title: string;
 }
 
-export function MetricSkeleton({ emoji, title }: Props): JSX.Element {
+export function MetricSkeleton({ icon: Icon, title }: Props): JSX.Element {
   return (
     <div
       className="bg-white border border-gray-200 rounded-lg p-4 flex flex-col gap-2 animate-pulse"
@@ -18,7 +20,7 @@ export function MetricSkeleton({ emoji, title }: Props): JSX.Element {
     >
       <div className="flex items-center gap-2">
         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
-          <span aria-hidden="true">{emoji}</span>
+          <Icon className="w-3.5 h-3.5" aria-hidden="true" />
           {title}
         </span>
       </div>

@@ -1,0 +1,511 @@
+{
+  "cnf_nutrient_count": 173,
+  "datasets": {
+    "foundation": {
+      "fk_system": "fdc_id",
+      "total_food_nutrient_rows": 170469,
+      "bridged_rows": 140591,
+      "unbridged_rows": 29878,
+      "bridged_pct": 82.47,
+      "distinct_nutrient_ids_used": 235,
+      "distinct_bridged_ids_used": 133,
+      "top_unbridged_by_row_count": [
+        {
+          "fdc_id": 1002,
+          "rows": 3790,
+          "name": "Nitrogen"
+        },
+        {
+          "fdc_id": 1009,
+          "rows": 1469,
+          "name": "Starch"
+        },
+        {
+          "fdc_id": 1102,
+          "rows": 1289,
+          "name": "Molybdenum, Mo"
+        },
+        {
+          "fdc_id": 1334,
+          "rows": 960,
+          "name": "PUFA 22:2"
+        },
+        {
+          "fdc_id": 1335,
+          "rows": 953,
+          "name": "SFA 11:0"
+        },
+        {
+          "fdc_id": 1094,
+          "rows": 844,
+          "name": "Sulfur, S"
+        },
+        {
+          "fdc_id": 1097,
+          "rows": 844,
+          "name": "Cobalt, Co"
+        },
+        {
+          "fdc_id": 1137,
+          "rows": 844,
+          "name": "Boron, B"
+        },
+        {
+          "fdc_id": 1146,
+          "rows": 844,
+          "name": "Nickel, Ni"
+        },
+        {
+          "fdc_id": 1100,
+          "rows": 592,
+          "name": "Iodine, I"
+        },
+        {
+          "fdc_id": 2014,
+          "rows": 583,
+          "name": "MUFA 22:1 n-9"
+        },
+        {
+          "fdc_id": 2012,
+          "rows": 576,
+          "name": "MUFA 20:1 c"
+        },
+        {
+          "fdc_id": 2019,
+          "rows": 565,
+          "name": "TFA 18:3 t"
+        },
+        {
+          "fdc_id": 2006,
+          "rows": 517,
+          "name": "SFA 21:0"
+        },
+        {
+          "fdc_id": 2009,
+          "rows": 494,
+          "name": "MUFA 14:1 c"
+        }
+      ]
+    },
+    "sr_legacy": {
+      "fk_system": "fdc_id",
+      "total_food_nutrient_rows": 644125,
+      "bridged_rows": 629197,
+      "unbridged_rows": 14928,
+      "bridged_pct": 97.68,
+      "distinct_nutrient_ids_used": 149,
+      "distinct_bridged_ids_used": 142,
+      "top_unbridged_by_row_count": [
+        {
+          "fdc_id": 1104,
+          "rows": 7356,
+          "name": "Vitamin A, IU"
+        },
+        {
+          "fdc_id": 1129,
+          "rows": 1477,
+          "name": "Tocotrienol, beta"
+        },
+        {
+          "fdc_id": 1130,
+          "rows": 1466,
+          "name": "Tocotrienol, gamma"
+        },
+        {
+          "fdc_id": 1128,
+          "rows": 1463,
+          "name": "Tocotrienol, alpha"
+        },
+        {
+          "fdc_id": 1131,
+          "rows": 1461,
+          "name": "Tocotrienol, delta"
+        },
+        {
+          "fdc_id": 1009,
+          "rows": 1167,
+          "name": "Starch"
+        },
+        {
+          "fdc_id": 1099,
+          "rows": 538,
+          "name": "Fluoride, F"
+        }
+      ]
+    },
+    "fndds": {
+      "fk_system": "nutrient_nbr",
+      "total_food_nutrient_rows": 353015,
+      "bridged_rows": 353015,
+      "unbridged_rows": 0,
+      "bridged_pct": 100.0,
+      "distinct_nutrient_ids_used": 65,
+      "distinct_bridged_ids_used": 65,
+      "top_unbridged_by_row_count": []
+    }
+  },
+  "nutrient_csv_identical_across_datasets": false,
+  "nutrient_csv_counts": {
+    "foundation": 477,
+    "sr_legacy": 474,
+    "fndds": 477
+  },
+  "bridge": {
+    "bridged_count": 150,
+    "unbridged_fdc_only_count": 311,
+    "unbridged_subcategory_count": 16,
+    "unit_mismatch_count": 3,
+    "unbridged_fdc_only_sample": [
+      {
+        "fdc_id": 2047,
+        "name": "Energy (Atwater General Factors)",
+        "unit": "KCAL",
+        "nutrient_nbr": 957,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 2048,
+        "name": "Energy (Atwater Specific Factors)",
+        "unit": "KCAL",
+        "nutrient_nbr": 958,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1001,
+        "name": "Solids",
+        "unit": "G",
+        "nutrient_nbr": 201,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1002,
+        "name": "Nitrogen",
+        "unit": "G",
+        "nutrient_nbr": 202,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1006,
+        "name": "Fiber, crude (DO NOT USE - Archived)",
+        "unit": "G",
+        "nutrient_nbr": 206,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1009,
+        "name": "Starch",
+        "unit": "G",
+        "nutrient_nbr": 209,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1015,
+        "name": "Amylose",
+        "unit": "G",
+        "nutrient_nbr": 218,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1016,
+        "name": "Amylopectin",
+        "unit": "G",
+        "nutrient_nbr": 219,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1017,
+        "name": "Pectin",
+        "unit": "G",
+        "nutrient_nbr": 220,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1019,
+        "name": "Pentosan",
+        "unit": "G",
+        "nutrient_nbr": 222,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1020,
+        "name": "Pentoses",
+        "unit": "G",
+        "nutrient_nbr": 223,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1021,
+        "name": "Hemicellulose",
+        "unit": "G",
+        "nutrient_nbr": 224,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1022,
+        "name": "Cellulose",
+        "unit": "G",
+        "nutrient_nbr": 225,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1023,
+        "name": "pH",
+        "unit": "PH",
+        "nutrient_nbr": 226,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1024,
+        "name": "Specific Gravity",
+        "unit": "SP_GR",
+        "nutrient_nbr": 227,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1025,
+        "name": "Organic acids",
+        "unit": "G",
+        "nutrient_nbr": 229,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1026,
+        "name": "Acetic acid",
+        "unit": "MG",
+        "nutrient_nbr": 230,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1027,
+        "name": "Aconitic acid",
+        "unit": "MG",
+        "nutrient_nbr": 231,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1028,
+        "name": "Benzoic acid",
+        "unit": "MG",
+        "nutrient_nbr": 232,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1029,
+        "name": "Chelidonic acid",
+        "unit": "MG",
+        "nutrient_nbr": 233,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1030,
+        "name": "Chlorogenic acid",
+        "unit": "MG",
+        "nutrient_nbr": 234,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1031,
+        "name": "Cinnamic acid",
+        "unit": "MG",
+        "nutrient_nbr": 235,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1032,
+        "name": "Citric acid",
+        "unit": "MG",
+        "nutrient_nbr": 236,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1033,
+        "name": "Fumaric acid",
+        "unit": "MG",
+        "nutrient_nbr": 237,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1034,
+        "name": "Galacturonic acid",
+        "unit": "MG",
+        "nutrient_nbr": 238,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1035,
+        "name": "Gallic acid",
+        "unit": "MG",
+        "nutrient_nbr": 239,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1036,
+        "name": "Glycolic acid",
+        "unit": "MG",
+        "nutrient_nbr": 240,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1037,
+        "name": "Isocitric acid",
+        "unit": "MG",
+        "nutrient_nbr": 241,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1038,
+        "name": "Lactic acid",
+        "unit": "MG",
+        "nutrient_nbr": 242,
+        "reason": "no_cnf_match"
+      },
+      {
+        "fdc_id": 1039,
+        "name": "Malic acid",
+        "unit": "MG",
+        "nutrient_nbr": 243,
+        "reason": "no_cnf_match"
+      }
+    ],
+    "unbridged_subcategory_sample": [
+      {
+        "fdc_id": 1050,
+        "name": "Carbohydrate, by summation",
+        "unit": "G",
+        "nutrient_nbr": 205.2,
+        "reason": "non_integer_subcategory"
+      },
+      {
+        "fdc_id": 1063,
+        "name": "Sugars, Total",
+        "unit": "G",
+        "nutrient_nbr": 269.3,
+        "reason": "non_integer_subcategory"
+      },
+      {
+        "fdc_id": 1119,
+        "name": "Zeaxanthin",
+        "unit": "UG",
+        "nutrient_nbr": 338.2,
+        "reason": "non_integer_subcategory"
+      },
+      {
+        "fdc_id": 1121,
+        "name": "Lutein",
+        "unit": "UG",
+        "nutrient_nbr": 338.1,
+        "reason": "non_integer_subcategory"
+      },
+      {
+        "fdc_id": 1159,
+        "name": "cis-beta-Carotene",
+        "unit": "UG",
+        "nutrient_nbr": 321.1,
+        "reason": "non_integer_subcategory"
+      },
+      {
+        "fdc_id": 1160,
+        "name": "cis-Lycopene",
+        "unit": "UG",
+        "nutrient_nbr": 337.1,
+        "reason": "non_integer_subcategory"
+      },
+      {
+        "fdc_id": 1161,
+        "name": "cis-Lutein/Zeaxanthin",
+        "unit": "UG",
+        "nutrient_nbr": 338.3,
+        "reason": "non_integer_subcategory"
+      },
+      {
+        "fdc_id": 2014,
+        "name": "MUFA 22:1 n-9",
+        "unit": "G",
+        "nutrient_nbr": 676.1,
+        "reason": "non_integer_subcategory"
+      },
+      {
+        "fdc_id": 2015,
+        "name": "MUFA 22:1 n-11",
+        "unit": "G",
+        "nutrient_nbr": 676.2,
+        "reason": "non_integer_subcategory"
+      },
+      {
+        "fdc_id": 2028,
+        "name": "trans-beta-Carotene",
+        "unit": "UG",
+        "nutrient_nbr": 321.2,
+        "reason": "non_integer_subcategory"
+      },
+      {
+        "fdc_id": 2029,
+        "name": "trans-Lycopene",
+        "unit": "UG",
+        "nutrient_nbr": 337.2,
+        "reason": "non_integer_subcategory"
+      },
+      {
+        "fdc_id": 2034,
+        "name": "Insoluble dietary fiber (IDF)",
+        "unit": "G",
+        "nutrient_nbr": 293.1,
+        "reason": "non_integer_subcategory"
+      },
+      {
+        "fdc_id": 2035,
+        "name": "Soluble dietary fiber (SDFP+SDFS)",
+        "unit": "G",
+        "nutrient_nbr": 293.2,
+        "reason": "non_integer_subcategory"
+      },
+      {
+        "fdc_id": 2038,
+        "name": "High Molecular Weight Dietary Fiber (HMWDF)",
+        "unit": "G",
+        "nutrient_nbr": 293.3,
+        "reason": "non_integer_subcategory"
+      },
+      {
+        "fdc_id": 2041,
+        "name": "Tocopherols and tocotrienols",
+        "unit": "MG",
+        "nutrient_nbr": 323.99,
+        "reason": "non_integer_subcategory"
+      },
+      {
+        "fdc_id": 2065,
+        "name": "Low Molecular Weight Dietary Fiber (LMWDF)",
+        "unit": "G",
+        "nutrient_nbr": 293.4,
+        "reason": "non_integer_subcategory"
+      }
+    ],
+    "unit_mismatches_sample": [
+      {
+        "fdc_id": 1062,
+        "name": "Energy",
+        "fdc_unit": "kJ",
+        "cnf_nutrient_id": 268,
+        "cnf_name": "ENERGY (KILOJOULES)",
+        "cnf_unit": "kilojoule"
+      },
+      {
+        "fdc_id": 1110,
+        "name": "Vitamin D (D2 + D3), International Units",
+        "fdc_unit": "IU",
+        "cnf_nutrient_id": 324,
+        "cnf_name": "VITAMIN D (INTERNATIONAL UNITS)",
+        "cnf_unit": "International Unit"
+      },
+      {
+        "fdc_id": 1169,
+        "name": "Niacin equivalent N406 +N407",
+        "fdc_unit": "MG",
+        "cnf_nutrient_id": 409,
+        "cnf_name": "TOTAL NIACIN EQUIVALENT",
+        "cnf_unit": "Niacin Equivalents"
+      }
+    ]
+  }
+}

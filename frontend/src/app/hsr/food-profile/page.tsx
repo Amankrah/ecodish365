@@ -548,7 +548,7 @@ export default function HSRFoodProfile() {
                       </span>
                     </div>
                     <div className="mt-2 text-sm text-gray-600">
-                      ⭐ <strong>Scientific Analysis:</strong> Using scientifically-improved HSR methods for more accurate assessment
+                      <strong>Scientific Analysis:</strong> Using scientifically-improved HSR methods for more accurate assessment
                     </div>
                   </div>
                 </div>

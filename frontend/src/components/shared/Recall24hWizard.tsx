@@ -28,8 +28,13 @@ import {
   CalendarClock, Coffee, Sandwich, Soup, Apple, Cookie, Pizza,
   Loader2, AlertCircle, Check, Info, Sparkles, ChevronRight, ChevronLeft,
   Camera, Type, Search,
+  Salad, Dna, Compass, Target, ArrowLeftRight,
   type LucideIcon,
 } from 'lucide-react';
+import { StarIcon, GlobeAltIcon, GlobeAmericasIcon, BeakerIcon } from '@heroicons/react/24/outline';
+import type { ComponentType, SVGProps } from 'react';
+
+type IconType = ComponentType<SVGProps<SVGSVGElement>>;
 import {
   CNFApiService,
   type CNFRecall24hResult,
@@ -91,25 +96,28 @@ const OCCASIONS: OccasionMeta[] = [
 
 const SCORE_BUTTONS: Array<{
   id: 'hefi' | 'heni' | 'hsr' | 'fcs' | 'environmental' | 'dietary_pattern' | 'scorecard' | 'planetary' | 'improve_product' | 'research_deep_dive';
-  emoji: string;
+  icon: IconType;
   label: string;
   path: string;
   note?: string;
 }> = [
-  // SCORECARD-1 (2026-05-26): one-click consumer view across all six lenses.
-  { id: 'scorecard',       emoji: '✨', label: 'All scores',            path: '/scorecard',              note: 'Every measure in one view' },
-  { id: 'improve_product', emoji: '🔄', label: 'Try ingredient swaps',  path: '/improve-product',        note: 'Find healthier substitutes for foods in this day' },
-  { id: 'hefi',            emoji: '🥗', label: 'Healthy eating',        path: '/hefi/calculate',          note: 'How well your day matches Canada\'s Food Guide' },
-  { id: 'heni',            emoji: '🧬', label: 'Health impact',         path: '/heni/calculate',          note: 'Healthy-life minutes across the day' },
-  { id: 'hsr',             emoji: '⭐', label: 'Star rating',           path: '/hsr/calculate',           note: 'Rough snapshot only. Stars rate products, not whole days.' },
-  { id: 'fcs',             emoji: '🧭', label: 'Food Compass',          path: '/fcs/calculate',           note: 'One score from 1 to 100 for the whole day' },
-  { id: 'environmental',   emoji: '🌍', label: 'Environment',           path: '/environmental/calculate', note: 'Climate, land, and water footprint' },
-  { id: 'dietary_pattern', emoji: '🎯', label: 'Eating style',          path: '/dietary-pattern',        note: 'Which familiar pattern your day resembles' },
-  { id: 'planetary',       emoji: '🪐', label: 'Planet budget',         path: '/planetary',              note: 'Your share of a daily planet budget for food' },
-  // RESEARCH-DEEP-DIVE (2026-06-09): substrate exposure for nutrition-epi
-  // research: full nutrient panel against IOM DRIs by life stage, FPED
-  // food groups, NOVA processing, per-nutrient top-contributor attribution.
-  { id: 'research_deep_dive', emoji: '🔬', label: 'Research deep-dive',  path: '/research/meal-deep-dive', note: 'Full nutrient panel against life-stage DRIs, FPED groups, NOVA processing, food-source attribution' },
+  // SCORECARD-1 (2026-05-26): one-click consumer view across all published lenses.
+  { id: 'scorecard',       icon: Sparkles,          label: 'All scores',            path: '/scorecard',              note: 'Every measure in one view' },
+  { id: 'improve_product', icon: ArrowLeftRight,    label: 'Try ingredient swaps',  path: '/improve-product',        note: 'Find healthier substitutes for foods in this day' },
+  { id: 'hefi',            icon: Salad,             label: 'Healthy eating',        path: '/hefi/calculate',          note: 'How well your day matches Canada\'s Food Guide' },
+  { id: 'heni',            icon: Dna,               label: 'Health impact',         path: '/heni/calculate',          note: 'Healthy-life minutes across the day' },
+  { id: 'hsr',             icon: StarIcon,          label: 'Star rating',           path: '/hsr/calculate',           note: 'Rough snapshot only. Stars rate products, not whole days.' },
+  { id: 'fcs',             icon: Compass,           label: 'Food Compass',          path: '/fcs/calculate',           note: 'One score from 1 to 100 for the whole day' },
+  { id: 'environmental',   icon: GlobeAltIcon,      label: 'Environment',           path: '/environmental/calculate', note: 'Climate, land, and water footprint' },
+  { id: 'dietary_pattern', icon: Target,            label: 'Eating style',          path: '/dietary-pattern',        note: 'Which familiar pattern your day resembles' },
+  { id: 'planetary',       icon: GlobeAmericasIcon, label: 'Planet budget',         path: '/planetary',              note: 'Your share of a daily planet budget for food' },
+  // NUTRIENT-ANALYSIS (2026-06-25, renamed from /research/meal-deep-dive):
+  // composition substrate for nutrition-epi research: full nutrient panel
+  // against IOM DRIs by life stage, FPED food groups, NOVA processing,
+  // per-nutrient top-contributor attribution. The internal id stays
+  // `research_deep_dive` because it is shared with the sessionStorage
+  // handoff payload on the receiving page.
+  { id: 'research_deep_dive', icon: BeakerIcon, label: 'Nutrient analysis',  path: '/research/nutrient-analysis', note: 'Full nutrient panel against life-stage DRIs, FPED groups, NOVA processing, food-source attribution' },
 ];
 
 interface MealRow {
@@ -890,7 +898,7 @@ export function Recall24hWizard({ userType, preselectScore }: Recall24hWizardPro
                     }`}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl" aria-hidden="true">{b.emoji}</span>
+                      <b.icon className="w-5 h-5 text-gray-700" aria-hidden="true" />
                       <span className="font-medium text-gray-900">{b.label}</span>
                       {isPre && (
                         <span className="ml-auto text-[10px] uppercase font-semibold text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded">recommended</span>

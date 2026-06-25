@@ -77,6 +77,131 @@ def _normalise_dish_name(name: str) -> str:
     return _NORMALISE_RE.sub(' ', name.strip().lower())
 
 
+# --- Layer 1: regional-token detection for source-aware routing -----------
+# When the dish name carries one of these tokens, the dish is much more
+# likely to resolve against the WAFCT extension than the CNF base. If the
+# active source filter is `cnf` only, we surface a warning + recommended
+# source on the response so the UI can offer a "retry with WAFCT" handoff
+# without overriding the user's explicit choice silently.
+#
+# Tokens are lowercase. Matching is whole-word against the lowercased
+# dish name. The set is intentionally conservative (single-word and
+# unambiguous multi-word phrases only) to avoid false positives on
+# Anglophone descriptions that happen to contain "fonio" etc. inside an
+# unrelated phrase.
+_WAFCT_REGIONAL_TOKENS: Tuple[str, ...] = (
+    'jollof', 'fonio', 'egusi', 'fufu', 'injera', 'tigernut', 'baobab',
+    'gari', 'eba', 'ogbono', 'moimoi', 'moi moi', 'attieke', 'attieké',
+    'attiéké', 'kenkey', 'kelewele', 'banku', 'akara', 'iru', 'wagashi',
+    'tuwo', 'suya', 'edikang', 'efo riro', 'ofe nsala', 'okra soup',
+    'pepper soup', 'pounded yam', 'amala', 'iyan', 'koko', 'koobi',
+    'kontomire', 'dawa dawa', 'cassava leaf', 'palm nut soup',
+    'palmnut soup', 'palmwine', 'palm wine', 'shea butter', 'shea nut',
+    'plantain fufu', 'green plantain', 'aloko', 'kaklo',
+)
+
+_WAFCT_TOKEN_RE = re.compile(
+    r'\b(' + '|'.join(re.escape(t) for t in _WAFCT_REGIONAL_TOKENS) + r')\b',
+    re.IGNORECASE,
+)
+
+
+def _detect_regional_signal(ndn: str) -> Optional[Tuple[str, str]]:
+    """Return (matched_token, recommended_source) when the normalised dish
+    name carries a regional signal. Currently WAFCT is the only regional
+    substrate the platform ships, so the recommended_source is always
+    `wafct` when a signal is detected. Returns None when no signal fires.
+    """
+    m = _WAFCT_TOKEN_RE.search(ndn)
+    if m is None:
+        return None
+    return m.group(1).lower(), 'wafct'
+
+
+# --- Layer 2: structural near-duplicate dedup -----------------------------
+# CNF / WAFCT food descriptions follow a "noun, qualifier1, qualifier2, ..."
+# convention. The matcher occasionally resolves two near-duplicate FoodIDs
+# from the same Stage-1 ingredient (e.g. "Pepper, sweet, red, boiled,
+# drained" and "Pepper, sweet, red, boiled, drained, with salt"). When the
+# tail qualifier is a known nutrient-neutral preparation modifier AND one
+# resolved mass is much smaller than the other (≥ DEDUP_MASS_RATIO), the
+# smaller is folded into the larger so the meal does not double-count the
+# same ingredient.
+_TERMINAL_NEUTRAL_MODIFIERS: frozenset = frozenset({
+    'with salt', 'salted', 'unsalted', 'without salt',
+    'drained', 'undrained', 'not drained',
+    'with skin', 'without skin', 'skinless',
+    'with bone', 'boneless', 'bone in',
+    'with juice', 'without juice', 'in juice', 'in water',
+    'fat trimmed', 'untrimmed', 'fat not trimmed',
+})
+
+# Mass-ratio guard. When the larger:smaller ratio is at or above this value
+# we treat the smaller as a redundant LLM emission. Below this ratio we
+# leave both ingredients in place because the recipe may legitimately use
+# salted + unsalted versions of the same food.
+NEAR_DUP_MASS_RATIO_THRESHOLD = 10.0
+
+
+def _structural_key(description: str) -> str:
+    """Strip terminal comma-separated tokens that are pure preparation
+    qualifiers and return the resulting lowercased key. Used to detect
+    near-duplicate CNF / WAFCT FoodIDs that the matcher resolved from the
+    same conceptual ingredient."""
+    parts = [p.strip() for p in (description or '').split(',')]
+    while parts:
+        tail = parts[-1].strip().lower()
+        if tail in _TERMINAL_NEUTRAL_MODIFIERS:
+            parts.pop()
+        else:
+            break
+    return ', '.join(parts).lower()
+
+
+def _fold_near_duplicate_food_ids(
+    ingredients: List['CNFIngredient'],
+) -> Tuple[List['CNFIngredient'], int]:
+    """Fold near-duplicate CNF / WAFCT FoodIDs that share the same
+    structural key (description minus trailing nutrient-neutral modifier)
+    and where the mass ratio is >= NEAR_DUP_MASS_RATIO_THRESHOLD. Returns
+    the folded list (preserving the heavier-mass entry per duplicate
+    group) and a count of merges performed.
+
+    Conservative by design. When two ingredients share a structural key
+    but have comparable masses (ratio < threshold), they remain separate
+    because a recipe may legitimately use both a salted and an unsalted
+    version of the same food. The mass-ratio guard catches the matcher's
+    repeat-emission pattern observed on jollof rice (FoodIDs 2486 + 2487:
+    "Pepper, sweet, red, boiled, drained" 30 g and "Pepper, sweet, red,
+    boiled, drained, with salt" 2 g, ratio 15:1).
+    """
+    if len(ingredients) < 2:
+        return list(ingredients), 0
+    # Order heavier-first so the surviving entry per group is always the
+    # mass-dominant one. The smaller is folded INTO it.
+    items = sorted(ingredients, key=lambda x: -x.mass_g)
+    keep: List['CNFIngredient'] = []
+    n_merged = 0
+    for ing in items:
+        key = _structural_key(ing.food_description)
+        merged = False
+        for surviving in keep:
+            if _structural_key(surviving.food_description) != key:
+                continue
+            if surviving.mass_g >= NEAR_DUP_MASS_RATIO_THRESHOLD * max(ing.mass_g, 1e-9):
+                surviving.mass_g += ing.mass_g
+                surviving.resolution_confidence = max(
+                    surviving.resolution_confidence,
+                    ing.resolution_confidence,
+                )
+                merged = True
+                n_merged += 1
+                break
+        if not merged:
+            keep.append(ing)
+    return keep, n_merged
+
+
 def _mass_tolerance(target_mass_g: float) -> float:
     """Scale-aware tolerance: max(10 g, 4 % of target).
 
@@ -207,9 +332,22 @@ class CNFDecomposedRecipe:
     unresolved_ingredients_audit: List[Dict[str, Any]] = field(default_factory=list)
     raw_llm_response: Optional[str] = None
     # Count of resolved ingredients that are themselves mixed dishes (Stage-1 handed
-    # back a dish, not an ingredient). Informational — does not change matched/
+    # back a dish, not an ingredient). Informational: does not change matched/
     # confidence; surfaced so the compound-meal lab can flag degenerate decompositions.
     dish_as_ingredient_count: int = 0
+    # Layer 1 (2026-06-10): when the dish name carries a regional signal
+    # that the current source filter excludes (e.g. "jollof rice" with
+    # source='cnf'), surface a one-line warning plus a recommended_source
+    # so the UI can offer a "retry with WAFCT" handoff without overriding
+    # the user's explicit choice. Both fields are None when no signal fires
+    # or the active source already covers the recommended substrate.
+    source_warning: Optional[str] = None
+    recommended_source: Optional[str] = None
+    # Layer 2 (2026-06-10): count of near-duplicate Stage-2 resolutions that
+    # were folded by the structural-key dedup pass (e.g. "Pepper, ..., with
+    # salt" folded into "Pepper, ..." when the masses differ by >= 10:1).
+    # Surfaced for transparency; zero in the common case.
+    near_duplicate_folds: int = 0
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -227,6 +365,9 @@ class CNFDecomposedRecipe:
             'timing_ms': round(self.timing_ms, 1),
             'unresolved_ingredients_audit': self.unresolved_ingredients_audit,
             'dish_as_ingredient_count': self.dish_as_ingredient_count,
+            'source_warning': self.source_warning,
+            'recommended_source': self.recommended_source,
+            'near_duplicate_folds': self.near_duplicate_folds,
         }
 
 
@@ -371,6 +512,56 @@ class CNFRecipeDecomposer:
     # --- public ----------------------------------------------------------
 
     def decompose(
+        self,
+        dish_name: str,
+        total_mass_g: float,
+        source: Optional[str] = None,
+        force_decompose: bool = False,
+    ) -> CNFDecomposedRecipe:
+        """Public entry point.
+
+        Calls the existing decomposition pipeline through `_decompose_inner`,
+        then applies the Layer 1 (2026-06-10) source-aware routing warning
+        so every return path (early bail, cache hit, catalog short-circuit,
+        full decomposition) carries the same source-warning logic.
+        """
+        result = self._decompose_inner(dish_name, total_mass_g, source, force_decompose)
+        self._apply_source_warning(result, source)
+        return result
+
+    def _apply_source_warning(
+        self,
+        result: CNFDecomposedRecipe,
+        source: Optional[str],
+    ) -> None:
+        """Layer 1: detect regional-token signal in the dish name and, when
+        the active source filter excludes the recommended substrate, attach
+        a one-line warning plus recommended_source to the response."""
+        if not result.normalised_dish_name:
+            return
+        # Do not override fields that an inner branch may have already set
+        # (the cached-result path replays a previously-decorated value).
+        if result.source_warning is not None or result.recommended_source is not None:
+            return
+        signal = _detect_regional_signal(result.normalised_dish_name)
+        if signal is None:
+            return
+        matched_token, recommended = signal
+        # Only warn when the current filter explicitly excludes the
+        # recommended substrate. `source=None` (both) covers all available
+        # substrates and gets no warning. `source='wafct'` covers WAFCT
+        # already. `source='cnf'` is the case the user hit.
+        if source == 'cnf' and recommended != 'cnf':
+            result.source_warning = (
+                f'Dish name contains "{matched_token}", which the platform routes '
+                f'to the {recommended.upper()} extension by default. The current '
+                f'source filter is CNF only, so the decomposer cannot reach the '
+                f'WAFCT entry for this dish. Re-running with source=both or '
+                f'source=wafct usually returns a direct catalogue hit.'
+            )
+            result.recommended_source = recommended
+
+    def _decompose_inner(
         self,
         dish_name: str,
         total_mass_g: float,
@@ -594,6 +785,15 @@ class CNFRecipeDecomposer:
             else:
                 by_id[ing.food_id] = ing
         resolved = list(by_id.values())
+
+        # Layer 2 (2026-06-10): structural near-duplicate dedup. Different
+        # CNF FoodIDs that share a structural key (CNF description minus
+        # nutrient-neutral trailing modifiers like "with salt", "drained")
+        # AND that have a mass ratio of at least NEAR_DUP_MASS_RATIO_THRESHOLD
+        # get folded: the smaller is absorbed into the larger. Mass-ratio
+        # guard keeps legitimate "salted + unsalted of the same food"
+        # recipes intact while killing the matcher's repeat emissions.
+        resolved, n_near_dup = _fold_near_duplicate_food_ids(resolved)
         resolved_mass = sum(i.mass_g for i in resolved)
 
         # Combine unresolved-from-LLM + dropped-from-Stage-2
@@ -663,6 +863,7 @@ class CNFRecipeDecomposer:
                     unresolved_ingredients_audit=dropped_audit,
                     raw_llm_response=raw_llm,
                     timing_ms=(time.perf_counter() - t0) * 1000,
+                    near_duplicate_folds=n_near_dup,
                 )
                 self._cache_put(key, result)
                 return result
@@ -710,6 +911,7 @@ class CNFRecipeDecomposer:
             unresolved_ingredients_audit=dropped_audit,
             raw_llm_response=raw_llm,
             timing_ms=(time.perf_counter() - t0) * 1000,
+            near_duplicate_folds=n_near_dup,
         )
         self._cache_put(key, result)
         return result

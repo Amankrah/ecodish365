@@ -190,7 +190,7 @@ function DietaryPatternPageInner() {
             <ol className="list-decimal list-inside space-y-1">
               <li>Go to the <a href="/recall-24h" className="text-blue-700 underline">food diary</a>.</li>
               <li>Log your day meal by meal.</li>
-              <li>On the score step, click <span className="font-medium">🎯 Eating style</span>.</li>
+              <li>On the score step, click <span className="font-medium">Eating style</span>.</li>
             </ol>
             <p className="text-xs text-gray-500 pt-2 border-t">
               The resemblance is computed against curated prototype days from

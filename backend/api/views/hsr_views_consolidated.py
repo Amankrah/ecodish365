@@ -1043,17 +1043,22 @@ def _get_nutritional_highlights(food: HSRFood, result) -> Dict:
     elif food.nutrients.get('FIBRE, TOTAL DIETARY', 0) > 5:
         highlights["high_in"].append("fiber")
     
-    # Specific FVNL categorization based on food group
+    # Specific FVNL categorization by canonical food category (FDC-MULTI-SOURCE
+    # 2026-06-26). Was hard-coded to CNF FoodGroupIDs 9/11/12/16; now reads the
+    # canonical-category bridge so WAFCT and FDC foods get the same nutrient-
+    # specific highlight as their CNF equivalents.
     if food.fvnl_percent > 67:
+        from api.services.food_group_category import canonical_category_for_group
         food_group_id = getattr(food, 'food_group_id', 0)
-        
-        if food_group_id == 9:  # Fruits
+        canonical = canonical_category_for_group(int(food_group_id) if food_group_id else 0)
+
+        if canonical == 'fruits':
             highlights["good_source_of"].append("vitamin C and natural fruit nutrients")
-        elif food_group_id == 11:  # Vegetables
+        elif canonical == 'vegetables':
             highlights["good_source_of"].append("vitamins, minerals, and fiber")
-        elif food_group_id == 12:  # Nuts and Seeds
+        elif canonical == 'nuts_seeds':
             highlights["good_source_of"].append("healthy fats and protein")
-        elif food_group_id == 16:  # Legumes
+        elif canonical == 'legumes':
             highlights["good_source_of"].append("plant protein and fiber")
         else:
             # Mixed foods with high FVNL content

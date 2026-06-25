@@ -1,6 +1,6 @@
 /**
- * SourceFilter — 3-button segmented control for picking which food database
- * a search box draws from (WAFCT-EXTEND, 2026-05-24).
+ * SourceFilter — 4-button segmented control for picking which food database
+ * a search box draws from (WAFCT-EXTEND 2026-05-24, FDC-INGEST 2026-06-25).
  *
  * Drops in above any food-search input on the 5 calculator pages
  * (HEFI / HENI / HSR / FCS / Environmental) plus the CNF Explorer.
@@ -9,19 +9,18 @@
  *
  * Backend wiring: the chosen value is passed via the `source` query param
  * to `/api/cnf/search/` (basic search) and as the `source` body field to
- * `/api/cnf/search/ai-enhanced/` (LLM-ranked search). Per
- * `WAFCT_EXPLORATION.md` §4 the chosen architecture is Option B
- * (WAFCT-as-extension); both sources live in the same in-memory schema and
- * the filter just narrows the post-retrieval candidate list.
+ * `/api/cnf/search/ai-enhanced/` (LLM-ranked search). All three sources
+ * (CNF, WAFCT, FDC) live in the same in-memory schema; the filter just
+ * narrows the post-retrieval candidate list.
  */
 'use client';
 
-import { Globe, Leaf, MapPin, type LucideIcon } from 'lucide-react';
+import { Globe, Leaf, MapPin, Flag, type LucideIcon } from 'lucide-react';
 
 /** Same shape as the API-side `SourceFilter` type in `@/lib/api` — re-
  *  exported here under a component-friendly name so callers don't have to
  *  cross-import. */
-export type SourceChoice = 'both' | 'cnf' | 'wafct';
+export type SourceChoice = 'both' | 'cnf' | 'wafct' | 'fdc';
 
 interface SourceFilterProps {
   source: SourceChoice;
@@ -46,9 +45,10 @@ const OPTIONS: Array<{
   Icon: LucideIcon;
   title: string;
 }> = [
-  { value: 'both',  label: 'Both',  Icon: Globe,  title: 'Search both Canadian Nutrient File and WAFCT 2019' },
-  { value: 'cnf',   label: 'CNF',   Icon: Leaf,  title: 'Search Canadian Nutrient File only (5,691 foods)' },
+  { value: 'both',  label: 'All',   Icon: Globe,  title: 'Search all food databases (CNF, WAFCT, FDC)' },
+  { value: 'cnf',   label: 'CNF',   Icon: Leaf,   title: 'Search Canadian Nutrient File only (5,993 foods)' },
   { value: 'wafct', label: 'WAFCT', Icon: MapPin, title: 'Search FAO/INFOODS West African Food Composition Table 2019 only (1,028 foods)' },
+  { value: 'fdc',   label: 'FDC',   Icon: Flag,   title: 'Search USDA FoodData Central only (~13,620 foods: Foundation + SR Legacy + FNDDS)' },
 ];
 
 export function SourceFilter({

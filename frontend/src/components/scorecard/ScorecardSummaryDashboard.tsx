@@ -75,10 +75,10 @@ export function ScorecardSummaryDashboard({
               }`}
             >
               <div className="flex items-center gap-1 font-medium text-gray-800">
-                <span aria-hidden="true">{card.emoji}</span>
+                <card.icon className="w-3.5 h-3.5 text-gray-600" aria-hidden="true" />
                 {icon}
               </div>
-              <p className="text-[11px] text-gray-600 truncate mt-0.5" title={card.headline}>
+              <p className="text-[11px] text-gray-600 truncate mt-0.5 font-mono tabular-nums" title={card.headline}>
                 {card.headline}
               </p>
             </div>

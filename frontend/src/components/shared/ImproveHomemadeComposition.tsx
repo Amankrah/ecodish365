@@ -4,7 +4,7 @@
 'use client';
 
 import { Fragment, useMemo, useState } from 'react';
-import { ChevronRight, Trash2 } from 'lucide-react';
+import { ChevronRight, Trash2, Sparkles, Salad, Compass } from 'lucide-react';
 import type { DecomposedIngredient, SubstitutionCompositionItem, SubstitutionSuggestion } from '@/lib/api';
 import { fromRecallAggregated, saveActiveFoodList } from '@/lib/activeFoodList';
 import { SubstitutionSuggestionsPanel } from './SubstitutionSuggestionsPanel';
@@ -15,9 +15,9 @@ import { SourceFilter, type SourceChoice } from './SourceFilter';
 type UserType = 'individual' | 'researcher' | 'policy';
 
 const SCORE_ROUTES = [
-  { id: 'scorecard' as const, emoji: '✨', label: 'Full scorecard', path: '/scorecard', note: 'All six health and environment metrics' },
-  { id: 'hefi' as const, emoji: '🥗', label: 'HEFI', path: '/hefi/calculate', note: 'Healthy Eating Food Index' },
-  { id: 'fcs' as const, emoji: '🧭', label: 'FCS', path: '/fcs/calculate', note: 'Food Compass Score' },
+  { id: 'scorecard' as const, icon: Sparkles, label: 'Full scorecard', path: '/scorecard', note: 'All six health and environment metrics' },
+  { id: 'hefi' as const, icon: Salad, label: 'HEFI', path: '/hefi/calculate', note: 'Healthy Eating Food Index' },
+  { id: 'fcs' as const, icon: Compass, label: 'FCS', path: '/fcs/calculate', note: 'Food Compass Score' },
 ];
 
 interface Props {
@@ -247,7 +247,7 @@ export function ImproveHomemadeComposition({
               disabled={routing !== null || rows.length === 0}
               className="flex items-start gap-2 p-3 border rounded-md hover:bg-blue-50 disabled:opacity-50 text-left"
             >
-              <span className="text-xl" aria-hidden="true">{route.emoji}</span>
+              <route.icon className="w-5 h-5 text-gray-700" aria-hidden="true" />
               <div className="flex-1">
                 <p className="text-sm font-medium">{route.label}</p>
                 <p className="text-xs text-gray-500">{route.note}</p>

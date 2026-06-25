@@ -21,7 +21,7 @@ import { CNFApiService, DatabaseStats, IntegrityCheck } from '@/lib/api';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { useCnfExplorer } from '@/components/cnf/CnfExplorerContext';
-import { formatGroupDisplayName, isWafctGroup } from '@/lib/cnfGroupDisplay';
+import { formatGroupDisplayName, isCnfGroup, isFdcGroup, isWafctGroup } from '@/lib/cnfGroupDisplay';
 import { CATALOGUE_NAV } from '@/lib/catalogueNav';
 
 interface AnalyticsData {
@@ -29,7 +29,7 @@ interface AnalyticsData {
   integrityCheck: IntegrityCheck | null;
 }
 
-type ChartScope = 'all' | 'cnf' | 'wafct';
+type ChartScope = 'all' | 'cnf' | 'wafct' | 'fdc';
 type ChartMetric = 'foodGroups' | 'topNutrients';
 
 const CHART_COLORS = [
@@ -89,7 +89,7 @@ export default function CatalogueOverviewPage() {
     try {
       const exportData = {
         timestamp: new Date().toISOString(),
-        catalogue: 'CNF + WAFCT',
+        catalogue: 'CNF + WAFCT + FDC',
         statistics: data.stats,
         integrity_check: data.integrityCheck,
       };
@@ -121,7 +121,9 @@ export default function CatalogueOverviewPage() {
         if (chartMetric !== 'foodGroups' || chartScope === 'all') return true;
         const id = groupIdByName.get(name);
         if (id == null) return chartScope === 'cnf';
-        return chartScope === 'wafct' ? isWafctGroup(id) : !isWafctGroup(id);
+        if (chartScope === 'wafct') return isWafctGroup(id);
+        if (chartScope === 'fdc')   return isFdcGroup(id);
+        return isCnfGroup(id);  // 'cnf' scope
       })
       .map(([name, value]) => {
         const id = groupIdByName.get(name);
@@ -129,7 +131,7 @@ export default function CatalogueOverviewPage() {
         return { name, label, value, groupId: id };
       })
       .sort((a, b) => b.value - a.value)
-      .slice(0, chartScope === 'wafct' ? 14 : 10);
+      .slice(0, chartScope === 'fdc' ? 20 : chartScope === 'wafct' ? 14 : 10);
   }, [data.stats, chartMetric, chartScope, groupIdByName]);
 
   const maxChartValue = chartData.length ? Math.max(...chartData.map(d => d.value)) : 1;
@@ -157,8 +159,12 @@ export default function CatalogueOverviewPage() {
   }
 
   const stats = data.stats;
-  const cnfCount = stats?.cnf_food_count ?? (stats ? stats.food_count : 0);
+  const cnfCount   = stats?.cnf_food_count ?? (stats ? stats.food_count : 0);
   const wafctCount = stats?.wafct_food_count ?? 0;
+  const fdcCount   = stats?.fdc_food_count ?? 0;
+  const fdcFoundationCount = stats?.fdc_foundation_food_count ?? 0;
+  const fdcSrLegacyCount   = stats?.fdc_sr_legacy_food_count ?? 0;
+  const fdcFnddsCount      = stats?.fdc_survey_fndds_food_count ?? 0;
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
@@ -204,7 +210,7 @@ export default function CatalogueOverviewPage() {
         </div>
 
         {stats && (
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+          <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
             <div className="stat-card col-span-2 lg:col-span-1">
               <div className="text-2xl font-bold text-gray-900">{formatNumber(stats.food_count)}</div>
               <div className="text-sm text-gray-600">Foods total</div>
@@ -216,6 +222,10 @@ export default function CatalogueOverviewPage() {
             <div className="stat-card">
               <div className="text-2xl font-bold text-amber-800">{formatNumber(wafctCount)}</div>
               <div className="text-sm text-gray-600">WAFCT foods</div>
+            </div>
+            <div className="stat-card">
+              <div className="text-2xl font-bold text-sky-800">{formatNumber(fdcCount)}</div>
+              <div className="text-sm text-gray-600">FDC foods</div>
             </div>
             <div className="stat-card">
               <div className="text-2xl font-bold text-gray-900">{formatNumber(stats.food_groups)}</div>
@@ -235,7 +245,7 @@ export default function CatalogueOverviewPage() {
               <div className="flex flex-wrap gap-2">
                 {chartMetric === 'foodGroups' && (
                   <>
-                    {(['all', 'cnf', 'wafct'] as ChartScope[]).map(scope => (
+                    {(['all', 'cnf', 'wafct', 'fdc'] as ChartScope[]).map(scope => (
                       <button
                         key={scope}
                         type="button"
@@ -382,11 +392,14 @@ export default function CatalogueOverviewPage() {
             <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-2">
                 <CircleStackIcon className="w-5 h-5 text-blue-600" />
-                <h3 className="font-medium text-blue-900">Dual-database coverage</h3>
+                <h3 className="font-medium text-blue-900">Multi-database coverage</h3>
               </div>
               <p className="text-sm text-blue-800">
-                {formatNumber(cnfCount)} Canadian (CNF) and {formatNumber(wafctCount)} West African (WAFCT) foods
-                in {stats.food_groups} groups. Use the source filter on search and compare to scope either database.
+                {formatNumber(cnfCount)} Canadian (CNF), {formatNumber(wafctCount)} West African (WAFCT),
+                and {formatNumber(fdcCount)} US foods (FDC — {formatNumber(fdcFoundationCount)} Foundation,
+                {' '}{formatNumber(fdcSrLegacyCount)} SR Legacy, {formatNumber(fdcFnddsCount)} Survey FNDDS)
+                in {stats.food_groups} groups. Use the source filter on search and compare to scope any single database
+                or search all three at once.
               </p>
             </div>
             <div className="bg-green-50 border border-green-100 rounded-xl p-4">

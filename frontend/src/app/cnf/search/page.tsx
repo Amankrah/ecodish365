@@ -73,11 +73,16 @@ export default function CNFSearchPage() {
     loadFilterOptions();
   }, []);
 
-  // Debounced search function
+  // Debounced search function.
+  // FDC-INGEST (2026-06-25): pass `source` as an explicit argument so the
+  // debounced closure picks up the latest selection. Previously the
+  // closure captured `source` once via `performSearch` and source-toggle
+  // re-triggers used the stale initial value ('both'), so picking WAFCT
+  // or FDC silently still searched everything.
   const debouncedSearch = useCallback(
-    debounce((searchQuery: string, searchFilters: SearchFilters, searchOffset: number) => {
+    debounce((searchQuery: string, searchFilters: SearchFilters, searchOffset: number, searchSource: SourceChoice) => {
       if (searchQuery.trim()) {
-        performSearch(searchQuery, searchFilters, searchOffset);
+        performSearch(searchQuery, searchFilters, searchOffset, searchSource);
       } else {
         setResults(null);
       }
@@ -88,9 +93,7 @@ export default function CNFSearchPage() {
   // Trigger search when query, filters, or source scope change
   useEffect(() => {
     setOffset(0);
-    debouncedSearch(query, filters, 0);
-    // `source` is read inside `performSearch` via the closure-captured
-    // state — include it in deps so toggling the SourceFilter retriggers.
+    debouncedSearch(query, filters, 0, source);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, filters, source, debouncedSearch]);
 
@@ -112,19 +115,24 @@ export default function CNFSearchPage() {
     }
   };
 
-  const performSearch = async (searchQuery: string, searchFilters: SearchFilters, searchOffset: number) => {
+  const performSearch = async (
+    searchQuery: string,
+    searchFilters: SearchFilters,
+    searchOffset: number,
+    searchSource: SourceChoice = source,
+  ) => {
     try {
       setLoading(true);
-      
+
       // Use enhanced search if category/method filters are specified
       let searchResults: SearchResult;
-      
+
       if (searchFilters.category || searchFilters.method) {
         const options: EnhancedSearchOptions = {
           query: searchQuery,
           limit: searchFilters.limit,
           offset: searchOffset,
-          source,  // WAFCT-EXTEND (2026-05-24)
+          source: searchSource,  // WAFCT-EXTEND (2026-05-24); FDC-INGEST (2026-06-25)
         };
 
         if (searchFilters.category) {
@@ -137,7 +145,7 @@ export default function CNFSearchPage() {
 
         searchResults = await CNFApiService.searchFoodsEnhanced(options);
       } else {
-        searchResults = await CNFApiService.searchFoods(searchQuery, searchFilters.limit, searchOffset, source);
+        searchResults = await CNFApiService.searchFoods(searchQuery, searchFilters.limit, searchOffset, searchSource);
       }
       
       // Apply client-side filtering for food groups and relevance
@@ -171,7 +179,7 @@ export default function CNFSearchPage() {
   const loadMoreResults = () => {
     const newOffset = offset + filters.limit;
     setOffset(newOffset);
-    debouncedSearch(query, filters, newOffset);
+    debouncedSearch(query, filters, newOffset, source);
   };
 
   const loadFoodDetails = async (foodId: number) => {
@@ -226,7 +234,7 @@ export default function CNFSearchPage() {
       source: 'catalogue',
       ingredients,
     });
-    router.push('/research/meal-deep-dive?from=cnf_search');
+    router.push('/research/nutrient-analysis?from=cnf_search');
   };
 
   const getRelevanceColor = (relevance: number) => {

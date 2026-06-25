@@ -16,7 +16,11 @@
 'use client';
 
 import { Fragment, useMemo, useState } from 'react';
-import { Loader2, Trash2, AlertTriangle, ChevronRight } from 'lucide-react';
+import { Loader2, Trash2, AlertTriangle, ChevronRight, Sparkles, Target, Salad, Dna, Compass } from 'lucide-react';
+import { GlobeAltIcon, GlobeAmericasIcon } from '@heroicons/react/24/outline';
+import type { ComponentType, SVGProps } from 'react';
+
+type IconType = ComponentType<SVGProps<SVGSVGElement>>;
 import type {
   DecomposedIngredient,
   DecompositionResult,
@@ -43,56 +47,56 @@ interface Props {
 // SCORECARD-1 (2026-05-26) tops the list with the consumer-friendly multi-metric view.
 type ScoreRoute = {
   id: 'hefi' | 'heni' | 'fcs' | 'environmental' | 'dietary_pattern' | 'scorecard' | 'planetary';
-  emoji: string;
+  icon: IconType;
   label: string;
   path: string;
   note: string;
 };
 
 const SCORE_ROUTES_RESEARCH: ScoreRoute[] = [
-  { id: 'scorecard', emoji: '✨', label: 'Scorecard',
+  { id: 'scorecard', icon: Sparkles, label: 'Scorecard',
     path: '/scorecard',
     note: 'All six metrics at a glance, framed for a lay reader' },
-  { id: 'dietary_pattern', emoji: '🎯', label: 'Dietary pattern',
+  { id: 'dietary_pattern', icon: Target, label: 'Dietary pattern',
     path: '/dietary-pattern',
     note: 'Which canonical pattern does this product resemble?' },
-  { id: 'hefi', emoji: '🥗', label: 'HEFI-2019',
+  { id: 'hefi', icon: Salad, label: 'HEFI-2019',
     path: '/hefi/calculate',
     note: 'Healthy Eating Food Index (Brassard 2022)' },
-  { id: 'heni', emoji: '🧬', label: 'HENI',
+  { id: 'heni', icon: Dna, label: 'HENI',
     path: '/heni/calculate',
     note: 'Health Nutritional Index — minutes of healthy life' },
-  { id: 'fcs', emoji: '🧭', label: 'FCS',
+  { id: 'fcs', icon: Compass, label: 'FCS',
     path: '/fcs/calculate',
     note: 'Food Compass Score — Mozaffarian 2021' },
-  { id: 'environmental', emoji: '🌍', label: 'Environmental',
+  { id: 'environmental', icon: GlobeAltIcon, label: 'Environmental',
     path: '/environmental/calculate',
     note: 'Per-100g environmental footprint (ReCiPe + AGRIBALYSE)' },
-  { id: 'planetary', emoji: '🪐', label: 'Planetary boundaries',
+  { id: 'planetary', icon: GlobeAmericasIcon, label: 'Planetary boundaries',
     path: '/planetary',
     note: 'EAT-Lancet 2.0 Table 2 — % of one person\'s daily food-system budget' },
 ];
 
 const SCORE_ROUTES_INDIVIDUAL: ScoreRoute[] = [
-  { id: 'scorecard', emoji: '✨', label: 'All scores',
+  { id: 'scorecard', icon: Sparkles, label: 'All scores',
     path: '/scorecard',
     note: 'Every measure in one view' },
-  { id: 'dietary_pattern', emoji: '🎯', label: 'Eating style',
+  { id: 'dietary_pattern', icon: Target, label: 'Eating style',
     path: '/dietary-pattern',
     note: 'Which familiar pattern this resembles' },
-  { id: 'hefi', emoji: '🥗', label: 'Healthy eating',
+  { id: 'hefi', icon: Salad, label: 'Healthy eating',
     path: '/hefi/calculate',
     note: 'How well it matches Canada\'s Food Guide' },
-  { id: 'heni', emoji: '🧬', label: 'Health impact',
+  { id: 'heni', icon: Dna, label: 'Health impact',
     path: '/heni/calculate',
     note: 'Healthy-life minutes' },
-  { id: 'fcs', emoji: '🧭', label: 'Food Compass',
+  { id: 'fcs', icon: Compass, label: 'Food Compass',
     path: '/fcs/calculate',
     note: 'One score from 1 to 100' },
-  { id: 'environmental', emoji: '🌍', label: 'Environment',
+  { id: 'environmental', icon: GlobeAltIcon, label: 'Environment',
     path: '/environmental/calculate',
     note: 'Climate, land, and water footprint' },
-  { id: 'planetary', emoji: '🪐', label: 'Planet budget',
+  { id: 'planetary', icon: GlobeAmericasIcon, label: 'Planet budget',
     path: '/planetary',
     note: 'Your share of a daily planet budget for food' },
 ];
@@ -477,7 +481,7 @@ export function PackagedFoodCompositionForm({
               disabled={routing !== null || rows.length === 0}
               className="flex items-start gap-2 p-3 border border-gray-300 rounded-md hover:bg-blue-50 hover:border-blue-300 disabled:opacity-50 disabled:cursor-not-allowed text-left"
             >
-              <span className="text-xl flex-shrink-0" aria-hidden="true">{route.emoji}</span>
+              <route.icon className="w-5 h-5 flex-shrink-0 text-gray-700" aria-hidden="true" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900">
                   {route.label}

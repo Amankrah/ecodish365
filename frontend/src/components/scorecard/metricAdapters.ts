@@ -9,6 +9,9 @@
  * static plain-English copy derived from the manuscript.
  */
 
+import type { ComponentType, SVGProps } from 'react';
+import { StarIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
+import { Salad, Dna, Compass, Target } from 'lucide-react';
 import type {
   HEFIResult,
   HENIResult,
@@ -21,13 +24,17 @@ import type { UserType, ExplanationsBlock } from '@/components/shared/AudienceTo
 import type { MetricKey, MetricOutcome } from '@/lib/foodProfileOrchestrator';
 import { humanizeForUser } from '@/lib/humanizeCopy';
 
-export type Accent =
-  | 'green' | 'purple' | 'amber' | 'blue' | 'emerald' | 'rose' | 'gray';
+export type IconType = ComponentType<SVGProps<SVGSVGElement>>;
+
+// Single neutral accent — the platform's scientific palette doesn't
+// differentiate metric cards by color any more. Lens identity is carried
+// by the icon + title (see ui-ux-pro-max color guide, 2026-06-25).
+export type Accent = 'neutral';
 
 export interface CardModel {
   metric: MetricKey;
   title: string;
-  emoji: string;
+  icon: IconType;
   /** Plain-text headline (e.g. "62 / 80 · Above average", "★★★½ 3.5/5") */
   headline: string;
   /** Optional secondary number / units line (small text under headline). */
@@ -59,7 +66,7 @@ export interface CardModel {
 
 const META: Record<MetricKey, {
   title: string;
-  emoji: string;
+  icon: IconType;
   accent: Accent;
   meaningIndividual: string;
   caveatIndividual: string;
@@ -68,8 +75,8 @@ const META: Record<MetricKey, {
 }> = {
   hefi: {
     title: 'Healthy eating',
-    emoji: '🥗',
-    accent: 'green',
+    icon: Salad,
+    accent: 'neutral',
     meaningIndividual:
       'How closely your foods match Canada\'s Food Guide recommendations.',
     caveatIndividual:
@@ -79,8 +86,8 @@ const META: Record<MetricKey, {
   },
   heni: {
     title: 'Health impact',
-    emoji: '🧬',
-    accent: 'purple',
+    icon: Dna,
+    accent: 'neutral',
     meaningIndividual:
       'Estimated minutes of healthy life these foods may add or take away.',
     caveatIndividual:
@@ -90,8 +97,8 @@ const META: Record<MetricKey, {
   },
   hsr: {
     title: 'Star rating',
-    emoji: '⭐',
-    accent: 'amber',
+    icon: StarIcon,
+    accent: 'neutral',
     meaningIndividual:
       'How healthy each product is compared with others in the same category.',
     caveatIndividual:
@@ -101,8 +108,8 @@ const META: Record<MetricKey, {
   },
   fcs: {
     title: 'Food Compass',
-    emoji: '🧭',
-    accent: 'blue',
+    icon: Compass,
+    accent: 'neutral',
     meaningIndividual:
       'How much these foods resemble diets linked to longer life in research studies.',
     caveatIndividual:
@@ -112,8 +119,8 @@ const META: Record<MetricKey, {
   },
   environmental: {
     title: 'Environment',
-    emoji: '🌍',
-    accent: 'emerald',
+    icon: GlobeAltIcon,
+    accent: 'neutral',
     meaningIndividual:
       'Estimated climate, land, and water needed to produce these foods.',
     caveatIndividual:
@@ -123,8 +130,8 @@ const META: Record<MetricKey, {
   },
   dietary_pattern: {
     title: 'Eating style',
-    emoji: '🎯',
-    accent: 'rose',
+    icon: Target,
+    accent: 'neutral',
     meaningIndividual:
       'Which familiar eating style your day most closely resembles.',
     caveatIndividual:
@@ -191,14 +198,14 @@ function errorCard(metric: MetricKey, reason: string): CardModel {
   return {
     metric,
     title: meta.title,
-    emoji: meta.emoji,
+    icon: meta.icon,
     headline: 'Could not score',
     meaning: meta.meaningIndividual,
     caveat: 'Other metrics may still be available below.',
     hint: reason,
     ctaHref: meta.ctaHref,
     ctaLabel: 'Try the full scorer',
-    accent: 'gray',
+    accent: 'neutral',
     status: 'error',
   };
 }
@@ -208,14 +215,14 @@ function hintCard(metric: MetricKey, hint: string): CardModel {
   return {
     metric,
     title: meta.title,
-    emoji: meta.emoji,
+    icon: meta.icon,
     headline: '—',
     meaning: meta.meaningIndividual,
     caveat: meta.caveatIndividual,
     hint,
     ctaHref: meta.ctaHref,
     ctaLabel: meta.ctaLabel,
-    accent: 'gray',
+    accent: 'neutral',
     status: 'hint',
   };
 }
@@ -271,7 +278,7 @@ export function toHefiCard(
   return {
     metric: 'hefi',
     title: meta.title,
-    emoji: meta.emoji,
+    icon: meta.icon,
     headline,
     meaning: pickMeaning('hefi', userType, outcome.explanations),
     caveat: pickCaveat('hefi', userType, outcome.explanations),
@@ -300,7 +307,7 @@ export function toHeniCard(
   return {
     metric: 'heni',
     title: meta.title,
-    emoji: meta.emoji,
+    icon: meta.icon,
     headline,
     subline,
     meaning: pickMeaning('heni', userType, outcome.explanations),
@@ -334,7 +341,7 @@ export function toHsrCard(
     return {
       metric: 'hsr',
       title: meta.title,
-      emoji: meta.emoji,
+      icon: meta.icon,
       headline: `${stars} · ${rating.toFixed(1)} / 5`,
       subline: level ? level.replace(/_/g, ' ') : undefined,
       meaning: pickMeaning('hsr', userType, outcome.explanations),
@@ -358,7 +365,7 @@ export function toHsrCard(
     return {
       metric: 'hsr',
       title: meta.title,
-      emoji: meta.emoji,
+      icon: meta.icon,
       headline: 'Per-product compare unavailable',
       meaning: META.hsr.meaningIndividual,
       caveat: 'HSR compares products within the same category, not whole days.',
@@ -383,7 +390,7 @@ export function toHsrCard(
   return {
     metric: 'hsr',
     title: meta.title,
-    emoji: meta.emoji,
+    icon: meta.icon,
     headline: `~${wAvg.toFixed(1)}★ weighted avg · ${summary.n_foods} products`,
     subline: `${goodOrBetter} of ${summary.n_foods} items ≥ 3.5★`,
     meaning: pickMeaning('hsr', userType, outcome.explanations) || multiMeaning,
@@ -440,7 +447,7 @@ export function toFcsCard(
   return {
     metric: 'fcs',
     title: meta.title,
-    emoji: meta.emoji,
+    icon: meta.icon,
     headline,
     subline,
     meaning: pickMeaning('fcs', userType, outcome.explanations),
@@ -501,7 +508,7 @@ export function toEnvironmentalCard(
   return {
     metric: 'environmental',
     title: meta.title,
-    emoji: meta.emoji,
+    icon: meta.icon,
     headline,
     meaning: pickMeaning('environmental', userType, outcome.explanations),
     caveat: pickCaveat('environmental', userType, outcome.explanations),
@@ -544,7 +551,7 @@ export function toDietaryPatternCard(
   return {
     metric: 'dietary_pattern',
     title: meta.title,
-    emoji: meta.emoji,
+    icon: meta.icon,
     headline,
     subline,
     meaning: userType === 'individual'
@@ -563,11 +570,5 @@ export function toDietaryPatternCard(
 /** Accent → Tailwind class lookup. Exported so MetricCard + MetricSkeleton
  *  share the same palette. */
 export const ACCENT_CLASSES: Record<Accent, { chip: string; border: string; bar: string }> = {
-  green:   { chip: 'bg-green-100 text-green-800',     border: 'border-green-200',   bar: 'bg-green-500' },
-  purple:  { chip: 'bg-purple-100 text-purple-800',   border: 'border-purple-200',  bar: 'bg-purple-500' },
-  amber:   { chip: 'bg-amber-100 text-amber-900',     border: 'border-amber-200',   bar: 'bg-amber-500' },
-  blue:    { chip: 'bg-blue-100 text-blue-800',       border: 'border-blue-200',    bar: 'bg-blue-500' },
-  emerald: { chip: 'bg-emerald-100 text-emerald-800', border: 'border-emerald-200', bar: 'bg-emerald-500' },
-  rose:    { chip: 'bg-rose-100 text-rose-800',       border: 'border-rose-200',    bar: 'bg-rose-500' },
-  gray:    { chip: 'bg-gray-100 text-gray-700',       border: 'border-gray-200',    bar: 'bg-gray-400' },
+  neutral: { chip: 'bg-slate-100 text-slate-700', border: 'border-slate-200', bar: 'bg-primary-500' },
 };
