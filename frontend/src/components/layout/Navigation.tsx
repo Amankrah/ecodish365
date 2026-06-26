@@ -12,7 +12,6 @@ import {
   ScaleIcon,
   ChevronDownIcon,
   GlobeAltIcon,
-  PlusCircleIcon,
   ClockIcon,
   BeakerIcon,
 } from '@heroicons/react/24/outline';
@@ -98,18 +97,6 @@ const navigation: NavItem[] = [
       { name: 'Dietary pattern', href: '/dietary-pattern' },
     ],
   },
-  {
-    name: 'Meals',
-    href: '/meals',
-    icon: PlusCircleIcon,
-    requiresAuth: true,
-    dropdown: [
-      { name: 'Create Meal', href: '/meals/create' },
-      { name: 'My Meals', href: '/meals/my-meals' },
-      { name: 'Saved Meals', href: '/meals/saved-meals' },
-      { name: 'Discover Meals', href: '/meals' },
-    ],
-  },
 ];
 
 // Path-to-category routing for the contextual sub-nav bar. First match
@@ -131,7 +118,6 @@ const CATEGORY_ROUTES: Array<{ prefix: string; category: string }> = [
   { prefix: '/recall-24h', category: 'Food diary' },
   { prefix: '/recall-history', category: 'Food diary' },
   { prefix: '/dietary-pattern', category: 'Food diary' },
-  { prefix: '/meals', category: 'Meals' },
 ];
 
 export default function Navigation() {
