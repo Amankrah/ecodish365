@@ -11,6 +11,7 @@ from .views import (
     fpid_views,                         # FPID-1 (ingredient-level food-group attribution + reconstruction QC)
     profile_views,                      # Unified profile score (all six metrics)
     research_deep_dive_views,           # RESEARCH-DEEP-DIVE (full nutrient panel + DRI + FPED + NOVA + contributions)
+    cohort_views,                       # PLATFORM-CODE-1.b (multi-lens cohort batch ingest)
 )
 from .views.cnf_views import (
     # Food Management
@@ -205,6 +206,39 @@ urlpatterns = [
     path('research/meal-deep-dive/export.csv/',
          research_deep_dive_views.research_meal_deep_dive_export_csv,
          name='research_meal_deep_dive_export_csv'),
+
+    # PLATFORM-CODE-1.b (2026-06-26) — multi-lens cohort batch ingest:
+    # score N recalls (one POST) across HEFI / HENI / HSR / FCS / env /
+    # dietary-pattern / FPED, return per-respondent scores + cohort
+    # distribution stats per lens. Stateless; client owns persistence
+    # (see frontend/src/lib/savedCohorts.ts). Hard cap 5,000 recalls.
+    path('research/cohort/',
+         cohort_views.cohort_score,
+         name='research_cohort_score'),
+    # Parse-only: CSV or NHANES XPT upload → Recall list + validation report.
+    # The frontend calls this for the preview, then re-POSTs the recalls
+    # to /research/cohort/ when the researcher hits Run.
+    path('research/cohort/ingest/',
+         cohort_views.cohort_ingest,
+         name='research_cohort_ingest'),
+    # Compare two already-scored cohorts: per-lens distribution delta +
+    # two-sided Mann-Whitney U + rank-biserial effect size. Frontend
+    # supplies per_respondent arrays from localStorage; no re-scoring.
+    path('research/cohort/compare/',
+         cohort_views.cohort_compare,
+         name='research_cohort_compare'),
+    # PLATFORM-CODE-1.k (2026-06-26) — built-in cohort library. Lets the
+    # researcher pick a public national-nutrition survey we already ship
+    # on disk (NHANES 2017-18 to start) instead of re-uploading the
+    # CDC/ANSES/PHAC file. The /recalls/ endpoint returns the same Recall
+    # shape as /research/cohort/ingest/, so the rest of the pipeline is
+    # unchanged.
+    path('research/cohort/library/',
+         cohort_views.cohort_library_index,
+         name='research_cohort_library_index'),
+    path('research/cohort/library/<str:cohort_id>/recalls/',
+         cohort_views.cohort_library_recalls,
+         name='research_cohort_library_recalls'),
 
     # =============================================================================
     # PKG-IMG-1 (2026-05-26) Phase 1 — packaged-food image → HSR

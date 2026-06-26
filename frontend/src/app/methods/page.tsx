@@ -110,7 +110,7 @@ export default function MethodsHubPage() {
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
                 Every score traces to a published factor pack.
               </h1>
-              <p className="mt-3 text-base text-gray-700 max-w-3xl leading-relaxed">
+              <p className="mt-3 text-lg text-gray-700 max-w-3xl leading-relaxed">
                 Every factor pack is versioned and checksummed. Every release is citeable. This is the
                 back-of-the-platform: documentation, data sources, citations, factor packs, and the
                 manuscript that describes the whole thing.
@@ -140,7 +140,7 @@ export default function MethodsHubPage() {
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Live</h2>
-          <p className="text-sm text-gray-600 mb-6">What the platform documents today.</p>
+          <p className="text-base text-gray-600 mb-6">What the platform documents today.</p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-5">
             {liveTools.map((t) => (
               <Link
@@ -156,7 +156,7 @@ export default function MethodsHubPage() {
                   </div>
                   <h3 className="text-base font-semibold text-gray-900">{t.name}</h3>
                 </div>
-                <p className="text-sm text-gray-700 leading-snug line-clamp-3">{t.description}</p>
+                <p className="text-base text-gray-700 leading-snug line-clamp-3">{t.description}</p>
                 <div className="mt-3 flex items-center text-sm font-medium text-primary-700 group-hover:text-primary-900">
                   Open <ArrowRightIcon className="ml-1 w-4 h-4" aria-hidden="true" />
                 </div>
@@ -172,7 +172,7 @@ export default function MethodsHubPage() {
             <h2 className="text-2xl font-bold text-gray-900">Roadmap</h2>
             <p className="text-xs text-gray-500">What the methods surface ships next.</p>
           </div>
-          <p className="text-sm text-gray-600 mb-6">
+          <p className="text-base text-gray-600 mb-6">
             The platform is open and bounded. These items make it cite-able, reproducible, and embeddable
             in research code.
           </p>
@@ -184,9 +184,9 @@ export default function MethodsHubPage() {
                     <r.icon className="w-4 h-4 text-gray-500" aria-hidden="true" />
                   </div>
                   <h3 className="text-sm font-semibold text-gray-700">{r.name}</h3>
-                  <span className="ml-auto text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">Soon</span>
+                  <span className="ml-auto text-xs font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">Soon</span>
                 </div>
-                <p className="text-sm text-gray-600 leading-snug">{r.description}</p>
+                <p className="text-base text-gray-600 leading-snug">{r.description}</p>
               </div>
             ))}
           </div>

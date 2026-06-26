@@ -37,7 +37,7 @@ export default function NutrientAnalysisError({
             <h1 className="mt-1 text-lg font-semibold text-gray-900">
               The analyzer ran into an error.
             </h1>
-            <p className="mt-2 text-sm text-gray-700 leading-relaxed">
+            <p className="mt-2 text-base text-gray-700 leading-relaxed">
               The composition computation or the catalogue handoff failed. Your active food list
               and recall history are stored in your browser and are not lost. Try the analysis
               again; if the same error keeps happening, the backend may be temporarily

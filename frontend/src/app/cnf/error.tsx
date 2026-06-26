@@ -38,7 +38,7 @@ export default function CnfError({
             <h1 className="mt-1 text-lg font-semibold text-gray-900">
               A catalogue page ran into an error.
             </h1>
-            <p className="mt-2 text-sm text-gray-700 leading-relaxed">
+            <p className="mt-2 text-base text-gray-700 leading-relaxed">
               The page failed to render. The catalogue data itself is not affected — most often
               this is a transient hydration or filter-state issue that clears on retry. Your
               active food list in the browser is safe.

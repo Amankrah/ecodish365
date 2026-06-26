@@ -12,14 +12,13 @@ import {
   ScaleIcon,
   ChevronDownIcon,
   GlobeAltIcon,
-  UserIcon,
   PlusCircleIcon,
-  BookmarkIcon,
   ClockIcon,
-  ArrowRightOnRectangleIcon,
+  BeakerIcon,
 } from '@heroicons/react/24/outline';
 import { clsx } from 'clsx';
 import { CATALOGUE_DROPDOWN, CATALOGUE_NAV } from '@/lib/catalogueNav';
+import { RESEARCH_DROPDOWN, RESEARCH_NAV } from '@/lib/researchNav';
 
 type DropdownChild = {
   name: string;
@@ -45,6 +44,17 @@ const navigation: NavItem[] = [
     href: CATALOGUE_NAV.href,
     icon: ChartBarIcon,
     dropdown: CATALOGUE_DROPDOWN,
+  },
+  // PLATFORM-CODE-1.l (2026-06-26): top-level Research category. The hub
+  // and its researcher-facing surfaces (Nutrient analysis, Cohort upload,
+  // Compare cohorts) used to be tucked under Food Catalogue, which meant
+  // a returning researcher had no way to land on /research without
+  // remembering the URL. Promoted to its own dropdown.
+  {
+    name: RESEARCH_NAV.section,
+    href: RESEARCH_NAV.href,
+    icon: BeakerIcon,
+    dropdown: RESEARCH_DROPDOWN,
   },
   {
     name: 'Nutrition Indicators',
@@ -103,11 +113,12 @@ const navigation: NavItem[] = [
 ];
 
 // Path-to-category routing for the contextual sub-nav bar. First match
-// wins. Keeps the original lens-page → Nutrition-dropdown behaviour and
-// adds /research/* under Food Catalogue (where Nutrient analysis lives).
+// wins. Routes /research/* to the Research dropdown (PLATFORM-CODE-1.l)
+// so the sub-nav strip on Nutrient analysis / Cohort upload shows the
+// research-specific tabs rather than the catalogue tabs.
 const CATEGORY_ROUTES: Array<{ prefix: string; category: string }> = [
   { prefix: '/cnf', category: CATALOGUE_NAV.section },
-  { prefix: '/research', category: CATALOGUE_NAV.section },
+  { prefix: '/research', category: RESEARCH_NAV.section },
   { prefix: '/scorecard', category: 'Nutrition Indicators' },
   { prefix: '/hefi', category: 'Nutrition Indicators' },
   { prefix: '/heni', category: 'Nutrition Indicators' },
@@ -124,9 +135,8 @@ const CATEGORY_ROUTES: Array<{ prefix: string; category: string }> = [
 ];
 
 export default function Navigation() {
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const closeTimeoutRef = useRef<number | null>(null);
   const pathname = usePathname();
@@ -237,7 +247,7 @@ export default function Navigation() {
                               aria-disabled="true"
                             >
                               <span>{d.name}</span>
-                              <span className="text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-full">Soon</span>
+                              <span className="text-xs font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-full">Soon</span>
                             </div>
                           );
                         }
@@ -262,94 +272,11 @@ export default function Navigation() {
               );
             })}
 
-            {/* User Menu / Auth Buttons */}
-            <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-gray-200">
-              {isAuthenticated ? (
-                <div className="relative">
-                  <button
-                    onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="flex items-center space-x-2 p-2 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50/80 transition-all duration-200"
-                  >
-                    <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center">
-                      <span className="text-white text-sm font-semibold">
-                        {user?.first_name?.charAt(0) || user?.username?.charAt(0) || 'U'}
-                      </span>
-                    </div>
-                    <ChevronDownIcon className={clsx(
-                      'w-4 h-4 transition-transform duration-200',
-                      userMenuOpen ? 'rotate-180' : ''
-                    )} />
-                  </button>
-
-                  {userMenuOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-56 bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/50 py-2 z-50">
-                      <div className="px-4 py-2 border-b border-gray-200">
-                        <p className="text-sm font-medium text-gray-900">{user?.full_name}</p>
-                        <p className="text-xs text-gray-500">{user?.email}</p>
-                      </div>
-                      <Link
-                        href="/meals/create"
-                        className="flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50/80 mx-2 rounded-lg transition-all duration-200"
-                        onClick={() => setUserMenuOpen(false)}
-                      >
-                        <PlusCircleIcon className="w-4 h-4 mr-3" />
-                        Create Meal
-                      </Link>
-                      <Link
-                        href="/meals/my-meals"
-                        className="flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50/80 mx-2 rounded-lg transition-all duration-200"
-                        onClick={() => setUserMenuOpen(false)}
-                      >
-                        <BookmarkIcon className="w-4 h-4 mr-3" />
-                        My Meals
-                      </Link>
-                      <Link
-                        href="/recall-history"
-                        className="flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50/80 mx-2 rounded-lg transition-all duration-200"
-                        onClick={() => setUserMenuOpen(false)}
-                      >
-                        <ClockIcon className="w-4 h-4 mr-3" />
-                        Saved days
-                      </Link>
-                      <Link
-                        href="/profile"
-                        className="flex items-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50/80 mx-2 rounded-lg transition-all duration-200"
-                        onClick={() => setUserMenuOpen(false)}
-                      >
-                        <UserIcon className="w-4 h-4 mr-3" />
-                        Profile Settings
-                      </Link>
-                      <hr className="my-2 border-gray-200" />
-                      <button
-                        onClick={() => {
-                          logout();
-                          setUserMenuOpen(false);
-                        }}
-                        className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50/80 mx-2 rounded-lg transition-all duration-200"
-                      >
-                        <ArrowRightOnRectangleIcon className="w-4 h-4 mr-3" />
-                        Sign Out
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="flex items-center space-x-2">
-                  <Link
-                    href="/auth/login"
-                    className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50/80 rounded-xl transition-all duration-200"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    href="/auth/register"
-                    className="px-3 py-2 text-sm font-medium text-white bg-gradient-primary hover:opacity-90 rounded-xl transition-all duration-200"
-                  >
-                    Sign Up
-                  </Link>
-                </div>
-              )}
-            </div>
+            {/* Auth controls intentionally removed from the nav (2026-06-26).
+                Login + registration + the user menu live at /auth/login,
+                /auth/register, and /profile; routes still work, but the nav
+                stays focused on platform surfaces (research, catalogue,
+                indicators) rather than account management. */}
           </div>
 
           {/* Mobile menu button */}
@@ -427,7 +354,7 @@ export default function Navigation() {
                               aria-disabled="true"
                             >
                               <span>{d.name}</span>
-                              <span className="text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-full">Soon</span>
+                              <span className="text-xs font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-full">Soon</span>
                             </div>
                           );
                         }
@@ -471,7 +398,7 @@ export default function Navigation() {
                     aria-disabled="true"
                   >
                     {link.name}
-                    <span className="text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-full">Soon</span>
+                    <span className="text-xs font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-full">Soon</span>
                   </span>
                 );
               }

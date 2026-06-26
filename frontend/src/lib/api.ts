@@ -4169,4 +4169,272 @@ export class MealApiService {
   }
 }
 
-export default CNFApiService; 
+// ===========================================================================
+// PLATFORM-CODE-1.b (2026-06-26) — Cohort batch ingest UI.
+// POST /api/research/cohort/        — score N recalls × M lenses
+// POST /api/research/cohort/ingest/ — parse upload → recalls + validation report
+// POST /api/research/cohort/compare/ — Mann-Whitney U on two cohorts (Phase D)
+// ===========================================================================
+
+export type CohortLens =
+  | 'hefi' | 'heni' | 'hsr' | 'fcs' | 'env' | 'dietary_pattern' | 'fped';
+
+export const COHORT_LENSES: CohortLens[] = [
+  'hefi', 'heni', 'hsr', 'fcs', 'env', 'dietary_pattern', 'fped',
+];
+
+export interface CohortFood {
+  food_id: number;
+  mass_g: number;
+  occasion?: string;
+}
+
+export interface CohortRecallInput {
+  respondent_id: string;
+  day_id: string;
+  foods: CohortFood[];
+}
+
+export interface CohortRespondentScore {
+  respondent_id: string;
+  day_id: string;
+  n_foods: number;
+  total_mass_g: number;
+  hefi_total_score: number | null;
+  heni_minutes: number | null;
+  hsr_stars: number | null;
+  fcs_score: number | null;
+  env_gw_per_100kcal: number | null;
+  env_sustainability: number | null;
+  env_monetized_cost: number | null;
+  pattern_top: string | null;
+  pattern_confidence: string | null;
+  fped_unmatched_pct: number | null;
+  errors?: string[];
+}
+
+export interface CohortHistogramBin {
+  bin_min: number;
+  bin_max: number;
+  count: number;
+}
+
+export interface CohortLensDistribution {
+  lens: string;
+  metric: string;
+  unit: string;
+  n: number;
+  n_missing: number;
+  median: number | null;
+  q1: number | null;
+  q3: number | null;
+  mean: number | null;
+  sd: number | null;
+  min: number | null;
+  max: number | null;
+  pct_meets_target: number | null;
+  histogram: CohortHistogramBin[];
+  /** Present only for dietary_pattern lens. */
+  pattern_counts?: Record<string, number>;
+}
+
+export interface CohortResult {
+  meta: {
+    n_recalls: number;
+    n_respondents: number;
+    lenses_run: CohortLens[];
+    parallelism: number;
+    runtime_s: number;
+    per_respondent_suppressed?: boolean;
+  };
+  per_respondent: CohortRespondentScore[];
+  distribution_by_lens: Record<string, CohortLensDistribution>;
+  coverage: {
+    n_recalls_total: number;
+    n_recalls_with_errors: number;
+    n_distinct_respondents: number;
+  };
+  provenance: {
+    cohort_endpoint_version: string;
+    lens_versions: Record<string, string>;
+    platform_substrate: string;
+  };
+}
+
+export interface CohortIngestValidationReport {
+  n_rows_read: number;
+  n_rows_dropped: number;
+  n_recalls_built: number;
+  n_respondents: number;
+  drop_reasons: Record<string, number>;
+  unknown_food_ids: number[];
+  sample_bad_rows: Array<Record<string, unknown>>;
+  fndds_matched: number;
+  fndds_unmatched: number;
+  headers_detected: string[];
+}
+
+export interface CohortIngestResponse {
+  format_detected: string;
+  validation_report: CohortIngestValidationReport;
+  recalls_preview: Array<{
+    respondent_id: string;
+    day_id: string;
+    n_foods: number;
+    foods: CohortFood[];
+  }>;
+  n_total_recalls: number;
+  recalls: CohortRecallInput[];
+}
+
+export type CohortIngestFormat =
+  | 'auto'
+  | 'generic_csv'
+  | 'nhanes_dr1iff'
+  | 'nhanes_dr2iff';
+
+export interface CohortLibraryEntry {
+  id: string;
+  name: string;
+  country: string;
+  year: string;
+  source: string;
+  source_url: string;
+  parse_format: string;
+  expected_recalls: number;
+  coverage_note: string;
+  survey_weight_note: string;
+  description: string;
+  file_present: boolean;
+}
+
+export interface CohortLibraryLoadResponse {
+  cohort: CohortLibraryEntry;
+  format_detected: string;
+  validation_report: CohortIngestValidationReport;
+  recalls_preview: Array<{
+    respondent_id: string;
+    day_id: string;
+    n_foods: number;
+    foods: CohortFood[];
+  }>;
+  n_total_recalls: number;
+  recalls: CohortRecallInput[];
+}
+
+export interface CohortCompareLensSummary {
+  n: number;
+  median: number | null;
+  mean: number | null;
+  sd: number | null;
+  min: number | null;
+  max: number | null;
+}
+
+export interface CohortCompareLensRow {
+  lens: string;
+  field: string;
+  unit: string;
+  a: CohortCompareLensSummary;
+  b: CohortCompareLensSummary;
+  median_delta: number | null;
+  mann_whitney: {
+    u: number | null;
+    p: number | null;
+    effect_r: number | null;
+    n_a: number;
+    n_b: number;
+    note?: string | null;
+  };
+}
+
+export interface CohortCompareResponse {
+  cohort_a: { name: string; n: number };
+  cohort_b: { name: string; n: number };
+  per_lens: CohortCompareLensRow[];
+  method: {
+    test: string;
+    effect_size: string;
+    min_sample_n: number;
+    multiple_testing_note: string;
+  };
+}
+
+export class CohortApiService {
+  /** Parse-only: upload CSV / XPT → recalls + validation report. Does not score. */
+  static async ingest(
+    file: File,
+    format: CohortIngestFormat = 'auto',
+    previewN = 100,
+  ): Promise<CohortIngestResponse> {
+    const form = new FormData();
+    form.append('file', file);
+    form.append('format', format);
+    form.append('preview_n', String(previewN));
+    const response = await api.post('/research/cohort/ingest/', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      // NHANES Day-1 XPT is ~72 MB; allow ample time + large payloads.
+      maxContentLength: 200 * 1024 * 1024,
+      maxBodyLength: 200 * 1024 * 1024,
+      timeout: 120_000,
+    });
+    return response.data as CohortIngestResponse;
+  }
+
+  /** List built-in cohorts shipped with the deployment (NHANES 2017-18, etc.). */
+  static async listLibrary(): Promise<CohortLibraryEntry[]> {
+    const response = await api.get('/research/cohort/library/');
+    return (response.data?.cohorts ?? []) as CohortLibraryEntry[];
+  }
+
+  /** Load a built-in cohort into the same Recall shape as a CSV upload.
+   * `sampleN` defaults to 200; the server caps at 5,000 (the cohort scorer's
+   * per-request cap). Returns recalls + validation report + cohort metadata. */
+  static async loadLibrary(cohortId: string, sampleN = 200): Promise<CohortLibraryLoadResponse> {
+    const response = await api.post(
+      `/research/cohort/library/${encodeURIComponent(cohortId)}/recalls/`,
+      { sample_n: sampleN },
+      { timeout: 120_000 },
+    );
+    return response.data as CohortLibraryLoadResponse;
+  }
+
+  /** Compare two scored cohorts (per-respondent arrays). Returns per-lens
+   * deltas + two-sided Mann-Whitney U + rank-biserial effect size. */
+  static async compare(
+    cohortA: { name: string; per_respondent: CohortRespondentScore[] },
+    cohortB: { name: string; per_respondent: CohortRespondentScore[] },
+    lenses?: string[],
+  ): Promise<CohortCompareResponse> {
+    const response = await api.post('/research/cohort/compare/', {
+      cohort_a: cohortA,
+      cohort_b: cohortB,
+      ...(lenses ? { lenses } : {}),
+    });
+    return response.data.result as CohortCompareResponse;
+  }
+
+  /** Score every recall across the requested lenses. Hard cap server-side at 5,000 recalls. */
+  static async runCohort(
+    recalls: CohortRecallInput[],
+    lenses: CohortLens[] = COHORT_LENSES,
+    options: { parallelism?: number; includePerRespondent?: boolean; anonymize?: boolean } = {},
+  ): Promise<CohortResult> {
+    const response = await api.post(
+      '/research/cohort/',
+      {
+        recalls,
+        lenses,
+        options: {
+          parallelism: options.parallelism ?? 4,
+          include_per_respondent: options.includePerRespondent ?? true,
+          anonymize: options.anonymize ?? false,
+        },
+      },
+      { timeout: 600_000 }, // 10 min — scoring is the expensive step
+    );
+    return response.data.result as CohortResult;
+  }
+}
+
+export default CNFApiService;

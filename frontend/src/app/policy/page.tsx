@@ -81,7 +81,7 @@ export default function PolicyHubPage() {
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
                 Population-level framing for the food system.
               </h1>
-              <p className="mt-3 text-base text-gray-700 max-w-3xl leading-relaxed">
+              <p className="mt-3 text-lg text-gray-700 max-w-3xl leading-relaxed">
                 Versioned numbers. Plain explanations. Population-anchored framing for procurement,
                 taxation, labelling, and food-environment surveillance, with a monetised social-cost
                 overlay where the evidence supports it.
@@ -111,7 +111,7 @@ export default function PolicyHubPage() {
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Live tools</h2>
-          <p className="text-sm text-gray-600 mb-6">
+          <p className="text-base text-gray-600 mb-6">
             Policy framing is shipped on the existing scoring surfaces via the audience toggle. The scenario
             simulator and the social-cost overlay are in flight; see the roadmap below.
           </p>
@@ -130,7 +130,7 @@ export default function PolicyHubPage() {
                   </div>
                   <h3 className="text-base font-semibold text-gray-900">{t.name}</h3>
                 </div>
-                <p className="text-sm text-gray-700 leading-snug line-clamp-3">{t.description}</p>
+                <p className="text-base text-gray-700 leading-snug line-clamp-3">{t.description}</p>
                 {t.note && (
                   <p className="mt-2 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded px-2 py-1">{t.note}</p>
                 )}
@@ -149,7 +149,7 @@ export default function PolicyHubPage() {
             <h2 className="text-2xl font-bold text-gray-900">Roadmap</h2>
             <p className="text-xs text-gray-500">What is in flight for the policy surface.</p>
           </div>
-          <p className="text-sm text-gray-600 mb-6">
+          <p className="text-base text-gray-600 mb-6">
             Today the policy surface is positioning plus the audience toggle on the existing scorers. The
             machinery for scenario simulation and social-cost overlay exists in the substitution engine
             (SUBST-1) and the LCA factor packs; what is missing is the policy-shaped frontend.
@@ -162,9 +162,9 @@ export default function PolicyHubPage() {
                     <r.icon className="w-4 h-4 text-gray-500" aria-hidden="true" />
                   </div>
                   <h3 className="text-sm font-semibold text-gray-700">{r.name}</h3>
-                  <span className="ml-auto text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">Soon</span>
+                  <span className="ml-auto text-xs font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">Soon</span>
                 </div>
-                <p className="text-sm text-gray-600 leading-snug">{r.description}</p>
+                <p className="text-base text-gray-600 leading-snug">{r.description}</p>
               </div>
             ))}
           </div>

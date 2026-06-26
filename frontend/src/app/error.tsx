@@ -30,7 +30,7 @@ export default function RootError({
           </div>
           <div className="flex-1">
             <h1 className="text-lg font-semibold text-gray-900">Something went wrong on this page.</h1>
-            <p className="mt-2 text-sm text-gray-700 leading-relaxed">
+            <p className="mt-2 text-base text-gray-700 leading-relaxed">
               The page hit an unexpected error. Your food list and any saved days in your browser are
               safe. Try the action again, or head back to the home page.
             </p>

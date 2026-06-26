@@ -103,7 +103,7 @@ export default function IndividualsHubPage() {
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
                 Is this food good for you, and for the planet?
               </h1>
-              <p className="mt-3 text-base text-gray-700 max-w-3xl leading-relaxed">
+              <p className="mt-3 text-lg text-gray-700 max-w-3xl leading-relaxed">
                 Score a single product, a homemade dish, or a whole day of eating. Plain-language
                 interpretation with the caveats that matter and no methodology jargon. The same published lenses
                 that power the research and policy surfaces, read in everyday English.
@@ -140,7 +140,7 @@ export default function IndividualsHubPage() {
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Live tools</h2>
-          <p className="text-sm text-gray-600 mb-6">Everything you need to score a food, a meal, or a day, in plain language.</p>
+          <p className="text-base text-gray-600 mb-6">Everything you need to score a food, a meal, or a day, in plain language.</p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {liveTools.map((t) => (
               <Link
@@ -156,7 +156,7 @@ export default function IndividualsHubPage() {
                   </div>
                   <h3 className="text-base font-semibold text-gray-900">{t.name}</h3>
                 </div>
-                <p className="text-sm text-gray-700 leading-snug line-clamp-3">{t.description}</p>
+                <p className="text-base text-gray-700 leading-snug line-clamp-3">{t.description}</p>
                 <div className="mt-3 flex items-center text-sm font-medium text-primary-700 group-hover:text-primary-900">
                   Open <ArrowRightIcon className="ml-1 w-4 h-4" aria-hidden="true" />
                 </div>
@@ -174,9 +174,9 @@ export default function IndividualsHubPage() {
               <div key={r.name} id={r.anchor} className="rounded-2xl border border-dashed border-gray-300 bg-white p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="text-sm font-semibold text-gray-700">{r.name}</h3>
-                  <span className="ml-auto text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">Soon</span>
+                  <span className="ml-auto text-xs font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">Soon</span>
                 </div>
-                <p className="text-sm text-gray-600 leading-snug">{r.description}</p>
+                <p className="text-base text-gray-600 leading-snug">{r.description}</p>
               </div>
             ))}
           </div>

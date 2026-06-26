@@ -38,7 +38,7 @@ export default function ScorecardError({
             <h1 className="mt-1 text-lg font-semibold text-gray-900">
               The scorecard failed to render.
             </h1>
-            <p className="mt-2 text-sm text-gray-700 leading-relaxed">
+            <p className="mt-2 text-base text-gray-700 leading-relaxed">
               The multi-lens view ran into an error before any scoring started. Your active food
               list and saved sessions are kept in your browser and are not lost. Retrying usually
               fixes a transient hydration issue.

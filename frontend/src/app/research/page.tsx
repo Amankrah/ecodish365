@@ -40,6 +40,13 @@ const compositionTools = [
     primary: true,
   },
   {
+    icon: CloudArrowUpIcon,
+    name: 'Cohort upload',
+    href: '/research/cohort',
+    description:
+      'Upload N recalls (NHANES What-We-Eat-in-America .xpt or any CSV with food_id, mass_g) and score the whole cohort across every lens in one pass. Distribution stats, per-respondent table, CSV export, and side-by-side comparison.',
+  },
+  {
     icon: ArrowsRightLeftIcon,
     name: 'Compare foods',
     href: '/cnf/compare',
@@ -148,13 +155,6 @@ const lensTools: LensToolCard[] = [
 
 const roadmap = [
   {
-    icon: CloudArrowUpIcon,
-    name: 'Cohort upload',
-    anchor: 'cohort',
-    description:
-      'CSV ingest of multiple 24-hour recalls (respondent, occasion, food_id, mass_g). Parallel scoring across the cohort under any single lens or all lenses at once.',
-  },
-  {
     icon: DocumentTextIcon,
     name: 'Methods + citation export',
     anchor: 'methods-export',
@@ -212,7 +212,7 @@ export default function ResearchHubPage() {
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
                 One substrate. Every published lens. Cross-continent. Reproducible.
               </h1>
-              <p className="mt-3 text-base text-gray-700 max-w-3xl leading-relaxed">
+              <p className="mt-3 text-lg text-gray-700 max-w-3xl leading-relaxed">
                 The research surface of ecodish365. Run a nutrient composition deep-dive on any meal
                 or 24-hour record, score it across every published lens at once, or run any single
                 lens on its own. Every result is auditable, citable, and traceable to a versioned
@@ -251,7 +251,7 @@ export default function ResearchHubPage() {
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Composition &amp; catalogue</h2>
-          <p className="text-sm text-gray-600 mb-6">
+          <p className="text-base text-gray-600 mb-6">
             The substrate every lens sits on. Nutrient composition, food-group attribution, processing tier,
             and catalogue exploration across CNF and WAFCT.
           </p>
@@ -270,7 +270,7 @@ export default function ResearchHubPage() {
                   </div>
                   <h3 className="text-base font-semibold text-gray-900">{t.name}</h3>
                 </div>
-                <p className="text-sm text-gray-700 leading-snug line-clamp-3">{t.description}</p>
+                <p className="text-base text-gray-700 leading-snug line-clamp-3">{t.description}</p>
                 <div className="mt-3 flex items-center text-sm font-medium text-primary-700 group-hover:text-primary-900">
                   Open <ArrowRightIcon className="ml-1 w-4 h-4" aria-hidden="true" />
                 </div>
@@ -287,7 +287,7 @@ export default function ResearchHubPage() {
             <h2 className="text-2xl font-bold text-gray-900">Published lenses</h2>
             <p className="text-xs text-gray-500">Each lens runs independently on the same substrate.</p>
           </div>
-          <p className="text-sm text-gray-600 mb-6">
+          <p className="text-base text-gray-600 mb-6">
             Run the full multi-lens scorecard, or run any single lens on its own. New lenses plug into the
             same substrate as they are published; the list is open, not fixed.
           </p>
@@ -311,7 +311,7 @@ export default function ResearchHubPage() {
                   </div>
                   <h3 className="text-base font-semibold text-gray-900">{t.name}</h3>
                 </div>
-                <p className="text-sm text-gray-700 leading-snug line-clamp-3">{t.description}</p>
+                <p className="text-base text-gray-700 leading-snug line-clamp-3">{t.description}</p>
                 <p className="mt-2 text-[11px] text-gray-500">{t.citation}</p>
                 <div className="mt-3 flex items-center text-sm font-medium text-primary-700 group-hover:text-primary-900">
                   Open <ArrowRightIcon className="ml-1 w-4 h-4" aria-hidden="true" />
@@ -328,7 +328,7 @@ export default function ResearchHubPage() {
             <h2 className="text-2xl font-bold text-gray-900">Roadmap</h2>
             <p className="text-xs text-gray-500">What is in flight for the next research-platform cycle.</p>
           </div>
-          <p className="text-sm text-gray-600 mb-6">These are the gaps between a decision-support tool and a publication-ready research platform. None of them require new science; all of them require frontend surfaces on top of capabilities the backend already provides.</p>
+          <p className="text-base text-gray-600 mb-6">These are the gaps between a decision-support tool and a publication-ready research platform. None of them require new science; all of them require frontend surfaces on top of capabilities the backend already provides.</p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {roadmap.map((r) => (
               <div key={r.name} id={r.anchor} className="rounded-2xl border border-dashed border-gray-300 bg-white p-5">
@@ -337,9 +337,9 @@ export default function ResearchHubPage() {
                     <r.icon className="w-4 h-4 text-gray-500" aria-hidden="true" />
                   </div>
                   <h3 className="text-sm font-semibold text-gray-700">{r.name}</h3>
-                  <span className="ml-auto text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">Soon</span>
+                  <span className="ml-auto text-xs font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">Soon</span>
                 </div>
-                <p className="text-sm text-gray-600 leading-snug">{r.description}</p>
+                <p className="text-base text-gray-600 leading-snug">{r.description}</p>
               </div>
             ))}
           </div>

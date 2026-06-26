@@ -11,12 +11,8 @@ export const CATALOGUE_DROPDOWN = [
   { name: 'Compare Foods', href: '/cnf/compare' },
   { name: 'Food Groups', href: '/cnf/groups' },
   { name: CATALOGUE_NAV.overview, href: '/cnf/analytics' },
-  // NUTRIENT-ANALYSIS (2026-06-25, renamed from /research/meal-deep-dive):
-  // researcher-facing composition substrate. Full nutrient panel against
-  // IOM DRIs by life stage, FPED food-group decomposition, NOVA
-  // processing, per-nutrient food-source attribution. Piped from the
-  // 24h-recall, the recipe decomposer, and AI-enhanced search via the
-  // shared activeFoodList handoff. Sibling tools (multi-lens scoring,
-  // per-lens calculators) live elsewhere; this one is composition only.
-  { name: 'Nutrient analysis', href: '/research/nutrient-analysis' },
 ] as const;
+// Nutrient analysis (/research/nutrient-analysis) and Cohort upload
+// (/research/cohort) used to live here while Research was tucked under Food
+// Catalogue. Promoted to a top-level Research category 2026-06-26 — see
+// [`researchNav.ts`](frontend/src/lib/researchNav.ts) RESEARCH_DROPDOWN.

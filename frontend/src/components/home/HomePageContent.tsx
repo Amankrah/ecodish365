@@ -201,7 +201,7 @@ export default function HomePageContent() {
             Score any food, meal, or 24-hour record across every published research lens, on one
             substrate, across continents. Versioned. Citeable. Reproducible.
           </p>
-          <p className="mt-4 text-sm text-gray-500 max-w-3xl mx-auto leading-relaxed">
+          <p className="mt-4 text-base text-gray-500 max-w-3xl mx-auto leading-relaxed">
             Published measures cover healthy eating, health impact, product stars, Food Compass,
             environmental footprint, and eating style. Each one answers a different question. We explain
             what each score means and where its limits are.
@@ -232,7 +232,7 @@ export default function HomePageContent() {
             </Link>
           </div>
 
-          <div className="mt-6 inline-flex items-start gap-2 max-w-2xl mx-auto bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 text-sm text-amber-900 text-left">
+          <div className="mt-6 inline-flex items-start gap-2 max-w-2xl mx-auto bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 text-base text-amber-900 text-left">
             <ExclamationTriangleIcon className="w-4 h-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
             <span>
               <strong>Research-grade, consumer-friendly.</strong> The platform reports what each
@@ -252,8 +252,8 @@ export default function HomePageContent() {
                 <div className="text-3xl sm:text-4xl font-bold text-emerald-600 tabular-nums">
                   <span className="inline-block min-w-[3ch] text-center">{s.value}</span>
                 </div>
-                <div className="mt-1 text-sm font-medium text-gray-800">{s.label}</div>
-                <div className="text-xs text-gray-500 mt-0.5">{s.sub}</div>
+                <div className="mt-1 text-base font-medium text-gray-800">{s.label}</div>
+                <div className="text-sm text-gray-500 mt-0.5">{s.sub}</div>
               </div>
             ))}
           </div>
@@ -288,11 +288,11 @@ export default function HomePageContent() {
                   </div>
                   <div>
                     <h3 className="text-base font-semibold text-gray-900">{l.name}</h3>
-                    <p className="text-xs text-gray-600 italic">{l.tagline}</p>
+                    <p className="text-sm text-gray-600 italic">{l.tagline}</p>
                   </div>
                 </div>
-                <p className="text-sm text-gray-700 leading-snug mb-2">{l.meaning}</p>
-                <p className="text-[11px] text-gray-500">{l.citation}</p>
+                <p className="text-base text-gray-700 leading-snug mb-2">{l.meaning}</p>
+                <p className="text-xs text-gray-500">{l.citation}</p>
                 <div className="mt-3 flex items-center text-sm font-medium text-blue-700 group-hover:text-blue-900">
                   {l.linkLabel} <ArrowRightIcon className="ml-1 w-4 h-4" aria-hidden="true" />
                 </div>
@@ -329,7 +329,7 @@ export default function HomePageContent() {
                   <a.icon className="w-6 h-6 text-white" aria-hidden="true" />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">{a.name}</h3>
-                <p className="text-sm text-gray-600 leading-relaxed mb-4 flex-1">{a.description}</p>
+                <p className="text-base text-gray-600 leading-relaxed mb-4 flex-1">{a.description}</p>
                 <Link
                   href={a.cta.href}
                   className="inline-flex items-center text-sm font-medium text-blue-700 hover:text-blue-900 group"
@@ -353,7 +353,7 @@ export default function HomePageContent() {
               </div>
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">A multi-database food catalogue</h2>
-                <p className="text-sm text-gray-700 mb-4">
+                <p className="text-base text-gray-700 mb-4">
                   New food-composition databases can be added without changing any of the scoring,
                   so the catalogue keeps growing. WAFCT 2019 landed in May 2026, USDA FoodData Central
                   in June 2026, ANSES CIQUAL 2025 also in June 2026 — and other regional databases can
@@ -362,31 +362,31 @@ export default function HomePageContent() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                   <div className="border border-gray-100 rounded-lg p-3">
                     <div className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">Active, authoritative</div>
-                    <div className="text-sm font-medium text-gray-900 mt-1">Canadian Nutrient File</div>
-                    <div className="text-xs text-gray-600 mt-0.5">5,993 foods, Health Canada (CNF 2026 edition).</div>
+                    <div className="text-base font-medium text-gray-900 mt-1">Canadian Nutrient File</div>
+                    <div className="text-sm text-gray-600 mt-0.5">5,993 foods, Health Canada (CNF 2026 edition).</div>
                   </div>
                   <div className="border border-gray-100 rounded-lg p-3">
                     <div className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">Active, extension</div>
-                    <div className="text-sm font-medium text-gray-900 mt-1">FAO/INFOODS WAFCT 2019</div>
-                    <div className="text-xs text-gray-600 mt-0.5">1,028 West African foods, Vincent 2019. Includes fonio, baobab, dawadawa, gari, egusi, and other West African staples.</div>
+                    <div className="text-base font-medium text-gray-900 mt-1">FAO/INFOODS WAFCT 2019</div>
+                    <div className="text-sm text-gray-600 mt-0.5">1,028 West African foods, Vincent 2019. Includes fonio, baobab, dawadawa, gari, egusi, and other West African staples.</div>
                   </div>
                   <div className="border border-gray-100 rounded-lg p-3">
                     <div className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">Active, extension</div>
-                    <div className="text-sm font-medium text-gray-900 mt-1">USDA FoodData Central</div>
-                    <div className="text-xs text-gray-600 mt-0.5">13,620 US foods — Foundation (395 analytically derived), SR Legacy (7,793 classic SR28), and Survey FNDDS (5,432 dietary-survey foods).</div>
+                    <div className="text-base font-medium text-gray-900 mt-1">USDA FoodData Central</div>
+                    <div className="text-sm text-gray-600 mt-0.5">13,620 US foods — Foundation (395 analytically derived), SR Legacy (7,793 classic SR28), and Survey FNDDS (5,432 dietary-survey foods).</div>
                   </div>
                   <div className="border border-gray-100 rounded-lg p-3">
                     <div className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">Active, extension</div>
-                    <div className="text-sm font-medium text-gray-900 mt-1">ANSES CIQUAL 2025</div>
-                    <div className="text-xs text-gray-600 mt-0.5">~3,484 French foods (English release). Pairs with Agribalyse 3.2 LCA via shared Ciqual codes for nutrition + environment.</div>
+                    <div className="text-base font-medium text-gray-900 mt-1">ANSES CIQUAL 2025</div>
+                    <div className="text-sm text-gray-600 mt-0.5">~3,484 French foods (English release). Pairs with Agribalyse 3.2 LCA via shared Ciqual codes for nutrition + environment.</div>
                   </div>
                   <div className="border border-dashed border-gray-300 rounded-lg p-3 text-gray-500">
                     <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Planned</div>
-                    <div className="text-sm font-medium text-gray-700 mt-1">Further composition tables</div>
-                    <div className="text-xs mt-0.5">EuroFIR, EFSA FoodEx2, NEVO (NL), BLS (DE), and other regional tables can plug in the same way.</div>
+                    <div className="text-base font-medium text-gray-700 mt-1">Further composition tables</div>
+                    <div className="text-sm mt-0.5">EuroFIR, EFSA FoodEx2, NEVO (NL), BLS (DE), and other regional tables can plug in the same way.</div>
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 mt-3">
+                <p className="text-sm text-gray-500 mt-3">
                   Each source keeps its own provenance, so differences in how foods were measured stay visible across CNF, WAFCT, FDC, and CIQUAL rows.
                 </p>
               </div>
@@ -403,7 +403,7 @@ export default function HomePageContent() {
             <h2 className="mt-2 text-2xl sm:text-3xl font-bold text-gray-900">
               Is this food good for you, and for the planet?
             </h2>
-            <p className="mt-3 text-sm text-gray-700 max-w-3xl">
+            <p className="mt-3 text-base text-gray-700 max-w-3xl">
               Score a single product, a homemade dish, or a whole day of eating. Plain-language
               interpretation with the caveats that matter and no methodology jargon.
             </p>
@@ -475,7 +475,7 @@ export default function HomePageContent() {
                   </div>
                   <h3 className="text-base font-semibold text-gray-900">{t.name}</h3>
                 </div>
-                <p className="text-sm text-gray-700 leading-snug">{t.description}</p>
+                <p className="text-base text-gray-700 leading-snug">{t.description}</p>
                 <div className="mt-3 flex items-center text-sm font-medium text-blue-700 group-hover:text-blue-900">
                   Open <ArrowRightIcon className="ml-1 w-4 h-4" aria-hidden="true" />
                 </div>
@@ -493,7 +493,7 @@ export default function HomePageContent() {
               <ExclamationTriangleIcon className="w-5 h-5" aria-hidden="true" />
               What the platform is <em>not</em>
             </h2>
-            <ul className="space-y-1.5 text-sm text-amber-900 list-disc list-inside">
+            <ul className="space-y-1.5 text-base text-amber-900 list-disc list-inside">
               <li><strong>Not clinical advice.</strong> Scoring is population-anchored, not a personal diagnosis or prescription.</li>
               <li><strong>Not a single composite score.</strong> Each published lens answers a different question, so we report them all rather than fold disagreement into one number.</li>
               <li><strong>Not a whole-life-cycle footprint.</strong> ReCiPe and AGRIBALYSE cover the production phase. Household preparation and end-of-life are out of scope in this version.</li>
@@ -508,7 +508,7 @@ export default function HomePageContent() {
       <section className="py-14 bg-gray-50 border-t border-gray-100">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-6">Primary references</h2>
-          <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-700">
+          <div className="grid md:grid-cols-2 gap-4 text-base text-gray-700">
             <ul className="space-y-1.5 list-disc list-inside">
               <li>HSRAC, <em>HSR Implementation Guide v9</em> (Dec 2025); Shahid 2020, <em>Nutrients</em> 12, 1791.</li>
               <li>Brassard et al. 2022a/b. HEFI-2019 development and evaluation. <em>APNM</em> 47, 595–610 / 582–594.</li>
