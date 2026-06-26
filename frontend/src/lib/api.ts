@@ -4437,4 +4437,240 @@ export class CohortApiService {
   }
 }
 
+// ===========================================================================
+// PLATFORM-CODE-1.m (2026-06-26) — Canadian population-reference layer.
+// GET  /api/research/population-reference/canada/2015/         — index
+// GET  /api/research/population-reference/canada/2015/intake/  — single cell
+// POST /api/research/population-reference/canada/2015/compare-cohort/
+// ===========================================================================
+
+export interface FctStratum {
+  sex: 'both' | 'male' | 'female';
+  age_band: string;
+  n_respondents: number;
+}
+
+export interface FctSubgroup {
+  code: string;
+  name: string;
+  main_group: string | null;
+}
+
+export interface FctBodyWeight {
+  sex: string;
+  age_band: string;
+  n_respondents: number | null;
+  mean_bw: number | null;
+  mean_lb: number | null;
+  mean_ub: number | null;
+  median_bw: number | null;
+  median_lb: number | null;
+  median_ub: number | null;
+}
+
+export interface FctProvenance {
+  source: string;
+  base_data: string;
+  weighting: string;
+  n_respondents_total: number;
+  ingestion_date: string;
+  bridge: {
+    embedding_model: string | null;
+    ranking_model: string | null;
+    min_confidence: number | null;
+    built_date: string | null;
+    n_bridged: number;
+    n_unbridged: number;
+    n_manual_overrides: number;
+    mean_confidence: number | null;
+  };
+  platform_item_id: string;
+}
+
+export interface PopulationReferenceIndex {
+  strata: FctStratum[];
+  subgroups: FctSubgroup[];
+  body_weights: FctBodyWeight[];
+  provenance: FctProvenance;
+}
+
+export interface FctIntakeCell {
+  subgroup_code: string;
+  subgroup_name: string | null;
+  main_group: string | null;
+  sex: string;
+  age_band: string;
+  basis: 'all_person' | 'eaters_only';
+  denom: 'per_person' | 'per_kg_bw';
+  n_respondents: number | null;
+  pct_eaters: number | null;
+  suppression_flag: 'none' | 'E' | 'F';
+  mean: number | null;
+  se_mean: number | null;
+  p50: number | null;
+  se_p50: number | null;
+  p90: number | null;
+  se_p90: number | null;
+  p95: number | null;
+  se_p95: number | null;
+}
+
+export interface CnfCandidateFood {
+  food_id: number;
+  description: string;
+  source: string;
+}
+
+export interface PopulationReferenceIntakeResponse {
+  cell: FctIntakeCell;
+  /** True when Health Canada did not release a statistic for this
+   * (subgroup × stratum × basis × denom) combination. The `cell` object
+   * is still returned with `suppression_flag: 'F'` and null values so
+   * the UI can render a graceful "Suppressed" state in place. */
+  not_published: boolean;
+  subgroup_meta: {
+    code: string;
+    name: string;
+    description: string;
+    notes: string;
+    main_group: string | null;
+  };
+  body_weight: FctBodyWeight | null;
+  cnf_candidates: CnfCandidateFood[];
+  n_cnf_candidates: number;
+  provenance: FctProvenance;
+}
+
+export interface CohortVsNationalRow {
+  bns_code: string;
+  subgroup_name: string | null;
+  main_group: string | null;
+  cohort_n_eaters: number | null;
+  cohort_pct_eaters: number | null;
+  cohort_median: number | null;
+  cohort_p90: number | null;
+  cohort_mean: number | null;
+  national_median: number | null;
+  national_p90: number | null;
+  national_mean: number | null;
+  national_pct_eaters: number | null;
+  national_n_respondents: number | null;
+  delta_median: number | null;
+  delta_p90: number | null;
+  national_suppression_flag: 'none' | 'E' | 'F' | null;
+  mean_bridge_confidence: number | null;
+}
+
+export interface CohortVsNationalResponse {
+  meta: {
+    n_recalls: number;
+    stratum: { sex: string; age_band: string };
+    basis: 'all_person' | 'eaters_only';
+    denom: 'per_person' | 'per_kg_bw';
+  };
+  per_subgroup: CohortVsNationalRow[];
+  coverage: {
+    mean_pct_bridged: number;
+    n_recalls_with_unbridged_mass: number;
+    n_recalls_zero_bridge_coverage: number;
+  };
+  body_weight_national: FctBodyWeight | null;
+  provenance: FctProvenance;
+}
+
+export interface NationalReferenceRow {
+  bns_code: string;
+  bns_name: string | null;
+  main_group: string | null;
+  bridge_confidence: number | null;
+  bridge_source: 'llm' | 'manual' | string;
+  national_median: number | null;
+  national_p90: number | null;
+  national_p95: number | null;
+  national_mean: number | null;
+  se_p50: number | null;
+  se_p90: number | null;
+  n_respondents: number | null;
+  pct_eaters: number | null;
+  suppression_flag: 'none' | 'E' | 'F';
+}
+
+export interface NationalReferenceBatchResponse {
+  stratum: { sex: string; age_band: string };
+  basis: 'all_person' | 'eaters_only';
+  denom: 'per_person' | 'per_kg_bw';
+  /** Keyed on stringified FoodID. Null means unbridged or fully suppressed. */
+  per_food: Record<string, NationalReferenceRow | null>;
+  provenance: FctProvenance;
+}
+
+export class PopulationReferenceApiService {
+  /** Index: every stratum + subgroup + body-weight reference. */
+  static async listIndex(): Promise<PopulationReferenceIndex> {
+    const response = await api.get('/research/population-reference/canada/2015/');
+    return response.data as PopulationReferenceIndex;
+  }
+
+  /** Single-cell intake stats for one (subgroup × stratum × basis × denom). */
+  static async intakeForStratum(params: {
+    subgroup: string;
+    sex: string;
+    age_band: string;
+    basis?: 'all_person' | 'eaters_only';
+    denom?: 'per_person' | 'per_kg_bw';
+  }): Promise<PopulationReferenceIntakeResponse> {
+    const response = await api.get('/research/population-reference/canada/2015/intake/', {
+      params: {
+        subgroup: params.subgroup,
+        sex: params.sex,
+        age_band: params.age_band,
+        basis: params.basis ?? 'eaters_only',
+        denom: params.denom ?? 'per_person',
+      },
+    });
+    return response.data as PopulationReferenceIntakeResponse;
+  }
+
+  /** Batch lookup: for N CNF food_ids + a stratum, return the bridged BNS
+   * subgroup + national intake distribution per food. Used by the per-food
+   * tooltip on /research/nutrient-analysis. */
+  static async forFoods(
+    foodIds: number[],
+    stratum: { sex: string; age_band: string },
+    options: { basis?: 'all_person' | 'eaters_only'; denom?: 'per_person' | 'per_kg_bw' } = {},
+  ): Promise<NationalReferenceBatchResponse> {
+    const response = await api.post(
+      '/research/population-reference/canada/2015/for-foods/',
+      {
+        food_ids: foodIds,
+        sex: stratum.sex,
+        age_band: stratum.age_band,
+        basis: options.basis ?? 'eaters_only',
+        denom: options.denom ?? 'per_person',
+      },
+      { timeout: 60_000 },
+    );
+    return response.data.result as NationalReferenceBatchResponse;
+  }
+
+  /** Compare a cohort to the published Canadian national distribution. */
+  static async compareCohort(
+    cohortRecalls: CohortRecallInput[],
+    stratum: { sex: string; age_band: string },
+    options: { basis?: 'all_person' | 'eaters_only'; denom?: 'per_person' | 'per_kg_bw' } = {},
+  ): Promise<CohortVsNationalResponse> {
+    const response = await api.post(
+      '/research/population-reference/canada/2015/compare-cohort/',
+      {
+        cohort_recalls: cohortRecalls,
+        stratum,
+        basis: options.basis ?? 'eaters_only',
+        denom: options.denom ?? 'per_person',
+      },
+      { timeout: 120_000 },
+    );
+    return response.data.result as CohortVsNationalResponse;
+  }
+}
+
 export default CNFApiService;

@@ -1,0 +1,151 @@
+Food-Group-Name, Food-Group-Code,Sex,Age,Number-of-Respondents,Percentage-of-Eaters,All-Person-Consumption-Intake-g-per-person-Mean,All-Person-Consumption-Intake-g-per-person-SE-Mean,All-Person-Consumption-Intake-g-per-person-P50,All-Person-Consumption-Intake-g-per-person-SE-P50,All-Person-Consumption-Intake-g-per-person-P90,All-Person-Consumption-Intake-g-per-person-SE-P90,All-Person-Consumption-Intake-g-per-person-P95,All-Person-Consumption-Intake-g-per-person-SE-P95,All-Person-Consumption-Intake-g-per-kg-body-weight-Mean,All-Person-Consumption-Intake-g-per-kg-body-weight-SE-Mean,All-Person-Consumption-Intake-g-per-kg-body-weight-P50,All-Person-Consumption-Intake-g-per-kg-body-weight-SE-P50,All-Person-Consumption-Intake-g-per-kg-body-weight-P90,All-Person-Consumption-Intake-g-per-kg-body-weight-SE-P90,All-Person-Consumption-Intake-g-per-kg-body-weight-P95,All-Person-Consumption-Intake-g-per-kg-body-weight-SE-P95,Eaters-Only-Consumption-Intake-g-per-person-Mean,Eaters-Only-Consumption-Intake-g-per-person-SE-Mean,Eaters-Only-Consumption-Intake-g-per-person-P50,Eaters-Only-Consumption-Intake-g-per-person-SE-P50,Eaters-Only-Consumption-Intake-g-per-person-P90,Eaters-Only-Consumption-Intake-g-per-person-SE-P90,Eaters-Only-Consumption-Intake-g-per-person-P95,Eaters-Only-Consumption-Intake-g-per-person-SE-P95,Eaters-Only-Consumption-Intake-g-per-kg-body-weight-Mean,Eaters-Only-Consumption-Intake-g-per-kg-body-weight-SE-Mean,Eaters-Only-Consumption-Intake-g-per-kg-body-weight-P50,Eaters-Only-Consumption-Intake-g-per-kg-body-weight-SE-P50,Eaters-Only-Consumption-Intake-g-per-kg-body-weight-P90,Eaters-Only-Consumption-Intake-g-per-kg-body-weight-SE-P90,Eaters-Only-Consumption-Intake-g-per-kg-body-weight-P95,Eaters-Only-Consumption-Intake-g-per-kg-body-weight-SE-P95
+BABY FOOD ,52,Both,All ages,19670,0.602241935,0.93 E,0.205188551,F,F,F,.,F,.,0.05 E,0.010108307,F,F,F,.,F,.,154.7623987,22.6332595,112.149576,10.27078826,398.88 E,92.25500371,489.77 E,85.51698924,8.08 E,1.397512706,F,F,21.36 E,5.199398132,31.86 E,7.552744362
+BABY FOOD ,52,Both,1-3 Years,1288,8.559212236,13.34 E,3.265410305,F,F,F,.,93.96 E,23.90797527,1.32 E,0.323595381,F,F,F,.,9.76 E,2.215757544,155.8158742,24.06564074,110.1692404,14.19928672,379.36 E,100.0609768,396.08 E,87.64711515,14.45010816,2.23852751,10.57909356,1.165806946,32.34 E,7.40419303,35.47 E,7.378202272
+BABY FOOD ,52,Both,4-8 Years,1199,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABY FOOD ,52,Both,9-13 Years,1962,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABY FOOD ,52,Both,14-18 Years,1890,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABY FOOD ,52,Both,19-30 Years,1849,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABY FOOD ,52,Both,31-50 Years,4389,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABY FOOD ,52,Both,51-70 Years,4465,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABY FOOD ,52,Both,71+ Years,2628,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABY FOOD ,52,Both,1-18 Years,6339,1.905268796,2.73 E,0.561949656,F,F,F,.,F,.,0.22 E,0.050874703,F,F,F,.,F,.,143.2660532,20.49644448,107.6521335,13.73220925,382.42 E,102.2595889,401.46 E,81.85951619,11.60298335,1.906643633,8.545951579,1.302817841,28.22 E,6.376640095,34.4 E,7.812186404
+BABY FOOD ,52,Both,19+ Years,13331,0.282206458,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,173.83 E,48.95660035,125.87 E,29.82498104,F,F,490.14 E,131.9042682,2.28 E,0.585598643,1.59 E,0.506842622,5.16 E,1.221959979,5.6 E,1.196031292
+BABY FOOD ,52,Male,9-13 Years,1023,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABY FOOD ,52,Male,14-18 Years,900,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABY FOOD ,52,Male,19-30 Years,857,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABY FOOD ,52,Male,31-50 Years,2005,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABY FOOD ,52,Male,51-70 Years,2151,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABY FOOD ,52,Male,71+ Years,1180,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABY FOOD ,52,Male,19+ Years,6193,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABY FOOD ,52,Female,9-13 Years,939,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABY FOOD ,52,Female,14-18 Years,990,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABY FOOD ,52,Female,19-30 Years,992,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABY FOOD ,52,Female,31-50 Years,2384,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABY FOOD ,52,Female,51-70 Years,2314,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABY FOOD ,52,Female,71+ Years,1448,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABY FOOD ,52,Female,19+ Years,7138,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABYFOOD PRODUCT,52A,Both,All ages,19670,0.602241935,0.93 E,0.205188551,F,F,F,.,F,.,0.05 E,0.010108307,F,F,F,.,F,.,154.7623987,22.6332595,112.149576,10.27078826,398.88 E,92.25500371,489.77 E,85.51698924,8.08 E,1.397512706,F,F,21.36 E,5.199398132,31.86 E,7.552744362
+BABYFOOD PRODUCT,52A,Both,1-3 Years,1288,8.559212236,13.34 E,3.265410305,F,F,F,.,93.96 E,23.90797527,1.32 E,0.323595381,F,F,F,.,9.76 E,2.215757544,155.8158742,24.06564074,110.1692404,14.19928672,379.36 E,100.0609768,396.08 E,87.64711515,14.45010816,2.23852751,10.57909356,1.165806946,32.34 E,7.40419303,35.47 E,7.378202272
+BABYFOOD PRODUCT,52A,Both,4-8 Years,1199,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABYFOOD PRODUCT,52A,Both,9-13 Years,1962,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABYFOOD PRODUCT,52A,Both,14-18 Years,1890,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABYFOOD PRODUCT,52A,Both,19-30 Years,1849,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABYFOOD PRODUCT,52A,Both,31-50 Years,4389,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABYFOOD PRODUCT,52A,Both,51-70 Years,4465,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABYFOOD PRODUCT,52A,Both,71+ Years,2628,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABYFOOD PRODUCT,52A,Both,1-18 Years,6339,1.905268796,2.73 E,0.561949656,F,F,F,.,F,.,0.22 E,0.050874703,F,F,F,.,F,.,143.2660532,20.49644448,107.6521335,13.73220925,382.42 E,102.2595889,401.46 E,81.85951619,11.60298335,1.906643633,8.545951579,1.302817841,28.22 E,6.376640095,34.4 E,7.812186404
+BABYFOOD PRODUCT,52A,Both,19+ Years,13331,0.282206458,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,173.83 E,48.95660035,125.87 E,29.82498104,F,F,490.14 E,131.9042682,2.28 E,0.585598643,1.59 E,0.506842622,5.16 E,1.221959979,5.6 E,1.196031292
+BABYFOOD PRODUCT,52A,Male,9-13 Years,1023,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABYFOOD PRODUCT,52A,Male,14-18 Years,900,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABYFOOD PRODUCT,52A,Male,19-30 Years,857,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABYFOOD PRODUCT,52A,Male,31-50 Years,2005,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABYFOOD PRODUCT,52A,Male,51-70 Years,2151,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABYFOOD PRODUCT,52A,Male,71+ Years,1180,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABYFOOD PRODUCT,52A,Male,19+ Years,6193,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABYFOOD PRODUCT,52A,Female,9-13 Years,939,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABYFOOD PRODUCT,52A,Female,14-18 Years,990,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABYFOOD PRODUCT,52A,Female,19-30 Years,992,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABYFOOD PRODUCT,52A,Female,31-50 Years,2384,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABYFOOD PRODUCT,52A,Female,51-70 Years,2314,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABYFOOD PRODUCT,52A,Female,71+ Years,1448,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+BABYFOOD PRODUCT,52A,Female,19+ Years,7138,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Both,All ages,19670,0.55756655,0.76 E,0.189589934,F,F,F,.,F,.,0.03 E,0.006657426,F,F,F,.,F,.,136.66 E,23.33902631,106.95 E,19.85161068,366.75 E,100.9169216,483.22 E,114.8082225,5.974037068,0.950143233,F,F,17.09 E,4.581051147,22.6 E,4.127801792
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Both,1-3 Years,1288,7.28356721,8.37 E,2.064976242,F,F,F,.,F,F,0.83 E,0.204826376,F,F,F,.,F,F,114.9723749,17.93380851,91.18 E,22.88237158,248.6434558,31.49824813,252.39 E,49.15868534,10.56076693,1.657856882,8.52 E,2.142542282,22.73590547,3.136445464,23.14 E,4.546257389
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Both,4-8 Years,1199,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Both,9-13 Years,1962,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Both,14-18 Years,1890,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Both,19-30 Years,1849,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Both,31-50 Years,4389,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Both,51-70 Years,4465,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Both,71+ Years,2628,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Both,1-18 Years,6339,1.688227192,1.89 E,0.375584927,F,F,F,.,F,.,0.14 E,0.032454174,F,F,F,.,F,.,111.9997353,15.57523881,86.69 E,25.6691425,251.6929214,19.49952835,265.8356706,37.99142958,8.476901818,1.363831913,5.7 E,1.88846906,22.41 E,4.637438315,22.98347709,2.765765092
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Both,19+ Years,13331,0.279865815,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,173.2 E,49.48488862,119.43 E,28.93521175,F,F,490.18 E,137.7843034,2.27 E,0.59173543,F,F,5.17 E,1.306232175,5.6 E,1.249771488
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Male,9-13 Years,1023,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Male,14-18 Years,900,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Male,19-30 Years,857,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Male,31-50 Years,2005,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Male,51-70 Years,2151,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Male,71+ Years,1180,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Male,19+ Years,6193,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Female,9-13 Years,939,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Female,14-18 Years,990,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Female,19-30 Years,992,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Female,31-50 Years,2384,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Female,51-70 Years,2314,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Female,71+ Years,1448,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.
+"INFANT FORMULA
+
+
+   *  Eaters with any human milk consumption are excluded.",52B,Female,19+ Years,7138,F,F,F,F,F,F,.,F,.,F,F,F,F,F,.,F,.,F,F,F,.,F,.,F,.,F,F,F,.,F,.,F,.

@@ -13,5 +13,8 @@ export const RESEARCH_DROPDOWN = [
   { name: 'Nutrient analysis',           href: '/research/nutrient-analysis' },
   { name: 'Cohort upload',               href: '/research/cohort' },
   { name: 'Compare cohorts',             href: '/research/cohort/compare' },
+  // PLATFORM-CODE-1.m (2026-06-26): standalone browse of the Health Canada
+  // CCHS Nutrition 2015 Food Consumption Table by (subgroup × stratum).
+  { name: 'Canadian population reference', href: '/research/canadian-population-reference' },
   { name: 'Methods & citation export',   href: '/research#methods-export', disabled: true },
 ] as const;

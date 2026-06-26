@@ -34,6 +34,7 @@ import { Progress } from '@/components/ui/progress';
 import { AudienceToggle, type UserType } from '@/components/shared/AudienceToggle';
 import CohortDistributionPanel from '@/components/research/CohortDistributionPanel';
 import CohortRespondentTable from '@/components/research/CohortRespondentTable';
+import CohortVsNationalPanel from '@/components/research/CohortVsNationalPanel';
 import {
   CohortApiService,
   COHORT_LENSES,
@@ -529,6 +530,13 @@ export default function CohortPage() {
             </Card>
 
             <CohortRespondentTable rows={result.per_respondent} audience={audience} />
+
+            {/* PLATFORM-CODE-1.m m.D: opt-in comparison to the Canadian
+                national reference (CCHS-FCT 2015). Uses the same recall
+                list we just scored; the panel handles its own fetching. */}
+            {ingest && (
+              <CohortVsNationalPanel cohortRecalls={ingest.recalls} />
+            )}
 
             <Card className="mt-6">
               <CardHeader className="pb-2"><CardTitle className="text-sm">Coverage & provenance</CardTitle></CardHeader>

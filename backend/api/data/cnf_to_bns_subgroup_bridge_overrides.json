@@ -1,0 +1,75 @@
+{
+  "_doc": "Hand-curated CNF FoodID -> BNS subgroup overrides. Loader gives these precedence over the LLM-ranked bridge (PLATFORM-CODE-1.m m.B). Format: {cnf_food_id_str: {bns_code, confidence, rationale, source}}. Add entries when the LLM bridge has misclassified a high-stakes single-ingredient food, OR left a critical food unbridged when an obvious BNS analog exists.",
+  "_initial_set_2026_06_26": "Initial 7 entries — single-ingredient staples that drive HEFI / HENI weights and were either unbridged or misranked by the LLM. Verified by direct inspection of CNF FoodDescription against the CCHS-FCT subgroup-list 2015 names.",
+  "overrides": {
+    "4066": {
+      "bns_code": "2A",
+      "confidence": 1.0,
+      "rationale": "CNF 'Bread, white, commercial' maps unambiguously to BNS 2A WHITE BREAD. LLM left unbridged.",
+      "source": "manual"
+    },
+    "4067": {
+      "bns_code": "3A",
+      "confidence": 1.0,
+      "rationale": "CNF 'Bread, whole wheat, commercial' maps unambiguously to BNS 3A WHOLE WHEAT BREADS. LLM left unbridged.",
+      "source": "manual"
+    },
+    "16": {
+      "bns_code": "17A",
+      "confidence": 1.0,
+      "rationale": "CNF 'Butter, whipped' maps to BNS 17A BUTTER (under parent 17 BUTTERS). LLM left unbridged.",
+      "source": "manual"
+    },
+    "4157": {
+      "bns_code": "9A",
+      "confidence": 1.0,
+      "rationale": "CNF 'Dessert, frozen, ice cream, vanilla, rich, 16% M.F.' is canonical ice cream — BNS 9A ICE CREAM. LLM incorrectly chose 43B POPSICLE-SHERBERT.",
+      "source": "manual"
+    },
+    "4644": {
+      "bns_code": "30",
+      "confidence": 1.0,
+      "rationale": "CNF 'Fast foods, hot dog, plain' is functionally a wiener/frankfurter — BNS 30 SAUSAGES (FRESH & CURED). LLM chose 32 LUNCHEON MEATS (more deli-meat focused).",
+      "source": "manual"
+    },
+    "1413": {
+      "bns_code": "5A",
+      "confidence": 1.0,
+      "rationale": "CNF 'Cereal, hot, oats (oatmeal), instant: regular, dry' — BNS 5A WHOLE GRAIN- OATS AND HIGH FIBRE BREAKFAST CEREALS. LLM chose parent code 5; lock to leaf.",
+      "source": "manual"
+    },
+    "60": {
+      "bns_code": "43C",
+      "confidence": 0.8,
+      "rationale": "CNF 'Dessert topping (non dairy), frozen, semisolid' belongs with BNS 43C JELLO-DESSERT TOPPINGS AND PUDDING MIXES (Miscellaneous), not the dairy group. LLM landed on dairy parent 9 at 0.5.",
+      "source": "manual"
+    },
+
+    "_egg_block_doc_2026_06_26": "All 24 CNF foods starting with 'Egg,' — whole chicken egg + parts + cooked variants + non-chicken poultry eggs + canonical omelets. CNF places these in FoodGroupID 1 'Dairy and Egg Products' which makes the canonical-category bridge tag them all as 'dairy_egg_combined'. The LLM consistently anchored on the 'dairy lane' and either picked milk subgroups (10A whole milk, 10D skim) or left raw eggs unbridged entirely. All map to BNS 16A EGG (under parent 16 EGGS in Meat alternatives).",
+
+    "83":   { "bns_code": "16A", "confidence": 1.0, "rationale": "CNF 'Egg, chicken, dried, whole' — BNS 16A EGG. LLM picked 10A WHOLE MILK by dairy-group anchoring.",     "source": "manual" },
+    "84":   { "bns_code": "16A", "confidence": 1.0, "rationale": "CNF 'Egg, chicken, dried, whole, stabilized' — BNS 16A EGG. LLM left unbridged.",                       "source": "manual" },
+    "85":   { "bns_code": "16A", "confidence": 1.0, "rationale": "CNF 'Egg, chicken, white, pan dried, flakes' — BNS 16A EGG. LLM left unbridged.",                       "source": "manual" },
+    "86":   { "bns_code": "16A", "confidence": 1.0, "rationale": "CNF 'Egg, chicken, white, dried, powder, glucose reduced' — BNS 16A EGG. LLM picked 10D MILK SKIM.",    "source": "manual" },
+    "87":   { "bns_code": "16A", "confidence": 1.0, "rationale": "CNF 'Egg, chicken, yolk, dried' — BNS 16A EGG. LLM left unbridged.",                                     "source": "manual" },
+    "88":   { "bns_code": "16A", "confidence": 1.0, "rationale": "CNF 'Egg, duck, whole, fresh, raw' — BNS 16A EGG. LLM left unbridged.",                                  "source": "manual" },
+    "89":   { "bns_code": "16A", "confidence": 1.0, "rationale": "CNF 'Egg, goose, whole, fresh, raw' — BNS 16A EGG. LLM left unbridged.",                                 "source": "manual" },
+    "90":   { "bns_code": "16A", "confidence": 1.0, "rationale": "CNF 'Egg, quail, whole, fresh, raw' — BNS 16A EGG. LLM left unbridged.",                                 "source": "manual" },
+    "91":   { "bns_code": "16A", "confidence": 1.0, "rationale": "CNF 'Egg, turkey, whole, fresh, raw' — BNS 16A EGG. LLM left unbridged.",                                "source": "manual" },
+    "125":  { "bns_code": "16A", "confidence": 1.0, "rationale": "CNF 'Egg, chicken, whole, fresh or frozen, raw' — BNS 16A EGG. LLM left unbridged.",                     "source": "manual" },
+    "126":  { "bns_code": "16A", "confidence": 1.0, "rationale": "CNF 'Egg, chicken, white, fresh or frozen, raw' — BNS 16A EGG. LLM left unbridged.",                     "source": "manual" },
+    "127":  { "bns_code": "16A", "confidence": 1.0, "rationale": "CNF 'Egg, chicken, yolk, fresh or frozen, raw' — BNS 16A EGG. LLM left unbridged.",                      "source": "manual" },
+    "129":  { "bns_code": "16A", "confidence": 1.0, "rationale": "CNF 'Egg, chicken, whole, cooked, fried' — BNS 16A EGG.",                                                "source": "manual" },
+    "130":  { "bns_code": "16A", "confidence": 1.0, "rationale": "CNF 'Egg, chicken, whole, cooked, boiled in shell, hard-cooked' — BNS 16A EGG.",                         "source": "manual" },
+    "132":  { "bns_code": "16A", "confidence": 1.0, "rationale": "CNF 'Egg, chicken, whole, cooked, poached' — BNS 16A EGG.",                                              "source": "manual" },
+    "133":  { "bns_code": "16A", "confidence": 1.0, "rationale": "CNF 'Egg, chicken, whole, cooked, scrambled or omelet' — BNS 16A EGG.",                                  "source": "manual" },
+    "4721": { "bns_code": "16A", "confidence": 1.0, "rationale": "CNF 'Egg, chicken, white, dried' — BNS 16A EGG.",                                                        "source": "manual" },
+    "5569": { "bns_code": "16A", "confidence": 1.0, "rationale": "CNF 'Egg, chicken, scrambled, frozen mixture' — predominantly egg, maps to BNS 16A EGG.",                "source": "manual" },
+    "6420": { "bns_code": "16A", "confidence": 1.0, "rationale": "CNF 'Egg, liquid egg product, fat free' — BNS 16A EGG.",                                                 "source": "manual" },
+    "6605": { "bns_code": "16A", "confidence": 1.0, "rationale": "CNF 'Egg, chicken, white, fresh or frozen, cooked' — BNS 16A EGG.",                                      "source": "manual" },
+    "6714": { "bns_code": "16A", "confidence": 0.8, "rationale": "CNF 'Egg, chicken, Western omelet, with peppers, onion and ham' — predominantly egg; BNS 16A. (Omelet is a composite dish; could arguably go to a mixed-dish bucket.)", "source": "manual" },
+    "6715": { "bns_code": "16A", "confidence": 0.8, "rationale": "CNF 'Egg, chicken, Spanish omelet, with onion, peppers, tomatoes and mushrooms' — predominantly egg; BNS 16A.", "source": "manual" },
+    "6716": { "bns_code": "16A", "confidence": 0.8, "rationale": "CNF 'Egg, chicken, omelet, with cheese' — predominantly egg; BNS 16A.",                                  "source": "manual" },
+    "6718": { "bns_code": "16A", "confidence": 1.0, "rationale": "CNF 'Egg, chicken, yolk, cooked' — BNS 16A EGG.",                                                        "source": "manual" }
+  }
+}

@@ -178,6 +178,28 @@ export function FoodProfileContent({
       )}
 
       <div>
+        <button type="button" onClick={() => setShowAllNutrients(v => !v)} className="flex items-center text-sm font-medium text-gray-800 hover:text-gray-900">
+          {showAllNutrients ? <ChevronUpIcon className="w-4 h-4 mr-1" /> : <ChevronDownIcon className="w-4 h-4 mr-1" />}
+          {showAllNutrients ? 'Hide' : 'Show'} all {food.NutrientValues.length} nutrients
+        </button>
+        {showAllNutrients && (
+          <div className="mt-2 max-h-64 overflow-y-auto border border-gray-200 rounded-lg divide-y divide-gray-100">
+            {food.NutrientValues.map((nutrient, index) => (
+              <div key={`${nutrient.NutrientName}-${index}`} className="flex justify-between items-start gap-2 px-3 py-2 text-sm">
+                <div className="min-w-0">
+                  <div className="text-gray-800">{nutrient.NutrientName}</div>
+                  {userType === 'researcher' && nutrient.NutrientSourceDescription && (
+                    <div className="text-[10px] text-gray-500 truncate">{nutrient.NutrientSourceDescription}</div>
+                  )}
+                </div>
+                <span className="font-medium text-gray-900 shrink-0">{nutrient.NutrientValue} {nutrient.NutrientUnit}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div>
         <h2 className="text-sm font-semibold text-gray-900 mb-2">
           {userType === 'researcher' ? 'Nutrients each scoring lens reads' : 'Key nutrients for scoring'}
         </h2>
@@ -261,28 +283,6 @@ export function FoodProfileContent({
             Compare this food
           </Link>
         </div>
-      </div>
-
-      <div>
-        <button type="button" onClick={() => setShowAllNutrients(v => !v)} className="flex items-center text-sm font-medium text-gray-800 hover:text-gray-900">
-          {showAllNutrients ? <ChevronUpIcon className="w-4 h-4 mr-1" /> : <ChevronDownIcon className="w-4 h-4 mr-1" />}
-          {showAllNutrients ? 'Hide' : 'Show'} all {food.NutrientValues.length} nutrients
-        </button>
-        {showAllNutrients && (
-          <div className="mt-2 max-h-64 overflow-y-auto border border-gray-200 rounded-lg divide-y divide-gray-100">
-            {food.NutrientValues.map((nutrient, index) => (
-              <div key={`${nutrient.NutrientName}-${index}`} className="flex justify-between items-start gap-2 px-3 py-2 text-sm">
-                <div className="min-w-0">
-                  <div className="text-gray-800">{nutrient.NutrientName}</div>
-                  {userType === 'researcher' && nutrient.NutrientSourceDescription && (
-                    <div className="text-[10px] text-gray-500 truncate">{nutrient.NutrientSourceDescription}</div>
-                  )}
-                </div>
-                <span className="font-medium text-gray-900 shrink-0">{nutrient.NutrientValue} {nutrient.NutrientUnit}</span>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
 
       {food.ConversionFactors.length > 0 && (

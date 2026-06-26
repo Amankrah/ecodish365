@@ -26,7 +26,12 @@
 import React, { Suspense, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { CNFApiService } from '@/lib/api';
+import {
+  CNFApiService,
+  PopulationReferenceApiService,
+  type NationalReferenceRow,
+} from '@/lib/api';
+import NationalReferenceCell from '@/components/research/NationalReferenceCell';
 import { loadActiveFoodList } from '@/lib/activeFoodList';
 import { SourceFilter, type SourceChoice } from '@/components/shared/SourceFilter';
 import { AudienceToggle, type UserType } from '@/components/shared/AudienceToggle';
@@ -416,6 +421,16 @@ function NutrientAnalysisInner() {
   const [submitting, setSubmitting] = useState(false);
   const [payload, setPayload] = useState<DeepDivePayload | null>(null);
 
+  // PLATFORM-CODE-1.m m.D.5 (2026-06-26): opt-in Canadian national reference
+  // per food row. Toggled by an explicit checkbox so default UX is unchanged.
+  // Fetches once per (food-list × stratum) change via the batched
+  // /population-reference/canada/2015/for-foods/ endpoint and caches the
+  // per-food rows in `nationalRefs` for both table mount points to read.
+  const [showNationalRef, setShowNationalRef] = useState(false);
+  const [nationalRefs, setNationalRefs] = useState<Record<string, NationalReferenceRow | null>>({});
+  const [nationalRefProvenance, setNationalRefProvenance] = useState<{ stratumLabel: string; bridgeConf: number | null } | null>(null);
+  const [loadingNationalRef, setLoadingNationalRef] = useState(false);
+
   // Phase C (2026-06-26): per-tab "View as: Chart | Table" toggle.
   // Defaults to Chart for individuals (visual interpretation); researcher
   // mode (Phase D) defaults to Table for exact-number readout.
@@ -637,6 +652,61 @@ function NutrientAnalysisInner() {
       foods: prev.foods.filter((_, j) => j !== foodIdx),
     }));
   };
+
+  // CCHS age-band resolver — mirror of `cchs_age_band_for_years` from
+  // [`cchs_fct_loader.py`](backend/api/services/cchs_fct_loader.py). The
+  // Canadian FCT uses age bands 1-3 / 4-8 / 9-13 / 14-18 / 19-30 / 31-50 /
+  // 51-70 / 71+ Years. Returns null when age is missing or outside bands.
+  const cchsAgeBandForYears = (age: number | null): string | null => {
+    if (age == null) return null;
+    if (age >= 1   && age <= 3.999) return '1-3 Years';
+    if (age >= 4   && age <= 8.999) return '4-8 Years';
+    if (age >= 9   && age <= 13.999) return '9-13 Years';
+    if (age >= 14  && age <= 18.999) return '14-18 Years';
+    if (age >= 19  && age <= 30.999) return '19-30 Years';
+    if (age >= 31  && age <= 50.999) return '31-50 Years';
+    if (age >= 51  && age <= 70.999) return '51-70 Years';
+    if (age >= 71) return '71+ Years';
+    return null;
+  };
+
+  const canadianStratum = useMemo(() => {
+    const band = cchsAgeBandForYears(lifeStage.age_years);
+    if (!band) return null;
+    if (lifeStage.sex !== 'male' && lifeStage.sex !== 'female') return null;
+    return { sex: lifeStage.sex as 'male' | 'female', age_band: band };
+  }, [lifeStage.age_years, lifeStage.sex]);
+
+  // Fetch the per-food national reference batch whenever the toggle is on
+  // AND the food list or stratum changes. Cached in `nationalRefs` for the
+  // input table and per-food NOVA results table to read.
+  useEffect(() => {
+    if (!showNationalRef || !canadianStratum || meal.foods.length === 0) {
+      // Clear cached rows when toggle is off or stratum is unavailable so
+      // we don't render stale data after a stratum change.
+      if (Object.keys(nationalRefs).length > 0) setNationalRefs({});
+      if (nationalRefProvenance !== null) setNationalRefProvenance(null);
+      return;
+    }
+    const foodIds = Array.from(new Set(meal.foods.map(f => f.food_id))).filter(id => id > 0);
+    if (foodIds.length === 0) return;
+    let cancelled = false;
+    setLoadingNationalRef(true);
+    PopulationReferenceApiService.forFoods(foodIds, canadianStratum, { basis: 'eaters_only', denom: 'per_person' })
+      .then(resp => {
+        if (cancelled) return;
+        setNationalRefs(resp.per_food);
+        setNationalRefProvenance({
+          stratumLabel: `${resp.stratum.sex} ${resp.stratum.age_band}, ${resp.basis.replace('_', ' ')} / ${resp.denom.replace('_', ' ')}`,
+          bridgeConf:   resp.provenance.bridge.mean_confidence ?? null,
+        });
+      })
+      .catch(() => { if (!cancelled) { setNationalRefs({}); setNationalRefProvenance(null); } })
+      .finally(() => { if (!cancelled) setLoadingNationalRef(false); });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showNationalRef, canadianStratum?.sex, canadianStratum?.age_band,
+      meal.foods.map(f => f.food_id).join(',')]);
 
   const resetMeal = () => {
     setMeal(newMeal('Meal'));
@@ -940,6 +1010,11 @@ function NutrientAnalysisInner() {
                   <tr className="border-b border-gray-200 text-left text-xs text-gray-600">
                     <th className="py-1">food</th>
                     <th className="py-1 text-right font-mono tabular-nums">mass (g)</th>
+                    {showNationalRef && canadianStratum && (
+                      <th className="py-1 text-left text-xs" title="Canadian national reference (CCHS-FCT 2015) per food for the selected stratum.">
+                        vs Canadian
+                      </th>
+                    )}
                     <th className="py-1" aria-label="remove"></th>
                   </tr>
                 </thead>
@@ -962,6 +1037,15 @@ function NutrientAnalysisInner() {
                           className="w-20 rounded border border-gray-300 px-2 py-0.5 text-right"
                         />
                       </td>
+                      {showNationalRef && canadianStratum && (
+                        <td className="py-1 pl-2">
+                          <NationalReferenceCell
+                            foodId={f.food_id}
+                            massG={f.mass_g}
+                            reference={nationalRefs[String(f.food_id)]}
+                          />
+                        </td>
+                      )}
                       <td className="py-1 pl-2 text-right">
                         <button
                           type="button"
@@ -1096,6 +1180,41 @@ function NutrientAnalysisInner() {
               </p>
             )}
 
+            {/* PLATFORM-CODE-1.m m.D.5: opt-in Canadian national reference.
+                Toggle is disabled until life-stage resolves to a CCHS-FCT
+                stratum (age >= 1, sex set). */}
+            <div className="rounded border border-slate-200 bg-slate-50 p-2">
+              <label className="flex items-start gap-2 text-xs text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={showNationalRef}
+                  disabled={canadianStratum === null}
+                  onChange={(e) => setShowNationalRef(e.target.checked)}
+                  className="mt-0.5"
+                />
+                <span>
+                  <span className="font-medium">Show Canadian national reference</span>
+                  <span className="block text-[11px] text-slate-500">
+                    CCHS Nutrition 2015 Food Consumption Table. Renders a per-food chip
+                    showing the published Canadian median + comparison glyph.
+                  </span>
+                  {canadianStratum === null && (
+                    <span className="block text-[11px] text-amber-700 mt-1">
+                      Requires an age (≥ 1 y) + sex set above.
+                    </span>
+                  )}
+                  {showNationalRef && loadingNationalRef && (
+                    <span className="block text-[11px] text-slate-500 mt-1">Loading…</span>
+                  )}
+                  {showNationalRef && nationalRefProvenance && !loadingNationalRef && (
+                    <span className="block text-[11px] text-slate-500 mt-1">
+                      vs {nationalRefProvenance.stratumLabel} · bridge mean confidence {nationalRefProvenance.bridgeConf}
+                    </span>
+                  )}
+                </span>
+              </label>
+            </div>
+
             {/* Phase B optional anthropometry — enables protein g/kg adequacy
                 (IOM 2005, ESPEN 2014) and the EER vs Goldberg cutoff (Black
                 2000). All optional; missing fields degrade gracefully. */}
@@ -1214,7 +1333,10 @@ function NutrientAnalysisInner() {
               showChart={tabView.processing === 'chart'}
               setView={(v) => setTabView((p) => ({ ...p, processing: v }))}
               chart={<NovaShareBar proc={payload.processing} />}
-              table={<ProcessingTab proc={payload.processing} />}
+              table={<ProcessingTab
+                proc={payload.processing}
+                nationalRefs={showNationalRef && canadianStratum ? nationalRefs : null}
+              />}
             />
           )}
           {activeTab === 'macros' && (
@@ -1527,10 +1649,14 @@ function FoodGroupsTab({ fg }: { fg: any }) {
   );
 }
 
-function ProcessingTab({ proc }: { proc: any }) {
+function ProcessingTab({ proc, nationalRefs }: {
+  proc: any;
+  nationalRefs: Record<string, NationalReferenceRow | null> | null;
+}) {
   const byMass: Record<string, number> = proc?.share_by_mass || {};
   const byEnergy: Record<string, number> = proc?.share_by_energy || {};
   const perFood: any[] = proc?.per_food || [];
+  const showNatCol = nationalRefs !== null;
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -1547,6 +1673,11 @@ function ProcessingTab({ proc }: { proc: any }) {
               <th className="px-3 py-2 text-center">NOVA</th>
               <th className="px-3 py-2 text-right">conf</th>
               <th className="px-3 py-2 text-left">rationale</th>
+              {showNatCol && (
+                <th className="px-3 py-2 text-left" title="Canadian national reference (CCHS-FCT 2015) per food for the selected stratum.">
+                  vs Canadian
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -1567,6 +1698,15 @@ function ProcessingTab({ proc }: { proc: any }) {
                 <td className="px-3 py-1 text-xs text-gray-600">
                   {f.nova_rationale}
                 </td>
+                {showNatCol && (
+                  <td className="px-3 py-1">
+                    <NationalReferenceCell
+                      foodId={f.food_id}
+                      massG={f.mass_g}
+                      reference={nationalRefs![String(f.food_id)]}
+                    />
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

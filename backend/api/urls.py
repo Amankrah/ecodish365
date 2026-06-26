@@ -12,6 +12,7 @@ from .views import (
     profile_views,                      # Unified profile score (all six metrics)
     research_deep_dive_views,           # RESEARCH-DEEP-DIVE (full nutrient panel + DRI + FPED + NOVA + contributions)
     cohort_views,                       # PLATFORM-CODE-1.b (multi-lens cohort batch ingest)
+    population_reference_views,         # PLATFORM-CODE-1.m (Canadian CCHS-FCT 2015 reference layer)
 )
 from .views.cnf_views import (
     # Food Management
@@ -239,6 +240,27 @@ urlpatterns = [
     path('research/cohort/library/<str:cohort_id>/recalls/',
          cohort_views.cohort_library_recalls,
          name='research_cohort_library_recalls'),
+
+    # PLATFORM-CODE-1.m (2026-06-26) — Canadian population-reference layer
+    # backed by the Health Canada CCHS-FCT 2015 published intake distributions.
+    # Three read-only endpoints: index, single-cell lookup, cohort comparison.
+    # All stateless; loaders are singletons (cchs_fct_loader + cnf_to_bns_bridge).
+    path('research/population-reference/canada/2015/',
+         population_reference_views.population_reference_index,
+         name='population_reference_canada_2015_index'),
+    path('research/population-reference/canada/2015/intake/',
+         population_reference_views.population_reference_intake,
+         name='population_reference_canada_2015_intake'),
+    path('research/population-reference/canada/2015/compare-cohort/',
+         population_reference_views.population_reference_compare_cohort,
+         name='population_reference_canada_2015_compare_cohort'),
+    # PLATFORM-CODE-1.m m.D.5 (2026-06-26) — batch lookup of CCHS-FCT
+    # national-reference cells for a food list + stratum. Feeds the
+    # per-food tooltip on /research/nutrient-analysis. One round-trip
+    # per (food-list × stratum) state change; UI caches the result.
+    path('research/population-reference/canada/2015/for-foods/',
+         population_reference_views.population_reference_for_foods,
+         name='population_reference_canada_2015_for_foods'),
 
     # =============================================================================
     # PKG-IMG-1 (2026-05-26) Phase 1 — packaged-food image → HSR
